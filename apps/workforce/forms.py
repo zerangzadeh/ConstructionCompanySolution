@@ -1,4 +1,5 @@
 from django import forms
+from django.db.models import Q
 
 from apps.accounts.models import User
 from apps.documents.models import (
@@ -6,7 +7,18 @@ from apps.documents.models import (
     DocumentConfidentiality,
     DocumentType,
 )
-from apps.organizations.models import MembershipStatus, Organization
+from apps.organizations.authorization import has_business_permission, scope_queryset
+from apps.organizations.form_scoping import (
+    scope_project_related_choices,
+    scoped_projects_for_form,
+    selected_form_project,
+)
+from apps.organizations.models import (
+    BusinessPermissionCode,
+    MembershipStatus,
+    Organization,
+    OrganizationMembership,
+)
 from apps.projects.models import Project, ProjectSite
 from apps.workforce.models import (
     Competency,
@@ -187,11 +199,24 @@ class TrainingRequirementForm(WorkforceCatalogueForm):
     position = forms.ModelChoiceField(label="سمت مرتبط", queryset=Position.objects.none(), required=False)
     project = forms.ModelChoiceField(label="پروژه مرتبط", queryset=Project.objects.none(), required=False)
 
-    def __init__(self, *args: object, organization: Organization, **kwargs: object) -> None:
+    def __init__(
+        self,
+        *args: object,
+        organization: Organization,
+        membership: OrganizationMembership | None = None,
+        **kwargs: object,
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.fields["competency"].queryset = Competency.objects.filter(organization=organization, is_active=True, archived_at__isnull=True)
         self.fields["position"].queryset = Position.objects.filter(organization=organization, is_active=True, archived_at__isnull=True)
-        self.fields["project"].queryset = Project.objects.filter(organization=organization, deleted_at__isnull=True)
+        if isinstance(membership, OrganizationMembership) and (
+            membership.organization_id == organization.pk
+        ):
+            self.fields["project"].queryset = scope_queryset(
+                Project.objects.filter(organization=organization, deleted_at__isnull=True),
+                membership=membership,
+                project_lookup="pk",
+            )
 
 
 class EmployeeTrainingRecordForm(_StyledForm):
@@ -201,10 +226,36 @@ class EmployeeTrainingRecordForm(_StyledForm):
     outcome = forms.ChoiceField(label="نتیجه", choices=TrainingOutcome.choices)
     notes = forms.CharField(label="یادداشت", required=False, widget=forms.Textarea(attrs={"rows": 3}))
 
-    def __init__(self, *args: object, organization: Organization, **kwargs: object) -> None:
+    def __init__(
+        self,
+        *args: object,
+        organization: Organization,
+        membership: OrganizationMembership | None = None,
+        **kwargs: object,
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.fields["employee"].queryset = Employee.objects.filter(organization=organization, archived_at__isnull=True)
-        self.fields["requirement"].queryset = TrainingRequirement.objects.filter(organization=organization, is_active=True, archived_at__isnull=True)
+        if (
+            isinstance(membership, OrganizationMembership)
+            and membership.organization_id == organization.pk
+            and membership.status == MembershipStatus.ACTIVE
+            and has_business_permission(
+                user=membership.user,
+                organization=organization,
+                permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE,
+                allow_any_scope=True,
+            )
+        ):
+            requirements = TrainingRequirement.objects.filter(
+                organization=organization, is_active=True, archived_at__isnull=True
+            )
+            scoped_requirements = scope_queryset(
+                requirements, membership=membership, project_lookup="project_id"
+            )
+            # Projectless catalogue entries retain their existing tenant visibility.
+            self.fields["requirement"].queryset = requirements.filter(
+                Q(project__isnull=True) | Q(pk__in=scoped_requirements.values("pk"))
+            )
 
 
 class PerformanceEvaluationForm(_StyledForm):
@@ -406,22 +457,38 @@ class EmployeeAssignmentForm(_StyledForm):
     )
 
     def __init__(
-        self, *args: object, organization: Organization, **kwargs: object
+        self,
+        *args: object,
+        organization: Organization,
+        membership: OrganizationMembership | None = None,
+        **kwargs: object,
     ) -> None:
         super().__init__(*args, **kwargs)
+        if not isinstance(membership, OrganizationMembership) or (
+            membership.organization_id != organization.pk
+        ):
+            return
         self.fields["employee"].queryset = Employee.objects.filter(
             organization=organization, archived_at__isnull=True, status="active"
         )
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization, deleted_at__isnull=True
+        projects = scoped_projects_for_form(
+            organization=organization, membership=membership
         )
-        project_id = (
-            self.data.get(self.add_prefix("project")) if self.is_bound else None
+        self.fields["project"].queryset = projects
+        project = selected_form_project(
+            data=self.data if self.is_bound else None,
+            field_name=self.add_prefix("project"),
+            projects=projects,
+            active_project=None,
         )
-        self.fields["site"].queryset = ProjectSite.objects.filter(
-            organization=organization, project_id=project_id, is_active=True
+        self.fields["site"].queryset = scope_project_related_choices(
+            ProjectSite.objects.filter(organization=organization, is_active=True),
+            membership=membership,
+            project_lookup="project_id",
+            site_lookup="pk",
+            project=project,
         )
-        self.fields["site"].widget.attrs["disabled"] = not bool(project_id)
+        self.fields["site"].widget.attrs["disabled"] = project is None
 
 
 class EmployeePositionAssignmentForm(_StyledForm):

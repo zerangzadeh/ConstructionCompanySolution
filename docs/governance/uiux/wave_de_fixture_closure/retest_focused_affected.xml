@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="49" time="30.195" timestamp="2026-10-23T11:38:55.065414+03:30" hostname="Zerangzadeh"><testcase classname="apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests" name="test_authoritative_user_person_relationship_resolution_allows_own_data" time="6.858" /><testcase classname="apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests" name="test_direct_url_masks_sensitive_field_and_discloses_no_other_object" time="0.806" /><testcase classname="apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests" name="test_inactive_membership_is_denied_even_with_authoritative_identity" time="0.172" /><testcase classname="apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests" name="test_navigation_visibility_follows_identity_but_does_not_grant_access" time="0.274" /><testcase classname="apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests" name="test_other_person_and_cross_tenant_relationships_are_denied" time="0.243" /><testcase classname="apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests" name="test_username_email_and_employee_number_similarity_never_infer_identity" time="0.142" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_authorized_empty_source_has_no_fabricated_balance_or_score" time="0.345" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_current_person_relationship_bridge_filters_legacy_source_rows" time="0.208" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_dashboard_localizes_source_status_and_retains_own_links" time="0.428" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_independent_profile_survives_source_error" time="0.166" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_manager_workspace_requires_explicit_team_lead_and_filters_team" time="0.225" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_missing_authorization_scope_fails_closed" time="0.173" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_missing_source_permission_is_unavailable_without_requests" time="0.184" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_missing_workforce_identity_fails_closed" time="0.245" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_my_requests_is_own_identity_scoped_and_source_owned" time="0.247" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_no_identity_or_foreign_tenant_never_reveals_source_existence" time="0.150" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_notification_is_deduplicated_linked_and_presentation_only" time="0.240" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_only_read_methods_and_authoritative_profile_remains_unchanged" time="0.175" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_workspaces_are_get_only_and_rtl" time="0.276" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_assigned_response_atomicity_privacy_and_no_financial_mutation" time="1.753" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_finalized_own_artifact_and_export_preserve_source" time="0.478" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_foreign_inquiry_and_payslip_urls_are_uniformly_denied" time="0.675" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_missing_authority_and_incomplete_component_mapping_fail_closed" time="0.240" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_missing_configuration_or_route_never_creates_orphan" time="0.580" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_multi_actor_response_retained_before_shared_threshold" time="1.209" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_own_identity_and_source_state_fail_closed" time="0.339" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_permission_tenant_isolation_and_rtl_ui" time="0.330"><failure message="AssertionError: False is not true : Couldn't find 'کارگاه مقرراتی مالیات و بیمه کارکنان' in the following response">self = &lt;apps.payroll.test_cep054.ESSPayrollTests testMethod=test_permission_tenant_isolation_and_rtl_ui&gt;
+
+    def test_permission_tenant_isolation_and_rtl_ui(self):
+        self._published_policy(
+            PAYROLL_TAX_REGULATORY_POLICY_CODE, self._tax_parameters()
+        )
+        with self.assertRaises(PermissionDenied):
+            calculate_statutory(
+                organization=self.organization,
+                actor=self.denied,
+                run=self.run,
+                kind=StatutoryCalculationKind.PAYROLL_TAX,
+                reason="Denied",
+            )
+        other_owner = User.objects.create_user(username="other-statutory-owner")
+        other = create_organization_with_owner(
+            owner=other_owner, name="Other Statutory", slug="other-statutory"
+        )
+        with self.assertRaises(PermissionDenied):
+            calculate_statutory(
+                organization=other,
+                actor=self.actor,
+                run=self.run,
+                kind=StatutoryCalculationKind.PAYROLL_TAX,
+                reason="Cross tenant",
+            )
+        self.client.force_login(self.actor)
+        session = self.client.session
+        session["active_organization_id"] = str(self.organization.pk)
+        session.save()
+        response = self.client.get(reverse("payroll:statutory_workbench"))
+        self.assertEqual(response.status_code, 200)
+&gt;       self.assertContains(response, "کارگاه مقرراتی مالیات و بیمه کارکنان")
+E       AssertionError: False is not true : Couldn't find 'کارگاه مقرراتی مالیات و بیمه کارکنان' in the following response
+[Synthetic response HTML omitted; assertion and stack retained.]
+
+apps\payroll\test_p7_s23_s28_statutory_payroll.py:674: AssertionError</failure></testcase><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_pinned_dms_evidence_obeys_own_assigned_privacy_on_all_paths" time="2.223" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_published_policy_without_source_and_review_fails_closed" time="0.149" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_replacement_lineage_is_source_linked_and_own_only" time="0.301" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_schema_output_export_idempotency_reconciliation_and_immutability" time="0.429" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_sensitive_permissions_do_not_expand_owner_admin_defaults" time="0.211" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_submit_idempotency_and_my_requests_keep_workflow_authority" time="1.172" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_tax_and_employee_insurance_are_decimal_version_pinned_and_independent" time="0.499" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_tenant_cannot_select_or_override_national_policy" time="0.205" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_ui_handler_claim_response_uses_configured_outcome_only" time="1.558" /><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_audit_actions_cover_consequential_lifecycle" time="0.417" /><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_default_denial_role_name_and_cross_tenant_routes" time="0.832" /><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_dms_pin_is_exact_stable_and_sensitive_history_is_restricted" time="0.252" /><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_knowledge_actions_have_no_automatic_downstream_effects" time="2.510" /><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_lifecycle_pins_source_and_prevents_author_self_approval" time="0.192" /><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_linked_correction_requires_normal_lifecycle_and_supersedes_once" time="0.356" /><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_platform_promotion_is_independent_and_does_not_expose_tenant_source" time="0.179" /><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_published_version_is_immutable_and_history_is_reproducible" time="0.159" /><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_recurrence_and_reuse_corrections_preserve_lineage" time="0.215" /><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_representative_source_adapters_pin_exact_facts_without_mutation" time="0.187"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_representative_source_adapters_pin_exact_facts_without_mutation&gt;
+
+    def test_representative_source_adapters_pin_exact_facts_without_mutation(self):
+        project = self._project()
+        field = FieldObservation.objects.create(
+            organization=self.organization,
+            project=project,
+            kind="general",
+            title="Accepted observation",
+            status="accepted",
+            revision=3,
+            create_operation_key=uuid4(),
+            create_payload_hash="f" * 64,
+            created_by=self.author,
+        )
+        template = InspectionTemplate.objects.create(
+            organization=self.organization,
+            profile=ControlProfile.HSE,
+            code=f"KN-{uuid4().hex[:8]}",
+            title="Knowledge inspection template",
+            created_by=self.author,
+        )
+        template_version = InspectionTemplateVersion.objects.create(
+            organization=self.organization,
+            template=template,
+            version_number=1,
+            checklist=[],
+            outcome_rules={},
+            source_references=[],
+            canonical_hash="c" * 64,
+            published_by=self.author,
+        )
+        inspection = Inspection.objects.create(
+            organization=self.organization,
+            project=project,
+            profile=ControlProfile.HSE,
+            number=f"KN-{uuid4().hex[:8]}",
+            template_version=template_version,
+            title="Passed inspection",
+            status=InspectionStatus.PASSED,
+            template_snapshot_hash=template_version.canonical_hash,
+            created_by=self.author,
+            inspector=self.author,
+        )
+        party = BusinessParty.objects.create(
+            organization=self.organization,
+            party_kind=PartyKind.COMPANY,
+            display_name="Knowledge partner",
+        )
+        profile = PartnerProfile.objects.create(
+            organization=self.organization,
+            party=party,
+            created_by=self.author,
+        )
+        evaluation = PartnerEvaluation.objects.create(
+            organization=self.organization,
+            profile=profile,
+            project=project,
+            period_start=date(2026, 1, 1),
+            period_end=date(2026, 1, 31),
+            criteria_snapshot=[{"code": "quality", "weight": 100}],
+            scores={"quality": 90},
+            status="published",
+            authored_by=self.author,
+            published_by=self.reviewer,
+        )
+        support = self._source()
+        originals = {
+            "field": (field.status, field.revision),
+            "inspection": (inspection.status, inspection.updated_at),
+            "evaluation": (evaluation.status, evaluation.updated_at),
+            "support": (support.status, support.summary),
+        }
+        candidate = self._candidate()
+        submit_candidate(
+            organization=self.organization,
+            actor=self.author,
+            candidate_id=candidate.pk,
+            expected_status=CandidateStatus.DRAFT,
+            sources=[
+                {"source_type": "field_observation", "source_id": field.pk},
+                {"source_type": "inspection", "source_id": inspection.pk},
+                {"source_type": "partner_evaluation", "source_id": evaluation.pk},
+                {"source_type": "support_case", "source_id": support.pk},
+            ],
+        )
+        pins = {
+            pin.source_type: (str(pin.source_id), pin.source_version, pin.source_status)
+            for pin in candidate.revisions.get(revision=1).source_pins.all()
+        }
+        self.assertEqual(set(pins), {
+            "field_observation",
+            "inspection",
+            "partner_evaluation",
+            "support_case",
+        })
+        field.refresh_from_db()
+        inspection.refresh_from_db()
+        evaluation.refresh_from_db()
+        support.refresh_from_db()
+        self.assertEqual((field.status, field.revision), originals["field"])
+        self.assertEqual((inspection.status, inspection.updated_at), originals["inspection"])
+        self.assertEqual((evaluation.status, evaluation.updated_at), originals["evaluation"])
+        self.assertEqual((support.status, support.summary), originals["support"])
+    
+        denied = User.objects.create_user(username="source-adapter-denied")
+        denied_role = OrganizationRole.objects.create(
+            code="knowledge_without_source_view", name="Knowledge without source view"
+        )
+        denied_role.permissions.add(
+            *BusinessPermission.objects.filter(
+                code__in=(
+                    BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE,
+                    BusinessPermissionCode.KNOWLEDGE_CANDIDATES_SUBMIT,
+                )
+            )
+        )
+        OrganizationMembership.objects.create(
+            organization=self.organization,
+            user=denied,
+            role_definition=denied_role,
+            status=MembershipStatus.ACTIVE,
+        )
+&gt;       denied_candidate = create_candidate(
+            organization=self.organization,
+            actor=denied,
+            title="Denied source",
+            body="Denied",
+            knowledge_type="lesson_learned",
+            authority_classification="advisory",
+            audience="tenant",
+            category_code="quality",
+        )
+
+apps\knowledge\test_p9_s21_s24.py:683: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:323: in create_candidate
+    _allow_scope(
+apps\knowledge\services.py:74: in _allow_scope
+    _allow(organization=organization, actor=actor, permission=permission)
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: source-adapter-denied&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_reuse_deduplicates_and_withdrawal_preserves_history" time="0.234" /><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_tenant_source_and_recurrence_are_isolated_and_distinct" time="0.061" /><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_withdrawal_requires_reason_preserves_history_and_is_idempotent" time="0.214" /></testsuite></testsuites>

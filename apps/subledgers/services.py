@@ -13,9 +13,10 @@ from django.db import models, transaction
 from django.db.models import Sum
 from django.utils import timezone
 
+from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
-from apps.organizations.authorization import require_business_permission
+from apps.organizations.authorization import require_business_permission, scope_queryset
 from apps.organizations.models import (
     BusinessPermissionCode,
     MembershipStatus,
@@ -152,6 +153,70 @@ def _lock_membership(
     ):
         raise PermissionDenied("عضویت فعال همین Tenant الزامی است.")
     return locked
+
+
+def settlement_movement_choices(
+    *,
+    organization: Organization,
+    actor: User,
+    obligation: Obligation,
+) -> models.QuerySet[TreasuryMovement]:
+    """Read-only choices mirroring allocation guards; mutation rechecks under locks."""
+    if obligation.organization_id != organization.pk:
+        raise PermissionDenied("قلم متعلق به این Tenant نیست.")
+    membership = require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.SUBLEDGERS_SETTLEMENTS_ALLOCATE,
+        project=obligation.project,
+        message="اختیار انتخاب منبع تسویه را ندارید.",
+    )
+    _require_unreversed_source(obligation)
+    if (
+        _active_settlement_amount(obligation=obligation)
+        + _approved_writeoff_amount(obligation=obligation)
+        >= obligation.original_amount
+    ):
+        return TreasuryMovement.objects.none()
+    choices = TreasuryMovement.objects.filter(
+        organization=organization,
+        status=TreasuryMovementStatus.POSTED,
+        kind=TreasuryMovementKind.RECEIPT
+        if obligation.direction == ObligationDirection.RECEIVABLE
+        else TreasuryMovementKind.DISBURSEMENT,
+        reverses__isnull=True,
+        reversal_movement__isnull=True,
+    )
+    if obligation.project_id:
+        choices = choices.filter(project_id=obligation.project_id)
+    if obligation.party_id:
+        choices = choices.filter(party_id=obligation.party_id)
+    choices = scope_queryset(
+        choices,
+        membership=membership,
+        project_lookup="project_id",
+        site_lookup="site_id",
+    )
+    from django.db.models.functions import Coalesce
+
+    amount_field = models.DecimalField(max_digits=24, decimal_places=6)
+    return (
+        choices.annotate(
+            applied_amount=Coalesce(
+                Sum(
+                    "subledger_allocations__amount",
+                    filter=models.Q(subledger_allocations__reversal__isnull=True),
+                ),
+                models.Value(ZERO),
+                output_field=amount_field,
+            ),
+        )
+        .annotate(available_amount=models.F("amount") - models.F("applied_amount"))
+        .filter(
+            available_amount__gt=ZERO,
+        )
+        .order_by("-movement_date", "pk")
+    )
 
 
 def _active_settlement_amount(

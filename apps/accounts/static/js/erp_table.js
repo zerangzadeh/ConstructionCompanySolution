@@ -50,14 +50,6 @@
                 event.preventDefault();
                 navigateWithFilters(form);
             });
-            form.addEventListener("input", (event) => {
-                if (event.target.matches("input[type='search'], input[type='text'], input:not([type]), input[data-jalali-date]")) {
-                    schedule(form, event.target);
-                }
-            });
-            form.addEventListener("change", (event) => {
-                if (event.target.matches("select")) schedule(form, event.target);
-            });
         });
         document.querySelectorAll("[data-table-filter-clear]").forEach((link) => {
             if (link.dataset.tableFilterBound) return;
@@ -75,6 +67,21 @@
             });
         });
     };
+
+    // Filter rows are associated via form="...", outside the form's DOM subtree.
+    // Delegate through the document so both nested and associated controls work.
+    document.addEventListener("input", (event) => {
+        const form = event.target.form;
+        if (form?.dataset.tableFilterBound !== "true") return;
+        if (event.target.matches("input[type='search'], input[type='text'], input:not([type]), input[data-jalali-date]")) {
+            schedule(form, event.target);
+        }
+    });
+    document.addEventListener("change", (event) => {
+        const form = event.target.form;
+        if (form?.dataset.tableFilterBound !== "true") return;
+        if (event.target.matches("select")) schedule(form, event.target);
+    });
 
     const sortKeyForHeader = (label) => {
         const path = window.location.pathname.toLowerCase();

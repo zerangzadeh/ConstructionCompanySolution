@@ -301,6 +301,7 @@ class VariationHandoffTests(VariationFixture, TestCase):
         self.assertFalse(
             OrganizationRole.objects.filter(
                 is_system=True,
+                code__in=("tenant_owner", "tenant_admin"),
                 permissions__code__in=[
                     P.BILLING_VARIATION_ELIGIBILITY_VIEW,
                     P.BILLING_VARIATION_ELIGIBILITY_RETRY,

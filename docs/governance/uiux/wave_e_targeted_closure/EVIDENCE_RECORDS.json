@@ -1,0 +1,246 @@
+[
+  {
+    "executed_at": "2026-10-23T13:12:47.512272+03:30",
+    "scenario_id": "RV-025",
+    "runtime": {
+      "environment": "Development / Non-Production",
+      "sha": "43ac319c6e73e48ca9626461b73987922c498ec3",
+      "branch": "main",
+      "base_url": "http://127.0.0.1:8000",
+      "browser_metadata": "BROWSER_METADATA.json",
+      "viewports": [
+        [
+          1440,
+          900
+        ],
+        [
+          1024,
+          768
+        ],
+        [
+          390,
+          844
+        ]
+      ],
+      "dirty_source": "ENTRY.json + SOURCE_INTEGRITY.json"
+    },
+    "authority": "Direct Human targeted F-110/F-134/fresh canonical portal fixture request",
+    "credentials_in_evidence": false,
+    "production": "UNTOUCHED",
+    "keyboard": "INTERACTIONS.json",
+    "authorization": "HTTP_CONTROLS.json + DATA_INTEGRITY.json",
+    "evidence_id": "RV-EV-061",
+    "result": "PASS",
+    "finding_ids": [
+      "UIUX-F-110"
+    ],
+    "personas": [
+      "P-01 / uiux.persona.project-operations",
+      "P-25 reader / uiux.audit.project"
+    ],
+    "preconditions": [
+      "Existing project/Quality read scopes unchanged",
+      "Only shared associated labels and calendar accessible names changed"
+    ],
+    "steps": [
+      "Normal authenticated login",
+      "View Projects and Quality at each viewport",
+      "Reach date/calendar controls with keyboard",
+      "Inspect programmatic labels, focus, RTL dates, contained table scrolling",
+      "Verify actual Jalali inclusion/exclusion through authenticated HTTP"
+    ],
+    "expected": "Each boundary has a unique associated Persian label and calendar action; filtering unchanged",
+    "actual": "Four Projects and two Quality boundaries and calendar triggers distinctly named; keyboard outline visible, no page overflow; existing from/to names, values and filtering retained",
+    "screenshots": [
+      "projects_1440.jpg",
+      "projects_1024.jpg",
+      "projects_390.jpg",
+      "projects_mobile_focus_next.jpg",
+      "projects_layout_1440.jpg",
+      "projects_layout_1024.jpg",
+      "projects_layout_390.jpg",
+      "quality_1440.jpg",
+      "quality_1024.jpg",
+      "quality_390.jpg"
+    ],
+    "limitations": [
+      "Shared consumers represented by template contract; only requested Projects/Quality surfaces freshly captured",
+      "Inherited Escape dismissal issue recorded independently as F-135; no full accessibility PASS claimed"
+    ]
+  },
+  {
+    "executed_at": "2026-10-23T13:12:47.512272+03:30",
+    "scenario_id": "RV-025",
+    "runtime": {
+      "environment": "Development / Non-Production",
+      "sha": "43ac319c6e73e48ca9626461b73987922c498ec3",
+      "branch": "main",
+      "base_url": "http://127.0.0.1:8000",
+      "browser_metadata": "BROWSER_METADATA.json",
+      "viewports": [
+        [
+          1440,
+          900
+        ],
+        [
+          1024,
+          768
+        ],
+        [
+          390,
+          844
+        ]
+      ],
+      "dirty_source": "ENTRY.json + SOURCE_INTEGRITY.json"
+    },
+    "authority": "Direct Human targeted F-110/F-134/fresh canonical portal fixture request",
+    "credentials_in_evidence": false,
+    "production": "UNTOUCHED",
+    "keyboard": "INTERACTIONS.json",
+    "authorization": "HTTP_CONTROLS.json + DATA_INTEGRITY.json",
+    "evidence_id": "RV-EV-062",
+    "result": "PASS",
+    "finding_ids": [
+      "UIUX-F-134"
+    ],
+    "persona": "P-18 / admin; separate existing Platform authority, no active tenant context",
+    "preconditions": [
+      "Existing independent Platform assignment"
+    ],
+    "steps": [
+      "Normal Platform login",
+      "Inspect catalogue/filter at all three sizes",
+      "Tab from localized select to display action",
+      "Verify tenant-admin denial and preserved organization query parameter"
+    ],
+    "expected": "Static Tenant label uses existing Persian company vocabulary",
+    "actual": "شرکت labels organization-filter; underlying organization parameter/options, stable codes, stored role identifiers/names and permissions unchanged",
+    "screenshots": [
+      "platform_1440.jpg",
+      "platform_1024.jpg",
+      "platform_390.jpg"
+    ],
+    "limitations": [
+      "Existing English system-role display names remain outside the authorized static-label repair"
+    ]
+  },
+  {
+    "executed_at": "2026-10-23T13:12:47.512272+03:30",
+    "scenario_id": "RV-025",
+    "runtime": {
+      "environment": "Development / Non-Production",
+      "sha": "43ac319c6e73e48ca9626461b73987922c498ec3",
+      "branch": "main",
+      "base_url": "http://127.0.0.1:8000",
+      "browser_metadata": "BROWSER_METADATA.json",
+      "viewports": [
+        [
+          1440,
+          900
+        ],
+        [
+          1024,
+          768
+        ],
+        [
+          390,
+          844
+        ]
+      ],
+      "dirty_source": "ENTRY.json + SOURCE_INTEGRITY.json"
+    },
+    "authority": "Direct Human targeted F-110/F-134/fresh canonical portal fixture request",
+    "credentials_in_evidence": false,
+    "production": "UNTOUCHED",
+    "keyboard": "INTERACTIONS.json",
+    "authorization": "HTTP_CONTROLS.json + DATA_INTEGRITY.json",
+    "evidence_id": "RV-EV-063",
+    "result": "PASS",
+    "finding_ids": [],
+    "persona": "P-26 / uiux.wcd.external; zero tenant memberships",
+    "preconditions": [
+      "Fresh invitation/acceptance through canonical services",
+      "Same retained supplier/exact issued RFQ version",
+      "Clock and old expiry unchanged"
+    ],
+    "steps": [
+      "Create and accept fresh invitation through canonical services; discard token",
+      "Normal external browser login",
+      "View positive context/form at all three sizes",
+      "Tab from supplier reference to submit action without submitting",
+      "Check required file label, RTL/LTR, table scroll, overflow, runtime logs",
+      "Deny expired grant, wrong actor, foreign opportunity identifier, manipulated POST and tenant workspaces"
+    ],
+    "expected": "Positive exact-scope portal while valid; no tenant access or cross-supplier disclosure",
+    "actual": "Positive portal and keyboard-reachable primary action at all sizes; no page overflow or runtime errors; 16/16 authenticated HTTP controls PASS; zero memberships and no quote submissions",
+    "screenshots": [
+      "portal_1440.jpg",
+      "portal_action_1440.jpg",
+      "portal_1024.jpg",
+      "portal_action_1024.jpg",
+      "portal_390.jpg",
+      "portal_action_390.jpg",
+      "external_no_tenant_access.jpg"
+    ],
+    "fixture": "PORTAL_FIXTURE.json",
+    "limitations": [
+      "Synthetic RFQ terms/line carry UIUX_TEST_ONLY_NON_AUTHORITATIVE",
+      "No file uploaded or quotation lifecycle replayed; prior accepted lifecycle evidence retained",
+      "Evidence proves the capture-time state; fresh grant expires normally"
+    ]
+  },
+  {
+    "executed_at": "2026-10-23T13:12:47.512272+03:30",
+    "scenario_id": "RV-025",
+    "runtime": {
+      "environment": "Development / Non-Production",
+      "sha": "43ac319c6e73e48ca9626461b73987922c498ec3",
+      "branch": "main",
+      "base_url": "http://127.0.0.1:8000",
+      "browser_metadata": "BROWSER_METADATA.json",
+      "viewports": [
+        [
+          1440,
+          900
+        ],
+        [
+          1024,
+          768
+        ],
+        [
+          390,
+          844
+        ]
+      ],
+      "dirty_source": "ENTRY.json + SOURCE_INTEGRITY.json"
+    },
+    "authority": "Direct Human targeted F-110/F-134/fresh canonical portal fixture request",
+    "credentials_in_evidence": false,
+    "production": "UNTOUCHED",
+    "keyboard": "INTERACTIONS.json",
+    "authorization": "HTTP_CONTROLS.json + DATA_INTEGRITY.json",
+    "evidence_id": "RV-EV-064",
+    "result": "FAIL_ACCESSIBILITY",
+    "finding_ids": [
+      "UIUX-F-135"
+    ],
+    "persona": "P-01 / uiux.persona.project-operations",
+    "preconditions": [
+      "Existing auto-open-on-focus non-modal Jalali picker; no Escape handler in entry script"
+    ],
+    "steps": [
+      "Focus Projects date boundary",
+      "Tab to named calendar button",
+      "Press Escape",
+      "Observe visible popover remains; retain focus/DOM evidence"
+    ],
+    "expected": "Keyboard dismissal without selecting/changing a date",
+    "actual": "Escape leaves one calendar popover visible; outside click dismisses; no focus trap or business change asserted",
+    "screenshots": [
+      "projects_390.jpg",
+      "projects_mobile_focus_next.jpg"
+    ],
+    "classification": "INHERITED_BASELINE_UI_DEBT; source clean at entry and name-only diff does not alter handlers",
+    "scope": "Recorded only; no independent product behavior invented or remediation absorbed"
+  }
+]

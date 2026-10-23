@@ -1,0 +1,84 @@
+{
+  "environment": "LOCAL_DEVELOPMENT_READ_ONLY",
+  "models": {
+    "partner_qualification.PartnerProfile": {
+      "target_tenant_count": 0,
+      "all_tenant_count": 0
+    },
+    "partner_qualification.QualificationRequirement": {
+      "target_tenant_count": 0,
+      "all_tenant_count": 0,
+      "target_inputs": []
+    },
+    "partner_qualification.PartnerQualification": {
+      "target_tenant_count": 0,
+      "all_tenant_count": 0
+    },
+    "fixed_assets.FixedAssetClassVersion": {
+      "target_tenant_count": 0,
+      "all_tenant_count": 0,
+      "target_inputs": []
+    },
+    "fixed_assets.AssetBookPolicyVersion": {
+      "target_tenant_count": 0,
+      "all_tenant_count": 0,
+      "target_inputs": []
+    },
+    "fixed_assets.FixedAsset": {
+      "target_tenant_count": 0,
+      "all_tenant_count": 0
+    },
+    "compliance.InspectionTemplate": {
+      "target_tenant_count": 0,
+      "all_tenant_count": 1
+    },
+    "compliance.InspectionTemplateVersion": {
+      "target_tenant_count": 0,
+      "all_tenant_count": 1,
+      "target_inputs": []
+    }
+  },
+  "mutation": "NONE_PENDING_APPROVED_INPUTS",
+  "local_authority": {
+    "docs/architecture/P9_S12_S15_PARTNER_QUALIFICATION_AND_PERFORMANCE_DECISION_PACKET.md": "3afd5418abee52ca00604d737e8813f40ff5955f2c07a2dfb9eb3eca533b8d76",
+    "docs/architecture/P8_S24_S27_EQUIPMENT_COST_AND_FIXED_ASSETS_DECISION_PACKET.md": "cb6d9bf9c993b20e18c75346bee1b98b6231e12867e7dbed92209a2f1d6480b3",
+    "docs/architecture/P9_S06_S11_HSE_QA_CAPA_DECISION_PACKET.md": "a93d2bc79f59250da6a479d9998aff5fc4e24da5d914f7a53dce502e9b5d5655"
+  },
+  "recovery": {
+    "package": "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip",
+    "member": "BONIRA_HSE_QA_V1_SCOPE_SPECIFICATION.md",
+    "member_sha256": "37d5232351ff13b2d29a5c1dd87fdf9a7790511e3285e2d44f7bf80f544330f4",
+    "conclusion": "Approved capability/lifecycle scope explicitly does not supply checklist content, regulatory form, risk/severity, acceptance thresholds or taxonomy. Missing policy must not be invented."
+  },
+  "other_tenant_template": {
+    "organization": "demo-construction-04",
+    "template": "P10-S20-CAL",
+    "source": "P10-S20 calibration v1",
+    "conclusion": "Calibration-only template in another tenant is not approved domain-owner inspection content for this tenant; neither copied nor promoted to business authority."
+  },
+  "conclusion": "BLOCKED: accepted architecture defines source-backed mechanics; no approved applicable qualification criteria/partner facts, asset class/book/capitalization facts, or inspection checklist/outcome rules recovered. Illustrative tests are not policy. No domain fixtures created.",
+  "minimum_actions": {
+    "CEP079-PREP-B06": {
+      "cases": [
+        "UAT-CASE-029",
+        "UAT-CASE-044"
+      ],
+      "owner": "Partner Qualification domain owner",
+      "required": "Approved versioned qualification/category applicability requirement, source_reference/source_version and partner evidence/facts for the applicable BusinessParty; then canonical isolated profile/qualification fixture."
+    },
+    "CEP079-PREP-B07": {
+      "cases": [
+        "UAT-CASE-043"
+      ],
+      "owner": "Fixed Assets/Accounting policy owner",
+      "required": "Approved effective asset class, book/monetary policy, capitalization source/reference and required candidate facts; non-posting candidate only. No invented threshold, useful life, treatment or recognition."
+    },
+    "CEP079-PREP-B08": {
+      "cases": [
+        "UAT-CASE-044"
+      ],
+      "owner": "Compliance HSE/QA domain owner",
+      "required": "Approved applicable inspection template/checklist, outcome rules, required evidence and source/version references; then isolated native inspection inputs."
+    }
+  }
+}

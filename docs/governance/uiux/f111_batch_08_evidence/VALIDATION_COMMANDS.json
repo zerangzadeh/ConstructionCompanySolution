@@ -1,0 +1,67 @@
+{
+  "focused": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/f111_batch_08_evidence/run_validation.py tests/test_uiux_f111_pattern_project_scope.py -q --reuse-db --tb=short --junitxml=docs/governance/uiux/f111_batch_08_evidence/focused.xml",
+    "exit_code": 0,
+    "result": "86 tests and 106 subtests PASS"
+  },
+  "regression": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/f111_batch_08_evidence/run_validation.py apps/procurement/tests.py apps/contracts/tests.py apps/inventory/tests.py apps/workforce/test_p7_s01_s05_workforce_foundation.py tests/test_uiux_f111_scope.py tests/test_uiux_f111_pattern_receipt_scope.py tests/test_uiux_f111_pattern_stock_scope.py -q --reuse-db --tb=short --junitxml=docs/governance/uiux/f111_batch_08_evidence/regression.xml",
+    "exit_code": 1,
+    "result": "83 tests and 129 subtests PASS; 22 exact baseline failures; zero new failures"
+  },
+  "baseline_regression": {
+    "command": "Same regression command with --entry-forms and baseline_regression.xml",
+    "exit_code": 1,
+    "source": "Eight byte-captured dirty-entry form/view files loaded through import finder; no working file replacement",
+    "comparison": "attribute_regression.py; all test outcomes and failure messages identical"
+  },
+  "django": {
+    "command": ".venv/Scripts/python.exe manage.py check",
+    "exit_code": 0
+  },
+  "migration": {
+    "command": ".venv/Scripts/python.exe manage.py makemigrations --check --dry-run",
+    "exit_code": 0,
+    "pending_development_migrations": 0
+  },
+  "ruff": {
+    "command": ".venv/Scripts/python.exe -m ruff check apps/procurement/forms.py apps/procurement/views.py apps/contracts/forms.py apps/contracts/views.py apps/inventory/forms.py apps/inventory/views.py apps/workforce/forms.py apps/workforce/views.py tests/test_uiux_f111_pattern_project_scope.py",
+    "exit_code": 0
+  },
+  "format": {
+    "command": ".venv/Scripts/python.exe -m ruff format --check tests/test_uiux_f111_pattern_project_scope.py",
+    "exit_code": 0,
+    "scope": "New focused test only; no existing whole-product-file formatting"
+  },
+  "whitespace": {
+    "command": "git diff --check; verify.py untracked Python/report trailing whitespace and Markdown link checks",
+    "exit_code": 0
+  },
+  "runtime": {
+    "commands": [
+      "runtime.py prepare",
+      "Fresh manage.py runserver 127.0.0.1:8011 --noreload",
+      "runtime.py http",
+      "runtime.py direct",
+      "cua_repl in-app browser real authentication, DOM and form submissions",
+      "runtime.py after",
+      "Verified own process identity, stopped server and child, checked port absence"
+    ],
+    "http": "88 PASS;22 per finding;all three actor types;actual credentials/form CSRF",
+    "direct": "32 PASS;eight denials per finding",
+    "browser": "14 observations;four actual server POST rejections;one additional client-only invalid-date control",
+    "integrity": "519 tables;session-only runtime delta;last_login excluded;all business rows and authority fingerprints unchanged",
+    "fixtures": "Reused existing Projects/personas/masters;zero persistent fixture or authority mutations;zero TrainingRequirements"
+  },
+  "harness_corrections": [
+    "Initial disposable BusinessParty fixture used kind instead of party_kind; corrected without product changes",
+    "Initial test expected negative Contract value rejection at form level; corrected to test existing service rejection and safe HTTP-form redisplay",
+    "Initial HTTP parser did not recognize Workforce non-field errorlist; extended local evidence parser, reran complete HTTP matrix",
+    "Source and evidence commands explicitly write UTF-8 on Windows; transient attribution encoding failure corrected",
+    "User continuation ended original fresh process and in-flight baseline/HTTP commands; retained interrupted logs and reran entire suites; identical product hashes across both processes"
+  ],
+  "browser_recovery": "Initial localhost tab opened before server start; retry succeeded. Existing B request/warehouse identifiers used for real duplicate server POST rejection. Invalid Jalali date was client-blocked and not counted as POST. Actors logged out via UI. Later stale error-page tab handles rejected by Browser Use URL policy; app owns temporary tab lifecycle cleanup; no authenticated business page or temporary grant left active.",
+  "test_isolation": "Serial disposable PostgreSQL test_bonira_uiux_batch01,temporary document root,test-only password hashing;runtime Development construction_erp",
+  "yaml": "Installed system Python311 PyYAML 6.0.3; no new dependency installed",
+  "safety": "No models/services/shared-helper/templates/settings/schema/migrations;no production;no CEP-078/079;no BATCH-09 or Wave C;no Git writes"
+}

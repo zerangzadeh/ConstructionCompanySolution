@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="22" skipped="0" tests="234" time="125.310" timestamp="2026-10-22T10:40:49.316752+03:30" hostname="Zerangzadeh"><testcase classname="apps.procurement.tests.ProcurementModelTests" name="test_issued_order_and_posted_receipt_details_are_immutable" time="50.507"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:255: in test_issued_order_and_posted_receipt_details_are_immutable
+    order, order_item = self.create_issued_order()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementModelTests" name="test_models_reject_cross_tenant_and_mismatched_relationships" time="0.131" /><testcase classname="apps.procurement.tests.ProcurementModelTests" name="test_quantities_prices_and_canonical_units_are_validated" time="0.110" /><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_order_amount_is_decimal_and_request_cannot_be_over_ordered" time="0.307"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:416: in test_order_amount_is_decimal_and_request_cannot_be_over_ordered
+    request, request_item = self.create_approved_request(Decimal(5))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_purchase_order_requires_approved_request_and_supplier_role" time="0.102"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:381: in test_purchase_order_requires_approved_request_and_supplier_role
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_reads_and_mutations_are_tenant_scoped" time="0.102"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:550: in test_reads_and_mutations_are_tenant_scoped
+    request, _ = self.create_approved_request()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_receipt_cannot_exceed_order_and_void_reopens_order" time="0.095"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:495: in test_receipt_cannot_exceed_order_and_void_reopens_order
+    order, order_item = self.create_issued_order(Decimal(5))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_receipts_complete_order_without_creating_inventory" time="0.105"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:449: in test_receipts_complete_order_without_creating_inventory
+    order, order_item = self.create_issued_order()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_rejection_requires_reason_and_is_terminal" time="0.097"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:338: in test_rejection_requires_reason_and_is_terminal
+    request, _ = self.create_approved_request()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_request_workflow_is_role_controlled_and_audited" time="0.105"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:292: in test_request_workflow_is_role_controlled_and_audited
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_viewer_cannot_mutate_procurement" time="0.109" /><testcase classname="apps.procurement.tests.ProcurementAdminTests" name="test_procurement_admin_is_read_only" time="0.076" /><testcase classname="apps.procurement.tests.ProcurementPanelTests" name="test_owner_can_open_scoped_procurement_pages" time="0.299"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:619: in test_owner_can_open_scoped_procurement_pages
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.contracts.tests.ContractServiceTests" name="test_active_member_without_view_permission_cannot_see_contracts" time="0.167"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\contracts\tests.py:49: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.contracts.tests.ContractServiceTests" name="test_contract_create_view_creates_contract" time="0.029"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\contracts\tests.py:49: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.contracts.tests.ContractServiceTests" name="test_contract_create_view_exposes_only_active_tenant_projects" time="0.026"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\contracts\tests.py:49: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.contracts.tests.ContractServiceTests" name="test_contract_detail_returns_not_found_for_another_organization" time="0.029"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\contracts\tests.py:49: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.contracts.tests.ContractServiceTests" name="test_contract_list_filters_can_be_combined_and_cleared" time="0.029"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\contracts\tests.py:49: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.contracts.tests.ContractServiceTests" name="test_contract_list_links_to_tenant_scoped_detail" time="0.029"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\contracts\tests.py:49: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.contracts.tests.ContractServiceTests" name="test_contract_list_requires_active_organization" time="0.029"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\contracts\tests.py:49: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.contracts.tests.ContractServiceTests" name="test_contract_number_is_unique_per_organization" time="0.031"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\contracts\tests.py:49: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.contracts.tests.ContractServiceTests" name="test_contract_queryset_is_tenant_scoped" time="0.027"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\contracts\tests.py:49: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.contracts.tests.ContractServiceTests" name="test_contract_rejects_negative_value" time="0.031"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\contracts\tests.py:49: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.contracts.tests.ContractServiceTests" name="test_contract_rejects_project_from_other_organization" time="0.028"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\contracts\tests.py:49: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.contracts.tests.ContractServiceTests" name="test_create_contract_scopes_project_and_records_audit" time="0.034"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\contracts\tests.py:49: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.contracts.tests.ContractServiceTests" name="test_view_permission_allows_read_but_not_contract_management" time="0.027"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\contracts\tests.py:49: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.inventory.tests.WarehouseServiceTests" name="test_archive_rejects_nonzero_stock_and_preserves_history" time="0.737" /><testcase classname="apps.inventory.tests.WarehouseServiceTests" name="test_code_is_canonical_and_creation_is_audited" time="0.170" /><testcase classname="apps.inventory.tests.WarehouseServiceTests" name="test_management_role_and_tenant_scope_are_enforced" time="0.127" /><testcase classname="apps.inventory.tests.WarehouseServiceTests" name="test_material_archive_requires_zero_derived_stock" time="0.355" /><testcase classname="apps.inventory.tests.WarehouseServiceTests" name="test_project_archive_requires_archived_warehouses_and_no_drafts" time="0.384" /><testcase classname="apps.inventory.tests.StockTransactionModelTests" name="test_model_rejects_cross_tenant_and_invalid_movement_shape" time="0.403" /><testcase classname="apps.inventory.tests.StockTransactionModelTests" name="test_posted_details_and_all_deletion_paths_are_blocked" time="0.339" /><testcase classname="apps.inventory.tests.StockTransactionServiceTests" name="test_draft_does_not_change_balance_and_posting_does" time="0.482" /><testcase classname="apps.inventory.tests.StockTransactionServiceTests" name="test_goods_receipt_can_enter_inventory_once_and_must_reverse_before_void" time="0.794" /><testcase classname="apps.inventory.tests.StockTransactionServiceTests" name="test_issue_and_transfer_cannot_create_negative_stock" time="0.199" /><testcase classname="apps.inventory.tests.StockTransactionServiceTests" name="test_rbac_and_read_queries_are_tenant_scoped" time="0.176" /><testcase classname="apps.inventory.tests.StockTransactionServiceTests" name="test_reversal_adds_opposite_entry_and_preserves_original" time="0.368" /><testcase classname="apps.inventory.tests.StockTransactionServiceTests" name="test_reversal_cannot_reopen_stock_in_an_archived_warehouse" time="0.433" /><testcase classname="apps.inventory.tests.StockTransactionServiceTests" name="test_reversal_is_blocked_when_it_would_make_stock_negative" time="0.340" /><testcase classname="apps.inventory.tests.StockTransactionServiceTests" name="test_transfer_debits_source_and_credits_destination" time="0.495" /><testcase classname="apps.inventory.tests.InventoryAdminTests" name="test_inventory_models_are_registered_read_only" time="0.068" /><testcase classname="apps.inventory.tests.InventoryPanelTests" name="test_owner_can_open_scoped_warehouse_pages" time="2.372" /><testcase classname="apps.inventory.tests.InventoryPanelTests" name="test_transaction_detail_rejects_cross_tenant_uuid" time="0.291" /><testcase classname="apps.inventory.tests.InventoryPanelTests" name="test_transaction_list_links_to_scoped_transaction_detail" time="0.987" /><testcase classname="apps.workforce.test_p7_s01_s05_workforce_foundation.P7WorkforceFoundationTests" name="test_qualification_revocation_and_typed_dms_evidence_preserve_history" time="0.515" /><testcase classname="apps.workforce.test_p7_s01_s05_workforce_foundation.P7WorkforceFoundationTests" name="test_sensitive_performance_and_labor_rate_access_is_default_denied" time="0.261" /><testcase classname="apps.workforce.test_p7_s01_s05_workforce_foundation.P7WorkforceFoundationTests" name="test_skill_proficiency_history_is_tenant_scoped_immutable_and_non_overlapping" time="0.503" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_actor_has_only_explicit_project_manager_role_and_a_b_grants" time="0.520" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_bound_authorized_second_parent_is_usable_on_every_form" time="0.182" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_direct_project_reads_still_deny_unauthorized_objects" time="0.787" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_existing_approved_request_and_project_lifecycle_filters_are_preserved" time="0.128" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_expired_grant_disappears_from_forms_and_http" time="1.243" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_future_grant_does_not_expose_choices" time="0.073" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_global_project_search_still_excludes_unauthorized_objects" time="0.259" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_inactive_membership_fails_closed_in_forms_and_http" time="0.092" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_inactive_sites_and_phases_remain_excluded" time="0.108" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_inactive_user_fails_closed_in_protected_form_choices" time="0.036" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_initial_child_choices_are_scoped_and_workforce_waits_for_parent" time="0.100" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_initial_get_scopes_every_surface_and_response_body" time="1.008" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_invalid_post_redisplay_keeps_authorized_choices_only" time="0.891" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_known_good_expense_and_estimate_forms_preserve_both_parent_choices" time="0.208" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_known_good_expense_and_estimate_http_forms_remain_scoped" time="0.973" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_missing_invalid_or_wrong_tenant_membership_fails_closed" time="0.052" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_mixed_authorized_parent_children_are_rejected" time="1.099" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_mutation_services_still_reject_unauthorized_same_and_cross_tenant" time="0.382" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_no_grants_fails_closed" time="0.820" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_phase_from_another_authorized_site_is_rejected" time="0.275" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_revoked_grant_disappears_from_forms_and_http" time="1.260" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_revoked_role_cannot_enter_any_affected_http_surface" time="0.422" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_shared_context_options_remain_scoped" time="0.892" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_site_only_grant_does_not_expand_po_authority" time="0.898" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_site_only_grant_preserves_service_specific_authorization" time="0.200" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_site_only_grant_rejects_sibling_site_and_phase" time="0.880" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_suspended_tenant_fails_closed_in_protected_form_choices" time="0.041" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_unauthorized_posts_are_rejected_without_creating_business_objects" time="3.602" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_valid_authorized_b_posts_succeed_for_three_project_scoped_services" time="0.458" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_workforce_endpoint_handles_missing_and_malformed_parent_safely" time="0.863" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_workforce_endpoint_never_discloses_c_d_or_cross_tenant" time="0.662" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_workforce_endpoint_returns_authorized_a_and_b_sites" time="0.460" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_workforce_endpoint_site_only_grant_excludes_sibling_sites" time="0.300" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_workforce_organization_grant_preserves_existing_success_path" time="0.133" /><testcase classname="tests.test_uiux_f111_scope.F111SelectorScopeTests" name="test_workforce_scoped_post_preserves_existing_organization_service_gate" time="0.268" /><testcase classname="tests.test_uiux_f111_pattern_receipt_scope.ReceiptSourceScopeTests" name="test_absent_revoked_expired_future_grants_fail_closed" time="2.605" /><testcase classname="tests.test_uiux_f111_pattern_receipt_scope.ReceiptSourceScopeTests" name="test_inactive_membership_user_tenant_fail_closed" time="0.136" /><testcase classname="tests.test_uiux_f111_pattern_receipt_scope.ReceiptSourceScopeTests" name="test_invalid_required_and_service_error_redisplays_remain_scoped" time="0.778" /><testcase classname="tests.test_uiux_f111_pattern_receipt_scope.ReceiptSourceScopeTests" name="test_manipulated_c_d_x_posts_and_direct_services_no_mutation" time="0.973" /><testcase classname="tests.test_uiux_f111_pattern_receipt_scope.ReceiptSourceScopeTests" name="test_missing_invalid_wrong_tenant_membership_fail_closed" time="0.030" /><testcase classname="tests.test_uiux_f111_pattern_receipt_scope.ReceiptSourceScopeTests" name="test_original_status_order_archival_and_version_guards_preserved" time="0.147" /><testcase classname="tests.test_uiux_f111_pattern_receipt_scope.ReceiptSourceScopeTests" name="test_qualifying_issued_versioned_sources_get_and_bound_b" time="0.305" /><testcase classname="tests.test_uiux_f111_pattern_receipt_scope.ReceiptSourceScopeTests" name="test_role_and_capability_entry_and_direct_service_denials" time="0.308" /><testcase classname="tests.test_uiux_f111_pattern_receipt_scope.ReceiptSourceScopeTests" name="test_site_only_excludes_parent_sources_and_denies_post_and_service" time="0.606" /><testcase classname="tests.test_uiux_f111_pattern_receipt_scope.ReceiptSourceScopeTests" name="test_valid_limited_and_organization_flows_preserve_version_and_audit" time="0.465" /><testcase classname="tests.test_uiux_f111_pattern_stock_scope.StockSourceScopeTests" name="test_existing_service_denials_and_mixed_authorized_relationships" time="6.738" /><testcase classname="tests.test_uiux_f111_pattern_stock_scope.StockSourceScopeTests" name="test_fail_closed_membership_grants_and_inactive_state" time="0.834" /><testcase classname="tests.test_uiux_f111_pattern_stock_scope.StockSourceScopeTests" name="test_forced_project_warehouse_receipt_ids_rejected_without_audit_or_balance" time="10.657" /><testcase classname="tests.test_uiux_f111_pattern_stock_scope.StockSourceScopeTests" name="test_inactive_membership_user_tenant" time="0.095" /><testcase classname="tests.test_uiux_f111_pattern_stock_scope.StockSourceScopeTests" name="test_lifecycle_predicates_and_receipt_material_mismatch" time="0.124" /><testcase classname="tests.test_uiux_f111_pattern_stock_scope.StockSourceScopeTests" name="test_organization_catalogue_and_central_manipulation" time="3.101" /><testcase classname="tests.test_uiux_f111_pattern_stock_scope.StockSourceScopeTests" name="test_original_archival_project_and_master_predicates" time="0.125" /><testcase classname="tests.test_uiux_f111_pattern_stock_scope.StockSourceScopeTests" name="test_qualifying_sources_get_bound_and_tenant_master_material" time="0.480" /><testcase classname="tests.test_uiux_f111_pattern_stock_scope.StockSourceScopeTests" name="test_required_type_shape_material_project_and_service_redisplay" time="0.964" /><testcase classname="tests.test_uiux_f111_pattern_stock_scope.StockSourceScopeTests" name="test_role_capability_entry_and_direct_service_denial" time="0.314" /><testcase classname="tests.test_uiux_f111_pattern_stock_scope.StockSourceScopeTests" name="test_site_only_cannot_promote_parent_or_sources" time="1.284" /><testcase classname="tests.test_uiux_f111_pattern_stock_scope.StockSourceScopeTests" name="test_valid_draft_variants_no_stock_posting_and_org_central" time="5.569" /></testsuite></testsuites>

@@ -28,6 +28,7 @@ from apps.organizations.models import (
     BusinessPermission,
     BusinessPermissionCode,
     MembershipRole,
+    MembershipRoleAssignment,
     MembershipScopeGrant,
     MembershipStatus,
     OrganizationRole,
@@ -80,6 +81,14 @@ class InvoiceAPFixture(ProcurementFixtureMixin):
             role.permissions.set(BusinessPermission.objects.filter(is_active=True))
             membership.role_definition = role
             membership.save(update_fields=["role_definition"])
+            # The compatibility pointer cannot replace a migrated active role.
+            MembershipRoleAssignment.objects.create(
+                organization=self.organization,
+                membership=membership,
+                role=role,
+                source="test_fixture",
+                reason="CEP-033 isolated explicit authority",
+            )
             MembershipScopeGrant.objects.create(
                 organization=self.organization,
                 membership=membership,
@@ -344,12 +353,15 @@ class SupplierInvoiceAPHandoffTests(InvoiceAPFixture, TestCase):
         self.assertEqual(m.SettlementAllocation.objects.count(), 1)
         self.assertIsNone(m.Obligation.objects.get(pk=target.pk).recognition_journal_id)
 
-    def test_reversal_permission_has_no_implicit_system_role_grants(self):
-        self.assertFalse(
-            OrganizationRole.objects.filter(
-                is_system=True,
-                permissions__code=BusinessPermissionCode.SUBLEDGERS_SOURCES_REVERSE,
-            ).exists()
+    def test_reversal_permission_has_only_reviewed_system_role_grants(self):
+        self.assertEqual(
+            set(
+                OrganizationRole.objects.filter(
+                    is_system=True,
+                    permissions__code=BusinessPermissionCode.SUBLEDGERS_SOURCES_REVERSE,
+                ).values_list("code", flat=True)
+            ),
+            {"accountant"},
         )
 
     def test_exactly_once_explicit_ap_acceptance_preserves_source_and_has_no_gl(self):

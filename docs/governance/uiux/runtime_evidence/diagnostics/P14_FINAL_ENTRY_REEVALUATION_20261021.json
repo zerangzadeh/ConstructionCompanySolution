@@ -1,0 +1,68 @@
+{
+  "record_type": "FINAL_ENTRY_READINESS_ONLY_NOT_RV_EXECUTION",
+  "verified_at": "2026-10-21T13:15:29.939826+03:30",
+  "baseline": "43ac319c6e73e48ca9626461b73987922c498ec3",
+  "runtime_url": "http://127.0.0.1:8001/",
+  "employee_detail": {
+    "status": "READY",
+    "identity": "account.demo-construction-02.owner",
+    "organization": "demo-construction-02",
+    "existing_role": "company_owner",
+    "permission_count": 515,
+    "selection": "Least permission-count eligible existing non-staff/non-platform demo identity; no added grants",
+    "method": "Actual decorated Django view invoked with membership-validated request context inside READ ONLY transaction; no browser or login/session writes",
+    "http_status": 200,
+    "response_body_saved": false,
+    "accessibility_test_executed": false
+  },
+  "reporting_reconciliations": {
+    "status": "BLOCKED",
+    "intended_identity": "uiux.audit.reporting",
+    "reason": "Role assignment unavailable; zero effective permissions; endpoint not exercised"
+  },
+  "project_closeout_detail": {
+    "status": "BLOCKED",
+    "intended_identity": "uiux.audit.reporting",
+    "case_alias": null,
+    "reason": "Role assignment unavailable; create_closeout_case not invoked"
+  },
+  "gates": {
+    "RV-GATE-00": "PASS",
+    "RV-GATE-01": "PASS",
+    "RV-GATE-02": "BLOCKED",
+    "RV-GATE-03": "BLOCKED",
+    "RV-GATE-04": "PASS",
+    "RV-GATE-05": "PASS"
+  },
+  "single_remaining_blocker": "No tenant membership with authorization_roles.assign and organization scope holds the entire 22-permission test-role set required by assign_membership_role. Existing Platform Admin catalogue authority does not waive its subset check.",
+  "actor_candidate_missing_permissions": [
+    {
+      "alias": "account.demo-construction-01.owner",
+      "missing_permissions": [
+        "accounting_recognition.view",
+        "reporting.metric_result.view",
+        "reporting.project_closeout_case.prepare",
+        "reporting.project_closeout_case.view",
+        "reporting.reconciliation_run.view"
+      ]
+    },
+    {
+      "alias": "admin",
+      "missing_permissions": [
+        "accounting_recognition.view",
+        "payroll_results.view",
+        "reporting.metric_result.view",
+        "reporting.project_closeout_case.prepare",
+        "reporting.project_closeout_case.view",
+        "reporting.reconciliation_run.view"
+      ]
+    }
+  ],
+  "role_created": "uiux_runtime_reporting_test",
+  "dedicated_membership": "active but quarantined; no assignments/scopes/effective permissions",
+  "existing_business_roles_unchanged": true,
+  "rv003_error_state": "UTV_RUNTIME_ERROR_STATE",
+  "runtime_scenarios_executed": false,
+  "assessment_executed": false,
+  "decision": "RUNTIME_ENTRY_BLOCKED"
+}

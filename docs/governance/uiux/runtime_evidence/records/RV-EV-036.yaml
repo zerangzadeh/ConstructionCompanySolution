@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "record": {
+    "evidence_id": "RV-EV-036",
+    "scenario_id": "UIUX-F-111_RUNTIME_RETEST",
+    "target": "Workforce assignment selectors",
+    "executed_at": "2026-10-22T01:23:01.876060+03:30",
+    "runtime": {
+      "environment_name": "Development",
+      "base_url": "http://127.0.0.1:8002",
+      "git_sha": "43ac319c6e73e48ca9626461b73987922c498ec3",
+      "branch": "main",
+      "browser": "Codex in-app browser",
+      "browser_version": "155.0.8059.80",
+      "browser_version_source": "diagnostics/F111_RETEST_BROWSER_VERSION.json",
+      "source_dirty": true
+    },
+    "persona": {
+      "persona_id": "P-17",
+      "test_user_alias": "uiux.persona.project-manager",
+      "organization_alias": "demo-construction-01",
+      "authorized_projects": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ],
+      "authority_reference": "diagnostics/F111_RETEST_BEFORE.json#authority"
+    },
+    "result": "PASS",
+    "actual_result": "Initial sites empty/disabled; selecting A then B returns only the selected authorized parent sites. Settled captures govern; transient loading captures retained.",
+    "screenshots": [
+      "screenshots/RV-EV-036__workforce-A-settled.png",
+      "screenshots/RV-EV-036__workforce-A.png",
+      "screenshots/RV-EV-036__workforce-B-settled.png",
+      "screenshots/RV-EV-036__workforce-B.png",
+      "screenshots/RV-EV-036__workforce-initial.png"
+    ],
+    "diagnostics": [
+      "diagnostics/F111_RETEST_BROWSER_DOM.json",
+      "diagnostics/F111_RETEST_HTTP.json",
+      "diagnostics/F111_RETEST_BEFORE.json",
+      "diagnostics/F111_RETEST_AFTER.json"
+    ],
+    "product_mutation": false,
+    "business_mutation": false,
+    "historical_evidence_overwritten": false
+  }
+}

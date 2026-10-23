@@ -1,0 +1,159 @@
+--- Registry before Human scope reentry02
++++ Registry after actual partial runtime
+@@ -66,8 +66,8 @@
+   authorized_not_started: 0
+   eligible_under_standing_authority: 0
+   in_progress: 0
+-  blocked_current: 2
+-  partial_current: 3
++  blocked_current: 1
++  partial_current: 4
+   failed_current: 0
+   not_started_other_current_governed: 6
+   deferred_post_v1: 7
+@@ -340,6 +340,15 @@
+       CEP-058: 0
+     production_authority: false
+     git_authority: ATTRIBUTABLE_ADD_COMMIT_PUSH_ORIGIN_MAIN_ONLY
++  CEP078_V1_BROWSER_SCOPE_20261023:
++    source: docs/governance/cep/supporting/CEP-078_V1_BROWSER_SCOPE_HUMAN_DECISION_20261023.md
++    authority: DIRECT_HUMAN_PRODUCT_GOVERNANCE_DECISION
++    status: APPROVED_BY_HUMAN
++    scope: BONIRA_V1_AND_CEP078_ONLY
++    supported_browsers: [Google Chrome, Microsoft Edge]
++    safari_required_for_entry_acceptance_dod: false
++    historical_evidence_preserved: true
++    safari_compatibility_certification_future_support: NOT_CLAIMED
+ registry_update_rules:
+   on_start:
+   - Read registry before product mutation
+@@ -4335,30 +4344,30 @@
+   CEP-078:
+     title: Browser, accessibility and responsive runtime verification
+     phase: VERIFICATION_UAT
+-    dependency_status: MANDATORY_PREREQUISITES_AND_SCOPED_GATE07_SUPPORTED_EXT0024_UNSATISFIED
+-    eligibility_status: BLOCKED_EXT0024_SAFARI_ENVIRONMENT_AND_EXACT_RUNTIME_IDENTITIES
++    dependency_status: MANDATORY_CEP003_CEP017_SCOPED_GATE07_AND_CHROME_EDGE_EXT0024_SATISFIED
++    eligibility_status: BLOCKED_REQUIRED_IN_SCOPE_ACCESSIBILITY_FAILURE_AFTER_VALID_ENTRY
+     authorization:
+       status: AUTHORIZED_FOR_ENTRY_AND_CONDITIONAL_NON_PRODUCTION_VERIFICATION
+       authorization_id: null
+       source: Human request 2026-10-23 to clear CEP078 entry blockers and execute only when eligible; prior blocked history preserved
+     execution:
+-      status: NOT_STARTED
+-      lifecycle: BLOCKED_BEFORE_ENTRY
+-      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
+-    acceptance:
+-      passed: null
++      status: PARTIAL
++      lifecycle: BLOCKED_AFTER_PARTIAL_VERIFICATION
++      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
++    acceptance:
++      passed: 4
+       total: 6
+-      status: UNEXECUTED_ENTRY_BLOCKED
+-    dod: NOT_MET_ENTRY_BLOCKED
++      status: PARTIAL_AC1_FAIL_AC3_PARTIAL_AC2_4_5_6_PASS
++    dod: NOT_MET_REQUIRED_ACCESSIBILITY_FAILURE_AND_REMAINING_UTV
+     blockers:
+-    - CEP-078-FINDING-002 / BLOCKER-EXTERNAL / EXT-0024 full named Chrome-Edge-Safari matrix defined; available Safari OS-device-browser-engine runtime and exact execution identities absent
+-    remaining_utv:
+-    - Safari test environment and exact OS-device-full-browser-engine identity; Chrome-Edge actual observed execution identities not replaced by installed binary metadata
+-    - Complete browser-accessibility-responsive matrix binding to existing safe canonical persona-route-state fixtures
+-    - All six canonical CEP078 browser runtime acceptance criteria unexecuted; no old RV result promoted to CEP execution
+-    completion_report:
+-      path: docs/governance/cep/evidence/CEP-078_REENTRY_01/CEP-078_COMPLETION_REPORT.md
+-      evidence_presence: CURRENT_SCOPED_GATE_PROOF_MATRIX_AND_IDENTITY_PARTIAL_NO_CEP_BROWSER_EXECUTION
++    - CEP-078-FINDING-006 / BLOCKER-TEST / Existing UIUX-F-107 login page has two nested main landmarks; required actual Edge check FAIL at desktop-tablet-mobile; separate remediation authority needed
++    remaining_utv:
++    - Chrome anonymous login coverage; current authenticated session redirected Login to Home and was preserved without identity change
++    - Other 32 approved journey inputs for both Chrome and Edge remain unexecuted after required failed shared-login accessibility test
++    - Remaining keyboard-semantic-table-modal-Jalali-role-workspace states and full cross-browser runtime coverage remain UTV; scope not deleted or promoted
++    completion_report:
++      path: docs/governance/cep/evidence/CEP-078_REENTRY_02/CEP-078_COMPLETION_REPORT.md
++      evidence_presence: ACTUAL_PARTIAL_RUNTIME_ARTIFACTS_WITH_OPEN_REQUIRED_ACCESSIBILITY_FINDING
+     git:
+       committed: false
+       commit_sha: null
+@@ -4366,24 +4375,30 @@
+       merged_to_main: false
+       remote_main_evidence: UNCOMMITTED_ENTRY_REVIEW_ONLY
+     last_execution:
+-      branch: null
+-      sha: null
++      branch: main
++      sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+     updated_at: '2026-10-23'
+     entry_review:
+-      evidence: docs/governance/cep/evidence/CEP-078_REENTRY_01/ENTRY_REVIEW.json
+-      acceptance_mapping: docs/governance/cep/evidence/CEP-078_REENTRY_01/CEP-078_ACCEPTANCE_MAPPING.csv
+-      prior_blocked_review: docs/governance/cep/evidence/CEP-078_ENTRY_REVIEW.json
+-      branch: main
+-      head: 43ac319c6e73e48ca9626461b73987922c498ec3
+-      result: BLOCKED_BEFORE_ENTRY
+-      canonical_report_verdict: EXECUTION FAILED
+-      verdict_semantics: External environment entry blocker; no browser scenario executed or failed
+-      gate07: PASS_FOR_CEP078_DEVELOPMENT_IMPLEMENTED_CAPABILITY_SCOPE_GLOBAL_ACTIVATION_NOT_GRANTED
+-      ext0024: MATRIX_DEFINED_SAFARI_ENVIRONMENT_AND_EXACT_RUNTIME_IDENTITIES_BLOCKED
+-      finding001: RESOLVED_FOR_SCOPED_ENTRY
+-      finding002: OPEN_EXACT_ENVIRONMENT_GAP
+-      current_gate_cases: 42_DISTINCT_PASS_WITH_ONE_EXPORT_ONLY_RETRY
+-      verification_execution: NOT_STARTED
++      evidence: docs/governance/cep/evidence/CEP-078_REENTRY_02/ENTRY_REVIEW.json
++      readiness: docs/governance/cep/evidence/CEP-078_REENTRY_02/READINESS_RESUMED.json
++      human_decision: CEP078_V1_BROWSER_SCOPE_20261023
++      result: PASS
++      gate07: PASS_FOR_CEP078_SCOPED_CONVERGENCE_REUSED
++      ext0024: PASS_APPROVED_CHROME_EDGE_CONTROL_RUNTIME_IDENTITY_VIEWPORT_READINESS
++      safari_requirement: EXCLUDED_BY_HUMAN_FOR_V1_CEP078
++      execution: STARTED_NO_ACCEPTANCE_PASS_INFERRED
++    verification_review:
++      evidence: docs/governance/cep/evidence/CEP-078_REENTRY_02/RUNTIME_RESULTS.json
++      acceptance_mapping: docs/governance/cep/evidence/CEP-078_REENTRY_02/CEP-078_ACCEPTANCE_MAPPING.csv
++      canonical_verdict: EXECUTION PARTIAL
++      entry_result: PASS_RETAINED
++      ext0024: APPROVED_CHROME_EDGE_READINESS_PASS_RETAINED
++      finding006: OPEN_EXISTING_UIUX_F107_REQUIRED_TEST_FAILURE
++      corrected_edge_assertions: 24_PASS_3_FAIL_ACROSS_THREE_VIEWPORTS
++      chrome_anonymous_login: UTV_AUTHENTICATED_REDIRECT_PRECONDITION_NOT_MET
++      source_changes: NONE
++      business_data: 518_MODEL_AGGREGATES_UNCHANGED
++      safari_requirement: EXCLUDED_BY_HUMAN_DECISION
+     history:
+     - date: '2026-10-23'
+       status: ENTRY_REVIEW_BLOCKED
+@@ -4397,6 +4412,15 @@
+     - date: '2026-10-23'
+       status: ENTRY_REVIEW_BLOCKED
+       reason: Both entry blockers did not clear. Finding001 resolved for scoped convergence; Finding002 remains open with exact Safari/runtime readiness gap. Runtime NOT_STARTED; all six AC UNEXECUTED; DoD NOT_MET_ENTRY_BLOCKED. New reentry completion report and manifests retained, prior blocked artifacts unchanged. No product-policy-permission-UI change, CEP079, Production, Human Sign-off or Git staging/integration command. STOP after final reconciliation.
++    - date: '2026-10-23'
++      status: HUMAN_BROWSER_SCOPE_APPLIED
++      reason: Explicit Human decision sets Chrome and Edge as V1-CEP078 supported browsers; Safari excluded from entry-AC-DoD without compatibility-certification-future-support inference. Historical source and blocked evidence unchanged.
++    - date: '2026-10-23'
++      status: ENTRY_PASS_AND_STARTED
++      reason: Human connected Edge extension; actual Chrome3 and Edge4 blank tabs controllable at all three canonical CSS viewports. Read-only OS process and loaded-module metadata proves uniform running Chrome155.0.8059.82 and Edge155.0.4283.62 across all visible family candidates, binding limitation explicit. No blocked internal-page workaround. Source-valid scoped GATE07 proof reused; Development guard passes. EXT0024 readiness and entry PASS; runtime scenarios begin, no AC-DoD PASS inferred.
++    - date: '2026-10-23'
++      status: PARTIAL
++      reason: Actual Edge Login at 1440x900-1024x768-390x844 reproduces existing UIUX-F107 two nested main landmarks. Corrected assertions24 PASS-3 required FAIL; initial Tab expectation skipped visible forgot-password link and was corrected in evidence only. Chrome existing authenticated session redirects to Home; anonymous login UTV, no session change. AC1 FAIL, AC3 PARTIAL, AC2-4-5-6 PASS; scoped DoD not met. Finding006 OPEN; affected verification stopped under required-test fix-or-block rule, no silent product remediation. Full remaining matrix UTV; accepted RV evidence and baseline debt unchanged. Human Chrome-Edge decision and valid entry retained; no Safari requirement, CEP079, Production, Human Sign-off or Git writes. STOP after partial reconciliation.
+   CEP-079:
+     title: null
+     phase: VERIFICATION_UAT
+@@ -4728,15 +4752,15 @@
+   verified_build_eligible_unblocked: []
+   verified_verification_eligible_unblocked: []
+   next_autonomous_cep: null
+-  current_session_continuation: "STOP_CEP078_REENTRY01_EXT0024_BLOCKED_AFTER_FINAL_RECONCILIATION"
++  current_session_continuation: "STOP_CEP078_PARTIAL_REQUIRED_ACCESSIBILITY_FINDING006_AFTER_RECONCILIATION"
+   current_independent_cep: null
+   next_entry_review_candidate: null
+-  next_candidate_full_entry_eligibility: "CEP078_SCOPED_GATE07_PASS_EXT0024_SAFARI_AND_EXACT_IDENTITIES_BLOCKED"
++  next_candidate_full_entry_eligibility: "CEP078_PARTIAL_NEEDS_SEPARATELY_AUTHORIZED_REMEDIATION_AND_AFFECTED_RUNTIME_REVALIDATION"
+   conditional_dependency_entry_review_candidates:
+   - CEP-073
+   - CEP-079
+   conditional_dependency_rule: Evaluate canonical scope conditions; no condition or execution authority inferred
+-  boundary_reason: "Current CEP078-only request assessed exact convergence; scoped GATE07 clears, EXT0024 full matrix environment incomplete; no browser execution or downstream authority"
++  boundary_reason: "Human Chrome-Edge scope applied and entry passed; actual required Login semantic check fails. No product-remediation or downstream-Production authority."
+   resume_cep_after_blocker_resolution: "CEP-078"
+   independent_candidates_entry_status: "NOT_EXECUTED_OUTSIDE_CURRENT_CEP078_ONLY_SCOPE"
+   cep057_resume_condition: COMPLETE

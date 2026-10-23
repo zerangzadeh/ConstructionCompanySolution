@@ -1,0 +1,680 @@
+schema_version: '1.5'
+document:
+  id: BONIRA-UIUX-RUNTIME-PERSONA-DATA-MATRIX
+  title: BONIRA UI/UX Runtime Persona and Test-Data Matrix
+  status: PLAN_RECONCILED_WITH_REFERENCE_PERSONA_IDENTITIES
+  audit_baseline_commit: 43ac319c6e73e48ca9626461b73987922c498ec3
+  canonical_path: docs/governance/uiux/UIUX_RUNTIME_PERSONA_DATA_MATRIX.yaml
+  revised_at: '2026-10-21'
+  revision_checkpoint: UIUX_REFERENCE_PERSONA_DOCUMENTATION_RECONCILIATION_CHECKPOINT_15.md
+rules:
+- Persona is a test archetype, not a new BONIRA role.
+- Map each persona to existing actual permissions/memberships before execution.
+- Do not infer authority from job title, navigation visibility or historical role names.
+- Use a non-production organization and disposable/reversible records for mutating scenarios.
+- Never record passwords, tokens or secrets in audit artefacts.
+- Tenant Owner, Tenant Admin and Platform Admin are distinct authority/persona shapes; never collapse them for convenience.
+- A single human may hold more than one real authority, but runtime evidence must record the effective authority used for
+  the tested journey.
+- Project Manager is distinct from an operational project user because managerial oversight, exception handling and approvals
+  create materially different UX needs.
+- Document Controller is a distinct construction-ERP persona because document/version/linking journeys are not adequately
+  represented by Knowledge curation.
+- Prefer least-privileged identities for ordinary journeys; do not use Owner or Platform Admin merely because they can reach
+  more pages.
+- Do not combine Inventory/Storekeeping with Equipment/Fleet merely because both concern physical assets.
+- 'Do not combine Timekeeping with Payroll: source preparation and payroll calculation/review are materially different journeys
+  and authorities.'
+- Do not combine HSE/Safety with Quality/QA-QC when validating lifecycle, terminology or permissions.
+- Employment-record/decree management and employee self-view are separate perspectives; if a management surface is absent,
+  record a product-coverage question rather than inventing a route.
+- External Supplier/Partner portal users are not ordinary tenant members and require separate isolation evidence.
+- Contract/Commercial administration is not equivalent to Procurement buying or Billing settlement.
+- Provisioned reference personas are persistent governed identities and must not be deleted or automatically deactivated merely
+  because validation completed.
+- Persona credentials and secrets must never be stored in persona governance documents or displayed in the reference-persona
+  UI.
+- Reference persona accounts may be reused across future waves/regressions after permissions, scope and scenario data are
+  re-verified.
+- Reference personas do not require a Persian display title in the product UI; a stable technical identifier/username is sufficient,
+  while a human-readable label may be shown when available.
+personas:
+- persona_id: P-01
+  name_fa: کاربر عادی شرکت
+  purpose: Login, settings, Home, navigation, search and ordinary list behavior.
+  required_authority_shape: Active tenant membership; ordinary read permissions; no privileged admin assumptions.
+  required_data:
+  - active organization
+  - at least two visible workspaces
+  - at least one no-result search
+  scenario_ids:
+  - RV-001
+  - RV-002
+  - RV-003
+  - RV-004
+  - RV-005
+  - RV-023
+  - RV-025
+  reference_identity:
+    display_title_fa: کاربر عادی شرکت
+    reference_username_target: uiux.persona.ordinary-user
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-02
+  name_fa: کاربر عملیاتی پروژه / مهندس کارگاه
+  purpose: Context, Estimate, Expense, Daily Report and project-scoped cascade behavior from the field/project-operations
+    perspective.
+  required_authority_shape: Project-scoped membership with create/view permissions for selected operational surfaces.
+  required_data:
+  - two projects
+  - at least two sites across different projects
+  - project phases
+  - project contracts
+  - expense categories
+  scenario_ids:
+  - RV-006
+  - RV-025
+  reference_identity:
+    display_title_fa: کاربر عملیاتی پروژه / مهندس کارگاه
+    reference_username_target: uiux.persona.project-operations
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-03
+  name_fa: کارشناس تدارکات
+  purpose: RFQ, purchase request/order, stage-aware actions and dependent source selection.
+  required_authority_shape: Procurement view/create/evaluate permissions within bounded project scope.
+  required_data:
+  - RFQ in actionable state
+  - approved purchase request
+  - multiple projects/suppliers
+  scenario_ids:
+  - RV-007
+  - RV-008
+  reference_identity:
+    display_title_fa: کارشناس تدارکات
+    reference_username_target: uiux.persona.procurement-buyer
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-04
+  name_fa: کارشناس تجهیزات و ناوگان
+  purpose: Equipment registry, assignment, usage, fuel, maintenance, work orders, downtime and equipment-cost operations.
+  required_authority_shape: Equipment/fleet permissions within known tenant/project scope; no inventory-custody authority
+    inferred.
+  required_data:
+  - multiple equipment assets
+  - project/site assignments
+  - maintenance plan and work order
+  - usage/fuel/downtime records
+  scenario_ids:
+  - RV-019
+  - RV-025
+  reference_identity:
+    display_title_fa: کارشناس تجهیزات و ناوگان
+    reference_username_target: uiux.persona.equipment-fleet
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-05
+  name_fa: حسابدار
+  purpose: Journal entry, dimensions, financial statements and audit-layer separation.
+  required_authority_shape: Accounting view/create permissions for non-production test organization.
+  required_data:
+  - fiscal year/period
+  - accounts
+  - projects/sites/WBS
+  - statement run
+  scenario_ids:
+  - RV-010
+  - RV-011
+  reference_identity:
+    display_title_fa: حسابدار
+    reference_username_target: uiux.persona.accountant
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-06
+  name_fa: کارشناس خزانه‌داری
+  purpose: Movement creation, source request context and operational/audit separation.
+  required_authority_shape: Treasury movement and operation permissions only as required by scenario.
+  required_data:
+  - approved payment request
+  - treasury accounts
+  - posted movement/reconciliation sample
+  scenario_ids:
+  - RV-012
+  reference_identity:
+    display_title_fa: کارشناس خزانه‌داری
+    reference_username_target: uiux.persona.treasury
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-07
+  name_fa: کارشناس صورتحساب، مطالبات و پرداخت‌های پیمان
+  purpose: Claims, payable certificates, commercial billing controls, subledger settlement and contractor/customer financial
+    documents.
+  required_authority_shape: Billing/AP-AR/subledger permissions only as actually granted; no Contract Admin or Treasury authority
+    inferred.
+  required_data:
+  - claim/progress records
+  - payable certificate/measurement data
+  - subledger settlement/allocation data
+  - commercial billing control examples
+  scenario_ids:
+  - RV-013
+  - RV-014
+  - RV-025
+  reference_identity:
+    display_title_fa: کارشناس صورتحساب، مطالبات و پرداخت‌های پیمان
+    reference_username_target: uiux.persona.billing-claims
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-08
+  name_fa: کارشناس عملیات منابع انسانی و پرونده پرسنلی
+  purpose: Employee master data, organizational placement, assignments, workforce foundation and personnel-record administration
+    excluding payroll and timekeeping.
+  required_authority_shape: Workforce/employee administration permissions; no Payroll, Timekeeping or Tenant Admin authority
+    inferred.
+  required_data:
+  - employees and organizational units
+  - positions and project assignments
+  - skills/qualifications/training/performance examples
+  - employee documents/relationships
+  scenario_ids:
+  - RV-015
+  - RV-025
+  - RV-029
+  reference_identity:
+    display_title_fa: کارشناس عملیات منابع انسانی و پرونده پرسنلی
+    reference_username_target: uiux.persona.hr-operations
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-09
+  name_fa: کارمند در خودخدمتی
+  purpose: ESS own-data privacy, mobile UX and request navigation.
+  required_authority_shape: Self-service own-data access only.
+  required_data:
+  - linked person/work relationship
+  - own payroll/time/leave/request records
+  scenario_ids:
+  - RV-016
+  reference_identity:
+    display_title_fa: کارمند در خودخدمتی
+    reference_username_target: uiux.persona.ess-employee
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-10
+  name_fa: کارشناس حضور و غیاب و کارکرد
+  purpose: Calendars, shifts, attendance, corrections, leave/mission, overtime and timesheet operations.
+  required_authority_shape: Timekeeping permissions within tenant/employee scope; no Payroll calculation authority inferred.
+  required_data:
+  - working calendar and shifts
+  - attendance records and corrections
+  - leave/mission and overtime requests
+  - timesheets in reviewable states
+  scenario_ids:
+  - RV-017
+  - RV-025
+  reference_identity:
+    display_title_fa: کارشناس حضور و غیاب و کارکرد
+    reference_username_target: uiux.persona.timekeeping
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-11
+  name_fa: کارشناس HSE و ایمنی
+  purpose: Safety incident registration, review, assignment, corrective action and HSE-oriented compliance evidence.
+  required_authority_shape: Safety/HSE permissions in known tenant/project scope; no Quality/QC authority inferred.
+  required_data:
+  - safety incidents in multiple states
+  - corrective-action examples
+  - project/site context
+  - HSE evidence where applicable
+  scenario_ids:
+  - RV-020
+  - RV-025
+  reference_identity:
+    display_title_fa: کارشناس HSE و ایمنی
+    reference_username_target: uiux.persona.hse-safety
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-12
+  name_fa: متولی دانش
+  purpose: Publication, reuse, history and promotion review.
+  required_authority_shape: Knowledge curate/review permissions; platform review tested only with actual platform authority.
+  required_data:
+  - published knowledge version
+  - source references
+  - promotion candidate
+  scenario_ids:
+  - RV-021
+  reference_identity:
+    display_title_fa: متولی دانش
+    reference_username_target: uiux.persona.knowledge-curator
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-13
+  name_fa: مدیر گردش‌کار
+  purpose: Workflow administration comprehension and configuration presentation.
+  required_authority_shape: Actual workflow administration permission; no generic tenant-admin inference.
+  required_data:
+  - workflow definition/version with multiple steps/outcomes
+  scenario_ids:
+  - RV-022
+  reference_identity:
+    display_title_fa: مدیر گردش‌کار
+    reference_username_target: uiux.persona.workflow-admin
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-14
+  name_fa: کاربر آزمون دسترس‌پذیری
+  purpose: Keyboard, landmarks, focus, responsive and semantic sweep.
+  required_authority_shape: Use actual least-privileged identities appropriate for each visited surface.
+  required_data:
+  - representative records for high-risk detail/list/form pages
+  scenario_ids:
+  - RV-024
+  - RV-025
+  reference_identity:
+    display_title_fa: کاربر آزمون دسترس‌پذیری
+    reference_username_target: uiux.persona.accessibility
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-15
+  name_fa: مالک شرکت / Tenant Owner
+  purpose: Executive company-level oversight, role-aware Home, organization-wide navigation/search and governance boundary
+    review.
+  required_authority_shape: Actual Tenant Owner authority only; never substitute Platform Admin. Organization-wide visibility
+    may exist, but platform or other-tenant authority must not.
+  required_data:
+  - organization with multiple projects/workspaces
+  - representative attention/exception/approval items where naturally available
+  - organization-level search data
+  - at least one lower-privilege comparison identity
+  scenario_ids:
+  - RV-002
+  - RV-004
+  - RV-005
+  - RV-025
+  - RV-026
+  reference_identity:
+    display_title_fa: مالک شرکت / Tenant Owner
+    reference_username_target: uiux.persona.tenant-owner
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-16
+  name_fa: ادمین شرکت / Tenant Admin
+  purpose: Tenant-level user, membership, role, scope and organization-settings administration without platform authority.
+  required_authority_shape: Actual Tenant Admin/local-admin authority under BONIRA governance; no implicit Owner or Platform
+    Admin authority.
+  required_data:
+  - active tenant with multiple memberships
+  - dedicated disposable/non-production test membership
+  - existing tenant roles and scope grants
+  - organization settings/configuration data
+  scenario_ids:
+  - RV-004
+  - RV-025
+  - RV-026
+  reference_identity:
+    display_title_fa: ادمین شرکت / Tenant Admin
+    reference_username_target: uiux.persona.tenant-admin
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-17
+  name_fa: مدیر پروژه / Project Manager
+  purpose: Project-level oversight, prioritization, exceptions, cross-module project context and managerial next-action review.
+  required_authority_shape: Actual project-manager-equivalent effective permissions and project scope; do not infer broad
+    financial/HR authority from title.
+  required_data:
+  - one active project with sites/phases/contracts
+  - project operational records across multiple modules
+  - actionable/exception states where naturally available
+  - at least one out-of-scope project for boundary comparison
+  scenario_ids:
+  - RV-002
+  - RV-004
+  - RV-006
+  - RV-007
+  - RV-008
+  - RV-019
+  - RV-020
+  - RV-025
+  reference_identity:
+    display_title_fa: مدیر پروژه / Project Manager
+    reference_username_target: uiux.persona.project-manager
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-18
+  name_fa: ادمین پلتفرم / Platform Admin
+  purpose: Platform-only administration, cross-tenant governance surfaces and strict separation from tenant operational administration.
+  required_authority_shape: Actual Platform Admin authority. This persona is not a Tenant Owner or Tenant Admin substitute
+    and must not be used for ordinary tenant journeys.
+  required_data:
+  - at least two non-production tenants
+  - platform role catalogue
+  - protected-operation configuration
+  - platform-level policy/configuration surfaces
+  scenario_ids:
+  - RV-004
+  - RV-021
+  - RV-025
+  - RV-027
+  reference_identity:
+    display_title_fa: ادمین پلتفرم / Platform Admin
+    reference_username_target: uiux.persona.platform-admin
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-19
+  name_fa: مسئول کنترل اسناد / Document Controller
+  purpose: Construction document registration, versioning, linking, retrieval and controlled operational document handling.
+  required_authority_shape: Document-management permissions within known tenant/project scope; no Knowledge-curator or Platform
+    authority inferred.
+  required_data:
+  - documents in multiple states
+  - at least one document with multiple versions
+  - project/business-object link targets
+  - own-document and organization-document examples
+  scenario_ids:
+  - RV-025
+  - RV-028
+  reference_identity:
+    display_title_fa: مسئول کنترل اسناد / Document Controller
+    reference_username_target: uiux.persona.document-controller
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-20
+  name_fa: کارشناس حقوق و دستمزد
+  purpose: Payroll period/run preparation, employee inputs, adjustments, statutory calculations, payslips, financial handoff
+    and reconciliation.
+  required_authority_shape: Payroll calculation/review permissions only; no Timekeeping source-edit authority or Treasury
+    final-payment authority inferred.
+  required_data:
+  - payroll period
+  - employees eligible for payroll
+  - timekeeping/input data
+  - earnings/deductions/rules
+  - run with reviewable result
+  scenario_ids:
+  - RV-018
+  - RV-025
+  reference_identity:
+    display_title_fa: کارشناس حقوق و دستمزد
+    reference_username_target: uiux.persona.payroll
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-21
+  name_fa: کارشناس احکام و سوابق استخدامی
+  purpose: Effective-dated employment records, personnel decree/record versions, supersession, source documents and employee-visible
+    employment history.
+  required_authority_shape: Existing employment-record management and employee-view permissions; do not infer Payroll or Tenant
+    Admin authority.
+  required_data:
+  - employee with active work relationship and revision
+  - source document with safe available version
+  - current and historical employment records where available
+  - ESS employee able to view own employment history
+  scenario_ids:
+  - RV-015
+  - RV-025
+  - RV-029
+  reference_identity:
+    display_title_fa: کارشناس احکام و سوابق استخدامی
+    reference_username_target: uiux.persona.employment-records
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-22
+  name_fa: انباردار / کارشناس کنترل موجودی
+  purpose: Warehouse, custody, reservation, count, transfer, receipt/issue transactions and inventory valuation visibility.
+  required_authority_shape: Inventory/material permissions for assigned warehouses/projects; no Equipment or Accounting authority
+    inferred.
+  required_data:
+  - warehouse with stock
+  - material catalogue
+  - inventory transactions
+  - reservation/count/transfer examples
+  - valuation data where authorized
+  scenario_ids:
+  - RV-009
+  - RV-025
+  reference_identity:
+    display_title_fa: انباردار / کارشناس کنترل موجودی
+    reference_username_target: uiux.persona.inventory-storekeeper
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-23
+  name_fa: کارشناس قراردادها و امور تجاری
+  purpose: Contract records, revisions, commercial review, tender/commercial evidence and contract-state next actions.
+  required_authority_shape: Contracts/commercial permissions within tenant/project scope; no Procurement Buyer or Billing
+    settlement authority inferred.
+  required_data:
+  - contract in active/reviewable state
+  - contractual records and revisions
+  - commercial/tender case with evidence
+  - project and counterparty context
+  scenario_ids:
+  - RV-025
+  - RV-030
+  reference_identity:
+    display_title_fa: کارشناس قراردادها و امور تجاری
+    reference_username_target: uiux.persona.contracts-commercial
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-24
+  name_fa: کارشناس کنترل پروژه / دفتر فنی
+  purpose: WBS/activity controls, comparison/exceptions, estimates, phase/site context and project cost-control interpretation.
+  required_authority_shape: Project-controls/estimate permissions for explicitly scoped projects; no Project Owner or Accounting
+    authority inferred.
+  required_data:
+  - project with WBS/activities/sites/phases
+  - estimate data
+  - progress/comparison/exception data
+  - cost-reconciliation view data where authorized
+  scenario_ids:
+  - RV-006
+  - RV-025
+  - RV-031
+  reference_identity:
+    display_title_fa: کارشناس کنترل پروژه / دفتر فنی
+    reference_username_target: uiux.persona.project-controls
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-25
+  name_fa: کارشناس کیفیت / QA-QC
+  purpose: Quality issue registration, review, assignment, corrective action, inspection/nonconformance/CAPA evidence and
+    QA/QC lifecycle.
+  required_authority_shape: Quality/QA-QC permissions within known project/site scope; no HSE authority inferred.
+  required_data:
+  - quality issues in multiple states
+  - inspection/nonconformance/CAPA examples where applicable
+  - corrective actions
+  - project/site context
+  scenario_ids:
+  - RV-020
+  - RV-025
+  reference_identity:
+    display_title_fa: کارشناس کیفیت / QA-QC
+    reference_username_target: uiux.persona.quality-qaqc
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+- persona_id: P-26
+  name_fa: تأمین‌کننده / شریک بیرونی در پرتال
+  purpose: External procurement/partner portal access, invitation acceptance, quotation/receipt evidence and strict tenant/opportunity
+    isolation.
+  required_authority_shape: External/portal grant only for the intended invitation/receipt/opportunity; no ordinary tenant
+    membership assumed.
+  required_data:
+  - active RFQ invitation or portal grant
+  - supplier/partner identity
+  - allowed receipt/quote/evidence target
+  - second tenant/opportunity for isolation comparison
+  scenario_ids:
+  - RV-025
+  - RV-032
+  reference_identity:
+    display_title_fa: تأمین‌کننده / شریک بیرونی در پرتال
+    reference_username_target: uiux.persona.external-supplier
+    retention: PERSISTENT_REFERENCE
+    ui_visibility: REQUIRED_WHEN_PROVISIONED
+    delete_on_validation_cleanup: false
+    provisioning_status: VERIFY_AT_RUNTIME_ENTRY
+    display_title_required: false
+    display_title_language_requirement: NONE
+    primary_ui_identifier: stable_username_or_persona_id
+coverage_revision:
+  previous_persona_count: 19
+  current_persona_count: 26
+  added_personas:
+  - P-20
+  - P-21
+  - P-22
+  - P-23
+  - P-24
+  - P-25
+  - P-26
+  refined_existing_personas:
+  - P-04
+  - P-07
+  - P-08
+  - P-10
+  - P-11
+  reason: Second functional-journey review separated materially different construction-ERP roles that had previously been
+    grouped too broadly.
+  static_findings_impact: NONE
+  runtime_plan_impact: 'YES'
+  new_product_role_authority_created: false
+reference_persona_policy:
+  policy_document: UIUX_REFERENCE_PERSONA_RETENTION_POLICY.md
+  catalogue_document: UIUX_REFERENCE_PERSONA_CATALOGUE.yaml
+  retention: PERSISTENT_REFERENCE
+  delete_after_validation: false
+  automatic_deactivation_after_validation: false
+  persian_display_title_required: false
+  governed_ui_visibility_required: true
+  reusable_after_validation: true
+  credentials_in_governance_artifacts: FORBIDDEN
+  authority_broadening_to_force_pass: FORBIDDEN
+  display_label_requirement: NO_PERSIAN_REQUIREMENT; stable technical identifier is sufficient, human-readable label optional.
+  reconciliation_status: CHECKPOINT_15_COMPLETE
+  catalogue_actual_aliases_reconciled: true
+  historical_evidence_files_are_immutable: true

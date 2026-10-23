@@ -1,0 +1,135 @@
+{
+  "scope": "Only six formerly UTV Workforce prerequisite cells; not CEP079 scenario execution",
+  "cells": [
+    {
+      "browser": "Chrome",
+      "viewport": [
+        1440,
+        900
+      ],
+      "result": "FAIL",
+      "checks": {
+        "exact_viewport": true,
+        "rtl_semantics": true,
+        "no_overflow": true,
+        "keyboard_opens": true,
+        "close_focus": false,
+        "escape_focus": false,
+        "list_filter_restore": true
+      },
+      "capture": "WORKFORCE_Chrome_1440.jpg"
+    },
+    {
+      "browser": "Chrome",
+      "viewport": [
+        1024,
+        768
+      ],
+      "result": "FAIL",
+      "checks": {
+        "exact_viewport": true,
+        "rtl_semantics": true,
+        "no_overflow": true,
+        "keyboard_opens": true,
+        "close_focus": false,
+        "escape_focus": false,
+        "list_filter_restore": true
+      },
+      "capture": "WORKFORCE_Chrome_1024.jpg"
+    },
+    {
+      "browser": "Chrome",
+      "viewport": [
+        390,
+        844
+      ],
+      "result": "FAIL",
+      "checks": {
+        "exact_viewport": true,
+        "rtl_semantics": true,
+        "no_overflow": true,
+        "keyboard_opens": true,
+        "close_focus": false,
+        "escape_focus": false,
+        "list_filter_restore": true
+      },
+      "capture": "WORKFORCE_Chrome_390.jpg"
+    },
+    {
+      "browser": "Edge",
+      "viewport": [
+        1440,
+        900
+      ],
+      "result": "FAIL",
+      "checks": {
+        "exact_viewport": true,
+        "rtl_semantics": true,
+        "no_overflow": true,
+        "keyboard_opens": true,
+        "close_focus": false,
+        "escape_focus": false,
+        "list_filter_restore": true
+      },
+      "capture": "WORKFORCE_Edge_1440.jpg"
+    },
+    {
+      "browser": "Edge",
+      "viewport": [
+        1024,
+        768
+      ],
+      "result": "FAIL",
+      "checks": {
+        "exact_viewport": true,
+        "rtl_semantics": true,
+        "no_overflow": true,
+        "keyboard_opens": true,
+        "close_focus": false,
+        "escape_focus": false,
+        "list_filter_restore": true
+      },
+      "capture": "WORKFORCE_Edge_1024.jpg"
+    },
+    {
+      "browser": "Edge",
+      "viewport": [
+        390,
+        844
+      ],
+      "result": "FAIL",
+      "checks": {
+        "exact_viewport": true,
+        "rtl_semantics": true,
+        "no_overflow": true,
+        "keyboard_opens": true,
+        "close_focus": false,
+        "escape_focus": false,
+        "list_filter_restore": true
+      },
+      "capture": "WORKFORCE_Edge_390.jpg"
+    }
+  ],
+  "distinct_cells": 6,
+  "fail": 6,
+  "pass": 0,
+  "utv": 0,
+  "raw_observations": 7,
+  "repeat": "One Chrome 390 hard-refresh attribution probe also FAIL; not counted as a seventh cell",
+  "failure": "Close does not restore trigger focus; Escape retains the open drawer and close-button focus",
+  "source_drift": {
+    "path": "templates/workforce/department_list.html",
+    "classification": "PRE_EXISTING_PRESENTATION_SURFACE_DRIFT_FROM_PRIOR_R5_EVIDENCE",
+    "current": "76a7c5f83707c86724da1420b52fd65f9f7cedd08d37c57e9807937234610ae7",
+    "prior_R5": "238f648fb22aa80d0f086b545faab388dc709d2c5322af551622f344ce909937",
+    "detail": "Current entry/HEAD template requests JS v4; prior final R5 evidence expected v5. Current JS bytes match prior final R5. Causal attribution to asset caching/source delivery is NOT proved; hard refresh still failed."
+  },
+  "attributable_regression_introduced_by_preparation": false,
+  "functional_current_result": "Actual FAIL retained, irrespective of presentation-only file classification",
+  "applicability": {
+    "UAT-CASE-040": "BLOCKING current cross-cutting keyboard/RTL/form prerequisite",
+    "UAT-CASE-034": "NOT CURRENTLY BLOCKING: ordinary Person/employee route selected; conditional blocker if department-tree traversal is required later"
+  },
+  "prior_sufficient_coverage_rerun": false,
+  "minimum_action": "Attribute and repair this bounded defect under separate implementation authority, then recheck exactly six cells; do not require blanket CEP078 completion"
+}

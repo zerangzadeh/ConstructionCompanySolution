@@ -1,0 +1,644 @@
+{
+  "at": "2026-10-23T14:53:50.082215+03:30",
+  "status": "DEFINED_CANONICAL_COVERAGE_NOT_ENVIRONMENT_READY",
+  "approval_semantics": "Current Human authorizes defining/proving the canonical CEP matrix. Codex derives technical planning under standing authority; no Human approval, support-policy exception or exclusion is fabricated. Execution approval remains conditional on all readiness evidence.",
+  "canonical_browser_basis": {
+    "Gap ID": "UIGAP-025",
+    "Current State": "Chrome/Edge/Safari behavior was not executed in Audit19",
+    "Target State": "Runtime browser evidence after implementation",
+    "Gap Classification": "UTV",
+    "Priority": "N/A",
+    "Source Evidence": "Audit19",
+    "Target Workspace / Navigation": "All critical journeys",
+    "V1 Status": "Verification gate",
+    "Dependency": "RMB-0706 / RMB-0806",
+    "Evidence Status": "UNABLE TO VERIFY"
+  },
+  "basis_interpretation": "UIGAP-025 expressly names unverified Chrome/Edge/Safari behavior for all critical journeys. All three remain in the plan; no approved exclusion/substitution was found. This preserves the named gap, without inventing supported release numbers or a new Firefox requirement.",
+  "browsers": [
+    {
+      "name": "Chrome",
+      "required_identity": "Actual browser product/full version, engine/runtime build, OS/device identity and observation tied to each execution",
+      "installed_version": "155.0.8059.82",
+      "observed_runtime_version": null,
+      "readiness": "PARTIAL_INSTALLED_BINARY_IDENTIFIED_NOT_EXECUTED"
+    },
+    {
+      "name": "Edge",
+      "required_identity": "Actual browser product/full version, engine/runtime build, OS/device identity and observation tied to each execution",
+      "installed_version": "155.0.4283.62",
+      "observed_runtime_version": null,
+      "readiness": "PARTIAL_INSTALLED_BINARY_IDENTIFIED_NOT_EXECUTED"
+    },
+    {
+      "name": "Safari",
+      "required_identity": "Actual browser product/full version, engine/runtime build, OS/device identity and observation tied to each execution",
+      "installed_version": null,
+      "observed_runtime_version": null,
+      "readiness": "BLOCKED_NO_AVAILABLE_RUNTIME_PROVIDER_OR_VERSION"
+    }
+  ],
+  "viewports_css": [
+    {
+      "class": "desktop",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "class": "tablet_narrow_desktop",
+      "width": 1024,
+      "height": 768
+    },
+    {
+      "class": "mobile",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "device_rule": "These are CSS viewport classes, not claims of physical-device certification. Record actual OS/device/emulation per execution. Safari OS/device/full browser build remains unavailable; do not label a Windows viewport emulation or generic WebKit as Safari evidence.",
+  "accessibility_basis": "docs/ui-guidelines.md section 49: WCAG 2.2 AA product target; keyboard/visible focus/RTL order, safe Escape/focus return, programmatic labels/errors, semantic headings/landmarks/tables, mixed-direction isolation, reduced motion. Target is not a conformance claim.",
+  "scope_sources": {
+    "docs/governance/cep/PROMPTS/CEP-078_EXECUTION_PROMPT.md": "313eb92ea69db33fe2ccaa6d881a6346949286aa8d9c688ac87dd820b0e92030",
+    "docs/ui-guidelines.md": "318a0365f7bcbb2e67349ce60c114b99f9e948cf9bcda8d9f06dce78ef481d3f",
+    "docs/governance/uiux/UIUX_RUNTIME_VALIDATION_EXECUTION_PLAYBOOK.md": "6cf038ba6d746a21118697a475be45993f9ea671ceedffe88d89b3e24f33187f",
+    "docs/governance/uiux/UIUX_RUNTIME_VALIDATION_MATRIX.yaml": "e3a9aab11385adf461299f5ef9a1a02620fdf8c6e3b2d9e4c9b68e70c5ee4678",
+    "docs/governance/uiux/UIUX_RUNTIME_PERSONA_DATA_MATRIX.yaml": "c363605feae33e6b63b32098e5c2469e0628473d703f8f901caea2a27550b1dc",
+    "docs/governance/uiux/UIUX_RUNTIME_FIXTURE_REGISTRY.yaml": "a69a95290b9720abac8e1751658cc5d1748a518a08e0587d3e4061526ad7843d"
+  },
+  "scenario_plan": [
+    {
+      "cep_scenario_id": "CEP-078-SC-001",
+      "source_scenario": "RV-001",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Authentication and personal settings\n  persona_archetype: Authenticated employee / ordinary tenant user\n  surfaces:\n  - /accounts/login/\n  - /accounts/settings/\n  validate:\n  - responsive layout and focus order\n  - single main landmark\n  - error messaging\n  - password visibility control\n  - Persian-first labels\n  - profile/password settings form consistency\n  priority: HIGH\n  persona_ids:\n  - P-01\n",
+      "block_sha256": "7b62eb8f5326e7642496fde04d24d54d1abb75a306e2c184e0fa76c6ca078c91",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-002",
+      "source_scenario": "RV-002",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Home normal state and role prioritization\n  persona_archetype: Project/operations user with multiple accessible workspaces\n  surfaces:\n  - /\n  validate:\n  - current organization/project context clarity\n  - whether Home is only destination links or conveys actionable work\n  - visual hierarchy versus role priority\n  - assigned work / alerts affordance\n  - desktop/mobile presentation\n  priority: CRITICAL_PRODUCT_REVIEW\n  persona_ids:\n  - P-01\n  - P-15\n  - P-17\n",
+      "block_sha256": "e8172b48a736607b3c0985cb2429ad0ba13e1f198102ec291becb07e553e5aff",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-003",
+      "source_scenario": "RV-003",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Home exceptional states\n  persona_archetype: User variants with no context / no workspace / unauthorized / empty data\n  surfaces:\n  - /\n  validate:\n  - no_context\n  - empty\n  - no_workspace\n  - unauthorized\n  - error\n  - actionable guidance and recovery\n  priority: HIGH\n  persona_ids:\n  - P-01\n",
+      "block_sha256": "7ea9617305a87fe728d12f4c80860af922c9782624f33f8878bbb91f2d3c59e0",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-004",
+      "source_scenario": "RV-004",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Application navigation and permission-visible destinations\n  persona_archetype: Two tenant personas with materially different permission bundles\n  surfaces:\n  - SHARED-MAIN-NAVIGATION\n  validate:\n  - duplicate/disabled navigation entries\n  - active group state\n  - desktop/mobile parity\n  - visibility does not grant authorization\n  - HSE/Commercial/Project Controls destination consistency\n  priority: HIGH\n  persona_ids:\n  - P-01\n  - P-15\n  - P-16\n  - P-17\n  - P-18\n",
+      "block_sha256": "437c742856f12483d47ce7f2fb958ea45a6d5250952949fd308adbb87ae8a443",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-005",
+      "source_scenario": "RV-005",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Authorized global search\n  persona_archetype: Scoped project user\n  surfaces:\n  - /search/\n  validate:\n  - authorized result scope\n  - no-result wording\n  - technical authorization language leakage\n  - cross-tenant/object-scope denial\n  priority: HIGH\n  persona_ids:\n  - P-01\n  - P-15\n",
+      "block_sha256": "21999c146b9a8b89bd69e5aaf19475d555cffd24b7e0a402598c9167303d1d90",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-006",
+      "source_scenario": "RV-006",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Canonical cascade filtering comparison\n  persona_archetype: Project-scoped operational user\n  surfaces:\n  - /estimates/create/\n  - /expenses/new/\n  - /daily-reports/create/\n  - /equipment/assignments/create/\n  validate:\n  - context defaulting\n  - Project→child selector cascade\n  - loading/empty/error states\n  - stale-child invalidation\n  - server rejects manipulated unauthorized/mismatched IDs\n  priority: CRITICAL_FORM_UX\n  persona_ids:\n  - P-02\n  - P-17\n  - P-24\n",
+      "block_sha256": "3a640af020e78921bf998dea9be09d4802b8519fa29389b7d5cee3f37d6fe221",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-007",
+      "source_scenario": "RV-007",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Procurement RFQ evaluation and valid next action\n  persona_archetype: Procurement buyer\n  surfaces:\n  - /procurement/rfqs/<uuid:rfq_id>/buyer/\n  validate:\n  - stage visibility\n  - single emphasized next action\n  - invalid actions absent/disabled\n  - technical/governance wording\n  priority: HIGH\n  persona_ids:\n  - P-03\n  - P-17\n",
+      "block_sha256": "15e84b7ea8aa5ef3c88cecb6ae40bae6ec4893c76f8b2c6fb28e1a48d905e710",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-008",
+      "source_scenario": "RV-008",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Purchase order from approved request\n  persona_archetype: Procurement buyer\n  surfaces:\n  - /procurement/orders/create/\n  validate:\n  - Project→Purchase Request narrowing\n  - known-data derivation/defaulting from source request\n  - post-submit mismatch prevention\n  priority: HIGH\n  persona_ids:\n  - P-03\n  - P-17\n",
+      "block_sha256": "70aa56df9cee3a8dc8493c148031a8d4987a3bdbf41e0abb6217e325cf283f7a",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-009",
+      "source_scenario": "RV-009",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Inventory navigation and drill-down\n  persona_archetype: Inventory operator\n  surfaces:\n  - /inventory/\n  - /inventory/custody/\n  - /inventory/valuation/\n  validate:\n  - consistent list/detail affordance\n  - technical IDs hidden from normal workflow\n  - task hierarchy between quantity/custody and valuation\n  priority: HIGH\n  persona_ids:\n  - P-22\n",
+      "block_sha256": "830ce4370cf804736089f0574e46e808de3ba2489329d5c5bea6094923194199",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-010",
+      "source_scenario": "RV-010",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Journal entry with project dimensions\n  persona_archetype: Accountant\n  surfaces:\n  - /accounting/journals/create/\n  validate:\n  - Project→Site/WBS cascade\n  - source/evidence/reconciliation references\n  - field labels after shared component rendering\n  - task-specific submit action\n  priority: CRITICAL_FORM_UX\n  persona_ids:\n  - P-05\n",
+      "block_sha256": "7d969e186ae7f201653e2cd8fd8913e7f8ce476d59e499cb8779af2982d51c70",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-011",
+      "source_scenario": "RV-011",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Financial statements\n  persona_archetype: Accountant / finance reviewer\n  surfaces:\n  - /accounting/statements/\n  - /accounting/statements/<uuid:run_id>/\n  validate:\n  - localized statement/account-type labels\n  - Jalali date display\n  - numeric alignment\n  - audit hashes progressively disclosed\n  priority: HIGH\n  persona_ids:\n  - P-05\n",
+      "block_sha256": "2c8c86ff1d814fd2f6ef99139e8f1d83d99c9771e223b22c84b50a63f8b9b7b0",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-012",
+      "source_scenario": "RV-012",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Treasury movement from an approved source request\n  persona_archetype: Treasury operator\n  surfaces:\n  - /treasury/movements/new/\n  - /treasury/operations/\n  validate:\n  - origin request→project/context derivation\n  - human-readable transaction references\n  - business versus audit metadata separation\n  - state-aware actions\n  priority: HIGH\n  persona_ids:\n  - P-06\n",
+      "block_sha256": "082ea95a0a8e2aca9bfcceffc2b5dfa725a9a63f8ca6ad5337b9316190660a43",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-013",
+      "source_scenario": "RV-013",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Subledger settlement allocation\n  persona_archetype: AP/AR operator\n  surfaces:\n  - /subledgers/\n  validate:\n  - movement selection without raw ID entry\n  - authorized posted movement narrowing\n  - dense multi-task workbench comprehension\n  priority: HIGH\n  persona_ids:\n  - P-07\n  - P-05\n",
+      "block_sha256": "96db700512084de0635327f7b2dba32610fe94942047133999847bf5e275c8f7",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-014",
+      "source_scenario": "RV-014",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Billing claims, payable certificates and statutory forms\n  persona_archetype: Commercial/billing specialist\n  surfaces:\n  - /billing/claims/<uuid:claim_id>/\n  - /billing/payable-certificates/new/\n  - /billing/commercial-controls/\n  validate:\n  - Jalali input/display\n  - dependent evidence/source selectors\n  - business calculation basis versus technical lineage\n  - task-specific CTA\n  priority: HIGH\n  persona_ids:\n  - P-07\n",
+      "block_sha256": "f3925d48057e48a3e75b08f7dafbe44166fd4c0896141148ec45967ab185a14b",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-015",
+      "source_scenario": "RV-015",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Workforce structure and employee administration\n  persona_archetype: HR administrator\n  surfaces:\n  - /workforce/departments/\n  - /workforce/positions/\n  - /workforce/teams/\n  - /workforce/employees/create/\n  - /workforce/foundation/\n  validate:\n  - tree/list keyboard usability\n  - filter placement\n  - known-account data reuse\n  - sensitive-data separation\n  - technical tenancy/permission wording\n  priority: HIGH\n  persona_ids:\n  - P-08\n  - P-21\n",
+      "block_sha256": "2adffe3015bb5c0c461e1b15410b42e8a435d1d8ebfb0be304edf8bc3f6fc71d",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-016",
+      "source_scenario": "RV-016",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Employee self-service\n  persona_archetype: Employee self-service user\n  surfaces:\n  - /workforce/ess/\n  - /payroll/ess/\n  validate:\n  - own-data privacy\n  - flat ESS navigation burden\n  - source-system/raw status leakage\n  - empty states\n  - mobile usability\n  priority: CRITICAL_ESS\n  persona_ids:\n  - P-09\n",
+      "block_sha256": "65ffd4f11dca6dd18f41b4054320eca8d020c6e63471932018b223bcc813a98b",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-017",
+      "source_scenario": "RV-017",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Timekeeping setup and daily operation\n  persona_archetype: Timekeeping/HR operator\n  surfaces:\n  - /timekeeping/\n  - /timekeeping/calendars/new/\n  validate:\n  - configuration versus daily-work separation\n  - ISO weekday input replacement need\n  - exception-code localization\n  - valid next action and workload visibility\n  priority: HIGH\n  persona_ids:\n  - P-10\n",
+      "block_sha256": "213de672e2825233875b0d6a8d7afd579164db34eb8b8bc33256a9e034bed67a",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-018",
+      "source_scenario": "RV-018",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Payroll processing and statutory handoff\n  persona_archetype: Payroll specialist\n  surfaces:\n  - /payroll/\n  - /payroll/runs/<uuid:run_id>/\n  - /payroll/statutory/\n  - /payroll/financial-handoffs/\n  validate:\n  - journey sequencing\n  - technical lineage/hash/JSON exposure\n  - exception handling\n  - form technical metadata generation versus manual input\n  priority: CRITICAL_PAYROLL\n  persona_ids:\n  - P-20\n",
+      "block_sha256": "2a483a9a9951cbd146035f9d9d8f93bf7f54e3f5292ec78d7e32fa13302146d0",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-019",
+      "source_scenario": "RV-019",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Equipment operation, maintenance and costing\n  persona_archetype: Equipment/maintenance operator\n  surfaces:\n  - /equipment/operations/\n  - /equipment/maintenance/\n  - /equipment/cost/\n  validate:\n  - action hierarchy\n  - Jalali dates\n  - Equipment→Plan/Employee→Qualification cascades\n  - source/occurrence key exposure\n  - delivery-phase metadata leakage\n  priority: HIGH\n  persona_ids:\n  - P-04\n",
+      "block_sha256": "7628fad657d7f5d49bc323a8171cc0cd601caaf3562a261215af46fc300a497b",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-020",
+      "source_scenario": "RV-020",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Safety and Quality lifecycle\n  persona_archetype: HSE/Quality reviewer\n  surfaces:\n  - /safety/<uuid:incident_id>/\n  - /quality/<uuid:issue_id>/\n  validate:\n  - next-action pattern\n  - semantic status colors\n  - Jalali dates\n  - inline transition forms\n  - POST action endpoints are not separate screens\n  priority: HIGH\n  persona_ids:\n  - P-11\n  - P-25\n  - P-17\n",
+      "block_sha256": "2b955b176e0c2e5af91318b72685f330b5337f190dab16bebca62ece233cf20b",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-021",
+      "source_scenario": "RV-021",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Knowledge publication, reuse and promotion\n  persona_archetype: Knowledge curator / platform reviewer\n  surfaces:\n  - /knowledge/publications/<uuid:version_id>/\n  - /knowledge/publications/<uuid:version_id>/history/\n  - /knowledge/platform/promotions/\n  validate:\n  - article view versus traceability separation\n  - raw source/status/hash exposure\n  - canonical form styling\n  - tenant/platform wording\n  priority: HIGH\n  persona_ids:\n  - P-12\n  - P-18\n",
+      "block_sha256": "571f5c9b29d449db7caa74694c49e0b38f3d3266a96e1a616d47f610bc79247c",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-022",
+      "source_scenario": "RV-022",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Workflow administration\n  persona_archetype: Workflow administrator\n  surfaces:\n  - /workflows/administration/versions/<uuid:version_id>/\n  validate:\n  - ability to understand process without reconstructing keys/transitions mentally\n  - business labels versus raw configuration\n  - visual workflow representation need\n  priority: HIGH\n  persona_ids:\n  - P-13\n",
+      "block_sha256": "180370e827ff25d5c87005ace0543335f9df52ac08fa85935b337d33e0d509f8",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-023",
+      "source_scenario": "RV-023",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Shared filtered/sorted/paginated table\n  persona_archetype: Any operational list user\n  surfaces:\n  - SHARED-TABLE-PAGINATION\n  - SHARED-LIST-DETAIL-AFFORDANCE\n  validate:\n  - filter+sort state survives page navigation\n  - clear-filter behavior\n  - row/detail affordance consistency\n  - keyboard focus and aria-sort\n  priority: HIGH\n  persona_ids:\n  - P-01\n",
+      "block_sha256": "2b9514c70d5f5fc31a4fe4a8979047e1fb15977208818e928e1c7b53e7f9340c",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-024",
+      "source_scenario": "RV-024",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Cross-module accessibility landmarks\n  persona_archetype: Keyboard and screen-reader-oriented validation persona\n  surfaces:\n  - /accounts/login/\n  - /workforce/employees/<uuid:employee_id>/\n  - /reporting/reconciliations/\n  - /reporting/project-closeout/<uuid:case_id>/\n  validate:\n  - single main landmark\n  - heading hierarchy\n  - focus visibility\n  - accessible icon-only controls\n  - table and form labels\n  priority: HIGH\n  persona_ids:\n  - P-14\n",
+      "block_sha256": "be6ff8d62dc4eedcf2fb3025d36df8244e42cdd1f8360d1930e1fb8489fcbd78",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-025",
+      "source_scenario": "RV-025",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Cross-role responsive representative sweep\n  persona_archetype: Representative tenant users\n  surfaces:\n  - /\n  - /projects/\n  - /procurement/rfqs/<uuid:rfq_id>/buyer/\n  - /workforce/ess/\n  - /accounting/statements/\n  - /equipment/operations/\n  validate:\n  - desktop 1440px\n  - tablet/narrow desktop\n  - mobile 390px\n  - sidebar/off-canvas behavior\n  - wide-table horizontal scrolling\n  - primary actions remain reachable\n  priority: HIGH\n  persona_ids:\n  - P-01\n  - P-15\n  - P-16\n  - P-17\n  - P-18\n  - P-19\n  - P-20\n  - P-22\n  - P-23\n  - P-24\n  - P-25\n  - P-26\n",
+      "block_sha256": "ab46ce6bb26290a2edb9fab7c5db3f69a36f11f478089b85fedf42a43d6f47c1",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-026",
+      "source_scenario": "RV-026",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Tenant administration and access governance\n  persona_archetype: Tenant Owner and Tenant Admin with deliberately distinct authority\n  persona_ids:\n  - P-15\n  - P-16\n  surfaces:\n  - /organizations/members/\n  - /organizations/roles/\n  - /organizations/members/<uuid:membership_id>/authorization/\n  - /organizations/settings/\n  - /organizations/configuration-profiles/\n  validate:\n  - Tenant Owner versus Tenant Admin task framing and navigation are distinguishable\n  - membership/user administration is understandable without leaking internal authorization implementation language\n  - role and scope assignment surfaces explain current authority, approver requirements and protected-operation boundaries\n  - no platform-only administration appears as an ordinary tenant task\n  - tenant boundaries and object scope remain authoritative server-side\n  - empty/quarantined/pending authorization states provide actionable guidance\n  priority: CRITICAL_ACCESS_UX\n",
+      "block_sha256": "e6f1d4ceb2047b563e2221eee5de9f6872d86572fac6acdac561926e04920bd7",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-027",
+      "source_scenario": "RV-027",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Platform administration and tenant boundary\n  persona_archetype: Platform Admin\n  persona_ids:\n  - P-18\n  surfaces:\n  - /organizations/platform/roles/\n  - /organizations/platform/protected-operations/\n  - /organizations/platform/accounting-policies/\n  - /organizations/\n  validate:\n  - platform-only surfaces are clearly separated from tenant operational administration\n  - cross-tenant context is explicit and cannot be mistaken for ordinary tenant context\n  - protected operations and role catalogue use understandable governance language with progressive disclosure\n  - Platform Admin authority is not presented as Tenant Owner/Tenant Admin identity\n  - tenant-specific data is not leaked across organizations outside authorized platform purpose\n  priority: CRITICAL_PLATFORM_BOUNDARY_UX\n",
+      "block_sha256": "9ee3ea8ec64f1df6585a0f82dc06a7566babc4cb6e5a286badedaf9ae1aa1a34",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-028",
+      "source_scenario": "RV-028",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Document control lifecycle\n  persona_archetype: Document Controller\n  persona_ids:\n  - P-19\n  surfaces:\n  - /documents/\n  - /documents/mine/\n  - /documents/upload/\n  - /documents/<uuid:document_id>/\n  - /documents/<uuid:document_id>/versions/add/\n  - /documents/<uuid:document_id>/links/add/\n  validate:\n  - document registration is task-oriented and does not require avoidable technical identifiers\n  - version history and current version are understandable\n  - project/business-object linking uses authorized existing records and clear context\n  - download/preview/version actions have consistent hierarchy and affordance\n  - own-document versus organization-document scope is clear\n  - empty/error/unauthorized states and mobile behavior are usable\n  priority: HIGH\n",
+      "block_sha256": "f13efe79e4a89c4dfb9a1889a45b874b1621f9808b56e39a42d93873d986861b",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-029",
+      "source_scenario": "RV-029",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Personnel decree / effective-dated employment record lifecycle\n  persona_archetype: HR Operations + Personnel Decree / Employment Records Specialist\n  persona_ids:\n  - P-08\n  - P-21\n  - P-09\n  surfaces:\n  - /workforce/employees/<uuid:employee_id>/\n  - /workforce/ess/employment/\n  - CANONICAL_INTERNAL_EMPLOYMENT_RECORD_MANAGEMENT_SURFACE_IF_PRESENT\n  validate:\n  - current versus historical/effective-dated employment information is understandable\n  - supersession/version semantics are presented as business history rather than raw technical lineage\n  - effective-from/effective-to dates are unambiguous and Jalali-consistent in the UI\n  - source document/version is traceable without exposing avoidable technical identifiers\n  - employee self-view is privacy-bounded to own employment history\n  - if no governed internal management surface exists for EMPLOYMENT_RECORDS_MANAGE, record NEEDS_PRODUCT_REVIEW rather than\n    inventing a route or UI\n  priority: CRITICAL_HR_EFFECTIVE_DATING\n",
+      "block_sha256": "ef50afa62bdd0d14ff3494f9ac7bf21ca52585f4be7698dea6f2101516da6cd3",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-030",
+      "source_scenario": "RV-030",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Contract and commercial administration lifecycle\n  persona_archetype: Contracts & Commercial Specialist\n  persona_ids:\n  - P-23\n  surfaces:\n  - /contracts/\n  - /contracts/<uuid:contract_id>/\n  - /contracts/<uuid:contract_id>/commercial-review/\n  - /contracts/contractual-records/\n  - /commercial/\n  - /commercial/<uuid:tender_id>/\n  - /commercial/<uuid:tender_id>/revise/\n  - /commercial/<uuid:tender_id>/evidence/\n  validate:\n  - contract status, commercial review and next action are task-oriented\n  - revision history is understandable without delivery/governance jargon dominating the page\n  - counterparty/project context is clear\n  - evidence/version references use business labels before canonical IDs\n  - commercial and procurement/billing responsibilities are not conflated\n  - responsive and keyboard behavior remain usable on representative detail/review screens\n  priority: HIGH\n",
+      "block_sha256": "09366fcdd00bb856d0c42968344d5958d42719a6cf1f126d97932b7bf274a431",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-031",
+      "source_scenario": "RV-031",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Project controls, estimates and technical-office oversight\n  persona_archetype: Project Controls / Technical Office Specialist + Project Manager\n  persona_ids:\n  - P-24\n  - P-17\n  surfaces:\n  - /projects/<uuid:project_id>/controls/\n  - /projects/<uuid:project_id>/controls/comparison/\n  - /projects/<uuid:project_id>/controls/exceptions/\n  - /projects/<uuid:project_id>/controls/cost-reconciliation/\n  - /estimates/\n  - /estimates/create/\n  validate:\n  - WBS/activity/comparison/exception information supports project-control decisions\n  - Project→Site→Phase context remains clear and appropriately narrowed\n  - estimate creation reuses known project context and task-specific actions\n  - exceptions and cost reconciliation surface priority and next action rather than implementation metadata\n  - Project Manager and specialist views are distinguishable where authority differs\n  priority: HIGH\n",
+      "block_sha256": "94213671d853e75b5e9f39fed1939005d63c0afc581aa3e5dee1ad41811a5c28",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-032",
+      "source_scenario": "RV-032",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: External supplier / partner procurement portal\n  persona_archetype: External Supplier / Partner Portal User\n  persona_ids:\n  - P-26\n  surfaces:\n  - /procurement/portal/accept/\n  - /procurement/portal/grants/<uuid:grant_id>/\n  - /procurement/portal/receipts/<uuid:receipt_id>/\n  - /procurement/rfq-invitations/<uuid:invitation_id>/portal/\n  - /procurement/quote-revisions/<uuid:revision_id>/sealed-evidence/\n  validate:\n  - external user purpose and current invitation/opportunity context are explicit\n  - portal user sees only granted opportunity/receipt/evidence scope\n  - cross-tenant and unrelated RFQ leakage is absent\n  - technical integrity/idempotency/hash metadata does not become ordinary user input\n  - submission/revision state and next action are understandable\n  - mobile/keyboard/error states are usable without exposing tenant-internal navigation\n  priority: CRITICAL_EXTERNAL_BOUNDARY_UX\n",
+      "block_sha256": "393b37a4d6f0f27131f19e0a21eccbd7cebc9380be8e233a59098bedbd03b9a9",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    },
+    {
+      "cep_scenario_id": "CEP-078-SC-033",
+      "source_scenario": "RV-033",
+      "source_role": "Scenario/route/persona planning input only; original RV results never relabeled CEP execution",
+      "canonical_input_block": "  journey: Reference persona catalogue and reusable identity administration\n  persona_archetype: Tenant Admin / Platform Admin administering governed reference personas\n  persona_ids:\n  - P-16\n  - P-18\n  surfaces:\n  - GOVERNED_REFERENCE_PERSONA_UI_SURFACE_TO_BE_CONFIRMED_OR_IMPLEMENTED\n  validate:\n  - all defined/provisioned reference personas are discoverable by stable persona/account identifier\n  - provisioning/readiness state is visible without exposing secrets\n  - organization/context and role/scope summaries are understandable\n  - persona authority is traceable without implying Persona equals Role\n  - reference personas remain available after prior validation completion\n  - no Persian display-title requirement is imposed\n  - no impersonation capability is assumed or silently introduced\n  priority: HIGH_GOVERNANCE_UX\n  current_planning_status: NEEDS_PRODUCT_UI_CONFIRMATION_OR_IMPLEMENTATION\nexecution_status:\n  runtime_validation_started: true\n  latest_wave: A\n  latest_wave_status: WAVE_A_PARTIAL\n  latest_wave_results: UIUX_RUNTIME_VALIDATION_RESULTS.yaml\n  full_runtime_audit_closed: false\n  environment_verified: true\n  test_identities_verified: PARTIAL_RECHECK_REQUIRED_AFTER_PERSONA_REVISION\n  scenario_data_verified: PARTIAL_RECHECK_REQUIRED_AFTER_PERSONA_REVISION\n  baseline_runtime_sha_verified: true\n  remediation_authorized: false\n  current_disposition: SCENARIO_SCOPED_ENTRY; EXISTING READY WAVE-A SUBSET MAY EXECUTE, BUT P-20..P-26 AND RV-029..RV-032\n    REQUIRE THEIR OWN ENTRY READINESS BEFORE EXECUTION\n  known_runtime_url: http://127.0.0.1:8001/\n  known_runtime_sha: 43ac319c6e73e48ca9626461b73987922c498ec3\nentry_gates:\n- gate_id: RV-GATE-00\n  name: Baseline identity\n  pass_condition: The runtime build SHA is known and either exactly equals the audit baseline 43ac319c6e73e48ca9626461b73987922c498ec3\n    or a new audit baseline is explicitly frozen and the static artefacts are reconciled before execution.\n  status: PASS_FROM_ENTRY_REVIEW\n- gate_id: RV-GATE-01\n  name: Non-production runtime environment\n  pass_condition: A reachable Development/Test runtime exists, production is excluded, and browser evidence can be captured\n    without mutating production data.\n  status: PASS_FROM_ENTRY_REVIEW\n- gate_id: RV-GATE-02\n  name: Persona identities and effective permissions\n  pass_condition: Each scenario persona is mapped to an actual test user/membership with known effective permissions and object\n    scope. Job title or UI visibility is never treated as authority.\n  status: PARTIAL_SCENARIO_SCOPED_RECHECK_REQUIRED\n  note: Previously proven identities/data remain valid only for their proven scenarios. P-15..P-26 and targeted scenarios\n    added by Checkpoints 11-12 require scenario-specific identity/data readiness.\n- gate_id: RV-GATE-03\n  name: Scenario data readiness\n  pass_condition: Required projects/sites/contracts/workflow states/financial records/ESS records exist in safe test data,\n    with IDs recorded only in the private execution record.\n  status: PARTIAL_SCENARIO_SCOPED_RECHECK_REQUIRED\n  note: Previously proven identities/data remain valid only for their proven scenarios. P-15..P-26 and targeted scenarios\n    added by Checkpoints 11-12 require scenario-specific identity/data readiness.\n- gate_id: RV-GATE-04\n  name: Mutation safety\n  pass_condition: Scenarios that create or transition records are confirmed safe, reversible or disposable, with no production,\n    certification, statutory activation or irreversible action.\n  status: PASS_FROM_ENTRY_REVIEW\n- gate_id: RV-GATE-05\n  name: Evidence capture readiness\n  pass_condition: Screenshot naming, viewport matrix, keyboard notes, expected result, actual result and finding disposition\n    format are prepared before the first scenario.\n  status: PASS_FROM_ENTRY_REVIEW\nresult_vocabulary:\n- PASS\n- FAIL_UIUX\n- FAIL_ACCESSIBILITY\n- FAIL_RESPONSIVE\n- FAIL_PERMISSION_OR_SCOPE\n- NEEDS_DOMAIN_REVIEW\n- BLOCKED_ENVIRONMENT\n- BLOCKED_TEST_DATA\n- BLOCKED_AUTHORIZATION_FIXTURE\n- NEEDS_PRODUCT_REVIEW\n- UTV\nfinding_handling:\n  existing_finding_confirmed: Link scenario evidence to existing UIUX-F-###; do not create duplicate.\n  existing_finding_disproved: Mark finding for reclassification only after evidence review; do not silently delete history.\n  new_uiux_defect: Create next UIUX-F-### with runtime evidence.\n  business_or_domain_suspect: Classify NEEDS_DOMAIN_REVIEW; do not change business semantics.\n  security_or_scope_failure: Stop the affected scenario, retain evidence, and escalate separately; UI hiding is not authorization.\n  remediation: Not permitted during validation. Record and continue only where safe.\n  persona_or_role_coverage_gap: Treat as a validation-plan coverage issue. Add/adjust persona or targeted runtime scenario\n    without inventing a product role or altering authorization.\n  missing_user_journey_or_surface: If a persona-critical governed capability exists in services/domain logic but no usable\n    product surface is discoverable, record NEEDS_PRODUCT_REVIEW. Do not invent a route, silently classify it as a UI defect,\n    or mutate product scope.\n  reference_persona_catalogue_missing: If no governed UI exists to view persistent reference personas with Persian display\n    titles, record NEEDS_PRODUCT_REVIEW / planned product gap. Do not infer that the governance catalogue alone satisfies\n    the UI requirement.\npersona_coverage_revision:\n  checkpoint: UIUX_PERSONA_COVERAGE_CORRECTION_CHECKPOINT_12.md\n  previous_persona_count: 19\n  current_persona_count: 26\n  previous_scenario_count: 28\n  current_scenario_count: 33\n  added_personas:\n    P-20: Payroll Specialist\n    P-21: Personnel Decree / Employment Records Specialist\n    P-22: Inventory / Storekeeper\n    P-23: Contracts & Commercial Specialist\n    P-24: Project Controls / Technical Office Specialist\n    P-25: Quality / QA-QC Specialist\n    P-26: External Supplier / Partner Portal User\n  refined_personas:\n    P-04: Equipment/Fleet only\n    P-07: Billing/Claims/AP-AR\n    P-08: HR operations/personnel records\n    P-10: Timekeeping only\n    P-11: HSE/Safety only\n  added_runtime_scenarios:\n  - RV-029\n  - RV-030\n  - RV-031\n  - RV-032\n  - RV-033\n  static_audit_rerun_required: false\n  finding_register_change_required_now: false\n  note: Pre-runtime coverage correction only; no product role, permission, remediation or CEP/UAT execution is implied.\n  reference_persona_retention_checkpoint: Checkpoint 13\nreference_persona_retention:\n  policy: UIUX_REFERENCE_PERSONA_RETENTION_POLICY.md\n  catalogue: UIUX_REFERENCE_PERSONA_CATALOGUE.yaml\n  persistent_after_validation: true\n  governed_ui_visibility_required: true\n  persian_display_title_required: false\n  cleanup_mode: RETAIN_AND_RECONCILE\n  impersonation_authorized: false\n  display_label_requirement: NONE\n  stable_identifier_required: true\n  reconciliation_status: PARTIAL_RV033; DOCUMENTATION_CONFLICTS_SUPERSEDED\n  historical_evidence_cleanup_instructions: SUPERSEDED_NOT_REWRITTEN\n  current_catalogue_aliases_reconciled: true\nwave_c_execution:\n  decision: WAVE_C_BLOCKED\n  results: UIUX_RUNTIME_VALIDATION_RESULTS.yaml# wave_c\n  full_execution_complete: false\n  session_closed: true\n  remediation_authority: Explicit attached user request; bounded Development-only override of observation-only\n    mechanics\n  future_waves: NOT_EXECUTED\n  cep078079: NOT_EXECUTED\n",
+      "block_sha256": "e4f9c115f8a3e8c6cdf7b3988d65cffdce13e264ca81daf2eda9dc21c5dfc332",
+      "browser_dimensions": [
+        "Chrome",
+        "Edge",
+        "Safari"
+      ],
+      "runtime_topics_only": "Browser/authenticated rendering; shared responsive/navigation/overflow; keyboard/focus; labels/headings/landmarks/table/form/error semantics; RTL/LTR/Jalali; console/runtime errors. Existing business scenarios supply states, not authority to redo domain transactions.",
+      "personas_and_routes": "Use the exact source block and current canonical persona/fixture registries; no role substitution or all-persona universal claim",
+      "state_and_data_gate": "Existing safe source-owned state required; missing/expired fixture stays BLOCKED/UTV; no policy/grant/identity/business-state mutation",
+      "responsive_rule": "Original scenario requirements plus representative cross-role RV-025 surfaces at all three canonical CSS viewports; no arbitrary device or route reduction",
+      "execution_result": "UTV_ENTRY_BLOCKED"
+    }
+  ],
+  "prerequisite_convergence": "GATE07_CONVERGENCE.json 19/19 implemented contributions, 42 current cases PASS; global/conditional activations not granted",
+  "application_identity": {
+    "artifact": "APPLICATION_IDENTITY.json",
+    "head": "43ac319c6e73e48ca9626461b73987922c498ec3",
+    "dirty_source_manifest_sha256": "196bae7115a81f255ea2e2b351bb440b71a17df792e77d7b26372dcd9b78f438",
+    "files": 1472
+  },
+  "environment_inventory": "BROWSER_INSTALLATIONS.json; sanitized CUA provider inventory, no unrelated tab metadata retained",
+  "exact_remaining_blocker": "EXT-0024 cannot be established: Safari target runtime/provider with exact OS/device/browser/engine version is absent from available test surfaces. Chrome/Edge installed versions do not prove observed execution identities. Full matrix readiness remains UTV, not reduced to available Chromium providers.",
+  "next_safe_action": "Make the named canonical Safari environment and exact runtime identities available through an approved test surface, bind safe fixture/persona/state coverage and recheck all browser identities, then repeat CEP entry. No product or support-policy change is required by this plan.",
+  "business_mutations": "NONE; read/focus/invalid-input observations only unless separately governed disposable state is proved",
+  "entry": "BLOCKED_EXT0024; no CEP runtime scenario executed",
+  "old_audit_evidence": "Retained for provenance/exact-scope reuse analysis only; no relabeling or duplicate runtime replay"
+}

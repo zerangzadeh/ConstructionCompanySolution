@@ -1,0 +1,54 @@
+{
+  "permission_role_matrix": {
+    "supplier_portal.invitations_manage": [],
+    "employment_records.manage": [],
+    "employment_records.view_own": [],
+    "time_calendars.manage": [
+      "company_manager",
+      "company_owner",
+      "operations_manager",
+      "project_manager",
+      "tenant_admin",
+      "tenant_manager",
+      "tenant_owner"
+    ],
+    "employees.create": [
+      "company_manager",
+      "company_owner",
+      "operations_manager",
+      "project_manager",
+      "tenant_admin",
+      "tenant_manager",
+      "tenant_owner"
+    ],
+    "payroll.prepare": [
+      "p7_demo_payroll_assurance"
+    ],
+    "documents.upload": [
+      "company_manager",
+      "company_owner",
+      "operations_manager",
+      "project_manager",
+      "tenant_admin",
+      "tenant_manager",
+      "tenant_owner"
+    ],
+    "project_controls.compare": [
+      "company_manager",
+      "company_owner",
+      "tenant_admin",
+      "tenant_owner"
+    ]
+  },
+  "tender": {
+    "result": "DENIED",
+    "reason": "سیاست معتبر مناقصه برای این شرکت فعال نشده است.",
+    "transaction": "ROLLED_BACK",
+    "activation_policy_modified": false
+  },
+  "payroll_role_boundary": "apps/accounts/management/commands/seed_account_data.py: _ensure_p7_demo_payroll_access: designated Development demo-owner-only assurance role; not a Payroll-only specialist bundle",
+  "employment_internal_routes": "Only workforce/ess/employment/ exists; no internal management endpoint for employment_records.manage in workforce/urls.py",
+  "document_safety": "Both P-19-authorized existing documents unavailable; get_document_version_for_download denies. Processing assessment requires Platform Operations plus actual scanner verdict; no mock CLEAN result was supplied.",
+  "temporary_authority": "NONE",
+  "negative_portal_evidence": "DIRECT_SERVICE.json; all three existing internal actors denied invitation-management service"
+}

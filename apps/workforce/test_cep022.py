@@ -37,7 +37,30 @@ from .person_services import end_work_relationship
 
 
 class EmploymentTests(TestCase):
-    _relationship = baseline.EmployeeDocumentAccessTests._relationship
+    def _relationship(self, person, number, *, start=None, end=None, legacy=None):
+        # PD-WC-04 own history now requires the explicit Employee.user link too.
+        from .models import Employee
+
+        if legacy is None:
+            previous = Employee.objects.filter(
+                organization=self.organization, user=person.user
+            ).first()
+            if previous is not None and previous.employee_number != number:
+                previous.user = None
+                previous.save(update_fields=["user"])
+            legacy, _ = Employee.objects.get_or_create(
+                organization=self.organization,
+                user=person.user,
+                defaults={
+                    "employee_number": number,
+                    "first_name": person.first_name,
+                    "last_name": person.last_name,
+                },
+            )
+        return baseline.EmployeeDocumentAccessTests._relationship(
+            self, person, number, start=start, end=end, legacy=legacy
+        )
+
     _upload = staticmethod(baseline.EmployeeDocumentAccessTests._upload)
     _document = baseline.EmployeeDocumentAccessTests._document
     _allow = baseline.EmployeeDocumentAccessTests._allow
@@ -435,7 +458,7 @@ class EmploymentTests(TestCase):
             WorkflowInstance.objects.get(subject_id=case.pk).status, "active"
         )
 
-    def test_no_new_default_grants(self):
+    def test_reconciled_capabilities_are_not_implicit_owner_admin_grants(self):
         from apps.organizations.role_defaults import DEFAULT_ROLE_PERMISSIONS
 
         new = {
@@ -447,7 +470,8 @@ class EmploymentTests(TestCase):
             P.ROSTERS_MANAGE,
             P.ROSTERS_VIEW,
         }
-        for codes in DEFAULT_ROLE_PERMISSIONS.values():
+        for role in ("tenant_owner", "tenant_admin"):
+            codes = DEFAULT_ROLE_PERMISSIONS[role]
             self.assertFalse(new & set(codes))
 
     def test_rehire_keeps_prior_episode_employment_evidence(self):

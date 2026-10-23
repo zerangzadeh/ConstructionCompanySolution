@@ -1,0 +1,74 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+
+<div class="mb-3 flex items-center justify-end gap-2" data-table-filter-controls="table-filters">
+    <form id="table-filters" method="get" class="flex items-center gap-2" aria-label="فیلترهای جدول" data-table-filter-form>
+        <button class="h-8 rounded-md border border-slate-200 bg-white px-2.5 text-[11px] font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-700" type="submit">اعمال فیلتر</button>
+        
+    </form>
+</div>
+<template id="table-filters-row">
+<tr class="bg-slate-50/70 align-top text-right">
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-warehouse">فیلتر کد و نام</label>
+            
+                <input id="table-filters-warehouse" type="search" name="warehouse" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-project">فیلتر پروژه</label>
+            
+                <input id="table-filters-project" type="search" name="project" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-location">فیلتر محل</label>
+            
+                <input id="table-filters-location" type="search" name="location" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+    </th>
+    
+</tr>
+
+</template>
+
+ 
+
+
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">انبارها</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">انبار و موجودی</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">انبارها</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">شرکت سازه‌پردازان پارس</p>
+        
+    </div>
+    
+</header>
+
+
+<section class="erp-surface mt-6 overflow-hidden rounded-xl"><div class="erp-table-wrap"><table class="w-full min-w-[760px] text-right"><thead><tr><th class="border-b border-slate-200 px-4 py-3">کد و نام</th><th class="border-b border-slate-200 px-4 py-3">پروژه</th><th class="border-b border-slate-200 px-4 py-3">محل</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th></tr></thead><tbody class="divide-y divide-slate-100"><tr><td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="/inventory/d5c8d76d-dd56-429b-a686-ea2f4c173ee2/">انبار کارگاه پروژه مجتمع مسکونی باغستان</a><p class="mt-0.5 text-[11px] text-slate-500" dir="ltr">WH-01</p></td><td class="px-4 py-3.5 text-slate-600">مجتمع مسکونی باغستان</td><td class="px-4 py-3.5 text-slate-600">تهران، منطقه ۲۲، بلوار پژوهش</td><td class="px-4 py-3.5"><span class="text-xs font-semibold text-emerald-700">فعال</span></td></tr></tbody></table></div></section>
+
+
+        </main>

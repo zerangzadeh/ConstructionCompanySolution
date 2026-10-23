@@ -1,0 +1,43 @@
+{
+  "focused": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/f111_batch_07_evidence/run_validation.py tests/test_uiux_f111_pattern_recurrence_scope.py --reuse-db -q --tb=short --junitxml=docs/governance/uiux/f111_batch_07_evidence/focused.xml",
+    "exit_code": 0
+  },
+  "regression": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/f111_batch_07_evidence/run_validation.py apps/expenses/tests.py apps/expenses/test_p4_s26_s30.py tests/test_uiux_f111_scope.py tests/test_uiux_f111_pattern_allocation_scope.py --reuse-db -q --tb=short --junitxml=docs/governance/uiux/f111_batch_07_evidence/regression.xml",
+    "exit_code": 1,
+    "attribution": "15 exact baseline setup failures; 59 passing tests and 106 subtests"
+  },
+  "baseline_regression": {
+    "same_command_with": "--entry-forms and baseline_regression.xml; import loader executes captured exact dirty-entry forms/views without replacing working files",
+    "exit_code": 1
+  },
+  "django": {
+    "command": ".venv/Scripts/python.exe manage.py check",
+    "exit_code": 0
+  },
+  "migration": {
+    "command": ".venv/Scripts/python.exe manage.py makemigrations --check --dry-run",
+    "exit_code": 0
+  },
+  "ruff": {
+    "command": ".venv/Scripts/python.exe -m ruff check apps/expenses/forms.py apps/expenses/views.py tests/test_uiux_f111_pattern_recurrence_scope.py",
+    "exit_code": 0
+  },
+  "format": {
+    "command": ".venv/Scripts/python.exe -m ruff format --check apps/expenses/forms.py apps/expenses/views.py tests/test_uiux_f111_pattern_recurrence_scope.py",
+    "exit_code": 0
+  },
+  "test_isolation": "Serial suites; migrated disposable PostgreSQL test_bonira_uiux_batch01; temporary document root; MD5 test-only password hasher; no Development business tests",
+  "runtime": [
+    "runtime.py prepare",
+    "runtime.py http",
+    "runtime.py direct",
+    "Chrome browser observations through cua_repl",
+    "runtime.py after",
+    "verified own server stop and browser logout/close"
+  ],
+  "settings": "Development only; PostgreSQL construction_erp; localhost:8010; zero pending migrations",
+  "harness_corrections": "Navigation next echoes caller-supplied query; site navigation retains authorized parent context; repeated demo names are disambiguated by Project UUID and distinctive template labels; expired-grant fixture requires ordered dates and no-scope HTTP entry is canonically 403; authority UUIDs compared by canonical JSON digest.",
+  "browser_recovery": "Initial navigation preceded server start; one full-page screenshot timed out, viewport capture succeeded; site-only login navigation raced its redirect, DOM observation confirmed actor then navigation succeeded. All five final screenshots and DOM observations retained."
+}

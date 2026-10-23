@@ -1023,6 +1023,19 @@ def lock_run_inputs(
             for rule in rules:
                 payroll_input = inputs.get((result.employee_id, rule.pk))
                 if (
+                    payroll_input
+                    and payroll_input.source_payload.get("producer")
+                    == "payroll.approved_timesheet.v1"
+                ):
+                    from .timesheet_inputs import validate_timesheet_input
+
+                    validate_timesheet_input(
+                        organization=organization,
+                        actor=actor,
+                        run=run,
+                        payroll_input=payroll_input,
+                    )
+                if (
                     rule.method == CalculationMethod.QUANTITY_TIMES_RATE
                     and payroll_input is None
                 ):

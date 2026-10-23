@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\docs\governance\uiux\f111_batch_09_evidence\runtime.py", line 279, in <module>
+    {"prepare": prepare, "http": http, "direct": direct, "after": after}[sys.argv[1]]()
+  File "E:\Construction_Company_Solution\docs\governance\uiux\f111_batch_09_evidence\runtime.py", line 124, in prepare
+    report = create_daily_report(organization=org, actor=actor, project=project, site=site, phase=phase, reporting_date=date(2026, 10, 1), work_performed="B09 synthetic Development sibling selector control")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\daily_reports\services.py", line 186, in create_daily_report
+    _validate_phase(organization=organization, site=site, phase=phase)
+  File "E:\Construction_Company_Solution\apps\daily_reports\services.py", line 74, in _validate_phase
+    raise PermissionDenied("\u0641\u0627\u0632 \u067e\u0631\u0648\u0698\u0647 \u0628\u0631\u0627\u06cc \u0627\u06cc\u0646 \u06a9\u0627\u0631\u06af\u0627\u0647 \u0641\u0639\u0627\u0644 \u0646\u06cc\u0633\u062a.")
+django.core.exceptions.PermissionDenied: \u0641\u0627\u0632 \u067e\u0631\u0648\u0698\u0647 \u0628\u0631\u0627\u06cc \u0627\u06cc\u0646 \u06a9\u0627\u0631\u06af\u0627\u0647 \u0641\u0639\u0627\u0644 \u0646\u06cc\u0633\u062a.

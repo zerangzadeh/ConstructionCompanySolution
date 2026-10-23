@@ -1,0 +1,99 @@
+{
+  "legacy_passes": 45,
+  "legacy_failures_reproduced": 13,
+  "attributable_regressions": 0,
+  "comparison": "In-memory entry Billing forms/views from unchanged HEAD; all other task-entry dirty sources retained; identical failure text per testcase",
+  "results": [
+    {
+      "class": "apps.billing.test_commercial_controls.CommercialControlTests",
+      "test": "test_audit_records_lifecycle_without_financial_side_effect",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633",
+      "cause": "PermissionDenied at apps/projects/services.py:169 during legacy setUp.create_project; existing fixtures lack governed explicit authorization setup"
+    },
+    {
+      "class": "apps.billing.test_commercial_controls.CommercialControlTests",
+      "test": "test_clearance_requirement_is_explicit_and_effective_dated",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633",
+      "cause": "PermissionDenied at apps/projects/services.py:169 during legacy setUp.create_project; existing fixtures lack governed explicit authorization setup"
+    },
+    {
+      "class": "apps.billing.test_commercial_controls.CommercialControlTests",
+      "test": "test_expiry_and_compliance_renewal_preserve_history",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633",
+      "cause": "PermissionDenied at apps/projects/services.py:169 during legacy setUp.create_project; existing fixtures lack governed explicit authorization setup"
+    },
+    {
+      "class": "apps.billing.test_commercial_controls.CommercialControlTests",
+      "test": "test_guarantee_workflow_exposure_release_and_immutable_history",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633",
+      "cause": "PermissionDenied at apps/projects/services.py:169 during legacy setUp.create_project; existing fixtures lack governed explicit authorization setup"
+    },
+    {
+      "class": "apps.billing.test_commercial_controls.CommercialControlTests",
+      "test": "test_missing_contract_authority_unsafe_evidence_and_tenant_scope_fail_closed",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633",
+      "cause": "PermissionDenied at apps/projects/services.py:169 during legacy setUp.create_project; existing fixtures lack governed explicit authorization setup"
+    },
+    {
+      "class": "apps.billing.test_commercial_controls.CommercialControlTests",
+      "test": "test_retention_release_calculation_correction_and_fail_closed_cap",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633",
+      "cause": "PermissionDenied at apps/projects/services.py:169 during legacy setUp.create_project; existing fixtures lack governed explicit authorization setup"
+    },
+    {
+      "class": "apps.billing.test_commercial_controls.CommercialControlTests",
+      "test": "test_rtl_operational_dashboard_is_tenant_scoped",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633",
+      "cause": "PermissionDenied at apps/projects/services.py:169 during legacy setUp.create_project; existing fixtures lack governed explicit authorization setup"
+    },
+    {
+      "class": "apps.billing.test_commercial_controls.CommercialControlTests",
+      "test": "test_workflow_domain_and_audit_failure_roll_back_atomically",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633",
+      "cause": "PermissionDenied at apps/projects/services.py:169 during legacy setUp.create_project; existing fixtures lack governed explicit authorization setup"
+    },
+    {
+      "class": "apps.documents.test_p1_s19_document_governance.P1S19DocumentGovernanceTests",
+      "test": "test_access_expiry_fails_closed",
+      "identical_failure": true,
+      "failure_sha256": "7780d2d198acddcd23ed3ea5ce1654784d756db54a1e3ed1a5b4ac33193dc3ce",
+      "cause": "PermissionDenied at apps/projects/services.py:169 during legacy setUp.create_project; existing fixtures lack governed explicit authorization setup"
+    },
+    {
+      "class": "apps.documents.test_p1_s19_document_governance.P1S19DocumentGovernanceTests",
+      "test": "test_category_is_tenant_scoped_and_confidentiality_is_closed",
+      "identical_failure": true,
+      "failure_sha256": "7780d2d198acddcd23ed3ea5ce1654784d756db54a1e3ed1a5b4ac33193dc3ce",
+      "cause": "PermissionDenied at apps/projects/services.py:169 during legacy setUp.create_project; existing fixtures lack governed explicit authorization setup"
+    },
+    {
+      "class": "apps.documents.test_p1_s19_document_governance.P1S19DocumentGovernanceTests",
+      "test": "test_document_number_is_tenant_sequence_and_immutable",
+      "identical_failure": true,
+      "failure_sha256": "7780d2d198acddcd23ed3ea5ce1654784d756db54a1e3ed1a5b4ac33193dc3ce",
+      "cause": "PermissionDenied at apps/projects/services.py:169 during legacy setUp.create_project; existing fixtures lack governed explicit authorization setup"
+    },
+    {
+      "class": "apps.documents.test_p1_s21_processing.P1S21DocumentProcessingTests",
+      "test": "test_permission_scoped_search_compare_and_signature_boundary",
+      "identical_failure": true,
+      "failure_sha256": "a9eafbc012122dde63b5bc88db460e9eef587296281ff7212e5e3b72c19216a2",
+      "cause": "PermissionDenied at apps/projects/services.py:169 during legacy setUp.create_project; existing fixtures lack governed explicit authorization setup"
+    },
+    {
+      "class": "apps.documents.test_p1_s21_processing.P1S21DocumentProcessingTests",
+      "test": "test_unknown_and_latest_non_clean_assessment_fail_closed",
+      "identical_failure": true,
+      "failure_sha256": "a9eafbc012122dde63b5bc88db460e9eef587296281ff7212e5e3b72c19216a2",
+      "cause": "PermissionDenied at apps/projects/services.py:169 during legacy setUp.create_project; existing fixtures lack governed explicit authorization setup"
+    }
+  ]
+}

@@ -163,11 +163,17 @@ class RFQCloseManifestTests(RFQCloseFixtureMixin, TestCase):
         other_project = Project.objects.create(
             organization=self.organization, code="OTHER-SCOPE", name="Other Scope"
         )
-        MembershipRoleAssignment.objects.create(
+        MembershipRoleAssignment.objects.get_or_create(
             organization=self.organization,
             membership=membership,
             role=membership.role_definition,
-            reason="P5-S07 object-scope test",
+            revoked_at__isnull=True,
+            defaults={"reason": "P5-S07 object-scope test"},
+        )
+        # Shared migrated fixture now grants Organization scope explicitly.
+        # Remove it before asserting the unrelated-Project denial.
+        membership.scope_grants.filter(revoked_at__isnull=True).update(
+            revoked_at=timezone.now(), revocation_reason="P5-S07 exact scope test"
         )
         MembershipScopeGrant.objects.create(
             organization=self.organization,

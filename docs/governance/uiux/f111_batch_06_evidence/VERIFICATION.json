@@ -1,0 +1,79 @@
+{
+  "decision": "BATCH_06_RUNTIME_VERIFIED_RESOLVED",
+  "finding": "UIUX-F-119",
+  "status": "RUNTIME_VERIFIED_RESOLVED",
+  "baseline_files_compared": 5190,
+  "changed_existing_files": [
+    "apps/expenses/forms.py",
+    "apps/expenses/views.py",
+    "docs/governance/uiux/UIUX_FINDINGS_REGISTER.yaml"
+  ],
+  "product_ast_boundaries_only": true,
+  "prior_batches_other_findings_registry_roadmap_graph_preserved": true,
+  "focused": "12 tests + 42 subtests PASS",
+  "regression": "47 tests + 64 subtests PASS; 15 exact-baseline setup failures; zero new regressions",
+  "http_observations": 25,
+  "browser_observations": 7,
+  "browser_exact_http_comparisons": [
+    "limited GET",
+    "refreshed GET after bare 400",
+    "refreshed GET after Activity mismatch",
+    "organization GET"
+  ],
+  "direct_service_denials": 8,
+  "authorized_runtime_allocations": 1,
+  "integrity": {
+    "tables": 519,
+    "preexisting_rows_changed": [],
+    "runtime_deltas": [
+      "sessions.Session",
+      "audit.AuditEvent",
+      "expenses.ExpenseAllocation"
+    ],
+    "authorized_allocation": {
+      "allocation": "181a4838-2032-48f0-bdbc-be20edaee60f",
+      "parent": "b4c15e54-8e19-43b7-abf3-858bf573d072",
+      "allocation_project": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+      "parent_project": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+      "status": "draft",
+      "amount": "10.00",
+      "real_authenticated_csrf": true,
+      "approved_or_posted": false
+    },
+    "runtime_success_audits": 1,
+    "unauthorized_mutations": 0,
+    "authority_unchanged": true,
+    "authority_fingerprint_before": "11d2793d4f063b9cff9fe754e53e46cd9c03d3de0ee3ab2e347920b882b86825",
+    "authority_fingerprint_after": "11d2793d4f063b9cff9fe754e53e46cd9c03d3de0ee3ab2e347920b882b86825",
+    "temporary_authority": "NONE; no cleanup needed",
+    "last_login_excluded": true,
+    "preparation_additions": {
+      "audit.AuditEvent": 46,
+      "projects.WBSNode": 5,
+      "projects.Activity": 5,
+      "projects.CostStructureVersion": 5,
+      "projects.CBSNode": 5,
+      "projects.CostCenter": 5,
+      "projects.BudgetVersion": 5,
+      "projects.ProjectBudgetControl": 5,
+      "projects.BudgetSourceManifest": 5,
+      "projects.BudgetManifestLine": 5,
+      "projects.BudgetAllocation": 5,
+      "estimates.Estimate": 5,
+      "estimates.EstimateRevision": 5,
+      "estimates.EstimateItem": 5,
+      "expenses.Expense": 1
+    },
+    "preparation_audits": 46
+  },
+  "migration": "NO",
+  "batch07_09": "NOT_EXECUTED",
+  "wave_c": "NOT_STARTED",
+  "production_cep078_079_git_writes": "NOT_EXECUTED",
+  "final_source_sha256": {
+    "apps/expenses/forms.py": "c47d45a5894aad08b1fa9d577744b9df00fdeb644b6574719229c7790ddf62c0",
+    "apps/expenses/views.py": "c25fd67506ac4d4e1f0b8fff8e2e05f31dc4731dfe94d03d0daa8a03b0cd3fe6",
+    "tests/test_uiux_f111_pattern_allocation_scope.py": "6c52aa6cd7a71744828db6dc4a1a6abd8216ab4f4c973e79785eb31e3b7a2ab7",
+    "docs/governance/uiux/UIUX_FINDINGS_REGISTER.yaml": "77687d3eb4527f67e881d2aba0db4b6c3bc9dcb68165d3270ade2f797d883fac"
+  }
+}

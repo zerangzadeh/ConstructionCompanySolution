@@ -1,0 +1,176 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+ 
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">ثبت دستی حضور</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">حضور و کارکرد</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">ثبت دستی حضور</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">ثبت دستی کنترل‌شده است و حضور قطعی فقط توسط بررسی‌کننده مستقل ایجاد می‌شود.</p>
+        
+    </div>
+    
+</header>
+
+<section class="erp-surface mx-auto mt-5 max-w-3xl rounded-2xl p-5 sm:p-7">
+  <form method="post" class="space-y-4" novalidate>
+    <!-- CSRF omitted -->
+    
+    
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_employee">
+        کارمند<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="employee" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" aria-describedby="id_employee-errors" aria-invalid="true" required id="id_employee">
+  <option value="" selected>---------</option>
+
+  <option value="9a4904d8-c421-4919-9162-0084aa9a9b0f">WAVE-C-HR - Wave C Synthetic</option>
+
+  <option value="56a63728-2278-41c6-84b5-0f8d4179c11d">۱۳۰ - محسن جاوید</option>
+
+  <option value="58deb1bc-7802-4aa9-821f-ea80c8903f6e">۲۲۲۲۲ - علی رضایی</option>
+
+  <option value="6cafa5b7-9a7a-4d2c-bf5a-be8b77054dfb">EMP-001 - مدیر سامانه</option>
+
+  <option value="c1312008-8583-41d7-9ffb-ffd56e738e9b">EMP-002 - مریم کاظمی</option>
+
+</select>
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_employee-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_project">
+        پروژه
+        
+    </label>
+    <select name="project" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" aria-describedby="id_project-errors" aria-invalid="true" id="id_project">
+  <option value="">---------</option>
+
+  <option value="f61f52ed-3c85-4570-af2b-5e89c025ab4e">PRJ-01-03 - بازسازی کارخانه نوآوران</option>
+
+  <option value="623b4e02-b751-495f-b0e7-7e1601b9ccdf">PRJ-01-04 - ساختمان اداری آفتاب</option>
+
+  <option value="58f517da-2139-45ac-8b7b-4f3d3a3d26e8">PRJ-01-01 - مجتمع مسکونی باغستان</option>
+
+  <option value="de3b5756-9d3e-4e67-a08b-97dbd2824c2f">PRJ-01-02 - مرکز درمانی مهر</option>
+
+</select>
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_project-errors" role="alert">یک گزینهٔ معتبر انتخاب کنید. آن گزینه از گزینه‌های موجود نیست.</p>
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_site">
+        کارگاه
+        
+    </label>
+    <select name="site" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" aria-describedby="id_site-errors" aria-invalid="true" id="id_site">
+  <option value="">---------</option>
+
+  <option value="de1707c9-a4d1-42a3-bef3-0a86e6e62370">PRJ-01-01 · B09-SIBLING - B09 synthetic ungranted sibling</option>
+
+  <option value="eef2f5d7-dc51-44d3-8414-8dc480f500c0">PRJ-01-01 · SITE-01 - کارگاه اصلی پروژه</option>
+
+  <option value="b83c65c4-5739-4076-b0aa-d892a14b8d60">PRJ-01-02 · SITE-01 - کارگاه اصلی پروژه</option>
+
+  <option value="1dfe7a20-143b-4db2-92c7-929745d8e521">PRJ-01-03 · SITE-01 - کارگاه اصلی پروژه</option>
+
+  <option value="4f195bba-4013-4cb3-acfa-53edfb3ef357">PRJ-01-04 · SITE-01 - کارگاه اصلی پروژه</option>
+
+</select>
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_site-errors" role="alert">&quot;not-a-site&quot; یک UUID معتبر نیست.</p>
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_calendar">
+        تقویم<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="calendar" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" aria-describedby="id_calendar-errors" aria-invalid="true" required id="id_calendar">
+  <option value="" selected>---------</option>
+
+  <option value="9cafbb89-e96c-4f47-b9f6-5195ba77e724">WorkCalendar object (9cafbb89-e96c-4f47-b9f6-5195ba77e724)</option>
+
+  <option value="9aa4dd26-dcc9-4b40-98a2-9714cf3036a6">WorkCalendar object (9aa4dd26-dcc9-4b40-98a2-9714cf3036a6)</option>
+
+</select>
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_calendar-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_shift">
+        شیفت
+    </label>
+    <select name="shift" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" id="id_shift">
+  <option value="" selected>---------</option>
+
+  <option value="58f0739a-3b9d-4666-8e04-1515962eae3e">ShiftDefinition object (58f0739a-3b9d-4666-8e04-1515962eae3e)</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_work_date">
+        تاریخ کار<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="date" name="work_date" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" aria-describedby="id_work_date-errors" aria-invalid="true" required id="id_work_date">
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_work_date-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_check_in_at">
+        ورود<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="datetime-local" name="check_in_at" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" aria-describedby="id_check_in_at-errors" aria-invalid="true" required id="id_check_in_at">
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_check_in_at-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_check_out_at">
+        خروج
+    </label>
+    <input type="datetime-local" name="check_out_at" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" id="id_check_out_at">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_source_reference">
+        مرجع ثبت
+    </label>
+    <input type="text" name="source_reference" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" id="id_source_reference">
+    
+    
+</div>
+
+    <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-5"><button class="erp-btn erp-btn--primary" type="submit">ثبت کنترل‌شده</button><a class="erp-btn erp-btn--secondary" href="/timekeeping/">بازگشت</a></div>
+  </form>
+</section>
+
+        </main>

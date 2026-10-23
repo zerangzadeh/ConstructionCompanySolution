@@ -1,0 +1,186 @@
+Found 11 test(s).
+System check identified no issues (0 silenced).
+Using existing test database for alias 'default'...
+EEE.EEEEEEF
+======================================================================
+ERROR: test_meter_idempotency_and_correction_preserve_history (apps.equipment.test_p8_s18_s23.P8EquipmentOperationsTests.test_meter_idempotency_and_correction_preserve_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\equipment\test_p8_s18_s23.py", line 155, in test_meter_idempotency_and_correction_preserve_history
+    reading = record_meter_reading(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 67, in record_meter_reading
+    _require(
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 39, in _require
+    require_business_permission(
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 436, in require_business_permission
+    raise PermissionDenied(message)
+django.core.exceptions.PermissionDenied: اجازه عملیات تجهیز را ندارید.
+
+======================================================================
+ERROR: test_operations_enforce_permission_tenant_project_and_site_scope (apps.equipment.test_p8_s18_s23.P8EquipmentOperationsTests.test_operations_enforce_permission_tenant_project_and_site_scope)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\equipment\test_p8_s18_s23.py", line 534, in test_operations_enforce_permission_tenant_project_and_site_scope
+    usage = record_usage(
+            ^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 143, in record_usage
+    _require(
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 39, in _require
+    require_business_permission(
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 436, in require_business_permission
+    raise PermissionDenied(message)
+django.core.exceptions.PermissionDenied: اجازه عملیات تجهیز را ندارید.
+
+======================================================================
+ERROR: test_operations_have_no_downstream_financial_or_fixed_asset_effect (apps.equipment.test_p8_s18_s23.P8EquipmentOperationsTests.test_operations_have_no_downstream_financial_or_fixed_asset_effect)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\equipment\test_p8_s18_s23.py", line 468, in test_operations_have_no_downstream_financial_or_fixed_asset_effect
+    record_usage(
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 143, in record_usage
+    _require(
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 39, in _require
+    require_business_permission(
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 436, in require_business_permission
+    raise PermissionDenied(message)
+django.core.exceptions.PermissionDenied: اجازه عملیات تجهیز را ندارید.
+
+======================================================================
+ERROR: test_plan_and_work_order_lifecycle (apps.equipment.test_p8_s18_s23.P8EquipmentOperationsTests.test_plan_and_work_order_lifecycle)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\equipment\test_p8_s18_s23.py", line 219, in test_plan_and_work_order_lifecycle
+    plan = create_maintenance_plan(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 309, in create_maintenance_plan
+    _require(
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 39, in _require
+    require_business_permission(
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 436, in require_business_permission
+    raise PermissionDenied(message)
+django.core.exceptions.PermissionDenied: اجازه عملیات تجهیز را ندارید.
+
+======================================================================
+ERROR: test_qualification_uses_workforce_authority_and_fails_closed (apps.equipment.test_p8_s18_s23.P8EquipmentOperationsTests.test_qualification_uses_workforce_authority_and_fails_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\equipment\test_p8_s18_s23.py", line 276, in test_qualification_uses_workforce_authority_and_fails_closed
+    link = record_operator_qualification(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 437, in record_operator_qualification
+    _require(
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 39, in _require
+    require_business_permission(
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 436, in require_business_permission
+    raise PermissionDenied(message)
+django.core.exceptions.PermissionDenied: اجازه عملیات تجهیز را ندارید.
+
+======================================================================
+ERROR: test_rtl_operations_workbench_and_mutation_routes_are_navigable (apps.equipment.test_p8_s18_s23.P8EquipmentOperationsTests.test_rtl_operations_workbench_and_mutation_routes_are_navigable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\equipment\test_p8_s18_s23.py", line 583, in test_rtl_operations_workbench_and_mutation_routes_are_navigable
+    order = self._work_order("P8-UI-WO")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\equipment\test_p8_s18_s23.py", line 63, in _work_order
+    return create_work_order(
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 349, in create_work_order
+    _require(
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 39, in _require
+    require_business_permission(
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 436, in require_business_permission
+    raise PermissionDenied(message)
+django.core.exceptions.PermissionDenied: اجازه عملیات تجهیز را ندارید.
+
+======================================================================
+ERROR: test_spare_references_link_posted_issue_and_reversal_without_inventory_mutation (apps.equipment.test_p8_s18_s23.P8EquipmentOperationsTests.test_spare_references_link_posted_issue_and_reversal_without_inventory_mutation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\equipment\test_p8_s18_s23.py", line 359, in test_spare_references_link_posted_issue_and_reversal_without_inventory_mutation
+    work_order=self._work_order("P8-SPARE-ISSUE"),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\equipment\test_p8_s18_s23.py", line 63, in _work_order
+    return create_work_order(
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 349, in create_work_order
+    _require(
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 39, in _require
+    require_business_permission(
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 436, in require_business_permission
+    raise PermissionDenied(message)
+django.core.exceptions.PermissionDenied: اجازه عملیات تجهیز را ندارید.
+
+======================================================================
+ERROR: test_spare_references_reject_unposted_foreign_duplicate_and_foreign_work_order (apps.equipment.test_p8_s18_s23.P8EquipmentOperationsTests.test_spare_references_reject_unposted_foreign_duplicate_and_foreign_work_order)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\equipment\test_p8_s18_s23.py", line 393, in test_spare_references_reject_unposted_foreign_duplicate_and_foreign_work_order
+    work_order = self._work_order("P8-SPARE-REJECT")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\equipment\test_p8_s18_s23.py", line 63, in _work_order
+    return create_work_order(
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 349, in create_work_order
+    _require(
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 39, in _require
+    require_business_permission(
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 436, in require_business_permission
+    raise PermissionDenied(message)
+django.core.exceptions.PermissionDenied: اجازه عملیات تجهیز را ندارید.
+
+======================================================================
+ERROR: test_usage_and_downtime_are_operational_and_single_open (apps.equipment.test_p8_s18_s23.P8EquipmentOperationsTests.test_usage_and_downtime_are_operational_and_single_open)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\equipment\test_p8_s18_s23.py", line 193, in test_usage_and_downtime_are_operational_and_single_open
+    record_usage(
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 143, in record_usage
+    _require(
+  File "E:\Construction_Company_Solution\apps\equipment\p8_services.py", line 39, in _require
+    require_business_permission(
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 436, in require_business_permission
+    raise PermissionDenied(message)
+django.core.exceptions.PermissionDenied: اجازه عملیات تجهیز را ندارید.
+
+======================================================================
+FAIL: test_owner_can_open_scoped_equipment_pages (apps.equipment.tests.EquipmentPanelTests.test_owner_can_open_scoped_equipment_pages)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\equipment\tests.py", line 343, in test_owner_can_open_scoped_equipment_pages
+    self.assertEqual(self.client.get(reverse("equipment:list")).status_code, 200)
+AssertionError: 403 != 200
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.825s
+
+FAILED (failures=1, errors=9)
+Preserving test database for alias 'default'...

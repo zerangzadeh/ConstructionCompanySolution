@@ -1,0 +1,2065 @@
+schema_version: '1.0'
+document:
+  id: BONIRA-UIUX-RUNTIME-VALIDATION-RESULTS
+  status: TARGETED_RUNTIME_VALIDATION_PARTIAL
+  scope: Original top-level baseline/scenario_results/evidence_gaps/assessments/wave_a_decision remain historical
+    Wave A. Current results are under targeted_revalidation. Wave C partial execution is appended under wave_c; Waves D-E not executed.
+baseline:
+  branch: main
+  head: 43ac319c6e73e48ca9626461b73987922c498ec3
+  base_url: http://127.0.0.1:8001/
+  environment: Development
+  browser: Microsoft Edge
+  browser_version: 155.0.4283.62
+  started_at: '2026-10-21T20:13:45.013000+03:30'
+  ended_at: '2026-10-21T20:25:20.188000+03:30'
+  checkpoint_15_detected: true
+  persona_count: 26
+  scenario_count: 33
+  wave_count: 5
+  catalogue_schema: '1.2'
+  persona_matrix_schema: '1.5'
+  validation_matrix_schema: '1.6'
+scenario_results:
+- scenario: RV-001
+  persona: P-01
+  target: Authentication and personal settings
+  result: FAIL_ACCESSIBILITY
+  evidence_ids:
+  - RV-EV-001
+  finding_ids:
+  - UIUX-F-107
+- scenario: RV-002
+  persona: P-01
+  target: Ordinary-user Home
+  result: FAIL_UIUX
+  evidence_ids:
+  - RV-EV-002
+  finding_ids:
+  - UIUX-F-065
+  - UIUX-F-066
+- scenario: RV-003
+  persona: P-01
+  target: no-context
+  result: PASS
+  evidence_ids:
+  - RV-EV-003
+  finding_ids: []
+- scenario: RV-003
+  persona: P-01
+  target: empty
+  result: PASS
+  evidence_ids:
+  - RV-EV-004
+  finding_ids: []
+- scenario: RV-003
+  persona: P-01
+  target: no-workspace
+  result: PASS
+  evidence_ids:
+  - RV-EV-005
+  finding_ids: []
+- scenario: RV-004
+  persona: P-01
+  target: Ordinary navigation and direct authorization
+  result: FAIL_UIUX
+  evidence_ids:
+  - RV-EV-006
+  finding_ids:
+  - UIUX-F-016
+  - UIUX-F-017
+- scenario: RV-004
+  persona: P-18
+  target: Platform versus explicit tenant navigation
+  result: FAIL_UIUX
+  evidence_ids:
+  - RV-EV-007
+  finding_ids:
+  - UIUX-F-016
+  - UIUX-F-017
+- scenario: RV-005
+  persona: P-01
+  target: Scoped global search
+  result: FAIL_UIUX
+  evidence_ids:
+  - RV-EV-008
+  finding_ids:
+  - UIUX-F-015
+- scenario: RV-023
+  persona: P-01
+  target: Filter/sort/clear; pagination blocked
+  result: FAIL_ACCESSIBILITY
+  evidence_ids:
+  - RV-EV-009
+  finding_ids:
+  - UIUX-F-085
+  - UIUX-F-110
+- scenario: RV-024
+  persona: P-14
+  target: Employee Detail
+  result: FAIL_ACCESSIBILITY
+  evidence_ids:
+  - RV-EV-010
+  finding_ids:
+  - UIUX-F-049
+- scenario: RV-026
+  persona: P-15
+  target: Designated Tenant Owner credential prerequisite
+  result: BLOCKED_ENVIRONMENT
+  evidence_ids:
+  - RV-EV-011
+  finding_ids: []
+  reason_code: CURRENT_CREDENTIAL_UNAVAILABLE
+- scenario: RV-027
+  persona: P-18
+  target: Platform administration
+  result: PASS
+  evidence_ids:
+  - RV-EV-012
+  finding_ids: []
+- scenario: RV-033
+  persona: P-18
+  target: Retained identity administration and authority trace
+  result: PARTIAL
+  evidence_ids:
+  - RV-EV-013
+  finding_ids:
+  - UIUX-F-020
+  - UIUX-F-109
+- scenario: RV-033
+  persona: P-01
+  target: Global identity admin negative access
+  result: PASS
+  evidence_ids:
+  - RV-EV-014
+  finding_ids: []
+- scenario: RV-003
+  persona: P-01 negative-state Supervisor reference
+  target: Supervisor credential-dependent no-workspace target
+  result: BLOCKED_ENVIRONMENT
+  reason_code: CURRENT_CREDENTIAL_UNAVAILABLE
+  evidence_ids: []
+  finding_ids: []
+  runtime_executed: false
+  basis: Human-confirmed credential blocker; prior reporting-account observation is independent evidence and does
+    not satisfy this identity-specific target.
+explicit_evidence_gaps:
+- target: RV-002 / P-17
+  status: BLOCKED_PERMISSION
+  reason: No actual managerial authority fixture.
+- target: RV-003 / runtime error
+  status: UTV_RUNTIME_ERROR_STATE
+  reason: No natural error fixture; no fault injection.
+- target: RV-003 / unauthorized Home context
+  status: UTV
+  reason: No naturally prepared denied Home context; direct-route denials do not substitute.
+- target: RV-004 / P-16
+  status: BLOCKED_IDENTITY
+  reason: Tenant Admin identity unavailable.
+- target: RV-004 / P-17
+  status: BLOCKED_PERMISSION
+  reason: Project Manager authority unavailable.
+- target: RV-023 / P-01 pagination
+  status: BLOCKED_TEST_DATA
+  reason: 9 authorized rows / 25 per page; no additional business rows created.
+- target: RV-024 / Reporting Reconciliations
+  status: BLOCKED_AUTHORIZATION_FIXTURE
+  reason: Retained reporting account has zero effective roles/scopes; canonical assigner-subset blocker preserved.
+- target: RV-024 / Project Closeout Detail
+  status: BLOCKED_AUTHORIZATION_FIXTURE
+  reason: Reporting authority fixture unresolved; zero closeout cases also remains.
+- target: RV-026 / P-16
+  status: BLOCKED_IDENTITY
+  reason: Owner is not Tenant Admin.
+- target: RV-002, RV-004, RV-005 Owner comparisons; RV-026 Owner
+  status: BLOCKED_ENVIRONMENT
+  reason: Designated retained Owner credential unavailable; identity and authority exist. RV-EV-011.
+  reason_code: CURRENT_CREDENTIAL_UNAVAILABLE
+- target: P-21 / Employment Records
+  status: NEEDS_PRODUCT_REVIEW
+  reason: Existing governed backend capability lacks established internal management surface; outside Wave A; unchanged.
+- target: P-26 / External Supplier
+  status: BLOCKED_AUTHORIZATION_FIXTURE
+  reason: External invitation/grant fixture absent; outside Wave A; unchanged.
+- target: RV-033 / revoked and scheduled authorization states
+  status: UTV
+  reason: Active and quarantined histories observed; no historical-state fixtures manufactured.
+- target: RV-003 / Supervisor credential-dependent no-workspace target
+  status: BLOCKED_ENVIRONMENT
+  reason_code: CURRENT_CREDENTIAL_UNAVAILABLE
+  reason: Human confirmed to preserve the account and block credential-dependent targets; no credential changes
+    or replacement identity.
+existing_finding_dispositions:
+- finding_id: UIUX-F-015
+  disposition: RUNTIME_CONFIRMED
+  evidence_ids:
+  - RV-EV-008
+  note: Scoped search and no-result copy.
+- finding_id: UIUX-F-016
+  disposition: RUNTIME_CONFIRMED
+  evidence_ids:
+  - RV-EV-006
+  - RV-EV-007
+  note: Enabled/disabled RFQ duplication.
+- finding_id: UIUX-F-017
+  disposition: RUNTIME_CONFIRMED
+  evidence_ids:
+  - RV-EV-006
+  - RV-EV-007
+  note: Disabled placeholders and duplicate Commercial.
+- finding_id: UIUX-F-020
+  disposition: RUNTIME_CONFIRMED
+  evidence_ids:
+  - RV-EV-013
+  note: Wording observed under separate actual tenant membership; not Owner journey execution.
+- finding_id: UIUX-F-043
+  disposition: NOT_EVALUATED
+  evidence_ids: []
+  note: Reporting/Closeout target blocked; no runtime conclusion changes static evidence.
+- finding_id: UIUX-F-044
+  disposition: NOT_EVALUATED
+  evidence_ids: []
+  note: Reporting/Closeout target blocked; no runtime conclusion changes static evidence.
+- finding_id: UIUX-F-045
+  disposition: NOT_EVALUATED
+  evidence_ids: []
+  note: Reporting/Closeout target blocked; no runtime conclusion changes static evidence.
+- finding_id: UIUX-F-046
+  disposition: NOT_EVALUATED
+  evidence_ids: []
+  note: Reporting/Closeout target blocked; no runtime conclusion changes static evidence.
+- finding_id: UIUX-F-047
+  disposition: NOT_EVALUATED
+  evidence_ids: []
+  note: Reporting/Closeout target blocked; no runtime conclusion changes static evidence.
+- finding_id: UIUX-F-049
+  disposition: RUNTIME_CONFIRMED
+  evidence_ids:
+  - RV-EV-010
+  note: Two nested main landmarks.
+- finding_id: UIUX-F-065
+  disposition: PARTIALLY_CONFIRMED
+  evidence_ids:
+  - RV-EV-002
+  note: Ordinary Home confirmed; designated Owner/Project Manager comparison not evaluated.
+- finding_id: UIUX-F-066
+  disposition: PARTIALLY_CONFIRMED
+  evidence_ids:
+  - RV-EV-002
+  note: Ordinary Home visual hierarchy confirmed; broader persona comparison missing.
+- finding_id: UIUX-F-085
+  disposition: NOT_EVALUATED
+  evidence_ids:
+  - RV-EV-009
+  note: Pagination unavailable at nine rows.
+- finding_id: UIUX-F-107
+  disposition: RUNTIME_CONFIRMED
+  evidence_ids:
+  - RV-EV-001
+  note: Login has two nested main landmarks.
+new_findings:
+- UIUX-F-109
+- UIUX-F-110
+security:
+  unauthorized_server_access_observed: false
+  cross_tenant_leakage_observed: false
+  object_scope_leakage_observed: false
+  platform_tenant_confusion_resulting_in_bypass_observed: false
+  scope_note: Sampled P-01 project/search/platform/admin denials only; not complete security or superuser-isolation
+    certification.
+safety:
+  product_code_changed: false
+  authorization_model_changed: false
+  new_permission_created: false
+  scope_broadened: false
+  business_data_created_to_force_pass: false
+  migration: false
+  production_action: false
+  remediation: false
+  cep_078_execution: false
+  cep_079_execution: false
+  git_write: false
+  reference_users_deleted: false
+  reference_users_auto_deactivated: false
+  retained_role_scope_removed_as_generic_cleanup: false
+integrity:
+  authority_before_after_equal: true
+  models_fingerprinted: 513
+  changed_model_fingerprints: []
+  excluded_bookkeeping: sessions/admin/auth/audit app tables; last_login and updated_at fields excluded from model
+    digests. No secrets or credential hashes stored, only whole-model SHA256 digests.
+  historical_json_sha256:
+    ENTRY_PREPARATION_20261021.json: 698d979ad5d8359af00b87da4b1c07d4c89d5f53c4e5924d9881dcbe2b970d61
+    P14_PRE_MUTATION_MANIFEST_20261021.json: 8d822086ea181ce68279fbad66de124dabce1cf37489cca0a1bc3e647483401f
+reference_retention_rule: RETAIN → RECONCILE → RESET SECRETS IF NEEDED → REVERIFY BEFORE REUSE
+wave_a_decision: WAVE_A_PARTIAL
+reason: Executable observations captured, but designated Owner RV-026 and comparisons could not execute without
+  its current credential. No authorization substitution or credential mutation.
+evidence_handling_exception:
+  type: DEMO_CREDENTIAL_IN_SOURCE_SEARCH_AND_DIAGNOSTIC_TOOL_OUTPUT
+  description: Checked-in demo authentication information was inadvertently exposed through source-search/credential-inspection
+    tool output. Prior tool output cannot be rewritten. Saved runtime evidence contains no credential payloads;
+    required public account aliases remain.
+  credential_reset_performed: false
+  exposed_source_literal_artifact_check: PASS for the source-search credential; required account aliases are not
+    treated as credential payloads.
+human_confirmed_credential_disposition:
+  recorded_at: '2026-10-21T17:41:08.475408+00:00'
+  blockers:
+  - persona: P-15 Tenant Owner
+    identity: account.demo-construction-01.owner
+    targets:
+    - RV-002 Owner comparison
+    - RV-004 Owner comparison
+    - RV-005 Owner comparison
+    - RV-026 Owner administration
+    status: BLOCKED_ENVIRONMENT
+    reason_code: CURRENT_CREDENTIAL_UNAVAILABLE
+  - persona: No-workspace Supervisor reference
+    identity: account.demo-construction-01.supervisor
+    targets:
+    - RV-003 Supervisor credential-dependent no-workspace target
+    status: BLOCKED_ENVIRONMENT
+    reason_code: CURRENT_CREDENTIAL_UNAVAILABLE
+  instruction: Preserve both accounts unchanged. Do not reset, replace, regenerate credentials, broaden authority
+    or substitute an identity to obtain coverage.
+  remaining_execution: All other executable Wave A targets were already completed; no additional runtime execution
+    in this reconciliation.
+historical_wave_a_document:
+  id: BONIRA-UIUX-RUNTIME-VALIDATION-RESULTS
+  status: WAVE_A_PARTIAL
+  scope: WAVE_A_ONLY; B-E NOT_EXECUTED; not runtime-audit closure, UAT, Human Sign-off or CEP execution.
+targeted_revalidation:
+  status: TARGETED_RUNTIME_VALIDATION_PARTIAL
+  started_at: '2026-10-21T22:48:19.708000+03:30'
+  ended_at: '2026-10-21T22:57:41.075000+03:30'
+  baseline:
+    branch: main
+    head: 43ac319c6e73e48ca9626461b73987922c498ec3
+    upstream: origin/main
+    divergence: 0/0
+    base_url: http://127.0.0.1:8001
+    pending_migrations: 0
+  fixture_verification:
+    authorization_fingerprint: dc41830339a943bd6aab2820da7340fc3e7d361f2e3643cae153b5abf3393007
+    matches_provisioning: true
+    unchanged_model_fingerprints: 514
+  scenario_results:
+  - evidence_id: RV-EV-015
+    scenario_id: RV-002
+    wave: A
+    target: Owner Home comparison
+    result: FAIL_UIUX
+    previous_status: 'BLOCKED_ENVIRONMENT: credential'
+    existing_finding_ids:
+    - UIUX-F-065
+    - UIUX-F-066
+    new_finding_ids: []
+    coverage_limits: []
+  - evidence_id: RV-EV-016
+    scenario_id: RV-004
+    wave: A
+    target: Owner navigation
+    result: FAIL_UIUX
+    previous_status: 'BLOCKED_ENVIRONMENT: credential'
+    existing_finding_ids:
+    - UIUX-F-016
+    - UIUX-F-017
+    new_finding_ids: []
+    coverage_limits: []
+  - evidence_id: RV-EV-017
+    scenario_id: RV-005
+    wave: A
+    target: Owner search comparison
+    result: FAIL_UIUX
+    previous_status: 'BLOCKED_ENVIRONMENT: credential'
+    existing_finding_ids:
+    - UIUX-F-015
+    new_finding_ids: []
+    coverage_limits: []
+  - evidence_id: RV-EV-018
+    scenario_id: RV-026
+    wave: A
+    target: Tenant Owner administration
+    result: FAIL_UIUX
+    previous_status: 'BLOCKED_ENVIRONMENT: credential'
+    existing_finding_ids:
+    - UIUX-F-020
+    new_finding_ids: []
+    coverage_limits:
+    - No role/scope change submitted.
+  - evidence_id: RV-EV-019
+    scenario_id: RV-003
+    wave: A
+    target: Preserved no-workspace state
+    result: PASS
+    previous_status: 'BLOCKED_ENVIRONMENT: credential'
+    existing_finding_ids: []
+    new_finding_ids: []
+    coverage_limits: []
+  - evidence_id: RV-EV-020
+    scenario_id: RV-023
+    wave: A
+    target: Pagination and date-filter accessibility
+    result: FAIL_ACCESSIBILITY
+    previous_status: 'BLOCKED_TEST_DATA: 9 rows'
+    existing_finding_ids:
+    - UIUX-F-085
+    - UIUX-F-110
+    new_finding_ids: []
+    coverage_limits:
+    - Separate bounded-pagination static finding retained; no global reclassification.
+  - evidence_id: RV-EV-021
+    scenario_id: RV-004 / RV-026
+    wave: A
+    target: Tenant Admin navigation/administration
+    result: FAIL_UIUX
+    previous_status: BLOCKED_IDENTITY
+    existing_finding_ids:
+    - UIUX-F-016
+    - UIUX-F-017
+    - UIUX-F-020
+    - UIUX-F-109
+    new_finding_ids: []
+    coverage_limits:
+    - No authority mutation submitted.
+  - evidence_id: RV-EV-022
+    scenario_id: RV-002 / RV-004
+    wave: A
+    target: Project Manager Home/navigation
+    result: FAIL_UIUX
+    previous_status: BLOCKED_PERMISSION
+    existing_finding_ids:
+    - UIUX-F-065
+    - UIUX-F-066
+    - UIUX-F-016
+    - UIUX-F-017
+    new_finding_ids: []
+    coverage_limits:
+    - Operational comparison only; advanced project_controls.compare/exceptions_view remain absent.
+  - evidence_id: RV-EV-023
+    scenario_id: RV-033
+    wave: A
+    target: Scheduled/revoked authorization histories
+    result: PARTIAL
+    previous_status: UTV scheduled/revoked
+    existing_finding_ids:
+    - UIUX-F-020
+    - UIUX-F-109
+    new_finding_ids: []
+    coverage_limits: &id001
+    - History subset executed; full 26-persona readiness/coverage UI remains partial; no activation/revocation.
+  - evidence_id: RV-EV-024
+    scenario_id: RV-006
+    wave: B
+    target: Estimate context/cascade subset
+    result: FAIL_UIUX
+    previous_status: BLOCKED_PERMISSION / TEST_DATA
+    existing_finding_ids:
+    - UIUX-F-105
+    new_finding_ids: []
+    coverage_limits:
+    - Intermediate pre-swap observations superseded by settled captures. Manipulated POST and natural error/loading
+      states UTV.
+  - evidence_id: RV-EV-025
+    scenario_id: RV-006
+    wave: B
+    target: Expense context/cascade subset
+    result: PARTIAL
+    previous_status: BLOCKED_PERMISSION / TEST_DATA
+    existing_finding_ids: []
+    new_finding_ids: []
+    coverage_limits: &id002
+    - No expense created. Manipulated POST and natural error/loading states UTV.
+  - evidence_id: RV-EV-026
+    scenario_id: RV-006
+    wave: B
+    target: Daily Report choice boundary
+    result: FAIL_PERMISSION_OR_SCOPE
+    previous_status: BLOCKED_PERMISSION / TEST_DATA
+    existing_finding_ids:
+    - UIUX-F-055
+    new_finding_ids:
+    - UIUX-F-111
+    coverage_limits: &id003
+    - P02 repeat of affected path not executed. No successful unauthorized write claimed.
+  - evidence_id: RV-EV-027
+    scenario_id: RV-006
+    wave: B
+    target: Equipment Assignment choice boundary
+    result: FAIL_PERMISSION_OR_SCOPE
+    previous_status: BLOCKED_PERMISSION / TEST_DATA
+    existing_finding_ids:
+    - UIUX-F-057
+    new_finding_ids:
+    - UIUX-F-111
+    coverage_limits: &id004
+    - Maintenance, operations and cost specialist coverage not executed.
+  - evidence_id: RV-EV-028
+    scenario_id: RV-008
+    wave: B
+    target: Approved-request PO preparation
+    result: FAIL_PERMISSION_OR_SCOPE
+    previous_status: BLOCKED_PERMISSION / TEST_DATA
+    existing_finding_ids:
+    - UIUX-F-054
+    new_finding_ids:
+    - UIUX-F-111
+    coverage_limits: &id005
+    - Buyer role gap remains. Follow-on journey UTV after security stop.
+  - evidence_id: RV-EV-029
+    scenario_id: RV-010
+    wave: B
+    target: Journal form/dimensions/hierarchy
+    result: FAIL_UIUX
+    previous_status: BLOCKED_PERMISSION / TEST_DATA
+    existing_finding_ids:
+    - UIUX-F-030
+    - UIUX-F-074
+    - UIUX-F-075
+    new_finding_ids:
+    - UIUX-F-112
+    coverage_limits:
+    - 'C/D legitimately visible to organization-scoped P05. No journal/line created/submitted/posted. /line/ GET
+      405: form is inline on detail. Scoped P06 entry remains blocked.'
+  - evidence_id: RV-EV-030
+    scenario_id: NEGATIVE_BOUNDARIES
+    wave: A/B
+    target: Direct URL/search/options boundaries
+    result: PASS
+    previous_status: NEWLY_PREPARED
+    existing_finding_ids: []
+    new_finding_ids: []
+    coverage_limits:
+    - Sampled GET boundaries only; manipulated business POST unexecuted; no complete security certification.
+  - evidence_id: RV-EV-031
+    scenario_id: RV-024 / RV-006 / RV-008 / RV-012 / RV-014 / RV-019
+    wave: A/B
+    target: Registry readiness decisions
+    result: BLOCKED_AUTHORIZATION_FIXTURE
+    previous_status: EXPLICIT_BLOCKERS
+    existing_finding_ids: []
+    new_finding_ids: []
+    coverage_limits: &id006
+    - No role or fixture provisioning, substitution, scope broadening or Wave C.
+  wave_a_decision: WAVE_A_COMPLETE_WITH_EXPLICIT_EVIDENCE_GAPS
+  wave_a_scope: All fixture-cleared bounded retests executed; not all-PASS/full-audit closure. Explicit unavailable
+    states remain.
+  wave_b_decision: WAVE_B_PARTIAL_WITH_SECURITY_FINDING_AND_EXPLICIT_BLOCKERS
+  remaining_blockers_and_utv:
+  - target: Scheduled/revoked authorization histories
+    status: PARTIAL
+    limits: *id001
+  - target: Expense context/cascade subset
+    status: PARTIAL
+    limits: *id002
+  - target: Daily Report choice boundary
+    status: FAIL_PERMISSION_OR_SCOPE
+    limits: *id003
+  - target: Equipment Assignment choice boundary
+    status: FAIL_PERMISSION_OR_SCOPE
+    limits: *id004
+  - target: Approved-request PO preparation
+    status: FAIL_PERMISSION_OR_SCOPE
+    limits: *id005
+  - target: Registry readiness decisions
+    status: BLOCKED_AUTHORIZATION_FIXTURE
+    limits: *id006
+  - target: RV-024 Reporting / Closeout
+    status: BLOCKED_AUTHORIZATION_FIXTURE
+    reason: Quarantined zero roles/scopes, canonical assigner-subset denial; no closeout case.
+  - target: RV-003 natural error / unauthorized Home
+    status: UTV
+    reason: No natural fixtures; no fault injection.
+  - target: P03/P04/P07/P24 specialists, P02 full create, P17 advanced comparison
+    status: BLOCKED_PERMISSION
+    reason: Canonical bundles remain incomplete; no substitutions.
+  - target: RV-012 Treasury
+    status: BLOCKED_PERMISSION / BLOCKED_TEST_DATA
+    reason: No organization entry, active mapped account, checker/source/lifecycle.
+  - target: RV-014 Billing
+    status: BLOCKED_PERMISSION / BLOCKED_TEST_DATA
+    reason: No approved contract terms at cutoff; certificate/statutory/lifecycle gaps.
+  - target: RV-019 Fleet
+    status: BLOCKED_PERMISSION / BLOCKED_TEST_DATA
+    reason: No P04 authority. Data alone insufficient; qualification/cost policy/rate absent.
+  - target: RV-006 manipulated business POST and natural loading/error states
+    status: UTV
+    reason: No business POST or fault injection; security-stopped paths not continued.
+  existing_finding_dispositions:
+  - finding_id: UIUX-F-065
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-015
+    - RV-EV-022
+    scope_note: Bounded observed portions only; original static/history retained.
+  - finding_id: UIUX-F-066
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-015
+    - RV-EV-022
+    scope_note: Bounded observed portions only; original static/history retained.
+  - finding_id: UIUX-F-016
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-016
+    - RV-EV-021
+    - RV-EV-022
+    scope_note: Bounded observed portions only; original static/history retained.
+  - finding_id: UIUX-F-017
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-016
+    - RV-EV-021
+    - RV-EV-022
+    scope_note: Bounded observed portions only; original static/history retained.
+  - finding_id: UIUX-F-015
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-017
+    scope_note: Bounded observed portions only; original static/history retained.
+  - finding_id: UIUX-F-020
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-018
+    - RV-EV-021
+    - RV-EV-023
+    scope_note: Bounded observed portions only; original static/history retained.
+  - finding_id: UIUX-F-085
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: NOT_REPRODUCED
+    evidence_ids:
+    - RV-EV-020
+    scope_note: Daily Reports preserves filter/sort/page. REVIEW_FOR_RECLASSIFICATION of route applicability only;
+      separate static bounded-pagination component finding retained.
+  - finding_id: UIUX-F-110
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-020
+    scope_note: Bounded observed portions only; original static/history retained.
+  - finding_id: UIUX-F-109
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-021
+    - RV-EV-023
+    scope_note: Bounded observed portions only; original static/history retained.
+  - finding_id: UIUX-F-105
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-024
+    scope_note: Bounded observed portions only; original static/history retained.
+  - finding_id: UIUX-F-055
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: PARTIALLY_CONFIRMED
+    evidence_ids:
+    - RV-EV-026
+    scope_note: Initial independent organization-wide choices observed; security stop before cascade/submission
+      or maintenance follow-on.
+  - finding_id: UIUX-F-057
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: PARTIALLY_CONFIRMED
+    evidence_ids:
+    - RV-EV-027
+    scope_note: Initial independent organization-wide choices observed; security stop before cascade/submission
+      or maintenance follow-on.
+  - finding_id: UIUX-F-054
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: PARTIALLY_CONFIRMED
+    evidence_ids:
+    - RV-EV-028
+    scope_note: Initial independent organization-wide choices observed; security stop before cascade/submission
+      or maintenance follow-on.
+  - finding_id: UIUX-F-030
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-029
+    scope_note: Bounded observed portions only; original static/history retained.
+  - finding_id: UIUX-F-074
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-029
+    scope_note: Bounded observed portions only; original static/history retained.
+  - finding_id: UIUX-F-075
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-029
+    scope_note: Bounded observed portions only; original static/history retained.
+  new_findings:
+  - UIUX-F-111
+  - UIUX-F-112
+  security:
+    unauthorized_access_observed: true
+    cross_tenant_leakage_observed: false
+    object_scope_leakage_observed: true
+    scope: Same-tenant selector metadata; affected paths stopped. Direct URLs/search deny/exclude. Unauthorized
+      write not proved.
+  safety:
+    product_code_changed: false
+    authorization_semantics_changed: false
+    new_permission_created_during_runtime: false
+    scope_broadened_during_runtime: false
+    production_action: false
+    remediation: false
+    cep_078_execution: false
+    cep_079_execution: false
+    git_write: false
+    reference_users_deleted: false
+    reference_users_auto_deactivated: false
+    business_fixture_changed: false
+  integrity:
+    authorization_before_after_equal: true
+    all_514_model_fingerprints_equal: true
+    capture_exception: runtime_evidence/diagnostics/TARGETED_RUNTIME_CAPTURE_EXCEPTION.json
+  reports:
+  - UIUX_RUNTIME_VALIDATION_WAVE_A_ADDENDUM.md
+  - UIUX_RUNTIME_VALIDATION_WAVE_B_REPORT.md
+  next_action: STOP. No Wave C, remediation, provisioning or Git writes.
+f111_runtime_retest:
+  executed_date: '2026-10-22'
+  timezone: Asia/Tehran
+  status: RUNTIME_VERIFIED_RESOLVED
+  final_decision: F111_RUNTIME_VERIFIED_RESOLVED
+  report: UIUX_F111_RUNTIME_RETEST_REPORT.md
+  baseline_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+  branch: main
+  current_head: 43ac319c6e73e48ca9626461b73987922c498ec3
+  current_source: Uncommitted authorized F-111 remediation; eight product files unchanged during retest.
+  runtime_url: http://127.0.0.1:8002
+  browser: Codex in-app browser
+  browser_version: 155.0.8059.80
+  browser_version_source: runtime_evidence/diagnostics/F111_RETEST_BROWSER_VERSION.json
+  actor: uiux.persona.project-manager
+  persona_id: P-17
+  authorized_projects: [PRJ-01-01, PRJ-01-02]
+  evidence_ids:
+  - RV-EV-032
+  - RV-EV-033
+  - RV-EV-034
+  - RV-EV-035
+  - RV-EV-036
+  - RV-EV-037
+  - RV-EV-038
+  - RV-EV-039
+  - RV-EV-040
+  runtime_exception: Port 8001 retained stale pre-remediation in-memory code under --noreload.
+    RV-EV-032 preserves its disclosure. Fresh port 8002 loaded current code and governs closure.
+  final_http_observations_pass: 48
+  final_manipulated_posts_rejected: 15
+  cross_tenant_posts_rejected: 4
+  earlier_parser_attempt: One additional safe Daily/C negative POST; incorrect evidence-parser error selector
+    corrected without product changes. Retained separately; 16 actual negative POST attempts total.
+  same_tenant_metadata_leakage_on_fresh_runtime: false
+  cross_tenant_metadata_leakage: false
+  unauthorized_mutation: false
+  invalid_redisplay_metadata_leakage: false
+  object_scope_enforcement: PASS
+  integrity:
+    authority_unchanged: true
+    concrete_models_compared: 519
+    unchanged_model_digests: 518
+    changed_models: [sessions.Session]
+    user_digest_excludes: [last_login]
+    business_and_audit_digests_unchanged: true
+    historical_evidence_unchanged: true
+    product_files_unchanged: true
+  safety:
+    product_code_changed_during_retest: false
+    role_permission_changed: false
+    scope_broadened: false
+    production_action: false
+    migration_executed: false
+    git_writes: false
+    generated_pdfs_added_to_git: false
+    generated_pdf_deletion_attempted: false
+    wave_c_started: false
+    cep_078_execution: false
+    cep_079_execution: false
+  next_action: STOP. Separate SAME_PATTERN_REVIEW_REQUIRED inventory remains unchanged.
+wave_c:
+  decision: WAVE_C_BLOCKED
+  execution: PARTIAL_WITH_EXPLICIT_STOP_BOUNDARY_BLOCKERS
+  session_closed: true
+  wave_closed: false
+  report: UIUX_RUNTIME_VALIDATION_WAVE_C_REPORT.md
+  evidence_directory: wave_c_evidence/
+  scenario_results:
+  - evidence_id: RV-EV-041
+    scenario_id: RV-007
+    runtime:
+      environment_name: Development
+      base_url: http://127.0.0.1:8015
+      git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+      effective_build: Existing accepted dirty source plus TOUCH_SET.json; FILES_BEFORE.json and final
+        artifact index identify bytes
+      browser: Microsoft Edge
+      browser_version: 155.0.4283.62
+      viewports:
+      - - 1440
+        - 900
+      - - 390
+        - 844
+      evidence_capture_interval:
+        starts_at: '2026-10-22T14:58:02.954877+03:30'
+        ends_at: '2026-10-22T15:13:09.075635+03:30'
+        basis: Capture-file modification times; reconciled_at kept separate; no fabricated per-request
+          clock
+    persona:
+      persona_ids:
+      - P-03
+      - P-17
+      actual_actors:
+      - uiux.audit.project
+      - uiux.persona.project-manager
+      - uiux.reference.batch03.site-only
+      effective_permission_bundle_reference:
+      - INVENTORY.json
+      - INVENTORY_PERSONA.json
+      - READINESS.json
+    surfaces:
+    - /procurement/rfqs/<uuid:rfq_id>/buyer/
+    expected_result:
+    - stage visibility
+    - single emphasized next action
+    - invalid actions absent/disabled
+    - technical/governance wording
+    actual_result: P-03 bounded Buyer absent. P-17 A workspace and empty comparison/award forms observed;
+      C/X/site denied. Stage/priority F008 remains open; valid specialist comparison/award lifecycle requires
+      approved role and source/grant/policy decisions, not invented next-action semantics.
+    result: NEEDS_PRODUCT_REVIEW
+    disposition: BLOCKED
+    finding_ids:
+    - UIUX-F-008
+    - UIUX-F-009
+    http_reference: after_HTTP.json
+    http_observations: 45
+    browser_reference: final_BROWSER.json
+    browser_observations: 1
+    screenshots:
+    - final_browser_04_desktop.png
+    - final_browser_04_mobile.png
+    accessibility:
+      keyboard_only: Six Tab steps captured per view; targeted disclosures separately checked. No whole-scenario
+        accessibility PASS inferred.
+      focus_visible: Recorded in final_BROWSER.json
+      landmarks: One main on all 20 captured pages
+      notes: Denied pages are negative controls, not positive specialist evidence
+    authorization:
+      server_authorization_verified_when_applicable: true
+      cross_tenant_leakage_observed: false
+      scope: 165 real authenticated HTTP observations + 9 delta + 20 direct services; VERIFICATION.json
+        gives exact metadata controls; blocking gates limit positive lifecycle coverage
+    mutation_performed: true
+    mutation_record_or_cleanup: INTEGRITY.json; three canonical issued synthetic RFQs + two immutable
+      empty statement projections; one retained P-22 reference account; no temporary authority
+    notes: Every canonical validation target is explicit; unexecuted targets remain blocked and do not
+      inherit PASS from a page render.
+    recorded_at: '2026-10-22T15:14:28.624985+03:30'
+    executed_at: '2026-10-22T15:13:09.075635+03:30'
+  - evidence_id: RV-EV-042
+    scenario_id: RV-009
+    runtime:
+      environment_name: Development
+      base_url: http://127.0.0.1:8015
+      git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+      effective_build: Existing accepted dirty source plus TOUCH_SET.json; FILES_BEFORE.json and final
+        artifact index identify bytes
+      browser: Microsoft Edge
+      browser_version: 155.0.4283.62
+      viewports:
+      - - 1440
+        - 900
+      - - 390
+        - 844
+      evidence_capture_interval:
+        starts_at: '2026-10-22T14:58:20.419677+03:30'
+        ends_at: '2026-10-22T15:13:11.290856+03:30'
+        basis: Capture-file modification times; reconciled_at kept separate; no fabricated per-request
+          clock
+    persona:
+      persona_ids:
+      - P-22
+      actual_actors:
+      - uiux.audit.project
+      - uiux.persona.inventory
+      effective_permission_bundle_reference:
+      - INVENTORY.json
+      - INVENTORY_PERSONA.json
+      - READINESS.json
+    surfaces:
+    - /inventory/
+    - /inventory/custody/
+    - /inventory/valuation/
+    expected_result:
+    - consistent list/detail affordance
+    - technical IDs hidden from normal workflow
+    - task hierarchy between quantity/custody and valuation
+    actual_result: Dedicated persistent P-22 existing Viewer/organization scope prepared canonically.
+      Quantity list, own warehouse drilldown, custody and valuation reads observed; project-scoped P-01
+      and C/X controls remain denied. Viewer cannot invoke valuation reconciliation. Operational posting/valuation
+      production is outside this navigation scenario.
+    result: PASS
+    disposition: PASS
+    finding_ids:
+    - UIUX-F-023
+    - UIUX-F-024
+    - UIUX-F-130
+    http_reference: after_HTTP.json
+    http_observations: 6
+    browser_reference: final_BROWSER.json
+    browser_observations: 5
+    screenshots:
+    - final_browser_01_desktop.png
+    - final_browser_01_mobile.png
+    - final_browser_02_desktop.png
+    - final_browser_02_mobile.png
+    - final_browser_03_desktop.png
+    - final_browser_03_mobile.png
+    - final_browser_05_desktop.png
+    - final_browser_05_mobile.png
+    - final_browser_06_desktop.png
+    - final_browser_06_mobile.png
+    accessibility:
+      keyboard_only: Six Tab steps captured per view; targeted disclosures separately checked. No whole-scenario
+        accessibility PASS inferred.
+      focus_visible: Recorded in final_BROWSER.json
+      landmarks: One main on all 20 captured pages
+      notes: Denied pages are negative controls, not positive specialist evidence
+    authorization:
+      server_authorization_verified_when_applicable: true
+      cross_tenant_leakage_observed: false
+      scope: 165 real authenticated HTTP observations + 9 delta + 20 direct services; VERIFICATION.json
+        gives exact metadata controls; blocking gates limit positive lifecycle coverage
+    mutation_performed: true
+    mutation_record_or_cleanup: INTEGRITY.json; three canonical issued synthetic RFQs + two immutable
+      empty statement projections; one retained P-22 reference account; no temporary authority
+    notes: Every canonical validation target is explicit; unexecuted targets remain blocked and do not
+      inherit PASS from a page render.
+    recorded_at: '2026-10-22T15:14:28.624985+03:30'
+    executed_at: '2026-10-22T15:13:11.290856+03:30'
+  - evidence_id: RV-EV-043
+    scenario_id: RV-011
+    runtime:
+      environment_name: Development
+      base_url: http://127.0.0.1:8015
+      git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+      effective_build: Existing accepted dirty source plus TOUCH_SET.json; FILES_BEFORE.json and final
+        artifact index identify bytes
+      browser: Microsoft Edge
+      browser_version: 155.0.4283.62
+      viewports:
+      - - 1440
+        - 900
+      - - 390
+        - 844
+      evidence_capture_interval:
+        starts_at: '2026-10-22T14:58:23.626536+03:30'
+        ends_at: '2026-10-22T15:13:37.381201+03:30'
+        basis: Capture-file modification times; reconciled_at kept separate; no fabricated per-request
+          clock
+    persona:
+      persona_ids:
+      - P-05
+      actual_actors:
+      - account.demo-construction-01.accountant
+      - uiux.audit.project
+      - uiux.persona.project-manager
+      effective_permission_bundle_reference:
+      - INVENTORY.json
+      - INVENTORY_PERSONA.json
+      - READINESS.json
+    surfaces:
+    - /accounting/statements/
+    - /accounting/statements/<uuid:run_id>/
+    expected_result:
+    - localized statement/account-type labels
+    - Jalali date display
+    - numeric alignment
+    - audit hashes progressively disclosed
+    actual_result: P-05 organization Accountant read/empty preview and retained immutable report observed;
+      same-tenant unauthorized and cross-tenant run denied. Populated synthetic 1-IRR manual journal preparation
+      reached missing active Tenant policy; transaction rolled back. Numeric/account-type populated runtime
+      is not PASS; all 15 enum presentation combinations and posted-line reporting have isolated tests.
+    result: BLOCKED_TEST_DATA
+    disposition: BLOCKED
+    finding_ids:
+    - UIUX-F-092
+    - UIUX-F-093
+    http_reference: after_HTTP.json
+    http_observations: 18
+    browser_reference: final_BROWSER.json
+    browser_observations: 2
+    screenshots:
+    - final_browser_19_desktop.png
+    - final_browser_19_mobile.png
+    - final_browser_20_desktop.png
+    - final_browser_20_mobile.png
+    accessibility:
+      keyboard_only: Six Tab steps captured per view; targeted disclosures separately checked. No whole-scenario
+        accessibility PASS inferred.
+      focus_visible: Recorded in final_BROWSER.json
+      landmarks: One main on all 20 captured pages
+      notes: Denied pages are negative controls, not positive specialist evidence
+    authorization:
+      server_authorization_verified_when_applicable: true
+      cross_tenant_leakage_observed: false
+      scope: 165 real authenticated HTTP observations + 9 delta + 20 direct services; VERIFICATION.json
+        gives exact metadata controls; blocking gates limit positive lifecycle coverage
+    mutation_performed: true
+    mutation_record_or_cleanup: INTEGRITY.json; three canonical issued synthetic RFQs + two immutable
+      empty statement projections; one retained P-22 reference account; no temporary authority
+    notes: Every canonical validation target is explicit; unexecuted targets remain blocked and do not
+      inherit PASS from a page render.
+    recorded_at: '2026-10-22T15:14:28.624985+03:30'
+    executed_at: '2026-10-22T15:13:37.381201+03:30'
+  - evidence_id: RV-EV-044
+    scenario_id: RV-013
+    runtime:
+      environment_name: Development
+      base_url: http://127.0.0.1:8015
+      git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+      effective_build: Existing accepted dirty source plus TOUCH_SET.json; FILES_BEFORE.json and final
+        artifact index identify bytes
+      browser: Microsoft Edge
+      browser_version: 155.0.4283.62
+      viewports:
+      - - 1440
+        - 900
+      - - 390
+        - 844
+      evidence_capture_interval:
+        starts_at: '2026-10-22T14:58:28.536133+03:30'
+        ends_at: '2026-10-22T15:13:34.130577+03:30'
+        basis: Capture-file modification times; reconciled_at kept separate; no fabricated per-request
+          clock
+    persona:
+      persona_ids:
+      - P-07
+      - P-05
+      actual_actors:
+      - account.demo-construction-01.accountant
+      - uiux.audit.project
+      effective_permission_bundle_reference:
+      - INVENTORY.json
+      - INVENTORY_PERSONA.json
+      - READINESS.json
+    surfaces:
+    - /subledgers/
+    expected_result:
+    - movement selection without raw ID entry
+    - authorized posted movement narrowing
+    - dense multi-task workbench comprehension
+    actual_result: P-05 workbench empty state observed; P-07 bounded specialist absent. Zero obligations
+      and no eligible posted Treasury source. Current source recognition is unactivated. No fake obligation,
+      cash movement, settlement or policy activation created.
+    result: NEEDS_DOMAIN_REVIEW
+    disposition: BLOCKED
+    finding_ids:
+    - UIUX-F-012
+    - UIUX-F-013
+    - UIUX-F-014
+    http_reference: after_HTTP.json
+    http_observations: 2
+    browser_reference: final_BROWSER.json
+    browser_observations: 2
+    screenshots:
+    - final_browser_07_desktop.png
+    - final_browser_07_mobile.png
+    - final_browser_18_desktop.png
+    - final_browser_18_mobile.png
+    accessibility:
+      keyboard_only: Six Tab steps captured per view; targeted disclosures separately checked. No whole-scenario
+        accessibility PASS inferred.
+      focus_visible: Recorded in final_BROWSER.json
+      landmarks: One main on all 20 captured pages
+      notes: Denied pages are negative controls, not positive specialist evidence
+    authorization:
+      server_authorization_verified_when_applicable: true
+      cross_tenant_leakage_observed: false
+      scope: 165 real authenticated HTTP observations + 9 delta + 20 direct services; VERIFICATION.json
+        gives exact metadata controls; blocking gates limit positive lifecycle coverage
+    mutation_performed: false
+    mutation_record_or_cleanup: INTEGRITY.json; three canonical issued synthetic RFQs + two immutable
+      empty statement projections; one retained P-22 reference account; no temporary authority
+    notes: Every canonical validation target is explicit; unexecuted targets remain blocked and do not
+      inherit PASS from a page render.
+    recorded_at: '2026-10-22T15:14:28.624985+03:30'
+    executed_at: '2026-10-22T15:13:34.130577+03:30'
+  - evidence_id: RV-EV-045
+    scenario_id: RV-015
+    runtime:
+      environment_name: Development
+      base_url: http://127.0.0.1:8015
+      git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+      effective_build: Existing accepted dirty source plus TOUCH_SET.json; FILES_BEFORE.json and final
+        artifact index identify bytes
+      browser: Microsoft Edge
+      browser_version: 155.0.4283.62
+      viewports:
+      - - 1440
+        - 900
+      - - 390
+        - 844
+      evidence_capture_interval:
+        starts_at: '2026-10-22T14:58:29.223408+03:30'
+        ends_at: '2026-10-22T15:13:14.515680+03:30'
+        basis: Capture-file modification times; reconciled_at kept separate; no fabricated per-request
+          clock
+    persona:
+      persona_ids:
+      - P-08
+      - P-21
+      actual_actors:
+      - uiux.audit.project
+      effective_permission_bundle_reference:
+      - INVENTORY.json
+      - INVENTORY_PERSONA.json
+      - READINESS.json
+    surfaces:
+    - /workforce/departments/
+    - /workforce/positions/
+    - /workforce/teams/
+    - /workforce/employees/create/
+    - /workforce/foundation/
+    expected_result:
+    - tree/list keyboard usability
+    - filter placement
+    - known-account data reuse
+    - sensitive-data separation
+    - technical tenancy/permission wording
+    actual_result: No bounded P-08/P-21 HR administration role. P-01 project identity denied organization
+      structure/foundation and create; manipulated employee POST rejected. Existing broad managerial roles
+      are not HR-only specialist authority.
+    result: BLOCKED_AUTHORIZATION_FIXTURE
+    disposition: BLOCKED
+    finding_ids: []
+    http_reference: after_HTTP.json
+    http_observations: 6
+    browser_reference: final_BROWSER.json
+    browser_observations: 2
+    screenshots:
+    - final_browser_08_desktop.png
+    - final_browser_08_mobile.png
+    - final_browser_09_desktop.png
+    - final_browser_09_mobile.png
+    accessibility:
+      keyboard_only: Six Tab steps captured per view; targeted disclosures separately checked. No whole-scenario
+        accessibility PASS inferred.
+      focus_visible: Recorded in final_BROWSER.json
+      landmarks: One main on all 20 captured pages
+      notes: Denied pages are negative controls, not positive specialist evidence
+    authorization:
+      server_authorization_verified_when_applicable: true
+      cross_tenant_leakage_observed: false
+      scope: 165 real authenticated HTTP observations + 9 delta + 20 direct services; VERIFICATION.json
+        gives exact metadata controls; blocking gates limit positive lifecycle coverage
+    mutation_performed: false
+    mutation_record_or_cleanup: INTEGRITY.json; three canonical issued synthetic RFQs + two immutable
+      empty statement projections; one retained P-22 reference account; no temporary authority
+    notes: Every canonical validation target is explicit; unexecuted targets remain blocked and do not
+      inherit PASS from a page render.
+    recorded_at: '2026-10-22T15:14:28.624985+03:30'
+    executed_at: '2026-10-22T15:13:14.515680+03:30'
+  - evidence_id: RV-EV-046
+    scenario_id: RV-017
+    runtime:
+      environment_name: Development
+      base_url: http://127.0.0.1:8015
+      git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+      effective_build: Existing accepted dirty source plus TOUCH_SET.json; FILES_BEFORE.json and final
+        artifact index identify bytes
+      browser: Microsoft Edge
+      browser_version: 155.0.4283.62
+      viewports:
+      - - 1440
+        - 900
+      - - 390
+        - 844
+      evidence_capture_interval:
+        starts_at: '2026-10-22T14:58:31.447978+03:30'
+        ends_at: '2026-10-22T15:13:15.955325+03:30'
+        basis: Capture-file modification times; reconciled_at kept separate; no fabricated per-request
+          clock
+    persona:
+      persona_ids:
+      - P-10
+      actual_actors:
+      - uiux.audit.project
+      effective_permission_bundle_reference:
+      - INVENTORY.json
+      - INVENTORY_PERSONA.json
+      - READINESS.json
+    surfaces:
+    - /timekeeping/
+    - /timekeeping/calendars/new/
+    expected_result:
+    - configuration versus daily-work separation
+    - ISO weekday input replacement need
+    - exception-code localization
+    - valid next action and workload visibility
+    actual_result: P-10 retained attendance-read subset observed; calendar GET/POST denied. Calendar administration/daily-write
+      specialist bundle unavailable. No broad HR/manager authority substituted; F040 setup/daily-work
+      structure remains open.
+    result: BLOCKED_AUTHORIZATION_FIXTURE
+    disposition: BLOCKED
+    finding_ids:
+    - UIUX-F-040
+    - UIUX-F-041
+    http_reference: after_HTTP.json
+    http_observations: 3
+    browser_reference: final_BROWSER.json
+    browser_observations: 1
+    screenshots:
+    - final_browser_10_desktop.png
+    - final_browser_10_mobile.png
+    accessibility:
+      keyboard_only: Six Tab steps captured per view; targeted disclosures separately checked. No whole-scenario
+        accessibility PASS inferred.
+      focus_visible: Recorded in final_BROWSER.json
+      landmarks: One main on all 20 captured pages
+      notes: Denied pages are negative controls, not positive specialist evidence
+    authorization:
+      server_authorization_verified_when_applicable: true
+      cross_tenant_leakage_observed: false
+      scope: 165 real authenticated HTTP observations + 9 delta + 20 direct services; VERIFICATION.json
+        gives exact metadata controls; blocking gates limit positive lifecycle coverage
+    mutation_performed: false
+    mutation_record_or_cleanup: INTEGRITY.json; three canonical issued synthetic RFQs + two immutable
+      empty statement projections; one retained P-22 reference account; no temporary authority
+    notes: Every canonical validation target is explicit; unexecuted targets remain blocked and do not
+      inherit PASS from a page render.
+    recorded_at: '2026-10-22T15:14:28.624985+03:30'
+    executed_at: '2026-10-22T15:13:15.955325+03:30'
+  - evidence_id: RV-EV-047
+    scenario_id: RV-018
+    runtime:
+      environment_name: Development
+      base_url: http://127.0.0.1:8015
+      git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+      effective_build: Existing accepted dirty source plus TOUCH_SET.json; FILES_BEFORE.json and final
+        artifact index identify bytes
+      browser: Microsoft Edge
+      browser_version: 155.0.4283.62
+      viewports:
+      - - 1440
+        - 900
+      - - 390
+        - 844
+      evidence_capture_interval:
+        starts_at: '2026-10-22T14:58:32.382854+03:30'
+        ends_at: '2026-10-22T14:58:33.015090+03:30'
+        basis: Capture-file modification times; reconciled_at kept separate; no fabricated per-request
+          clock
+    persona:
+      persona_ids:
+      - P-20
+      actual_actors:
+      - uiux.audit.project
+      effective_permission_bundle_reference:
+      - INVENTORY.json
+      - INVENTORY_PERSONA.json
+      - READINESS.json
+    surfaces:
+    - /payroll/
+    - /payroll/runs/<uuid:run_id>/
+    - /payroll/statutory/
+    - /payroll/financial-handoffs/
+    expected_result:
+    - journey sequencing
+    - technical lineage/hash/JSON exposure
+    - exception handling
+    - form technical metadata generation versus manual input
+    actual_result: P-20 unprovisioned. Built-in sensitive Payroll permissions excluded by default. Existing
+      p7_demo_payroll_assurance is explicitly designated to the demo Owner and includes sensitive Workforce
+      permissions; no reuse as a Payroll-only specialist or statutory activation. Viewer negatives only;
+      run/statutory/handoff positive lifecycle unexecuted.
+    result: BLOCKED_AUTHORIZATION_FIXTURE
+    disposition: BLOCKED
+    finding_ids:
+    - UIUX-F-005
+    - UIUX-F-006
+    - UIUX-F-058
+    - UIUX-F-059
+    - UIUX-F-067
+    - UIUX-F-068
+    - UIUX-F-069
+    http_reference: after_HTTP.json
+    http_observations: 3
+    browser_reference: final_BROWSER.json
+    browser_observations: 0
+    screenshots: []
+    accessibility:
+      keyboard_only: Six Tab steps captured per view; targeted disclosures separately checked. No whole-scenario
+        accessibility PASS inferred.
+      focus_visible: Recorded in final_BROWSER.json
+      landmarks: One main on all 20 captured pages
+      notes: Denied pages are negative controls, not positive specialist evidence
+    authorization:
+      server_authorization_verified_when_applicable: true
+      cross_tenant_leakage_observed: false
+      scope: 165 real authenticated HTTP observations + 9 delta + 20 direct services; VERIFICATION.json
+        gives exact metadata controls; blocking gates limit positive lifecycle coverage
+    mutation_performed: false
+    mutation_record_or_cleanup: INTEGRITY.json; three canonical issued synthetic RFQs + two immutable
+      empty statement projections; one retained P-22 reference account; no temporary authority
+    notes: Every canonical validation target is explicit; unexecuted targets remain blocked and do not
+      inherit PASS from a page render.
+    recorded_at: '2026-10-22T15:14:28.624985+03:30'
+    executed_at: '2026-10-22T14:58:33.015090+03:30'
+  - evidence_id: RV-EV-048
+    scenario_id: RV-028
+    runtime:
+      environment_name: Development
+      base_url: http://127.0.0.1:8015
+      git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+      effective_build: Existing accepted dirty source plus TOUCH_SET.json; FILES_BEFORE.json and final
+        artifact index identify bytes
+      browser: Microsoft Edge
+      browser_version: 155.0.4283.62
+      viewports:
+      - - 1440
+        - 900
+      - - 390
+        - 844
+      evidence_capture_interval:
+        starts_at: '2026-10-22T14:58:33.691250+03:30'
+        ends_at: '2026-10-22T15:13:19.151753+03:30'
+        basis: Capture-file modification times; reconciled_at kept separate; no fabricated per-request
+          clock
+    persona:
+      persona_ids:
+      - P-19
+      actual_actors:
+      - uiux.audit.project
+      effective_permission_bundle_reference:
+      - INVENTORY.json
+      - INVENTORY_PERSONA.json
+      - READINESS.json
+    surfaces:
+    - /documents/
+    - /documents/mine/
+    - /documents/upload/
+    - /documents/<uuid:document_id>/
+    - /documents/<uuid:document_id>/versions/add/
+    - /documents/<uuid:document_id>/links/add/
+    expected_result:
+    - document registration is task-oriented and does not require avoidable technical identifiers
+    - version history and current version are understandable
+    - project/business-object linking uses authorized existing records and clear context
+    - download/preview/version actions have consistent hierarchy and affordance
+    - own-document versus organization-document scope is clear
+    - empty/error/unauthorized states and mobile behavior are usable
+    actual_result: P-19 retained document read/detail/version history observed; C/X metadata and write
+      routes denied. Upload/version/link specialist bundle absent. Both accessible versions unavailable
+      for safe download; direct download lookup denies. No fabricated CLEAN scanner assessment or Platform
+      Operations bypass.
+    result: BLOCKED_AUTHORIZATION_FIXTURE
+    disposition: BLOCKED
+    finding_ids:
+    - UIUX-F-011
+    http_reference: after_HTTP.json
+    http_observations: 19
+    browser_reference: final_BROWSER.json
+    browser_observations: 2
+    screenshots:
+    - final_browser_11_desktop.png
+    - final_browser_11_mobile.png
+    - final_browser_12_desktop.png
+    - final_browser_12_mobile.png
+    accessibility:
+      keyboard_only: Six Tab steps captured per view; targeted disclosures separately checked. No whole-scenario
+        accessibility PASS inferred.
+      focus_visible: Recorded in final_BROWSER.json
+      landmarks: One main on all 20 captured pages
+      notes: Denied pages are negative controls, not positive specialist evidence
+    authorization:
+      server_authorization_verified_when_applicable: true
+      cross_tenant_leakage_observed: false
+      scope: 165 real authenticated HTTP observations + 9 delta + 20 direct services; VERIFICATION.json
+        gives exact metadata controls; blocking gates limit positive lifecycle coverage
+    mutation_performed: false
+    mutation_record_or_cleanup: INTEGRITY.json; three canonical issued synthetic RFQs + two immutable
+      empty statement projections; one retained P-22 reference account; no temporary authority
+    notes: Every canonical validation target is explicit; unexecuted targets remain blocked and do not
+      inherit PASS from a page render.
+    recorded_at: '2026-10-22T15:14:28.624985+03:30'
+    executed_at: '2026-10-22T15:13:19.151753+03:30'
+  - evidence_id: RV-EV-049
+    scenario_id: RV-029
+    runtime:
+      environment_name: Development
+      base_url: http://127.0.0.1:8015
+      git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+      effective_build: Existing accepted dirty source plus TOUCH_SET.json; FILES_BEFORE.json and final
+        artifact index identify bytes
+      browser: Microsoft Edge
+      browser_version: 155.0.4283.62
+      viewports:
+      - - 1440
+        - 900
+      - - 390
+        - 844
+      evidence_capture_interval:
+        starts_at: '2026-10-22T14:58:38.517412+03:30'
+        ends_at: '2026-10-22T14:58:39.306154+03:30'
+        basis: Capture-file modification times; reconciled_at kept separate; no fabricated per-request
+          clock
+    persona:
+      persona_ids:
+      - P-08
+      - P-21
+      - P-09
+      actual_actors:
+      - uiux.audit.project
+      effective_permission_bundle_reference:
+      - INVENTORY.json
+      - INVENTORY_PERSONA.json
+      - READINESS.json
+    surfaces:
+    - /workforce/employees/<uuid:employee_id>/
+    - /workforce/ess/employment/
+    - CANONICAL_INTERNAL_EMPLOYMENT_RECORD_MANAGEMENT_SURFACE_IF_PRESENT
+    expected_result:
+    - current versus historical/effective-dated employment information is understandable
+    - supersession/version semantics are presented as business history rather than raw technical lineage
+    - effective-from/effective-to dates are unambiguous and Jalali-consistent in the UI
+    - source document/version is traceable without exposing avoidable technical identifiers
+    - employee self-view is privacy-bounded to own employment history
+    - if no governed internal management surface exists for EMPLOYMENT_RECORDS_MANAGE, record NEEDS_PRODUCT_REVIEW
+      rather than inventing a route or UI
+    actual_result: No governed internal employment-record management UI. employment_records.manage and
+      view_own absent from every actual role. Unlinked ESS denied; cross-tenant Employee denied. No identity
+      inferred from Employee/usernames and no management route invented.
+    result: NEEDS_PRODUCT_REVIEW
+    disposition: BLOCKED
+    finding_ids: []
+    http_reference: after_HTTP.json
+    http_observations: 4
+    browser_reference: final_BROWSER.json
+    browser_observations: 0
+    screenshots: []
+    accessibility:
+      keyboard_only: Six Tab steps captured per view; targeted disclosures separately checked. No whole-scenario
+        accessibility PASS inferred.
+      focus_visible: Recorded in final_BROWSER.json
+      landmarks: One main on all 20 captured pages
+      notes: Denied pages are negative controls, not positive specialist evidence
+    authorization:
+      server_authorization_verified_when_applicable: true
+      cross_tenant_leakage_observed: false
+      scope: 165 real authenticated HTTP observations + 9 delta + 20 direct services; VERIFICATION.json
+        gives exact metadata controls; blocking gates limit positive lifecycle coverage
+    mutation_performed: false
+    mutation_record_or_cleanup: INTEGRITY.json; three canonical issued synthetic RFQs + two immutable
+      empty statement projections; one retained P-22 reference account; no temporary authority
+    notes: Every canonical validation target is explicit; unexecuted targets remain blocked and do not
+      inherit PASS from a page render.
+    recorded_at: '2026-10-22T15:14:28.624985+03:30'
+    executed_at: '2026-10-22T14:58:39.306154+03:30'
+  - evidence_id: RV-EV-050
+    scenario_id: RV-030
+    runtime:
+      environment_name: Development
+      base_url: http://127.0.0.1:8015
+      git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+      effective_build: Existing accepted dirty source plus TOUCH_SET.json; FILES_BEFORE.json and final
+        artifact index identify bytes
+      browser: Microsoft Edge
+      browser_version: 155.0.4283.62
+      viewports:
+      - - 1440
+        - 900
+      - - 390
+        - 844
+      evidence_capture_interval:
+        starts_at: '2026-10-22T14:58:39.574166+03:30'
+        ends_at: '2026-10-22T15:13:23.780206+03:30'
+        basis: Capture-file modification times; reconciled_at kept separate; no fabricated per-request
+          clock
+    persona:
+      persona_ids:
+      - P-23
+      actual_actors:
+      - uiux.audit.project
+      effective_permission_bundle_reference:
+      - INVENTORY.json
+      - INVENTORY_PERSONA.json
+      - READINESS.json
+    surfaces:
+    - /contracts/
+    - /contracts/<uuid:contract_id>/
+    - /contracts/<uuid:contract_id>/commercial-review/
+    - /contracts/contractual-records/
+    - /commercial/
+    - /commercial/<uuid:tender_id>/
+    - /commercial/<uuid:tender_id>/revise/
+    - /commercial/<uuid:tender_id>/evidence/
+    expected_result:
+    - contract status, commercial review and next action are task-oriented
+    - revision history is understandable without delivery/governance jargon dominating the page
+    - counterparty/project context is clear
+    - evidence/version references use business labels before canonical IDs
+    - commercial and procurement/billing responsibilities are not conflated
+    - responsive and keyboard behavior remain usable on representative detail/review screens
+    actual_result: P-23 contract read/commercial-review and empty tender list observed. C/X contract access
+      denied. Canonical create_tender_bid preparation denied missing active tender policy and rolled back.
+      Specialist preparation bundle and policy activation cannot be invented.
+    result: NEEDS_DOMAIN_REVIEW
+    disposition: BLOCKED
+    finding_ids:
+    - UIUX-F-038
+    http_reference: after_HTTP.json
+    http_observations: 9
+    browser_reference: final_BROWSER.json
+    browser_observations: 3
+    screenshots:
+    - final_browser_13_desktop.png
+    - final_browser_13_mobile.png
+    - final_browser_14_desktop.png
+    - final_browser_14_mobile.png
+    - final_browser_15_desktop.png
+    - final_browser_15_mobile.png
+    accessibility:
+      keyboard_only: Six Tab steps captured per view; targeted disclosures separately checked. No whole-scenario
+        accessibility PASS inferred.
+      focus_visible: Recorded in final_BROWSER.json
+      landmarks: One main on all 20 captured pages
+      notes: Denied pages are negative controls, not positive specialist evidence
+    authorization:
+      server_authorization_verified_when_applicable: true
+      cross_tenant_leakage_observed: false
+      scope: 165 real authenticated HTTP observations + 9 delta + 20 direct services; VERIFICATION.json
+        gives exact metadata controls; blocking gates limit positive lifecycle coverage
+    mutation_performed: false
+    mutation_record_or_cleanup: INTEGRITY.json; three canonical issued synthetic RFQs + two immutable
+      empty statement projections; one retained P-22 reference account; no temporary authority
+    notes: Every canonical validation target is explicit; unexecuted targets remain blocked and do not
+      inherit PASS from a page render.
+    recorded_at: '2026-10-22T15:14:28.624985+03:30'
+    executed_at: '2026-10-22T15:13:23.780206+03:30'
+  - evidence_id: RV-EV-051
+    scenario_id: RV-031
+    runtime:
+      environment_name: Development
+      base_url: http://127.0.0.1:8015
+      git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+      effective_build: Existing accepted dirty source plus TOUCH_SET.json; FILES_BEFORE.json and final
+        artifact index identify bytes
+      browser: Microsoft Edge
+      browser_version: 155.0.4283.62
+      viewports:
+      - - 1440
+        - 900
+      - - 390
+        - 844
+      evidence_capture_interval:
+        starts_at: '2026-10-22T14:58:42.298406+03:30'
+        ends_at: '2026-10-22T15:13:25.752848+03:30'
+        basis: Capture-file modification times; reconciled_at kept separate; no fabricated per-request
+          clock
+    persona:
+      persona_ids:
+      - P-24
+      - P-17
+      actual_actors:
+      - uiux.audit.project
+      - uiux.persona.project-manager
+      - uiux.reference.batch03.site-only
+      effective_permission_bundle_reference:
+      - INVENTORY.json
+      - INVENTORY_PERSONA.json
+      - READINESS.json
+    surfaces:
+    - /projects/<uuid:project_id>/controls/
+    - /projects/<uuid:project_id>/controls/comparison/
+    - /projects/<uuid:project_id>/controls/exceptions/
+    - /projects/<uuid:project_id>/controls/cost-reconciliation/
+    - /estimates/
+    - /estimates/create/
+    expected_result:
+    - WBS/activity/comparison/exception information supports project-control decisions
+    - Project→Site→Phase context remains clear and appropriately narrowed
+    - estimate creation reuses known project context and task-specific actions
+    - exceptions and cost reconciliation surface priority and next action rather than implementation metadata
+    - Project Manager and specialist views are distinguishable where authority differs
+    actual_result: 'P-17 and P-24 retained Viewer comparison: A controls/WBS/activities and estimates
+      read observed; P-17 estimate form observed. C/X/site controls and advanced comparison/exceptions/cost
+      reconciliation denied. Bounded P-24 role and approved comparison authority absent; no Project Cost
+      source invented.'
+    result: BLOCKED_AUTHORIZATION_FIXTURE
+    disposition: BLOCKED
+    finding_ids:
+    - UIUX-F-019
+    http_reference: after_HTTP.json
+    http_observations: 42
+    browser_reference: final_BROWSER.json
+    browser_observations: 1
+    screenshots:
+    - final_browser_16_desktop.png
+    - final_browser_16_mobile.png
+    accessibility:
+      keyboard_only: Six Tab steps captured per view; targeted disclosures separately checked. No whole-scenario
+        accessibility PASS inferred.
+      focus_visible: Recorded in final_BROWSER.json
+      landmarks: One main on all 20 captured pages
+      notes: Denied pages are negative controls, not positive specialist evidence
+    authorization:
+      server_authorization_verified_when_applicable: true
+      cross_tenant_leakage_observed: false
+      scope: 165 real authenticated HTTP observations + 9 delta + 20 direct services; VERIFICATION.json
+        gives exact metadata controls; blocking gates limit positive lifecycle coverage
+    mutation_performed: false
+    mutation_record_or_cleanup: INTEGRITY.json; three canonical issued synthetic RFQs + two immutable
+      empty statement projections; one retained P-22 reference account; no temporary authority
+    notes: Every canonical validation target is explicit; unexecuted targets remain blocked and do not
+      inherit PASS from a page render.
+    recorded_at: '2026-10-22T15:14:28.624985+03:30'
+    executed_at: '2026-10-22T15:13:25.752848+03:30'
+  - evidence_id: RV-EV-052
+    scenario_id: RV-032
+    runtime:
+      environment_name: Development
+      base_url: http://127.0.0.1:8015
+      git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+      effective_build: Existing accepted dirty source plus TOUCH_SET.json; FILES_BEFORE.json and final
+        artifact index identify bytes
+      browser: Microsoft Edge
+      browser_version: 155.0.4283.62
+      viewports:
+      - - 1440
+        - 900
+      - - 390
+        - 844
+      evidence_capture_interval:
+        starts_at: '2026-10-22T14:58:55.857004+03:30'
+        ends_at: '2026-10-22T15:13:27.170182+03:30'
+        basis: Capture-file modification times; reconciled_at kept separate; no fabricated per-request
+          clock
+    persona:
+      persona_ids:
+      - P-26
+      actual_actors:
+      - uiux.audit.project
+      effective_permission_bundle_reference:
+      - INVENTORY.json
+      - INVENTORY_PERSONA.json
+      - READINESS.json
+    surfaces:
+    - /procurement/portal/accept/
+    - /procurement/portal/grants/<uuid:grant_id>/
+    - /procurement/portal/receipts/<uuid:receipt_id>/
+    - /procurement/rfq-invitations/<uuid:invitation_id>/portal/
+    - /procurement/quote-revisions/<uuid:revision_id>/sealed-evidence/
+    expected_result:
+    - external user purpose and current invitation/opportunity context are explicit
+    - portal user sees only granted opportunity/receipt/evidence scope
+    - cross-tenant and unrelated RFQ leakage is absent
+    - technical integrity/idempotency/hash metadata does not become ordinary user input
+    - submission/revision state and next action are understandable
+    - mobile/keyboard/error states are usable without exposing tenant-internal navigation
+    actual_result: All actual roles lack supplier_portal.invitations_manage by explicit default exclusion.
+      Canonical invitation creation denied Owner; complete initial fixture transaction rolled back. Three
+      direct internal actors denied. Acceptance anonymous-to-tenant-boundary page and invalid token controls
+      observed; no P-26 external grant/submission/receipt/isolation positive claim.
+    result: BLOCKED_AUTHORIZATION_FIXTURE
+    disposition: BLOCKED
+    finding_ids:
+    - UIUX-F-060
+    - UIUX-F-129
+    http_reference: after_HTTP.json
+    http_observations: 8
+    browser_reference: final_BROWSER.json
+    browser_observations: 1
+    screenshots:
+    - final_browser_17_desktop.png
+    - final_browser_17_mobile.png
+    accessibility:
+      keyboard_only: Six Tab steps captured per view; targeted disclosures separately checked. No whole-scenario
+        accessibility PASS inferred.
+      focus_visible: Recorded in final_BROWSER.json
+      landmarks: One main on all 20 captured pages
+      notes: Denied pages are negative controls, not positive specialist evidence
+    authorization:
+      server_authorization_verified_when_applicable: true
+      cross_tenant_leakage_observed: false
+      scope: 165 real authenticated HTTP observations + 9 delta + 20 direct services; VERIFICATION.json
+        gives exact metadata controls; blocking gates limit positive lifecycle coverage
+    mutation_performed: false
+    mutation_record_or_cleanup: INTEGRITY.json; three canonical issued synthetic RFQs + two immutable
+      empty statement projections; one retained P-22 reference account; no temporary authority
+    notes: Every canonical validation target is explicit; unexecuted targets remain blocked and do not
+      inherit PASS from a page render.
+    recorded_at: '2026-10-22T15:14:28.624985+03:30'
+    executed_at: '2026-10-22T15:13:27.170182+03:30'
+  all_12_scenarios_dispositioned: true
+  full_required_execution_complete: false
+  utv: Positive specialist lifecycles named in each blocked record
+  migration: 'NO'
+  new_findings:
+  - UIUX-F-129
+  - UIUX-F-130
+  production: UNTOUCHED
+  cep078079: NOT_EXECUTED
+  git_add_commit_push: NOT_EXECUTED
+
+# Current targeted re-entry; previous wave_c section is historical.
+latest_wave_c_execution: wave_c_role_reconciliation
+wave_c_targeted_reentry:
+  decision: WAVE_C_BLOCKED
+  recorded_at: '2026-10-22T16:28:15.021514+03:30'
+  authority: wave_c_reentry/AUTHORIZATION.txt; PD-WC-01..08
+  supersedes: Initial wave_c scenario dispositions; initial pass is preserved as history and in entry_reports
+  all_12_scenarios_dispositioned: true
+  pass_count: 5
+  blocked_count: 7
+  scenario_results:
+  - scenario_id: RV-007
+    result: BLOCKED
+    actual_result: Bounded Buyer receiving/preparation role provisioned at Project A. Genuine synthetic source fingerprint
+      captured/submitted canonically; same-tenant C, foreign X, site-only and manipulated actions deny. Protected
+      opening/confidential first-grant remains unavailable; F-008 stage/prerequisite/unique-empty-stage guidance
+      is implemented without an invented later-stage priority.
+    expected_result:
+    - stage visibility
+    - single emphasized next action
+    - invalid actions absent/disabled
+    - technical/governance wording
+    http_observations: 11
+    browser_observations: 1
+    evidence: wave_c_reentry/; RV-009 retains wave_c_evidence prior PASS
+    residual_blocker:
+      scenario: RV-007
+      missing: A governed tenant first-grant/delegator for rfq_quotes.open and rfq_quotes.view_confidential (and
+        the independently assigned opening duties required by the canonical closed-RFQ lifecycle).
+      why: The full custom role was created, but assign_membership_role rejected transfer of permissions absent
+        from the assigning tenant actor. No active tenant holder exists. The available receiving/preparation subset
+        now captures and submits a genuine hashed synthetic source; it cannot open/confidentially compare it. F-008
+        does not invent precedence among concurrent permitted commands.
+      minimum_input: Provide a governed authorized tenant delegator, or approve a bounded first-grant mechanism
+        preserving independent approval and exact project scope.
+  - scenario_id: RV-009
+    result: PASS
+    actual_result: Prior PASS retained; only necessary inherited isolation/valuation smoke coverage ran. No Inventory
+      fixture or scope changes.
+    expected_result:
+    - consistent list/detail affordance
+    - technical IDs hidden from normal workflow
+    - task hierarchy between quantity/custody and valuation
+    http_observations: 0
+    browser_observations: 0
+    evidence: wave_c_reentry/; RV-009 retains wave_c_evidence prior PASS
+    residual_blocker: null
+  - scenario_id: RV-011
+    result: BLOCKED
+    actual_result: Exact existing monetary defaults recovered, but both published policy dates are 2026-12-22. Current
+      canonical selection rejects them and the attempt rolls back. No populated journal/statement is fabricated.
+    expected_result:
+    - localized statement/account-type labels
+    - Jalali date display
+    - numeric alignment
+    - audit hashes progressively disclosed
+    http_observations: 1
+    browser_observations: 0
+    evidence: wave_c_reentry/; RV-009 retains wave_c_evidence prior PASS
+    residual_blocker:
+      scenario: RV-011
+      missing: Currently effective accounting-money-precision and accounting-rounding versions.
+      why: Both existing published code-owned versions start on 2026-12-22. Canonical selection rejects them on
+        2026-10-22. Advancing an existing accounting effective date is not determined by PD-WC-06. The activation
+        attempt rolled back; no journal was fabricated.
+      minimum_input: Approve a specific currently effective Development version/date for the existing closed values,
+        or wait for the published effective date and apply it canonically.
+  - scenario_id: RV-013
+    result: BLOCKED
+    actual_result: Registered source adapters verified. No eligible AP/AR source, approved tolerance policy, Treasury
+      approval-policy version or cash/clearing mapping exists. Accounting effective-date gate also persists. Workbench
+      and negative controls observed; no fake obligation, cash movement or settlement.
+    expected_result:
+    - movement selection without raw ID entry
+    - authorized posted movement narrowing
+    - dense multi-task workbench comprehension
+    http_observations: 1
+    browser_observations: 0
+    evidence: wave_c_reentry/; RV-009 retains wave_c_evidence prior PASS
+    residual_blocker:
+      scenario: RV-013
+      missing: 'One eligible approved AP/AR source and a canonically postable Treasury source: approved source policy,
+        treasury-self-approval.allow_self_approval, cash/clearing ledger mappings, and effective accounting policies.'
+      why: All four source adapters are registered, but no eligible source exists. The invoice route requires an
+        approved MatchTolerancePolicy with explicit quantity_tolerance_bps and unit_price_tolerance_bps; none exists.
+        Treasury has no policy version or account mapping. Neither allowed boolean alternatives, account-code guesses
+        nor test tolerance values select a business policy.
+      minimum_input: Supply one governed eligible source/policy configuration and the explicit Treasury approval/mapping
+        decisions; also resolve RV-011's accounting effective-date gate.
+  - scenario_id: RV-015
+    result: PASS
+    actual_result: Least-privilege HR specialist completes structure/foundation/create surfaces. Canonical department/position/team/employee
+      fixtures plus real CSRF department creation and existing-account Employee reuse verified. Explicit Employee.user/Person/WorkRelationship
+      links retained. Sensitive performance/rate controls deny. New employee-detail nested main fixed as F-131;
+      desktop/mobile final capture has one main.
+    expected_result:
+    - tree/list keyboard usability
+    - filter placement
+    - known-account data reuse
+    - sensitive-data separation
+    - technical tenancy/permission wording
+    http_observations: 18
+    browser_observations: 4
+    evidence: wave_c_reentry/; RV-009 retains wave_c_evidence prior PASS
+    residual_blocker: null
+  - scenario_id: RV-017
+    result: PASS
+    actual_result: Least-privilege Timekeeping specialist completes calendar/setup/daily attendance journeys on
+      isolated synthetic calendar. Canonical attendance and real CSRF holiday creation verified. Closed setup disclosure
+      separates daily work; populated mobile overflow fixed. ISO weekday entry remains an observed existing form
+      convention, not a change to calendar rules.
+    expected_result:
+    - configuration versus daily-work separation
+    - ISO weekday input replacement need
+    - exception-code localization
+    - valid next action and workload visibility
+    http_observations: 12
+    browser_observations: 2
+    evidence: wave_c_reentry/; RV-009 retains wave_c_evidence prior PASS
+    residual_blocker: null
+  - scenario_id: RV-018
+    result: BLOCKED
+    actual_result: Separate Payroll-only specialist with no Workforce-sensitive grants completes configuration,
+      period/run preparation and draft/statutory/handoff surfaces. Canonical synthetic non-statutory example stops
+      at active-monetary-policy input-lock gate. No statutory rules or downstream financial effects manufactured.
+      Bounded presentation, project-site narrowing and generated retry-key changes validated; populated downstream
+      journeys remain blocked.
+    expected_result:
+    - journey sequencing
+    - technical lineage/hash/JSON exposure
+    - exception handling
+    - form technical metadata generation versus manual input
+    http_observations: 22
+    browser_observations: 5
+    evidence: wave_c_reentry/; RV-009 retains wave_c_evidence prior PASS
+    residual_blocker:
+      scenario: RV-018
+      missing: Effective monetary policies for the prepared non-statutory run; reviewed official tax/insurance rules
+        and output schemas for statutory journeys; a governed source-payload selection contract for the remaining
+        F-059 input derivation.
+      why: A separate Payroll-only specialist, synthetic configuration/rule/period/run are provisioned. Input lock
+        reaches the canonical missing active policy gate. No published statutory rule/source was supplied. Current
+        source snapshot inputs are caller-supplied; hiding them or inventing their content cannot establish source
+        integrity. Run/statutory/handoff presentation is improved, but their populated downstream runtime remains
+        unverified.
+      minimum_input: Resolve RV-011, provide reviewed canonical statutory source/schema evidence, and specify the
+        authoritative input producer/selection contract for source snapshots.
+  - scenario_id: RV-028
+    result: PASS
+    actual_result: Project-scoped Document Specialist creates one benign synthetic document, two immutable versions
+      and canonical Project link. Both byte-identical hashes receive genuine Microsoft Defender no-threat verdicts
+      through canonical processing assessment; both downloads pass. C/X/unauthorized controls deny. Temporary independently
+      assigned Platform Operations duty revoked; no CLEAN evidence synthesized.
+    expected_result:
+    - document registration is task-oriented and does not require avoidable technical identifiers
+    - version history and current version are understandable
+    - project/business-object linking uses authorized existing records and clear context
+    - download/preview/version actions have consistent hierarchy and affordance
+    - own-document versus organization-document scope is clear
+    - empty/error/unauthorized states and mobile behavior are usable
+    http_observations: 13
+    browser_observations: 1
+    evidence: wave_c_reentry/; RV-009 retains wave_c_evidence prior PASS
+    residual_blocker: null
+  - scenario_id: RV-029
+    result: BLOCKED
+    actual_result: Governed internal management form/list/append-only command UI implemented. Isolated authorized
+      creation, duplicate/invalid redisplay, cross-tenant/other-person history, missing/mismatched Employee.user
+      and sensitive-metadata controls pass. Live management/own custom roles remain unassignable through tenant
+      delegation. Explicit linked identity fixture is present, with fail-closed live own-history denial; no identity
+      inference.
+    expected_result:
+    - current versus historical/effective-dated employment information is understandable
+    - supersession/version semantics are presented as business history rather than raw technical lineage
+    - effective-from/effective-to dates are unambiguous and Jalali-consistent in the UI
+    - source document/version is traceable without exposing avoidable technical identifiers
+    - employee self-view is privacy-bounded to own employment history
+    - if no governed internal management surface exists for EMPLOYMENT_RECORDS_MANAGE, record NEEDS_PRODUCT_REVIEW
+      rather than inventing a route or UI
+    http_observations: 4
+    browser_observations: 2
+    evidence: wave_c_reentry/; RV-009 retains wave_c_evidence prior PASS
+    residual_blocker:
+      scenario: RV-029
+      missing: A governed tenant first-grant/delegator for employment_records.manage and employment_records.view_own.
+      why: Both custom roles exist, but canonical assignment rejects permissions held by no tenant delegator. The
+        management UI and explicit Employee.user plus existing Person/WorkRelationship linkage are implemented and
+        tested; there is no permitted live specialist to complete the management/own-history positive journey. Platform
+        privilege cannot supply that tenant authority.
+      minimum_input: Provide an authorized tenant delegator or approve a bounded first-grant path with independent
+        approval. No new identity model is needed.
+  - scenario_id: RV-030
+    result: BLOCKED
+    actual_result: Project-scoped Commercial specialist provisioned; tender creation form and contract reads available.
+      Canonical tender activation lacks an approved policy reference/activation contract. No threshold, scoring,
+      approval, award rule or test-policy activation invented.
+    expected_result:
+    - contract status, commercial review and next action are task-oriented
+    - revision history is understandable without delivery/governance jargon dominating the page
+    - counterparty/project context is clear
+    - evidence/version references use business labels before canonical IDs
+    - commercial and procurement/billing responsibilities are not conflated
+    - responsive and keyboard behavior remain usable on representative detail/review screens
+    http_observations: 6
+    browser_observations: 1
+    evidence: wave_c_reentry/; RV-009 retains wave_c_evidence prior PASS
+    residual_blocker:
+      scenario: RV-030
+      missing: An approved canonical Development Tender policy reference and its governed activation contract.
+      why: The Commercial specialist is provisioned. There is no TenderBidActivation row, approved policy_reference
+        or code-owned default activation. The placeholder approved-test-policy in isolated tests is not a Product
+        Decision; writing it would fabricate activation evidence.
+      minimum_input: Supply the approved policy/version reference and bounded canonical activation instructions;
+        define any required tender values rather than deriving them from test fixtures.
+  - scenario_id: RV-031
+    result: PASS
+    actual_result: Project-scoped Controls Analyst reads WBS/activity and populated advanced comparison/reconciliation
+      from the existing accepted budget (one coded line); exceptions remain a scoped read model. Same-tenant project
+      C and foreign X controls deny. No Project Cost source fact added or source-authority inference. Canonical
+      authorized reconciliation-view audit is preserved.
+    expected_result:
+    - WBS/activity/comparison/exception information supports project-control decisions
+    - Project→Site→Phase context remains clear and appropriately narrowed
+    - estimate creation reuses known project context and task-specific actions
+    - exceptions and cost reconciliation surface priority and next action rather than implementation metadata
+    - Project Manager and specialist views are distinguishable where authority differs
+    http_observations: 11
+    browser_observations: 3
+    evidence: wave_c_reentry/; RV-009 retains wave_c_evidence prior PASS
+    residual_blocker: null
+  - scenario_id: RV-032
+    result: BLOCKED
+    actual_result: Exact tenant custom Portal Manager role created but canonical tenant assignment rejects unavailable
+      permission transfer. External invitation lifecycle remains blocked. F-060 also lacks an external original-payload
+      custody/hash input contract; existing portal metadata hash is not substituted for file-integrity evidence.
+      No external identity with tenant membership created.
+    expected_result:
+    - external user purpose and current invitation/opportunity context are explicit
+    - portal user sees only granted opportunity/receipt/evidence scope
+    - cross-tenant and unrelated RFQ leakage is absent
+    - technical integrity/idempotency/hash metadata does not become ordinary user input
+    - submission/revision state and next action are understandable
+    - mobile/keyboard/error states are usable without exposing tenant-internal navigation
+    http_observations: 1
+    browser_observations: 0
+    evidence: wave_c_reentry/; RV-009 retains wave_c_evidence prior PASS
+    residual_blocker:
+      scenario: RV-032
+      missing: A governed tenant first-grant/delegator for supplier_portal.invitations_manage; an external submitted/uploaded-payload
+        custody/hash contract for F-060.
+      why: The tenant custom role exists but canonical assignment rejects the unavailable permission transfer. The
+        portal accepts only a precomputed integrity fingerprint and metadata, not original bytes. Its metadata fingerprint
+        includes that supplied hash. Existing sealed-file custody requires tenant authority and a closed RFQ, so
+        it cannot be reused as an external pre-submission upload path without an approved contract change. Hashing
+        a reference string would weaken integrity.
+      minimum_input: Provide the governed first-grant authority and approve/identify the external payload-custody
+        interface from which the server can compute the canonical hash. External users must remain outside tenant
+        membership.
+  residual_blockers: wave_c_reentry/RESIDUAL_BLOCKERS.json
+  report: UIUX_RUNTIME_VALIDATION_WAVE_C_REPORT.md
+  evidence_directory: wave_c_reentry/
+  validation:
+    focused: 26 tests + 6 subtests PASS
+    combined_regression: 75 tests + 44 subtests PASS; 1 unchanged-source baseline registry failure; BASELINE_DEBT.json
+    http: 100 matrix observations, 35 CSRF-bearing POSTs; two successful retained writes in HTTP_INITIAL_COMPLETE.json;
+      known-account reuse in EMPLOYMENT_IDENTITY.json
+    browser: 19 observations, 38 desktop/mobile screenshots plus bounded interaction captures; all final observations
+      one main and no page overflow
+    direct: 21 expected controls; business rows unchanged; only canonical authorized reconciliation-view audit appended
+  full_required_execution_complete: false
+  wave_closed: false
+  migration: 'NO'
+  production: UNTOUCHED
+  cep078079: NOT_EXECUTED
+  git_writes: NOT_EXECUTED
+  prior_closed_findings_preserved: true
+
+wave_c_role_reconciliation:
+  decision: WAVE_C_BLOCKED
+  recorded_on: '2026-10-22'
+  authority: authorization_reconciliation/PRODUCT_DECISION.md
+  scope: Role reconciliation and affected authorization boundaries only
+  matrix: 147 of 148 prior gaps mapped; one catalog-only reserved code explicitly unassigned
+  owner_admin_permissions: UNCHANGED_FROM_HEAD
+  initial_grant: SIX_SCENARIO_GRANTS_PLUS_ONE_CONCURRENCY_FIXTURE_AUDITED
+  affected:
+    RV-007: First-grant blocker resolved; opening form/duties authorized. Issued RFQ closes 2026-10-24; no early
+      close/opening or source/scan bypass.
+    RV-029: Employment manager and explicitly linked own-history actor authorized; HTTP 200 and denial/invalid/CSRF
+      boundaries verified. No new employment history/source document manufactured; full populated scenario not rerun.
+    RV-032: Project-scoped invitation manager authorized; real CSRF POST creates one synthetic invitation, with
+      no external tenant membership. External original-payload custody/hash contract remains unresolved.
+  unaffected_gates:
+  - RV-011 accounting effective monetary policies
+  - RV-013 eligible source/Treasury approval and mapping policy
+  - RV-018 statutory source/schema and payload selection contract
+  - RV-030 approved Tender policy reference/activation
+  new_finding: UIUX-F-132_RUNTIME_VERIFIED_RESOLVED
+  validation: authorization_reconciliation/FINAL_VERIFICATION.json
+  full_wave_c_completion: false
+  wave_closed: false
+  prior_closed_findings_preserved: true
+  production: UNTOUCHED
+  human_signoff: NOT_EXECUTED
+  cep_078_079: NOT_EXECUTED
+  git_writes: NOT_EXECUTED
+  report: authorization_reconciliation/COMPLETION_REPORT.md
+
+wave_c_domain_resolution:
+  recorded_on: '2026-10-23'
+  product_decisions: wave_c_domain_resolution/PRODUCT_DECISIONS.md
+  domain_decision_status: DOMAIN_DECISION_PACK_READY
+  wave_status: WAVE_C_BLOCKED
+  report: wave_c_domain_resolution/COMPLETION_REPORT.md
+  verification: wave_c_domain_resolution/FINAL_VERIFICATION.json
+  residual_gates: wave_c_domain_resolution/RESIDUAL_BLOCKERS.json
+  affected:
+    RV-011: Development monetary bridge and populated statement runtime verified; future published versions unchanged.
+    RV-013: Approved AP source, compatible posted Treasury source and populated settlement runtime verified.
+    RV-018: Ordinary Payroll, Timesheet producer, payslip, handoff preparation and statutory fail-closed prerequisites verified; official statutory success remains unvalidated under D03.
+    RV-030: Activation, project creation and service/HTTP transitions verified; final corrected desktop/mobile browser confirmation blocked by Work settings.
+    RV-032: Actual retained original, server SHA-256, immutable evidence, quarantine and replay controls verified; external user has no Tenant membership.
+  focused: 59 tests and 10 subtests PASS; 6 overlapping Commercial tests PASS again after final correction
+  http: 28 expected controls plus 6 final Tender controls PASS
+  broad_regression: NOT_GREEN; 10 failures retained in wave_c_domain_resolution/BASELINE_DEBT.json
+  development_migration: procurement.0016_external_portal_original_evidence APPLIED
+  authorization_reopened: false
+  full_wave_c_completion: false
+  wave_closed: false
+  prior_closed_findings_preserved: true
+  production: UNTOUCHED
+  human_signoff: NOT_EXECUTED
+  cep_078_079: NOT_EXECUTED
+  git_writes: NOT_EXECUTED

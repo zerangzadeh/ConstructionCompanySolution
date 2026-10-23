@@ -265,7 +265,9 @@ class P11AuthorizationTests(TestCase):
             organization=self.organization,
             actor=self.owner,
             membership_id=target.pk,
-            role=MembershipRole.PROJECT_MANAGER,
+            # The reconciled Project Manager now has specialist capabilities
+            # absent from Owner; use a delegable read role for this control.
+            role=MembershipRole.VIEWER,
             approver_membership_id=approver.pk,
             reason="approved assignment",
         )

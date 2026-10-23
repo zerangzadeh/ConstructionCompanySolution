@@ -1,0 +1,128 @@
+--- Registry_at_resume
++++ Registry_after_CEP078_reconciliation
+@@ -65,9 +65,9 @@
+   execution_state_complete: 68
+   authorized_not_started: 0
+   eligible_under_standing_authority: 0
+-  in_progress: 1
++  in_progress: 0
+   blocked_current: 1
+-  partial_current: 3
++  partial_current: 4
+   failed_current: 0
+   not_started_other_current_governed: 6
+   deferred_post_v1: 7
+@@ -4345,35 +4345,38 @@
+     title: Browser, accessibility and responsive runtime verification
+     phase: VERIFICATION_UAT
+     dependency_status: MANDATORY_CEP003_CEP017_SCOPED_GATE07_AND_CHROME_EDGE_EXT0024_SATISFIED
+-    eligibility_status: ELIGIBLE_RESUMED_WITH_EXPLICIT_BOUNDED_TECHNICAL_REMEDIATION_AUTHORITY
++    eligibility_status: ENTRY_RETAINED_PARTIAL_RUNTIME_REQUIRED_STATE_GAPS
+     authorization:
+       status: AUTHORIZED_NON_PRODUCTION_VERIFICATION_AND_BOUNDED_TECHNICAL_REMEDIATION
+       authorization_id: null
+       source: Direct Human request 2026-10-23 continuing CEP078 with explicit bounded technical UI-responsive-localization-accessibility remediation and focused revalidation; no business-authorization-scope changes
+     execution:
+-      status: IN_PROGRESS
+-      lifecycle: RESUMED_BOUNDED_REMEDIATION_AND_RUNTIME_VERIFICATION
++      status: PARTIAL
++      lifecycle: PARTIAL_RECONCILED_REQUIRED_SOURCE_FIXTURE_AND_COVERAGE_GAPS
+       advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
+     acceptance:
+       passed: 4
+       total: 6
+-      status: PARTIAL_AC1_FAIL_AC3_PARTIAL_AC2_4_5_6_PASS
+-    dod: NOT_MET_REQUIRED_ACCESSIBILITY_FAILURE_AND_REMAINING_UTV
++      status: PARTIAL_AC1_AC3_PARTIAL_AC2_4_5_6_PASS
++    dod: NOT_MET_REQUIRED_SOURCE_FIXTURE_AND_UNEXECUTED_STATE_GAPS
+     blockers:
+-    - CEP-078-FINDING-006 / BLOCKER-TEST / Existing UIUX-F-107 login page has two nested main landmarks; required actual Edge check FAIL at desktop-tablet-mobile; separate remediation authority needed
+-    remaining_utv:
+-    - Chrome anonymous login coverage; current authenticated session redirected Login to Home and was preserved without identity change
+-    - Other 32 approved journey inputs for both Chrome and Edge remain unexecuted after required failed shared-login accessibility test
+-    - Remaining keyboard-semantic-table-modal-Jalali-role-workspace states and full cross-browser runtime coverage remain UTV; scope not deleted or promoted
+-    completion_report:
+-      path: docs/governance/cep/evidence/CEP-078_REENTRY_02/CEP-078_COMPLETION_REPORT.md
+-      evidence_presence: ACTUAL_PARTIAL_RUNTIME_ARTIFACTS_WITH_OPEN_REQUIRED_ACCESSIBILITY_FINDING
++    - CEP-078-FINDING-016 / BLOCKER-DATA / Populated Billing claim lacks approved effective mandatory commercial-regulatory source and review; technical UI authority does not supply policy values
++    - CEP-078-FINDING-022 / BLOCKER-DATA / Planned SC033 admin variant lacks qualified existing staff actor; Platform Admin authority is distinct; no elevation or catalogue completion inferred
++    remaining_utv:
++    - Full approved configured journey-state/accessibility dimensions not directly executed remain UTV; rendered-state coverage is not complete runtime acceptance
++    - Populated ProgressClaim detail and qualified SC033 admin/catalogue coverage remain UTV; no new source/rate/approval/permission/staff grant invented
++    - Historical row067 receipt unavailable; original404 and Edge unexecuted cells retained; separate current positive portal rows068/069 actual PASS not relabeled
++    - Native screen-reader/reduced-motion and unexecuted async loading-error branches remain UTV; CSS emulation is not physical-device certification
++    - REENTRY03 prior audit-event and document-number-sequence aggregate attribution remains PARTIAL; current518-model integrity PASS is limited to this continuation
++    completion_report:
++      path: docs/governance/cep/evidence/CEP-078_REENTRY_04/CEP-078_COMPLETION_REPORT.md
++      evidence_presence: ACTUAL_RUNTIME_REMEDIATION_AND_REVALIDATION_WITH_EXPLICIT_REQUIRED_GAPS
+     git:
+       committed: false
+       commit_sha: null
+       pushed: false
+       merged_to_main: false
+-      remote_main_evidence: UNCOMMITTED_ENTRY_REVIEW_ONLY
++      remote_main_evidence: UNCOMMITTED_RUNTIME_REMEDIATION_NO_REMOTE_FRESHNESS_QUERY
+     last_execution:
+       branch: main
+       sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+@@ -4388,16 +4391,18 @@
+       safari_requirement: EXCLUDED_BY_HUMAN_FOR_V1_CEP078
+       execution: STARTED_NO_ACCEPTANCE_PASS_INFERRED
+     verification_review:
+-      evidence: docs/governance/cep/evidence/CEP-078_REENTRY_02/RUNTIME_RESULTS.json
+-      acceptance_mapping: docs/governance/cep/evidence/CEP-078_REENTRY_02/CEP-078_ACCEPTANCE_MAPPING.csv
++      evidence: docs/governance/cep/evidence/CEP-078_REENTRY_04/RUNTIME_RESULTS.json
++      acceptance_mapping: docs/governance/cep/evidence/CEP-078_REENTRY_04/CEP-078_ACCEPTANCE_MAPPING.csv
++      scenario_reconciliation: docs/governance/cep/evidence/CEP-078_REENTRY_04/SCENARIO_RECONCILIATION.csv
+       canonical_verdict: EXECUTION PARTIAL
+       entry_result: PASS_RETAINED
+       ext0024: APPROVED_CHROME_EDGE_READINESS_PASS_RETAINED
+-      finding006: OPEN_EXISTING_UIUX_F107_REQUIRED_TEST_FAILURE
+-      corrected_edge_assertions: 24_PASS_3_FAIL_ACROSS_THREE_VIEWPORTS
+-      chrome_anonymous_login: UTV_AUTHENTICATED_REDIRECT_PRECONDITION_NOT_MET
+-      source_changes: NONE
+-      business_data: 518_MODEL_AGGREGATES_UNCHANGED
++      finding006: RESOLVED_BY_PRIOR_AUTHORIZED_REPAIR_AND_ACTUAL_BOTH_BROWSER_LOGIN_REVALIDATION
++      finding018: RESOLVED_TOOLING_SESSION_INTERRUPTION_NO_PRODUCT_FAILURE_INFERRED
++      current_final_runtime: 60_OF_60_CELLS_AND_408_ASSERTIONS_PASS_BOUNDED_SCOPE
++      retained_observations: ALL_PRIOR_PASS_FAIL_UTV_AND_REMEDIATION_PRESERVED
++      current_focused_validation: 53_OF_54_PASS_ONE_KNOWN_NAV019_BASELINE_ASSERTION_DEBT
++      current_business_data: 515_OF_518_MODELS_UNCHANGED_ONLY_CANONICAL_SYNTHETIC_ROLE_SCOPE_CLEANUP_AND_THREE_AUDIT_APPENDS
+       safari_requirement: EXCLUDED_BY_HUMAN_DECISION
+     history:
+     - date: '2026-10-23'
+@@ -4424,6 +4429,15 @@
+     - date: '2026-10-23'
+       status: RESUMED
+       reason: Explicit Human separately authorizes bounded Development technical remediation followed by focused tests and browser revalidation; no business-authorization-tenant-scope changes. Entry and scoped GATE07-EXT0024 proof source-valid and retained. F107 redundant login inner main removed under this bounded authority;9 existing authentication tests PASS. Prior failure remains historical; current runtime revalidation and full missing matrix pending. Evidence CEP-078_REENTRY_03.
++    - date: '2026-10-23'
++      status: RESUMED_AFTER_TOOLING_SESSION_INTERRUPTION
++      reason: Explicit Human CEP078-only resume. First Browser inventory and fresh Chrome-Edge tabs proved control; old prior-session tab ownership handled with fresh tabs. Same main43ac319, accepted11 remediation deltas,1497 source hashes and retained gate-scope evidence grounded; no unobserved runtime product failure inferred.
++    - date: '2026-10-23'
++      status: BOUNDED_REMEDIATION_AND_RUNTIME_REVALIDATION
++      reason: Actual remaining table-Jalali-cascade-residual-semantic checks executed; parent metadata filters only already authorized choices, month navigation preserves event path-focus, stale login assertion aligned to accepted single-main behavior. Final60 cells408 assertions PASS; original failures preserved. Focused53of54 PASS with known NAV019 baseline assertion debt; lint-format-system-whitespace PASS. No new schema-domain-policy-role-definition or financial behavior.
++    - date: '2026-10-23'
++      status: PARTIAL_RECONCILED
++      reason: Four of six AC PASS; AC1-and-AC3 PARTIAL and DoD NOT_MET while Finding016 approved Billing source, Finding022 qualified admin variant and explicit unexecuted state dimensions remain gaps. Existing synthetic accessibility role-two-scopes revoked with independent audited services; current518-model comparison permits exactly those changes and three audit appends. Earlier data-attribution PARTIAL retained. Prior evidence unchanged, original identities restored, viewports reset, new tabs closed. All86 records/counts reconciled; global gates and079 untouched. STOP at CEP078 boundary; no Git writes-Production-Human Sign-off.
+   CEP-079:
+     title: null
+     phase: VERIFICATION_UAT
+@@ -4755,15 +4769,15 @@
+   verified_build_eligible_unblocked: []
+   verified_verification_eligible_unblocked: []
+   next_autonomous_cep: null
+-  current_session_continuation: "CONTINUE_CEP078_ONLY_BOUNDED_TECHNICAL_REMEDIATION_AND_VERIFICATION"
++  current_session_continuation: "STOP_CEP078_PARTIAL_AFTER_FINAL_AC_DOD_RECONCILIATION"
+   current_independent_cep: null
+   next_entry_review_candidate: null
+-  next_candidate_full_entry_eligibility: "CEP078_PARTIAL_NEEDS_SEPARATELY_AUTHORIZED_REMEDIATION_AND_AFFECTED_RUNTIME_REVALIDATION"
++  next_candidate_full_entry_eligibility: "CEP078_REQUIRES_APPROVED_BILLING_SOURCE_QUALIFIED_VARIANT_AND_REMAINING_ACTUAL_STATE_EVIDENCE"
+   conditional_dependency_entry_review_candidates:
+   - CEP-073
+   - CEP-079
+   conditional_dependency_rule: Evaluate canonical scope conditions; no condition or execution authority inferred
+-  boundary_reason: "Human Chrome-Edge scope applied and entry passed; actual required Login semantic check fails. No product-remediation or downstream-Production authority."
++  boundary_reason: "Tooling interruption resolved; bounded repairs and60final cells PASS. Required source-fixture and unexecuted coverage gaps retain partial AC-DoD. Explicit Human excludes079-Production-Signoff-Git writes."
+   resume_cep_after_blocker_resolution: "CEP-078"
+   independent_candidates_entry_status: "NOT_EXECUTED_OUTSIDE_CURRENT_CEP078_ONLY_SCOPE"
+   cep057_resume_condition: COMPLETE

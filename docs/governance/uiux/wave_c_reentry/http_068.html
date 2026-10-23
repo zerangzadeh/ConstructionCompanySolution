@@ -1,0 +1,63 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+ 
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">فرصت مناقصه جدید</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">تجاری</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">فرصت مناقصه جدید</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">ثبت هویت فرصت پیش از قرارداد</p>
+        
+    </div>
+    
+</header>
+
+<form method="post" class="erp-surface mt-5 max-w-2xl rounded-xl p-5"><!-- CSRF omitted -->
+
+<div class="space-y-4">
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_opportunity_code">
+        شناسه فرصت<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="opportunity_code" maxlength="80" aria-describedby="id_opportunity_code-errors" aria-invalid="true" required id="id_opportunity_code">
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_opportunity_code-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_title">
+        عنوان
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="title" maxlength="255" aria-describedby="id_title-errors" aria-invalid="true" required id="id_title">
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_title-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_description">
+        توضیحات
+        
+    </label>
+    <textarea name="description" cols="40" rows="10" id="id_description">
+</textarea>
+    
+    
+</div>
+</div>
+<button class="erp-btn erp-btn--primary mt-5" type="submit">ثبت پیش‌نویس</button>
+</form>
+
+        </main>

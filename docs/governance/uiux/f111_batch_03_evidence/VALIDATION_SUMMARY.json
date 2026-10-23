@@ -1,0 +1,67 @@
+{
+  "decision": "BATCH_03_IMPLEMENTED_RUNTIME_RETEST_PENDING",
+  "findings": {
+    "UIUX-F-123": {
+      "finding_status": "OPEN",
+      "implementation_status": "REMEDIATION_IMPLEMENTED_PENDING_RUNTIME_RETEST",
+      "required_live_site_only_negative": "PENDING_NO_EXISTING_QUALIFYING_ACTOR"
+    },
+    "UIUX-F-124": {
+      "finding_status": "OPEN",
+      "implementation_status": "REMEDIATION_IMPLEMENTED_PENDING_RUNTIME_RETEST",
+      "required_live_site_only_negative": "PENDING_NO_EXISTING_QUALIFYING_ACTOR"
+    }
+  },
+  "focused": {
+    "command": "run_validation.py tests/test_uiux_f111_pattern_payable_scope.py --reuse-db -q --tb=short --junitxml=.../focused.xml",
+    "tests_passed": 13,
+    "subtests_passed": 42,
+    "exit_code": 0
+  },
+  "regression": {
+    "command": "run_validation.py apps/billing/test_payable_certificates.py tests/test_uiux_f111_pattern_commercial_scope.py tests/test_uiux_f111_pattern_clearance_scope.py tests/test_uiux_f111_scope.py --reuse-db -q --tb=short --junitxml=.../regression.xml",
+    "tests_passed": 65,
+    "subtests_passed": 163,
+    "baseline_failures": 11,
+    "exit_code": 1
+  },
+  "entry_replay": {
+    "command": "run_validation.py --entry-forms apps/billing/test_payable_certificates.py --reuse-db -q --tb=short --junitxml=.../baseline.xml",
+    "failures": 11,
+    "identical_failure_attributes_and_tracebacks": 11,
+    "exit_code": 1
+  },
+  "checks": {
+    "migration_currency": 0,
+    "django_check": 0,
+    "migration_drift": 0,
+    "ruff_lint": 0,
+    "ruff_format": 0,
+    "git_diff_check": 0,
+    "bounded_verification": 0
+  },
+  "environment": {
+    "python": "C:/Users/azera/AppData/Local/Programs/Python/Python311/python.exe",
+    "PYTHONPATH": "E:/Construction_Company_Solution/.venv/Lib/site-packages",
+    "test_database": "test_bonira_uiux_batch01",
+    "test_storage": "TemporaryDirectory outside checkout",
+    "development_database": "construction_erp",
+    "settings": "config.settings.development"
+  },
+  "migration": "NO",
+  "runtime_http_observations": 12,
+  "browser_selectors_inspected": 2,
+  "runtime_models_compared": 519,
+  "runtime_mutations": "Sessions and User last_login only; zero business, source, audit or authority mutation",
+  "persistent_fixture_or_authority_preparation": "NOT_AUTHORIZED_NOT_PERFORMED",
+  "batch04_to09": "NOT_EXECUTED",
+  "wave_c": "NOT_STARTED",
+  "production_cep078_cep079_git_writes": "NOT_EXECUTED",
+  "initial_harness_corrections": [
+    "Foreign disposable test membership needed existing organization scope for service control",
+    "Runtime script explicit loop bindings for Ruff",
+    "Browser identity locator scoped to visible account summary"
+  ],
+  "all_prior_batch01_batch02_evidence_and_code": "PRESERVED",
+  "source_boundary": "Two payable form classes and two payable create views only"
+}

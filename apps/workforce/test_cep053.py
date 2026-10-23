@@ -40,20 +40,24 @@ class ESSDashboardTests(baseline.Cep018WorkspaceTests):
         if directory:
             Path(directory, name + ".html").write_bytes(response.content)
 
-    def test_dashboard_retains_own_raw_source_status_and_links(self):
+    def test_dashboard_localizes_source_status_and_retains_own_links(self):
         self._login(self.requester)
         response = self.client.get(reverse("workforce:ess_dashboard"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "داشبورد خدمات من")
         self.assertContains(response, str(self.own_leave.pk))
         self.assertContains(response, str(self.team_overtime.pk))
-        self.assertContains(response, self.own_leave.state)
         self.assertNotContains(response, str(self.other_leave.pk))
         self.assertContains(response, reverse("workforce:ess_profile"))
         self.assertContains(response, 'dir="rtl"')
-        self.assertContains(response, "وضعیت منبع")
+        self.assertContains(response, "وضعیت درخواست")
         self.assertNotContains(response, 'name="first_name"')
         dashboard = response.context["dashboard"]
+        own_row = next(
+            row for row in dashboard.requests if row.source_id == self.own_leave.pk
+        )
+        self.assertEqual(own_row.status, self.own_leave.state)
+        self.assertContains(response, own_row.status_label)
         self.assertTrue(all(row.source_url for row in dashboard.requests))
         for row in dashboard.requests:
             self.assertEqual(self.client.get(row.source_url).status_code, 200)
@@ -64,7 +68,7 @@ class ESSDashboardTests(baseline.Cep018WorkspaceTests):
         self.team_overtime.delete()
         self._login(self.requester)
         response = self.client.get(reverse("workforce:ess_dashboard"))
-        self.assertContains(response, "درخواست مجازی برای نمایش ثبت نشده است.")
+        self.assertContains(response, "هنوز درخواستی برای نمایش ندارید.")
         self.assertEqual(response.context["dashboard"].requests_state, "empty")
         self.assertNotContains(response, "مانده مرخصی: ۰")
         self.assertNotContains(response, "امتیاز")

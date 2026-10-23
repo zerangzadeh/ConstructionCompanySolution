@@ -58,9 +58,9 @@ class Cep003LocalizationAccessibilityTests(SimpleTestCase):
         login = (template_root / "accounts" / "login.html").read_text(encoding="utf-8")
         base = (template_root / "base.html").read_text(encoding="utf-8")
 
-        self.assertIn(
-            '<main class="bonira-login__layout" aria-labelledby="login-title">', login
-        )
+        self.assertIn('<div class="bonira-login__layout">', login)
+        self.assertNotIn("<main", login)
+        self.assertIn('<main id="main-content"', base)
         self.assertIn('<h1 id="login-title">', login)
         self.assertIn('<html lang="fa" dir="rtl">', base)
         self.assertIn("{% block title %}بنیرا{% endblock %}", base)

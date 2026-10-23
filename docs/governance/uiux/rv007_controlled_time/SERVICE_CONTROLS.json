@@ -1,0 +1,86 @@
+[
+  {
+    "case": "early protected opening after close but before close+24h",
+    "result": "DENIED",
+    "exception": "ValueError",
+    "message": "زمان مجاز گشایش پیشنهاد فرا نرسیده است.",
+    "application_now": "2026-10-22 22:47:57.091314+00:00"
+  },
+  {
+    "case": "unopened confidential source delivery",
+    "result": "DENIED",
+    "exception": "PermissionDenied",
+    "message": "نسخه پیشنهاد گشوده نشده است.",
+    "application_now": "2026-10-22 22:47:57.091314+00:00"
+  },
+  {
+    "case": "close+24h minus one microsecond",
+    "result": "DENIED",
+    "exception": "ValueError",
+    "message": "زمان مجاز گشایش پیشنهاد فرا نرسیده است.",
+    "application_now": "2026-10-23 22:46:57.091313+00:00"
+  },
+  {
+    "case": "requester cannot approve own opening",
+    "result": "DENIED",
+    "exception": "PermissionDenied",
+    "message": "اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+    "application_now": "2026-10-23 22:46:58.091314+00:00"
+  },
+  {
+    "case": "business permission without revision grant cannot read source",
+    "result": "DENIED",
+    "exception": "PermissionDenied",
+    "message": "اعطای فعال مشاهده محرمانه وجود ندارد.",
+    "application_now": "2026-10-23 22:46:58.091314+00:00"
+  },
+  {
+    "case": "admissibility preparer cannot approve",
+    "result": "DENIED",
+    "exception": "PermissionDenied",
+    "message": "اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+    "application_now": "2026-10-23 22:46:58.091314+00:00"
+  },
+  {
+    "case": "same-tenant unauthorized confidential denial",
+    "result": "DENIED",
+    "exception": "PermissionDenied",
+    "message": "اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+    "application_now": "2026-10-23 22:46:58.091314+00:00"
+  },
+  {
+    "case": "site-only cannot read project-level confidential quote",
+    "result": "DENIED",
+    "exception": "PermissionDenied",
+    "message": "اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+    "application_now": "2026-10-23 22:46:58.091314+00:00"
+  },
+  {
+    "case": "cross-tenant confidential denial",
+    "result": "DENIED",
+    "exception": "PermissionDenied",
+    "message": "هدف گشایش در این سازمان معتبر نیست.",
+    "application_now": "2026-10-23 22:46:58.091314+00:00"
+  },
+  {
+    "case": "opening approver cannot read confidential content without permission",
+    "result": "DENIED",
+    "exception": "PermissionDenied",
+    "message": "اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+    "application_now": "2026-10-23 22:46:58.091314+00:00"
+  },
+  {
+    "case": "changed idempotent opening reason rejected",
+    "result": "DENIED",
+    "exception": "ValueError",
+    "message": "کلید یکتا با درخواست گشایش متفاوت استفاده شده است.",
+    "application_now": "2026-10-23 22:46:58.091314+00:00"
+  },
+  {
+    "case": "sealed original cannot be silently overwritten",
+    "result": "DENIED",
+    "exception": "ValueError",
+    "message": "کلید یکتا قبلاً با محموله فنی متفاوت استفاده شده است.",
+    "application_now": "2026-10-23 22:46:58.091314+00:00"
+  }
+]

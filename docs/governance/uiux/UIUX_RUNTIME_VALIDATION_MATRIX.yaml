@@ -1,0 +1,726 @@
+schema_version: '1.6'
+document:
+  id: BONIRA-UIUX-RUNTIME-VALIDATION-MATRIX
+  title: BONIRA UI/UX Runtime and Role-based Validation Matrix
+  status: PLAN_RECONCILED_DOCUMENTATION_READY_FOR_WAVE_A
+  repository: zerangzadeh/ConstructionCompanySolution
+  branch: main
+  audit_baseline_commit: 43ac319c6e73e48ca9626461b73987922c498ec3
+  canonical_path: docs/governance/uiux/UIUX_RUNTIME_VALIDATION_MATRIX.yaml
+  prepared_at: '2026-10-21'
+  revised_at: '2026-10-21'
+  revision_checkpoint: UIUX_REFERENCE_PERSONA_DOCUMENTATION_RECONCILIATION_CHECKPOINT_15.md
+governance_boundary:
+  this_is: UI/UX audit runtime validation plan
+  this_is_not:
+  - CEP-078 execution
+  - CEP-079 UAT execution
+  - Production Certification
+  - Human Sign-off
+  - remediation authorization
+  persona_rule: Persona names are runtime test archetypes, not new BONIRA roles. Map each archetype to actual non-production
+    identity/membership/portal grant, effective permissions and object scope before its scenario. Do not infer authority from
+    title, navigation or broad privileged access. Tenant Owner, Tenant Admin and Platform Admin remain distinct; Timekeeping/Payroll,
+    Safety/Quality, Inventory/Equipment and Contract/Billing perspectives must not be collapsed.
+  canonical_verification_separation:
+    CEP-078:
+      title: Browser, accessibility and responsive runtime verification
+      relationship: TOPIC_OVERLAP_ONLY
+      rule: This UI/UX audit matrix is not CEP-078 execution evidence. It may be reused as planning input only if CEP-078
+        later passes its own canonical entry conditions and is explicitly executed under its own evidence/manifest requirements.
+    CEP-079:
+      title: Representative UAT execution
+      relationship: SEPARATE_UAT_PROGRAM
+      rule: These 33 audit scenarios do not replace, reduce, or claim execution of the canonical 44 representative UAT scenarios
+        owned by CEP-079.
+evidence_requirements:
+- exact baseline/build SHA
+- persona identity and effective organization/project/site context
+- desktop screenshot(s)
+- mobile or narrow viewport screenshot(s) where applicable
+- keyboard-only interaction notes
+- visible labels/actions/state
+- network/request evidence only where cascade or partial-refresh behavior is under test
+- server-side authorization result for protected actions
+- finding IDs confirmed, disproved or refined
+scenarios:
+- scenario_id: RV-001
+  journey: Authentication and personal settings
+  persona_archetype: Authenticated employee / ordinary tenant user
+  surfaces:
+  - /accounts/login/
+  - /accounts/settings/
+  validate:
+  - responsive layout and focus order
+  - single main landmark
+  - error messaging
+  - password visibility control
+  - Persian-first labels
+  - profile/password settings form consistency
+  priority: HIGH
+  persona_ids:
+  - P-01
+- scenario_id: RV-002
+  journey: Home normal state and role prioritization
+  persona_archetype: Project/operations user with multiple accessible workspaces
+  surfaces:
+  - /
+  validate:
+  - current organization/project context clarity
+  - whether Home is only destination links or conveys actionable work
+  - visual hierarchy versus role priority
+  - assigned work / alerts affordance
+  - desktop/mobile presentation
+  priority: CRITICAL_PRODUCT_REVIEW
+  persona_ids:
+  - P-01
+  - P-15
+  - P-17
+- scenario_id: RV-003
+  journey: Home exceptional states
+  persona_archetype: User variants with no context / no workspace / unauthorized / empty data
+  surfaces:
+  - /
+  validate:
+  - no_context
+  - empty
+  - no_workspace
+  - unauthorized
+  - error
+  - actionable guidance and recovery
+  priority: HIGH
+  persona_ids:
+  - P-01
+- scenario_id: RV-004
+  journey: Application navigation and permission-visible destinations
+  persona_archetype: Two tenant personas with materially different permission bundles
+  surfaces:
+  - SHARED-MAIN-NAVIGATION
+  validate:
+  - duplicate/disabled navigation entries
+  - active group state
+  - desktop/mobile parity
+  - visibility does not grant authorization
+  - HSE/Commercial/Project Controls destination consistency
+  priority: HIGH
+  persona_ids:
+  - P-01
+  - P-15
+  - P-16
+  - P-17
+  - P-18
+- scenario_id: RV-005
+  journey: Authorized global search
+  persona_archetype: Scoped project user
+  surfaces:
+  - /search/
+  validate:
+  - authorized result scope
+  - no-result wording
+  - technical authorization language leakage
+  - cross-tenant/object-scope denial
+  priority: HIGH
+  persona_ids:
+  - P-01
+  - P-15
+- scenario_id: RV-006
+  journey: Canonical cascade filtering comparison
+  persona_archetype: Project-scoped operational user
+  surfaces:
+  - /estimates/create/
+  - /expenses/new/
+  - /daily-reports/create/
+  - /equipment/assignments/create/
+  validate:
+  - context defaulting
+  - Project→child selector cascade
+  - loading/empty/error states
+  - stale-child invalidation
+  - server rejects manipulated unauthorized/mismatched IDs
+  priority: CRITICAL_FORM_UX
+  persona_ids:
+  - P-02
+  - P-17
+  - P-24
+- scenario_id: RV-007
+  journey: Procurement RFQ evaluation and valid next action
+  persona_archetype: Procurement buyer
+  surfaces:
+  - /procurement/rfqs/<uuid:rfq_id>/buyer/
+  validate:
+  - stage visibility
+  - single emphasized next action
+  - invalid actions absent/disabled
+  - technical/governance wording
+  priority: HIGH
+  persona_ids:
+  - P-03
+  - P-17
+- scenario_id: RV-008
+  journey: Purchase order from approved request
+  persona_archetype: Procurement buyer
+  surfaces:
+  - /procurement/orders/create/
+  validate:
+  - Project→Purchase Request narrowing
+  - known-data derivation/defaulting from source request
+  - post-submit mismatch prevention
+  priority: HIGH
+  persona_ids:
+  - P-03
+  - P-17
+- scenario_id: RV-009
+  journey: Inventory navigation and drill-down
+  persona_archetype: Inventory operator
+  surfaces:
+  - /inventory/
+  - /inventory/custody/
+  - /inventory/valuation/
+  validate:
+  - consistent list/detail affordance
+  - technical IDs hidden from normal workflow
+  - task hierarchy between quantity/custody and valuation
+  priority: HIGH
+  persona_ids:
+  - P-22
+- scenario_id: RV-010
+  journey: Journal entry with project dimensions
+  persona_archetype: Accountant
+  surfaces:
+  - /accounting/journals/create/
+  validate:
+  - Project→Site/WBS cascade
+  - source/evidence/reconciliation references
+  - field labels after shared component rendering
+  - task-specific submit action
+  priority: CRITICAL_FORM_UX
+  persona_ids:
+  - P-05
+- scenario_id: RV-011
+  journey: Financial statements
+  persona_archetype: Accountant / finance reviewer
+  surfaces:
+  - /accounting/statements/
+  - /accounting/statements/<uuid:run_id>/
+  validate:
+  - localized statement/account-type labels
+  - Jalali date display
+  - numeric alignment
+  - audit hashes progressively disclosed
+  priority: HIGH
+  persona_ids:
+  - P-05
+- scenario_id: RV-012
+  journey: Treasury movement from an approved source request
+  persona_archetype: Treasury operator
+  surfaces:
+  - /treasury/movements/new/
+  - /treasury/operations/
+  validate:
+  - origin request→project/context derivation
+  - human-readable transaction references
+  - business versus audit metadata separation
+  - state-aware actions
+  priority: HIGH
+  persona_ids:
+  - P-06
+- scenario_id: RV-013
+  journey: Subledger settlement allocation
+  persona_archetype: AP/AR operator
+  surfaces:
+  - /subledgers/
+  validate:
+  - movement selection without raw ID entry
+  - authorized posted movement narrowing
+  - dense multi-task workbench comprehension
+  priority: HIGH
+  persona_ids:
+  - P-07
+  - P-05
+- scenario_id: RV-014
+  journey: Billing claims, payable certificates and statutory forms
+  persona_archetype: Commercial/billing specialist
+  surfaces:
+  - /billing/claims/<uuid:claim_id>/
+  - /billing/payable-certificates/new/
+  - /billing/commercial-controls/
+  validate:
+  - Jalali input/display
+  - dependent evidence/source selectors
+  - business calculation basis versus technical lineage
+  - task-specific CTA
+  priority: HIGH
+  persona_ids:
+  - P-07
+- scenario_id: RV-015
+  journey: Workforce structure and employee administration
+  persona_archetype: HR administrator
+  surfaces:
+  - /workforce/departments/
+  - /workforce/positions/
+  - /workforce/teams/
+  - /workforce/employees/create/
+  - /workforce/foundation/
+  validate:
+  - tree/list keyboard usability
+  - filter placement
+  - known-account data reuse
+  - sensitive-data separation
+  - technical tenancy/permission wording
+  priority: HIGH
+  persona_ids:
+  - P-08
+  - P-21
+- scenario_id: RV-016
+  journey: Employee self-service
+  persona_archetype: Employee self-service user
+  surfaces:
+  - /workforce/ess/
+  - /payroll/ess/
+  validate:
+  - own-data privacy
+  - flat ESS navigation burden
+  - source-system/raw status leakage
+  - empty states
+  - mobile usability
+  priority: CRITICAL_ESS
+  persona_ids:
+  - P-09
+- scenario_id: RV-017
+  journey: Timekeeping setup and daily operation
+  persona_archetype: Timekeeping/HR operator
+  surfaces:
+  - /timekeeping/
+  - /timekeeping/calendars/new/
+  validate:
+  - configuration versus daily-work separation
+  - ISO weekday input replacement need
+  - exception-code localization
+  - valid next action and workload visibility
+  priority: HIGH
+  persona_ids:
+  - P-10
+- scenario_id: RV-018
+  journey: Payroll processing and statutory handoff
+  persona_archetype: Payroll specialist
+  surfaces:
+  - /payroll/
+  - /payroll/runs/<uuid:run_id>/
+  - /payroll/statutory/
+  - /payroll/financial-handoffs/
+  validate:
+  - journey sequencing
+  - technical lineage/hash/JSON exposure
+  - exception handling
+  - form technical metadata generation versus manual input
+  priority: CRITICAL_PAYROLL
+  persona_ids:
+  - P-20
+- scenario_id: RV-019
+  journey: Equipment operation, maintenance and costing
+  persona_archetype: Equipment/maintenance operator
+  surfaces:
+  - /equipment/operations/
+  - /equipment/maintenance/
+  - /equipment/cost/
+  validate:
+  - action hierarchy
+  - Jalali dates
+  - Equipment→Plan/Employee→Qualification cascades
+  - source/occurrence key exposure
+  - delivery-phase metadata leakage
+  priority: HIGH
+  persona_ids:
+  - P-04
+- scenario_id: RV-020
+  journey: Safety and Quality lifecycle
+  persona_archetype: HSE/Quality reviewer
+  surfaces:
+  - /safety/<uuid:incident_id>/
+  - /quality/<uuid:issue_id>/
+  validate:
+  - next-action pattern
+  - semantic status colors
+  - Jalali dates
+  - inline transition forms
+  - POST action endpoints are not separate screens
+  priority: HIGH
+  persona_ids:
+  - P-11
+  - P-25
+  - P-17
+- scenario_id: RV-021
+  journey: Knowledge publication, reuse and promotion
+  persona_archetype: Knowledge curator / platform reviewer
+  surfaces:
+  - /knowledge/publications/<uuid:version_id>/
+  - /knowledge/publications/<uuid:version_id>/history/
+  - /knowledge/platform/promotions/
+  validate:
+  - article view versus traceability separation
+  - raw source/status/hash exposure
+  - canonical form styling
+  - tenant/platform wording
+  priority: HIGH
+  persona_ids:
+  - P-12
+  - P-18
+- scenario_id: RV-022
+  journey: Workflow administration
+  persona_archetype: Workflow administrator
+  surfaces:
+  - /workflows/administration/versions/<uuid:version_id>/
+  validate:
+  - ability to understand process without reconstructing keys/transitions mentally
+  - business labels versus raw configuration
+  - visual workflow representation need
+  priority: HIGH
+  persona_ids:
+  - P-13
+- scenario_id: RV-023
+  journey: Shared filtered/sorted/paginated table
+  persona_archetype: Any operational list user
+  surfaces:
+  - SHARED-TABLE-PAGINATION
+  - SHARED-LIST-DETAIL-AFFORDANCE
+  validate:
+  - filter+sort state survives page navigation
+  - clear-filter behavior
+  - row/detail affordance consistency
+  - keyboard focus and aria-sort
+  priority: HIGH
+  persona_ids:
+  - P-01
+- scenario_id: RV-024
+  journey: Cross-module accessibility landmarks
+  persona_archetype: Keyboard and screen-reader-oriented validation persona
+  surfaces:
+  - /accounts/login/
+  - /workforce/employees/<uuid:employee_id>/
+  - /reporting/reconciliations/
+  - /reporting/project-closeout/<uuid:case_id>/
+  validate:
+  - single main landmark
+  - heading hierarchy
+  - focus visibility
+  - accessible icon-only controls
+  - table and form labels
+  priority: HIGH
+  persona_ids:
+  - P-14
+- scenario_id: RV-025
+  journey: Cross-role responsive representative sweep
+  persona_archetype: Representative tenant users
+  surfaces:
+  - /
+  - /projects/
+  - /procurement/rfqs/<uuid:rfq_id>/buyer/
+  - /workforce/ess/
+  - /accounting/statements/
+  - /equipment/operations/
+  validate:
+  - desktop 1440px
+  - tablet/narrow desktop
+  - mobile 390px
+  - sidebar/off-canvas behavior
+  - wide-table horizontal scrolling
+  - primary actions remain reachable
+  priority: HIGH
+  persona_ids:
+  - P-01
+  - P-15
+  - P-16
+  - P-17
+  - P-18
+  - P-19
+  - P-20
+  - P-22
+  - P-23
+  - P-24
+  - P-25
+  - P-26
+- scenario_id: RV-026
+  journey: Tenant administration and access governance
+  persona_archetype: Tenant Owner and Tenant Admin with deliberately distinct authority
+  persona_ids:
+  - P-15
+  - P-16
+  surfaces:
+  - /organizations/members/
+  - /organizations/roles/
+  - /organizations/members/<uuid:membership_id>/authorization/
+  - /organizations/settings/
+  - /organizations/configuration-profiles/
+  validate:
+  - Tenant Owner versus Tenant Admin task framing and navigation are distinguishable
+  - membership/user administration is understandable without leaking internal authorization implementation language
+  - role and scope assignment surfaces explain current authority, approver requirements and protected-operation boundaries
+  - no platform-only administration appears as an ordinary tenant task
+  - tenant boundaries and object scope remain authoritative server-side
+  - empty/quarantined/pending authorization states provide actionable guidance
+  priority: CRITICAL_ACCESS_UX
+- scenario_id: RV-027
+  journey: Platform administration and tenant boundary
+  persona_archetype: Platform Admin
+  persona_ids:
+  - P-18
+  surfaces:
+  - /organizations/platform/roles/
+  - /organizations/platform/protected-operations/
+  - /organizations/platform/accounting-policies/
+  - /organizations/
+  validate:
+  - platform-only surfaces are clearly separated from tenant operational administration
+  - cross-tenant context is explicit and cannot be mistaken for ordinary tenant context
+  - protected operations and role catalogue use understandable governance language with progressive disclosure
+  - Platform Admin authority is not presented as Tenant Owner/Tenant Admin identity
+  - tenant-specific data is not leaked across organizations outside authorized platform purpose
+  priority: CRITICAL_PLATFORM_BOUNDARY_UX
+- scenario_id: RV-028
+  journey: Document control lifecycle
+  persona_archetype: Document Controller
+  persona_ids:
+  - P-19
+  surfaces:
+  - /documents/
+  - /documents/mine/
+  - /documents/upload/
+  - /documents/<uuid:document_id>/
+  - /documents/<uuid:document_id>/versions/add/
+  - /documents/<uuid:document_id>/links/add/
+  validate:
+  - document registration is task-oriented and does not require avoidable technical identifiers
+  - version history and current version are understandable
+  - project/business-object linking uses authorized existing records and clear context
+  - download/preview/version actions have consistent hierarchy and affordance
+  - own-document versus organization-document scope is clear
+  - empty/error/unauthorized states and mobile behavior are usable
+  priority: HIGH
+- scenario_id: RV-029
+  journey: Personnel decree / effective-dated employment record lifecycle
+  persona_archetype: HR Operations + Personnel Decree / Employment Records Specialist
+  persona_ids:
+  - P-08
+  - P-21
+  - P-09
+  surfaces:
+  - /workforce/employees/<uuid:employee_id>/
+  - /workforce/ess/employment/
+  - CANONICAL_INTERNAL_EMPLOYMENT_RECORD_MANAGEMENT_SURFACE_IF_PRESENT
+  validate:
+  - current versus historical/effective-dated employment information is understandable
+  - supersession/version semantics are presented as business history rather than raw technical lineage
+  - effective-from/effective-to dates are unambiguous and Jalali-consistent in the UI
+  - source document/version is traceable without exposing avoidable technical identifiers
+  - employee self-view is privacy-bounded to own employment history
+  - if no governed internal management surface exists for EMPLOYMENT_RECORDS_MANAGE, record NEEDS_PRODUCT_REVIEW rather than
+    inventing a route or UI
+  priority: CRITICAL_HR_EFFECTIVE_DATING
+- scenario_id: RV-030
+  journey: Contract and commercial administration lifecycle
+  persona_archetype: Contracts & Commercial Specialist
+  persona_ids:
+  - P-23
+  surfaces:
+  - /contracts/
+  - /contracts/<uuid:contract_id>/
+  - /contracts/<uuid:contract_id>/commercial-review/
+  - /contracts/contractual-records/
+  - /commercial/
+  - /commercial/<uuid:tender_id>/
+  - /commercial/<uuid:tender_id>/revise/
+  - /commercial/<uuid:tender_id>/evidence/
+  validate:
+  - contract status, commercial review and next action are task-oriented
+  - revision history is understandable without delivery/governance jargon dominating the page
+  - counterparty/project context is clear
+  - evidence/version references use business labels before canonical IDs
+  - commercial and procurement/billing responsibilities are not conflated
+  - responsive and keyboard behavior remain usable on representative detail/review screens
+  priority: HIGH
+- scenario_id: RV-031
+  journey: Project controls, estimates and technical-office oversight
+  persona_archetype: Project Controls / Technical Office Specialist + Project Manager
+  persona_ids:
+  - P-24
+  - P-17
+  surfaces:
+  - /projects/<uuid:project_id>/controls/
+  - /projects/<uuid:project_id>/controls/comparison/
+  - /projects/<uuid:project_id>/controls/exceptions/
+  - /projects/<uuid:project_id>/controls/cost-reconciliation/
+  - /estimates/
+  - /estimates/create/
+  validate:
+  - WBS/activity/comparison/exception information supports project-control decisions
+  - Project→Site→Phase context remains clear and appropriately narrowed
+  - estimate creation reuses known project context and task-specific actions
+  - exceptions and cost reconciliation surface priority and next action rather than implementation metadata
+  - Project Manager and specialist views are distinguishable where authority differs
+  priority: HIGH
+- scenario_id: RV-032
+  journey: External supplier / partner procurement portal
+  persona_archetype: External Supplier / Partner Portal User
+  persona_ids:
+  - P-26
+  surfaces:
+  - /procurement/portal/accept/
+  - /procurement/portal/grants/<uuid:grant_id>/
+  - /procurement/portal/receipts/<uuid:receipt_id>/
+  - /procurement/rfq-invitations/<uuid:invitation_id>/portal/
+  - /procurement/quote-revisions/<uuid:revision_id>/sealed-evidence/
+  validate:
+  - external user purpose and current invitation/opportunity context are explicit
+  - portal user sees only granted opportunity/receipt/evidence scope
+  - cross-tenant and unrelated RFQ leakage is absent
+  - technical integrity/idempotency/hash metadata does not become ordinary user input
+  - submission/revision state and next action are understandable
+  - mobile/keyboard/error states are usable without exposing tenant-internal navigation
+  priority: CRITICAL_EXTERNAL_BOUNDARY_UX
+- scenario_id: RV-033
+  journey: Reference persona catalogue and reusable identity administration
+  persona_archetype: Tenant Admin / Platform Admin administering governed reference personas
+  persona_ids:
+  - P-16
+  - P-18
+  surfaces:
+  - GOVERNED_REFERENCE_PERSONA_UI_SURFACE_TO_BE_CONFIRMED_OR_IMPLEMENTED
+  validate:
+  - all defined/provisioned reference personas are discoverable by stable persona/account identifier
+  - provisioning/readiness state is visible without exposing secrets
+  - organization/context and role/scope summaries are understandable
+  - persona authority is traceable without implying Persona equals Role
+  - reference personas remain available after prior validation completion
+  - no Persian display-title requirement is imposed
+  - no impersonation capability is assumed or silently introduced
+  priority: HIGH_GOVERNANCE_UX
+  current_planning_status: NEEDS_PRODUCT_UI_CONFIRMATION_OR_IMPLEMENTATION
+execution_status:
+  runtime_validation_started: true
+  latest_wave: A
+  latest_wave_status: WAVE_A_PARTIAL
+  latest_wave_results: UIUX_RUNTIME_VALIDATION_RESULTS.yaml
+  full_runtime_audit_closed: false
+  environment_verified: true
+  test_identities_verified: PARTIAL_RECHECK_REQUIRED_AFTER_PERSONA_REVISION
+  scenario_data_verified: PARTIAL_RECHECK_REQUIRED_AFTER_PERSONA_REVISION
+  baseline_runtime_sha_verified: true
+  remediation_authorized: false
+  current_disposition: SCENARIO_SCOPED_ENTRY; EXISTING READY WAVE-A SUBSET MAY EXECUTE, BUT P-20..P-26 AND RV-029..RV-032
+    REQUIRE THEIR OWN ENTRY READINESS BEFORE EXECUTION
+  known_runtime_url: http://127.0.0.1:8001/
+  known_runtime_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+entry_gates:
+- gate_id: RV-GATE-00
+  name: Baseline identity
+  pass_condition: The runtime build SHA is known and either exactly equals the audit baseline 43ac319c6e73e48ca9626461b73987922c498ec3
+    or a new audit baseline is explicitly frozen and the static artefacts are reconciled before execution.
+  status: PASS_FROM_ENTRY_REVIEW
+- gate_id: RV-GATE-01
+  name: Non-production runtime environment
+  pass_condition: A reachable Development/Test runtime exists, production is excluded, and browser evidence can be captured
+    without mutating production data.
+  status: PASS_FROM_ENTRY_REVIEW
+- gate_id: RV-GATE-02
+  name: Persona identities and effective permissions
+  pass_condition: Each scenario persona is mapped to an actual test user/membership with known effective permissions and object
+    scope. Job title or UI visibility is never treated as authority.
+  status: PARTIAL_SCENARIO_SCOPED_RECHECK_REQUIRED
+  note: Previously proven identities/data remain valid only for their proven scenarios. P-15..P-26 and targeted scenarios
+    added by Checkpoints 11-12 require scenario-specific identity/data readiness.
+- gate_id: RV-GATE-03
+  name: Scenario data readiness
+  pass_condition: Required projects/sites/contracts/workflow states/financial records/ESS records exist in safe test data,
+    with IDs recorded only in the private execution record.
+  status: PARTIAL_SCENARIO_SCOPED_RECHECK_REQUIRED
+  note: Previously proven identities/data remain valid only for their proven scenarios. P-15..P-26 and targeted scenarios
+    added by Checkpoints 11-12 require scenario-specific identity/data readiness.
+- gate_id: RV-GATE-04
+  name: Mutation safety
+  pass_condition: Scenarios that create or transition records are confirmed safe, reversible or disposable, with no production,
+    certification, statutory activation or irreversible action.
+  status: PASS_FROM_ENTRY_REVIEW
+- gate_id: RV-GATE-05
+  name: Evidence capture readiness
+  pass_condition: Screenshot naming, viewport matrix, keyboard notes, expected result, actual result and finding disposition
+    format are prepared before the first scenario.
+  status: PASS_FROM_ENTRY_REVIEW
+result_vocabulary:
+- PASS
+- FAIL_UIUX
+- FAIL_ACCESSIBILITY
+- FAIL_RESPONSIVE
+- FAIL_PERMISSION_OR_SCOPE
+- NEEDS_DOMAIN_REVIEW
+- BLOCKED_ENVIRONMENT
+- BLOCKED_TEST_DATA
+- BLOCKED_AUTHORIZATION_FIXTURE
+- NEEDS_PRODUCT_REVIEW
+- UTV
+finding_handling:
+  existing_finding_confirmed: Link scenario evidence to existing UIUX-F-###; do not create duplicate.
+  existing_finding_disproved: Mark finding for reclassification only after evidence review; do not silently delete history.
+  new_uiux_defect: Create next UIUX-F-### with runtime evidence.
+  business_or_domain_suspect: Classify NEEDS_DOMAIN_REVIEW; do not change business semantics.
+  security_or_scope_failure: Stop the affected scenario, retain evidence, and escalate separately; UI hiding is not authorization.
+  remediation: Not permitted during validation. Record and continue only where safe.
+  persona_or_role_coverage_gap: Treat as a validation-plan coverage issue. Add/adjust persona or targeted runtime scenario
+    without inventing a product role or altering authorization.
+  missing_user_journey_or_surface: If a persona-critical governed capability exists in services/domain logic but no usable
+    product surface is discoverable, record NEEDS_PRODUCT_REVIEW. Do not invent a route, silently classify it as a UI defect,
+    or mutate product scope.
+  reference_persona_catalogue_missing: If no governed UI exists to view persistent reference personas with Persian display
+    titles, record NEEDS_PRODUCT_REVIEW / planned product gap. Do not infer that the governance catalogue alone satisfies
+    the UI requirement.
+persona_coverage_revision:
+  checkpoint: UIUX_PERSONA_COVERAGE_CORRECTION_CHECKPOINT_12.md
+  previous_persona_count: 19
+  current_persona_count: 26
+  previous_scenario_count: 28
+  current_scenario_count: 33
+  added_personas:
+    P-20: Payroll Specialist
+    P-21: Personnel Decree / Employment Records Specialist
+    P-22: Inventory / Storekeeper
+    P-23: Contracts & Commercial Specialist
+    P-24: Project Controls / Technical Office Specialist
+    P-25: Quality / QA-QC Specialist
+    P-26: External Supplier / Partner Portal User
+  refined_personas:
+    P-04: Equipment/Fleet only
+    P-07: Billing/Claims/AP-AR
+    P-08: HR operations/personnel records
+    P-10: Timekeeping only
+    P-11: HSE/Safety only
+  added_runtime_scenarios:
+  - RV-029
+  - RV-030
+  - RV-031
+  - RV-032
+  - RV-033
+  static_audit_rerun_required: false
+  finding_register_change_required_now: false
+  note: Pre-runtime coverage correction only; no product role, permission, remediation or CEP/UAT execution is implied.
+  reference_persona_retention_checkpoint: Checkpoint 13
+reference_persona_retention:
+  policy: UIUX_REFERENCE_PERSONA_RETENTION_POLICY.md
+  catalogue: UIUX_REFERENCE_PERSONA_CATALOGUE.yaml
+  persistent_after_validation: true
+  governed_ui_visibility_required: true
+  persian_display_title_required: false
+  cleanup_mode: RETAIN_AND_RECONCILE
+  impersonation_authorized: false
+  display_label_requirement: NONE
+  stable_identifier_required: true
+  reconciliation_status: PARTIAL_RV033; DOCUMENTATION_CONFLICTS_SUPERSEDED
+  historical_evidence_cleanup_instructions: SUPERSEDED_NOT_REWRITTEN
+  current_catalogue_aliases_reconciled: true
+wave_c_execution:
+  decision: WAVE_C_BLOCKED
+  results: UIUX_RUNTIME_VALIDATION_RESULTS.yaml# wave_c
+  full_execution_complete: false
+  session_closed: true
+  remediation_authority: Explicit attached user request; bounded Development-only override of observation-only
+    mechanics
+  future_waves: NOT_EXECUTED
+  cep078079: NOT_EXECUTED

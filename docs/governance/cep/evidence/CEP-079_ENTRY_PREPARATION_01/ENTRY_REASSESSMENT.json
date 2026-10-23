@@ -1,0 +1,186 @@
+{
+  "date": "2026-10-24",
+  "cep": "CEP-079",
+  "kind": "ENTRY_BLOCKER_CLOSURE_ONLY_TASKS_1_TO_5_SERIAL",
+  "entry": "BLOCKED",
+  "gate09": "NOT_PASSED",
+  "ext0025": "NOT_READY",
+  "canonical_prompt_sha256": "c02eb0bf068da7a036cf20776fd212be9d5146e994a9e6364ad4ddff9f6fb342",
+  "head": "43ac319c6e73e48ca9626461b73987922c498ec3",
+  "integrated_source_identity": "BLOCKER_CLOSURE_BASELINE.json exact dirty source hashes plus authorized template asset-version delta in CLOSEOUT_CHECK.json",
+  "canonical_requirements": {
+    "GATE-09": {
+      "Gate ID": "GATE-09",
+      "Gate Name": "Representative UAT Readiness",
+      "Gate Type": "UAT READINESS GATE",
+      "Purpose": "Confirm representative UAT can safely begin after required implementation outcomes, applicable runtime/verification prerequisites, and EXT-0025 are available.",
+      "Required IMB IDs": "IMB-0001; IMB-0002; IMB-0003; IMB-0004; IMB-0007; IMB-0011; IMB-0012; IMB-0013; IMB-0014; IMB-0015; IMB-0018; IMB-0019; IMB-0020; IMB-0022; IMB-0023; IMB-0024; IMB-0039; IMB-0043; IMB-0044; IMB-0045; IMB-0046; IMB-0047; IMB-0051; IMB-0052; IMB-0053; IMB-0054; IMB-0069; IMB-0076; IMB-0094; IMB-0095",
+      "Required External Dependencies": "EXT-0025",
+      "Evidence Required": "30 implementation prerequisites available; authoritative 44-scenario mapping; integrated target build; safe disposable test context.",
+      "Pass Condition": "All direct implementation prerequisites required by the approved representative scenarios are available; applicable prerequisite verification evidence is available where required; EXT-0025 is ready. Human Sign-off / EXT-0026 is not a prerequisite.",
+      "Failure Consequence": "IMB-0110 cannot execute.",
+      "Downstream Work Unlocked": "RW-09 / IMB-0110",
+      "UTV?": "YES until environment/scenarios are executable",
+      "Human Sign-off?": "NO",
+      "Notes": "UAT READINESS ONLY. EXT-0026 is forbidden here. REPRESENTATIVE UAT ≠ EXHAUSTIVE UAT."
+    },
+    "EXT-0025": {
+      "External Dependency ID": "EXT-0025",
+      "Name": "Integrated representative UAT environment and approved 44-scenario set",
+      "Category": "RUNTIME / ACCEPTANCE ENVIRONMENT",
+      "Affected IMB IDs": "IMB-0110",
+      "Blocking Stage": "VERIFICATION",
+      "Owner Type": "UAT governance / test owner type",
+      "Evidence Required": "Integrated target build; authoritative Audit20 44-scenario representative set; safe disposable Tenant/project test data/context; browser/database runtime; result capture format",
+      "Current Status": "NOT EXECUTED",
+      "UTV?": "YES",
+      "Notes": "EXTERNAL UAT EXECUTION PREREQUISITE. Internal IMB→IMB-0110 edges separately model IMPLEMENTATION AVAILABILITY PREREQUISITES. Representative UAT remains non-exhaustive. Human Sign-off remains NOT EXECUTED."
+    }
+  },
+  "prerequisites": {
+    "conditional_edges": 30,
+    "applies": 30,
+    "owner_ceps": 27,
+    "supported_implementation_outcomes": 29,
+    "unverified": [
+      "CEP-040/IMB-0039"
+    ],
+    "verification_failures_separate": "WORKFORCE_ASSESSMENT.json",
+    "evidence": "30_PREREQUISITE_ASSESSMENT.csv"
+  },
+  "scenarios": {
+    "approved": 44,
+    "scenario_imb_mappings": 48,
+    "qualified_starting_contexts": 33,
+    "blocked": 11,
+    "not_executed": 44,
+    "blocked_ids": [
+      "UAT-CASE-009",
+      "UAT-CASE-012",
+      "UAT-CASE-016",
+      "UAT-CASE-018",
+      "UAT-CASE-019",
+      "UAT-CASE-020",
+      "UAT-CASE-022",
+      "UAT-CASE-023",
+      "UAT-CASE-029",
+      "UAT-CASE-043",
+      "UAT-CASE-044"
+    ],
+    "evidence": "44_CASE_READINESS_MATRIX.csv"
+  },
+  "ext_requirements": {
+    "integrated_build_source_identity": "IDENTIFIED_CURRENT_HEAD_PLUS_DIRTY_SOURCE_HASHES",
+    "authoritative_catalogue_mapping": "RECOVERED_APPROVED_SOURCE",
+    "safe_disposable_context": "ISOLATED_SYNTHETIC_TARGETS_PREPARED_EXISTING_ACCEPTED_BUSINESS_ROWS_UNCHANGED",
+    "actors_scopes_permissions": "QUALIFIED_EXPLICIT_EXISTING_CANONICAL_ASSIGNMENTS_NO_ROLE_DEFINITION_CHANGES",
+    "scenario_specific_data": "NOT_READY_11_BLOCKED_ROWS",
+    "browser_runtime": "AVAILABLE_CHROME_AND_EDGE",
+    "database_django_runtime": "AVAILABLE_DEVELOPMENT_POSTGRESQL_DJANGO_MIGRATIONS_CURRENT",
+    "capture": "AVAILABLE_JSON_CSV_SCREENSHOTS_SOURCES_HASHES_NO_UAT_RESULTS"
+  },
+  "remaining_blockers": [
+    {
+      "id": "CEP079-PREP-B01",
+      "cases": [
+        "UAT-CASE-012"
+      ],
+      "classification": "MISSING_EVIDENCE",
+      "requirement": "CEP040 / IMB0039 exact completion, AC/DoD and tests proving source reconciliation, version/as-of, duplicates/supersession, tenant/project aggregation and no financial writes",
+      "minimum_action": "Recover original authoritative execution/acceptance/test evidence. Search is exhausted in the approved local, retained Git and recovery sources; downstream completion claims are insufficient. No reimplementation to manufacture proof.",
+      "evidence": "CEP040_RECOVERY.json"
+    },
+    {
+      "id": "CEP079-PREP-B03",
+      "cases": [
+        "UAT-CASE-009",
+        "UAT-CASE-016 (AR branch)",
+        "UAT-CASE-023"
+      ],
+      "classification": "PRODUCT_REGULATORY_OR_HUMAN_SOURCE_REQUIRED",
+      "requirement": "Approved effective tax_rate, tax_basis, insurance_rate, insurance_basis; effective source provenance; real ACCEPTED professional review; applicable ContractTermVersion and TenantBillingConfiguration",
+      "minimum_action": "Supply existing approved commercial/regulatory values and bases, effective authority/source/version and accepted professional review, plus approved contract terms/configuration. If unavailable, the responsible Human/Product-Regulatory authority must determine them. Then prepare only disposable claim/AR/settlement inputs through owning lifecycles.",
+      "evidence": "BILLING_SOURCE_RECOVERY.json; BILLING_BROAD_RECOVERY_INDEX.json; SOURCE_PRODUCER_REGISTRY.json; TASK5_AUTHORITY_DELTA.json; BILLING_AUTHORITY_DECISION_REQUIREMENT.json"
+    },
+    {
+      "id": "CEP079-PREP-B04",
+      "cases": [
+        "UAT-CASE-018"
+      ],
+      "classification": "CANONICAL_FIXTURE_PREPARATION_INTEGRITY_FAILURE",
+      "requirement": "Native period-end reconciliation result-hash verification rejects prepared evidence; signed reconciliation/statements are not qualified",
+      "minimum_action": "Separately authorize bounded Accounting reconciliation result-hash defect attribution/correction, then prepare signed native period-end evidence and retained statements; independent existing close/reopen actors are identified. No close/reopen executed.",
+      "evidence": "TASK3_DISCOVERY.json; TASK3_RECONCILIATION_FIXTURE.json; TASK3_RECONCILIATION_RETRY_PREIMAGE.json"
+    },
+    {
+      "id": "CEP079-PREP-B05",
+      "cases": [
+        "UAT-CASE-019",
+        "UAT-CASE-020",
+        "UAT-CASE-022"
+      ],
+      "classification": "MISSING_QUALIFIED_CONFIGURATION_AND_FIXTURE",
+      "requirement": "ACTIVE BANK Treasury account with approved effective bank/GL mapping; disposable statement and cleared cheque sources",
+      "minimum_action": "Locate approved bank/accounting mapping inputs, then activate an isolated Development bank account and prepare statement/cheque starting states canonically. Obtain source-owner approval only if an applicable mapping does not already exist; do not invent the account mapping.",
+      "evidence": "TREASURY_PREPARATION_RESULT.json; QUALIFIED_STARTING_DATA.json"
+    },
+    {
+      "id": "CEP079-PREP-B06",
+      "cases": [
+        "UAT-CASE-029",
+        "UAT-CASE-044"
+      ],
+      "classification": "MISSING_GOVERNED_BUSINESS_SOURCE_AND_FIXTURE",
+      "requirement": "Qualified PartnerProfile, sourced QualificationRequirement and associated qualified partner context",
+      "minimum_action": "Attach an existing approved requirement/source/version and partner facts, then prepare an isolated profile/context through the canonical lifecycle. If no approved requirement exists, obtain domain-owner criteria; do not treat illustrative test criteria as approved business policy.",
+      "evidence": "QUALIFIED_STARTING_DATA.json; 44_CASE_READINESS_MATRIX.json; TASK4_GOVERNED_INPUT_DISCOVERY.json"
+    },
+    {
+      "id": "CEP079-PREP-B07",
+      "cases": [
+        "UAT-CASE-043"
+      ],
+      "classification": "MISSING_GOVERNED_FINANCIAL_SOURCE_AND_FIXTURE",
+      "requirement": "Qualified FixedAssetClassVersion, AssetBookPolicyVersion and positive asset candidate with sourced capitalization/monetary facts",
+      "minimum_action": "Attach applicable approved class/book/capitalization sources and asset facts; prepare a non-posting isolated candidate. Source-owner decision is needed only where existing approved inputs cannot be located; no invented depreciation or posting policy.",
+      "evidence": "QUALIFIED_STARTING_DATA.json; 44_CASE_READINESS_MATRIX.json; TASK4_GOVERNED_INPUT_DISCOVERY.json"
+    },
+    {
+      "id": "CEP079-PREP-B08",
+      "cases": [
+        "UAT-CASE-044"
+      ],
+      "classification": "MISSING_GOVERNED_BUSINESS_SOURCE_AND_FIXTURE",
+      "requirement": "Published Compliance InspectionTemplateVersion with approved checklist/outcome rules/source references",
+      "minimum_action": "Attach an approved existing-semantic inspection template and prepare isolated inspection inputs. Obtain domain-owner content if absent; no invented checklist/risk rules.",
+      "evidence": "QUALIFIED_STARTING_DATA.json; 44_CASE_READINESS_MATRIX.json; TASK4_GOVERNED_INPUT_DISCOVERY.json"
+    }
+  ],
+  "authority": "Direct Human bounded Tasks 1..5 request; presentation/focus correction and canonical synthetic Development fixtures permitted. No UAT, production, Human Sign-off, statutory invention or Git writes.",
+  "cep078": "PARTIAL preserved; not a canonical dependency. Only material scenario intersections assessed; no blanket COMPLETE requirement.",
+  "fixtures": "Task3 native projection fixture preparation attempted atomically and rolled back on canonical integrity failure; no direct database bypass or financial mutations. Nine protected source-table fingerprints unchanged. Task4/5 read-only; no unsupported inputs created.",
+  "uat_execution": "NOT_STARTED_ALL_44_NOT_EXECUTED",
+  "may_begin_next_step": false,
+  "product_remediation": "AUTHORIZED_PRESENTATION_ONLY_TEMPLATE_ASSET_VERSION_4_TO_5",
+  "git_writes": "NONE",
+  "production": "NONE",
+  "human_signoff": "NOT_EXECUTED",
+  "history": [
+    {
+      "date": "2026-10-23",
+      "entry": "BLOCKED",
+      "qualified_starting_contexts": 32,
+      "prerequisites_supported": 29,
+      "retained_failed_workforce_evidence": "WORKFORCE_ASSESSMENT.json; WORKFORCE_SIX_CELLS.json",
+      "resolved_blocker": "CEP079-PREP-B02",
+      "resolution": "WORKFORCE_CLOSURE.json"
+    }
+  ],
+  "tasks": "BLOCKER_CLOSURE_TASKS.json",
+  "delta_preservation": {
+    "prior_32_ready_rows": "UNCHANGED_NO_REQUALIFICATION",
+    "UAT-CASE-034": "UNCHANGED_READY",
+    "prior_29_supported_prerequisites": "UNCHANGED",
+    "new_ready_case": "UAT-CASE-040"
+  }
+}

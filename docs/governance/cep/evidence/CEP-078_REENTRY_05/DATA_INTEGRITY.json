@@ -1,0 +1,104 @@
+{
+  "at": "2026-10-23 16:14:11.800332+00:00",
+  "result": "PASS",
+  "models_compared": 518,
+  "unchanged_model_aggregates": 509,
+  "all_preexisting_rows_unchanged": true,
+  "new_only_isolated_fixture_and_audits": true,
+  "deltas": [
+    {
+      "model": "accounts.User",
+      "added_ids": [
+        "ee464f47-3097-4d5b-a2a8-aac88b4e8ec7"
+      ],
+      "changed_ids": [],
+      "removed_ids": [],
+      "authorized": true
+    },
+    {
+      "model": "organizations.OrganizationMembership",
+      "added_ids": [
+        "d84c0e54-536a-405d-a2f6-f1e7fb7d8035"
+      ],
+      "changed_ids": [],
+      "removed_ids": [],
+      "authorized": true
+    },
+    {
+      "model": "organizations.MembershipRoleAssignment",
+      "added_ids": [
+        "0661e242-789d-4260-b269-68b1b551ed78"
+      ],
+      "changed_ids": [],
+      "removed_ids": [],
+      "authorized": true
+    },
+    {
+      "model": "organizations.MembershipScopeGrant",
+      "added_ids": [
+        "22a20bf0-207b-4b67-b274-c2455bd4ae4a"
+      ],
+      "changed_ids": [],
+      "removed_ids": [],
+      "authorized": true
+    },
+    {
+      "model": "organizations.AuthorizationMigrationIssue",
+      "added_ids": [
+        "046c3804-b3fe-4fc4-8e6d-d7784607950e"
+      ],
+      "changed_ids": [],
+      "removed_ids": [],
+      "authorized": true
+    },
+    {
+      "model": "audit.AuditEvent",
+      "added_ids": [
+        "1f2105a1-8a9c-4a79-9bc5-21da45e19a4a",
+        "47864cb6-fefd-405f-823a-5050155c4dc4",
+        "5d0b9225-0ed1-4fc1-b1af-6c17cffcaeff",
+        "7b9c4bbb-0bae-4b96-818e-6d938ba86feb",
+        "89256701-6588-4757-a1be-fbddd459ac52",
+        "8b663a33-3cf5-4b9b-a534-ff160a5483c0",
+        "9bd11a74-9570-4f51-843e-dd40f422fed7",
+        "d7e9a106-9875-424e-bd24-1f9de36dd96a",
+        "da7f082e-ed4a-4754-9edd-c02f6986ffd4",
+        "ebc04883-3dc6-435c-adec-e8d68fc96713"
+      ],
+      "changed_ids": [],
+      "removed_ids": [],
+      "authorized": true
+    },
+    {
+      "model": "workforce.Employee",
+      "added_ids": [
+        "43337615-f509-47f0-9012-fe76c5a9e95b"
+      ],
+      "changed_ids": [],
+      "removed_ids": [],
+      "authorized": true
+    },
+    {
+      "model": "workforce.EmployeeQualification",
+      "added_ids": [
+        "ffe69b36-9a5d-4bdc-9107-7b7eaa5d82d6"
+      ],
+      "changed_ids": [],
+      "removed_ids": [],
+      "authorized": true
+    },
+    {
+      "model": "workforce.EmployeeQualificationLifecycleEvent",
+      "added_ids": [
+        "4ebb47af-60c2-4d66-9b80-d712075e86f7"
+      ],
+      "changed_ids": [],
+      "removed_ids": [],
+      "authorized": true
+    }
+  ],
+  "cleanup": "New test role, scope and membership canonically revoked; new isolated qualification canonically revoked; nonstaff/nonsuperuser identity and immutable employee/source/audit retained; no operator link",
+  "sessions_last_login": "Excluded by existing snapshot contract",
+  "prior_reentry03_attribution": "Historical PARTIAL remains; no retrospective inference from this exact continuation comparison",
+  "financial_business_policy_records_changed": false
+}

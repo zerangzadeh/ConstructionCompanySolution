@@ -1,0 +1,102 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+
+<div class="mb-3 flex items-center justify-end gap-2" data-table-filter-controls="table-filters">
+    <form id="table-filters" method="get" class="flex items-center gap-2" aria-label="فیلترهای جدول" data-table-filter-form>
+        <button class="h-8 rounded-md border border-slate-200 bg-white px-2.5 text-[11px] font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-700" type="submit">اعمال فیلتر</button>
+        
+    </form>
+</div>
+<template id="table-filters-row">
+<tr class="bg-slate-50/70 align-top text-right">
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-number">فیلتر شماره قرارداد</label>
+            
+                <input id="table-filters-number" type="search" name="number" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-title">فیلتر عنوان و پروژه</label>
+            
+                <input id="table-filters-title" type="search" name="title" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-counterparty">فیلتر طرف قرارداد</label>
+            
+                <input id="table-filters-counterparty" type="search" name="counterparty" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-status">فیلتر وضعیت</label>
+            
+                <select id="table-filters-status" name="status" form="table-filters" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                    <option value="">همه</option>
+                    <option value="draft">پیش‌نویس</option><option value="active">فعال</option><option value="completed">تکمیل‌شده</option><option value="terminated">خاتمه‌یافته</option>
+                </select>
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+    </th>
+    
+</tr>
+
+</template>
+
+ 
+
+
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">قراردادها</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">مشاهده قراردادها</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">قراردادها</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">شرکت سازه‌پردازان پارس</p>
+        
+    </div>
+    
+</header>
+
+<section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست قراردادها">
+<div class="erp-panel-header"><div><h2 class="text-sm font-semibold text-slate-900">قراردادهای پروژه‌ها</h2><p class="mt-0.5 text-[11px] text-slate-500">تعهدات قراردادی شرکت فعال</p></div><span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">5 رکورد</span></div><div class="erp-table-wrap"><table class="w-full min-w-[880px] text-right"><thead><tr><th class="border-b border-slate-200 px-4 py-3">شماره قرارداد</th><th class="border-b border-slate-200 px-4 py-3">عنوان و پروژه</th><th class="border-b border-slate-200 px-4 py-3">طرف قرارداد</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th><th class="border-b border-slate-200 px-4 py-3 text-left">ارزش قرارداد</th></tr></thead><tbody class="divide-y divide-slate-100"><tr><td class="whitespace-nowrap px-4 py-3.5 font-medium" dir="ltr"><a class="text-blue-700 hover:text-blue-900 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="/contracts/04722245-478d-4154-9c15-c2c2a423fc4d/">CTR-01-01-04</a></td><td class="px-4 py-3.5"><p class="font-semibold"><a class="text-slate-900 hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="/contracts/04722245-478d-4154-9c15-c2c2a423fc4d/">قرارداد اجرای تأسیسات مکانیکی و برقی</a></p><p class="mt-0.5 text-[11px] text-slate-500">مجتمع مسکونی باغستان</p></td><td class="px-4 py-3.5 text-slate-600">پیمانکاری تأسیسات نیروی شرق</td><td class="px-4 py-3.5"><span class="erp-badge erp-badge--success">
+    تکمیل‌شده
+</span>
+</td><td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums" dir="ltr">82,000,000,000 <span class="font-normal text-slate-500" dir="rtl">IRR</span></td></tr><tr><td class="whitespace-nowrap px-4 py-3.5 font-medium" dir="ltr"><a class="text-blue-700 hover:text-blue-900 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="/contracts/1c869bb0-cb4b-4a47-8210-87167b90ee6f/">CTR-01-01-05</a></td><td class="px-4 py-3.5"><p class="font-semibold"><a class="text-slate-900 hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="/contracts/1c869bb0-cb4b-4a47-8210-87167b90ee6f/">قرارداد اجرای نما و پوسته ساختمان</a></p><p class="mt-0.5 text-[11px] text-slate-500">مجتمع مسکونی باغستان</p></td><td class="px-4 py-3.5 text-slate-600">شرکت اجرای نمای سپید</td><td class="px-4 py-3.5"><span class="erp-badge erp-badge--success">
+    فعال
+</span>
+</td><td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums" dir="ltr">82,900,000,000 <span class="font-normal text-slate-500" dir="rtl">IRR</span></td></tr><tr><td class="whitespace-nowrap px-4 py-3.5 font-medium" dir="ltr"><a class="text-blue-700 hover:text-blue-900 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="/contracts/87a144ae-9cbb-4509-baf2-e2c9db0740ba/">CTR-01-01-02</a></td><td class="px-4 py-3.5"><p class="font-semibold"><a class="text-slate-900 hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="/contracts/87a144ae-9cbb-4509-baf2-e2c9db0740ba/">قرارداد تأمین بتن آماده و خدمات پمپاژ</a></p><p class="mt-0.5 text-[11px] text-slate-500">مجتمع مسکونی باغستان</p></td><td class="px-4 py-3.5 text-slate-600">تأمین بتن البرز</td><td class="px-4 py-3.5"><span class="erp-badge erp-badge--success">
+    فعال
+</span>
+</td><td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums" dir="ltr">80,200,000,000 <span class="font-normal text-slate-500" dir="rtl">IRR</span></td></tr><tr><td class="whitespace-nowrap px-4 py-3.5 font-medium" dir="ltr"><a class="text-blue-700 hover:text-blue-900 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="/contracts/c4eb279a-4db9-4546-b992-7d3000794b9b/">CTR-01-01-03</a></td><td class="px-4 py-3.5"><p class="font-semibold"><a class="text-slate-900 hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="/contracts/c4eb279a-4db9-4546-b992-7d3000794b9b/">قرارداد خرید و تحویل فولاد مصرفی</a></p><p class="mt-0.5 text-[11px] text-slate-500">مجتمع مسکونی باغستان</p></td><td class="px-4 py-3.5 text-slate-600">بازرگانی فولاد ایرانیان</td><td class="px-4 py-3.5"><span class="erp-badge erp-badge--neutral">
+    پیش‌نویس
+</span>
+</td><td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums" dir="ltr">81,100,000,000 <span class="font-normal text-slate-500" dir="rtl">IRR</span></td></tr><tr><td class="whitespace-nowrap px-4 py-3.5 font-medium" dir="ltr"><a class="text-blue-700 hover:text-blue-900 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="/contracts/c1731b3b-d971-40e5-95ef-3d3ce2c4b838/">CTR-01-01-01</a></td><td class="px-4 py-3.5"><p class="font-semibold"><a class="text-slate-900 hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="/contracts/c1731b3b-d971-40e5-95ef-3d3ce2c4b838/">قرارداد مدیریت پیمان و اجرای عملیات اصلی</a></p><p class="mt-0.5 text-[11px] text-slate-500">مجتمع مسکونی باغستان</p></td><td class="px-4 py-3.5 text-slate-600">شرکت سرمایه‌گذاری شهر فردا</td><td class="px-4 py-3.5"><span class="erp-badge erp-badge--success">
+    فعال
+</span>
+</td><td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums" dir="ltr">608,500,000,000 <span class="font-normal text-slate-500" dir="rtl">IRR</span></td></tr></tbody></table></div><div class="border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500">نمایش 5 قرارداد</div>
+</section>
+
+
+        </main>

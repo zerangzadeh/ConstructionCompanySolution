@@ -1,0 +1,146 @@
+[
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/procurement/portal/grants/dacde271-a02f-4d09-842d-3fb5695033a4/",
+    "case": "fresh authenticated exact invitation context",
+    "status": 200,
+    "final": "/procurement/portal/grants/dacde271-a02f-4d09-842d-3fb5695033a4/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/",
+    "case": "old expired grant remains denied",
+    "status": 404,
+    "final": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/procurement/portal/grants/fe5c60ff-9298-4fd9-942b-8e635a315098/",
+    "case": "foreign opportunity identifier cannot become a portal grant",
+    "status": 404,
+    "final": "/procurement/portal/grants/fe5c60ff-9298-4fd9-942b-8e635a315098/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "uiux.persona.tenant-admin",
+    "path": "/procurement/portal/grants/dacde271-a02f-4d09-842d-3fb5695033a4/",
+    "case": "tenant membership never becomes external principal",
+    "status": 404,
+    "final": "/procurement/portal/grants/dacde271-a02f-4d09-842d-3fb5695033a4/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "uiux.persona.tenant-admin",
+    "path": "/procurement/portal/grants/dacde271-a02f-4d09-842d-3fb5695033a4/submit/",
+    "case": "manipulated external write denied",
+    "status": 404,
+    "final": "/procurement/portal/grants/dacde271-a02f-4d09-842d-3fb5695033a4/submit/",
+    "method": "POST",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/payroll/",
+    "case": "external has no implicit tenant authority",
+    "status": 200,
+    "final": "/organizations/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/projects/",
+    "case": "external has no implicit tenant authority",
+    "status": 200,
+    "final": "/organizations/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/procurement/rfqs/18a7b335-38bb-4162-95e3-7a5ed16e14d8/buyer/",
+    "case": "external has no implicit tenant authority",
+    "status": 200,
+    "final": "/organizations/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "uiux.persona.tenant-admin",
+    "path": "/organizations/platform/roles/",
+    "case": "tenant admin cannot read Platform catalogue",
+    "status": 403,
+    "final": "/organizations/platform/roles/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "admin",
+    "path": "/organizations/platform/roles/",
+    "case": "separate Platform Admin localized catalogue",
+    "status": 200,
+    "final": "/organizations/platform/roles/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/projects/7806a619-7ca4-42ac-90f7-fb585c39f112/",
+    "case": "foreign tenant or unassigned Project denied",
+    "status": 403,
+    "final": "/projects/7806a619-7ca4-42ac-90f7-fb585c39f112/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/projects/f61f52ed-3c85-4570-af2b-5e89c025ab4e/",
+    "case": "foreign tenant or unassigned Project denied",
+    "status": 403,
+    "final": "/projects/f61f52ed-3c85-4570-af2b-5e89c025ab4e/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/projects/?start_date_from=1404%2F01%2F01&start_date_to=1404%2F12%2F29",
+    "case": "existing Jalali date bounds keep intended projects",
+    "status": 200,
+    "final": "/projects/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/quality/?identified_at_from=1404%2F01%2F01&identified_at_to=1404%2F12%2F29",
+    "case": "existing Quality Jalali bounds retain same row",
+    "status": 200,
+    "final": "/quality/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/projects/?start_date_from=1499%2F01%2F01",
+    "case": "future date bound excludes historical records",
+    "status": 200,
+    "final": "/projects/",
+    "method": "GET",
+    "passed": true
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/quality/?identified_at_from=1499%2F01%2F01",
+    "case": "future date bound excludes historical records",
+    "status": 200,
+    "final": "/quality/",
+    "method": "GET",
+    "passed": true
+  }
+]

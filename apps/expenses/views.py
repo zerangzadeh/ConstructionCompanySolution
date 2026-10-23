@@ -44,6 +44,7 @@ from apps.organizations.authorization import (
     get_active_membership,
     has_business_permission,
     is_platform_admin,
+    scope_queryset,
 )
 from apps.organizations.decorators import (
     active_organization_required,
@@ -373,12 +374,17 @@ def expense_detail(request: HttpRequest, expense_id: str) -> HttpResponse:
         get_organization_expenses(user=request.user, organization=request.organization),
         pk=expense_id,
     )
+    membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
     return render(
         request,
         "expenses/detail.html",
         {
             "expense": expense,
-            "allocation_form": ExpenseAllocationForm(organization=request.organization),
+            "allocation_form": ExpenseAllocationForm(
+                organization=request.organization, membership=membership
+            ),
             "return_form": ExpenseReturnForm(),
             "void_form": ExpenseVoidForm(),
         },
@@ -394,7 +400,15 @@ def expense_allocate(request: HttpRequest, expense_id: str) -> HttpResponse:
         get_organization_expenses(user=request.user, organization=request.organization),
         pk=expense_id,
     )
-    form = ExpenseAllocationForm(request.POST, organization=request.organization)
+    membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
+    form = ExpenseAllocationForm(
+        request.POST,
+        organization=request.organization,
+        membership=membership,
+        expense=expense,
+    )
     if not form.is_valid():
         return HttpResponse(status=400)
     try:
@@ -462,11 +476,20 @@ def expense_return(request: HttpRequest, expense_id: str) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.EXPENSE_RECURRENCES_MANAGE)
 def recurrence_list(request: HttpRequest) -> HttpResponse:
-    templates = request.organization.recurringexpensetemplate_set.select_related(
-        "project"
-    ).order_by("description")
+    membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
+    templates = request.organization.recurringexpensetemplate_set.none()
+    if membership is not None:
+        templates = scope_queryset(
+            request.organization.recurringexpensetemplate_set.select_related("project"),
+            membership=membership,
+            project_lookup="project_id",
+        ).order_by("description")
     form = RecurringExpenseTemplateForm(
-        request.POST or None, organization=request.organization
+        request.POST or None,
+        organization=request.organization,
+        membership=membership,
     )
     if request.method == "POST" and form.is_valid():
         data = form.cleaned_data

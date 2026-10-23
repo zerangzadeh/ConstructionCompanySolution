@@ -1,0 +1,410 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+   <nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">واحدهای سازمانی</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">منابع انسانی</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">واحدهای سازمانی</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">ساختار دپارتمان‌ها و واحدهای شرکت</p>
+        
+    </div>
+    
+        <a class="erp-page-header__action erp-btn erp-btn--primary shrink-0" href="/workforce/departments/create/">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>واحد جدید
+        </a>
+    
+</header>
+ 
+<nav class="mt-5 flex flex-wrap gap-2" aria-label="بخش‌های منابع انسانی">
+    <a class="erp-btn erp-btn--secondary" href="/workforce/">کارکنان</a>
+    <a class="erp-btn erp-btn--secondary" href="/workforce/foundation/">توانمندی و توسعه</a>
+    
+    <a class="erp-btn erp-btn--secondary erp-btn--active" href="/workforce/departments/" aria-current="page">واحدها</a>
+    <a class="erp-btn erp-btn--secondary" href="/workforce/positions/">سمت‌ها</a>
+    <a class="erp-btn erp-btn--secondary" href="/workforce/teams/">گروه‌های کاری</a>
+</nav>
+
+
+
+<section class="org-chart-shell mt-4" data-org-chart>
+    <div class="org-chart-toolbar">
+        <div class="org-chart-view-switch" role="group" aria-label="نوع نمایش">
+            <button type="button" data-view="tree" class="is-active" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M12 8v8"/></svg>نمای درختی</button>
+            <button type="button" data-view="list" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>نمای لیستی</button>
+        </div>
+        <label class="org-chart-search"><span class="sr-only">جستجو در چارت واحدها</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input type="search" data-chart-search placeholder="جستجو در واحدها…" autocomplete="off"></label>
+        <label class="org-chart-select"><span class="sr-only">فیلتر واحد</span><select data-department-filter><option value="">همه واحدها</option><option value="aa41ed5f-86dc-4364-bdc9-b482a256c1b4">Wave C synthetic department</option><option value="117fc1fc-a880-4012-b769-bfb7815c854a">Wave C synthetic HTTP department</option><option value="ad46fed4-6c9a-44a4-89e4-808066f9bba9">دفتر فنی و مهندسی</option><option value="2ecbd4ca-c272-4e0b-82a6-836d814c2342">دفتر نظارت</option><option value="65faea06-ae22-4e3b-bc9e-4ab92020168a">مدیریت اجرا</option></select></label>
+        <label class="org-chart-select"><span class="sr-only">فیلتر وضعیت</span><select data-status-filter><option value="">همه وضعیت‌ها</option><option value="true">فعال</option><option value="false">غیرفعال</option></select></label>
+    </div>
+
+    <div class="org-chart-workspace" data-tree-view>
+        <div class="org-chart-canvas-wrap">
+            <div class="org-chart-canvas-tools" role="group" aria-label="کنترل اندازه چارت">
+                <button type="button" data-zoom-in aria-label="بزرگ‌نمایی">+</button><button type="button" data-zoom-out aria-label="کوچک‌نمایی">−</button>
+                <button type="button" data-fullscreen aria-label="نمایش تمام‌صفحه"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3H3v5m13-5h5v5M8 21H3v-5m13 5h5v-5"/></svg></button>
+            </div>
+            <div class="org-chart-scroll" data-chart-scroll>
+                <div class="org-chart-tree" data-chart-tree><ul>
+    <li class="org-chart__node org-chart__root" data-chart-branch>
+        <article class="org-chart-card org-chart-card--primary org-chart-card--organization" data-chart-card data-department-id="organization-root" tabindex="0" role="button" aria-controls="department-details-organization-root" aria-label="نمایش خلاصه شرکت">
+            <div class="org-chart-card__heading">
+                <span class="org-chart-card__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V7h8v14m0-10h6v10M8 10h2m-2 4h2m-2 4h2m8-4h-2m2 4h-2"/></svg>
+                </span>
+                <div class="min-w-0 text-right">
+                    <h5>شرکت سازه‌پردازان پارس</h5>
+                    <p>ریشه ساختار شرکتی</p>
+                </div>
+            </div>
+
+            <div class="org-chart-card__footer">
+                <span>5 نفر در شرکت</span> 
+                <button type="button" data-collapse-branch aria-expanded="true" aria-label="جمع کردن واحدهای شرکت">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 14 5-5 5 5"/></svg>
+                </button> 
+            </div>
+        </article>
+
+        
+        <ul>
+<li class="org-chart__node" data-chart-branch data-chart-node data-department-id="aa41ed5f-86dc-4364-bdc9-b482a256c1b4" data-active="true">
+    <article class="org-chart-card org-chart-card--emerald" data-chart-card tabindex="0" role="button" aria-controls="department-details-aa41ed5f-86dc-4364-bdc9-b482a256c1b4" aria-label="نمایش جزئیات Wave C synthetic department">
+        <div class="org-chart-card__heading">
+            <span class="org-chart-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
+            </span>
+            <div class="min-w-0 text-right">
+                <h3>Wave C synthetic department</h3>
+                <p dir="ltr">WAVE-C-HR</p>
+            </div>
+        </div>
+
+        <div class="org-chart-card__footer">
+            <span>1 نفر در مجموعه</span>
+            
+            <span class="org-chart-card__leaf">1 نفر مستقیم</span>
+            
+        </div>
+    </article>
+
+    
+</li>
+
+<li class="org-chart__node" data-chart-branch data-chart-node data-department-id="117fc1fc-a880-4012-b769-bfb7815c854a" data-active="true">
+    <article class="org-chart-card org-chart-card--emerald" data-chart-card tabindex="0" role="button" aria-controls="department-details-117fc1fc-a880-4012-b769-bfb7815c854a" aria-label="نمایش جزئیات Wave C synthetic HTTP department">
+        <div class="org-chart-card__heading">
+            <span class="org-chart-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
+            </span>
+            <div class="min-w-0 text-right">
+                <h3>Wave C synthetic HTTP department</h3>
+                <p dir="ltr">WAVE-C-HTTP</p>
+            </div>
+        </div>
+
+        <div class="org-chart-card__footer">
+            <span>0 نفر در مجموعه</span>
+            
+            <span class="org-chart-card__leaf">0 نفر مستقیم</span>
+            
+        </div>
+    </article>
+
+    
+</li>
+
+<li class="org-chart__node" data-chart-branch data-chart-node data-department-id="ad46fed4-6c9a-44a4-89e4-808066f9bba9" data-active="true">
+    <article class="org-chart-card org-chart-card--emerald" data-chart-card tabindex="0" role="button" aria-controls="department-details-ad46fed4-6c9a-44a4-89e4-808066f9bba9" aria-label="نمایش جزئیات دفتر فنی و مهندسی">
+        <div class="org-chart-card__heading">
+            <span class="org-chart-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
+            </span>
+            <div class="min-w-0 text-right">
+                <h3>دفتر فنی و مهندسی</h3>
+                <p dir="ltr">TEC</p>
+            </div>
+        </div>
+
+        <div class="org-chart-card__footer">
+            <span>2 نفر در مجموعه</span>
+            
+            <span class="org-chart-card__leaf">2 نفر مستقیم</span>
+            
+        </div>
+    </article>
+
+    
+</li>
+
+<li class="org-chart__node" data-chart-branch data-chart-node data-department-id="2ecbd4ca-c272-4e0b-82a6-836d814c2342" data-active="true">
+    <article class="org-chart-card org-chart-card--emerald" data-chart-card tabindex="0" role="button" aria-controls="department-details-2ecbd4ca-c272-4e0b-82a6-836d814c2342" aria-label="نمایش جزئیات دفتر نظارت">
+        <div class="org-chart-card__heading">
+            <span class="org-chart-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
+            </span>
+            <div class="min-w-0 text-right">
+                <h3>دفتر نظارت</h3>
+                <p dir="ltr">۰۰۴</p>
+            </div>
+        </div>
+
+        <div class="org-chart-card__footer">
+            <span>1 نفر در مجموعه</span>
+            
+            <span class="org-chart-card__leaf">1 نفر مستقیم</span>
+            
+        </div>
+    </article>
+
+    
+</li>
+
+<li class="org-chart__node" data-chart-branch data-chart-node data-department-id="65faea06-ae22-4e3b-bc9e-4ab92020168a" data-active="true">
+    <article class="org-chart-card org-chart-card--emerald" data-chart-card tabindex="0" role="button" aria-controls="department-details-65faea06-ae22-4e3b-bc9e-4ab92020168a" aria-label="نمایش جزئیات مدیریت اجرا">
+        <div class="org-chart-card__heading">
+            <span class="org-chart-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
+            </span>
+            <div class="min-w-0 text-right">
+                <h3>مدیریت اجرا</h3>
+                <p dir="ltr">EXE</p>
+            </div>
+        </div>
+
+        <div class="org-chart-card__footer">
+            <span>1 نفر در مجموعه</span>
+            
+            <span class="org-chart-card__leaf">1 نفر مستقیم</span>
+            
+        </div>
+    </article>
+
+    
+</li>
+
+</ul>
+    </li>
+</ul>
+</div>
+                <div class="org-chart-no-results" data-no-results hidden>واحدی مطابق فیلتر انتخاب‌شده پیدا نشد.</div>
+                
+            </div>
+            <div class="org-chart-legend" aria-label="راهنمای رنگ‌ها">
+                <span>راهنما:</span>
+                <span><i class="bg-blue-600"></i>ریشه شرکتی</span>
+                <span><i class="bg-emerald-400"></i>سطح ۱</span>
+                <span><i class="bg-amber-400"></i>سطح ۲</span>
+                <span><i class="bg-blue-400"></i>سطح ۳</span>
+                <span><i class="bg-violet-400"></i>سطح ۴</span>
+                <span><i class="bg-rose-400"></i>سطح ۵ و بعدی</span>
+            </div>
+        </div>
+
+        <aside class="org-chart-details" data-details-drawer aria-live="polite">
+            <header>
+                <div>
+                    <p>اطلاعات ساختار</p>
+                    <h2>جزئیات واحد یا شرکت</h2>
+                </div><button type="button" data-close-details aria-label="بستن جزئیات">×</button></header>
+            <section id="department-details-organization-root" class="org-chart-details__panel" data-details-panel data-department-id="organization-root" hidden>
+                <div class="org-chart-details__heading">
+                    <div>
+                        <h5>شرکت سازه‌پردازان پارس</h5>
+                        <p>ریشه ساختار شرکتی</p>
+                    </div>
+                </div>
+                <dl class="org-chart-details__facts">
+                    <div><dt>وضعیت شرکت</dt>
+                        <dd>فعال</dd>
+                    </div>
+                    <div><dt>تعداد واحدها</dt>
+                        <dd>5</dd>
+                    </div>
+                    <div><dt>کل کارکنان</dt>
+                        <dd>5 نفر</dd>
+                    </div>
+                </dl>
+                <div class="org-chart-details__section">
+                    <h4>راهنما</h4>
+                    <p>این کارت ریشه، نمایندهٔ شرکت است و واحد شرکتی مستقل محسوب نمی‌شود. برای مشاهدهٔ جزئیات یک واحد، کارت همان واحد را انتخاب کنید.</p>
+                </div>
+            </section>
+            
+<section id="department-details-aa41ed5f-86dc-4364-bdc9-b482a256c1b4" class="org-chart-details__panel" data-details-panel data-department-id="aa41ed5f-86dc-4364-bdc9-b482a256c1b4" hidden>
+    <div class="org-chart-details__title">
+        <span class="org-chart-card__icon org-chart-card__icon--emerald" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
+        </span>
+        <div><h3>Wave C synthetic department</h3><p dir="ltr">WAVE-C-HR</p></div>
+    </div>
+
+    <dl class="org-chart-details__facts">
+        <div><dt>واحد بالادست</dt><dd>سطح نخست شرکت</dd></div>
+        <div><dt>وضعیت</dt><dd>فعال</dd></div>
+        <div><dt>کارکنان مستقیم</dt><dd>1 نفر</dd></div>
+        <div><dt>کل کارکنان مجموعه</dt><dd>1 نفر</dd></div>
+    </dl>
+
+    <div class="org-chart-details__section">
+        <h4>شرح واحد</h4>
+        <p>برای این واحد شرحی ثبت نشده است.</p>
+    </div>
+
+</section>
+
+
+<section id="department-details-117fc1fc-a880-4012-b769-bfb7815c854a" class="org-chart-details__panel" data-details-panel data-department-id="117fc1fc-a880-4012-b769-bfb7815c854a" hidden>
+    <div class="org-chart-details__title">
+        <span class="org-chart-card__icon org-chart-card__icon--emerald" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
+        </span>
+        <div><h3>Wave C synthetic HTTP department</h3><p dir="ltr">WAVE-C-HTTP</p></div>
+    </div>
+
+    <dl class="org-chart-details__facts">
+        <div><dt>واحد بالادست</dt><dd>سطح نخست شرکت</dd></div>
+        <div><dt>وضعیت</dt><dd>فعال</dd></div>
+        <div><dt>کارکنان مستقیم</dt><dd>0 نفر</dd></div>
+        <div><dt>کل کارکنان مجموعه</dt><dd>0 نفر</dd></div>
+    </dl>
+
+    <div class="org-chart-details__section">
+        <h4>شرح واحد</h4>
+        <p>Bounded Development fixture</p>
+    </div>
+
+</section>
+
+
+<section id="department-details-ad46fed4-6c9a-44a4-89e4-808066f9bba9" class="org-chart-details__panel" data-details-panel data-department-id="ad46fed4-6c9a-44a4-89e4-808066f9bba9" hidden>
+    <div class="org-chart-details__title">
+        <span class="org-chart-card__icon org-chart-card__icon--emerald" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
+        </span>
+        <div><h3>دفتر فنی و مهندسی</h3><p dir="ltr">TEC</p></div>
+    </div>
+
+    <dl class="org-chart-details__facts">
+        <div><dt>واحد بالادست</dt><dd>سطح نخست شرکت</dd></div>
+        <div><dt>وضعیت</dt><dd>فعال</dd></div>
+        <div><dt>کارکنان مستقیم</dt><dd>2 نفر</dd></div>
+        <div><dt>کل کارکنان مجموعه</dt><dd>2 نفر</dd></div>
+    </dl>
+
+    <div class="org-chart-details__section">
+        <h4>شرح واحد</h4>
+        <p>کنترل نقشه‌ها، برنامه‌ریزی و هماهنگی فنی پروژه‌ها</p>
+    </div>
+
+</section>
+
+
+<section id="department-details-2ecbd4ca-c272-4e0b-82a6-836d814c2342" class="org-chart-details__panel" data-details-panel data-department-id="2ecbd4ca-c272-4e0b-82a6-836d814c2342" hidden>
+    <div class="org-chart-details__title">
+        <span class="org-chart-card__icon org-chart-card__icon--emerald" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
+        </span>
+        <div><h3>دفتر نظارت</h3><p dir="ltr">۰۰۴</p></div>
+    </div>
+
+    <dl class="org-chart-details__facts">
+        <div><dt>واحد بالادست</dt><dd>سطح نخست شرکت</dd></div>
+        <div><dt>وضعیت</dt><dd>فعال</dd></div>
+        <div><dt>کارکنان مستقیم</dt><dd>1 نفر</dd></div>
+        <div><dt>کل کارکنان مجموعه</dt><dd>1 نفر</dd></div>
+    </dl>
+
+    <div class="org-chart-details__section">
+        <h4>شرح واحد</h4>
+        <p>برای این واحد شرحی ثبت نشده است.</p>
+    </div>
+
+</section>
+
+
+<section id="department-details-65faea06-ae22-4e3b-bc9e-4ab92020168a" class="org-chart-details__panel" data-details-panel data-department-id="65faea06-ae22-4e3b-bc9e-4ab92020168a" hidden>
+    <div class="org-chart-details__title">
+        <span class="org-chart-card__icon org-chart-card__icon--emerald" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
+        </span>
+        <div><h3>مدیریت اجرا</h3><p dir="ltr">EXE</p></div>
+    </div>
+
+    <dl class="org-chart-details__facts">
+        <div><dt>واحد بالادست</dt><dd>سطح نخست شرکت</dd></div>
+        <div><dt>وضعیت</dt><dd>فعال</dd></div>
+        <div><dt>کارکنان مستقیم</dt><dd>1 نفر</dd></div>
+        <div><dt>کل کارکنان مجموعه</dt><dd>1 نفر</dd></div>
+    </dl>
+
+    <div class="org-chart-details__section">
+        <h4>شرح واحد</h4>
+        <p>مدیریت عملیات اجرایی و گروه‌های کارگاهی</p>
+    </div>
+
+</section>
+
+
+
+            <div class="org-chart-details__placeholder" data-details-placeholder><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
+                <p>برای مشاهده اطلاعات، یک واحد را از چارت انتخاب کنید.</p>
+            </div>
+        </aside>
+    </div>
+
+    <div class="org-chart-list" data-list-view data-table-filter-controls hidden>
+        
+        <div class="erp-table-wrap">
+            <table class="w-full min-w-[760px] text-right">
+                <thead>
+                    <tr>
+                        <th>کد و نام واحد</th>
+                        <th>واحد بالادست</th>
+                        <th>وضعیت</th>
+                        <th>شرح</th></tr>
+                </thead>
+                <tbody>
+                    <tr data-list-row data-department-id="aa41ed5f-86dc-4364-bdc9-b482a256c1b4" data-active="true">
+                        <td><a class="font-semibold text-slate-900 transition hover:text-blue-700" href="/workforce/departments/aa41ed5f-86dc-4364-bdc9-b482a256c1b4/">Wave C synthetic department</a><a class="block text-[11px] text-slate-500 hover:text-blue-700" dir="ltr"
+                                href="/workforce/departments/aa41ed5f-86dc-4364-bdc9-b482a256c1b4/">WAVE-C-HR</a></td>
+                        <td>—</td>
+                        <td>فعال</td>
+                        <td>—</td></tr>
+                    <tr data-list-row data-department-id="117fc1fc-a880-4012-b769-bfb7815c854a" data-active="true">
+                        <td><a class="font-semibold text-slate-900 transition hover:text-blue-700" href="/workforce/departments/117fc1fc-a880-4012-b769-bfb7815c854a/">Wave C synthetic HTTP department</a><a class="block text-[11px] text-slate-500 hover:text-blue-700" dir="ltr"
+                                href="/workforce/departments/117fc1fc-a880-4012-b769-bfb7815c854a/">WAVE-C-HTTP</a></td>
+                        <td>—</td>
+                        <td>فعال</td>
+                        <td>Bounded Development fixture</td></tr>
+                    <tr data-list-row data-department-id="ad46fed4-6c9a-44a4-89e4-808066f9bba9" data-active="true">
+                        <td><a class="font-semibold text-slate-900 transition hover:text-blue-700" href="/workforce/departments/ad46fed4-6c9a-44a4-89e4-808066f9bba9/">دفتر فنی و مهندسی</a><a class="block text-[11px] text-slate-500 hover:text-blue-700" dir="ltr"
+                                href="/workforce/departments/ad46fed4-6c9a-44a4-89e4-808066f9bba9/">TEC</a></td>
+                        <td>—</td>
+                        <td>فعال</td>
+                        <td>کنترل نقشه‌ها، برنامه‌ریزی و هماهنگی فنی پروژه‌ها</td></tr>
+                    <tr data-list-row data-department-id="2ecbd4ca-c272-4e0b-82a6-836d814c2342" data-active="true">
+                        <td><a class="font-semibold text-slate-900 transition hover:text-blue-700" href="/workforce/departments/2ecbd4ca-c272-4e0b-82a6-836d814c2342/">دفتر نظارت</a><a class="block text-[11px] text-slate-500 hover:text-blue-700" dir="ltr"
+                                href="/workforce/departments/2ecbd4ca-c272-4e0b-82a6-836d814c2342/">۰۰۴</a></td>
+                        <td>—</td>
+                        <td>فعال</td>
+                        <td>—</td></tr>
+                    <tr data-list-row data-department-id="65faea06-ae22-4e3b-bc9e-4ab92020168a" data-active="true">
+                        <td><a class="font-semibold text-slate-900 transition hover:text-blue-700" href="/workforce/departments/65faea06-ae22-4e3b-bc9e-4ab92020168a/">مدیریت اجرا</a><a class="block text-[11px] text-slate-500 hover:text-blue-700" dir="ltr"
+                                href="/workforce/departments/65faea06-ae22-4e3b-bc9e-4ab92020168a/">EXE</a></td>
+                        <td>—</td>
+                        <td>فعال</td>
+                        <td>مدیریت عملیات اجرایی و گروه‌های کارگاهی</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+        </main>

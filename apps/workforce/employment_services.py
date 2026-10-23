@@ -149,6 +149,15 @@ def own_employment_history(
         code=BusinessPermissionCode.EMPLOYMENT_RECORDS_VIEW_OWN,
     )
     subject = resolve_ess_subject(user=actor, organization=organization)
+    # PD-WC-04: an explicit legacy Employee.user link is additionally required.
+    # Person.user remains the existing ESS identity contract; neither link is inferred.
+    employee = subject.current_relationship.legacy_employee
+    if (
+        employee is None
+        or employee.organization_id != organization.pk
+        or employee.user_id != actor.pk
+    ):
+        raise PermissionDenied(DENIED)
     try:
         access = {
             a.document.pk: a

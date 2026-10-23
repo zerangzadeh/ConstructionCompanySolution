@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\docs\governance\uiux\authorization_reconciliation\http_revalidation.py", line 104, in <module>
+    check("uiux.wavec.portal", portal_path, [200], "Exact project invitation management granted")
+  File "E:\Construction_Company_Solution\docs\governance\uiux\authorization_reconciliation\http_revalidation.py", line 63, in check
+    assert observation["passed"], observation
+AssertionError: {'actor': 'uiux.wavec.portal', 'path': '/procurement/rfq-invitations/9ab10872-ad73-422f-b384-5a5c92d6fe45/portal/', 'method': 'GET', 'case': 'Exact project invitation management granted', 'status': 500, 'expected': [200], 'final_path': '/procurement/rfq-invitations/9ab10872-ad73-422f-b384-5a5c92d6fe45/portal/', 'csrf': None, 'response_sha256': 'd0d35cfc5b6119d8fa61c73f5acce72dd9a03739935c29259df01bb33b7ebdd9', 'passed': False}

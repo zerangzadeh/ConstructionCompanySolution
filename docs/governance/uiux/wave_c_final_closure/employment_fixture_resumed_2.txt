@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\docs\governance\uiux\wave_c_final_closure\employment_fixture.py", line 54, in <module>
+    revoke_platform_role(actor=User.objects.get(username='superuser'),approver=User.objects.get(username='superuser'),assignment_id=assignment.pk,reason='Final synthetic employment scan complete; PD-WC-07 duty revoked')
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\access_services.py", line 899, in revoke_platform_role
+    raise PermissionDenied("\u062a\u0623\u06cc\u06cc\u062f \u0645\u0633\u062a\u0642\u0644 Superuser \u0627\u0644\u0632\u0627\u0645\u06cc \u0627\u0633\u062a.")
+django.core.exceptions.PermissionDenied: \u062a\u0623\u06cc\u06cc\u062f \u0645\u0633\u062a\u0642\u0644 Superuser \u0627\u0644\u0632\u0627\u0645\u06cc \u0627\u0633\u062a.

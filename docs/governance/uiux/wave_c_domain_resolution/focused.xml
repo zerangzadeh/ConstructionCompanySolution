@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="44" time="55.463" timestamp="2026-10-22T21:24:20.677276+03:30" hostname="Zerangzadeh"><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_acceptance_creates_no_membership_and_context_is_exact_scope" time="7.203" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_accepted_identity_is_denied_after_email_rebind" time="0.818" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_ambiguous_email_and_internal_membership_fail_closed" time="0.774" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_authorized_invitation_management_view_rechecks_object_scope" time="1.696" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_email_impersonation_and_cross_tenant_invitation_are_denied" time="1.103" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_invitation_management_is_default_ungranted_and_token_hash_only" time="1.204" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_new_submission_supersedes_without_mutating_history" time="1.356" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_revocation_is_append_only_and_immediately_denies_access" time="0.981" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_submission_reuses_quote_revision_and_is_idempotent" time="1.353" /><testcase classname="apps.procurement.test_portal_payload.PortalPayloadTests" name="test_bad_mime_magic_empty_or_unsupported_file_rejected" time="1.463" /><testcase classname="apps.procurement.test_portal_payload.PortalPayloadTests" name="test_client_digest_mismatch_rejects_without_receipt_or_retained_content" time="1.122" /><testcase classname="apps.procurement.test_portal_payload.PortalPayloadTests" name="test_expired_or_other_principal_cannot_stage_a_file" time="0.729" /><testcase classname="apps.procurement.test_portal_payload.PortalPayloadTests" name="test_http_requires_file_uses_multipart_and_hides_digest" time="0.990" /><testcase classname="apps.procurement.test_portal_payload.PortalPayloadTests" name="test_replay_checks_actual_retained_content" time="1.004" /><testcase classname="apps.procurement.test_portal_payload.PortalPayloadTests" name="test_retained_bytes_digest_provenance_quarantine_and_no_tenant_membership" time="0.865" /><testcase classname="apps.procurement.test_portal_payload.PortalPayloadTests" name="test_storage_or_evidence_failure_rolls_back_rows_and_cleans_files" time="0.961" /><testcase classname="apps.payroll.test_timesheet_inputs.TimesheetInputTests" name="test_missing_mapping_or_inexact_unit_conversion_fails_closed" time="0.333" /><testcase classname="apps.payroll.test_timesheet_inputs.TimesheetInputTests" name="test_nonapproved_or_out_of_period_source_denied" time="0.209" /><testcase classname="apps.payroll.test_timesheet_inputs.TimesheetInputTests" name="test_selector_has_no_manual_source_or_quantity_fields" time="0.221" /><testcase classname="apps.payroll.test_timesheet_inputs.TimesheetInputTests" name="test_source_derives_quantity_identity_and_provenance_then_locks" time="0.267" /><testcase classname="apps.payroll.test_timesheet_inputs.TimesheetInputTests" name="test_unauthorized_actor_denied_and_source_tamper_prevents_lock" time="0.221" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_accepts_one_immutable_original_without_mutating_close_manifest" time="1.375" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_audit_failure_rolls_back_database_and_protected_bytes" time="1.197" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_code_owned_item_count_and_package_limits_fail_closed" time="1.169" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_cross_tenant_target_is_denied_without_business_evidence" time="0.883" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_file_policy_fails_closed_with_redacted_audit" time="0.924" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_idempotency_hash_validation_ooxml_and_attachment_identity" time="1.169" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_permission_has_no_owner_admin_platform_or_uploader_bypass" time="1.322" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_permission_is_intersected_with_project_scope" time="1.062"><failure message="django.db.utils.IntegrityError: duplicate key value violates unique constraint &quot;membership_one_unrevoked_role&quot;&#10;DETAIL:  Key (membership_id, role_id)=(8e0f2ff7-534a-49b1-9344-6192b0f6b8d9, d85d639b-4eb8-4f37-a1c4-9f25dbd5861f) already exists.">.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UniqueViolation: duplicate key value violates unique constraint "membership_one_unrevoked_role"
+E   DETAIL:  Key (membership_id, role_id)=(8e0f2ff7-534a-49b1-9344-6192b0f6b8d9, d85d639b-4eb8-4f37-a1c4-9f25dbd5861f) already exists.
+
+The above exception was the direct cause of the following exception:
+apps\procurement\test_p5_s08_sealed_custody.py:275: in test_permission_is_intersected_with_project_scope
+    MembershipRoleAssignment.objects.create(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+.venv\Lib\site-packages\django\db\models\base.py:902: in save
+    self.save_base(
+.venv\Lib\site-packages\django\db\models\base.py:1008: in save_base
+    updated = self._save_table(
+.venv\Lib\site-packages\django\db\models\base.py:1169: in _save_table
+    results = self._do_insert(
+.venv\Lib\site-packages\django\db\models\base.py:1210: in _do_insert
+    return manager._insert(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:1873: in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1882: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.IntegrityError: duplicate key value violates unique constraint "membership_one_unrevoked_role"
+E   DETAIL:  Key (membership_id, role_id)=(8e0f2ff7-534a-49b1-9344-6192b0f6b8d9, d85d639b-4eb8-4f37-a1c4-9f25dbd5861f) already exists.</failure></testcase><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_sealed_content_is_denied_from_generic_document_paths_and_admin" time="2.125" /><testcase classname="apps.commercial.test_cep032.TenderBidLifecycleTests" name="test_exact_transitions_and_immutable_submitted_history" time="0.177" /><testcase classname="apps.commercial.test_cep032.TenderBidLifecycleTests" name="test_policy_absence_and_permission_fail_closed" time="0.029" /><testcase classname="apps.commercial.test_cep032.TenderBidLifecycleTests" name="test_tenant_isolation_and_no_cross_domain_effect" time="0.035" /><testcase classname="apps.commercial.test_cep032.TenderBidLifecycleTests" name="test_workspace_empty_detail_and_policy_absent_error" time="0.233" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalConcurrencyTests" name="test_concurrent_identical_submission_creates_one_receipt" time="8.569" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyConcurrencyTests" name="test_equivalent_retries_converge_and_distinct_attachments_do_not_collapse" time="9.653" /></testsuite></testsuites>

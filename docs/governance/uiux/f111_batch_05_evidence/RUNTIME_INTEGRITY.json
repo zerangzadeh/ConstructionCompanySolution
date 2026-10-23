@@ -1,0 +1,48 @@
+{
+  "tables": 519,
+  "preexisting_rows_changed": [],
+  "preparation_and_authorized_runtime_additions": {
+    "sessions.Session": 7,
+    "audit.AuditEvent": 37,
+    "procurement.PurchaseOrder": 5,
+    "procurement.PurchaseOrderItem": 5,
+    "procurement.GoodsReceipt": 5,
+    "procurement.GoodsReceiptItem": 5,
+    "procurement.PurchaseOrderVersion": 5,
+    "procurement.PurchaseOrderVersionLine": 5,
+    "inventory.Warehouse": 2,
+    "inventory.StockTransaction": 2
+  },
+  "runtime_deltas": [
+    "sessions.Session",
+    "audit.AuditEvent",
+    "inventory.StockTransaction"
+  ],
+  "authorized_drafts": [
+    {
+      "kind": "transfer",
+      "id": "15d27cc7-3348-4076-9a0c-4139cffa795a",
+      "status": "draft",
+      "project": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+      "real_authenticated_csrf": true,
+      "posted": false
+    },
+    {
+      "kind": "receipt",
+      "id": "964c000c-9f5d-40f5-8ecf-1c957d5d15c0",
+      "status": "draft",
+      "project": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+      "real_authenticated_csrf": true,
+      "posted": false
+    }
+  ],
+  "unauthorized_mutations": 0,
+  "retained_failure_audits": 3,
+  "unauthorized_success_audits": 0,
+  "posted_stock_or_value_changes": 0,
+  "authority_unchanged": true,
+  "authority_fingerprint_before": "91bfa62e7a5f5fe8a0bc3a0966c6dce67912ea325d2a47d9e1d4db5c43df5c76",
+  "authority_fingerprint_after": "91bfa62e7a5f5fe8a0bc3a0966c6dce67912ea325d2a47d9e1d4db5c43df5c76",
+  "temporary_authority": "NONE; cleanup not required",
+  "last_login_excluded": true
+}

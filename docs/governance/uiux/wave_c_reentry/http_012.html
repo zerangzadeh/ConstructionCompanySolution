@@ -1,0 +1,84 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+ 
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">ثبت واحد سازمانی</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">منابع انسانی</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">ثبت واحد سازمانی</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">شرکت سازه‌پردازان پارس</p>
+        
+    </div>
+    
+</header>
+
+<form class="erp-surface mt-6 max-w-4xl rounded-xl p-5" method="post">
+    <!-- CSRF omitted -->
+    
+
+    <div class="grid gap-4 sm:grid-cols-2">
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_code">
+        کد
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="code" maxlength="50" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" required id="id_code">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_name">
+        نام
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="name" maxlength="255" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" required id="id_name">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_parent">
+        واحد سازمانی والد
+    </label>
+    <select name="parent" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" id="id_parent">
+  <option value="" selected>---------</option>
+
+  <option value="aa41ed5f-86dc-4364-bdc9-b482a256c1b4">WAVE-C-HR - Wave C synthetic department</option>
+
+  <option value="117fc1fc-a880-4012-b769-bfb7815c854a">WAVE-C-HTTP - Wave C synthetic HTTP department</option>
+
+  <option value="ad46fed4-6c9a-44a4-89e4-808066f9bba9">TEC - دفتر فنی و مهندسی</option>
+
+  <option value="2ecbd4ca-c272-4e0b-82a6-836d814c2342">۰۰۴ - دفتر نظارت</option>
+
+  <option value="65faea06-ae22-4e3b-bc9e-4ab92020168a">EXE - مدیریت اجرا</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_description">
+        توضیحات
+        
+    </label>
+    <textarea name="description" cols="40" rows="3" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" id="id_description">
+</textarea>
+    
+    
+</div>
+</div>
+    <div class="mt-6 flex gap-3"><button class="erp-btn erp-btn--primary" type="submit">ثبت</button><a class="erp-btn erp-btn--secondary" href="/workforce/departments/">انصراف</a></div>
+</form>
+
+        </main>

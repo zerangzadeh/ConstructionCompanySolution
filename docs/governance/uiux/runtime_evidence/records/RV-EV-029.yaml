@@ -1,0 +1,97 @@
+schema_version: '1.0'
+record:
+  evidence_id: RV-EV-029
+  scenario_id: RV-010
+  wave: B
+  target: Journal form/dimensions/hierarchy
+  executed_at: '2026-10-21T22:51:09.547000+03:30'
+  runtime:
+    environment_name: Development
+    base_url: http://127.0.0.1:8001
+    git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+    browser: Microsoft Edge (isolated real headless browser)
+    browser_version: 155.0.4283.62
+    viewport:
+    - width: 390
+      height: 844
+    - width: 1024
+      height: 768
+    - width: 1440
+      height: 900
+    device_scale_factor: 1
+  persona:
+    persona_id: P-05
+    test_user_alias: account.demo-construction-01.accountant
+    organization_alias: demo-construction-01
+    project_context_alias: Exact fields/session in linked observations; authority in BEFORE snapshot
+    site_context_alias: null
+    effective_permission_bundle_reference: diagnostics/TARGETED_RUNTIME_BEFORE.json#identities
+  preconditions:
+  - Frozen baseline and Development verified; provisioning authorization and 514 model digests match.
+  - Same retained actual identities; no role/fixture changes.
+  steps:
+  - journal-form
+  - dimension-bearing-draft
+  - journal-project-A
+  - journal-project-B
+  - journal-mobile
+  - journal-form-tablet
+  - styled-journal-detail
+  - styled-journal-mobile
+  - styled-journal-form-tablet
+  - styled-journal-form
+  expected_result:
+  - Scoped choices/context, preserved query/business dimensions, accessible task guidance.
+  actual_result:
+  - Canonical Accountant entry works. Inline line form retains independent Site/WBS and stale Site A after Project
+    B. Source/evidence/reconciliation keys exposed. Two saved balanced lines have actual project/site/WBS, but summary
+    shows dash plus UUID. Styled sampled mobile has no page-level overflow.
+  accessibility:
+    keyboard_only: false
+    focus_visible: Representative focus samples in diagnostics; no assistive-technology certification
+    landmarks_ok: true
+    labels_ok: null
+    notes: Styled replacements govern visual claims. Early unstyled layout evidence excluded.
+  responsive:
+    desktop: true
+    tablet_or_narrow: true
+    mobile: true
+    notes: Representative viewports only.
+  authorization:
+    ui_visibility_observed: true
+    server_authorization_verified_when_applicable: false
+    cross_tenant_leakage_observed: false
+    object_scope_leakage_observed: false
+    unauthorized_access_observed: false
+    notes: Selector metadata leak; unauthorized write/direct-object bypass not proved. No business POST submitted.
+  result: FAIL_UIUX
+  previous_status: BLOCKED_PERMISSION / TEST_DATA
+  existing_finding_ids:
+  - UIUX-F-030
+  - UIUX-F-074
+  - UIUX-F-075
+  new_finding_ids:
+  - UIUX-F-112
+  needs_domain_review: false
+  screenshots:
+  - screenshots/RV-EV-029__styled-journal-detail__1440x900.png
+  - screenshots/RV-EV-029__styled-journal-mobile__390x844.png
+  - screenshots/RV-EV-029__styled-journal-form-tablet__1024x768.png
+  - screenshots/RV-EV-029__styled-journal-form__1440x900.png
+  excluded_visual_captures:
+  - screenshots/RV-EV-029__journal-form__1440x900.png
+  - screenshots/RV-EV-029__dimension-bearing-draft__1440x900.png
+  - screenshots/RV-EV-029__journal-project-A__1440x900.png
+  - screenshots/RV-EV-029__journal-project-B__1440x900.png
+  - screenshots/RV-EV-029__journal-mobile__390x844.png
+  - screenshots/RV-EV-029__journal-form-tablet__1024x768.png
+  network_or_console_evidence:
+  - diagnostics/TARGETED_RUNTIME_BROWSER_OBSERVATIONS.json
+  - diagnostics/TARGETED_RUNTIME_CAPTURE_EXCEPTION.json
+  mutation_performed: true
+  mutation_record_or_cleanup: Authentication/session bookkeeping and governed context selection only. No business/admin
+    write, fixture/authority change or cleanup.
+  coverage_limits:
+  - 'C/D legitimately visible to organization-scoped P05. No journal/line created/submitted/posted. /line/ GET 405:
+    form is inline on detail. Scoped P06 entry remains blocked.'
+  notes: Original Wave A history preserved; initial unstyled/transient captures are not final visual conclusions.

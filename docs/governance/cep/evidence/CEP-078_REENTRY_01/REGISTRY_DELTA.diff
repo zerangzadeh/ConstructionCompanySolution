@@ -1,0 +1,123 @@
+--- Registry at reentry01 start
++++ Registry after reentry01
+@@ -160,6 +160,19 @@
+     reconciled_at: '2026-10-20'
+     closure_review: V1_IMPLEMENTATION_CLOSURE_20261020.md
+     note: CEP046/063/068 are now COMPLETE. Prior incomplete-contributor rationale is historical. Global capability/activation and browser/UAT gate evidence has not been requalified; NOT_READY retained without implying an implementation blocker or Production readiness.
++    relevant_capability_convergence:
++      CEP-078:
++        status: PASS
++        evaluated_at: '2026-10-23'
++        source: OBJECTIVE_CURRENT_CONVERGENCE_ASSESSMENT
++        evidence: docs/governance/cep/evidence/CEP-078_REENTRY_01/GATE07_CONVERGENCE.json
++        scope: Development implemented shared UI and ESS frameworks plus available and conditional-unavailable states; all19 required IMB contributions mapped
++        current_tests: 42_DISTINCT_PASS_WITH_ONE_EXPORT_ONLY_RETRY
++        source_authority: PRESERVED
++        external_activation: EXT0014_0016_0019_REQUIRED_ONLY_WHERE_AFFECTED_ACTIVATION_APPLIES_NO_NEW_ACTIVATION
++        final_browser_runtime: UTV
++        global_gate_pass_inferred: false
++        human_signoff_or_production: NOT_EXECUTED
+ authorization_batches:
+   AUTH-BATCH-003:
+     execution_mode: SERIAL
+@@ -4322,12 +4335,12 @@
+   CEP-078:
+     title: Browser, accessibility and responsive runtime verification
+     phase: VERIFICATION_UAT
+-    dependency_status: MANDATORY_CEP003_CEP017_COMPLETE_ENTRY_GATE_AND_EXT0024_UNSATISFIED
+-    eligibility_status: BLOCKED_GATE07_AND_UNVERIFIED_EXT0024
++    dependency_status: MANDATORY_PREREQUISITES_AND_SCOPED_GATE07_SUPPORTED_EXT0024_UNSATISFIED
++    eligibility_status: BLOCKED_EXT0024_SAFARI_ENVIRONMENT_AND_EXACT_RUNTIME_IDENTITIES
+     authorization:
+       status: AUTHORIZED_FOR_ENTRY_AND_CONDITIONAL_NON_PRODUCTION_VERIFICATION
+       authorization_id: null
+-      source: Human request 2026-10-23 to continue through CEP078 supported terminal reconciliation; canonical entry conditions not waived
++      source: Human request 2026-10-23 to clear CEP078 entry blockers and execute only when eligible; prior blocked history preserved
+     execution:
+       status: NOT_STARTED
+       lifecycle: BLOCKED_BEFORE_ENTRY
+@@ -4338,15 +4351,14 @@
+       status: UNEXECUTED_ENTRY_BLOCKED
+     dod: NOT_MET_ENTRY_BLOCKED
+     blockers:
+-    - CEP-078-FINDING-001 / BLOCKER-DEPENDENCY / GATE-07 NOT_READY; current full or capability-scoped convergence clearance not established
+-    - CEP-078-FINDING-002 / BLOCKER-EXTERNAL / EXT-0024 approved supported browser-device-viewport-accessibility matrix and exact runtime build-version not established
+-    remaining_utv:
+-    - Canonical CEP078 cross-browser-responsive-accessibility runtime outcome and six scenario acceptance criteria remain unexecuted
+-    - Exact full browser versions and approved CEP matrix; original audit version and representative-equivalence limitations retained
+-    - Any approved tablet keyboard or semantic-state coverage not directly evidenced; no full WCAG-screen-reader-all-route claim
+-    completion_report:
+-      path: docs/governance/cep/reports/CEP-078_COMPLETION_REPORT.md
+-      evidence_presence: ENTRY_REVIEW_AND_REUSE_MAPPING_ONLY_NO_CEP_RUNTIME_EXECUTION
++    - CEP-078-FINDING-002 / BLOCKER-EXTERNAL / EXT-0024 full named Chrome-Edge-Safari matrix defined; available Safari OS-device-browser-engine runtime and exact execution identities absent
++    remaining_utv:
++    - Safari test environment and exact OS-device-full-browser-engine identity; Chrome-Edge actual observed execution identities not replaced by installed binary metadata
++    - Complete browser-accessibility-responsive matrix binding to existing safe canonical persona-route-state fixtures
++    - All six canonical CEP078 browser runtime acceptance criteria unexecuted; no old RV result promoted to CEP execution
++    completion_report:
++      path: docs/governance/cep/evidence/CEP-078_REENTRY_01/CEP-078_COMPLETION_REPORT.md
++      evidence_presence: CURRENT_SCOPED_GATE_PROOF_MATRIX_AND_IDENTITY_PARTIAL_NO_CEP_BROWSER_EXECUTION
+     git:
+       committed: false
+       commit_sha: null
+@@ -4358,23 +4370,33 @@
+       sha: null
+     updated_at: '2026-10-23'
+     entry_review:
+-      evidence: docs/governance/cep/evidence/CEP-078_ENTRY_REVIEW.json
+-      acceptance_mapping: docs/governance/cep/evidence/CEP-078_ACCEPTANCE_MAPPING.csv
++      evidence: docs/governance/cep/evidence/CEP-078_REENTRY_01/ENTRY_REVIEW.json
++      acceptance_mapping: docs/governance/cep/evidence/CEP-078_REENTRY_01/CEP-078_ACCEPTANCE_MAPPING.csv
++      prior_blocked_review: docs/governance/cep/evidence/CEP-078_ENTRY_REVIEW.json
+       branch: main
+       head: 43ac319c6e73e48ca9626461b73987922c498ec3
+       result: BLOCKED_BEFORE_ENTRY
+       canonical_report_verdict: EXECUTION FAILED
+-      verdict_semantics: Entry requirements prevent execution; not a runtime scenario test failure
+-      implementation_prerequisites: CEP003_AND_CEP017_AVAILABLE
+-      gate07: NOT_READY_RETAINED_NO_GLOBAL_OR_SCOPED_PASS_INFERRED
+-      ext0024: NOT_ESTABLISHED
+-      accepted_artifact_hashes: 340_PASS_0_MISMATCH
+-      accepted_product_source_hashes: 1497_PASS_0_MISMATCH
++      verdict_semantics: External environment entry blocker; no browser scenario executed or failed
++      gate07: PASS_FOR_CEP078_DEVELOPMENT_IMPLEMENTED_CAPABILITY_SCOPE_GLOBAL_ACTIVATION_NOT_GRANTED
++      ext0024: MATRIX_DEFINED_SAFARI_ENVIRONMENT_AND_EXACT_RUNTIME_IDENTITIES_BLOCKED
++      finding001: RESOLVED_FOR_SCOPED_ENTRY
++      finding002: OPEN_EXACT_ENVIRONMENT_GAP
++      current_gate_cases: 42_DISTINCT_PASS_WITH_ONE_EXPORT_ONLY_RETRY
+       verification_execution: NOT_STARTED
+     history:
+     - date: '2026-10-23'
+       status: ENTRY_REVIEW_BLOCKED
+       reason: Current Human CEP078-only non-production request reviewed at main43ac319 with accepted dirty UIUX work. Prompt identity, prerequisite implementation and340 accepted artifacts plus1497 final source hashes verified. GATE07 remains NOT_READY; EXT0024 matrix-exact-version readiness unproved. Accepted Waves and RV025 PASS retained under original RV IDs; no retrospective CEP runtime promotion. AC unexecuted, DoD not met; final report uses EXECUTION FAILED for blocked entry, not a runtime failure. No product-data-migration-browser-Git writes, CEP079, Production or Human Sign-off.
++    - date: '2026-10-23'
++      status: SCOPED_GATE07_CONVERGENCE_VERIFIED
++      reason: Reentry01 maps all 19 canonical contributions to actual sources and current tests. 42 distinct cases PASS; initial 41 PASS and one legacy exporter encoding failure retained, then original failed case passes with exporter destination isolated. Source and business assertions unchanged. Conditional Leave-Mission-certificate activations stay closed where absent. Canonical scoped emergence clears Finding001 for CEP078 Development entry only; global GATE07 remains NOT_READY and final browser evidence UTV.
++    - date: '2026-10-23'
++      status: EXT0024_MATRIX_DEFINED_ENVIRONMENT_BLOCKED
++      reason: Canonical UIGAP025 explicitly names unverified Chrome-Edge-Safari behavior across critical journeys. All three browsers, 33 source scenario blocks and three CSS viewport classes retained. Exact accepted dirty application/configuration identity and installed Chrome155.0.8059.82-Edge155.0.4283.62 binary versions retained. Available provider and standard-path inventory has no Safari runtime or exact OS-device-browser-engine identity. No reduced Chromium-only matrix or runtime PASS.
++    - date: '2026-10-23'
++      status: ENTRY_REVIEW_BLOCKED
++      reason: Both entry blockers did not clear. Finding001 resolved for scoped convergence; Finding002 remains open with exact Safari/runtime readiness gap. Runtime NOT_STARTED; all six AC UNEXECUTED; DoD NOT_MET_ENTRY_BLOCKED. New reentry completion report and manifests retained, prior blocked artifacts unchanged. No product-policy-permission-UI change, CEP079, Production, Human Sign-off or Git staging/integration command. STOP after final reconciliation.
+   CEP-079:
+     title: null
+     phase: VERIFICATION_UAT
+@@ -4706,15 +4728,15 @@
+   verified_build_eligible_unblocked: []
+   verified_verification_eligible_unblocked: []
+   next_autonomous_cep: null
+-  current_session_continuation: "STOP_CEP078_BLOCKED_AFTER_FINAL_RECONCILIATION"
++  current_session_continuation: "STOP_CEP078_REENTRY01_EXT0024_BLOCKED_AFTER_FINAL_RECONCILIATION"
+   current_independent_cep: null
+   next_entry_review_candidate: null
+-  next_candidate_full_entry_eligibility: "CEP078_ENTRY_REVIEW_COMPLETE_BLOCKED_GATE07_EXT0024"
++  next_candidate_full_entry_eligibility: "CEP078_SCOPED_GATE07_PASS_EXT0024_SAFARI_AND_EXACT_IDENTITIES_BLOCKED"
+   conditional_dependency_entry_review_candidates:
+   - CEP-073
+   - CEP-079
+   conditional_dependency_rule: Evaluate canonical scope conditions; no condition or execution authority inferred
+-  boundary_reason: "Current Human scope is CEP078 only through supported terminal state; entry blocked, no CEP079 or Production authority"
++  boundary_reason: "Current CEP078-only request assessed exact convergence; scoped GATE07 clears, EXT0024 full matrix environment incomplete; no browser execution or downstream authority"
+   resume_cep_after_blocker_resolution: "CEP-078"
+   independent_candidates_entry_status: "NOT_EXECUTED_OUTSIDE_CURRENT_CEP078_ONLY_SCOPE"
+   cep057_resume_condition: COMPLETE

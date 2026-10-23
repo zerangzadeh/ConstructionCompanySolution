@@ -1,0 +1,198 @@
+[
+  {
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/",
+    "method": "GET",
+    "case": "RFQ buyer retains receiving/preparation and opening action",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/",
+    "csrf": null,
+    "response_sha256": "16061390f453b2a29e7411b891ee7ef4651e14b7d7bd1af675b808513813323a",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.opening-approver",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/",
+    "method": "GET",
+    "case": "Independent RFQ approval duty",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/",
+    "csrf": null,
+    "response_sha256": "488d1ddada6a577141ae73d7dd7d61b6e792e0db360570f38289eddc69631f21",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.custodian",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/",
+    "method": "GET",
+    "case": "Separate RFQ custody duty",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/",
+    "csrf": null,
+    "response_sha256": "f2d38ccd86bd400805a636c76db012d5fe4e24fcabd61756cf8af648f1ff07fe",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/request_opening/",
+    "method": "GET",
+    "case": "Newly authorized opening form",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/request_opening/",
+    "csrf": null,
+    "response_sha256": "b59921e93f2e92268243bacc28d9a88782fc08df7b765d59be4cc5c0491a955b",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/request_opening/",
+    "method": "POST",
+    "case": "Existing future-close/source lifecycle guard retained",
+    "status": 400,
+    "expected": [
+      400
+    ],
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/request_opening/",
+    "csrf": true,
+    "response_sha256": "6eb758f282e1366d2ef3bd7e5a29955742fe4e091f332882f0e4003beaa5c1b6",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.hr",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/request_opening/",
+    "method": "GET",
+    "case": "Unassigned HR actor cannot open RFQ",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/request_opening/",
+    "csrf": null,
+    "response_sha256": "84d2caa088aa53a4a6f436a2a39078cfa0e6a77e878ec761d94ecc3cce931635",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/request_opening/",
+    "method": "POST",
+    "case": "Opening POST requires CSRF",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/request_opening/",
+    "csrf": false,
+    "response_sha256": "a8c1c826df1bde8bf5b1c745b1529d708cdfc9d6d56b242b95185e513abaea27",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.employment",
+    "path": "/workforce/employment/",
+    "method": "GET",
+    "case": "Employment manager granted access",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final_path": "/workforce/employment/",
+    "csrf": null,
+    "response_sha256": "e60a146c85605e65ae4454165c3fa87a0550df75f05b64c6ba52d2d91321fa46",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.employment",
+    "path": "/workforce/employment/",
+    "method": "POST",
+    "case": "Employment invalid form redisplays with no write",
+    "status": 400,
+    "expected": [
+      400
+    ],
+    "final_path": "/workforce/employment/",
+    "csrf": true,
+    "response_sha256": "1783b1f220e916482fba89306c9cf6100f707ba6bc35006638a491e4af71746b",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.employment",
+    "path": "/workforce/employment/",
+    "method": "POST",
+    "case": "Employment POST requires CSRF",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "final_path": "/workforce/employment/",
+    "csrf": false,
+    "response_sha256": "a8c1c826df1bde8bf5b1c745b1529d708cdfc9d6d56b242b95185e513abaea27",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/employment/",
+    "method": "GET",
+    "case": "HR foundation role does not imply Employment authority",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "final_path": "/workforce/employment/",
+    "csrf": null,
+    "response_sha256": "833f124d91bb330b48162e090f5f1d359efab0c21e080c454e8b41c3c579b049",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.time",
+    "path": "/workforce/ess/employment/",
+    "method": "GET",
+    "case": "Own history uses existing explicitly linked identity",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final_path": "/workforce/ess/employment/",
+    "csrf": null,
+    "response_sha256": "f42611afa31363c49976c90e94daab7f7f02bbaf7b03dfcd0d26c51e397e7333",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/ess/employment/",
+    "method": "GET",
+    "case": "Unassigned user cannot read own-history capability",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "final_path": "/workforce/ess/employment/",
+    "csrf": null,
+    "response_sha256": "247900cdea99b3505a6b562911d7fe6fe9e5b46950a8fea16748afc5a90640fd",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.portal",
+    "path": "/procurement/rfq-invitations/9ab10872-ad73-422f-b384-5a5c92d6fe45/portal/",
+    "method": "GET",
+    "case": "Exact project invitation management granted",
+    "status": 500,
+    "expected": [
+      200
+    ],
+    "final_path": "/procurement/rfq-invitations/9ab10872-ad73-422f-b384-5a5c92d6fe45/portal/",
+    "csrf": null,
+    "response_sha256": "d0d35cfc5b6119d8fa61c73f5acce72dd9a03739935c29259df01bb33b7ebdd9",
+    "passed": false
+  }
+]

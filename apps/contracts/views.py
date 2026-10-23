@@ -26,7 +26,10 @@ from apps.contracts.services import (
     create_contract,
     get_organization_contracts,
 )
-from apps.organizations.authorization import has_business_permission
+from apps.organizations.authorization import (
+    get_active_membership,
+    has_business_permission,
+)
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -103,7 +106,13 @@ def contract_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.CONTRACTS_CREATE)
 def contract_create(request: HttpRequest) -> HttpResponse:
-    form = ContractForm(request.POST or None, organization=request.organization)
+    form = ContractForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+    )
     if request.method == "POST" and form.is_valid():
         data = form.cleaned_data
         try:

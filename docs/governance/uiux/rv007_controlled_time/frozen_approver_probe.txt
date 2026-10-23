@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\docs\governance\uiux\rv007_controlled_time\frozen_approver_probe.py", line 32, in <module>
+    member = OrganizationMembership.objects.create(organization=org, user=user, role=MembershipRole.TENANT_MANAGER, status=MembershipStatus.ACTIVE)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "C:\Users\azera\AppData\Local\Temp\bonira-wave-c-head-9ta7fyjx\apps\organizations\models.py", line 2382, in save
+    self.role_definition = OrganizationRole.objects.get(code=self.role)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 635, in get
+    raise self.model.DoesNotExist(
+apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.

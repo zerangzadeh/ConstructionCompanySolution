@@ -18,6 +18,20 @@ P = BusinessPermissionCode
 
 PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
     PermissionResource(
+        "support", "Tenant support and attention",
+        ("support.Notification", "support.SupportCase", "support.SupportCaseEvent",
+         "support.SupportEvidence", "support.SupportAccessRequest"),
+        (P.SUPPORT_CASE_VIEW, P.SUPPORT_CASE_CREATE, P.SUPPORT_CASE_UPDATE,
+         P.SUPPORT_CASE_RESOLVE, P.SUPPORT_CASE_REOPEN, P.SUPPORT_CASE_ASSIGN,
+         P.SUPPORT_EVIDENCE_LINK, P.SUPPORT_EVIDENCE_SENSITIVE_VIEW,
+         P.SUPPORT_CALENDAR_VIEW, P.SUPPORT_NOTIFICATIONS_VIEW,
+         P.SUPPORT_NOTIFICATIONS_ACKNOWLEDGE, P.SUPPORT_AUDIT_RECONCILE,
+         P.SUPPORT_ACCESS_REQUEST, P.SUPPORT_ACCESS_USE,
+         P.SUPPORT_ACCESS_TENANT_CONFIRM, P.SUPPORT_ACCESS_REVOKE,
+         P.SUPPORT_ACCESS_PLATFORM_APPROVE),
+        ("apps.support.services", "apps.support.views"),
+    ),
+    PermissionResource(
         "leave_authority", "سیاست و مانده مرخصی",
         ("workforce.LeavePolicyVersion", "workforce.LeaveBalanceEntry"),
         (P.LEAVE_POLICIES_MANAGE, P.LEAVE_BALANCES_MANAGE, P.LEAVE_BALANCES_VIEW),
@@ -2016,6 +2030,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
 
 PERMISSION_MANAGED_APPS = frozenset(
     {
+        "support",
         "organizations",
         "parties",
         "materials",

@@ -2,9 +2,15 @@ from django import forms
 
 from apps.accounts.models import User
 from apps.daily_reports.models import DailyReport
-from apps.organizations.models import MembershipStatus, Organization
+from apps.organizations.authorization import scope_queryset
+from apps.organizations.form_scoping import scoped_projects_for_form
+from apps.organizations.models import (
+    MembershipStatus,
+    Organization,
+    OrganizationMembership,
+)
 from apps.parties.models import BusinessParty
-from apps.projects.models import Activity, Project, ProjectPhase, ProjectSite
+from apps.projects.models import Activity, ProjectPhase, ProjectSite
 from apps.safety.models import SafetyIncident
 from apps.workforce.models import Employee
 from core.forms import JalaliDateMixin
@@ -44,27 +50,51 @@ class SafetyIncidentForm(_StyledForm, forms.ModelForm):
         }
 
     def __init__(
-        self, *args: object, organization: Organization, **kwargs: object
+        self,
+        *args: object,
+        organization: Organization,
+        membership: OrganizationMembership | None = None,
+        **kwargs: object,
     ) -> None:
         super().__init__(*args, **kwargs)
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization, deleted_at__isnull=True
-        )
-        self.fields["site"].queryset = ProjectSite.objects.filter(
-            organization=organization, is_active=True
-        )
-        self.fields["phase"].queryset = ProjectPhase.objects.filter(
-            organization=organization
-        )
-        self.fields["activity"].queryset = Activity.objects.filter(
-            organization=organization, archived_at__isnull=True, is_active=True
-        )
-        self.fields["daily_report"].queryset = DailyReport.objects.filter(
-            organization=organization
-        )
+        for protected in ("project", "site", "phase", "activity", "daily_report"):
+            self.fields[protected].queryset = self.fields[protected].queryset.none()
         for optional in ("site", "phase", "activity", "daily_report"):
             self.fields[optional].required = False
         self._style_fields()
+        if not isinstance(membership, OrganizationMembership) or (
+            membership.organization_id != organization.pk
+        ):
+            return
+        self.fields["project"].queryset = scoped_projects_for_form(
+            organization=organization, membership=membership
+        )
+        self.fields["site"].queryset = scope_queryset(
+            ProjectSite.objects.filter(organization=organization, is_active=True),
+            membership=membership,
+            project_lookup="project_id",
+            site_lookup="pk",
+        )
+        self.fields["phase"].queryset = scope_queryset(
+            ProjectPhase.objects.filter(organization=organization),
+            membership=membership,
+            project_lookup="site__project_id",
+            site_lookup="site_id",
+        )
+        self.fields["activity"].queryset = scope_queryset(
+            Activity.objects.filter(
+                organization=organization, archived_at__isnull=True, is_active=True
+            ),
+            membership=membership,
+            project_lookup="project_id",
+            site_lookup="site_id",
+        )
+        self.fields["daily_report"].queryset = scope_queryset(
+            DailyReport.objects.filter(organization=organization),
+            membership=membership,
+            project_lookup="project_id",
+            site_lookup="site_id",
+        )
 
 
 class SafetyIncidentAssignmentForm(_StyledForm, forms.Form):

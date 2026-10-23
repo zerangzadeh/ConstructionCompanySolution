@@ -1,0 +1,271 @@
+....FFFF.F.................FFFFFFFFFFFFFFFFF............... [ 64%]
+........................ [ 91%]
+........                                                     [100%]
+================================== FAILURES ===================================
+_ EquipmentServiceTests.test_assignment_lifecycle_preserves_history_and_derived_status _
+apps\equipment\tests.py:207: in test_assignment_lifecycle_preserves_history_and_derived_status
+    assignment = assign_equipment(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\equipment\services.py:279: in assign_equipment
+    _require_permission(
+apps\equipment\services.py:74: in _require_permission
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0645\u062f\u06cc\u0631\u06cc\u062a \u062a\u062c\u0647\u06cc\u0632\u0627\u062a \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ EquipmentServiceTests.test_assignment_service_rejects_cross_tenant_and_overlap _
+apps\equipment\tests.py:246: in test_assignment_service_rejects_cross_tenant_and_overlap
+    assign_equipment(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\equipment\services.py:279: in assign_equipment
+    _require_permission(
+apps\equipment\services.py:74: in _require_permission
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0645\u062f\u06cc\u0631\u06cc\u062a \u062a\u062c\u0647\u06cc\u0632\u0627\u062a \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+__ EquipmentServiceTests.test_create_and_scoped_read_enforce_rbac_and_audit ___
+apps\equipment\tests.py:173: in test_create_and_scoped_read_enforce_rbac_and_audit
+    equipment = create_equipment(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\equipment\services.py:149: in create_equipment
+    _require_permission(
+apps\equipment\services.py:74: in _require_permission
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0645\u062f\u06cc\u0631\u06cc\u062a \u062a\u062c\u0647\u06cc\u0632\u0627\u062a \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ EquipmentServiceTests.test_maintenance_lifecycle_updates_equipment_and_audits _
+apps\equipment\tests.py:275: in test_maintenance_lifecycle_updates_equipment_and_audits
+    record = create_maintenance_record(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\equipment\services.py:453: in create_maintenance_record
+    _require_permission(
+apps\equipment\services.py:74: in _require_permission
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0645\u062f\u06cc\u0631\u06cc\u062a \u062a\u062c\u0647\u06cc\u0632\u0627\u062a \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_______ EquipmentPanelTests.test_owner_can_open_scoped_equipment_pages ________
+apps\equipment\tests.py:343: in test_owner_can_open_scoped_equipment_pages
+    self.assertEqual(self.client.get(reverse("equipment:list")).status_code, 200)
+E   AssertionError: 403 != 200
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:253 Forbidden (Permission denied): /equipment/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 197, in _get_response\n    response = wrapped_callback(request, *callback_args, **callback_kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 52, in wrapped\n    return view_func(request, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 76, in wrapped\n    require_organization_permission(request, permission, message)\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 30, in require_organization_permission\n    raise PermissionDenied(message)\ndjango.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0627\u06cc\u0646 \u0639\u0645\u0644\u06cc\u0627\u062a \u062f\u0631 \u0634\u0631\u06a9\u062a \u0641\u0639\u0627\u0644 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+___ DailyReportServiceTests.test_create_report_is_tenant_scoped_and_audited ___
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ DailyReportServiceTests.test_draft_report_accepts_operational_entries_and_locks_on_submit _
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+____ DailyReportServiceTests.test_list_and_create_views_are_tenant_scoped _____
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+__ DailyReportServiceTests.test_report_list_and_detail_exclude_other_tenant ___
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ DailyReportServiceTests.test_report_optionally_scopes_to_an_active_worksite_phase _
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+______ DailyReportServiceTests.test_report_rejects_cross_tenant_project _______
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+___ DailyReportServiceTests.test_report_rejects_phase_from_another_worksite ___
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+____ DailyReportServiceTests.test_report_rejects_site_from_another_project ____
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ DailyReportServiceTests.test_structured_entries_are_locked_after_submission_and_reject_cross_project_activity _
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ DailyReportServiceTests.test_structured_entries_validate_master_scope_and_preserve_material_snapshots _
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_____ DailyReportServiceTests.test_submitted_report_can_be_approved_once ______
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+__________ DailyReportServiceTests.test_viewer_cannot_create_report ___________
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ MaintenanceWorkflowTests.test_cancellation_is_a_terminal_workbench_outcome __
+apps\equipment\test_workflow.py:174: in test_cancellation_is_a_terminal_workbench_outcome
+    record = self._scheduled("W57-CANCEL")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\equipment\test_workflow.py:52: in _scheduled
+    return create_maintenance_record(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\equipment\services.py:453: in create_maintenance_record
+    _require_permission(
+apps\equipment\services.py:74: in _require_permission
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0645\u062f\u06cc\u0631\u06cc\u062a \u062a\u062c\u0647\u06cc\u0632\u0627\u062a \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+___ MaintenanceWorkflowTests.test_create_restores_missing_platform_catalog ____
+apps\equipment\test_workflow.py:219: in test_create_restores_missing_platform_catalog
+    record = self._scheduled("W57-CATALOG-RECOVERY")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\equipment\test_workflow.py:52: in _scheduled
+    return create_maintenance_record(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\equipment\services.py:453: in create_maintenance_record
+    _require_permission(
+apps\equipment\services.py:74: in _require_permission
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0645\u062f\u06cc\u0631\u06cc\u062a \u062a\u062c\u0647\u06cc\u0632\u0627\u062a \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ MaintenanceWorkflowTests.test_cycle_uses_workbench_domain_service_due_date_and_terminal_history _
+apps\equipment\test_workflow.py:65: in test_cycle_uses_workbench_domain_service_due_date_and_terminal_history
+    record = self._scheduled()
+             ^^^^^^^^^^^^^^^^^
+apps\equipment\test_workflow.py:52: in _scheduled
+    return create_maintenance_record(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\equipment\services.py:453: in create_maintenance_record
+    _require_permission(
+apps\equipment\services.py:74: in _require_permission
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0645\u062f\u06cc\u0631\u06cc\u062a \u062a\u062c\u0647\u06cc\u0632\u0627\u062a \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ MaintenanceWorkflowTests.test_open_only_backfill_shadow_and_legacy_compatibility_path _
+apps\equipment\test_workflow.py:154: in test_open_only_backfill_shadow_and_legacy_compatibility_path
+    _transition_maintenance_status_domain(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\equipment\services.py:556: in _transition_maintenance_status_domain
+    _require_permission(
+apps\equipment\services.py:74: in _require_permission
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0645\u062f\u06cc\u0631\u06cc\u062a \u062a\u062c\u0647\u06cc\u0632\u0627\u062a \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+___ MaintenanceWorkflowTests.test_tenant_scope_and_candidacy_are_rechecked ____
+apps\equipment\test_workflow.py:195: in test_tenant_scope_and_candidacy_are_rechecked
+    record = self._scheduled("W57-AUTH")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\equipment\test_workflow.py:52: in _scheduled
+    return create_maintenance_record(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\equipment\services.py:453: in create_maintenance_record
+    _require_permission(
+apps\equipment\services.py:74: in _require_permission
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0645\u062f\u06cc\u0631\u06cc\u062a \u062a\u062c\u0647\u06cc\u0632\u0627\u062a \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+=========================== short test summary info ===========================
+FAILED apps/equipment/tests.py::EquipmentServiceTests::test_assignment_lifecycle_preserves_history_and_derived_status
+FAILED apps/equipment/tests.py::EquipmentServiceTests::test_assignment_service_rejects_cross_tenant_and_overlap
+FAILED apps/equipment/tests.py::EquipmentServiceTests::test_create_and_scoped_read_enforce_rbac_and_audit
+FAILED apps/equipment/tests.py::EquipmentServiceTests::test_maintenance_lifecycle_updates_equipment_and_audits
+FAILED apps/equipment/tests.py::EquipmentPanelTests::test_owner_can_open_scoped_equipment_pages
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_create_report_is_tenant_scoped_and_audited
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_draft_report_accepts_operational_entries_and_locks_on_submit
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_list_and_create_views_are_tenant_scoped
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_report_list_and_detail_exclude_other_tenant
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_report_optionally_scopes_to_an_active_worksite_phase
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_report_rejects_cross_tenant_project
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_report_rejects_phase_from_another_worksite
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_report_rejects_site_from_another_project
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_structured_entries_are_locked_after_submission_and_reject_cross_project_activity
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_structured_entries_validate_master_scope_and_preserve_material_snapshots
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_submitted_report_can_be_approved_once
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_viewer_cannot_create_report
+FAILED apps/equipment/test_workflow.py::MaintenanceWorkflowTests::test_cancellation_is_a_terminal_workbench_outcome
+FAILED apps/equipment/test_workflow.py::MaintenanceWorkflowTests::test_create_restores_missing_platform_catalog
+FAILED apps/equipment/test_workflow.py::MaintenanceWorkflowTests::test_cycle_uses_workbench_domain_service_due_date_and_terminal_history
+FAILED apps/equipment/test_workflow.py::MaintenanceWorkflowTests::test_open_only_backfill_shadow_and_legacy_compatibility_path
+FAILED apps/equipment/test_workflow.py::MaintenanceWorkflowTests::test_tenant_scope_and_candidacy_are_rechecked
+22 failed, 69 passed, 73 subtests passed in 62.54s (0:01:02)

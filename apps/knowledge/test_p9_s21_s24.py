@@ -25,8 +25,10 @@ from apps.documents.models import (
     DocumentVersion,
 )
 from apps.organizations.models import (
+    AuthorizationScopeType,
     BusinessPermission,
     BusinessPermissionCode,
+    MembershipScopeGrant,
     MembershipStatus,
     Organization,
     OrganizationMembership,
@@ -111,17 +113,29 @@ class KnowledgeP9S21S24Tests(TestCase):
             )
         )
         for user in (self.author, self.reviewer):
-            OrganizationMembership.objects.create(
+            membership = OrganizationMembership.objects.create(
                 organization=self.organization,
                 user=user,
                 role_definition=self.role,
                 status=MembershipStatus.ACTIVE,
             )
-        OrganizationMembership.objects.create(
+            MembershipScopeGrant.objects.create(
+                organization=self.organization,
+                membership=membership,
+                scope_type=AuthorizationScopeType.ORGANIZATION,
+                reason="Explicit Knowledge regression fixture scope",
+            )
+        other_membership = OrganizationMembership.objects.create(
             organization=self.other_organization,
             user=self.other,
             role_definition=self.role,
             status=MembershipStatus.ACTIVE,
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.other_organization,
+            membership=other_membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Explicit foreign-tenant Knowledge regression fixture scope",
         )
 
     def _source(self, *, organization=None, user=None):
@@ -660,11 +674,17 @@ class KnowledgeP9S21S24Tests(TestCase):
                 )
             )
         )
-        OrganizationMembership.objects.create(
+        denied_membership = OrganizationMembership.objects.create(
             organization=self.organization,
             user=denied,
             role_definition=denied_role,
             status=MembershipStatus.ACTIVE,
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=denied_membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Reach the intended missing-source-permission denial",
         )
         denied_candidate = create_candidate(
             organization=self.organization,

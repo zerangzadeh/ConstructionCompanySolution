@@ -330,6 +330,11 @@ def _create_sealed_records(
     staged: StagedEvidence,
     stored_names: list[str],
 ) -> QuoteRevisionEvidence:
+    if QuoteRevisionEvidence.objects.filter(
+        quote_revision=revision,
+        source_channel=QuoteEvidenceSourceChannel.EXTERNAL_PORTAL_UPLOAD,
+    ).exists():
+        raise ValueError("ارسال درگاه فقط یک اصل تغییرناپذیر دارد؛ افزودن قلم مجاز نیست.")
     existing = QuoteRevisionEvidence.objects.filter(
         quote_revision=revision, idempotency_key=idempotency_key
     ).first()

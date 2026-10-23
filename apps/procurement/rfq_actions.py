@@ -23,7 +23,12 @@ from apps.procurement import admissibility_services as admissibility
 from apps.procurement import comparison_services as commercial
 from apps.procurement import opening_services as opening
 from apps.procurement import quote_services as quotes
-from apps.procurement.models import SourcingAward, SourcingAwardPreparation
+from apps.procurement.models import (
+    QuoteRevision,
+    RequestForQuotationInvitation,
+    SourcingAward,
+    SourcingAwardPreparation,
+)
 from apps.procurement.rfq_action_forms import (
     ACTIONS,
     AwardAllocations,
@@ -45,6 +50,40 @@ def action_links(request: HttpRequest, rfq) -> list[dict[str, str]]:
             project=rfq.project,
         )
     ]
+
+
+def buyer_progress(request: HttpRequest, rfq, actions: list[dict]) -> dict:
+    """Read-only prerequisites; never invent priority between concurrent commands."""
+    can_metadata = has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=P.RFQ_QUOTES_VIEW_METADATA,
+        project=rfq.project,
+    )
+    progress = {"primary": None, "quote_count": None, "capture_ready": False}
+    if not can_metadata:
+        return progress
+    revisions = QuoteRevision.objects.filter(
+        organization=request.organization,
+        envelope__rfq=rfq,
+    )
+    progress["quote_count"] = revisions.count()
+    # _capture_allowed owns these exact RFQ/current-invitation prerequisites.
+    progress["capture_ready"] = (
+        rfq.status in {"issued", "closed"}
+        and RequestForQuotationInvitation.objects.filter(
+            organization=request.organization,
+            rfq_version__rfq=rfq,
+            rfq_version__version_number=rfq.current_version_number,
+        )
+        .exclude(status__in={"declined", "withdrawn", "expired"})
+        .exists()
+    )
+    # With no revision there is no submission/opening/admissibility/comparison
+    # candidate. Capture is the only determinate next buyer action in this state.
+    if progress["quote_count"] == 0 and progress["capture_ready"]:
+        progress["primary"] = next((a for a in actions if a["code"] == "capture"), None)
+    return progress
 
 
 @active_organization_required
@@ -85,12 +124,14 @@ def buyer_workspace(request: HttpRequest, rfq_id: str) -> HttpResponse:
         )
     )
     award_scope = comparisons if can_award else comparisons.none()
+    actions = action_links(request, rfq)
     return render(
         request,
         "procurement/rfq_buyer_workspace.html",
         {
             "rfq": rfq,
-            "actions": action_links(request, rfq),
+            "actions": actions,
+            "progress": buyer_progress(request, rfq, actions),
             "comparisons": inputs,
             "award_preparations": SourcingAwardPreparation.objects.filter(
                 organization=request.organization, comparison__in=award_scope

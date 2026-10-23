@@ -25,6 +25,7 @@ from apps.daily_reports.services import (
     get_organization_daily_reports,
     submit_daily_report,
 )
+from apps.organizations.authorization import get_active_membership
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -106,7 +107,13 @@ def daily_report_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_CREATE)
 def daily_report_create(request: HttpRequest) -> HttpResponse:
-    form = DailyReportForm(request.POST or None, organization=request.organization)
+    form = DailyReportForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+    )
     if request.method == "POST" and form.is_valid():
         data = form.cleaned_data
         try:

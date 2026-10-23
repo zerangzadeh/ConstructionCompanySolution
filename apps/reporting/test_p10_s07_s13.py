@@ -152,7 +152,7 @@ class P10S07S13AcceptanceTests(TestCase):
             13,
         )
 
-    def test_02_fifteen_permissions_are_registered_and_default_denied(self) -> None:
+    def test_02_permissions_registered_and_owner_admin_defaults_denied(self) -> None:
         self.assertEqual(len(RECONCILIATION_PERMISSIONS), 15)
         registered = {
             str(code)
@@ -161,7 +161,9 @@ class P10S07S13AcceptanceTests(TestCase):
             for code in resource.permissions
         }
         self.assertTrue(RECONCILIATION_PERMISSIONS.issubset(registered))
-        for permissions in DEFAULT_ROLE_PERMISSIONS.values():
+        for permissions in (
+            DEFAULT_ROLE_PERMISSIONS[role] for role in ("tenant_owner", "tenant_admin")
+        ):
             self.assertTrue(RECONCILIATION_PERMISSIONS.isdisjoint(permissions))
 
     def test_03_all_thirteen_pairs_execute_without_fabricating_zero(self) -> None:

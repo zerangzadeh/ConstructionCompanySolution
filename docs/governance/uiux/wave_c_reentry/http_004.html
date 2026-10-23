@@ -1,0 +1,110 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+ 
+<nav class="text-sm text-slate-500"><a class="text-blue-700 underline" href="/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/">پیشنهاد، مقایسه و انتخاب</a> / ثبت پیشنهاد مهروموم‌شده</nav>
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">ثبت پیشنهاد مهروموم‌شده</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">تدارکات</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">ثبت پیشنهاد مهروموم‌شده</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">Wave C synthetic opportunity A</p>
+        
+    </div>
+    
+</header>
+
+<p class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">فقط منابع مجاز همین استعلام قابل انتخاب‌اند. خالی بودن فهرست یعنی منبع، دسترسی نسخه یا پیش‌نیاز این مرحله موجود نیست؛ سیاست یا تصمیمی به‌طور خودکار ایجاد نمی‌شود.</p>
+<form method="post" class="erp-surface mt-5 rounded-xl p-5" id="buyer-action-form"><!-- CSRF omitted -->
+
+<div class="grid gap-4 md:grid-cols-2">
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_supplier_submitted_at">
+        زمان ارائه تأمین‌کننده
+    </label>
+    <input type="text" name="supplier_submitted_at" value="" data-jalali-date="datetime" data-input-mask="####/##/##" inputmode="numeric" autocomplete="off" id="id_supplier_submitted_at">
+    
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_invitation">
+        دعوت‌نامه<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="invitation" aria-describedby="id_invitation-errors" aria-invalid="true" required id="id_invitation">
+  <option value="" selected>---------</option>
+
+  <option value="9ab10872-ad73-422f-b384-5a5c92d6fe45">تأمین بتن البرز</option>
+
+</select>
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_invitation-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_integrity_fingerprint">
+        اثر انگشت SHA-256 منبع<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="integrity_fingerprint" value="invalid" maxlength="64" aria-describedby="id_integrity_fingerprint-errors" aria-invalid="true" required id="id_integrity_fingerprint">
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_integrity_fingerprint-errors" role="alert">یک مقدار معتبر وارد کنید.</p>
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_source_channel">
+        مسیر دریافت<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="source_channel" aria-describedby="id_source_channel-errors" aria-invalid="true" required id="id_source_channel">
+  <option value="" selected>انتخاب کنید</option>
+
+  <option value="internal_email">ایمیل داخلی</option>
+
+  <option value="manual_capture">ثبت داخلی</option>
+
+  <option value="secure_drop">دریافت امن</option>
+
+  <option value="external_portal">درگاه خارجی دعوت‌محور</option>
+
+</select>
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_source_channel-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_source_reference">
+        مرجع دریافت
+    </label>
+    <input type="text" name="source_reference" maxlength="255" id="id_source_reference">
+    
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_idempotency_key">
+        شناسه پیگیری عملیات<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="idempotency_key" maxlength="128" aria-describedby="id_idempotency_key-errors" aria-invalid="true" required id="id_idempotency_key">
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_idempotency_key-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+</div>
+
+<div class="mt-6 flex flex-wrap gap-3"><button type="submit" class="erp-btn erp-btn--primary">ثبت پیشنهاد مهروموم‌شده</button><a class="erp-btn erp-btn--secondary" href="/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/">بازگشت</a></div>
+</form>
+
+        </main>

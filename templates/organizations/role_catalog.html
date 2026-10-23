@@ -5,7 +5,7 @@
 
   {% if platform_mode %}
     <form method="get" class="erp-surface mt-5 flex flex-wrap items-end gap-3 rounded-xl p-4">
-      <div class="min-w-64"><label class="mb-1 block text-xs font-bold text-slate-600" for="organization-filter">Tenant</label><select id="organization-filter" name="organization" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"><option value="">نقش‌های سراسری و سیستمی</option>{% for organization in organizations %}<option value="{{ organization.id }}"{% if catalog_organization.id == organization.id %} selected{% endif %}>{{ organization.name }}</option>{% endfor %}</select></div>
+      <div class="min-w-64"><label class="mb-1 block text-xs font-bold text-slate-600" for="organization-filter">شرکت</label><select id="organization-filter" name="organization" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"><option value="">نقش‌های سراسری و سیستمی</option>{% for organization in organizations %}<option value="{{ organization.id }}"{% if catalog_organization.id == organization.id %} selected{% endif %}>{{ organization.name }}</option>{% endfor %}</select></div>
       <button class="erp-btn erp-btn--secondary" type="submit">نمایش</button>
     </form>
   {% endif %}

@@ -86,6 +86,7 @@ from apps.equipment.services import (
     transition_maintenance_status,
 )
 from apps.fixed_assets.workspace import equipment_financial_links
+from apps.organizations.authorization import get_active_membership
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -789,7 +790,11 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.EQUIPMENT_ASSIGNMENTS_CREATE)
 def assignment_create(request: HttpRequest) -> HttpResponse:
     form = EquipmentAssignmentForm(
-        request.POST or None, organization=request.organization
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
     )
     if request.method == "POST" and form.is_valid():
         try:
@@ -920,7 +925,11 @@ def maintenance_list(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.MAINTENANCE_RECORDS_CREATE)
 def maintenance_create(request: HttpRequest) -> HttpResponse:
     form = MaintenanceRecordForm(
-        request.POST or None, organization=request.organization
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
     )
     if request.method == "POST" and form.is_valid():
         try:

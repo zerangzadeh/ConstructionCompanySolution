@@ -5,7 +5,10 @@ from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from apps.organizations.authorization import has_business_permission
+from apps.organizations.authorization import (
+    get_active_membership,
+    has_business_permission,
+)
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -410,7 +413,11 @@ def payable_certificate_list(request: HttpRequest) -> HttpResponse:
 @require_http_methods(["GET", "POST"])
 def payable_certificate_create(request: HttpRequest) -> HttpResponse:
     form = PayableCertificateForm(
-        request.POST or None, organization=request.organization
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
     )
     if request.method == "POST" and form.is_valid():
         try:
@@ -608,7 +615,11 @@ def payable_measurement_list(request: HttpRequest) -> HttpResponse:
 @require_http_methods(["GET", "POST"])
 def payable_measurement_create(request: HttpRequest) -> HttpResponse:
     form = PayableMeasurementForm(
-        request.POST or None, organization=request.organization
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
     )
     if request.method == "POST" and form.is_valid():
         try:
@@ -740,7 +751,14 @@ def commercial_control_dashboard(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.GUARANTEES_MANAGE)
 @require_http_methods(["GET", "POST"])
 def guarantee_create(request: HttpRequest) -> HttpResponse:
-    form = GuaranteeForm(request.POST or None, organization=request.organization)
+    form = GuaranteeForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+        actor=request.user,
+    )
     if request.method == "POST" and form.is_valid():
         try:
             guarantee = create_guarantee(
@@ -897,7 +915,12 @@ def guarantee_return(request: HttpRequest, guarantee_id: str) -> HttpResponse:
 @require_http_methods(["GET", "POST"])
 def compliance_evidence_create(request: HttpRequest) -> HttpResponse:
     form = ComplianceEvidenceForm(
-        request.POST or None, organization=request.organization
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+        actor=request.user,
     )
     if request.method == "POST" and form.is_valid():
         try:
@@ -996,7 +1019,14 @@ def compliance_evidence_return(request: HttpRequest, evidence_id: str) -> HttpRe
 @organization_permission_required(BusinessPermissionCode.RETENTION_RELEASES_CREATE)
 @require_http_methods(["GET", "POST"])
 def retention_release_create(request: HttpRequest) -> HttpResponse:
-    form = RetentionReleaseForm(request.POST or None, organization=request.organization)
+    form = RetentionReleaseForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+        actor=request.user,
+    )
     if request.method == "POST" and form.is_valid():
         try:
             release = create_retention_release(

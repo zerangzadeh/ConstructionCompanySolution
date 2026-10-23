@@ -1,0 +1,34 @@
+.........FF....................................                [100%]
+================================== FAILURES ===================================
+_ P5S26S27MatchReviewTests.test_review_is_permissioned_read_only_and_preserves_downstream_state _
+apps\subledgers\test_p5_s26_s27_match_review.py:46: in setUp
+    self.match = self._retained_match()
+                 ^^^^^^^^^^^^^^^^^^^^^^
+apps\subledgers\test_p5_s26_s27_match_review.py:79: in _retained_match
+    approve_match_tolerance_policy(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\subledgers\services.py:1510: in approve_match_tolerance_policy
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062e\u062a\u06cc\u0627\u0631 \u062a\u0623\u06cc\u06cc\u062f \u0633\u06cc\u0627\u0633\u062a \u0631\u0648\u0627\u062f\u0627\u0631\u06cc \u062a\u0637\u0628\u06cc\u0642 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S26S27MatchReviewTests.test_tenant_permission_and_project_scope_hide_match_evidence _
+apps\subledgers\test_p5_s26_s27_match_review.py:46: in setUp
+    self.match = self._retained_match()
+                 ^^^^^^^^^^^^^^^^^^^^^^
+apps\subledgers\test_p5_s26_s27_match_review.py:79: in _retained_match
+    approve_match_tolerance_policy(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\subledgers\services.py:1510: in approve_match_tolerance_policy
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062e\u062a\u06cc\u0627\u0631 \u062a\u0623\u06cc\u06cc\u062f \u0633\u06cc\u0627\u0633\u062a \u0631\u0648\u0627\u062f\u0627\u0631\u06cc \u062a\u0637\u0628\u06cc\u0642 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+=========================== short test summary info ===========================
+FAILED apps/subledgers/test_p5_s26_s27_match_review.py::P5S26S27MatchReviewTests::test_review_is_permissioned_read_only_and_preserves_downstream_state
+FAILED apps/subledgers/test_p5_s26_s27_match_review.py::P5S26S27MatchReviewTests::test_tenant_permission_and_project_scope_hide_match_evidence
+2 failed, 45 passed, 10 subtests passed in 115.20s (0:01:55)

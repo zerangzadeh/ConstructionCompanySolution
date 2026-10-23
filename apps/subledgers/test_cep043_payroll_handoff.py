@@ -301,7 +301,8 @@ class PayrollAPHandoffTests(PayrollAPFixture, TestCase):
         self.assertTrue(
             all(
                 not codes.intersection(values)
-                for values in DEFAULT_ROLE_PERMISSIONS.values()
+                for role in ("tenant_owner", "tenant_admin")
+                for values in (DEFAULT_ROLE_PERMISSIONS[role],)
             )
         )
 

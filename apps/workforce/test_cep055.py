@@ -433,10 +433,12 @@ class PersonalChangeTests(baseline.ESSDashboardTests):
         self.assertContains(accepted, "پذیرش صریح")
         self._capture55("accepted", accepted)
 
-    def test_no_implicit_builtin_grant_or_direct_profile_mutation(self):
+    def test_owner_admin_not_implicitly_granted_personal_profile_mutation(self):
         from apps.organizations.role_defaults import DEFAULT_ROLE_PERMISSIONS
 
-        for codes in DEFAULT_ROLE_PERMISSIONS.values():
+        for codes in (
+            DEFAULT_ROLE_PERMISSIONS[role] for role in ("tenant_owner", "tenant_admin")
+        ):
             self.assertFalse(
                 {
                     P.PERSONAL_DATA_VIEW,

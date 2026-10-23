@@ -1,0 +1,65 @@
+{
+  "recorded_at": "2026-10-22 22:29:28.895397+00:00",
+  "status": "BLOCKED_CANONICAL_TEMPORAL_PREREQUISITE",
+  "roles_pre_authorized": {
+    "uiux.wavec.buyer": {
+      "rfq_quotes.open": true,
+      "rfq_quotes.view_confidential": true
+    },
+    "uiux.wavec.opening-approver": {
+      "rfq_quotes.approve_open": true,
+      "rfq_quotes.manage_confidential_access": true
+    },
+    "uiux.wavec.custodian": {
+      "rfqs.close_custody": true,
+      "rfqs.custody_sealed_evidence": true
+    }
+  },
+  "independent_actors": true,
+  "probe": [
+    {
+      "case": "new_past_close_rfq_quote_submission",
+      "outcome": "DENIED",
+      "exception": "ValueError",
+      "message": "پس از مهلت، پیشنهاد جدید قابل نهایی‌سازی نیست.",
+      "is_late": true,
+      "closing_at": "2026-10-21 21:29:28.481839+00:00",
+      "received_at": "2026-10-22 22:29:28.703866+00:00",
+      "claimed_supplier_submitted_at_does_not_override_server_receipt": true
+    },
+    {
+      "case": "opening_without_effective_on_time_submission",
+      "outcome": "DENIED",
+      "exception": "PermissionDenied",
+      "manifest_disposition": "no_effective_submission"
+    },
+    {
+      "case": "retained_rfq_early_close",
+      "outcome": "DENIED",
+      "message": "بستن دستی نمی‌تواند پیش از مهلت معتبر انجام شود."
+    },
+    {
+      "case": "retained_rfq_early_opening",
+      "outcome": "DENIED",
+      "message": "هدف گشایش در این سازمان معتبر نیست.",
+      "first_failing_gate": "No closed/effective-submitted manifest; isolated 24-hour gate not reached"
+    }
+  ],
+  "synthetic_probe_rolled_back": true,
+  "synthetic_rfq_retained": false,
+  "production": "UNTOUCHED",
+  "git_writes": "NOT_EXECUTED",
+  "clock_override": false,
+  "direct_database_fabrication": false,
+  "authorization_bypass": false,
+  "procurement_all_model_fingerprints_unchanged": true,
+  "retained_rfq_unchanged": true,
+  "retained_rfq": {
+    "id": "7dd5036e-e20a-481a-ad43-dabaa692a166",
+    "status": "issued",
+    "closing_at": "2026-10-24 11:16:11.414658+00:00",
+    "earliest_opening_at": "2026-10-25 11:16:11.414658+00:00",
+    "gap_hours": 24
+  },
+  "source_scan_custody": "NOT_REACHED; valid custody requires effective submitted revision; no fake clean verdict or file"
+}

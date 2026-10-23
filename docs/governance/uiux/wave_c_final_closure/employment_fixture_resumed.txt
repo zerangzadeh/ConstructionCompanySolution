@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\docs\governance\uiux\wave_c_final_closure\employment_fixture.py", line 32, in <module>
+    category=DocumentCategory.objects.filter(organization=org,code='WCF-EMPLOYMENT').first() or create_document_category(organization=org,actor=owner,code='WCF-EMPLOYMENT',name='\u0633\u0648\u0627\u0628\u0642 \u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0622\u0632\u0645\u0627\u06cc\u0634\u06cc \u062a\u0648\u0633\u0639\u0647',description=label,employee_current_visible=True,employee_history_visible=True,employee_download_allowed=False)
+                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\services.py", line 530, in create_document_category
+    category.save()
+  File "E:\Construction_Company_Solution\apps\documents\models.py", line 130, in save
+    self.full_clean()
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'__all__': ['\u200fDocument category \u0628\u0627 \u0627\u06cc\u0646 Organization \u0648 Code \u0648\u062c\u0648\u062f \u062f\u0627\u0631\u062f.']}

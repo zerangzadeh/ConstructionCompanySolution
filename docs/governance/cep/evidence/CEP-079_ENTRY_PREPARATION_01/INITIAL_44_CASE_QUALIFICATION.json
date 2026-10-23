@@ -1,0 +1,2340 @@
+{
+  "at": "2026-10-23T18:29:27.028581+00:00",
+  "kind": "ENTRY_PREPARATION_NOT_UAT_RESULTS",
+  "scope": "Frozen authoritative 44 cases, unchanged semantic rows; starting data and explicit authority only",
+  "source_mapping_sha256": "585a89893a69881afb0589a5173385ed2d3e860203a222700875a02a64744e45",
+  "no_role_hierarchy_or_persona_equals_role_inference": true,
+  "no_role_permission_scope_changes": true,
+  "source_readiness_limit": "READY means qualified starting inputs/authority, never a promised PASS; source policy/currentness, object grants and workflow authority rechecked transactionally at actual execution",
+  "safe_data_policy": "Existing accepted rows/master versions are read-only. Future mutating targets must use the identified new CEP079 namespace or newly created clearly isolated records. No reversal of accepted old financial/Payroll/stock sources.",
+  "rows": [
+    {
+      "scenario_id": "UAT-CASE-001",
+      "scenario_title": "Login and reach canonical authenticated landing",
+      "required_persona": "Company Manager",
+      "actor": "account.demo-construction-01.owner",
+      "canonical_roles": [
+        "tenant_owner",
+        "p7_demo_payroll_assurance"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "projects.view"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Existing test login and authenticated Home; no UAT login performed",
+      "suitable_existing_data": {
+        "projects.Project": {
+          "count": 29,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0003"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-002",
+      "scenario_title": "Identify organization context and reach project portfolio",
+      "required_persona": "Company Manager",
+      "actor": "account.demo-construction-01.owner",
+      "canonical_roles": [
+        "tenant_owner",
+        "p7_demo_payroll_assurance"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "projects.view"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Active tenant, project A and explicit organization scope",
+      "suitable_existing_data": {
+        "projects.Project": {
+          "count": 29,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "projects.ProjectSite": {
+          "count": 5,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0004"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-003",
+      "scenario_title": "Reach management financial/project reports and review business status",
+      "required_persona": "Company Manager",
+      "actor": "account.demo-construction-01.owner",
+      "canonical_roles": [
+        "tenant_owner",
+        "p7_demo_payroll_assurance"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "reporting.metric_result.view",
+          "reporting.portfolio.view"
+        ],
+        "missing_permissions": [
+          "reporting.metric_result.view",
+          "reporting.portfolio.view"
+        ],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Existing accepted sources read-only; new projection refresh only during later UAT; no legacy reporting fallback",
+      "suitable_existing_data": {
+        "projects.BudgetVersion": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "accounting.JournalEntry": {
+          "count": 7,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "AUTHORIZATION",
+          "requirement": "Existing canonical actor lacks registered required permissions",
+          "missing": [
+            "reporting.metric_result.view",
+            "reporting.portfolio.view"
+          ],
+          "minimum_action": "Supply a qualified existing canonical role/actor or obtain an approved catalog/assignment decision; do not use the explicitly noncanonical uiux_runtime_reporting_test role or broaden existing roles here"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0047",
+        "IMB-0051"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-004",
+      "scenario_title": "Use workbench to review/approve permitted business items",
+      "required_persona": "Company Manager",
+      "actor": "account.demo-construction-01.owner",
+      "canonical_roles": [
+        "tenant_owner",
+        "p7_demo_payroll_assurance"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "purchase_requests.approve"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "Requester cep078.synthetic.operations; acting manager is independent checker",
+      "required_disposable_state": "New CEP079 submitted PR, owner is an actual candidate, creator is different; claim/action deferred",
+      "suitable_existing_data": {
+        "procurement.PurchaseRequest": {
+          "count": 9,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "workflows.WorkItem": {
+          "count": 66,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0007"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-005",
+      "scenario_title": "Review reconciliation and project closeout readiness",
+      "required_persona": "Company Manager",
+      "actor": "account.demo-construction-01.owner",
+      "canonical_roles": [
+        "tenant_owner",
+        "p7_demo_payroll_assurance"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "reporting.reconciliation_run.view",
+          "reporting.project_closeout_case.view"
+        ],
+        "missing_permissions": [
+          "reporting.project_closeout_case.view",
+          "reporting.reconciliation_run.view"
+        ],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Review truthful incomplete closeout evidence; no completeness/financial activation inferred",
+      "suitable_existing_data": {
+        "reporting.ProjectCloseoutCase": {
+          "count": 1,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "AUTHORIZATION",
+          "requirement": "Existing canonical actor lacks registered required permissions",
+          "missing": [
+            "reporting.project_closeout_case.view",
+            "reporting.reconciliation_run.view"
+          ],
+          "minimum_action": "Supply a qualified existing canonical role/actor or obtain an approved catalog/assignment decision; do not use the explicitly noncanonical uiux_runtime_reporting_test role or broaden existing roles here"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0045",
+        "IMB-0046"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-006",
+      "scenario_title": "Review audit/history evidence and supporting documents",
+      "required_persona": "Company Manager",
+      "actor": "account.demo-construction-01.owner",
+      "canonical_roles": [
+        "tenant_owner",
+        "p7_demo_payroll_assurance"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "documents.view",
+          "documents.download"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Read-only source-linked project documents and retained audit; no confidential employee identity inference",
+      "suitable_existing_data": {
+        "documents.Document": {
+          "count": 16,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "documents.DocumentVersion": {
+          "count": 18,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0095"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-007",
+      "scenario_title": "Find assigned project and enter project context",
+      "required_persona": "Project Manager",
+      "actor": "uiux.persona.project-manager",
+      "canonical_roles": [
+        "project_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "projects.view"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Project A/B allowed, C and foreign tenant project denied; current explicit grants",
+      "suitable_existing_data": {
+        "projects.Project": {
+          "count": 29,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "projects.ProjectSite": {
+          "count": 5,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0004"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-008",
+      "scenario_title": "Review budget, baseline, progress and project controls",
+      "required_persona": "Project Manager",
+      "actor": "uiux.persona.project-manager",
+      "canonical_roles": [
+        "project_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "budgets.view",
+          "project_cost.view",
+          "reporting.metric_result.view"
+        ],
+        "missing_permissions": [
+          "budgets.view",
+          "project_cost.view",
+          "reporting.metric_result.view"
+        ],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Accepted budget/progress are read-only inputs to governed Project Controls metrics; no unmanaged legacy aggregates",
+      "suitable_existing_data": {
+        "projects.BudgetVersion": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "billing.ProgressRecord": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "AUTHORIZATION",
+          "requirement": "Existing canonical actor lacks registered required permissions",
+          "missing": [
+            "budgets.view",
+            "project_cost.view",
+            "reporting.metric_result.view"
+          ],
+          "minimum_action": "Supply a qualified existing canonical role/actor or obtain an approved catalog/assignment decision; do not use the explicitly noncanonical uiux_runtime_reporting_test role or broaden existing roles here"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0043"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-009",
+      "scenario_title": "Review contracts, progress, claims and commercial dates",
+      "required_persona": "Project Manager",
+      "actor": "uiux.persona.project-manager",
+      "canonical_roles": [
+        "project_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "contracts.view",
+          "claims.view"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Contract/baseline inputs exist; populated claim and approved source configuration unavailable",
+      "suitable_existing_data": {
+        "contracts.Contract": {
+          "count": 20,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "billing.ProjectBaseline": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "billing.ProgressRecord": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "BILLING_INPUTS",
+          "requirement": "Qualified approved claim source / ContractTermVersion / Billing configuration / effective regulatory provenance and accepted professional review",
+          "minimum_action": "Resolve exact Billing evidence item; create only canonical isolated claim/AR/cash starting states afterwards"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0013"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-010",
+      "scenario_title": "Review daily reports plus materials/procurement visibility",
+      "required_persona": "Project Manager",
+      "actor": "uiux.persona.project-manager",
+      "canonical_roles": [
+        "project_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "daily_reports.view",
+          "materials.view",
+          "purchase_orders.view"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Read-only project A daily reports, materials and procurement; Site remains within Project",
+      "suitable_existing_data": {
+        "daily_reports.DailyReport": {
+          "count": 58,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "materials.Material": {
+          "count": 10,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0012"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-011",
+      "scenario_title": "Review workforce/equipment/safety/quality operations",
+      "required_persona": "Project Manager",
+      "actor": "uiux.persona.project-manager",
+      "canonical_roles": [
+        "project_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "employees.view",
+          "equipment.view",
+          "safety_incidents.view",
+          "quality_issues.view"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Read source states, including legacy/unassessed; no invented Safety/Quality approval",
+      "suitable_existing_data": {
+        "workforce.Employee": {
+          "count": 7,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "equipment.Equipment": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "safety.SafetyIncident": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "quality.QualityIssue": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0020",
+        "IMB-0094"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-012",
+      "scenario_title": "Review project cost and reconciliation/reporting",
+      "required_persona": "Project Manager",
+      "actor": "uiux.persona.project-manager",
+      "canonical_roles": [
+        "project_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "project_cost.reconciliations_view"
+        ],
+        "missing_permissions": [
+          "project_cost.reconciliations_view"
+        ],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "IMB0039 required outcome/evidence unverified; incomplete source coverage must remain visible",
+      "suitable_existing_data": {
+        "projects.BudgetVersion": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "projects.ProjectCostFact": {
+          "count": 0,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "AUTHORIZATION",
+          "requirement": "Existing canonical actor lacks registered required permissions",
+          "missing": [
+            "project_cost.reconciliations_view"
+          ],
+          "minimum_action": "Supply a qualified existing canonical role/actor or obtain an approved catalog/assignment decision; do not use the explicitly noncanonical uiux_runtime_reporting_test role or broaden existing roles here"
+        },
+        {
+          "classification": "MISSING_EVIDENCE",
+          "requirement": "CEP040/IMB0039 exact AC/DoD and test/transaction/source-reconciliation/no-write evidence",
+          "minimum_action": "Recover authoritative execution proof; no reimplementation as evidence manufacture"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0039"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-013",
+      "scenario_title": "Open Accounting, chart of accounts and fiscal periods",
+      "required_persona": "Accountant",
+      "actor": "account.demo-construction-01.accountant",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "accounting.view"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Existing accounts/fiscal definitions read-only; synthetic period available for mutations",
+      "suitable_existing_data": {
+        "accounting.Account": {
+          "count": 22,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "accounting.FiscalYear": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "accounting.FiscalPeriod": {
+          "count": 5,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": []
+    },
+    {
+      "scenario_id": "UAT-CASE-014",
+      "scenario_title": "Create, balance, submit and post journal",
+      "required_persona": "Accountant",
+      "actor": "account.demo-construction-01.accountant",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "accounting.journals_prepare",
+          "accounting.journals_submit"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New journal target during UAT, existing posting policies; distinct owner checker; no source-owned journal bypass",
+      "suitable_existing_data": {
+        "accounting.Account": {
+          "count": 22,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "accounting.FiscalPeriod": {
+          "count": 5,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": []
+    },
+    {
+      "scenario_id": "UAT-CASE-015",
+      "scenario_title": "Reverse/replace journal and preserve correction lineage",
+      "required_persona": "Accountant",
+      "actor": "account.demo-construction-01.accountant",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "accounting.adjustments_prepare"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New CEP079 posted manual journal is the only allowed reversal/replacement target; accepted old journals untouched",
+      "suitable_existing_data": {
+        "accounting.JournalEntry": {
+          "count": 7,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": []
+    },
+    {
+      "scenario_id": "UAT-CASE-016",
+      "scenario_title": "Recognize AP/AR, inspect aging and reconciliation",
+      "required_persona": "Accountant",
+      "actor": "account.demo-construction-01.accountant",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "subledgers.obligations_recognize",
+          "subledgers.aging_run"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "New native AP obligation qualified; the AR branch requires an authoritative receivable source, not an invented obligation",
+      "suitable_existing_data": {
+        "subledgers.Obligation": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "subledgers.SupplierInvoiceMatch": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "MISSING_FIXTURE",
+          "requirement": "Native AP is prepared; AR branch has no qualified receivable source",
+          "minimum_action": "Provide a disposable registered AR producer source; if sourced from Billing, use the same approved Billing inputs, never fabricate an AR obligation"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0014"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-017",
+      "scenario_title": "Use financial reconciliation and reporting evidence",
+      "required_persona": "Accountant",
+      "actor": "account.demo-construction-01.accountant",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "accounting.reconciliations_run",
+          "reporting.reconciliation_run.view",
+          "reporting.metric_result.view"
+        ],
+        "missing_permissions": [
+          "reporting.metric_result.view",
+          "reporting.reconciliation_run.view"
+        ],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Native source reconciliations retained; governed Reporting authority also required; unknown/missing ties are not zero",
+      "suitable_existing_data": {
+        "accounting.JournalEntry": {
+          "count": 7,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "treasury.TreasuryMovement": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "AUTHORIZATION",
+          "requirement": "Existing canonical actor lacks registered required permissions",
+          "missing": [
+            "reporting.metric_result.view",
+            "reporting.reconciliation_run.view"
+          ],
+          "minimum_action": "Supply a qualified existing canonical role/actor or obtain an approved catalog/assignment decision; do not use the explicitly noncanonical uiux_runtime_reporting_test role or broaden existing roles here"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0044",
+        "IMB-0051"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-018",
+      "scenario_title": "Request/approve fiscal close and reopen with protected-operation controls",
+      "required_persona": "Accountant",
+      "actor": "account.demo-construction-01.accountant",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "accounting.periods_close",
+          "accounting.periods_reopen"
+        ],
+        "missing_permissions": [
+          "accounting.periods_reopen"
+        ],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New isolated CEP079 synthetic fiscal period; actual close/reopen deferred; old accepted periods untouched",
+      "suitable_existing_data": {
+        "accounting.FiscalPeriod": {
+          "count": 5,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "AUTHORIZATION",
+          "requirement": "Existing canonical actor lacks registered required permissions",
+          "missing": [
+            "accounting.periods_reopen"
+          ],
+          "minimum_action": "Supply a qualified existing canonical role/actor or obtain an approved catalog/assignment decision; do not use the explicitly noncanonical uiux_runtime_reporting_test role or broaden existing roles here"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": []
+    },
+    {
+      "scenario_id": "UAT-CASE-019",
+      "scenario_title": "Open Treasury workspace, statements, matching and bank reconciliation",
+      "required_persona": "Treasurer",
+      "actor": "account.demo-construction-01.accountant",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "treasury.view",
+          "treasury.statements_import",
+          "treasury.bank_reconciliations_run"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Bank statements require an ACTIVE BANK account with approved effective GL mapping; only active CASH exists",
+      "suitable_existing_data": {
+        "treasury.TreasuryAccount": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "MISSING_FIXTURE",
+          "requirement": "No ACTIVE BANK Treasury account / qualified effective bank-to-GL mapping / disposable bank/cheque context",
+          "minimum_action": "Provide approved isolated bank account/mapping starting context through canonical lifecycle; prepare cheque/statement sources without mapping-policy invention"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0053"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-020",
+      "scenario_title": "Operate native Treasury accounts/movements/payment requests/cheques/advances",
+      "required_persona": "Treasurer",
+      "actor": "account.demo-construction-01.accountant",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "treasury.accounts_manage",
+          "treasury.movements_create",
+          "treasury.payment_requests_create",
+          "treasury.cheques_manage",
+          "treasury.advances_manage"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New cash movement/advance sources qualified; cheque/bank portion lacks active bank context; no invented bank-to-GL mapping",
+      "suitable_existing_data": {
+        "treasury.TreasuryAccount": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "treasury.TreasuryMovement": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "treasury.TreasuryAdvance": {
+          "count": 1,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "MISSING_FIXTURE",
+          "requirement": "No ACTIVE BANK Treasury account / qualified effective bank-to-GL mapping / disposable bank/cheque context",
+          "minimum_action": "Provide approved isolated bank account/mapping starting context through canonical lifecycle; prepare cheque/statement sources without mapping-policy invention"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0053"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-021",
+      "scenario_title": "Settle obligation through Treasury and observe Accounting consequence",
+      "required_persona": "Treasurer",
+      "actor": "account.demo-construction-01.accountant",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "subledgers.settlements_allocate",
+          "treasury.movements_create"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New AP obligation; a separate party/direction/amount-matched unallocated cash source is required; advance cash cannot be double-used",
+      "suitable_existing_data": {
+        "subledgers.Obligation": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "treasury.TreasuryMovement": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "MISSING_FIXTURE",
+          "requirement": "Separate source-matched unallocated cash movement for the new AP obligation; advance cash cannot be reused",
+          "minimum_action": "Prepare a separate canonical synthetic disbursement with the obligation party, amount, currency and context; verify no prior allocation or reversal"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0052"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-022",
+      "scenario_title": "Execute cheque/advance/movement reversal and correction paths",
+      "required_persona": "Treasurer",
+      "actor": "account.demo-construction-01.accountant",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "treasury.movements_reverse",
+          "treasury.cheques_manage",
+          "treasury.advances_reverse"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "Reverse only new CEP079 cash/advance originals; cleared cheque original and active bank context are missing",
+      "suitable_existing_data": {
+        "treasury.TreasuryMovement": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "treasury.TreasuryAdvance": {
+          "count": 1,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "treasury.ChequeInstrument": {
+          "count": 0,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "MISSING_FIXTURE",
+          "requirement": "No ACTIVE BANK Treasury account / qualified effective bank-to-GL mapping / disposable bank/cheque context",
+          "minimum_action": "Provide approved isolated bank account/mapping starting context through canonical lifecycle; prepare cheque/statement sources without mapping-policy invention"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0052"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-023",
+      "scenario_title": "Settle Billing/AR using the authoritative cash path",
+      "required_persona": "Treasurer",
+      "actor": "account.demo-construction-01.accountant",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "claims.view",
+          "subledgers.settlements_allocate"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "New Billing/AR original and native cash source required; no legacy Payment writer",
+      "suitable_existing_data": {
+        "billing.ProgressClaim": {
+          "count": 0,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "subledgers.Obligation": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "BILLING_INPUTS",
+          "requirement": "Qualified approved claim source / ContractTermVersion / Billing configuration / effective regulatory provenance and accepted professional review",
+          "minimum_action": "Resolve exact Billing evidence item; create only canonical isolated claim/AR/cash starting states afterwards"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0054"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-024",
+      "scenario_title": "Navigate Procurement and create/submit Purchase Requisition",
+      "required_persona": "Procurement Specialist",
+      "actor": "cep078.synthetic.operations",
+      "canonical_roles": [
+        "operations_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "purchase_requests.create",
+          "purchase_requests.submit"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New PR target during later UAT, existing units/materials and project A; no accepted PR modified",
+      "suitable_existing_data": {
+        "materials.Material": {
+          "count": 10,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "projects.Project": {
+          "count": 29,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0012"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-025",
+      "scenario_title": "Approve PR and create/submit/approve Purchase Order",
+      "required_persona": "Procurement Specialist",
+      "actor": "cep078.synthetic.operations",
+      "canonical_roles": [
+        "operations_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "purchase_orders.create",
+          "purchase_orders.issue"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New CEP079 submitted PR plus actual independent owner candidate; PO target created later",
+      "suitable_existing_data": {
+        "procurement.PurchaseRequest": {
+          "count": 9,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0012"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-026",
+      "scenario_title": "Run RFQ, quote opening, comparison and award",
+      "required_persona": "Procurement Specialist",
+      "actor": "uiux.wavec.buyer",
+      "canonical_roles": [
+        "wave_c_buyer",
+        "rfq_opener"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "rfqs.view",
+          "rfq_quotes.capture",
+          "rfq_quotes.prepare_comparison",
+          "rfq_quotes.prepare_sourcing_award"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "uiux.wavec.custodian (custody/admissibility), uiux.wavec.opening-approver (opening), uiux.wavec.buyer (opener/comparison), owner (RFQ/award); each object-specific grant/appointment must be bound by native lifecycle",
+      "required_disposable_state": "Existing RFQ, supplier, material source identities; separate registered custodian/opener/approver/award actors; source-specific authority must qualify current RFQ",
+      "suitable_existing_data": {
+        "procurement.RequestForQuotation": {
+          "count": 6,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "parties.BusinessParty": {
+          "count": 8,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0022"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-027",
+      "scenario_title": "Create/post/void Goods Receipt from Purchase Order",
+      "required_persona": "Procurement Specialist",
+      "actor": "cep078.synthetic.operations",
+      "canonical_roles": [
+        "operations_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "goods_receipts.create",
+          "goods_receipts.post",
+          "goods_receipts.void"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New CEP079 READY issued PO, with remaining quantity; new receipt target only",
+      "suitable_existing_data": {
+        "procurement.PurchaseOrder": {
+          "count": 14,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0012"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-028",
+      "scenario_title": "Create supplier invoice, perform match and inspect AP handoff boundary",
+      "required_persona": "Procurement Specialist",
+      "actor": "account.demo-construction-01.accountant",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "supplier_invoices.prepare",
+          "supplier_invoices.approve",
+          "subledgers.obligations_recognize"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New posted GR and approved matched invoice/native AP fixture; owning AP authority is explicit, not a buyer-role inference",
+      "suitable_existing_data": {
+        "procurement.GoodsReceipt": {
+          "count": 10,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "subledgers.SupplierInvoiceMatch": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0023"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-029",
+      "scenario_title": "Manage materials/parties governance and partner qualification",
+      "required_persona": "Procurement Specialist",
+      "actor": "cep078.synthetic.operations",
+      "canonical_roles": [
+        "operations_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "materials.steward",
+          "parties.change",
+          "partner.profile_manage",
+          "partner.qualifications_prepare"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "Masters exist; Partner Qualification requires approved requirement/context inputs; no arbitrary criteria or weights invented",
+      "suitable_existing_data": {
+        "materials.Material": {
+          "count": 10,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "parties.BusinessParty": {
+          "count": 8,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "partner_qualification.QualificationRequirement": {
+          "count": 0,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "MISSING_FIXTURE_OR_BUSINESS_SOURCE",
+          "requirement": "No PartnerProfile / governed QualificationRequirement / qualified Partner source",
+          "minimum_action": "Supply approved qualification requirement/context and isolated partner fixture; no invented eligibility criteria, weights or Post-V1 scoring"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0018",
+        "IMB-0019"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-030",
+      "scenario_title": "Navigate Inventory and review stock/warehouse context",
+      "required_persona": "Storekeeper",
+      "actor": "cep078.synthetic.operations",
+      "canonical_roles": [
+        "operations_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "warehouses.view",
+          "stock_balances.view"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "New CEP079 warehouse and stock only; read balances; C/foreign scope comparator retained",
+      "suitable_existing_data": {
+        "inventory.Warehouse": {
+          "count": 8,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "inventory.StockTransaction": {
+          "count": 12,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0012"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-031",
+      "scenario_title": "Receive posted Goods Receipt into Inventory without duplicate handoff",
+      "required_persona": "Storekeeper",
+      "actor": "cep078.synthetic.operations",
+      "canonical_roles": [
+        "operations_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "stock_transactions.create",
+          "stock_transactions.post"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "New posted CEP079 HANDOFF receipt has no Inventory target; handoff/retry performed later, not now",
+      "suitable_existing_data": {
+        "procurement.GoodsReceipt": {
+          "count": 10,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "inventory.Warehouse": {
+          "count": 8,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0024"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-032",
+      "scenario_title": "Issue, reserve, consume and transfer stock; reject insufficient stock",
+      "required_persona": "Storekeeper",
+      "actor": "cep078.synthetic.operations",
+      "canonical_roles": [
+        "operations_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "stock_transactions.create",
+          "stock_transactions.post",
+          "inventory_reservations.manage",
+          "inventory_transfers.prepare"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New positive stock and separate empty CEP079 destination; insufficient-stock target is explicit fictional quantity above available balance",
+      "suitable_existing_data": {
+        "inventory.StockTransaction": {
+          "count": 12,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "inventory.Warehouse": {
+          "count": 8,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0012"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-033",
+      "scenario_title": "Reverse stock, count inventory and run valuation/correction",
+      "required_persona": "Storekeeper",
+      "actor": "cep078.synthetic.operations",
+      "canonical_roles": [
+        "operations_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "stock_transactions.reverse",
+          "inventory_counts.prepare",
+          "inventory_valuation.prepare"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New posted stock is disposable reversal/count target; valuation source unit/price is pinned new approved PO/invoice, no GL recognition inferred",
+      "suitable_existing_data": {
+        "inventory.StockTransaction": {
+          "count": 12,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "subledgers.SupplierInvoiceMatch": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": []
+    },
+    {
+      "scenario_id": "UAT-CASE-034",
+      "scenario_title": "Navigate Workforce and manage employee/personnel records",
+      "required_persona": "HR Responsible",
+      "actor": "uiux.wavec.hr",
+      "canonical_roles": [
+        "wave_c_hr"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "employees.view",
+          "employees.create"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Person/current WorkRelationship inputs explicit; select ordinary employee/personnel path; department tree is not added to this frozen case",
+      "suitable_existing_data": {
+        "workforce.Person": {
+          "count": 6,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "workforce.WorkRelationship": {
+          "count": 6,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "workforce.Employee": {
+          "count": 7,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0069"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-035",
+      "scenario_title": "Use attendance, leave, mission and overtime flows",
+      "required_persona": "HR Responsible",
+      "actor": "uiux.wavec.time",
+      "canonical_roles": [
+        "wave_c_time",
+        "wave_c_employment_own"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "attendance.capture",
+          "leave_mission.request",
+          "overtime.request"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "Existing explicit test employee, calendar and configured Leave sources; frozen legacy flows only, no later ESS monetary activation",
+      "suitable_existing_data": {
+        "workforce.Employee": {
+          "count": 7,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "timekeeping.WorkCalendar": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "workforce.LeavePolicyVersion": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0012",
+        "IMB-0013"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-036",
+      "scenario_title": "Create/submit/approve timesheet and labor distribution",
+      "required_persona": "HR Responsible",
+      "actor": "uiux.wavec.time",
+      "canonical_roles": [
+        "wave_c_time",
+        "wave_c_employment_own"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "timesheets.prepare",
+          "timesheets.view"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New timesheet target during UAT; known consistent Project/Site/Activity and explicit test employee; preview conserves minutes, not invented cost/rate",
+      "suitable_existing_data": {
+        "workforce.Employee": {
+          "count": 7,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "projects.Activity": {
+          "count": 21,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "timekeeping.WorkCalendar": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0076"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-037",
+      "scenario_title": "Prepare, calculate, review, approve and finalize Payroll",
+      "required_persona": "HR Responsible",
+      "actor": "uiux.wavec.payroll",
+      "canonical_roles": [
+        "wave_c_payroll"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "payroll.prepare",
+          "payroll_results.view"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New OPEN CEP079 Payroll period and full-period approved synthetic Timesheet; existing approved native input producer and non-statutory rules; distinct reviewer/finalizer",
+      "suitable_existing_data": {
+        "payroll.PayrollPeriod": {
+          "count": 3,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "payroll.EmploymentPayConfiguration": {
+          "count": 1,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "payroll.PayrollRule": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "timekeeping.Timesheet": {
+          "count": 3,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0013"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-038",
+      "scenario_title": "Perform payroll correction/reversal, payslip and reports",
+      "required_persona": "HR Responsible",
+      "actor": "uiux.wavec.payroll",
+      "canonical_roles": [
+        "wave_c_payroll"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "payroll.adjust",
+          "payslips.view"
+        ],
+        "missing_permissions": [
+          "payroll.adjust"
+        ],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "New finalized CEP079 non-statutory run/payslip is the correction/reversal target; old final runs retained unchanged",
+      "suitable_existing_data": {
+        "payroll.PayrollRun": {
+          "count": 3,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "payroll.Payslip": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "AUTHORIZATION",
+          "requirement": "Existing canonical actor lacks registered required permissions",
+          "missing": [
+            "payroll.adjust"
+          ],
+          "minimum_action": "Supply a qualified existing canonical role/actor or obtain an approved catalog/assignment decision; do not use the explicitly noncanonical uiux_runtime_reporting_test role or broaden existing roles here"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": []
+    },
+    {
+      "scenario_id": "UAT-CASE-039",
+      "scenario_title": "Administer workflow definitions/versions through ordinary product UI",
+      "required_persona": "Company Manager",
+      "actor": "account.demo-construction-01.owner",
+      "canonical_roles": [
+        "tenant_owner",
+        "p7_demo_payroll_assurance"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "workflows.view",
+          "workflows.create",
+          "workflows.change_draft",
+          "workflows.publish"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "Existing version validation/publication authority; no extra separation rule invented",
+      "required_disposable_state": "New declarative draft/version from existing registered template; no new step, command, rule or executable expression",
+      "suitable_existing_data": {
+        "workflows.WorkflowTemplate": {
+          "count": 19,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "workflows.WorkflowDefinition": {
+          "count": 11,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0011"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-040",
+      "scenario_title": "Use forms in Persian-first RTL responsive UI with understandable validation",
+      "required_persona": "All Personas",
+      "actor": "cep078.synthetic.operations",
+      "canonical_roles": [
+        "operations_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "projects.view"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Cross-cutting representative form/RTL/keyboard inputs; exact six Workforce Close/Escape prerequisite cells currently FAIL",
+      "suitable_existing_data": {
+        "workforce.Department": {
+          "count": 5,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "REQUIRED_VERIFICATION_FAIL",
+          "requirement": "Six exact Workforce cells FAIL close_focus and escape_focus; hard-refresh probe also FAIL",
+          "minimum_action": "Separately authorize the bounded asset/source-delivery or presentation correction after attribution, then rerun only these six cells"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0012",
+        "IMB-0013",
+        "IMB-0014",
+        "IMB-0015"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-041",
+      "scenario_title": "Encounter permission denial/object scope/protected approvals safely and understandably",
+      "required_persona": "All Personas",
+      "actor": "cep078.synthetic.operations",
+      "canonical_roles": [
+        "operations_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "projects.view"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "N/A for read-only starting-state use",
+      "required_disposable_state": "Positive canonical actors plus existing scoped viewer A, denied C and foreign tenant; protected new PR maker/checker split; no denied action executed",
+      "suitable_existing_data": {
+        "projects.Project": {
+          "count": 29,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "procurement.PurchaseRequest": {
+          "count": 9,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0001",
+        "IMB-0002"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-042",
+      "scenario_title": "Create/version/link/download documents and deny unauthorized sensitive access",
+      "required_persona": "Project Manager",
+      "actor": "uiux.persona.project-manager",
+      "canonical_roles": [
+        "project_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "documents.upload",
+          "documents.view",
+          "documents.download"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "Existing tenant/project category and safe disposable upload content; new target only; source-specific denied document comparator required",
+      "suitable_existing_data": {
+        "documents.Document": {
+          "count": 16,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "documents.DocumentVersion": {
+          "count": 18,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "READY_STARTING_CONTEXT_ONLY",
+      "blocking_requirements": [],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0095"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-043",
+      "scenario_title": "Operate Equipment and Fixed Assets within accepted non-posting boundary",
+      "required_persona": "Project Manager",
+      "actor": "uiux.persona.project-manager",
+      "canonical_roles": [
+        "project_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "equipment.view",
+          "fixed_assets.view",
+          "fixed_assets.candidate_prepare"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "Equipment sources exist; Fixed Asset positive candidate requires qualified class/book policy, monetary/capitalization references and explicit asset facts; no posting extension",
+      "suitable_existing_data": {
+        "equipment.Equipment": {
+          "count": 2,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "fixed_assets.FixedAssetClassVersion": {
+          "count": 0,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "fixed_assets.AssetBookPolicyVersion": {
+          "count": 0,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "MISSING_FIXTURE_OR_FINANCIAL_SOURCE",
+          "requirement": "No qualified FixedAssetClassVersion or AssetBookPolicyVersion; no positive asset fixture",
+          "minimum_action": "Supply approved class/book/capitalization/monetary source references and asset facts, then prepare isolated non-posting candidate; no fabricated depreciation or posting policy"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0020"
+      ]
+    },
+    {
+      "scenario_id": "UAT-CASE-044",
+      "scenario_title": "Use Safety, Quality, Compliance and Partner Qualification journeys",
+      "required_persona": "Project Manager",
+      "actor": "uiux.persona.project-manager",
+      "canonical_roles": [
+        "project_manager"
+      ],
+      "tenant": "demo-construction-01",
+      "tenant_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "object_scope": "Project A 58f517da-2139-45ac-8b7b-4f3d3a3d26e8; organization scope only where owning service requires it; exact source scope intersects current grants",
+      "positive_authority_state": {
+        "membership": "active",
+        "tenant": "active",
+        "user_active": true,
+        "required_permissions": [
+          "safety_incidents.view",
+          "quality_issues.view",
+          "compliance.view",
+          "partner.profile_manage"
+        ],
+        "missing_permissions": [],
+        "project_scope_verified": true
+      },
+      "negative_authority_state": {
+        "actor": "uiux.audit.project",
+        "denied_project_C": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+        "foreign_tenant_project": "63063dae-394e-46e4-9abb-09284e821561",
+        "not_executed": true
+      },
+      "independent_approver_or_separation": "account.demo-construction-01.owner",
+      "required_disposable_state": "Safety/Quality source states exist; published Compliance template and Partner Qualification requirements absent; Post-V1 performance scope excluded",
+      "suitable_existing_data": {
+        "safety.SafetyIncident": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "quality.QualityIssue": {
+          "count": 4,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "compliance.InspectionTemplateVersion": {
+          "count": 0,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        },
+        "partner_qualification.QualificationRequirement": {
+          "count": 0,
+          "selection": "See exact retained/synthetic identifiers in QUALIFIED_STARTING_DATA and fixture manifests; old accepted sources read-only"
+        }
+      },
+      "minimal_synthetic_data_needed": "Prepared identified namespace CEP079-PREP-01; later UAT creates its own target records. Outstanding input gaps are enumerated below, not silently substituted",
+      "readiness_result": "BLOCKED",
+      "blocking_requirements": [
+        {
+          "classification": "MISSING_FIXTURE_OR_BUSINESS_SOURCE",
+          "requirement": "No PartnerProfile / governed QualificationRequirement / qualified Partner source",
+          "minimum_action": "Supply approved qualification requirement/context and isolated partner fixture; no invented eligibility criteria, weights or Post-V1 scoring"
+        },
+        {
+          "classification": "MISSING_FIXTURE_OR_BUSINESS_SOURCE",
+          "requirement": "No published Compliance InspectionTemplateVersion",
+          "minimum_action": "Supply an approved existing-semantic template and isolated Inspection/test records; do not invent checklist/risk criteria"
+        }
+      ],
+      "uat_execution_result": "NOT_EXECUTED",
+      "upstream_imb_ids": [
+        "IMB-0094"
+      ]
+    }
+  ]
+}

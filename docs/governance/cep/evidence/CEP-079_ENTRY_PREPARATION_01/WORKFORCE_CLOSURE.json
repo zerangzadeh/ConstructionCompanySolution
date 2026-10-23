@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-24",
+  "scope": "SC015-TREE-KEYBOARD-LIST six prerequisite cells only; UAT-CASE-040 not executed",
+  "reproduction": {"family": "Chrome", "viewport": [1440, 900], "asset": "organization_chart.js?v=4", "close_focus": false, "escape_focus": false},
+  "attribution": "Current source and direct HTTP bytes both SHA256 2992304f1b67b7373e9c25861123431593c841460cd5b66605ba63108e7004de and contain focus/Escape handlers. Browser v4 observation failed. Template-only v5 identity plus reload passed. Stale versioned asset delivery is supported; exact browser cache internals were not inspected.",
+  "change": "templates/workforce/department_list.html: organization_chart.js?v=4 -> ?v=5 only; existing JS preserved",
+  "focused_test": "Chrome 1440 Close click and Escape both close drawer and restore selected card focus after v5 reload",
+  "cells": [
+    {"family": "Chrome", "viewport": [1440, 900], "at": "2026-10-23T20:34:00.297Z", "result": "PASS"},
+    {"family": "Chrome", "viewport": [1024, 768], "at": "2026-10-23T20:34:02.944Z", "result": "PASS"},
+    {"family": "Chrome", "viewport": [390, 844], "at": "2026-10-23T20:34:05.848Z", "result": "PASS"},
+    {"family": "Edge", "viewport": [1440, 900], "at": "2026-10-23T20:34:13.035Z", "result": "PASS"},
+    {"family": "Edge", "viewport": [1024, 768], "at": "2026-10-23T20:34:16.761Z", "result": "PASS"},
+    {"family": "Edge", "viewport": [390, 844], "result": "PASS", "interaction": "Keyboard Enter on Close and List; Escape on Close; read-only DOM witness after each action"}
+  ],
+  "assertions_each_cell": {"exact_viewport": true, "fa_rtl": true, "no_document_overflow": true, "Enter_opens_panel": true, "Close_restores_selected_card_focus": true, "Escape_closes_and_restores_focus": true, "list_visible": true, "list_rows": 5, "nonmatching_filter_rows": 0, "cleared_filter_rows": 5, "asset_version": 5},
+  "focus_identity": "aria-label: نمایش جزئیات Wave C synthetic department",
+  "retained_failed_probes": [
+    {"family": "Edge", "viewport": [390, 844], "at": "2026-10-23T20:34:20.808Z", "close_click_focus": false, "escape_focus": true, "list_click_visible": false},
+    {"family": "Edge", "viewport": [390, 844], "at": "2026-10-23T20:34:45.624Z", "close_click_focus": true, "escape_focus": true, "list_click_visible": false}
+  ],
+  "probe_limitation": "Immediate mobile pointer clicks had inconsistent observed results; no causal claim. A fresh observed Close click restored focus. Exact keyboard prerequisite revalidation used Enter and all assertions passed. Pointer-click reliability outside those keyboard assertions is not certified.",
+  "result": "6/6_KEYBOARD_PREREQUISITE_CELLS_PASS",
+  "UAT-CASE-034": "UNAFFECTED_EXISTING_READY_ROW_PRESERVED",
+  "viewport_overrides": "RESET_BOTH_BROWSERS",
+  "business_permission_scope_workflow_schema_changes": "NONE"
+}

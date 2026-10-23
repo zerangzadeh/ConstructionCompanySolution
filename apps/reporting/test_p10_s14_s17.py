@@ -171,7 +171,9 @@ class P10S14S17AcceptanceTests(TestCase):
             for code in resource.permissions
         }
         self.assertTrue(CLOSEOUT_PERMISSIONS.issubset(registered))
-        for permissions in DEFAULT_ROLE_PERMISSIONS.values():
+        for permissions in (
+            DEFAULT_ROLE_PERMISSIONS[role] for role in ("tenant_owner", "tenant_admin")
+        ):
             self.assertTrue(CLOSEOUT_PERMISSIONS.isdisjoint(permissions))
         draft = ProjectCloseoutProfileVersion.objects.create(
             definition=profile.definition,

@@ -15,7 +15,7 @@ from apps.accounting.models import (
 from apps.organizations.models import Organization, OrganizationMembership
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project, ProjectSite, WBSNode
-from core.forms import JalaliDateMixin
+from core.forms import JalaliDateMixin, attach_parent_choice_ui
 
 
 class AccountingFormMixin:
@@ -174,6 +174,8 @@ class JournalLineForm(AccountingFormMixin, forms.Form):
         self.fields["wbs_node"].queryset = WBSNode.objects.filter(
             project__organization=organization
         )
+        attach_parent_choice_ui(self, "site", "project", "project_id")
+        attach_parent_choice_ui(self, "wbs_node", "project", "project_id")
         self.fields["party"].queryset = BusinessParty.objects.filter(
             organization=organization, archived_at__isnull=True
         )

@@ -7,6 +7,7 @@ from django.urls import reverse
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.commercial.models import (
+    TenderBid,
     TenderBidActivation,
     TenderBidRevision,
     TenderBidStatus,
@@ -29,6 +30,7 @@ from apps.organizations.models import (
 from apps.organizations.models import (
     BusinessPermissionCode as P,
 )
+from apps.projects.models import Project
 
 
 class TenderBidLifecycleTests(TestCase):
@@ -67,6 +69,67 @@ class TenderBidLifecycleTests(TestCase):
             policy_reference="approved-test-policy",
             activated_by=self.actor,
         )
+
+    def test_project_scoped_create_selects_only_authorized_tenant_project(self):
+        self.activate()
+        project = Project.objects.create(
+            organization=self.organization, code="SCOPED", name="Allowed project"
+        )
+        foreign = Project.objects.create(
+            organization=self.other, code="FOREIGN", name="Foreign project"
+        )
+        membership = self.organization.memberships.get(user=self.actor)
+        membership.scope_grants.update(
+            scope_type=AuthorizationScopeType.PROJECT, project=project
+        )
+        self.login(self.actor)
+        url = reverse("commercial:tender_create")
+        response = self.client.get(url)
+        self.assertContains(response, "Allowed project")
+        self.assertNotContains(response, "Foreign project")
+        response = self.client.post(
+            url,
+            {
+                "opportunity_code": "SCOPED-CREATE",
+                "title": "Scoped opportunity",
+                "project": str(project.pk),
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            TenderBid.objects.get(opportunity_code="SCOPED-CREATE").project_id,
+            project.pk,
+        )
+        response = self.client.post(
+            url,
+            {
+                "opportunity_code": "FORGED",
+                "title": "Forged",
+                "project": str(foreign.pk),
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(TenderBid.objects.filter(opportunity_code="FORGED").exists())
+
+    def test_evidence_picker_rejects_unknown_or_unavailable_source_without_revision(
+        self,
+    ):
+        self.activate()
+        tender = self.create()
+        self.login(self.actor)
+        response = self.client.get(
+            reverse("commercial:tender_detail", args=[tender.pk])
+        )
+        self.assertContains(response, '<select name="document_version_id"')
+        self.assertNotContains(
+            response, '<input type="text" name="document_version_id"'
+        )
+        response = self.client.post(
+            reverse("commercial:tender_evidence", args=[tender.pk]),
+            {"document_version_id": "00000000-0000-0000-0000-000000000001"},
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(tender.revisions.count(), 1)
 
     def create(self):
         return create_tender_bid(

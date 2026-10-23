@@ -1,0 +1,51 @@
+diff --git a/apps/procurement/test_cep032_buyer_actions.py b/apps/procurement/test_cep032_buyer_actions.py
+index f09d3b0..32e27c3 100644
+--- a/apps/procurement/test_cep032_buyer_actions.py
++++ b/apps/procurement/test_cep032_buyer_actions.py
+@@ -8,6 +8,7 @@ from django.urls import reverse
+ from apps.organizations.models import (
+     AuthorizationScopeType,
+     BusinessPermission,
++    MembershipRoleAssignment,
+     MembershipScopeGrant,
+     OrganizationRole,
+ )
+@@ -38,6 +39,14 @@ class BuyerActionTests(P5S11FixtureMixin, TestCase):
+         )
+         membership.role_definition = role
+         membership.save(update_fields=["role_definition"])
++        # Migrated memberships read active assignments, not the compatibility
++        # field. Make the fixture's existing custom-role intent effective.
++        MembershipRoleAssignment.objects.create(
++            organization=self.organization,
++            membership=membership,
++            role=role,
++            reason="CEP-032 explicit isolated custom test role",
++        )
+         MembershipScopeGrant.objects.create(
+             organization=self.organization,
+             membership=membership,
+diff --git a/apps/procurement/test_rfq_close.py b/apps/procurement/test_rfq_close.py
+index 77b8ecb..0809b1d 100644
+--- a/apps/procurement/test_rfq_close.py
++++ b/apps/procurement/test_rfq_close.py
+@@ -163,11 +163,17 @@ class RFQCloseManifestTests(RFQCloseFixtureMixin, TestCase):
+         other_project = Project.objects.create(
+             organization=self.organization, code="OTHER-SCOPE", name="Other Scope"
+         )
+-        MembershipRoleAssignment.objects.create(
++        MembershipRoleAssignment.objects.get_or_create(
+             organization=self.organization,
+             membership=membership,
+             role=membership.role_definition,
+-            reason="P5-S07 object-scope test",
++            revoked_at__isnull=True,
++            defaults={"reason": "P5-S07 object-scope test"},
++        )
++        # Shared migrated fixture now grants Organization scope explicitly.
++        # Remove it before asserting the unrelated-Project denial.
++        membership.scope_grants.filter(revoked_at__isnull=True).update(
++            revoked_at=timezone.now(), revocation_reason="P5-S07 exact scope test"
+         )
+         MembershipScopeGrant.objects.create(
+             organization=self.organization,

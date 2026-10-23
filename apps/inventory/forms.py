@@ -3,6 +3,8 @@ from django.utils import timezone
 
 from apps.inventory.models import StockTransactionType, Warehouse
 from apps.materials.models import Material
+from apps.organizations.authorization import scope_queryset
+from apps.organizations.models import OrganizationMembership
 from apps.procurement.models import GoodsReceiptItem, GoodsReceiptStatus
 from apps.projects.models import Project
 from core.forms import JalaliDateMixin
@@ -33,10 +35,22 @@ class WarehouseForm(_StyledForm):
         label="محل انبار", required=False, widget=forms.Textarea(attrs={"rows": 3})
     )
 
-    def __init__(self, *args: object, organization, **kwargs: object) -> None:
+    def __init__(
+        self,
+        *args: object,
+        organization,
+        membership: OrganizationMembership | None = None,
+        **kwargs: object,
+    ) -> None:
         super().__init__(*args, **kwargs)
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization, deleted_at__isnull=True
+        if not isinstance(membership, OrganizationMembership) or (
+            membership.organization_id != organization.pk
+        ):
+            return
+        self.fields["project"].queryset = scope_queryset(
+            Project.objects.filter(organization=organization, deleted_at__isnull=True),
+            membership=membership,
+            project_lookup="pk",
         ).order_by("name")
 
 
@@ -84,10 +98,24 @@ class StockTransactionForm(_StyledForm):
         label="یادداشت‌ها", required=False, widget=forms.Textarea(attrs={"rows": 3})
     )
 
-    def __init__(self, *args: object, organization, **kwargs: object) -> None:
+    def __init__(
+        self,
+        *args: object,
+        organization,
+        membership: OrganizationMembership | None = None,
+        **kwargs: object,
+    ) -> None:
         super().__init__(*args, **kwargs)
-        active_warehouses = Warehouse.objects.filter(
-            organization=organization, is_active=True, archived_at__isnull=True
+        if not isinstance(membership, OrganizationMembership) or (
+            membership.organization_id != organization.pk
+        ):
+            return
+        active_warehouses = scope_queryset(
+            Warehouse.objects.filter(
+                organization=organization, is_active=True, archived_at__isnull=True
+            ),
+            membership=membership,
+            project_lookup="project_id",
         ).order_by("name")
         self.fields["source_warehouse"].queryset = active_warehouses
         self.fields["destination_warehouse"].queryset = active_warehouses
@@ -102,14 +130,20 @@ class StockTransactionForm(_StyledForm):
             .select_related("unit_of_measure")
             .order_by("name")
         )
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization, deleted_at__isnull=True
+        self.fields["project"].queryset = scope_queryset(
+            Project.objects.filter(organization=organization, deleted_at__isnull=True),
+            membership=membership,
+            project_lookup="pk",
         ).order_by("name")
         self.fields["goods_receipt_item"].queryset = (
-            GoodsReceiptItem.objects.filter(
-                organization=organization,
-                goods_receipt__status=GoodsReceiptStatus.POSTED,
-                stock_transactions__isnull=True,
+            scope_queryset(
+                GoodsReceiptItem.objects.filter(
+                    organization=organization,
+                    goods_receipt__status=GoodsReceiptStatus.POSTED,
+                    stock_transactions__isnull=True,
+                ),
+                membership=membership,
+                project_lookup="goods_receipt__project_id",
             )
             .select_related("goods_receipt", "material")
             .order_by("goods_receipt__receipt_number")

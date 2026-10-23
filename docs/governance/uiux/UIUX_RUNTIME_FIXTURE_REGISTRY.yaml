@@ -1,0 +1,1027 @@
+{
+  "schema_version": "1.0",
+  "document": {
+    "id": "BONIRA-UIUX-RUNTIME-FIXTURE-REGISTRY",
+    "status": "RUNTIME_FIXTURE_LAYER_READY_WITH_EXPLICIT_GAPS",
+    "scope": "Development persona and fixture preparation only; no runtime result or CEP state authority",
+    "prepared_at": "2026-10-21T22:18:02.843153+03:30",
+    "retain_reference_identities": true,
+    "credentials_in_registry": false
+  },
+  "baseline": {
+    "branch": "main",
+    "head": "43ac319c6e73e48ca9626461b73987922c498ec3",
+    "settings": "config.settings.development",
+    "database": {
+      "ENGINE": "django.db.backends.postgresql",
+      "NAME": "construction_erp",
+      "HOST": "127.0.0.1",
+      "PORT": "5432"
+    },
+    "checkpoint": "UIUX_REFERENCE_PERSONA_DOCUMENTATION_RECONCILIATION_CHECKPOINT_15.md",
+    "wave_a": "WAVE_A_PARTIAL_UNCHANGED",
+    "wave_b": "WAVE_B_READY_WITH_EXPLICIT_BLOCKED_TARGETS_UNCHANGED"
+  },
+  "personas": [
+    {
+      "persona": "P-01",
+      "identity": "uiux.audit.project",
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "PROVISIONED",
+      "note": "Retained unchanged; no new readiness claim. viewer assignment; explicit project scope PRJ-01-01; preserved empty/no-workspace/no-context variants",
+      "canonical_roles": [
+        "viewer"
+      ],
+      "scope": [
+        "PRJ-01-01"
+      ]
+    },
+    {
+      "persona": "P-02",
+      "identity": "uiux.persona.project-operations",
+      "canonical_roles": [
+        "member"
+      ],
+      "scope": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ],
+      "result": "PARTIAL",
+      "gap_classification": "EXISTING_CANONICAL_ROLE",
+      "note": "Daily report and request creation supported; estimate/expense/equipment-assignment creation not included in member role."
+    },
+    {
+      "persona": "P-03",
+      "identity": "uiux.audit.project",
+      "canonical_roles": [
+        "viewer"
+      ],
+      "scope": [
+        "PRJ-01-01"
+      ],
+      "result": "NEEDS_PRODUCT_REVIEW",
+      "gap_classification": "MISSING_PRODUCT_ROLE",
+      "note": "No bounded buyer role among current canonical roles; purchase_orders.create exists only in broader management roles. Existing read identity retained unchanged."
+    },
+    {
+      "persona": "P-04",
+      "identity": null,
+      "canonical_roles": [],
+      "scope": [],
+      "result": "NEEDS_PRODUCT_REVIEW",
+      "gap_classification": "MISSING_PRODUCT_ROLE",
+      "note": "No bounded fleet specialist role. Actual Project Manager prepared authorized project equipment data; no P04 identity claimed."
+    },
+    {
+      "persona": "P-05",
+      "identity": "account.demo-construction-01.accountant",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "scope": [
+        "organization"
+      ],
+      "result": "PROVISIONED",
+      "gap_classification": "EXISTING_CANONICAL_ROLE",
+      "note": "Retained account; canonical broad tenant_manager assignment revoked; canonical accountant assigned. Organization scope required by existing journal-preparation service. 402 to 167 role-union permissions; prior role history and legacy compatibility field retained."
+    },
+    {
+      "persona": "P-06",
+      "identity": "uiux.persona.treasury",
+      "canonical_roles": [
+        "accountant"
+      ],
+      "scope": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ],
+      "result": "PARTIAL",
+      "gap_classification": "MISSING_SCOPE",
+      "note": "Existing accountant role legitimately includes Treasury capabilities. Project scopes preserved; organization-context entry/view/account management fails closed. No organization grant added solely to simplify test."
+    },
+    {
+      "persona": "P-07",
+      "identity": "uiux.audit.project",
+      "canonical_roles": [
+        "viewer"
+      ],
+      "scope": [
+        "PRJ-01-01"
+      ],
+      "result": "NEEDS_PRODUCT_REVIEW",
+      "gap_classification": "MISSING_PRODUCT_ROLE",
+      "note": "Read comparison retained. Accountant can prepare claims but not payable certificates/statutory lifecycle; no bounded full billing specialist role. No manager/Owner substitution."
+    },
+    {
+      "persona": "P-08",
+      "identity": null,
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "NOT_PROVISIONED",
+      "note": "Retained unchanged; no new readiness claim. no bounded HR administration identity; ordinary project identity lacks effective employee access",
+      "canonical_roles": [],
+      "scope": []
+    },
+    {
+      "persona": "P-09",
+      "identity": null,
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "NOT_PROVISIONED",
+      "note": "Retained unchanged; no new readiness claim. no explicit Person-to-User link available",
+      "canonical_roles": [],
+      "scope": []
+    },
+    {
+      "persona": "P-10",
+      "identity": "uiux.audit.project",
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "PARTIAL",
+      "note": "Retained unchanged; no new readiness claim. attendance read subset; calendar/operational administration unavailable",
+      "canonical_roles": [
+        "viewer"
+      ],
+      "scope": [
+        "PRJ-01-01"
+      ]
+    },
+    {
+      "persona": "P-11",
+      "identity": "uiux.audit.project",
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "PARTIAL",
+      "note": "Retained unchanged; no new readiness claim. Safety read subset; lifecycle authority unprepared",
+      "canonical_roles": [
+        "viewer"
+      ],
+      "scope": [
+        "PRJ-01-01"
+      ]
+    },
+    {
+      "persona": "P-12",
+      "identity": null,
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "NOT_PROVISIONED",
+      "note": "Retained unchanged; no new readiness claim. no effective bounded Knowledge-curation identity mapped",
+      "canonical_roles": [],
+      "scope": []
+    },
+    {
+      "persona": "P-13",
+      "identity": null,
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "NOT_PROVISIONED",
+      "note": "Retained unchanged; no new readiness claim. no bounded Workflow-administration identity mapped",
+      "canonical_roles": [],
+      "scope": []
+    },
+    {
+      "persona": "P-14",
+      "identity": "uiux.audit.reporting",
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "BLOCKED",
+      "note": "Retained unchanged; no new readiness claim. reporting identity active but quarantined; zero effective permissions/scope; no closeout case",
+      "canonical_roles": [],
+      "scope": []
+    },
+    {
+      "persona": "P-15",
+      "identity": "account.demo-construction-01.owner",
+      "canonical_roles": [
+        "tenant_owner",
+        "p7_demo_payroll_assurance"
+      ],
+      "scope": [
+        "organization"
+      ],
+      "result": "PROVISIONED",
+      "gap_classification": "EXISTING_ROLE_COMBINATION",
+      "note": "Controlled credential recovery only; existing role/membership/scope mapping exactly preserved."
+    },
+    {
+      "persona": "P-16",
+      "identity": "uiux.persona.tenant-admin",
+      "canonical_roles": [
+        "tenant_admin"
+      ],
+      "scope": [
+        "organization"
+      ],
+      "result": "PROVISIONED",
+      "gap_classification": "IDENTITY_ONLY_GAP",
+      "note": "Existing canonical Tenant Admin role used; no Owner role, platform assignment, staff or superuser flag. Future viewer and canonically revoked member histories retained."
+    },
+    {
+      "persona": "P-17",
+      "identity": "uiux.persona.project-manager",
+      "canonical_roles": [
+        "project_manager"
+      ],
+      "scope": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ],
+      "result": "PARTIAL",
+      "gap_classification": "EXISTING_CANONICAL_ROLE",
+      "note": "Canonical project manager and A/B scopes prepared. C and Tenant B denied. Operational create authorities present; project_controls.compare/exceptions_view absent and not added."
+    },
+    {
+      "persona": "P-18",
+      "identity": "admin",
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "PROVISIONED",
+      "note": "Retained unchanged; no new readiness claim. actual Platform Admin assignment; tenant memberships are separate authorities",
+      "canonical_roles": [
+        "platform_admin (platform)",
+        "tenant_owner"
+      ],
+      "scope": [
+        "demo-construction-01:organization",
+        "demo-construction-02:organization",
+        "demo-construction-03:organization",
+        "demo-construction-04:organization"
+      ]
+    },
+    {
+      "persona": "P-19",
+      "identity": "uiux.audit.project",
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "PARTIAL",
+      "note": "Retained unchanged; no new readiness claim. document view/download subset; upload/version/link authority absent",
+      "canonical_roles": [
+        "viewer"
+      ],
+      "scope": [
+        "PRJ-01-01"
+      ]
+    },
+    {
+      "persona": "P-20",
+      "identity": null,
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "NOT_PROVISIONED",
+      "note": "Retained unchanged; no new readiness claim. Owner has payroll authority but is not substituted for a bounded payroll specialist",
+      "canonical_roles": [],
+      "scope": []
+    },
+    {
+      "persona": "P-21",
+      "identity": null,
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "NEEDS_PRODUCT_REVIEW",
+      "note": "Retained unchanged; no new readiness claim. governed backend exists; internal employment-record management surface absent",
+      "canonical_roles": [],
+      "scope": []
+    },
+    {
+      "persona": "P-22",
+      "identity": "uiux.audit.project",
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "PARTIAL",
+      "note": "Retained unchanged; no new readiness claim. warehouse/stock read subset; operational and valuation coverage incomplete",
+      "canonical_roles": [
+        "viewer"
+      ],
+      "scope": [
+        "PRJ-01-01"
+      ]
+    },
+    {
+      "persona": "P-23",
+      "identity": "uiux.audit.project",
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "PARTIAL",
+      "note": "Retained unchanged; no new readiness claim. contract/tender read subset; contractual-record and preparation authority incomplete",
+      "canonical_roles": [
+        "viewer"
+      ],
+      "scope": [
+        "PRJ-01-01"
+      ]
+    },
+    {
+      "persona": "P-24",
+      "identity": "uiux.audit.project",
+      "canonical_roles": [
+        "viewer"
+      ],
+      "scope": [
+        "PRJ-01-01"
+      ],
+      "result": "NEEDS_PRODUCT_REVIEW",
+      "gap_classification": "MISSING_PRODUCT_ROLE",
+      "note": "No bounded canonical technical-office role; controls comparison, exceptions and cost reconciliation require broader roles. Read identity retained; no managerial role granted to force coverage."
+    },
+    {
+      "persona": "P-25",
+      "identity": "uiux.audit.project",
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "PARTIAL",
+      "note": "Retained unchanged; no new readiness claim. Quality read subset; create/review authority absent; no Safety substitution",
+      "canonical_roles": [
+        "viewer"
+      ],
+      "scope": [
+        "PRJ-01-01"
+      ]
+    },
+    {
+      "persona": "P-26",
+      "identity": null,
+      "result": "UNCHANGED",
+      "prior_catalogue_status": "BLOCKED",
+      "note": "Retained unchanged; no new readiness claim. no portal principal, invitation or grant; no tenant-member substitution",
+      "canonical_roles": [],
+      "scope": []
+    }
+  ],
+  "credential_recovery": [
+    {
+      "identity": "account.demo-construction-01.owner",
+      "result": "CONTROLLED_CREDENTIAL_RESET",
+      "authorization_unchanged": true,
+      "credential_store": "Existing current-user Windows DPAPI store outside repository",
+      "password_verified_in_memory": true
+    },
+    {
+      "identity": "account.demo-construction-01.supervisor",
+      "result": "CONTROLLED_CREDENTIAL_RESET",
+      "authorization_unchanged": true,
+      "credential_store": "Existing current-user Windows DPAPI store outside repository",
+      "password_verified_in_memory": true
+    },
+    {
+      "identity": "account.demo-construction-01.accountant",
+      "result": "CONTROLLED_CREDENTIAL_RESET",
+      "authorization_unchanged": true,
+      "credential_store": "Existing current-user Windows DPAPI store outside repository",
+      "password_verified_in_memory": true
+    }
+  ],
+  "project_topology": {
+    "organization": "demo-construction-01",
+    "A": {
+      "project": "PRJ-01-01",
+      "id": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+      "scoped_personas": "P01/P02/P17/P06 authorized"
+    },
+    "B": {
+      "project": "PRJ-01-02",
+      "id": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+      "scoped_personas": "P02/P17/P06 authorized; P01 unauthorized"
+    },
+    "C": {
+      "project": "PRJ-01-03",
+      "id": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+      "scoped_personas": "P01/P02/P17/P06 unauthorized"
+    },
+    "cross_tenant": {
+      "organization": "demo-construction-02",
+      "project": "PRJ-02-01",
+      "id": "63063dae-394e-46e4-9abb-09284e821561",
+      "scoped_personas": "P01/P02/P17/P06 unauthorized"
+    },
+    "organization_accountant_limit": "P05 has legitimate organization financial scope; C is not a negative project fixture for P05. Scoped financial comparator P06 has A/B-only authority; organization entry denies it."
+  },
+  "fixtures": {
+    "RV-023": {
+      "status": "FIXTURE_READY",
+      "authorized_before": 9,
+      "authorized_after": 30,
+      "page_size": 25,
+      "expected_page_lengths": [
+        25,
+        5
+      ],
+      "created": [
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "242a2cf6-3538-4901-a0d7-c64e15da4dbe",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "64f3bf4e-029b-4724-818d-3bc2697f81b6",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "55ba8d98-cf38-4045-b3a9-54334d942613",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "d876c8c4-62c4-4480-8998-9fd9de6ac080",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "5ed827e5-bc28-4ab0-baad-24db2420df43",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "77124738-1a2a-495a-8b50-980fa44a1a62",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "13a4ec01-2d35-4e0d-b7fc-9e0063cc5c41",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "b7dab0b5-5981-49a3-9213-71a33c737fde",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "287bdebb-0175-44f7-aa85-69ce4d155ff1",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "59911474-3ee8-4532-ab45-1943da7a7ae9",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "74225ca0-98e5-4291-b645-fdc446794711",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "59ddd5e2-373d-40f0-824e-798f1335b2a6",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "aa70867f-26cc-492e-b220-11fbf278d11c",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "96fbfa1b-f8ba-4f08-ba5b-2d811c834d86",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "b1eb3cf3-014f-4848-9296-956e8a7b31c5",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "9e08b091-82dd-4cb6-9c3a-0a0dd97ce1ce",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "d5309e79-485a-4caf-be92-62263e453bdc",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "1a993610-e291-45bf-899e-08c1a5c69a25",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "af6baaa4-9d68-4583-a4cf-2612dadf85a9",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "6de4770f-2af6-44ee-9edd-df5cbcc12b63",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "ba570e1f-6d53-45e1-a1a1-38a9b5760a29",
+          "created": true,
+          "canonical_path": "apps.daily_reports.services.create_daily_report",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        }
+      ],
+      "actor": "uiux.persona.project-operations",
+      "runtime_pagination_not_executed": true
+    },
+    "RV-006": {
+      "status": "FIXTURE_READY_FOR_P17_PARTIAL_FOR_P02_P24",
+      "records": [
+        {
+          "model": "estimates.Estimate",
+          "id": "b73c20b4-2d05-42cb-b035-f755ce784870",
+          "created": true,
+          "canonical_path": "apps.estimates.services.create_estimate",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "expenses.Expense",
+          "id": "db256686-36e8-4d85-8eb4-efa16b0c3b0a",
+          "created": true,
+          "canonical_path": "apps.expenses.services.create_expense_draft",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "projects.ProjectSite",
+          "id": "eef2f5d7-dc51-44d3-8414-8dc480f500c0",
+          "created": false,
+          "canonical_path": "Existing canonical Development seed",
+          "organization": "demo-construction-01",
+          "status": null
+        },
+        {
+          "model": "projects.ProjectPhase",
+          "id": "6e051d90-25d5-4bb0-8248-5a4d7bb7885e",
+          "created": false,
+          "canonical_path": "Existing canonical Development seed",
+          "organization": "demo-construction-01",
+          "status": "active"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "ba570e1f-6d53-45e1-a1a1-38a9b5760a29",
+          "created": false,
+          "canonical_path": "Existing canonical Development seed / retained fixture",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "estimates.Estimate",
+          "id": "f9d36a32-0900-4889-9786-329b270138c8",
+          "created": true,
+          "canonical_path": "apps.estimates.services.create_estimate",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "expenses.Expense",
+          "id": "b87f90a9-8767-4c7b-8b35-cfdddc0aff5b",
+          "created": true,
+          "canonical_path": "apps.expenses.services.create_expense_draft",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "projects.ProjectSite",
+          "id": "b83c65c4-5739-4076-b0aa-d892a14b8d60",
+          "created": false,
+          "canonical_path": "Existing canonical Development seed",
+          "organization": "demo-construction-01",
+          "status": null
+        },
+        {
+          "model": "projects.ProjectPhase",
+          "id": "ce509fcf-7930-46ab-8225-8e604146ee2c",
+          "created": false,
+          "canonical_path": "Existing canonical Development seed",
+          "organization": "demo-construction-01",
+          "status": "active"
+        },
+        {
+          "model": "daily_reports.DailyReport",
+          "id": "0383ad95-7014-4aae-aee3-24c0ddf5f607",
+          "created": false,
+          "canonical_path": "Existing canonical Development seed / retained fixture",
+          "organization": "demo-construction-01",
+          "status": "submitted"
+        },
+        {
+          "model": "equipment.EquipmentAssignment",
+          "id": "4856f302-4027-4c49-8996-c749f273c24c",
+          "created": false,
+          "canonical_path": "Existing canonical Development seed",
+          "organization": "demo-construction-01",
+          "status": "active"
+        },
+        {
+          "model": "equipment.EquipmentAssignment",
+          "id": "5551e389-d0d9-48b3-91eb-74c5f66cbffe",
+          "created": true,
+          "canonical_path": "apps.equipment.services.assign_equipment",
+          "organization": "demo-construction-01",
+          "status": "active"
+        }
+      ],
+      "expense_route": "/expenses/create/",
+      "authorized_projects": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ],
+      "P02_limit": "member lacks estimate/expense/equipment assignment creation",
+      "P24_limit": "No bounded canonical technical-office role; no manager substitution"
+    },
+    "RV-008": {
+      "status": "FIXTURE_AND_AUTHORITY_SUBSET_READY_P17_P03_BLOCKED",
+      "records": [
+        {
+          "model": "procurement.PurchaseRequest",
+          "id": "e4d6ebbd-8056-4811-98fb-93f0797a61fc",
+          "created": false,
+          "canonical_path": "Existing approved canonical Development seed; finalized state retained",
+          "organization": "demo-construction-01",
+          "status": "approved",
+          "project": "PRJ-01-01",
+          "item_count": 2
+        },
+        {
+          "model": "procurement.PurchaseRequest",
+          "id": "95b26b51-7739-4a59-a24a-fba901b222ed",
+          "created": false,
+          "canonical_path": "Existing approved canonical Development seed; finalized state retained",
+          "organization": "demo-construction-01",
+          "status": "approved",
+          "project": "PRJ-01-02",
+          "item_count": 2
+        },
+        {
+          "model": "procurement.PurchaseRequest",
+          "id": "ef85f56c-99a5-4969-b223-459ad6b1fbb8",
+          "created": false,
+          "canonical_path": "Existing approved canonical Development seed; finalized state retained",
+          "organization": "demo-construction-01",
+          "status": "approved",
+          "project": "PRJ-01-03",
+          "item_count": 2
+        },
+        {
+          "model": "procurement.PurchaseRequest",
+          "id": "045e3d64-0ced-42e2-83b1-7f29a053bf1f",
+          "created": false,
+          "canonical_path": "Existing approved canonical Development seed; finalized state retained",
+          "organization": "demo-construction-02",
+          "status": "approved",
+          "project": "PRJ-02-01",
+          "item_count": 2
+        },
+        {
+          "model": "parties.BusinessParty",
+          "id": "74e7190b-1f81-4d86-afcb-2da76f0e3b4e",
+          "created": false,
+          "canonical_path": "Existing BusinessParty with active canonical supplier role",
+          "organization": "demo-construction-01",
+          "status": null
+        }
+      ],
+      "P17_has_purchase_orders_create": true,
+      "P03": "NEEDS_PRODUCT_REVIEW; no bounded buyer role; no role fabricated",
+      "note": "Data prerequisites only; create route and workflow gates not executed",
+      "authority_evidence": "runtime_evidence/fixture_provisioning/VERIFICATION.json#readiness_authority_only",
+      "runtime_executed": false
+    },
+    "RV-010": {
+      "status": "FIXTURE_READY",
+      "records": [
+        {
+          "model": "accounting.JournalEntry",
+          "id": "ac8999b1-2f65-4e8c-85b5-246159e647dd",
+          "created": true,
+          "canonical_path": "apps.accounting.services.create_journal",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        },
+        {
+          "model": "accounting.JournalLine",
+          "id": "a3809da7-1131-4c34-b954-f73763e98be7",
+          "created": true,
+          "canonical_path": "apps.accounting.services.add_journal_line",
+          "organization": "demo-construction-01",
+          "status": null
+        },
+        {
+          "model": "accounting.JournalLine",
+          "id": "ce97a317-12a0-4fa9-a14b-27b5635721e5",
+          "created": true,
+          "canonical_path": "apps.accounting.services.add_journal_line",
+          "organization": "demo-construction-01",
+          "status": null
+        }
+      ],
+      "fiscal_year": "FY-1405",
+      "period": 3,
+      "period_status": "open",
+      "journal_status": "draft",
+      "actor": "account.demo-construction-01.accountant",
+      "posting_performed": false,
+      "scope_limit": "Accountant requires organization grant for create_journal; same-tenant project denial belongs to scoped financial comparator, not organization accountant"
+    },
+    "RV-012": {
+      "status": "PARTIAL_BLOCKED_ELIGIBLE_SOURCE_AND_ACCOUNT_ACTIVATION",
+      "records": [
+        {
+          "model": "treasury.TreasuryAccount",
+          "id": "abddceb8-a1be-4f12-85da-5b2d6269c063",
+          "created": true,
+          "canonical_path": "apps.treasury.services.create_treasury_account",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        }
+      ],
+      "account_status": "draft",
+      "approved_eligible_sources": 0,
+      "governing_budget_controls": 0,
+      "source_blocker": "Movement form accepts approved employee_reimbursement only. No approved reimbursement expense/request or accepted governing budget exists. Do not invent acceptance/governance semantics.",
+      "account_blocker": "Activation requires effective Accounting mapping and independent organization-scoped finance checker. P06 remains project-scoped; no scope expansion solely to prepare fixtures.",
+      "P06_scope_gate": "MovementForm clears source choices unless Treasury view passes organization context; project-only scopes do not satisfy that call. No UI or authorization changes.",
+      "prior_rolled_back_attempt": "runtime_evidence/fixture_provisioning/GROUP_RV012.json"
+    },
+    "RV-014": {
+      "status": "BLOCKED_CANONICAL_PREREQUISITE",
+      "error_type": "ValidationError",
+      "reason": "['Ã™â€ Ã˜Â³Ã˜Â®Ã™â€¡ Ã˜ÂªÃ˜Â£Ã›Å’Ã›Å’Ã˜Â¯Ã˜Â´Ã˜Â¯Ã™â€¡ Ã˜Â´Ã˜Â±Ã˜Â§Ã›Å’Ã˜Â· Ã™â€šÃ˜Â±Ã˜Â§Ã˜Â±Ã˜Â¯Ã˜Â§Ã˜Â¯ Ã˜Â¨Ã˜Â±Ã˜Â§Ã›Å’ Ã˜ÂªÃ˜Â§Ã˜Â±Ã›Å’Ã˜Â® Ã™â€šÃ˜Â·Ã˜Â¹ Ã™Ë†Ã˜Â¬Ã™Ë†Ã˜Â¯ Ã™â€ Ã˜Â¯Ã˜Â§Ã˜Â±Ã˜Â¯.']",
+      "rolled_back": true,
+      "reused_baseline_and_progress": {
+        "approved_baseline": {
+          "model": "billing.ProjectBaseline",
+          "id": "1f32c3c2-c16a-4006-98c0-2df2de97f355",
+          "created": false,
+          "canonical_path": "Existing canonical approved Development baseline",
+          "organization": "demo-construction-01",
+          "status": "approved"
+        },
+        "verified_progress": [
+          {
+            "model": "billing.ProgressRecord",
+            "id": "36da3b94-cc2e-47bb-915c-f5d020367fbd",
+            "created": false,
+            "canonical_path": "Existing canonical verified Development progress",
+            "organization": "demo-construction-01",
+            "status": "verified"
+          }
+        ]
+      }
+    },
+    "RV-019": {
+      "status": "PARTIAL_DATA_READY_P04_ROLE_GAP",
+      "records": [
+        {
+          "model": "equipment.Equipment",
+          "id": "aa70efc4-34eb-4624-a51d-8e035c2dec1c",
+          "created": false,
+          "canonical_path": "Existing canonical Development seed",
+          "organization": "demo-construction-01",
+          "status": "assigned"
+        },
+        {
+          "model": "equipment.EquipmentAssignment",
+          "id": "4856f302-4027-4c49-8996-c749f273c24c",
+          "created": false,
+          "canonical_path": "Existing canonical Development seed",
+          "organization": "demo-construction-01",
+          "status": "active"
+        },
+        {
+          "model": "equipment.EquipmentMeter",
+          "id": "69be31ae-a971-40ed-8c5c-e86c66e76eca",
+          "created": true,
+          "canonical_path": "EquipmentMeter.full_clean/save + canonical permission check + audit",
+          "organization": "demo-construction-01",
+          "status": null
+        },
+        {
+          "model": "equipment.MeterReading",
+          "id": "72087ad9-2305-4d50-baff-d70556147aca",
+          "created": true,
+          "canonical_path": "apps.equipment.p8_services.record_meter_reading",
+          "organization": "demo-construction-01",
+          "status": null
+        },
+        {
+          "model": "equipment.EquipmentUsageLog",
+          "id": "fb2254b0-a70b-4348-8d39-2e20c6e9f6eb",
+          "created": true,
+          "canonical_path": "apps.equipment.p8_services.record_usage",
+          "organization": "demo-construction-01",
+          "status": null
+        },
+        {
+          "model": "equipment.MaintenancePlan",
+          "id": "a259dbdf-7a33-4593-9ac8-36c4beaf3a8d",
+          "created": true,
+          "canonical_path": "apps.equipment.p8_services.create_maintenance_plan",
+          "organization": "demo-construction-01",
+          "status": null
+        },
+        {
+          "model": "equipment.EquipmentWorkOrder",
+          "id": "03d97bff-bc31-4d88-9fd3-905217a7de65",
+          "created": true,
+          "canonical_path": "apps.equipment.p8_services.create_work_order",
+          "organization": "demo-construction-01",
+          "status": "draft"
+        }
+      ],
+      "actor": "uiux.persona.project-manager",
+      "actor_capacity": "Actual Project Manager on authorized deployment; not P04 substitution",
+      "remaining": [
+        "P04 bounded canonical fleet role absent",
+        "No approved workforce qualification linked; no inferred operator identity",
+        "No approved equipment cost policy/rate; no invented cost policy or allocations"
+      ],
+      "prior_rolled_back_attempt": "runtime_evidence/fixture_provisioning/GROUP_RV019.json"
+    },
+    "RV-024": {
+      "status": "BLOCKED_AUTHORIZATION_FIXTURE",
+      "assignment_attempt": {
+        "status": "BLOCKED_AUTHORIZATION_FIXTURE",
+        "assigner": "account.demo-construction-01.owner",
+        "reason": "Canonical assigner permission-subset check denied; transaction rolled back",
+        "missing_permission_codes": [
+          "accounting_recognition.view",
+          "reporting.metric_result.view",
+          "reporting.project_closeout_case.prepare",
+          "reporting.project_closeout_case.view",
+          "reporting.reconciliation_run.view"
+        ]
+      },
+      "closeout_case_created": false,
+      "note": "Required authority unavailable; no closeout profile/case manufactured."
+    },
+    "RV-033": {
+      "status": "HISTORY_FIXTURES_READY_NOT_RUNTIME_PASS",
+      "identity": "uiux.persona.tenant-admin",
+      "history": [
+        {
+          "assignment_id": "259ef84e-3b5b-4b62-9b4f-cd3b14005a02",
+          "state": "FUTURE_EFFECTIVE",
+          "starts_at": "2099-01-01 00:00:00+00:00",
+          "ends_at": "2099-01-08 00:00:00+00:00",
+          "identity": "uiux.persona.tenant-admin"
+        },
+        {
+          "assignment_id": "6663e1db-421f-4377-9bdc-4638a5c9ba26",
+          "state": "REVOKED",
+          "identity": "uiux.persona.tenant-admin"
+        }
+      ],
+      "future_role": "viewer",
+      "revoked_role": "member",
+      "canonical_paths": [
+        "assign_membership_role",
+        "revoke_membership_role"
+      ],
+      "note": "No new role definition; future viewer is a subset of active Tenant Admin authority. No activation or retirement of persona."
+    }
+  },
+  "integrity": {
+    "focused_checks_pass": 42,
+    "focused_checks_fail": 0,
+    "django_check": "PASS (0 issues)",
+    "prior_uiux_files_unchanged": 111,
+    "unchanged_model_fingerprints": 494,
+    "changed_model_count": 20,
+    "before_authorization_fingerprint": "89beb3e15e6a0340fced57485ad31073558c6252d9dd82a37f32a370beb5d01e",
+    "after_authorization_fingerprint": "dc41830339a943bd6aab2820da7340fc3e7d361f2e3643cae153b5abf3393007",
+    "evidence_directory": "runtime_evidence/fixture_provisioning",
+    "historical_artifacts_rewritten": false,
+    "product_changes": false,
+    "git_writes": false,
+    "wave_runs": false
+  },
+  "retention": "Retain personas and identified Development fixture data. No automatic deactivation/deletion. Future cleanup uses canonical domain workflows and explicit authorization; no raw deletion implied.",
+  "wave_de_fixture_closure": {
+    "recorded_at": "2026-10-23T11:58:41.840766+03:30",
+    "RV-016": {
+      "label": "UIUX_TEST_ONLY_NON_AUTHORITATIVE — RV-016/RV-021 Development fixture",
+      "actor": "uiux.persona.project-operations",
+      "person": "99295105-0096-4800-92fb-427ae60d4b9c",
+      "relationship": "f8b0422d-7b66-4afd-9c15-efc5e28ee39b",
+      "mechanism": "create_person(user=explicit existing member) + create_work_relationship; existing member permission and project scopes unchanged",
+      "legacy_employee": null,
+      "payroll_history": "legitimate empty own history; no payroll financial source manufactured",
+      "permissions_unchanged": true
+    },
+    "RV-021": {
+      "label": "UIUX_TEST_ONLY_NON_AUTHORITATIVE — RV-016/RV-021 Development fixture",
+      "author": "uiux.persona.tenant-admin",
+      "curator": "account.demo-construction-01.owner",
+      "authority": "Existing tenant_admin author and tenant_owner independent reviewer/approver/publisher; no new grants",
+      "candidate": "7a0e29e5-dd6d-4af7-a3a3-e974a4e73e43",
+      "version": "a4468fd4-72fb-4410-91fb-b8f83d0d46d8",
+      "source": "f33b15a7-d0da-4ac9-aa8c-d91d6485ef6b",
+      "source_type": "field_observation",
+      "promotion": "db0d9457-aab6-4911-b3b9-a9dabc08627e",
+      "separation": true,
+      "platform_status": "requested; no platform review/approval/publication performed"
+    },
+    "platform_session": {
+      "actor": "admin",
+      "explicit_platform_admin": true,
+      "existing_seed_credential_verified": true,
+      "credential_reset": false,
+      "credential_in_evidence": false,
+      "storage": "existing current-user DPAPI store only"
+    },
+    "Wave_E_external_blocker": {
+      "observed_at": "2026-10-23T08:17:55.030839+00:00",
+      "grant": "f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0",
+      "actor": "uiux.wcd.external",
+      "invitation_status": "accepted",
+      "expires_at": "2026-10-22T23:58:23.997576+00:00",
+      "expired": true,
+      "revoked": false,
+      "rfq_status": "issued",
+      "rfq_closing": "2026-10-23T17:58:23.790663+00:00",
+      "tenant_membership_count": 0,
+      "fixture_mutated": false,
+      "result": "BLOCKED_TEST_DATA",
+      "reason": "Existing accepted portal invitation has expired; no E grant renewal/validity rewrite is in the bounded D fixture-repair scope.",
+      "service_denial": "مجوز درگاه فعال نیست."
+    },
+    "roles_permissions_scopes_unchanged": true,
+    "reference_accounts": "RETAINED; no deletion/deactivation/reset"
+  },
+  "wave_e_targeted_closure": {
+    "recorded_at": "2026-10-23T13:12:47.512272+03:30",
+    "fresh_portal": {
+      "created_at": "2026-10-23 09:28:32.619599+00:00",
+      "actor": "uiux.wavec.portal",
+      "external": "uiux.wcd.external",
+      "invitation": "b2dece54-f7e4-4aa9-be0f-63fed263d7f3",
+      "grant": "dacde271-a02f-4d09-842d-3fb5695033a4",
+      "path": "/procurement/portal/grants/dacde271-a02f-4d09-842d-3fb5695033a4/",
+      "expires_at": "2026-10-23 15:28:32.619599+00:00",
+      "closing_at": "2026-10-23 17:58:23.790663+00:00",
+      "rfq": "18a7b335-38bb-4162-95e3-7a5ed16e14d8",
+      "rfq_invitation": "58ebeb37-5794-4dde-a571-dc6588e059dc",
+      "capability": "rfq_quote.submit",
+      "membership_count": 0,
+      "services": [
+        "create_supplier_portal_invitation",
+        "accept_supplier_portal_invitation",
+        "get_supplier_portal_rfq_context"
+      ],
+      "token_persisted": false,
+      "old_invitation_rewritten": false,
+      "rfq_mutated": false
+    },
+    "replaces_expired_context_for_positive_evidence_only": true,
+    "old_grant_retained_and_denied": true,
+    "membership_roles_permissions_scopes_unchanged": true,
+    "data_integrity": "wave_e_targeted_closure/DATA_INTEGRITY.json",
+    "reference_accounts": "RETAINED; no reset/deletion/deactivation",
+    "evidence_valid_at_capture": true
+  }
+}

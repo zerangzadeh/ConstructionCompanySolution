@@ -11,17 +11,21 @@ from apps.expenses.models import (
     PlatformExpenseGroup,
     RecurringExpenseTemplate,
 )
+from apps.organizations.authorization import scope_queryset
 from apps.organizations.form_scoping import (
+    normalized_uuid,
     scope_project_related_choices,
     scoped_projects_for_form,
     selected_form_project,
 )
+from apps.organizations.models import OrganizationMembership
 from apps.parties.models import BusinessParty
 from apps.projects.models import (
     Activity,
     CBSNode,
     CostCenter,
     Project,
+    ProjectBudgetControl,
     ProjectPhase,
     WBSNode,
 )
@@ -185,23 +189,93 @@ class ExpenseAllocationForm(forms.ModelForm):
             "allocation_basis_reference",
         ]
 
-    def __init__(self, *args, organization=None, **kwargs):
+    def __init__(
+        self, *args, organization=None, membership=None, expense=None, **kwargs
+    ):
         super().__init__(*args, **kwargs)
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization, deleted_at__isnull=True
-        )
-        self.fields["wbs_node"].queryset = WBSNode.objects.filter(
-            organization=organization, is_active=True, archived_at__isnull=True
-        )
-        self.fields["activity"].queryset = Activity.objects.filter(
-            organization=organization, is_active=True, archived_at__isnull=True
-        )
+        for name in ("project", "wbs_node", "activity"):
+            self.fields[name].queryset = self.fields[name].queryset.none()
         self.fields["cbs_node"].queryset = CBSNode.objects.filter(
             organization=organization, is_leaf=True, structure_version__status="locked"
         )
         self.fields["cost_center"].queryset = CostCenter.objects.filter(
             organization=organization, structure_version__status="locked"
         )
+        if not isinstance(membership, OrganizationMembership) or (
+            organization is None or membership.organization_id != organization.pk
+        ):
+            return
+        projects = scope_queryset(
+            Project.objects.filter(organization=organization, deleted_at__isnull=True),
+            membership=membership,
+            project_lookup="pk",
+        )
+        self.fields["project"].queryset = projects
+        wbs_nodes = scope_queryset(
+            WBSNode.objects.filter(
+                organization=organization, is_active=True, archived_at__isnull=True
+            ),
+            membership=membership,
+            project_lookup="project_id",
+        )
+        activities = scope_queryset(
+            Activity.objects.filter(
+                organization=organization, is_active=True, archived_at__isnull=True
+            ),
+            membership=membership,
+            project_lookup="project_id",
+        )
+        if self.is_bound:
+            project = selected_form_project(
+                data=self.data,
+                field_name=self.add_prefix("project"),
+                projects=projects,
+                active_project=None,
+            )
+            wbs_nodes = (
+                wbs_nodes.filter(project=project) if project else wbs_nodes.none()
+            )
+            wbs_id = normalized_uuid(self.data.get(self.add_prefix("wbs_node")))
+            selected_wbs = wbs_nodes.filter(pk=wbs_id).first() if wbs_id else None
+            activities = (
+                activities.filter(project=project, wbs_node=selected_wbs)
+                if project and selected_wbs
+                else activities.none()
+            )
+            # The service supplies these non-editable relations at save time;
+            # model validation needs the same trusted context before that call.
+            if expense is not None and expense.organization_id == organization.pk:
+                self.instance.expense = expense
+                self.instance.organization = organization
+            control = (
+                ProjectBudgetControl.objects.filter(
+                    organization=organization,
+                    project=project,
+                    governing_budget__status="accepted",
+                )
+                .select_related("governing_budget")
+                .first()
+                if project
+                else None
+            )
+            if control:
+                self.instance.governing_budget = control.governing_budget
+        self.fields["wbs_node"].queryset = wbs_nodes
+        self.fields["activity"].queryset = activities
+
+    def _post_clean(self):
+        # Invalid choices must fail before model.clean dereferences required FKs.
+        if self.errors:
+            return
+        if not self.instance.expense_id:
+            self.add_error(None, "An authorized expense is required for allocation.")
+            return
+        if not self.instance.governing_budget_id:
+            self.add_error(
+                None, "An accepted governing budget is required for expense coding."
+            )
+            return
+        super()._post_clean()
 
 
 class ExpenseReturnForm(forms.Form):
@@ -254,11 +328,25 @@ class RecurringExpenseTemplateForm(JalaliDateMixin, forms.ModelForm):
             "source_reference_prefix",
         ]
 
-    def __init__(self, *args, organization=None, **kwargs):
+    def __init__(self, *args, organization=None, membership=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization, deleted_at__isnull=True
+        self.fields["project"].queryset = Project.objects.none()
+        if not isinstance(membership, OrganizationMembership) or (
+            organization is None or membership.organization_id != organization.pk
+        ):
+            return
+        self.fields["project"].queryset = scope_queryset(
+            Project.objects.filter(organization=organization, deleted_at__isnull=True),
+            membership=membership,
+            project_lookup="pk",
         )
+
+    def _post_clean(self):
+        # Model.clean dereferences required Project/date values; reject incomplete
+        # field validation before reaching those model invariants.
+        if self.errors:
+            return
+        super()._post_clean()
 
 
 class RecurringExpenseProposalForm(JalaliDateMixin, forms.Form):

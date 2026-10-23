@@ -1,0 +1,209 @@
+# BONIRA UI/UX — Wave C Final Closure Pass
+
+Repository:
+
+`E:\Construction_Company_Solution`
+
+Current effective state:
+
+- Existing accepted dirty source must be preserved.
+- Authorization reconciliation is complete.
+- PD-WC-D01–D05 are implemented.
+- RV-011, RV-013, ordinary RV-018 and RV-032 domain/source blockers are resolved.
+- RV-030 service/HTTP validation passes; browser confirmation remains.
+- RV-029 authorization is resolved; populated own-history runtime remains.
+- RV-007 authorization is resolved; real RFQ close lifecycle remains.
+- Production, CEP-078/079 and Git writes remain unauthorized.
+
+Do not reopen:
+
+- Authorization architecture
+- Role reconciliation
+- Domain decisions D01–D05
+- Waves A/B
+- previously closed findings
+
+Do not redesign or refactor unrelated code.
+
+## Objective
+
+Close only the remaining Wave C evidence gaps and determine whether Wave C can be declared complete.
+
+---
+
+## 1. Regression attribution
+
+Inspect all 10 failures currently recorded in:
+
+`wave_c_domain_resolution/BASELINE_DEBT.json`
+
+For every failure classify exactly:
+
+- `BASELINE_PREEXISTING`
+- `ATTRIBUTABLE_REGRESSION`
+- `INDETERMINATE`
+
+Prove baseline attribution against the frozen/entry implementation where possible.
+
+Do not repair unrelated baseline debt merely to make the suite green.
+
+If any failure is attributable to the current Authorization/domain/UIUX changes:
+
+- fix only that attributable regression;
+- rerun its focused and affected regression tests;
+- preserve all unrelated behavior.
+
+Wave C must not close with an unresolved attributable regression.
+
+---
+
+## 2. RV-030 Tender browser closure
+
+No new Tender Product Decision is required.
+
+Use the already configured Development Tender activation and existing Commercial specialist.
+
+Perform representative authenticated browser verification on the corrected current source at:
+
+- desktop representative viewport
+- mobile representative viewport
+
+Verify:
+
+- Tender list/detail/create journey renders correctly;
+- policy/reference presentation is business-facing;
+- project/counterparty context is understandable;
+- corrected unique DOM IDs remain unique;
+- available transitions/actions reflect current state;
+- terminal rejection state is understandable;
+- no raw technical identifiers dominate the normal workflow;
+- keyboard focus and basic responsive behavior are usable.
+
+Reuse existing HTTP/service evidence.
+
+Do not repeat domain implementation.
+
+If local browser execution remains unavailable because of environment settings:
+
+record exactly:
+
+`RV-030_BROWSER_BLOCKED_ENVIRONMENT`
+
+Do not modify product code or weaken the requirement to manufacture PASS.
+
+---
+
+## 3. RV-029 populated employment / own-history closure
+
+Use the already authorized Employment Manager and explicitly linked own-history actor.
+
+Prefer existing Development employment history.
+
+If no qualifying populated Development history exists, a minimal synthetic Development-only employment-history fixture may be created through canonical services only, with explicit test provenance.
+
+Do not infer identity.
+
+Identity must continue to rely on explicit:
+
+- Employee.user
+- Person
+- WorkRelationship
+
+Verify:
+
+- management list/detail;
+- append-only employment version;
+- current versus historical presentation;
+- effective dates;
+- supersession/history;
+- own-history access;
+- another employee denial;
+- cross-tenant denial;
+- missing/mismatched Employee.user denial;
+- source/document traceability without avoidable raw identifiers;
+- invalid POST redisplay.
+
+No Production or real-person data.
+
+---
+
+## 4. RV-007 opening lifecycle
+
+Use the existing authorized Procurement actors and retained RFQ/source evidence.
+
+Do not alter the RFQ close date.
+
+If the canonical RFQ is not yet legally/time-valid for opening, retain:
+
+`RV-007_PENDING_REAL_CLOSE_CONDITION`
+
+and do not fabricate closure.
+
+Once the real close condition is satisfied, execute:
+
+- close/custody prerequisites;
+- protected opening;
+- independent opening duties;
+- confidential comparison access;
+- same-tenant unauthorized denial;
+- site-only denial;
+- cross-tenant denial;
+- manipulated action denial;
+- source/hash/scan integrity checks;
+- stage/next-action UI;
+- desktop/mobile representative browser verification.
+
+No early opening and no fabricated CLEAN/source evidence.
+
+---
+
+## 5. Final Wave C reconciliation
+
+After the executable items above:
+
+reconcile only current Wave C results and affected findings.
+
+Explicitly distinguish:
+
+- PASS
+- BLOCKED_ENVIRONMENT
+- PENDING_REAL_TIME_CONDITION
+- BASELINE_DEBT
+- ATTRIBUTABLE_REGRESSION
+- OUT_OF_WAVE_C_CERTIFICATION
+
+Do not convert official statutory success to PASS; it remains outside Wave C under PD-WC-D03.
+
+Preserve previous closed findings and historical evidence.
+
+## Required final output
+
+Report:
+
+1. REGRESSION_ATTRIBUTION
+2. RV-029_FINAL
+3. RV-030_FINAL
+4. RV-007_FINAL
+5. REMAINING_EVIDENCE_GAPS
+6. WAVE_C_FINAL_MATRIX
+7. MIGRATION_AND_DATA_INTEGRITY
+8. GIT_AND_PRODUCTION_BOUNDARY
+9. FINAL_DECISION
+
+Final decision must be exactly one of:
+
+`WAVE_C_COMPLETE`
+
+`WAVE_C_COMPLETE_WITH_EXPLICIT_BASELINE_DEBT`
+
+`WAVE_C_BLOCKED_ENVIRONMENT`
+
+`WAVE_C_PENDING_REAL_TIME_CONDITION`
+
+`WAVE_C_BLOCKED_ATTRIBUTABLE_REGRESSION`
+
+Do not execute Wave D, CEP-078 or CEP-079.
+
+Do not commit, push or merge.
+
+STOP.

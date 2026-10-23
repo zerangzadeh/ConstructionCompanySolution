@@ -529,7 +529,7 @@ class CertificateTests(TestCase):
         )
         self.assertEqual(EmployeeQualification.objects.count(), 1)
 
-    def test_empty_error_uniform_denial_and_no_default_sensitive_grants(self):
+    def test_empty_error_uniform_denial_and_owner_admin_sensitive_defaults_denied(self):
         self._client_as(self.employee_user)
         empty = self.client.get(reverse("workforce:certificate_index"))
         self.assertContains(empty, "درخواست گواهی مجازی برای نمایش موجود نیست.")
@@ -564,7 +564,9 @@ class CertificateTests(TestCase):
             P.HR_CERTIFICATES_CONFIGURE,
             P.HR_CERTIFICATES_CANCEL,
         }
-        for grants in DEFAULT_ROLE_PERMISSIONS.values():
+        for grants in (
+            DEFAULT_ROLE_PERMISSIONS[role] for role in ("tenant_owner", "tenant_admin")
+        ):
             self.assertFalse(codes & grants)
 
     def test_foreign_tenant_and_unassigned_member_cannot_read_or_generate(self):

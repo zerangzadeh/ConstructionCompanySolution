@@ -1,0 +1,73 @@
+{
+  "authorization": "User attachment 2026-10-21; Development-only personas/test-fixtures; no Wave execution",
+  "baseline": "43ac319c6e73e48ca9626461b73987922c498ec3",
+  "new_accounts": {
+    "uiux.persona.project-operations": {
+      "role": "member",
+      "scope": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ]
+    },
+    "uiux.persona.project-manager": {
+      "role": "project_manager",
+      "scope": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ]
+    },
+    "uiux.persona.tenant-admin": {
+      "role": "tenant_admin",
+      "scope": [
+        "organization"
+      ]
+    },
+    "uiux.persona.treasury": {
+      "role": "accountant",
+      "scope": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ]
+    }
+  },
+  "existing_account_correction": {
+    "identity": "account.demo-construction-01.accountant",
+    "revoke_effective_role": "tenant_manager",
+    "assign_role": "accountant",
+    "scope": [
+      "organization"
+    ],
+    "rationale": "Reuse retained accountant alias for existing canonical financial role. Journal preparation is organization-scoped in existing service. Compatibility role field retained; no new financial permissions."
+  },
+  "credential_recovery": [
+    "account.demo-construction-01.owner",
+    "account.demo-construction-01.supervisor",
+    "account.demo-construction-01.accountant"
+  ],
+  "authorization_actors": {
+    "assigner": "account.demo-construction-01.owner",
+    "independent_approver": "admin tenant_owner membership only; no platform override"
+  },
+  "scheduled_history": {
+    "membership": "uiux.persona.tenant-admin",
+    "role": "viewer",
+    "starts_at": "2099-01-01T00:00:00Z",
+    "ends_at": "2099-01-08T00:00:00Z"
+  },
+  "revoked_history": {
+    "membership": "uiux.persona.tenant-admin",
+    "role": "member",
+    "canonical_create_and_revoke": true
+  },
+  "business_fixtures": [
+    "21 daily reports in P01 authorized Project A to total 30",
+    "representative estimates/expenses/daily reports for A/B; reuse existing approved requests/suppliers/sites/phases/WBS/baselines/progress/equipment assignments",
+    "draft journal with project/site/WBS lines",
+    "Treasury approved eligible source and draft/submitted movements only if existing canonical prerequisites allow"
+  ],
+  "product_mutations": false,
+  "schema_migrations": false,
+  "git_writes": false,
+  "preserve_original_uiux_files": true,
+  "stop_on_unexpected_authority_change": true
+}

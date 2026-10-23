@@ -110,10 +110,10 @@ class PromotionRequestForm(forms.Form):
     body = forms.CharField(
         label="متن پالایش‌شده و بی‌نام", widget=forms.Textarea(attrs={"rows": 8})
     )
-    audience = forms.CharField(label="مخاطب Platform", max_length=80)
-    category_code = forms.CharField(label="دسته Platform", max_length=80)
+    audience = forms.CharField(label="مخاطب سکوی مشترک", max_length=80)
+    category_code = forms.CharField(label="دسته سکوی مشترک", max_length=80)
     anonymization_statement = forms.CharField(
-        label="شرح حذف/ناشناس‌سازی اطلاعات Tenant",
+        label="شرح حذف و بی‌نام‌سازی اطلاعات شرکت",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
 

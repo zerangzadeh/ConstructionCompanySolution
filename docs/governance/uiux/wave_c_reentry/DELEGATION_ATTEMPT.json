@@ -1,0 +1,221 @@
+{
+  "buyer": {
+    "scenario": "RV-007",
+    "actor": "uiux.wavec.buyer",
+    "role": "3d10e260-cd10-401a-a703-ef0c3cc23a9f",
+    "code": "wave_c_buyer",
+    "permissions": [
+      "rfqs.view",
+      "rfq_quotes.view_metadata",
+      "rfq_quotes.capture",
+      "rfq_quotes.submit",
+      "rfq_quotes.open",
+      "rfq_quotes.view_confidential",
+      "rfq_quotes.prepare_admissibility",
+      "rfq_quotes.prepare_comparison",
+      "rfq_quotes.evaluate_comparison",
+      "rfq_quotes.prepare_sourcing_award"
+    ],
+    "scope": "project",
+    "project": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+    "status": "BLOCKED_CANONICAL_DELEGATION",
+    "reason": "انتقال مجوزی خارج از اختیار عامل ممنوع است.",
+    "account_transaction": "ROLLED_BACK",
+    "missing_assigner_permissions": [
+      "rfq_quotes.open",
+      "rfq_quotes.view_confidential"
+    ]
+  },
+  "hr": {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "role": "3cf94627-6dd3-472a-bfb4-0ef2baafb345",
+    "code": "wave_c_hr",
+    "permissions": [
+      "employees.view",
+      "employees.create",
+      "departments.view",
+      "departments.create",
+      "positions.view",
+      "positions.create",
+      "work_teams.view",
+      "work_teams.create"
+    ],
+    "scope": "organization",
+    "project": null,
+    "status": "PROVISIONED",
+    "membership": "672d4180-276d-43b9-aaed-11dc3da137d8",
+    "assigner": "account.demo-construction-01.owner",
+    "approver": "admin"
+  },
+  "time": {
+    "scenario": "RV-017",
+    "actor": "uiux.wavec.time",
+    "role": "b42ab916-df09-4e9a-b746-31f43901a9b8",
+    "code": "wave_c_time",
+    "permissions": [
+      "attendance.view",
+      "attendance.capture",
+      "attendance.import",
+      "time_calendars.manage",
+      "leave_mission.request",
+      "overtime.request",
+      "timesheets.prepare",
+      "timesheets.view"
+    ],
+    "scope": "organization",
+    "project": null,
+    "status": "PROVISIONED",
+    "membership": "5c308674-27db-4d7f-a646-77627b1fc72a",
+    "assignment": "e97df9db-07bb-4f2a-8521-ddfe59cc4ec0",
+    "grant": "766cc409-c640-4127-91f6-54eb62ce4f3c",
+    "assigner": "account.demo-construction-01.owner",
+    "approver": "admin"
+  },
+  "payroll": {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "role": "c4de17c6-c140-4433-b5bc-d878d1654da4",
+    "code": "wave_c_payroll",
+    "permissions": [
+      "payroll_results.view",
+      "payroll_configuration.view",
+      "payroll_configuration.manage",
+      "payroll.prepare",
+      "payroll_audit.view",
+      "payslips.view",
+      "payroll_statutory_configuration.view",
+      "payroll_statutory.prepare",
+      "payroll_statutory_outputs.generate",
+      "payroll_statutory_audit.view",
+      "payroll_liability_handoff.prepare",
+      "payroll_accounting_handoff.prepare",
+      "payroll_payment_handoff.prepare",
+      "payroll_project_cost_handoff.prepare",
+      "payroll_handoff_reconciliation.prepare"
+    ],
+    "scope": "organization",
+    "project": null,
+    "status": "PROVISIONED",
+    "membership": "2b4bcef2-e7fa-4ab2-80e4-e37c2b67f945",
+    "assignment": "ec9bcbad-0d66-4040-a0b0-26336f7c52d2",
+    "grant": "f2b6556c-39d6-4a47-8ee6-b6395fbc30ce",
+    "assigner": "account.demo-construction-01.owner",
+    "approver": "admin"
+  },
+  "documents": {
+    "scenario": "RV-028",
+    "actor": "uiux.wavec.documents",
+    "role": "06b91e0a-ff37-4872-ac08-58f2f4a95dcb",
+    "code": "wave_c_documents",
+    "permissions": [
+      "documents.view",
+      "documents.upload",
+      "documents.download",
+      "projects.view"
+    ],
+    "scope": "project",
+    "project": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+    "status": "PROVISIONED",
+    "membership": "70945fbf-cb51-4fe6-96a3-eedad8536ebc",
+    "assignment": "09b9a35f-096c-4847-8303-5bcf6378ec0f",
+    "grant": "361a94c4-2762-4e41-a3ab-0ce853a96de6",
+    "assigner": "account.demo-construction-01.owner",
+    "approver": "admin"
+  },
+  "employment": {
+    "scenario": "RV-029",
+    "actor": "uiux.wavec.employment",
+    "role": "a5c7fbbf-9e14-4cca-8239-98c74a00477b",
+    "code": "wave_c_employment",
+    "permissions": [
+      "employment_records.manage",
+      "employees.view",
+      "documents.view"
+    ],
+    "scope": "organization",
+    "project": null,
+    "status": "BLOCKED_CANONICAL_DELEGATION",
+    "reason": "انتقال مجوزی خارج از اختیار عامل ممنوع است.",
+    "account_transaction": "ROLLED_BACK",
+    "missing_assigner_permissions": [
+      "employment_records.manage"
+    ]
+  },
+  "employment-own": {
+    "scenario": "RV-029",
+    "actor": "uiux.wavec.employment-own",
+    "role": "157f4117-dce8-472a-8d3e-cab7d26b8981",
+    "code": "wave_c_employment_own",
+    "permissions": [
+      "employment_records.view_own"
+    ],
+    "scope": "organization",
+    "project": null,
+    "status": "BLOCKED_CANONICAL_DELEGATION",
+    "reason": "انتقال مجوزی خارج از اختیار عامل ممنوع است.",
+    "account_transaction": "ROLLED_BACK",
+    "missing_assigner_permissions": [
+      "employment_records.view_own"
+    ]
+  },
+  "commercial": {
+    "scenario": "RV-030",
+    "actor": "uiux.wavec.commercial",
+    "role": "9e1b0930-965e-4fd3-a9d2-af413f12cb97",
+    "code": "wave_c_commercial",
+    "permissions": [
+      "tender_bids.view",
+      "tender_bids.prepare",
+      "tender_bids.transition",
+      "contracts.view",
+      "projects.view"
+    ],
+    "scope": "project",
+    "project": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+    "status": "PROVISIONED",
+    "membership": "83cf7d53-b74c-4814-8897-bf95b7c43f69",
+    "assignment": "8f7989f8-3265-469b-b686-24f5e7cb2e4d",
+    "grant": "e4697a6f-6df4-413f-978b-e0c7bc55566e",
+    "assigner": "account.demo-construction-01.owner",
+    "approver": "admin"
+  },
+  "controls": {
+    "scenario": "RV-031",
+    "actor": "uiux.wavec.controls",
+    "role": "1b98fb22-e185-46e1-8ad1-60ef5d157d3c",
+    "code": "wave_c_controls",
+    "permissions": [
+      "projects.view",
+      "project_controls.view",
+      "project_controls.compare",
+      "project_controls.exceptions_view",
+      "project_cost.reconciliations_view"
+    ],
+    "scope": "project",
+    "project": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+    "status": "PROVISIONED",
+    "membership": "b19b90b6-0738-4a55-aca0-1a0b3ef274fd",
+    "assignment": "cc4051a9-0cfd-4e80-942d-bd1d76346588",
+    "grant": "ddc8a6bf-e278-4504-bd3b-f47d5fa7a1ab",
+    "assigner": "account.demo-construction-01.owner",
+    "approver": "admin"
+  },
+  "portal": {
+    "scenario": "RV-032",
+    "actor": "uiux.wavec.portal",
+    "role": "218c62c3-9b92-439a-9980-dc1e91a57684",
+    "code": "wave_c_portal",
+    "permissions": [
+      "supplier_portal.invitations_manage"
+    ],
+    "scope": "project",
+    "project": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+    "status": "BLOCKED_CANONICAL_DELEGATION",
+    "reason": "انتقال مجوزی خارج از اختیار عامل ممنوع است.",
+    "account_transaction": "ROLLED_BACK",
+    "missing_assigner_permissions": [
+      "supplier_portal.invitations_manage"
+    ]
+  }
+}

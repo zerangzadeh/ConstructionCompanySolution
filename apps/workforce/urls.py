@@ -4,11 +4,12 @@ from apps.workforce import certificate_views as certificates
 from apps.workforce import personal_change_views as personal
 from apps.workforce import views
 from apps.workforce import ess_timekeeping_views as own_time
-from apps.workforce.employment_views import employment_history
+from apps.workforce.employment_views import employment_history, employment_manage
 
 app_name = "workforce"
 
 urlpatterns = [
+    path("employment/", employment_manage, name="employment_manage"),
     path("ess/timekeeping/",own_time.index,name="ess_timekeeping"),
     path("ess/timekeeping/<str:kind>/new/",own_time.create,name="ess_timekeeping_create"),
     path("ess/timekeeping/<str:kind>/<uuid:record_id>/",own_time.detail,name="ess_timekeeping_detail"),

@@ -1,0 +1,401 @@
+[
+  {
+    "evidence_id": "RV-EV-053",
+    "scenario_id": "RV-016",
+    "executed_at": "2026-10-22T23:27:57.800Z",
+    "runtime": {
+      "environment_name": "Development",
+      "base_url": "http://127.0.0.1:8000/",
+      "git_sha": "43ac319c6e73e48ca9626461b73987922c498ec3",
+      "dirty_source_manifest": "ENTRY.json#hashes",
+      "browser": "ChatGPT in-app browser",
+      "browser_version": "155.0.0.0 (reduced User-Agent)",
+      "full_engine_build": "NOT_EXPOSED",
+      "viewports": [
+        {
+          "width": 1440,
+          "height": 900
+        },
+        {
+          "width": 390,
+          "height": 844
+        },
+        {
+          "width": 1024,
+          "height": 768
+        }
+      ]
+    },
+    "persona": {
+      "effective_permission_bundle_reference": "READINESS.json#personas",
+      "effective_scope_reference": "SCOPES.json",
+      "verified_shapes": [
+        "P-09 functional own-data perspective: uiux.wavec.time explicit Person and current WorkRelationship; unchanged wave_c_time + wave_c_employment_own",
+        "P-09 functional own-data perspective: uiux.wavec.time",
+        "uiux.wavec.time lacks payroll_ess.view_own; negative evidence only"
+      ]
+    },
+    "preconditions": [
+      "Existing active membership/explicit effective permissions and scope; no account or grant creation",
+      "Existing domain state only; no production access",
+      "Accepted Wave C closure and retained 18 baseline failures"
+    ],
+    "steps": [
+      "Verify actual identity and effective server authority",
+      "Open the canonical reachable populated surface, or explicitly record missing fixture",
+      "Inspect semantic DOM and responsive viewport; use Tab/Enter on existing controls where applicable",
+      "Save screenshots/AX observations and compare role-conditioned controls",
+      "Supplement with real-cookie server read/scope controls; no successful business POST"
+    ],
+    "expected_result": "Canonical scenario validation targets in UIUX_RUNTIME_VALIDATION_MATRIX.yaml; denied/empty pages cannot satisfy required populated success evidence",
+    "actual_result": "Explicitly linked uiux.wavec.time has positive own-profile dashboard/empty-request and mobile evidence. It lacks payroll_ess.view_own; /payroll/ess/ returns 403. Other retained own-payroll permission holders lack an explicit ESS subject. No grant or identity link was added. Populated request/raw-status and positive Payroll ESS evidence remain unproved.",
+    "result": "BLOCKED_AUTHORIZATION_FIXTURE",
+    "existing_finding_ids": [
+      "UIUX-F-021",
+      "UIUX-F-022"
+    ],
+    "new_finding_ids": [],
+    "screenshots": [
+      "d016_ess_desktop.jpg",
+      "d016_ess_mobile.jpg",
+      "d016_payroll_ess_denied.jpg"
+    ],
+    "browser_observations": "BROWSER.json",
+    "server_controls": "HTTP.json",
+    "console": "RUNTIME_LOGS.json",
+    "accessibility": {
+      "keyboard_notes": "d016_keyboard.json; d020_keyboard.json; Workflow disclosure Enter captured; not exhaustive WCAG audit",
+      "labels_landmarks_headings": "Per-capture semantic DOM, not inferred for blocked positive targets"
+    },
+    "responsive": {
+      "notes": "Per-capture width equals client width; required positive targets missing for RV-016/RV-021. No Wave E coverage inferred."
+    },
+    "business_mutation_performed": false,
+    "product_remediation": "Only RV-020 observed action_in_progress/verified/closed badge presentation; original text/status values remain unchanged",
+    "capture_viewports": {
+      "d016_ess_desktop": {
+        "width": 1440,
+        "height": 900
+      },
+      "d016_ess_mobile": {
+        "width": 390,
+        "height": 844
+      },
+      "d016_payroll_ess_denied": {
+        "width": 390,
+        "height": 844
+      }
+    }
+  },
+  {
+    "evidence_id": "RV-EV-054",
+    "scenario_id": "RV-020",
+    "executed_at": "2026-10-22T23:26:08.300Z",
+    "runtime": {
+      "environment_name": "Development",
+      "base_url": "http://127.0.0.1:8000/",
+      "git_sha": "43ac319c6e73e48ca9626461b73987922c498ec3",
+      "dirty_source_manifest": "ENTRY.json#hashes",
+      "browser": "ChatGPT in-app browser",
+      "browser_version": "155.0.0.0 (reduced User-Agent)",
+      "full_engine_build": "NOT_EXPOSED",
+      "viewports": [
+        {
+          "width": 1440,
+          "height": 900
+        },
+        {
+          "width": 390,
+          "height": 844
+        },
+        {
+          "width": 1024,
+          "height": 768
+        }
+      ]
+    },
+    "persona": {
+      "effective_permission_bundle_reference": "READINESS.json#personas",
+      "effective_scope_reference": "SCOPES.json",
+      "verified_shapes": [
+        "P-17 uiux.persona.project-manager",
+        "P-17 uiux.persona.project-manager A/B",
+        "P-17 uiux.persona.project-manager A/B",
+        "P-17 uiux.persona.project-manager A/B",
+        "P-11 retained uiux.audit.project viewer; project A only; read perspective, no lifecycle authority",
+        "P-25 retained uiux.audit.project viewer; project A only; independent Quality read perspective",
+        "P-25 read-only uiux.audit.project A scope",
+        "P-25 uiux.audit.project; closed badge retest",
+        "P-11 uiux.audit.project; closed badge retest",
+        "P-17 uiux.persona.project-manager A/B",
+        "P-17 keyboard reaches existing resolution action; no submission",
+        "P-17 verified status uses success; unchanged lifecycle",
+        "P-17 uiux.persona.project-manager; narrow desktop/tablet scope only"
+      ]
+    },
+    "preconditions": [
+      "Existing active membership/explicit effective permissions and scope; no account or grant creation",
+      "Existing domain state only; no production access",
+      "Accepted Wave C closure and retained 18 baseline failures"
+    ],
+    "steps": [
+      "Verify actual identity and effective server authority",
+      "Open the canonical reachable populated surface, or explicitly record missing fixture",
+      "Inspect semantic DOM and responsive viewport; use Tab/Enter on existing controls where applicable",
+      "Save screenshots/AX observations and compare role-conditioned controls",
+      "Supplement with real-cookie server read/scope controls; no successful business POST"
+    ],
+    "expected_result": "Canonical scenario validation targets in UIUX_RUNTIME_VALIDATION_MATRIX.yaml; denied/empty pages cannot satisfy required populated success evidence",
+    "actual_result": "Separate Safety and Quality reader perspectives through retained P-11/P-25 uiux.audit.project A-only scope; authorized managerial comparison through P-17 uiux.persona.project-manager A/B. Populated closed, action-in-progress and verified details, inline next actions, Jalali dates, labels/headings, visible keyboard focus and bounded desktop/mobile/tablet layout observed. Three demonstrated semantic badge cases fixed and retested. No lifecycle submitted; no specialist create/review authority or exhaustive WCAG certification claimed.",
+    "result": "PASS",
+    "existing_finding_ids": [
+      "UIUX-F-090",
+      "UIUX-F-091"
+    ],
+    "new_finding_ids": [],
+    "screenshots": [
+      "d020_manager_out_of_scope.jpg",
+      "d020_safety_manager_desktop.jpg",
+      "d020_quality_manager_desktop.jpg",
+      "d020_quality_manager_mobile.jpg",
+      "d020_safety_reader_desktop.jpg",
+      "d020_quality_reader_desktop.jpg",
+      "d020_quality_reader_mobile.jpg",
+      "d020_quality_closed_retest_mobile.jpg",
+      "d020_safety_closed_retest_mobile.jpg",
+      "d020_safety_retest_desktop.jpg",
+      "d020_safety_action_retest_mobile.jpg",
+      "d020_quality_retest_mobile.jpg",
+      "d020_quality_retest_tablet.jpg"
+    ],
+    "browser_observations": "BROWSER.json",
+    "server_controls": "HTTP.json",
+    "console": "RUNTIME_LOGS.json",
+    "accessibility": {
+      "keyboard_notes": "d016_keyboard.json; d020_keyboard.json; Workflow disclosure Enter captured; not exhaustive WCAG audit",
+      "labels_landmarks_headings": "Per-capture semantic DOM, not inferred for blocked positive targets"
+    },
+    "responsive": {
+      "notes": "Per-capture width equals client width; required positive targets missing for RV-016/RV-021. No Wave E coverage inferred."
+    },
+    "business_mutation_performed": false,
+    "product_remediation": "Only RV-020 observed action_in_progress/verified/closed badge presentation; original text/status values remain unchanged",
+    "capture_viewports": {
+      "d020_manager_out_of_scope": {
+        "width": 1440,
+        "height": 900
+      },
+      "d020_safety_manager_desktop": {
+        "width": 1440,
+        "height": 900
+      },
+      "d020_quality_manager_desktop": {
+        "width": 1440,
+        "height": 900
+      },
+      "d020_quality_manager_mobile": {
+        "width": 390,
+        "height": 844
+      },
+      "d020_safety_reader_desktop": {
+        "width": 1440,
+        "height": 900
+      },
+      "d020_quality_reader_desktop": {
+        "width": 1440,
+        "height": 900
+      },
+      "d020_quality_reader_mobile": {
+        "width": 390,
+        "height": 844
+      },
+      "d020_quality_closed_retest_mobile": {
+        "width": 390,
+        "height": 844
+      },
+      "d020_safety_closed_retest_mobile": {
+        "width": 390,
+        "height": 844
+      },
+      "d020_safety_retest_desktop": {
+        "width": 1440,
+        "height": 900
+      },
+      "d020_safety_action_retest_mobile": {
+        "width": 390,
+        "height": 844
+      },
+      "d020_quality_retest_mobile": {
+        "width": 390,
+        "height": 844
+      },
+      "d020_quality_retest_tablet": {
+        "width": 1024,
+        "height": 768
+      }
+    }
+  },
+  {
+    "evidence_id": "RV-EV-055",
+    "scenario_id": "RV-021",
+    "executed_at": "2026-10-22T23:30:13.558Z",
+    "runtime": {
+      "environment_name": "Development",
+      "base_url": "http://127.0.0.1:8000/",
+      "git_sha": "43ac319c6e73e48ca9626461b73987922c498ec3",
+      "dirty_source_manifest": "ENTRY.json#hashes",
+      "browser": "ChatGPT in-app browser",
+      "browser_version": "155.0.0.0 (reduced User-Agent)",
+      "full_engine_build": "NOT_EXPOSED",
+      "viewports": [
+        {
+          "width": 1440,
+          "height": 900
+        },
+        {
+          "width": 390,
+          "height": 844
+        },
+        {
+          "width": 1024,
+          "height": 768
+        }
+      ]
+    },
+    "persona": {
+      "effective_permission_bundle_reference": "READINESS.json#personas",
+      "effective_scope_reference": "SCOPES.json",
+      "verified_shapes": [
+        "uiux.persona.tenant-admin is not Platform Admin; negative only"
+      ]
+    },
+    "preconditions": [
+      "Existing active membership/explicit effective permissions and scope; no account or grant creation",
+      "Existing domain state only; no production access",
+      "Accepted Wave C closure and retained 18 baseline failures"
+    ],
+    "steps": [
+      "Verify actual identity and effective server authority",
+      "Open the canonical reachable populated surface, or explicitly record missing fixture",
+      "Inspect semantic DOM and responsive viewport; use Tab/Enter on existing controls where applicable",
+      "Save screenshots/AX observations and compare role-conditioned controls",
+      "Supplement with real-cookie server read/scope controls; no successful business POST"
+    ],
+    "expected_result": "Canonical scenario validation targets in UIUX_RUNTIME_VALIDATION_MATRIX.yaml; denied/empty pages cannot satisfy required populated success evidence",
+    "actual_result": "No tenant KnowledgePublication or KnowledgePublicationVersion exists. No mapped P-12 curator fixture. Existing P-18 admin is a verified Platform Admin, but has no existing credential in the retained DPAPI store or current authenticated browser session. Tenant Admin correctly denied the platform queue. No article/history/promotion success inferred from a denial or missing data; no publication, grant or credential created.",
+    "result": "BLOCKED_TEST_DATA",
+    "existing_finding_ids": [
+      "UIUX-F-099",
+      "UIUX-F-103"
+    ],
+    "new_finding_ids": [],
+    "screenshots": [
+      "d021_tenant_admin_platform_denied.jpg"
+    ],
+    "browser_observations": "BROWSER.json",
+    "server_controls": "HTTP.json",
+    "console": "RUNTIME_LOGS.json",
+    "accessibility": {
+      "keyboard_notes": "d016_keyboard.json; d020_keyboard.json; Workflow disclosure Enter captured; not exhaustive WCAG audit",
+      "labels_landmarks_headings": "Per-capture semantic DOM, not inferred for blocked positive targets"
+    },
+    "responsive": {
+      "notes": "Per-capture width equals client width; required positive targets missing for RV-016/RV-021. No Wave E coverage inferred."
+    },
+    "business_mutation_performed": false,
+    "product_remediation": "Only RV-020 observed action_in_progress/verified/closed badge presentation; original text/status values remain unchanged",
+    "capture_viewports": {
+      "d021_tenant_admin_platform_denied": {
+        "width": 390,
+        "height": 844
+      }
+    }
+  },
+  {
+    "evidence_id": "RV-EV-056",
+    "scenario_id": "RV-022",
+    "executed_at": "2026-10-22T23:29:04.517Z",
+    "runtime": {
+      "environment_name": "Development",
+      "base_url": "http://127.0.0.1:8000/",
+      "git_sha": "43ac319c6e73e48ca9626461b73987922c498ec3",
+      "dirty_source_manifest": "ENTRY.json#hashes",
+      "browser": "ChatGPT in-app browser",
+      "browser_version": "155.0.0.0 (reduced User-Agent)",
+      "full_engine_build": "NOT_EXPOSED",
+      "viewports": [
+        {
+          "width": 1440,
+          "height": 900
+        },
+        {
+          "width": 390,
+          "height": 844
+        },
+        {
+          "width": 1024,
+          "height": 768
+        }
+      ]
+    },
+    "persona": {
+      "effective_permission_bundle_reference": "READINESS.json#personas",
+      "effective_scope_reference": "SCOPES.json",
+      "verified_shapes": [
+        "Workflow administration functional perspective: uiux.persona.tenant-admin; existing tenant_admin role, organization scope, explicit workflows.view/create/change_draft/publish/retire",
+        "uiux.persona.tenant-admin unchanged organization scope",
+        "uiux.persona.tenant-admin; disclosure opened by Enter; no lifecycle command"
+      ]
+    },
+    "preconditions": [
+      "Existing active membership/explicit effective permissions and scope; no account or grant creation",
+      "Existing domain state only; no production access",
+      "Accepted Wave C closure and retained 18 baseline failures"
+    ],
+    "steps": [
+      "Verify actual identity and effective server authority",
+      "Open the canonical reachable populated surface, or explicitly record missing fixture",
+      "Inspect semantic DOM and responsive viewport; use Tab/Enter on existing controls where applicable",
+      "Save screenshots/AX observations and compare role-conditioned controls",
+      "Supplement with real-cookie server read/scope controls; no successful business POST"
+    ],
+    "expected_result": "Canonical scenario validation targets in UIUX_RUNTIME_VALIDATION_MATRIX.yaml; denied/empty pages cannot satisfy required populated success evidence",
+    "actual_result": "Verified explicit existing Tenant Admin workflow permissions and organization scope used for the functional administration perspective; not a new P-13 identity or narrow role claim. Populated immutable published version reviewed on desktop/mobile; keyboard disclosure works, no overflow/duplicate IDs. Raw transitions confirm F-048; PD-WD-022 records the primary review representation question. No arbitrary visual designer or authoring/lifecycle changes invented.",
+    "result": "BLOCKED_PRODUCT_DECISION",
+    "existing_finding_ids": [
+      "UIUX-F-048"
+    ],
+    "new_finding_ids": [],
+    "screenshots": [
+      "d022_workflow_desktop.jpg",
+      "d022_workflow_mobile.jpg",
+      "d022_workflow_configuration_mobile.jpg"
+    ],
+    "browser_observations": "BROWSER.json",
+    "server_controls": "HTTP.json",
+    "console": "RUNTIME_LOGS.json",
+    "accessibility": {
+      "keyboard_notes": "d016_keyboard.json; d020_keyboard.json; Workflow disclosure Enter captured; not exhaustive WCAG audit",
+      "labels_landmarks_headings": "Per-capture semantic DOM, not inferred for blocked positive targets"
+    },
+    "responsive": {
+      "notes": "Per-capture width equals client width; required positive targets missing for RV-016/RV-021. No Wave E coverage inferred."
+    },
+    "business_mutation_performed": false,
+    "product_remediation": "Only RV-020 observed action_in_progress/verified/closed badge presentation; original text/status values remain unchanged",
+    "capture_viewports": {
+      "d022_workflow_desktop": {
+        "width": 1440,
+        "height": 900
+      },
+      "d022_workflow_mobile": {
+        "width": 390,
+        "height": 844
+      },
+      "d022_workflow_configuration_mobile": {
+        "width": 390,
+        "height": 844
+      }
+    }
+  }
+]

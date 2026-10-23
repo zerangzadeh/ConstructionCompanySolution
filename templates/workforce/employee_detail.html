@@ -55,7 +55,7 @@
 {% include "workforce/_tabs.html" %}
 
 <div class="mt-5 grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_21rem]">
-    <main class="min-w-0 space-y-5">
+    <section class="min-w-0 space-y-5" aria-label="جزئیات پرونده کارمند">
         <section class="erp-surface overflow-hidden rounded-2xl">
             <header class="border-b border-slate-100 px-5 py-4 sm:px-6">
                 <div>
@@ -143,7 +143,7 @@
             <p class="px-5 py-8 text-center text-sm text-slate-500 sm:px-6">این کارمند هنوز به پروژه‌ای تخصیص داده نشده است.</p>
             {% endif %}
         </section>
-    </main>
+    </section>
 
     <aside class="space-y-5 xl:sticky xl:top-5">
         {% if "employees.change_profile_image" in business_permission_codes %}

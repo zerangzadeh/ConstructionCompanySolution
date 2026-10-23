@@ -1,0 +1,1683 @@
+[
+  {
+    "scenario": "RV-007",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/",
+    "sha256": "6645f566d724fcd35f35a096ca11e49d492d036abb8d71be84dc97017d76df90",
+    "html": "http_001.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-007",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/capture/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/capture/",
+    "sha256": "528bb1d495ee586c78dc6b267e10cd71e025a65295986eed72d12b25a1d4fe88",
+    "html": "http_002.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-007",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/prepare_comparison/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/prepare_comparison/",
+    "sha256": "0a9369491652ed9290a351e72a237791fb9a5a9c51cdf994449b01ac49c855a2",
+    "html": "http_003.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-007",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/capture/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 400,
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/capture/",
+    "sha256": "221b7f2044b8977a2ad1bb47f99a2a6bd93bc848601fc0274eb89d557c691b36",
+    "html": "http_004.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-007",
+    "actor": "uiux.persona.inventory",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/capture/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/capture/",
+    "sha256": "960f6c77de0f85a69b202f5f13d48d329b763aea1febafc85375187a5adf19ce",
+    "html": "http_005.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-007",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/prepare_comparison/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 400,
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/prepare_comparison/",
+    "sha256": "2035914c3db890aa3b7c7c4d0e3eba0bdcbc1a27897bae093db902405f6e8f3f",
+    "html": "http_006.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-007",
+    "actor": "uiux.persona.inventory",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/prepare_comparison/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/prepare_comparison/",
+    "sha256": "dd43bfdd24e83c9fef5c85984c962ecd93c34fb5a65e698c649be27f855d1cc7",
+    "html": "http_007.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-007",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/capture/",
+    "case": "missing CSRF rejects",
+    "method": "POST",
+    "csrf": false,
+    "status": 403,
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/capture/",
+    "sha256": "a8c1c826df1bde8bf5b1c745b1529d708cdfc9d6d56b242b95185e513abaea27",
+    "html": null,
+    "expected": [
+      403
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/workforce/",
+    "sha256": "6657d62102091efd07205595325ef881911ab125e68b0a8e50e23ae6d8067581",
+    "html": "http_009.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/departments/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/workforce/departments/",
+    "sha256": "79c5eb87ef0faf52e5be7904faa74a1dd784c272be6c714d6eed59acd68a27a3",
+    "html": "http_010.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/foundation/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/workforce/foundation/",
+    "sha256": "e112d34302180a47c2ad150501d7d4b7511a0a80db3754d55c413fd1f8c2dae6",
+    "html": "http_011.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/departments/create/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/workforce/departments/create/",
+    "sha256": "057d8ca600046d60f3a8906ff3b87a389a98759636544ecf9aad574e08ba126e",
+    "html": "http_012.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/positions/create/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/workforce/positions/create/",
+    "sha256": "ce8c3e9e962fa60941453fea91b599c173b9281210d952783f6cec9ff83e67fa",
+    "html": "http_013.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/teams/create/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/workforce/teams/create/",
+    "sha256": "9a89bda6710c3979a883fe30bb9df07d88e7ae41b10e5752453061e40e164754",
+    "html": "http_014.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/employees/create/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/workforce/employees/create/",
+    "sha256": "0352f149810df459d534e5d716d1abdfa3ab06f4e04fce4bc5739e92c9075de2",
+    "html": "http_015.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/departments/create/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/workforce/departments/create/",
+    "sha256": "e25b461d6a6c38d3353b34fd46e2dfb99c956b5183ec021bb0939686abfb8b93",
+    "html": "http_016.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.persona.inventory",
+    "path": "/workforce/departments/create/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/workforce/departments/create/",
+    "sha256": "0de53f9c350be1ae0ae3801caa491ade43b98ef92ff4128b60df1fe0252ad494",
+    "html": "http_017.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/positions/create/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/workforce/positions/create/",
+    "sha256": "49ff4414a0114d1ee254ee18c53842696c38afb397758d09062d69e78905b9af",
+    "html": "http_018.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.persona.inventory",
+    "path": "/workforce/positions/create/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/workforce/positions/create/",
+    "sha256": "5e2a901c185b6e39b274d60c61b448f69992a965ca44ac766adab54979e57505",
+    "html": "http_019.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/teams/create/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/workforce/teams/create/",
+    "sha256": "04c5fb7655781f4784211fbde2a56a2cedda01e0bf3c1bebc10185c5baa01ea0",
+    "html": "http_020.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.persona.inventory",
+    "path": "/workforce/teams/create/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/workforce/teams/create/",
+    "sha256": "9b1eddd113e407a057343f50ba0cb25b674b1bd193c31d71ef7b717e9817d140",
+    "html": "http_021.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/employees/create/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/workforce/employees/create/",
+    "sha256": "02c3f86d8f975734024f6bf0df5e72d8f014cfa7530f1bc790003eb05c066906",
+    "html": "http_022.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.persona.inventory",
+    "path": "/workforce/employees/create/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/workforce/employees/create/",
+    "sha256": "eec5e67704a81554dfe314b2b91f4ca3535824ea5bb649f8cb1f33bfec8227c4",
+    "html": "http_023.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/departments/",
+    "case": "missing CSRF rejects",
+    "method": "POST",
+    "csrf": false,
+    "status": 403,
+    "final_path": "/workforce/departments/",
+    "sha256": "a8c1c826df1bde8bf5b1c745b1529d708cdfc9d6d56b242b95185e513abaea27",
+    "html": null,
+    "expected": [
+      403
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-017",
+    "actor": "uiux.wavec.time",
+    "path": "/timekeeping/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/timekeeping/",
+    "sha256": "d9be737b1cac90c435391c5a377d28e809fdf0b2342bc35071765ae894ececde",
+    "html": "http_025.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-017",
+    "actor": "uiux.wavec.time",
+    "path": "/timekeeping/calendars/new/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/timekeeping/calendars/new/",
+    "sha256": "d23ab31e4fd82da18ceaab4a17c09b200cafa68b4fea8b734b142576445b62d4",
+    "html": "http_026.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-017",
+    "actor": "uiux.wavec.time",
+    "path": "/timekeeping/holidays/new/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/timekeeping/holidays/new/",
+    "sha256": "9b6900661feccb7bc482fff6775ce7d2bfaff2e093b7393301a2043f1efcc36e",
+    "html": "http_027.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-017",
+    "actor": "uiux.wavec.time",
+    "path": "/timekeeping/attendance/new/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/timekeeping/attendance/new/",
+    "sha256": "8aa6e8c65b6c38e85162ceb879bcb6f99fc9261824499505fc53c37188c36dbe",
+    "html": "http_028.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-017",
+    "actor": "uiux.wavec.time",
+    "path": "/timekeeping/attendance/import/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/timekeeping/attendance/import/",
+    "sha256": "8ad915591a734136f50158eacf99c73ba73aad943bbf65c91415dfb3388c770b",
+    "html": "http_029.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-017",
+    "actor": "uiux.wavec.time",
+    "path": "/timekeeping/calendars/new/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/timekeeping/calendars/new/",
+    "sha256": "5da75f5857d33a3f97afbd5db2a8fcf4e60d44ae8f4b45c92ae2e4f8eb48f330",
+    "html": "http_030.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-017",
+    "actor": "uiux.persona.inventory",
+    "path": "/timekeeping/calendars/new/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/timekeeping/calendars/new/",
+    "sha256": "f6bef3271de90571ceb408004019b19cf2ba62f6c5c14e95e2abcbf4c04dd955",
+    "html": "http_031.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-017",
+    "actor": "uiux.wavec.time",
+    "path": "/timekeeping/holidays/new/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/timekeeping/holidays/new/",
+    "sha256": "1c84257bff7a08981ed0afc0b3147cc66fa9e4c931559275773f23f7303fce7f",
+    "html": "http_032.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-017",
+    "actor": "uiux.persona.inventory",
+    "path": "/timekeeping/holidays/new/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/timekeeping/holidays/new/",
+    "sha256": "2da8f3d8329e1bd7b91d35f66239e396b46f3db2b035f1e7b38462bfeb043fcd",
+    "html": "http_033.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-017",
+    "actor": "uiux.wavec.time",
+    "path": "/timekeeping/attendance/new/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/timekeeping/attendance/new/",
+    "sha256": "b2cfd65f7884e3cb349966030b922b5b95c69881ead82e11f47eba9d438162cc",
+    "html": "http_034.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-017",
+    "actor": "uiux.persona.inventory",
+    "path": "/timekeeping/attendance/new/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/timekeeping/attendance/new/",
+    "sha256": "ec0dfeeef1cb2fd4beb2f906ace3e338d79fccb74fabc21ba9e12e4c77289d53",
+    "html": "http_035.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-017",
+    "actor": "uiux.wavec.time",
+    "path": "/timekeeping/calendars/new/",
+    "case": "missing CSRF rejects",
+    "method": "POST",
+    "csrf": false,
+    "status": 403,
+    "final_path": "/timekeeping/calendars/new/",
+    "sha256": "a8c1c826df1bde8bf5b1c745b1529d708cdfc9d6d56b242b95185e513abaea27",
+    "html": null,
+    "expected": [
+      403
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/payroll/",
+    "sha256": "7a23ad085e6a1d763764d7cacc5fe6d05bdc6757384215801a0815b1ff5e5a10",
+    "html": "http_037.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/configuration/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/payroll/configuration/",
+    "sha256": "0b4ee7403260b6c5d9d64833d5b290ae2ba802f01fe23cbc51d1ec302a652fdb",
+    "html": "http_038.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/configuration/employment/new/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/payroll/configuration/employment/new/",
+    "sha256": "e97c77081aa6a4806fe91ae3bd8a0b358bb5c7d0fd903bbe91ff9bef65ca65a5",
+    "html": "http_039.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/configuration/rules/new/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/payroll/configuration/rules/new/",
+    "sha256": "dd18fe5ce88b9093cefbed9c1690e742fa5a2b8fbfd7a2211a13b928aa4a9189",
+    "html": "http_040.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/runs/new/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/payroll/runs/new/",
+    "sha256": "e9de079e8e70424f760e5f42fa46b2e624bb850fd9e0116db7d41db55e1b679e",
+    "html": "http_041.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/runs/78ec311e-3d9c-4702-bfd8-37db6da18f78/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/payroll/runs/78ec311e-3d9c-4702-bfd8-37db6da18f78/",
+    "sha256": "9fbe2fbd87445034ed5efe96eb44a54882800a81ae4f34d6d339dff52c3761fb",
+    "html": "http_042.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/statutory/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/payroll/statutory/",
+    "sha256": "b8e739f21fe65434cbe993f8078219a4e8a41eeade0d18526d4b7ec022782c4d",
+    "html": "http_043.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/statutory/calculations/new/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/payroll/statutory/calculations/new/",
+    "sha256": "8d3e5a87881cfbcf8c3aa14e7975b7206da238c4e072f15a527aa68678dc047e",
+    "html": "http_044.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/financial-handoffs/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/payroll/financial-handoffs/",
+    "sha256": "065406de8413d21deaeaf6c16aa6c80d01e924a27aae3129b7c7106c1850f471",
+    "html": "http_045.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/financial-handoffs/new/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/payroll/financial-handoffs/new/",
+    "sha256": "6d2cca71c0f0f772efadd056f69cf2c2acfc86cfd787f6da86182fbf34657257",
+    "html": "http_046.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/configuration/employment/new/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/payroll/configuration/employment/new/",
+    "sha256": "18a11c74cc1a23cf9b72d3608cb4e54fdeef1410cb65e05822def58ab2f62b0a",
+    "html": "http_047.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.persona.inventory",
+    "path": "/payroll/configuration/employment/new/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/payroll/configuration/employment/new/",
+    "sha256": "f7aa043e89f0996160046232772b892fec4676b38547ea73b2fd0676f20d2579",
+    "html": "http_048.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/configuration/rules/new/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/payroll/configuration/rules/new/",
+    "sha256": "875df0bce750f46b658d07f2b82cef56f4f48b3bb4d62a60ca5f766466c89fe3",
+    "html": "http_049.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.persona.inventory",
+    "path": "/payroll/configuration/rules/new/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/payroll/configuration/rules/new/",
+    "sha256": "3408d53fd70697a72e3bcd2dcac4c1ba1ee55d8184f978ea10a4f2edf6639403",
+    "html": "http_050.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/runs/new/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/payroll/runs/new/",
+    "sha256": "618f2e15999a6202ba8cfb04f46eaa086aa2f1352359d6446e106e9df938b47e",
+    "html": "http_051.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.persona.inventory",
+    "path": "/payroll/runs/new/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/payroll/runs/new/",
+    "sha256": "64f760bb8f23561dfe0f5aee3e3456a86bcef5e688fe7a801a617f6bb828b24d",
+    "html": "http_052.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/statutory/calculations/new/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/payroll/statutory/calculations/new/",
+    "sha256": "ab28e12428dc631d791ec0debb43839e89dc44a169410bba4c4ca78cedd23849",
+    "html": "http_053.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.persona.inventory",
+    "path": "/payroll/statutory/calculations/new/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/payroll/statutory/calculations/new/",
+    "sha256": "19e6e8a131b0077b8d5ca26cb0e9e0e2a90724ab4498d8c8c840af6a5861333a",
+    "html": "http_054.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/financial-handoffs/new/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/payroll/financial-handoffs/new/",
+    "sha256": "ac41b7794440dc00b0ad71549366444f98a554090769e03fc88e6e277c293022",
+    "html": "http_055.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.persona.inventory",
+    "path": "/payroll/financial-handoffs/new/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/payroll/financial-handoffs/new/",
+    "sha256": "e7ac56b1f53b1dcfd866efe6727015d35d531e931e180e98a82fbf434225a81d",
+    "html": "http_056.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/configuration/",
+    "case": "missing CSRF rejects",
+    "method": "POST",
+    "csrf": false,
+    "status": 403,
+    "final_path": "/payroll/configuration/",
+    "sha256": "a8c1c826df1bde8bf5b1c745b1529d708cdfc9d6d56b242b95185e513abaea27",
+    "html": null,
+    "expected": [
+      403
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-028",
+    "actor": "uiux.wavec.documents",
+    "path": "/documents/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/documents/",
+    "sha256": "0a9482f9f5789df2af41eb8867597b9bc5eeffc1906ab1de9d3803e161d47926",
+    "html": "http_058.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-028",
+    "actor": "uiux.wavec.documents",
+    "path": "/documents/upload/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/documents/upload/",
+    "sha256": "4c238e7af46536d10fa61ed4167b7e743a9fa094bd84bb432c262ce742b1b99f",
+    "html": "http_059.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-028",
+    "actor": "uiux.wavec.documents",
+    "path": "/documents/ca7ca134-a6e5-4a5c-8bd5-68e3b56a9251/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/documents/ca7ca134-a6e5-4a5c-8bd5-68e3b56a9251/",
+    "sha256": "9dd5dec4cf8677cdf592d761c82797d692d37b80e0bc0e66e451ee768efbfbf3",
+    "html": "http_060.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-028",
+    "actor": "uiux.wavec.documents",
+    "path": "/documents/ca7ca134-a6e5-4a5c-8bd5-68e3b56a9251/download/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/documents/ca7ca134-a6e5-4a5c-8bd5-68e3b56a9251/download/",
+    "sha256": "001d98cf2c5ce5c1553b5744ca26278996271b3a01d1180216dde6d2fed6461f",
+    "html": null,
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-028",
+    "actor": "uiux.wavec.documents",
+    "path": "/documents/upload/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/documents/upload/",
+    "sha256": "0429837144ab09caa83ccf5da219b985218047e7161ca854e60f74a2185dd12c",
+    "html": "http_062.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-028",
+    "actor": "uiux.persona.inventory",
+    "path": "/documents/upload/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/documents/upload/",
+    "sha256": "150c549f77847f85946eae970f80b73b8e18dacd7ea965d48a3c5f2b0fdea891",
+    "html": "http_063.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-028",
+    "actor": "uiux.wavec.documents",
+    "path": "/documents/upload/",
+    "case": "missing CSRF rejects",
+    "method": "POST",
+    "csrf": false,
+    "status": 403,
+    "final_path": "/documents/upload/",
+    "sha256": "a8c1c826df1bde8bf5b1c745b1529d708cdfc9d6d56b242b95185e513abaea27",
+    "html": null,
+    "expected": [
+      403
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-030",
+    "actor": "uiux.wavec.commercial",
+    "path": "/commercial/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/commercial/",
+    "sha256": "c6f616fb62d0060e491180f8ecc0ef30ea04b37ab928eea9bcc22042d40cfa31",
+    "html": "http_065.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-030",
+    "actor": "uiux.wavec.commercial",
+    "path": "/commercial/create/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/commercial/create/",
+    "sha256": "9d30397ab16a17cee382a7fed44c34e1b8aca9862f22e3e74d188ba98b131e1a",
+    "html": "http_066.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-030",
+    "actor": "uiux.wavec.commercial",
+    "path": "/contracts/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/contracts/",
+    "sha256": "4f947d79cf416eb3042cf0d563d8a50a2cd308a6b92520f1c802d03aff4b1440",
+    "html": "http_067.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-030",
+    "actor": "uiux.wavec.commercial",
+    "path": "/commercial/create/",
+    "case": "invalid redisplay + foreign identifier",
+    "method": "POST",
+    "csrf": true,
+    "status": 400,
+    "final_path": "/commercial/create/",
+    "sha256": "3208e487505831b908c1c888582039269be92238a3449d591d0471a83b678860",
+    "html": "http_068.html",
+    "expected": [
+      200,
+      400,
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-030",
+    "actor": "uiux.persona.inventory",
+    "path": "/commercial/create/",
+    "case": "same-tenant unauthorized POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/commercial/create/",
+    "sha256": "d59c787027f1debaabeb8f798c170ca64ff82a907efdbacef8faa63b32f69d43",
+    "html": "http_069.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-030",
+    "actor": "uiux.wavec.commercial",
+    "path": "/commercial/create/",
+    "case": "missing CSRF rejects",
+    "method": "POST",
+    "csrf": false,
+    "status": 403,
+    "final_path": "/commercial/create/",
+    "sha256": "a8c1c826df1bde8bf5b1c745b1529d708cdfc9d6d56b242b95185e513abaea27",
+    "html": null,
+    "expected": [
+      403
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-031",
+    "actor": "uiux.wavec.controls",
+    "path": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/",
+    "sha256": "cc196ef519d048f3d690fc7206dec43cdf2cf0c6d65f3a972fc81f801822f6ae",
+    "html": "http_071.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-031",
+    "actor": "uiux.wavec.controls",
+    "path": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/comparison/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/comparison/",
+    "sha256": "49b3b96b5a22be032029556542a295a5d7c715688db413fd48cf6d4f85a9f0f6",
+    "html": "http_072.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-031",
+    "actor": "uiux.wavec.controls",
+    "path": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/exceptions/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/exceptions/",
+    "sha256": "92860c17e5e0ffab80cb634b27dc79ded59a30bbdd00afc8ed6d687ae2c533e3",
+    "html": "http_073.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-031",
+    "actor": "uiux.wavec.controls",
+    "path": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/cost-reconciliation/",
+    "case": "specialist GET",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/cost-reconciliation/",
+    "sha256": "2130d30a4df7200c798a99d8ba0071c70c3e2cb3b5ba03dc8b9c700b95b5fd1c",
+    "html": "http_074.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-031",
+    "actor": "uiux.wavec.controls",
+    "path": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/comparison/",
+    "case": "missing CSRF rejects",
+    "method": "POST",
+    "csrf": false,
+    "status": 403,
+    "final_path": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/comparison/",
+    "sha256": "a8c1c826df1bde8bf5b1c745b1529d708cdfc9d6d56b242b95185e513abaea27",
+    "html": null,
+    "expected": [
+      403
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-007",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/f4226383-3750-4124-9bc7-418a6e2f3904/buyer/",
+    "case": "C scope",
+    "method": "GET",
+    "csrf": null,
+    "status": 404,
+    "final_path": "/procurement/rfqs/f4226383-3750-4124-9bc7-418a6e2f3904/buyer/",
+    "sha256": "bb7c90ebb9a4a6c2433196106df2c9ddc3c3eca2a4bb75a8a2aaed564dd54125",
+    "html": "http_076.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-007",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/fe5c60ff-9298-4fd9-942b-8e635a315098/buyer/",
+    "case": "X scope",
+    "method": "GET",
+    "csrf": null,
+    "status": 404,
+    "final_path": "/procurement/rfqs/fe5c60ff-9298-4fd9-942b-8e635a315098/buyer/",
+    "sha256": "c63ad2ded881ab62bc5a1ed2d3cc624d8477f752853552564d25d73fb1823222",
+    "html": "http_077.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-031",
+    "actor": "uiux.wavec.controls",
+    "path": "/projects/f61f52ed-3c85-4570-af2b-5e89c025ab4e/controls/comparison/",
+    "case": "C project scope",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/projects/f61f52ed-3c85-4570-af2b-5e89c025ab4e/controls/comparison/",
+    "sha256": "d0aa1e4dc5cdde05ff8315e4b678c1f3358d5a9c44e3a5cabb5e3ad73b1daf8a",
+    "html": "http_078.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-031",
+    "actor": "uiux.wavec.controls",
+    "path": "/projects/f61f52ed-3c85-4570-af2b-5e89c025ab4e/controls/exceptions/",
+    "case": "C project scope",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/projects/f61f52ed-3c85-4570-af2b-5e89c025ab4e/controls/exceptions/",
+    "sha256": "98efb22e8adde790153cd003cd4113f9c46729ae1af55dc7f1359c0a23d2a45d",
+    "html": "http_079.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-031",
+    "actor": "uiux.wavec.controls",
+    "path": "/projects/f61f52ed-3c85-4570-af2b-5e89c025ab4e/controls/cost-reconciliation/",
+    "case": "C project scope",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/projects/f61f52ed-3c85-4570-af2b-5e89c025ab4e/controls/cost-reconciliation/",
+    "sha256": "566fbf1eba767dccc0fd8e416328d3c6f2db69360aeb9eb3a803acc322b7a9b7",
+    "html": "http_080.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-031",
+    "actor": "uiux.wavec.controls",
+    "path": "/projects/63063dae-394e-46e4-9abb-09284e821561/controls/comparison/",
+    "case": "X project scope",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/projects/63063dae-394e-46e4-9abb-09284e821561/controls/comparison/",
+    "sha256": "32e1896c7a9be8ec02ee0a4ba39b5975e7adcffd80675ea8edede652b8144570",
+    "html": "http_081.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-031",
+    "actor": "uiux.wavec.controls",
+    "path": "/projects/63063dae-394e-46e4-9abb-09284e821561/controls/exceptions/",
+    "case": "X project scope",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/projects/63063dae-394e-46e4-9abb-09284e821561/controls/exceptions/",
+    "sha256": "e68b37a1bf36e0f9c9ca2414b0604a303e4724810b7c7228b36d5c0c81d958ee",
+    "html": "http_082.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-031",
+    "actor": "uiux.wavec.controls",
+    "path": "/projects/63063dae-394e-46e4-9abb-09284e821561/controls/cost-reconciliation/",
+    "case": "X project scope",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/projects/63063dae-394e-46e4-9abb-09284e821561/controls/cost-reconciliation/",
+    "sha256": "a942baa7a0d59a7f974beb4151cc78a1076996c702724c0b8756b6d9f06f572b",
+    "html": "http_083.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-007",
+    "actor": "uiux.reference.batch03.site-only",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/",
+    "case": "site-only cannot expand RFQ scope",
+    "method": "GET",
+    "csrf": null,
+    "status": 404,
+    "final_path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/",
+    "sha256": "7344cecc9fd780e7262d91854dac6efaa152d2bb07b93a0e61c9e24770c524aa",
+    "html": "http_084.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-029",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/employment/",
+    "case": "management capability denied without exact code",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/workforce/employment/",
+    "sha256": "94d9ff16fdf64b18ce49437269388e725e5915aa7880e7b4c1d7fc3727327cd0",
+    "html": "http_085.html",
+    "expected": [
+      403
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-029",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/ess/employment/",
+    "case": "unlinked own-history fail closed",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/workforce/ess/employment/",
+    "sha256": "3857d997c4867b473296056db6e89b5d06d80a9f5ff175a44f9ac4e82c6c2d16",
+    "html": "http_086.html",
+    "expected": [
+      403
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-029",
+    "actor": "uiux.persona.inventory",
+    "path": "/workforce/employment/",
+    "case": "management capability denied without exact code",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/workforce/employment/",
+    "sha256": "00a7a574c39bc1c4bd3c21ffbf1fafe1cd1a0f5dd1fbc51509db3953fd401381",
+    "html": "http_087.html",
+    "expected": [
+      403
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-029",
+    "actor": "uiux.persona.inventory",
+    "path": "/workforce/ess/employment/",
+    "case": "unlinked own-history fail closed",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/workforce/ess/employment/",
+    "sha256": "bfeca92402fe7d8feb226ea0d5dd17cbcd2c3ed07df9678d1a6904c7653df386",
+    "html": "http_088.html",
+    "expected": [
+      403
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/foundation/labor-rates/create/",
+    "case": "sensitive Workforce denial",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/workforce/foundation/labor-rates/create/",
+    "sha256": "1b1fbf9041c5d06646ce2c3fb952633934b5aee28b5321145462ffc4991c5dfe",
+    "html": "http_089.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.wavec.hr",
+    "path": "/workforce/foundation/performance/create/",
+    "case": "sensitive Workforce denial",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/workforce/foundation/performance/create/",
+    "sha256": "9d074175ba75a7cd60788d55da28266382d51946889e915a3a4e0573a8fca329",
+    "html": "http_090.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-028",
+    "actor": "uiux.wavec.documents",
+    "path": "/documents/f64e5b6b-a99e-4501-895b-7ef68cc75c95/",
+    "case": "C object-scope denial",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/documents/f64e5b6b-a99e-4501-895b-7ef68cc75c95/",
+    "sha256": "816bb8f8df498ae8a19a344ca9d1b6d9f2e375dcfd11faf01cf282ddd852cceb",
+    "html": "http_091.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-028",
+    "actor": "uiux.wavec.documents",
+    "path": "/documents/f64e5b6b-a99e-4501-895b-7ef68cc75c95/download/",
+    "case": "C object-scope denial",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/documents/f64e5b6b-a99e-4501-895b-7ef68cc75c95/download/",
+    "sha256": "5f3cdce0d0c88c29a4ff4e69cb71b8c89a84011e6efab790346d3e59ede1ac9d",
+    "html": "http_092.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-028",
+    "actor": "uiux.wavec.documents",
+    "path": "/documents/f64e5b6b-a99e-4501-895b-7ef68cc75c95/versions/add/",
+    "case": "C manipulated object POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/documents/f64e5b6b-a99e-4501-895b-7ef68cc75c95/versions/add/",
+    "sha256": "22140511b8639475996536ca3e9d6978a1e1d8cfa6458e597e86819960212fb1",
+    "html": "http_093.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-028",
+    "actor": "uiux.wavec.documents",
+    "path": "/documents/52127753-fe11-4fe6-bc8b-a072549d7c31/",
+    "case": "X object-scope denial",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/documents/52127753-fe11-4fe6-bc8b-a072549d7c31/",
+    "sha256": "34eb8ece9a81743083713bf2758e7a491c4ba5a6888ca77fbfd2df2364c40847",
+    "html": "http_094.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-028",
+    "actor": "uiux.wavec.documents",
+    "path": "/documents/52127753-fe11-4fe6-bc8b-a072549d7c31/download/",
+    "case": "X object-scope denial",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/documents/52127753-fe11-4fe6-bc8b-a072549d7c31/download/",
+    "sha256": "462a1b70c4aec30fe3961479ba25ce44b78ced7319f426fa7dea1fd95876974b",
+    "html": "http_095.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-028",
+    "actor": "uiux.wavec.documents",
+    "path": "/documents/52127753-fe11-4fe6-bc8b-a072549d7c31/versions/add/",
+    "case": "X manipulated object POST",
+    "method": "POST",
+    "csrf": true,
+    "status": 403,
+    "final_path": "/documents/52127753-fe11-4fe6-bc8b-a072549d7c31/versions/add/",
+    "sha256": "abfff6707a07ad6742a9e6aab0d89e9b7668f259618795e3e9d58421224ec3b2",
+    "html": "http_096.html",
+    "expected": [
+      403,
+      404
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-018",
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/configuration/employment/new/",
+    "case": "project-site refresh preserves input",
+    "method": "POST",
+    "csrf": true,
+    "status": 200,
+    "final_path": "/payroll/configuration/employment/new/",
+    "sha256": "c8c3fb9d96c3e5b5b020cad1ba6c5ee210db8f924637123bffdc0ae0c51cf069",
+    "html": "http_097.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/accounting/statements/",
+    "case": "policy/source gate remains",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/accounting/statements/",
+    "sha256": "3726a29d3af96fb06e0686718073ae2eb6077b5fc7c3a58010a0fc09927e6ba3",
+    "html": "http_098.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-013",
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/subledgers/",
+    "case": "policy/source gate remains",
+    "method": "GET",
+    "csrf": null,
+    "status": 200,
+    "final_path": "/subledgers/",
+    "sha256": "aab2ecaeec15c6ce4a4754cfdb6616bfb6bd6a7265370d8150fdf209163220c1",
+    "html": "http_099.html",
+    "expected": [
+      200
+    ],
+    "passed": true
+  },
+  {
+    "scenario": "RV-032",
+    "actor": "uiux.wavec.commercial",
+    "path": "/procurement/rfq-invitations/9ab10872-ad73-422f-b384-5a5c92d6fe45/portal/",
+    "case": "invitation permission remains unassignable",
+    "method": "GET",
+    "csrf": null,
+    "status": 403,
+    "final_path": "/procurement/rfq-invitations/9ab10872-ad73-422f-b384-5a5c92d6fe45/portal/",
+    "sha256": "7de0b9707c275192aec80e783088b6bfd1fa1f24eee75b2795a66e0c615d896b",
+    "html": "http_100.html",
+    "expected": [
+      403
+    ],
+    "passed": true
+  }
+]

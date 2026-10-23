@@ -44,6 +44,7 @@ from apps.inventory.p8_services import (
     submit_inventory_count,
     valuation_reconciliation,
 )
+from apps.organizations.authorization import has_business_permission
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -120,12 +121,34 @@ def custody_workbench(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.INVENTORY_VALUATION_VIEW)
 @require_GET
 def valuation_workbench(request: HttpRequest) -> HttpResponse:
-    return render(request, "inventory/valuation_workbench.html", {
-        "pools": InventoryValuationPool.objects.filter(organization=request.organization).select_related("material")[:50],
-        "events": InventoryValuationEvent.objects.filter(organization=request.organization).select_related("stock_transaction").order_by("-finalized_at")[:100],
-        "envelopes": DownstreamCostSourceEnvelope.objects.filter(organization=request.organization).select_related("valuation_event")[:100],
-        "reconciliation": valuation_reconciliation(organization=request.organization, actor=request.user),
-    })
+    return render(
+        request,
+        "inventory/valuation_workbench.html",
+        {
+            "pools": InventoryValuationPool.objects.filter(
+                organization=request.organization
+            ).select_related("material")[:50],
+            "events": InventoryValuationEvent.objects.filter(
+                organization=request.organization
+            )
+            .select_related("stock_transaction")
+            .order_by("-finalized_at")[:100],
+            "envelopes": DownstreamCostSourceEnvelope.objects.filter(
+                organization=request.organization
+            ).select_related("valuation_event")[:100],
+            "reconciliation": (
+                valuation_reconciliation(
+                    organization=request.organization, actor=request.user
+                )
+                if has_business_permission(
+                    user=request.user,
+                    organization=request.organization,
+                    permission=BusinessPermissionCode.INVENTORY_VALUATION_RECONCILE,
+                )
+                else None
+            ),
+        },
+    )
 
 
 @active_organization_required

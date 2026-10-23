@@ -8,7 +8,7 @@
         </div>
         <label class="min-w-48 flex-1 sm:flex-none">
             <span class="mb-1 block text-[10px] font-semibold text-slate-500">پروژه{% if context_requires_project %} <span class="text-rose-600">(برای این عملیات الزامی)</span>{% endif %}</span>
-            <select class="min-h-9 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-800" name="project_id" data-context-project>
+            <select class="min-h-9 min-w-0 max-w-full rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-800" name="project_id" data-context-project>
                 <option value="">بدون پروژه / همه دامنه مجاز</option>
                 {% for project in context_projects %}<option value="{{ project.pk }}"{% if active_project.pk == project.pk %} selected{% endif %}>{{ project.code }} — {{ project.name }}</option>{% endfor %}
             </select>
@@ -16,7 +16,7 @@
         {% if site_context_relevant %}
             <label class="min-w-48 flex-1 sm:flex-none">
                 <span class="mb-1 block text-[10px] font-semibold text-slate-500">کارگاه مرتبط</span>
-                <select class="min-h-9 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-800" name="site_id" data-context-site{% if not active_project %} disabled{% endif %}>
+                <select class="min-h-9 min-w-0 max-w-full rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-800" name="site_id" data-context-site{% if not active_project %} disabled{% endif %}>
                     <option value="">بدون کارگاه</option>
                     {% for site in context_sites %}<option value="{{ site.pk }}"{% if active_site.pk == site.pk %} selected{% endif %}>{{ site.code }} — {{ site.name }}</option>{% endfor %}
                 </select>

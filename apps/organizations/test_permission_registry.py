@@ -22,7 +22,10 @@ from apps.organizations.permission_registry import (
     registered_model_labels,
     registered_permission_codes,
 )
-from apps.organizations.role_defaults import DEFAULT_ROLE_PERMISSIONS
+from apps.organizations.role_defaults import (
+    DEFAULT_ROLE_METADATA,
+    DEFAULT_ROLE_PERMISSIONS,
+)
 
 
 def _permission_members_referenced_by(modules: tuple[str, ...]) -> set[str]:
@@ -111,7 +114,8 @@ class PermissionRegistryArchitectureTests(SimpleTestCase):
     def test_role_defaults_only_use_registered_permissions(self) -> None:
         catalog = registered_permission_codes()
 
-        self.assertEqual(set(DEFAULT_ROLE_PERMISSIONS), set(MembershipRole.values))
+        self.assertEqual(set(DEFAULT_ROLE_PERMISSIONS), set(DEFAULT_ROLE_METADATA))
+        self.assertLessEqual(set(MembershipRole.values), set(DEFAULT_ROLE_METADATA))
         for role_code, permissions in DEFAULT_ROLE_PERMISSIONS.items():
             with self.subTest(role=role_code):
                 self.assertLessEqual(permissions, catalog)

@@ -4,6 +4,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
+from apps.organizations.authorization import get_active_membership
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -116,7 +117,13 @@ def incident_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.SAFETY_INCIDENTS_CREATE)
 def incident_create(request: HttpRequest) -> HttpResponse:
-    form = SafetyIncidentForm(request.POST or None, organization=request.organization)
+    form = SafetyIncidentForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+    )
     if request.method == "POST" and form.is_valid():
         try:
             incident = create_safety_incident(

@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\docs\governance\uiux\f111_batch_08_evidence\runtime.py", line 218, in <module>
+    {"prepare": prepare, "http": http, "direct": direct, "after": after}[sys.argv[1]]()
+  File "E:\Construction_Company_Solution\docs\governance\uiux\f111_batch_08_evidence\runtime.py", line 158, in http
+    parsed = observe("authorized B stricter service denial" if allowed else "blank stricter service denial", payload(finding, "B" if allowed else "") | {"csrfmiddlewaretoken": parsed.token})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\docs\governance\uiux\f111_batch_08_evidence\runtime.py", line 141, in observe
+    assert parsed.errors, (finding, alias, case, "missing validation error")
+AssertionError: ('125', 'uiux.persona.project-manager', 'authorized B stricter service denial', 'missing validation error')

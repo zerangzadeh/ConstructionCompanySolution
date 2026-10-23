@@ -6,7 +6,8 @@
   <form method="post" class="space-y-4" novalidate>
     {% csrf_token %}
     {% if form.non_field_errors %}<div class="rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ form.non_field_errors }}</div>{% endif %}
-    {% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
+    {% for field in form %}{% if field.is_hidden %}{{ field }}{{ field.errors }}{% elif field.name != "evidence_json" and field.name != "mapping_reference" %}{% include "components/form_field.html" with field=field only %}{% if field.name == "project" %}<button type="submit" name="_refresh_context" value="1" formnovalidate class="erp-btn erp-btn--secondary">نمایش کارگاه‌های پروژه</button>{% endif %}{% endif %}{% endfor %}
+    {% if form.evidence_json or form.mapping_reference %}<details class="rounded-lg border border-slate-200 p-3" {% if form.evidence_json.errors or form.mapping_reference.errors %}open{% endif %}><summary class="cursor-pointer text-sm font-medium">شواهد و نگاشت تکمیلی</summary><div class="mt-3 space-y-4">{% if form.evidence_json %}{% include "components/form_field.html" with field=form.evidence_json only %}{% endif %}{% if form.mapping_reference %}{% include "components/form_field.html" with field=form.mapping_reference only %}{% endif %}</div></details>{% endif %}
     <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-5"><button class="erp-btn erp-btn--primary" type="submit">ثبت کنترل‌شده</button><a class="erp-btn erp-btn--secondary" href="{% url 'payroll:workbench' %}">بازگشت</a></div>
   </form>
 </section>

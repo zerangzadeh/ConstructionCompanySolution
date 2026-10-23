@@ -1,0 +1,892 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="15" skipped="0" tests="49" time="62.729" timestamp="2026-10-23T11:35:36.115517+03:30" hostname="Zerangzadeh"><testcase classname="apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests" name="test_authoritative_user_person_relationship_resolution_allows_own_data" time="36.488" /><testcase classname="apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests" name="test_direct_url_masks_sensitive_field_and_discloses_no_other_object" time="1.373" /><testcase classname="apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests" name="test_inactive_membership_is_denied_even_with_authoritative_identity" time="0.195" /><testcase classname="apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests" name="test_navigation_visibility_follows_identity_but_does_not_grant_access" time="0.440" /><testcase classname="apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests" name="test_other_person_and_cross_tenant_relationships_are_denied" time="0.370" /><testcase classname="apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests" name="test_username_email_and_employee_number_similarity_never_infer_identity" time="0.193" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_authorized_empty_source_has_no_fabricated_balance_or_score" time="0.513" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_current_person_relationship_bridge_filters_legacy_source_rows" time="0.264" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_dashboard_localizes_source_status_and_retains_own_links" time="0.593" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_independent_profile_survives_source_error" time="0.314" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_manager_workspace_requires_explicit_team_lead_and_filters_team" time="0.363" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_missing_authorization_scope_fails_closed" time="0.232" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_missing_source_permission_is_unavailable_without_requests" time="0.300" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_missing_workforce_identity_fails_closed" time="0.252" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_my_requests_is_own_identity_scoped_and_source_owned" time="0.281" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_no_identity_or_foreign_tenant_never_reveals_source_existence" time="0.222" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_notification_is_deduplicated_linked_and_presentation_only" time="0.422" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_only_read_methods_and_authoritative_profile_remains_unchanged" time="0.291" /><testcase classname="apps.workforce.test_cep053.ESSDashboardTests" name="test_workspaces_are_get_only_and_rtl" time="0.474" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_assigned_response_atomicity_privacy_and_no_financial_mutation" time="2.508" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_finalized_own_artifact_and_export_preserve_source" time="0.724" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_foreign_inquiry_and_payslip_urls_are_uniformly_denied" time="0.988" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_missing_authority_and_incomplete_component_mapping_fail_closed" time="0.420" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_missing_configuration_or_route_never_creates_orphan" time="0.866" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_multi_actor_response_retained_before_shared_threshold" time="1.907" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_own_identity_and_source_state_fail_closed" time="0.519"><failure message="AssertionError: False is not true : Couldn't find 'فیش قطعی مجازی برای نمایش موجود نیست.' in the following response">self = &lt;apps.payroll.test_cep054.ESSPayrollTests testMethod=test_own_identity_and_source_state_fail_closed&gt;
+
+    def test_own_identity_and_source_state_fail_closed(self):
+        self._login(self.unassigned)
+        denied = self.client.get(reverse("payroll:ess_payslip", args=[self.slip.pk]))
+        missing = self.client.get(reverse("payroll:ess_payslip", args=[uuid4()]))
+        self.assertEqual(denied.status_code, 403)
+        self.assertEqual(denied.content, missing.content)
+        self._capture("unauthorized", denied)
+        self._login(self.employee_user)
+        with patch(
+            "apps.payroll.ess_views.services.own_payroll_history",
+            side_effect=ValidationError("secret diagnostic"),
+        ):
+            error = self.client.get(reverse("payroll:ess_history"))
+        self.assertEqual(error.status_code, 400)
+        self.assertNotIn(b"secret diagnostic", error.content)
+        self._capture("error", error)
+        with patch(
+            "apps.payroll.ess_views.services.own_payroll_history", return_value=()
+        ):
+            empty = self.client.get(reverse("payroll:ess_history"))
+&gt;       self.assertContains(empty, "فیش قطعی مجازی برای نمایش موجود نیست.")
+E       AssertionError: False is not true : Couldn't find 'فیش قطعی مجازی برای نمایش موجود نیست.' in the following response
+[Synthetic response HTML omitted; assertion and stack retained.]
+
+apps\payroll\test_cep054.py:241: AssertionError</failure></testcase><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_permission_tenant_isolation_and_rtl_ui" time="0.561"><failure message="AssertionError: False is not true : Couldn't find 'کارگاه مقرراتی مالیات و بیمه کارکنان' in the following response">self = &lt;apps.payroll.test_cep054.ESSPayrollTests testMethod=test_permission_tenant_isolation_and_rtl_ui&gt;
+
+    def test_permission_tenant_isolation_and_rtl_ui(self):
+        self._published_policy(
+            PAYROLL_TAX_REGULATORY_POLICY_CODE, self._tax_parameters()
+        )
+        with self.assertRaises(PermissionDenied):
+            calculate_statutory(
+                organization=self.organization,
+                actor=self.denied,
+                run=self.run,
+                kind=StatutoryCalculationKind.PAYROLL_TAX,
+                reason="Denied",
+            )
+        other_owner = User.objects.create_user(username="other-statutory-owner")
+        other = create_organization_with_owner(
+            owner=other_owner, name="Other Statutory", slug="other-statutory"
+        )
+        with self.assertRaises(PermissionDenied):
+            calculate_statutory(
+                organization=other,
+                actor=self.actor,
+                run=self.run,
+                kind=StatutoryCalculationKind.PAYROLL_TAX,
+                reason="Cross tenant",
+            )
+        self.client.force_login(self.actor)
+        session = self.client.session
+        session["active_organization_id"] = str(self.organization.pk)
+        session.save()
+        response = self.client.get(reverse("payroll:statutory_workbench"))
+        self.assertEqual(response.status_code, 200)
+&gt;       self.assertContains(response, "کارگاه مقرراتی مالیات و بیمه کارکنان")
+E       AssertionError: False is not true : Couldn't find 'کارگاه مقرراتی مالیات و بیمه کارکنان' in the following response
+[Synthetic response HTML omitted; assertion and stack retained.]
+
+apps\payroll\test_p7_s23_s28_statutory_payroll.py:674: AssertionError</failure></testcase><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_pinned_dms_evidence_obeys_own_assigned_privacy_on_all_paths" time="2.259" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_published_policy_without_source_and_review_fails_closed" time="0.176" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_replacement_lineage_is_source_linked_and_own_only" time="0.362" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_schema_output_export_idempotency_reconciliation_and_immutability" time="0.527" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_sensitive_permissions_do_not_expand_owner_admin_defaults" time="0.201" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_submit_idempotency_and_my_requests_keep_workflow_authority" time="1.291" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_tax_and_employee_insurance_are_decimal_version_pinned_and_independent" time="0.423" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_tenant_cannot_select_or_override_national_policy" time="0.230" /><testcase classname="apps.payroll.test_cep054.ESSPayrollTests" name="test_ui_handler_claim_response_uses_configured_outcome_only" time="1.771" /><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_audit_actions_cover_consequential_lifecycle" time="0.204"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_audit_actions_cover_consequential_lifecycle&gt;
+
+    def test_audit_actions_cover_consequential_lifecycle(self):
+&gt;       version = self._published()
+                  ^^^^^^^^^^^^^^^^^
+
+apps\knowledge\test_p9_s21_s24.py:958: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\knowledge\test_p9_s21_s24.py:197: in _published
+    candidate = self._candidate()
+                ^^^^^^^^^^^^^^^^^
+apps\knowledge\test_p9_s21_s24.py:137: in _candidate
+    return create_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:323: in create_candidate
+    _allow_scope(
+apps\knowledge\services.py:74: in _allow_scope
+    _allow(organization=organization, actor=actor, permission=permission)
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: knowledge-author&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_default_denial_role_name_and_cross_tenant_routes" time="0.029"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_default_denial_role_name_and_cross_tenant_routes&gt;
+
+    def test_default_denial_role_name_and_cross_tenant_routes(self):
+        denied_user = User.objects.create_user(username="knowledge-manager-name-only")
+        empty_role = OrganizationRole.objects.create(
+            code="knowledge_manager_name_only", name="Knowledge Manager"
+        )
+        OrganizationMembership.objects.create(
+            organization=self.organization,
+            user=denied_user,
+            role_definition=empty_role,
+            status=MembershipStatus.ACTIVE,
+        )
+        with self.assertRaises(PermissionDenied):
+            create_candidate(
+                organization=self.organization,
+                actor=denied_user,
+                title="denied",
+                body="denied",
+                knowledge_type="lesson_learned",
+                authority_classification="advisory",
+                audience="tenant",
+                category_code="quality",
+            )
+&gt;       version = self._published()
+                  ^^^^^^^^^^^^^^^^^
+
+apps\knowledge\test_p9_s21_s24.py:844: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\knowledge\test_p9_s21_s24.py:197: in _published
+    candidate = self._candidate()
+                ^^^^^^^^^^^^^^^^^
+apps\knowledge\test_p9_s21_s24.py:137: in _candidate
+    return create_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:323: in create_candidate
+    _allow_scope(
+apps\knowledge\services.py:74: in _allow_scope
+    _allow(organization=organization, actor=actor, permission=permission)
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: knowledge-author&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_dms_pin_is_exact_stable_and_sensitive_history_is_restricted" time="0.057"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_dms_pin_is_exact_stable_and_sensitive_history_is_restricted&gt;
+
+    def test_dms_pin_is_exact_stable_and_sensitive_history_is_restricted(self):
+        document, first, second = self._document_version(
+            confidentiality=DocumentConfidentiality.CONFIDENTIAL
+        )
+        source = self._source()
+&gt;       candidate = self._candidate()
+                    ^^^^^^^^^^^^^^^^^
+
+apps\knowledge\test_p9_s21_s24.py:693: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\knowledge\test_p9_s21_s24.py:137: in _candidate
+    return create_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:323: in create_candidate
+    _allow_scope(
+apps\knowledge\services.py:74: in _allow_scope
+    _allow(organization=organization, actor=actor, permission=permission)
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: knowledge-author&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_knowledge_actions_have_no_automatic_downstream_effects" time="1.115"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_knowledge_actions_have_no_automatic_downstream_effects&gt;
+
+    def test_knowledge_actions_have_no_automatic_downstream_effects(self):
+        source = self._source()
+        downstream_apps = (
+            "accounting",
+            "billing",
+            "compliance",
+            "contracts",
+            "equipment",
+            "financials",
+            "fixed_assets",
+            "inventory",
+            "partner_qualification",
+            "payroll",
+            "procurement",
+            "projects",
+            "subledgers",
+            "support",
+            "treasury",
+        )
+    
+        def counts():
+            return {
+                model._meta.label_lower: model._default_manager.count()
+                for label in downstream_apps
+                for model in django_apps.get_app_config(label).get_models()
+            }
+    
+        before = counts()
+&gt;       candidate = self._candidate()
+                    ^^^^^^^^^^^^^^^^^
+
+apps\knowledge\test_p9_s21_s24.py:918: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\knowledge\test_p9_s21_s24.py:137: in _candidate
+    return create_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:323: in create_candidate
+    _allow_scope(
+apps\knowledge\services.py:74: in _allow_scope
+    _allow(organization=organization, actor=actor, permission=permission)
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: knowledge-author&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_lifecycle_pins_source_and_prevents_author_self_approval" time="0.021"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_lifecycle_pins_source_and_prevents_author_self_approval&gt;
+
+    def test_lifecycle_pins_source_and_prevents_author_self_approval(self):
+&gt;       candidate = self._candidate()
+                    ^^^^^^^^^^^^^^^^^
+
+apps\knowledge\test_p9_s21_s24.py:244: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\knowledge\test_p9_s21_s24.py:137: in _candidate
+    return create_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:323: in create_candidate
+    _allow_scope(
+apps\knowledge\services.py:74: in _allow_scope
+    _allow(organization=organization, actor=actor, permission=permission)
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: knowledge-author&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_linked_correction_requires_normal_lifecycle_and_supersedes_once" time="0.023"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_linked_correction_requires_normal_lifecycle_and_supersedes_once&gt;
+
+    def test_linked_correction_requires_normal_lifecycle_and_supersedes_once(self):
+&gt;       previous = self._published()
+                   ^^^^^^^^^^^^^^^^^
+
+apps\knowledge\test_p9_s21_s24.py:365: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\knowledge\test_p9_s21_s24.py:197: in _published
+    candidate = self._candidate()
+                ^^^^^^^^^^^^^^^^^
+apps\knowledge\test_p9_s21_s24.py:137: in _candidate
+    return create_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:323: in create_candidate
+    _allow_scope(
+apps\knowledge\services.py:74: in _allow_scope
+    _allow(organization=organization, actor=actor, permission=permission)
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: knowledge-author&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_platform_promotion_is_independent_and_does_not_expose_tenant_source" time="0.020"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_platform_promotion_is_independent_and_does_not_expose_tenant_source&gt;
+
+    def test_platform_promotion_is_independent_and_does_not_expose_tenant_source(self):
+&gt;       source_version = self._published()
+                         ^^^^^^^^^^^^^^^^^
+
+apps\knowledge\test_p9_s21_s24.py:778: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\knowledge\test_p9_s21_s24.py:197: in _published
+    candidate = self._candidate()
+                ^^^^^^^^^^^^^^^^^
+apps\knowledge\test_p9_s21_s24.py:137: in _candidate
+    return create_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:323: in create_candidate
+    _allow_scope(
+apps\knowledge\services.py:74: in _allow_scope
+    _allow(organization=organization, actor=actor, permission=permission)
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: knowledge-author&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_published_version_is_immutable_and_history_is_reproducible" time="0.021"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_published_version_is_immutable_and_history_is_reproducible&gt;
+
+    def test_published_version_is_immutable_and_history_is_reproducible(self):
+&gt;       version = self._published()
+                  ^^^^^^^^^^^^^^^^^
+
+apps\knowledge\test_p9_s21_s24.py:346: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\knowledge\test_p9_s21_s24.py:197: in _published
+    candidate = self._candidate()
+                ^^^^^^^^^^^^^^^^^
+apps\knowledge\test_p9_s21_s24.py:137: in _candidate
+    return create_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:323: in create_candidate
+    _allow_scope(
+apps\knowledge\services.py:74: in _allow_scope
+    _allow(organization=organization, actor=actor, permission=permission)
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: knowledge-author&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_recurrence_and_reuse_corrections_preserve_lineage" time="0.025"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_recurrence_and_reuse_corrections_preserve_lineage&gt;
+
+    def test_recurrence_and_reuse_corrections_preserve_lineage(self):
+        first, second = self._source(), self._source()
+        key = uuid4()
+&gt;       recurrence = record_recurrence(
+            organization=self.organization,
+            actor=self.author,
+            recurrence_key="support-repeat",
+            scope_description="Tenant",
+            period_start="2026-01-01",
+            period_end="2026-01-31",
+            sources=[
+                {"source_type": "support_case", "source_id": first.pk},
+                {"source_type": "support_case", "source_id": second.pk},
+            ],
+            operation_key=key,
+        )
+
+apps\knowledge\test_p9_s21_s24.py:477: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:862: in record_recurrence
+    _allow(
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: knowledge-author&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_RECURRENCE_RECORD
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_representative_source_adapters_pin_exact_facts_without_mutation" time="0.122"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_representative_source_adapters_pin_exact_facts_without_mutation&gt;
+
+    def test_representative_source_adapters_pin_exact_facts_without_mutation(self):
+        project = self._project()
+        field = FieldObservation.objects.create(
+            organization=self.organization,
+            project=project,
+            kind="general",
+            title="Accepted observation",
+            status="accepted",
+            revision=3,
+            create_operation_key=uuid4(),
+            create_payload_hash="f" * 64,
+            created_by=self.author,
+        )
+        template = InspectionTemplate.objects.create(
+            organization=self.organization,
+            profile=ControlProfile.HSE,
+            code=f"KN-{uuid4().hex[:8]}",
+            title="Knowledge inspection template",
+            created_by=self.author,
+        )
+        template_version = InspectionTemplateVersion.objects.create(
+            organization=self.organization,
+            template=template,
+            version_number=1,
+            checklist=[],
+            outcome_rules={},
+            source_references=[],
+            canonical_hash="c" * 64,
+            published_by=self.author,
+        )
+        inspection = Inspection.objects.create(
+            organization=self.organization,
+            project=project,
+            profile=ControlProfile.HSE,
+            number=f"KN-{uuid4().hex[:8]}",
+            template_version=template_version,
+            title="Passed inspection",
+            status=InspectionStatus.PASSED,
+            template_snapshot_hash=template_version.canonical_hash,
+            created_by=self.author,
+            inspector=self.author,
+        )
+        party = BusinessParty.objects.create(
+            organization=self.organization,
+            party_kind=PartyKind.COMPANY,
+            display_name="Knowledge partner",
+        )
+        profile = PartnerProfile.objects.create(
+            organization=self.organization,
+            party=party,
+            created_by=self.author,
+        )
+        evaluation = PartnerEvaluation.objects.create(
+            organization=self.organization,
+            profile=profile,
+            project=project,
+            period_start=date(2026, 1, 1),
+            period_end=date(2026, 1, 31),
+            criteria_snapshot=[{"code": "quality", "weight": 100}],
+            scores={"quality": 90},
+            status="published",
+            authored_by=self.author,
+            published_by=self.reviewer,
+        )
+        support = self._source()
+        originals = {
+            "field": (field.status, field.revision),
+            "inspection": (inspection.status, inspection.updated_at),
+            "evaluation": (evaluation.status, evaluation.updated_at),
+            "support": (support.status, support.summary),
+        }
+&gt;       candidate = self._candidate()
+                    ^^^^^^^^^^^^^^^^^
+
+apps\knowledge\test_p9_s21_s24.py:619: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\knowledge\test_p9_s21_s24.py:137: in _candidate
+    return create_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:323: in create_candidate
+    _allow_scope(
+apps\knowledge\services.py:74: in _allow_scope
+    _allow(organization=organization, actor=actor, permission=permission)
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: knowledge-author&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_reuse_deduplicates_and_withdrawal_preserves_history" time="0.022"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_reuse_deduplicates_and_withdrawal_preserves_history&gt;
+
+    def test_reuse_deduplicates_and_withdrawal_preserves_history(self):
+&gt;       version = self._published()
+                  ^^^^^^^^^^^^^^^^^
+
+apps\knowledge\test_p9_s21_s24.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\knowledge\test_p9_s21_s24.py:197: in _published
+    candidate = self._candidate()
+                ^^^^^^^^^^^^^^^^^
+apps\knowledge\test_p9_s21_s24.py:137: in _candidate
+    return create_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:323: in create_candidate
+    _allow_scope(
+apps\knowledge\services.py:74: in _allow_scope
+    _allow(organization=organization, actor=actor, permission=permission)
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: knowledge-author&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_tenant_source_and_recurrence_are_isolated_and_distinct" time="0.016"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_tenant_source_and_recurrence_are_isolated_and_distinct&gt;
+
+    def test_tenant_source_and_recurrence_are_isolated_and_distinct(self):
+&gt;       candidate = self._candidate()
+                    ^^^^^^^^^^^^^^^^^
+
+apps\knowledge\test_p9_s21_s24.py:290: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\knowledge\test_p9_s21_s24.py:137: in _candidate
+    return create_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:323: in create_candidate
+    _allow_scope(
+apps\knowledge\services.py:74: in _allow_scope
+    _allow(organization=organization, actor=actor, permission=permission)
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: knowledge-author&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests" name="test_withdrawal_requires_reason_preserves_history_and_is_idempotent" time="0.020"><failure message="django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.">self = &lt;apps.knowledge.test_p9_s21_s24.KnowledgeP9S21S24Tests testMethod=test_withdrawal_requires_reason_preserves_history_and_is_idempotent&gt;
+
+    def test_withdrawal_requires_reason_preserves_history_and_is_idempotent(self):
+&gt;       version = self._published()
+                  ^^^^^^^^^^^^^^^^^
+
+apps\knowledge\test_p9_s21_s24.py:442: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\knowledge\test_p9_s21_s24.py:197: in _published
+    candidate = self._candidate()
+                ^^^^^^^^^^^^^^^^^
+apps\knowledge\test_p9_s21_s24.py:137: in _candidate
+    return create_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\knowledge\services.py:323: in create_candidate
+    _allow_scope(
+apps\knowledge\services.py:74: in _allow_scope
+    _allow(organization=organization, actor=actor, permission=permission)
+apps\knowledge\services.py:57: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: knowledge-author&gt;, organization = &lt;Organization: Knowledge&gt;
+permission = BusinessPermissionCode.KNOWLEDGE_CANDIDATES_CREATE
+message = 'مجوز لازم برای عملیات دانش وجود ندارد.', project = None, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات دانش وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase></testsuite></testsuites>

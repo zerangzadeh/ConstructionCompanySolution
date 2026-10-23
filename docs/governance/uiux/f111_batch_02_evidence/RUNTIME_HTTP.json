@@ -1,0 +1,78 @@
+[
+  {
+    "actor": "uiux.persona.project-manager",
+    "label": "limited GET",
+    "path": "/billing/retention-releases/new/",
+    "method": "GET",
+    "status": 200,
+    "clearance_options": [
+      {
+        "value": "",
+        "label": "---------"
+      }
+    ],
+    "errors": [],
+    "model_deltas": [],
+    "response_sha256": "8c0cdffb5623f517d5bc3b3a8cea5c29b57ca75836bf2d1fb2f0a94fa84886a7",
+    "authenticated_csrf_middleware": true,
+    "claim": "AVAILABLE_CONTROL_ONLY_NO_QUALIFYING_CLEARANCE"
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "label": "limited missing amount redisplay",
+    "path": "/billing/retention-releases/new/",
+    "method": "POST",
+    "status": 200,
+    "clearance_options": [
+      {
+        "value": "",
+        "label": "---------"
+      }
+    ],
+    "errors": [
+      "این فیلد لازم است."
+    ],
+    "model_deltas": [],
+    "response_sha256": "202da5eea581ebd22ca6491c4244b62682a4fbb927debb0964274149fb4bd78e",
+    "authenticated_csrf_middleware": true,
+    "claim": "AVAILABLE_CONTROL_ONLY_NO_QUALIFYING_CLEARANCE"
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "label": "nonexistent UUID POST; supplemental only, NOT same/cross-tenant proof",
+    "path": "/billing/retention-releases/new/",
+    "method": "POST",
+    "status": 200,
+    "clearance_options": [
+      {
+        "value": "",
+        "label": "---------"
+      }
+    ],
+    "errors": [
+      "یک گزینهٔ معتبر انتخاب کنید. آن گزینه از گزینه‌های موجود نیست."
+    ],
+    "model_deltas": [],
+    "response_sha256": "2ac4a1d317e81c9b4ad915b1a812c11019caa3e456c258f545902be461c558d1",
+    "authenticated_csrf_middleware": true,
+    "claim": "AVAILABLE_CONTROL_ONLY_NO_QUALIFYING_CLEARANCE"
+  },
+  {
+    "actor": "uiux.persona.tenant-admin",
+    "label": "organization/view GET without source; positive PENDING",
+    "path": "/billing/retention-releases/new/",
+    "method": "GET",
+    "status": 200,
+    "clearance_options": [
+      {
+        "value": "",
+        "label": "---------"
+      }
+    ],
+    "errors": [],
+    "model_deltas": [],
+    "response_sha256": "ce6d4183449ab1d34a5428ab1c14be7eb79117f3d3519176f4df7c73deb6e9c4",
+    "authenticated_csrf_middleware": true,
+    "claim": "AVAILABLE_CONTROL_ONLY_NO_QUALIFYING_CLEARANCE"
+  }
+]

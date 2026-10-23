@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\docs\governance\cep\evidence\CEP-078_REENTRY_03\persona_fixture.py", line 41, in <module>
+    subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-Command',command],input=json.dumps({'alias':alias,'password':password}),text=True,capture_output=True,check=True)
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', "$d=[Console]::In.ReadToEnd()|ConvertFrom-Json; $p=Join-Path $env:LOCALAPPDATA 'BONIRA/UIUXRuntimeAudit/credentials'; [System.IO.Directory]::CreateDirectory($p)|Out-Null; $s=ConvertTo-SecureString $d.password -AsPlainText -Force; [pscredential]::new($d.alias,$s)|Export-Clixml -LiteralPath (Join-Path $p ($d.alias+'.clixml'))"]' returned non-zero exit status 1.

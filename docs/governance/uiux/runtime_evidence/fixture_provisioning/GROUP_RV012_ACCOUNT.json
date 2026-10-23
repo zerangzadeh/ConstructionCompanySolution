@@ -1,0 +1,19 @@
+{
+  "status": "PARTIAL_BLOCKED_ELIGIBLE_SOURCE_AND_ACCOUNT_ACTIVATION",
+  "records": [
+    {
+      "model": "treasury.TreasuryAccount",
+      "id": "abddceb8-a1be-4f12-85da-5b2d6269c063",
+      "created": true,
+      "canonical_path": "apps.treasury.services.create_treasury_account",
+      "organization": "demo-construction-01",
+      "status": "draft"
+    }
+  ],
+  "account_status": "draft",
+  "approved_eligible_sources": 0,
+  "governing_budget_controls": 0,
+  "source_blocker": "Movement form accepts approved employee_reimbursement only. No approved reimbursement expense/request or accepted governing budget exists. Do not invent acceptance/governance semantics.",
+  "account_blocker": "Activation requires effective Accounting mapping and independent organization-scoped finance checker. P06 remains project-scoped; no scope expansion solely to prepare fixtures.",
+  "P06_scope_gate": "MovementForm clears source choices unless Treasury view passes organization context; project-only scopes do not satisfy that call. No UI or authorization changes."
+}

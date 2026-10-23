@@ -1,0 +1,19 @@
+--- session-entry/erp_jalali.js
++++ current/erp_jalali.js
+@@ -284,6 +284,16 @@
+     document.addEventListener("submit", (event) => {
+         if (!prepareForm(event.target)) event.preventDefault();
+     }, true);
++    document.addEventListener("keydown", (event) => {
++        if (event.key !== "Escape" || !activeInput) return;
++        const wrap = activeInput.closest(".erp-jalali-wrap");
++        const popover = wrap?.querySelector(":scope > .erp-jalali-popover");
++        if (!popover || popover.hidden) return;
++        const returnFocus = popover.contains(document.activeElement);
++        popover.hidden = true;
++        event.preventDefault();
++        if (returnFocus) wrap.querySelector(":scope > .erp-jalali-trigger")?.focus();
++    });
+     document.addEventListener("click", (event) => {
+         if (!event.target.closest(".erp-jalali-wrap")) document.querySelectorAll(".erp-jalali-popover").forEach((item) => { item.hidden = true; });
+     });

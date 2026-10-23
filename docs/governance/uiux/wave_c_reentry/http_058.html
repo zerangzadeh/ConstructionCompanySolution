@@ -1,0 +1,114 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+
+<div class="mb-3 flex items-center justify-end gap-2" data-table-filter-controls="table-filters">
+    <form id="table-filters" method="get" class="flex items-center gap-2" aria-label="فیلترهای جدول" data-table-filter-form>
+        <button class="h-8 rounded-md border border-slate-200 bg-white px-2.5 text-[11px] font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-700" type="submit">اعمال فیلتر</button>
+        
+    </form>
+</div>
+<template id="table-filters-row">
+<tr class="bg-slate-50/70 align-top text-right">
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-document">فیلتر سند</label>
+            
+                <input id="table-filters-document" type="search" name="document" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-content">فیلتر محتوا/OCR</label>
+            
+                <input id="table-filters-content" type="search" name="content" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-document_type">فیلتر نوع</label>
+            
+                <select id="table-filters-document_type" name="document_type" form="table-filters" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                    <option value="">همه</option>
+                    <option value="general">عمومی</option><option value="contract">قرارداد</option><option value="drawing">نقشه</option><option value="receipt">رسید</option><option value="photo">تصویر</option><option value="report">گزارش</option><option value="other">سایر</option>
+                </select>
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-version">فیلتر نسخه جاری</label>
+            
+                <input id="table-filters-version" type="search" name="version" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+    </th>
+    
+</tr>
+
+</template>
+
+ 
+
+
+
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">اسناد شرکت</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">مدیریت اسناد</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">اسناد شرکت</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">شرکت سازه‌پردازان پارس</p>
+        
+    </div>
+    
+        <a class="erp-page-header__action erp-btn erp-btn--primary shrink-0" href="/documents/upload/">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>ایجاد سند
+        </a>
+    
+</header>
+
+<section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست اسناد">
+  
+  <div class="erp-panel-header"><div><h2 class="text-sm font-semibold text-slate-900">مخزن اسناد خصوصی</h2><p class="mt-0.5 text-[11px] text-slate-500">اسناد نسخه‌بندی‌شده با دسترسی بر اساس شرکت و پروژه</p></div><span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">3 سند</span></div>
+  <div class="erp-table-wrap"><table class="w-full min-w-[950px] text-right"><thead><tr><th class="border-b border-slate-200 px-4 py-3">سند</th><th class="border-b border-slate-200 px-4 py-3">ارتباط‌ها</th><th class="border-b border-slate-200 px-4 py-3">نوع</th><th class="border-b border-slate-200 px-4 py-3">نسخه جاری</th><th class="border-b border-slate-200 px-4 py-3">عملیات</th></tr></thead>
+  <tbody class="divide-y divide-slate-100"><tr>
+    <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="/documents/ca7ca134-a6e5-4a5c-8bd5-68e3b56a9251/">Wave C benign synthetic scanner evidence</a><p class="mt-0.5 text-[11px] text-slate-500" dir="ltr">WAVE-C-REENTRY-SCAN</p></td>
+    <td class="px-4 py-3.5 text-xs text-slate-600"><span class="me-1 inline-block rounded bg-slate-100 px-2 py-1">PRJ-01-01 - مجتمع مسکونی باغستان</span></td>
+    <td class="px-4 py-3.5"><span class="erp-badge erp-badge--info">عمومی</span></td>
+    <td class="px-4 py-3.5"><span dir="ltr">v2</span><p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500" dir="ltr">wave-c-benign-v2.png</p><span class="mt-1 inline-block text-[11px] font-semibold text-emerald-700">قابل استفاده</span></td>
+    <td class="px-4 py-3.5"><div class="flex gap-3"><a class="text-xs font-semibold text-blue-700" href="/documents/ca7ca134-a6e5-4a5c-8bd5-68e3b56a9251/">جزئیات</a><a class="text-xs font-semibold text-slate-600" href="/documents/ca7ca134-a6e5-4a5c-8bd5-68e3b56a9251/download/">دریافت</a></div></td>
+  </tr><tr>
+    <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="/documents/7e222488-5667-423a-81bf-30c6e08c9274/">گزارش کنترل کیفیت مصالح</a><p class="mt-0.5 text-[11px] text-slate-500" dir="ltr">DOC-01-01-02</p></td>
+    <td class="px-4 py-3.5 text-xs text-slate-600"><span class="me-1 inline-block rounded bg-slate-100 px-2 py-1">PRJ-01-01 - مجتمع مسکونی باغستان</span><span class="me-1 inline-block rounded bg-slate-100 px-2 py-1">Retired demo Payment PAY-01-01-02 (359047cb-f66f-4efc-a6fe-a6fcb2106e7f)</span></td>
+    <td class="px-4 py-3.5"><span class="erp-badge erp-badge--info">سایر</span></td>
+    <td class="px-4 py-3.5"><span dir="ltr">v1</span><p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500" dir="ltr">DOC-01-01-02.pdf</p><span class="mt-1 inline-block text-[11px] font-semibold text-amber-700">قرنطینه/نامشخص</span></td>
+    <td class="px-4 py-3.5"><div class="flex gap-3"><a class="text-xs font-semibold text-blue-700" href="/documents/7e222488-5667-423a-81bf-30c6e08c9274/">جزئیات</a></div></td>
+  </tr><tr>
+    <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="/documents/5edf4ded-b36f-49a7-87f3-30fb975bdbcd/">صورت‌جلسه هماهنگی اجرایی</a><p class="mt-0.5 text-[11px] text-slate-500" dir="ltr">DOC-01-01-01</p></td>
+    <td class="px-4 py-3.5 text-xs text-slate-600"><span class="me-1 inline-block rounded bg-slate-100 px-2 py-1">PRJ-01-01 - مجتمع مسکونی باغستان</span><span class="me-1 inline-block rounded bg-slate-100 px-2 py-1">Retired demo Payment PAY-01-01-01 (d00a3f0e-26f7-407f-b4cb-02332cab7dfc)</span></td>
+    <td class="px-4 py-3.5"><span class="erp-badge erp-badge--info">عمومی</span></td>
+    <td class="px-4 py-3.5"><span dir="ltr">v1</span><p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500" dir="ltr">DOC-01-01-01.pdf</p><span class="mt-1 inline-block text-[11px] font-semibold text-amber-700">قرنطینه/نامشخص</span></td>
+    <td class="px-4 py-3.5"><div class="flex gap-3"><a class="text-xs font-semibold text-blue-700" href="/documents/5edf4ded-b36f-49a7-87f3-30fb975bdbcd/">جزئیات</a></div></td>
+  </tr></tbody></table></div>
+  
+</section>
+
+
+        </main>

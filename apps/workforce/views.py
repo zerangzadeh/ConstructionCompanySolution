@@ -13,10 +13,18 @@ from django.views.decorators.http import require_GET, require_POST
 
 from apps.documents.models import DocumentConfidentiality
 from apps.documents.services import create_document
-from apps.organizations.authorization import has_business_permission
+from apps.organizations.authorization import (
+    get_active_membership,
+    has_business_permission,
+)
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
+)
+from apps.organizations.form_scoping import (
+    scope_project_related_choices,
+    scoped_projects_for_form,
+    selected_form_project,
 )
 from apps.organizations.models import BusinessPermissionCode
 from apps.projects.models import ProjectSite
@@ -1347,7 +1355,11 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.PROJECT_ASSIGNMENTS_CREATE)
 def assignment_create(request: HttpRequest) -> HttpResponse:
     form = EmployeeAssignmentForm(
-        request.POST or None, organization=request.organization
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
     )
     if request.method == "POST" and form.is_valid():
         try:
@@ -1368,15 +1380,28 @@ def assignment_create(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.PROJECT_ASSIGNMENTS_CREATE)
 @require_GET
 def assignment_sites(request: HttpRequest) -> HttpResponse:
-    project_id = request.GET.get("project")
-    sites = []
-    if project_id:
-        sites = ProjectSite.objects.filter(
+    membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
+    project = selected_form_project(
+        data=request.GET,
+        field_name="project",
+        projects=scoped_projects_for_form(
+            organization=request.organization, membership=membership
+        ),
+        active_project=None,
+    )
+    sites = scope_project_related_choices(
+        ProjectSite.objects.filter(
             organization=request.organization,
-            project_id=project_id,
             project__deleted_at__isnull=True,
             is_active=True,
-        ).order_by("name")
+        ),
+        membership=membership,
+        project_lookup="project_id",
+        site_lookup="pk",
+        project=project,
+    ).order_by("name")
     return render(request, "workforce/_site_options.html", {"sites": sites})
 
 
@@ -1565,7 +1590,13 @@ def workforce_qualification_revoke(
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE)
 def workforce_training_requirement_create(request: HttpRequest) -> HttpResponse:
-    form = TrainingRequirementForm(request.POST or None, organization=request.organization)
+    form = TrainingRequirementForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+    )
     if request.method == "POST" and form.is_valid():
         try:
             create_training_requirement(organization=request.organization, actor=request.user, **form.cleaned_data)
@@ -1580,7 +1611,13 @@ def workforce_training_requirement_create(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE)
 def workforce_training_record_create(request: HttpRequest) -> HttpResponse:
-    form = EmployeeTrainingRecordForm(request.POST or None, organization=request.organization)
+    form = EmployeeTrainingRecordForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+    )
     if request.method == "POST" and form.is_valid():
         try:
             record = record_employee_training(organization=request.organization, actor=request.user, **form.cleaned_data)

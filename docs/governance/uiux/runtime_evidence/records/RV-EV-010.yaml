@@ -1,0 +1,78 @@
+schema_version: '1.0'
+document:
+  id: BONIRA-UIUX-RV-EV-010
+  status: WAVE_A_RUNTIME_EVIDENCE
+record:
+  evidence_id: RV-EV-010
+  scenario_id: RV-024
+  executed_at: '2026-10-21T20:18:59.409000+03:30'
+  runtime:
+    environment_name: Development
+    base_url: http://127.0.0.1:8001/
+    git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+    browser: Microsoft Edge (real headless browser)
+    browser_version: 155.0.4283.62
+    viewport:
+    - width: 1440
+      height: 900
+    - width: 390
+      height: 844
+    - width: 1440
+      height: 900
+    device_scale_factor: 1
+  persona:
+    persona_id: P-14
+    test_user_alias: account.demo-construction-02.owner
+    organization_alias: demo-construction-02
+    project_context_alias: null
+    site_context_alias: null
+    effective_permission_bundle_reference: runtime_evidence/diagnostics/WAVE_A_AUTHORITY_BEFORE_20261021.json#account.demo-construction-02.owner
+  target: Employee Detail
+  preconditions:
+  - Frozen baseline verified; Development runtime; preserved identity; actual authority reverified read-only.
+  - Only authentication and governed session-context POSTs permitted; business/admin mutation blocked by browser
+    guard.
+  steps:
+  - Fresh valid membership selected for demo-construction-02; open existing Employee Detail from employee list.
+  - Use keyboard skip link and ten main-content Tab stops; inspect landmarks, headings, control labels and mobile.
+  expected_result:
+  - Understandable task/context, accessible controls and authoritative tenant/object/permission boundaries.
+  actual_result:
+  - Detail HTTP 200; two nested main landmarks. H1 employee title, H2 sections, H3 children.
+  - Ten main-content stops have meaningful names and visible blue focus outlines; sampled inputs have labels; no
+    visible document overflow on mobile.
+  - Reporting and Closeout not executed; their authorization fixtures remain blocked.
+  accessibility:
+    keyboard_only: true
+    focus_visible: true
+    landmarks_ok: false
+    labels_ok: true
+    notes: DOM semantics, browser accessibility snapshot and representative keyboard checks; no assistive-technology
+      certification.
+  responsive:
+    desktop: true
+    tablet_or_narrow: false
+    mobile: true
+    notes: Representative captured viewports only; absence means not sampled, not a failure.
+  authorization:
+    ui_visibility_observed: true
+    server_authorization_verified_when_applicable: false
+    cross_tenant_leakage_observed: false
+    notes: Claims limited to sampled URLs/queries. Platform admin also has superuser and separate tenant_owner memberships;
+      these are recorded independently.
+  result: FAIL_ACCESSIBILITY
+  existing_finding_ids:
+  - UIUX-F-049
+  new_finding_ids: []
+  needs_domain_review: false
+  screenshots:
+  - screenshots/RV-024__P-14__employee-detail__1440x900__01.png
+  - screenshots/RV-024__P-14__employee-mobile__390x844__01.png
+  - screenshots/RV-024__P-14__employee-keyboard__1440x900__01.png
+  network_or_console_evidence:
+  - diagnostics/WAVE_A_BROWSER_OBSERVATIONS_20261021.json
+  mutation_performed: true
+  mutation_record_or_cleanup: Authentication/session bookkeeping only; context selection where noted. No product/business/admin
+    mutation; accounts and role/scope retained.
+  notes: Existing non-platform tenant_owner used only for this approved read target; no ESS identity inferred. Synthetic
+    Development employee data; no employee mutation. DOM/keyboard validation does not claim screen-reader testing.

@@ -1,0 +1,250 @@
+{
+  "groups": [
+    {
+      "group": "Native cash/advance corrected fixture invocation",
+      "result": "PREPARED",
+      "records": [
+        {
+          "model": "treasury.TreasuryMovement",
+          "id": "0832f8ac-1b7c-4cbc-bb0f-8f1bf22d94ea",
+          "status": "posted",
+          "purpose": "New native posted movement; existing approved account mapping/policy, distinct maker/checker"
+        },
+        {
+          "model": "treasury.TreasuryMovement",
+          "id": "4bb1b543-775b-4736-926a-bb7039b905f2",
+          "status": "posted",
+          "purpose": "New native posted movement; existing approved account mapping/policy, distinct maker/checker"
+        },
+        {
+          "model": "treasury.PaymentRequest",
+          "id": "288cca5a-9f29-4e3f-b20e-1d9d45232a1c",
+          "status": "released",
+          "purpose": "New synthetic released request; existing accepted request untouched"
+        },
+        {
+          "model": "treasury.TreasuryAdvance",
+          "id": "bdc6204b-ee77-4fe6-a313-edaea5ab211a",
+          "status": "open",
+          "purpose": "New open synthetic advance; reversal starting state"
+        }
+      ]
+    },
+    {
+      "group": "Payroll native timesheet producer binding",
+      "result": "PREPARED",
+      "records": [
+        {
+          "model": "timekeeping.Timesheet",
+          "id": "259db6c9-0829-42a8-b9be-27c44d8ebc19",
+          "status": null,
+          "purpose": "New isolated synthetic day; existing explicit employee and context links retained"
+        },
+        {
+          "model": "timekeeping.TimesheetEntry",
+          "id": "034539b6-5a39-4c83-8c8f-0e7f6bb700e2",
+          "status": null,
+          "purpose": "Existing source quantity copied as a fictional work fact, not a rate/rule"
+        },
+        {
+          "model": "payroll.PayrollPeriod",
+          "id": "72d724d5-6b66-4102-9bb1-909a73630eba",
+          "status": "open",
+          "purpose": "New synthetic period within existing effective pay configuration and non-statutory rules"
+        },
+        {
+          "model": "payroll.PayrollRun",
+          "id": "e7ee7226-2ead-403b-b120-8774daae4e26",
+          "status": "draft",
+          "purpose": "New run; existing payroll history remains untouched"
+        },
+        {
+          "model": "payroll.PayrollInput",
+          "id": "6022db24-f7de-4299-837e-3cd61938d5f8",
+          "status": "finalized",
+          "purpose": "Existing approved Timesheet-to-Payroll producer; no manual quantity substitution"
+        }
+      ]
+    }
+  ],
+  "data_changes": {
+    "audit.AuditEvent": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "91467150-9895-4a49-9199-3f0455701f0c",
+        "f6a364c4-0472-44ae-8da5-2f240ced316f",
+        "4a87e70b-69e8-414d-b087-b27a6d6649c2",
+        "d1996f09-4fac-4919-b53c-9962ab6e5c89",
+        "32e8d432-92c0-40d1-b89a-5c8f8fff81c4",
+        "7329b663-2bc6-45db-92fe-cb081ccfdae4",
+        "ed9dbaa0-89ea-4705-9e6d-47bb792c269a",
+        "81430574-6c02-4745-98fd-0bee0a2b078e",
+        "13b5a60f-6106-4ff3-8cda-5051e0ceb498",
+        "ea103f0d-d551-48f4-970a-c606fa8304b2",
+        "40db7db6-b1e3-45ac-be8b-35f05689f40e",
+        "b209379b-d5a6-4ae8-a564-9ac467da8a92",
+        "214bc736-9087-4de5-a459-89eb2c0bbe5a",
+        "a64500fc-4ea6-47b6-91ab-70bbed4a5ecf",
+        "bb797244-11d1-4306-a955-30cae2ba61f5",
+        "c1f911e5-cf91-411e-9413-534132cca20b",
+        "1dada626-3964-4c80-ad73-f5cf4dbd6021",
+        "92ef2b1c-f30a-4f05-a671-6cca360091fd",
+        "5dca17e1-a122-4906-a367-a5526d7e4e0b",
+        "dd6e4719-bbb0-404b-9eac-89d16a746f40",
+        "22b5af1b-8e76-4482-abd4-df98b8bbc37a",
+        "9e837975-3fa3-4e1b-bbf6-c6ee3e018f94",
+        "d4adcf1e-5fde-4bc3-aa20-8b4c6940704b",
+        "07d33fbb-5ba6-41f0-bf74-a7e316b191eb",
+        "ebe720da-b89a-4aa9-bb37-8208942fffaf",
+        "dde6c2f0-012b-44aa-90e5-23a0eb6f6af6",
+        "ae1dadf7-1428-42d7-a278-539cb337a6e4",
+        "83182b79-2bd0-4b74-a29e-88ca665de62e"
+      ]
+    },
+    "accounting.JournalEntry": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "f578a87d-dfe4-496f-ac9b-5d16e329479e",
+        "fd6e1a08-e89c-4282-833b-ae3e921733f6"
+      ]
+    },
+    "accounting.JournalLine": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "638a8073-c660-4a5d-a812-b2cedb4d568c",
+        "1dabb89d-9c5e-4240-9cc6-f0df997016da",
+        "605a05ae-9e5f-4f6a-bb63-e44893c57c1e",
+        "75f7aa3a-26c9-44f4-ba97-a0971dce386f"
+      ]
+    },
+    "accounting.JournalNumberSequence": {
+      "changed_or_missing_existing": [
+        "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2"
+      ],
+      "new": []
+    },
+    "treasury.TreasuryMovement": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "4bb1b543-775b-4736-926a-bb7039b905f2",
+        "0832f8ac-1b7c-4cbc-bb0f-8f1bf22d94ea"
+      ]
+    },
+    "treasury.TreasuryMovementLeg": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "31e08108-c408-438a-9c70-dd047cf67c14",
+        "650f2de9-a2df-4280-a24d-d0378de454af"
+      ]
+    },
+    "treasury.TreasuryMovementTransition": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "4c5e42e5-154b-4a50-8807-464419640d70",
+        "414a79d5-e5b4-42ce-a8b0-2b828ae5f67a",
+        "2d4ba65d-c88f-4c19-9423-e871d1fda535",
+        "59f56613-0678-435f-8093-98562f6ecd55",
+        "8bb39591-73fa-467d-a6c1-5d09944c84dd",
+        "8848559a-bb14-4496-93d3-b2068acb9c31"
+      ]
+    },
+    "treasury.TreasuryPostingEvidence": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "1ce5ebe1-c82d-4440-a69d-954f8ef6acda",
+        "a46d8030-57a6-4d03-9f77-234db9831eb8"
+      ]
+    },
+    "treasury.PaymentRequest": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "288cca5a-9f29-4e3f-b20e-1d9d45232a1c"
+      ]
+    },
+    "treasury.PaymentRequestTransition": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "1459dee1-eb7a-4f4f-87b8-7516e1b858f7",
+        "ada9ec14-e950-497a-8c48-bec030d03223",
+        "6688b309-bfb8-42db-ae79-3c1938a40e94"
+      ]
+    },
+    "treasury.TreasuryAdvance": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "bdc6204b-ee77-4fe6-a313-edaea5ab211a"
+      ]
+    },
+    "timekeeping.Timesheet": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "259db6c9-0829-42a8-b9be-27c44d8ebc19"
+      ]
+    },
+    "timekeeping.TimesheetEntry": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "034539b6-5a39-4c83-8c8f-0e7f6bb700e2"
+      ]
+    },
+    "timekeeping.TimesheetReview": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "d6b7a42f-c5e7-40b8-a33a-b1ce9824c0dc"
+      ]
+    },
+    "payroll.PayrollPeriod": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "72d724d5-6b66-4102-9bb1-909a73630eba"
+      ]
+    },
+    "payroll.PayrollRun": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "e7ee7226-2ead-403b-b120-8774daae4e26"
+      ]
+    },
+    "payroll.PayrollRunEmployee": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "4d8fa8e6-9f21-4cf5-9364-34aa7d2a4917"
+      ]
+    },
+    "payroll.PayrollInput": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "6022db24-f7de-4299-837e-3cd61938d5f8"
+      ]
+    },
+    "payroll.PayrollInputSnapshot": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "aa21812e-d5fb-4510-9ef4-9ac86af20477",
+        "d5915cf8-2462-4dc2-8a94-cfecbc399290"
+      ]
+    },
+    "payroll.PayrollResultLine": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "9be82f6b-4fa7-4c0f-b214-3fb8d51dc7f9",
+        "5ff5605e-f76f-4b4e-a91e-7f423a000b74"
+      ]
+    },
+    "payroll.PayrollCumulativeState": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "4c430a31-eb54-4760-ba03-22c4298c9ea5",
+        "63e82758-1ceb-46f8-98e6-cfff046ed0f7"
+      ]
+    },
+    "payroll.Payslip": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "8dbd35b7-faf4-4866-8243-bd20471c1038"
+      ]
+    }
+  },
+  "corrections": "Fixture API use corrected to existing contracts: vendor advance links at release, Timesheet input through approved native producer; NO Product/source semantic change",
+  "no_uat_scenarios_executed": true
+}

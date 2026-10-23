@@ -1,0 +1,513 @@
+................F....F.............F......                                       [100%]
+================================== FAILURES ===================================
+_ QualityOperationalScopeTests.test_direct_services_preserve_actual_scope_tenant_and_structure_checks _
+tests\test_uiux_f111_pattern_operational_scope.py:503: in test_direct_services_preserve_actual_scope_tenant_and_structure_checks
+    self.create(self.site_user, "A", site=self.sources["A"]["site2"])
+tests\test_uiux_f111_pattern_operational_scope.py:280: in create
+    return self.service(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\services.py:556: in create_quality_issue
+    issue = _create_quality_issue_domain(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\services.py:208: in _create_quality_issue_domain
+    _validate_structure(
+apps\quality\services.py:118: in _validate_structure
+    raise ValueError("\u0641\u0627\u0632 \u0628\u0627\u06cc\u062f \u0645\u062a\u0639\u0644\u0642 \u0628\u0647 \u06a9\u0627\u0631\u06af\u0627\u0647 \u0645\u0633\u0626\u0644\u0647 \u0628\u0627\u0634\u062f.")
+E   ValueError: \u0641\u0627\u0632 \u0628\u0627\u06cc\u062f \u0645\u062a\u0639\u0644\u0642 \u0628\u0647 \u06a9\u0627\u0631\u06af\u0627\u0647 \u0645\u0633\u0626\u0644\u0647 \u0628\u0627\u0634\u062f.
+---------------------------- Captured stdout call -----------------------------
+uuuuuuu
+_ QualityOperationalScopeTests.test_optional_children_and_project_only_activity_preserved _
+tests\test_uiux_f111_pattern_operational_scope.py:524: in test_optional_children_and_project_only_activity_preserved
+    response = self.client.post(reverse(self.route), data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1156: in post
+    response = super().post(
+.venv\Lib\site-packages\django\test\client.py:499: in post
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:52: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:77: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\quality\views.py:137: in issue_create
+    issue = create_quality_issue(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\services.py:572: in create_quality_issue
+    start_quality_workflow(organization=organization, issue=issue, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\workflow.py:509: in start_quality_workflow
+    ensure_quality_compatibility_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\workflow.py:382: in ensure_quality_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+------------------------------ Captured log call ------------------------------
+ERROR    django.request:log.py:253 Internal Server Error: /quality/create/
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\quality\views.py", line 137, in issue_create
+    issue = create_quality_issue(
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\quality\services.py", line 572, in create_quality_issue
+    start_quality_workflow(organization=organization, issue=issue, actor=actor)
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\quality\workflow.py", line 509, in start_quality_workflow
+    ensure_quality_compatibility_workflow(organization=organization, actor=actor)
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\quality\workflow.py", line 382, in ensure_quality_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 635, in get
+    raise self.model.DoesNotExist(
+apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+_ QualityOperationalScopeTests.test_organization_scope_and_authorized_creation_each_actor (actor='b09-limited') _
+tests\test_uiux_f111_pattern_operational_scope.py:476: in test_organization_scope_and_authorized_creation_each_actor
+    response = self.client.post(reverse(self.route), data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1156: in post
+    response = super().post(
+.venv\Lib\site-packages\django\test\client.py:499: in post
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:52: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:77: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\quality\views.py:137: in issue_create
+    issue = create_quality_issue(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\services.py:572: in create_quality_issue
+    start_quality_workflow(organization=organization, issue=issue, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\workflow.py:509: in start_quality_workflow
+    ensure_quality_compatibility_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\workflow.py:382: in ensure_quality_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+_ QualityOperationalScopeTests.test_organization_scope_and_authorized_creation_each_actor (actor='b09-owner') _
+tests\test_uiux_f111_pattern_operational_scope.py:476: in test_organization_scope_and_authorized_creation_each_actor
+    response = self.client.post(reverse(self.route), data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1156: in post
+    response = super().post(
+.venv\Lib\site-packages\django\test\client.py:499: in post
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:52: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:77: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\quality\views.py:137: in issue_create
+    issue = create_quality_issue(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\services.py:572: in create_quality_issue
+    start_quality_workflow(organization=organization, issue=issue, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\workflow.py:509: in start_quality_workflow
+    ensure_quality_compatibility_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\workflow.py:382: in ensure_quality_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+_ QualityOperationalScopeTests.test_organization_scope_and_authorized_creation_each_actor (actor='b09-site') _
+tests\test_uiux_f111_pattern_operational_scope.py:476: in test_organization_scope_and_authorized_creation_each_actor
+    response = self.client.post(reverse(self.route), data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1156: in post
+    response = super().post(
+.venv\Lib\site-packages\django\test\client.py:499: in post
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:52: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:77: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\quality\views.py:137: in issue_create
+    issue = create_quality_issue(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\services.py:572: in create_quality_issue
+    start_quality_workflow(organization=organization, issue=issue, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\workflow.py:509: in start_quality_workflow
+    ensure_quality_compatibility_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\workflow.py:382: in ensure_quality_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+_ SafetyOperationalScopeTests.test_optional_children_and_project_only_activity_preserved _
+tests\test_uiux_f111_pattern_operational_scope.py:524: in test_optional_children_and_project_only_activity_preserved
+    response = self.client.post(reverse(self.route), data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1156: in post
+    response = super().post(
+.venv\Lib\site-packages\django\test\client.py:499: in post
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:52: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:77: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\safety\views.py:129: in incident_create
+    incident = create_safety_incident(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\services.py:536: in create_safety_incident
+    start_safety_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:487: in start_safety_workflow
+    ensure_safety_compatibility_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:360: in ensure_safety_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+------------------------------ Captured log call ------------------------------
+ERROR    django.request:log.py:253 Internal Server Error: /safety/create/
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\safety\views.py", line 129, in incident_create
+    incident = create_safety_incident(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\safety\services.py", line 536, in create_safety_incident
+    start_safety_workflow(
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\safety\workflow.py", line 487, in start_safety_workflow
+    ensure_safety_compatibility_workflow(organization=organization, actor=actor)
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\safety\workflow.py", line 360, in ensure_safety_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 635, in get
+    raise self.model.DoesNotExist(
+apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+_ SafetyOperationalScopeTests.test_organization_scope_and_authorized_creation_each_actor (actor='b09-limited') _
+tests\test_uiux_f111_pattern_operational_scope.py:476: in test_organization_scope_and_authorized_creation_each_actor
+    response = self.client.post(reverse(self.route), data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1156: in post
+    response = super().post(
+.venv\Lib\site-packages\django\test\client.py:499: in post
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:52: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:77: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\safety\views.py:129: in incident_create
+    incident = create_safety_incident(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\services.py:536: in create_safety_incident
+    start_safety_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:487: in start_safety_workflow
+    ensure_safety_compatibility_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:360: in ensure_safety_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+_ SafetyOperationalScopeTests.test_organization_scope_and_authorized_creation_each_actor (actor='b09-owner') _
+tests\test_uiux_f111_pattern_operational_scope.py:476: in test_organization_scope_and_authorized_creation_each_actor
+    response = self.client.post(reverse(self.route), data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1156: in post
+    response = super().post(
+.venv\Lib\site-packages\django\test\client.py:499: in post
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:52: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:77: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\safety\views.py:129: in incident_create
+    incident = create_safety_incident(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\services.py:536: in create_safety_incident
+    start_safety_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:487: in start_safety_workflow
+    ensure_safety_compatibility_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:360: in ensure_safety_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+_ SafetyOperationalScopeTests.test_organization_scope_and_authorized_creation_each_actor (actor='b09-site') _
+tests\test_uiux_f111_pattern_operational_scope.py:476: in test_organization_scope_and_authorized_creation_each_actor
+    response = self.client.post(reverse(self.route), data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1156: in post
+    response = super().post(
+.venv\Lib\site-packages\django\test\client.py:499: in post
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:52: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:77: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\safety\views.py:129: in incident_create
+    incident = create_safety_incident(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\services.py:536: in create_safety_incident
+    start_safety_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:487: in start_safety_workflow
+    ensure_safety_compatibility_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:360: in ensure_safety_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+=========================== short test summary info ===========================
+FAILED tests/test_uiux_f111_pattern_operational_scope.py::QualityOperationalScopeTests::test_direct_services_preserve_actual_scope_tenant_and_structure_checks
+FAILED tests/test_uiux_f111_pattern_operational_scope.py::QualityOperationalScopeTests::test_optional_children_and_project_only_activity_preserved
+SUBFAILED(actor='b09-limited') tests/test_uiux_f111_pattern_operational_scope.py::QualityOperationalScopeTests::test_organization_scope_and_authorized_creation_each_actor
+SUBFAILED(actor='b09-owner') tests/test_uiux_f111_pattern_operational_scope.py::QualityOperationalScopeTests::test_organization_scope_and_authorized_creation_each_actor
+SUBFAILED(actor='b09-site') tests/test_uiux_f111_pattern_operational_scope.py::QualityOperationalScopeTests::test_organization_scope_and_authorized_creation_each_actor
+FAILED tests/test_uiux_f111_pattern_operational_scope.py::SafetyOperationalScopeTests::test_optional_children_and_project_only_activity_preserved
+SUBFAILED(actor='b09-limited') tests/test_uiux_f111_pattern_operational_scope.py::SafetyOperationalScopeTests::test_organization_scope_and_authorized_creation_each_actor
+SUBFAILED(actor='b09-owner') tests/test_uiux_f111_pattern_operational_scope.py::SafetyOperationalScopeTests::test_organization_scope_and_authorized_creation_each_actor
+SUBFAILED(actor='b09-site') tests/test_uiux_f111_pattern_operational_scope.py::SafetyOperationalScopeTests::test_organization_scope_and_authorized_creation_each_actor
+9 failed, 39 passed, 202 subtests passed in 40.01s

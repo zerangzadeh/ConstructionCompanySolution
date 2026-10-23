@@ -1,0 +1,98 @@
+{
+  "affected": {
+    "tests": 15,
+    "passed": 14,
+    "failures": 1,
+    "cases": [
+      {
+        "test": "apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests.test_acceptance_creates_no_membership_and_context_is_exact_scope",
+        "result": "PASS",
+        "message": ""
+      },
+      {
+        "test": "apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests.test_accepted_identity_is_denied_after_email_rebind",
+        "result": "PASS",
+        "message": ""
+      },
+      {
+        "test": "apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests.test_ambiguous_email_and_internal_membership_fail_closed",
+        "result": "PASS",
+        "message": ""
+      },
+      {
+        "test": "apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests.test_authorized_invitation_management_view_rechecks_object_scope",
+        "result": "PASS",
+        "message": ""
+      },
+      {
+        "test": "apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests.test_email_impersonation_and_cross_tenant_invitation_are_denied",
+        "result": "PASS",
+        "message": ""
+      },
+      {
+        "test": "apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests.test_invitation_management_is_default_ungranted_and_token_hash_only",
+        "result": "PASS",
+        "message": ""
+      },
+      {
+        "test": "apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests.test_new_submission_supersedes_without_mutating_history",
+        "result": "PASS",
+        "message": ""
+      },
+      {
+        "test": "apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests.test_revocation_is_append_only_and_immediately_denies_access",
+        "result": "PASS",
+        "message": ""
+      },
+      {
+        "test": "apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests.test_submission_reuses_quote_revision_and_is_idempotent",
+        "result": "PASS",
+        "message": ""
+      },
+      {
+        "test": "apps.organizations.test_p1_1_authorization.P11RoleCatalogCloseoutTests.test_role_catalog_routes_enforce_platform_and_tenant_boundaries",
+        "result": "PASS",
+        "message": ""
+      },
+      {
+        "test": "apps.projects.tests.ProjectServiceTests.test_project_list_requires_active_organization",
+        "result": "PASS",
+        "message": ""
+      },
+      {
+        "test": "apps.projects.tests.ProjectServiceTests.test_project_list_is_tenant_scoped",
+        "result": "FAIL",
+        "message": "AssertionError: False is not true : Couldn't find '/projects/sites/'  [response HTML redacted]"
+      },
+      {
+        "test": "apps.quality.tests.QualityIssueViewAndAdminTests.test_admin_is_read_only",
+        "result": "PASS",
+        "message": ""
+      },
+      {
+        "test": "apps.quality.tests.QualityIssueViewAndAdminTests.test_create_view_relations_are_tenant_scoped",
+        "result": "PASS",
+        "message": ""
+      },
+      {
+        "test": "apps.quality.tests.QualityIssueServiceTests.test_create_read_rbac_tenant_scope_and_audit",
+        "result": "PASS",
+        "message": ""
+      }
+    ]
+  },
+  "focused": {
+    "tests": 11,
+    "passed": 11,
+    "subtests_passed": 3
+  },
+  "classification": "BASELINE TEST DEBT",
+  "proof": "BASELINE_PROBE.json reproduces the same missing /projects/sites/ assertion with clean-at-entry immutable-HEAD templates supplied in memory; tenant-visible/hidden assertions already passed",
+  "original_18_baseline_failures": "PRESERVED; ../rv007_controlled_time/REGRESSION_ATTRIBUTION.json; not rerun/reclassified",
+  "inherited_statutory_copy_assertion": "PRESERVED separately; ../wave_de_fixture_closure/REGRESSION_ATTRIBUTION.json; not rerun",
+  "additional_inherited_projects_assertion": 1,
+  "unresolved_attributable_regressions": 0,
+  "indeterminate_regressions": 0,
+  "full_suite_pass_claimed": false,
+  "html_csrf_redacted": true
+}

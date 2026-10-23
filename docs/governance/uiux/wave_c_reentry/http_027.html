@@ -1,0 +1,96 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+ 
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">تعطیلی یا روز کاری جایگزین</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">حضور و کارکرد</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">تعطیلی یا روز کاری جایگزین</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">هیچ تعطیلی قانونی به‌صورت پیش‌فرض استنباط نمی‌شود؛ منبع و دلیل در تاریخچه می‌ماند.</p>
+        
+    </div>
+    
+</header>
+
+<section class="erp-surface mx-auto mt-5 max-w-3xl rounded-2xl p-5 sm:p-7">
+  <form method="post" class="space-y-4" novalidate>
+    <!-- CSRF omitted -->
+    
+    
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_calendar">
+        تقویم<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="calendar" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" required id="id_calendar">
+  <option value="" selected>---------</option>
+
+  <option value="9cafbb89-e96c-4f47-b9f6-5195ba77e724">WorkCalendar object (9cafbb89-e96c-4f47-b9f6-5195ba77e724)</option>
+
+  <option value="9aa4dd26-dcc9-4b40-98a2-9714cf3036a6">WorkCalendar object (9aa4dd26-dcc9-4b40-98a2-9714cf3036a6)</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_holiday_date">
+        تاریخ<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="date" name="holiday_date" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" required id="id_holiday_date">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_name">
+        نام
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="name" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" required id="id_name">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_reason">
+        دلیل
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <textarea name="reason" cols="40" rows="3" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" required id="id_reason">
+</textarea>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_source_reference">
+        مرجع منبع
+    </label>
+    <input type="text" name="source_reference" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" id="id_source_reference">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_is_working_override">
+        روز کاری جایگزین
+    </label>
+    <input type="checkbox" name="is_working_override" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" id="id_is_working_override">
+    
+    
+</div>
+
+    <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-5"><button class="erp-btn erp-btn--primary" type="submit">ثبت کنترل‌شده</button><a class="erp-btn erp-btn--secondary" href="/timekeeping/">بازگشت</a></div>
+  </form>
+</section>
+
+        </main>

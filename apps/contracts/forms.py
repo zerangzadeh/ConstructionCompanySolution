@@ -7,6 +7,8 @@ from apps.contracts.models import (
     ContractualRecordKind,
     ContractualRevisionAction,
 )
+from apps.organizations.authorization import scope_queryset
+from apps.organizations.models import OrganizationMembership
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project
 from core.forms import JalaliDateMixin
@@ -40,12 +42,26 @@ class ContractForm(JalaliDateMixin, forms.ModelForm):
             "notes",
         ]
 
-    def __init__(self, *args, organization=None, **kwargs):
+    def __init__(
+        self,
+        *args,
+        organization=None,
+        membership: OrganizationMembership | None = None,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization,
-            deleted_at__isnull=True,
-        ).order_by("name")
+        if (
+            isinstance(membership, OrganizationMembership)
+            and organization is not None
+            and membership.organization_id == organization.pk
+        ):
+            self.fields["project"].queryset = scope_queryset(
+                Project.objects.filter(
+                    organization=organization, deleted_at__isnull=True
+                ),
+                membership=membership,
+                project_lookup="pk",
+            ).order_by("name")
         self.fields["party"].queryset = BusinessParty.objects.filter(
             organization=organization, archived_at__isnull=True
         ).order_by("display_name")

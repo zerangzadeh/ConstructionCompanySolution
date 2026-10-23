@@ -1,0 +1,45 @@
+Found 2 test(s).
+System check identified no issues (0 silenced).
+Using existing test database for alias 'default'...
+EE
+======================================================================
+ERROR: test_department_chart_excludes_positions_and_is_tenant_scoped (apps.workforce.tests.WorkforcePanelTests.test_department_chart_excludes_positions_and_is_tenant_scoped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workforce\tests.py", line 1218, in test_department_chart_excludes_positions_and_is_tenant_scoped
+    parent = create_position(
+             ^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\workforce\services.py", line 225, in create_position
+    _require_management_access(
+  File "E:\Construction_Company_Solution\apps\workforce\services.py", line 90, in _require_management_access
+    require_business_permission(
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 436, in require_business_permission
+    raise PermissionDenied(message)
+django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید.
+
+======================================================================
+ERROR: test_department_page_renders_hierarchical_organization_chart (apps.workforce.tests.WorkforcePanelTests.test_department_page_renders_hierarchical_organization_chart)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workforce\tests.py", line 1379, in test_department_page_renders_hierarchical_organization_chart
+    ceo_position = create_position(
+                   ^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\workforce\services.py", line 225, in create_position
+    _require_management_access(
+  File "E:\Construction_Company_Solution\apps\workforce\services.py", line 90, in _require_management_access
+    require_business_permission(
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 436, in require_business_permission
+    raise PermissionDenied(message)
+django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید.
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.129s
+
+FAILED (errors=2)
+Preserving test database for alias 'default'...

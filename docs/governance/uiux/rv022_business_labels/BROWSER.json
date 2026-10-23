@@ -1,0 +1,227 @@
+[
+  {
+    "name": "review_desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "at": "2026-10-23T06:15:17.243Z",
+    "url": "http://127.0.0.1:8000/workflows/administration/versions/521eb6af-b641-4c39-9024-c60c1ed2fda0/",
+    "actor": "uiux.persona.tenant-admin",
+    "facts": {
+      "advancedOpen": false,
+      "advancedText": "پیکربندی پیشرفته و شناسه‌های فنی\ndaily-report-legacy-compatibility · daily_reports.daily_report_approval\nمحدودهٔ انتخابمحدودهٔ عمومی شرکت\nپیکربندی کامل ثبت‌شدهٔ این نسخه{\n  \"steps\": [\n    {\n      \"key\": \"approved\",\n      \"name\": \"تأییدشده\",\n      \"step_type\": \"end\",\n      \"is_start\": false,\n      \"is_terminal\": true,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {},\n      \"routing\": []\n    },\n    {\n      \"key\": \"legacy_approval\",\n      \"name\": \"تأیید گزارش روزانه\",\n      \"step_type\": \"approval\",\n      \"is_start\": false,\n      \"is_terminal\": false,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {\n        \"decision_policy\": \"any\"\n      },\n      \"routing\": [\n        {\n          \"resolver_type\": \"business_permission\",\n          \"configuration\": {\n            \"permission\": \"daily_reports.approve\"\n          },\n          \"order\": 0,\n          \"is_fallback\": false\n        },\n        {\n          \"resolver_type\": \"organization_owner\",\n          \"configuration\": {},\n          \"order\": 1,\n          \"is_fallback\": true\n        }\n      ]\n    },\n    {\n      \"key\": \"start\",\n      \"name\": \"شروع\",\n      \"step_type\": \"start\",\n      \"is_start\": true,\n      \"is_terminal\": false,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {},\n      \"routing\": []\n    }\n  ],\n  \"transitions\": [\n    {\n      \"source\": \"legacy_approval\",\n      \"target\": \"approved\",\n      \"outcome\": \"approved\",\n      \"domain_command\": \"daily_reports.daily_report.approve\",\n      \"required_permission\": \"daily_reports.approve\",\n      \"priority\": 0,\n      \"is_default\": false,\n      \"conditions\": []\n    },\n    {\n      \"source\": \"start\",\n      \"target\": \"legacy_approval\",\n      \"outcome\": \"submitted\",\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"priority\": 0,\n      \"is_default\": true,\n      \"conditions\": []\n    }\n  ]\n}",
+      "clientWidth": 1425,
+      "dir": "rtl",
+      "duplicateIds": [],
+      "focus": {
+        "outline": "rgb(15, 23, 42) none 2.4px",
+        "tag": "BODY",
+        "text": null
+      },
+      "h1": 1,
+      "lang": "fa",
+      "mainCount": 1,
+      "pageWidth": 1425,
+      "primaryText": "نمای فرایند\n\nمسیرهای ثبت‌شده میان گام‌ها را بررسی کنید. فهرست گام‌ها ترتیب اجرای آن‌ها را تعیین نمی‌کند.\n\nگام‌ها\nتأییدشده\nتأیید گزارش روزانه\nشروع\nانتقال‌ها\nمسیرهای ثبت‌شدهٔ فرایند\nاز گام\tبه گام\tنتیجه\nتأیید گزارش روزانه\tتأییدشده\tتأیید\nشروع\tتأیید گزارش روزانه\tارسال‌شده",
+      "table": {
+        "clientWidth": 1059,
+        "headers": [
+          {
+            "text": "از گام"
+          },
+          {
+            "text": "به گام"
+          },
+          {
+            "text": "نتیجه"
+          }
+        ],
+        "overflowX": "auto",
+        "scrollLeft": 0,
+        "scrollWidth": 1059
+      },
+      "title": "سازگاری تأیید گزارش روزانه | گردش‌کار"
+    }
+  },
+  {
+    "name": "review_tablet",
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "at": "2026-10-23T06:15:17.387Z",
+    "url": "http://127.0.0.1:8000/workflows/administration/versions/521eb6af-b641-4c39-9024-c60c1ed2fda0/",
+    "actor": "uiux.persona.tenant-admin",
+    "facts": {
+      "advancedOpen": false,
+      "advancedText": "پیکربندی پیشرفته و شناسه‌های فنی\ndaily-report-legacy-compatibility · daily_reports.daily_report_approval\nمحدودهٔ انتخابمحدودهٔ عمومی شرکت\nپیکربندی کامل ثبت‌شدهٔ این نسخه{\n  \"steps\": [\n    {\n      \"key\": \"approved\",\n      \"name\": \"تأییدشده\",\n      \"step_type\": \"end\",\n      \"is_start\": false,\n      \"is_terminal\": true,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {},\n      \"routing\": []\n    },\n    {\n      \"key\": \"legacy_approval\",\n      \"name\": \"تأیید گزارش روزانه\",\n      \"step_type\": \"approval\",\n      \"is_start\": false,\n      \"is_terminal\": false,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {\n        \"decision_policy\": \"any\"\n      },\n      \"routing\": [\n        {\n          \"resolver_type\": \"business_permission\",\n          \"configuration\": {\n            \"permission\": \"daily_reports.approve\"\n          },\n          \"order\": 0,\n          \"is_fallback\": false\n        },\n        {\n          \"resolver_type\": \"organization_owner\",\n          \"configuration\": {},\n          \"order\": 1,\n          \"is_fallback\": true\n        }\n      ]\n    },\n    {\n      \"key\": \"start\",\n      \"name\": \"شروع\",\n      \"step_type\": \"start\",\n      \"is_start\": true,\n      \"is_terminal\": false,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {},\n      \"routing\": []\n    }\n  ],\n  \"transitions\": [\n    {\n      \"source\": \"legacy_approval\",\n      \"target\": \"approved\",\n      \"outcome\": \"approved\",\n      \"domain_command\": \"daily_reports.daily_report.approve\",\n      \"required_permission\": \"daily_reports.approve\",\n      \"priority\": 0,\n      \"is_default\": false,\n      \"conditions\": []\n    },\n    {\n      \"source\": \"start\",\n      \"target\": \"legacy_approval\",\n      \"outcome\": \"submitted\",\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"priority\": 0,\n      \"is_default\": true,\n      \"conditions\": []\n    }\n  ]\n}",
+      "clientWidth": 1009,
+      "dir": "rtl",
+      "duplicateIds": [],
+      "focus": {
+        "outline": "rgb(15, 23, 42) none 2.4px",
+        "tag": "BODY",
+        "text": null
+      },
+      "h1": 1,
+      "lang": "fa",
+      "mainCount": 1,
+      "pageWidth": 1009,
+      "primaryText": "نمای فرایند\n\nمسیرهای ثبت‌شده میان گام‌ها را بررسی کنید. فهرست گام‌ها ترتیب اجرای آن‌ها را تعیین نمی‌کند.\n\nگام‌ها\nتأییدشده\nتأیید گزارش روزانه\nشروع\nانتقال‌ها\nمسیرهای ثبت‌شدهٔ فرایند\nاز گام\tبه گام\tنتیجه\nتأیید گزارش روزانه\tتأییدشده\tتأیید\nشروع\tتأیید گزارش روزانه\tارسال‌شده",
+      "table": {
+        "clientWidth": 643,
+        "headers": [
+          {
+            "text": "از گام"
+          },
+          {
+            "text": "به گام"
+          },
+          {
+            "text": "نتیجه"
+          }
+        ],
+        "overflowX": "auto",
+        "scrollLeft": 0,
+        "scrollWidth": 643
+      },
+      "title": "سازگاری تأیید گزارش روزانه | گردش‌کار"
+    }
+  },
+  {
+    "name": "review_mobile",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "at": "2026-10-23T06:15:17.520Z",
+    "url": "http://127.0.0.1:8000/workflows/administration/versions/521eb6af-b641-4c39-9024-c60c1ed2fda0/",
+    "actor": "uiux.persona.tenant-admin",
+    "facts": {
+      "advancedOpen": false,
+      "advancedText": "پیکربندی پیشرفته و شناسه‌های فنی\ndaily-report-legacy-compatibility · daily_reports.daily_report_approval\nمحدودهٔ انتخابمحدودهٔ عمومی شرکت\nپیکربندی کامل ثبت‌شدهٔ این نسخه{\n  \"steps\": [\n    {\n      \"key\": \"approved\",\n      \"name\": \"تأییدشده\",\n      \"step_type\": \"end\",\n      \"is_start\": false,\n      \"is_terminal\": true,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {},\n      \"routing\": []\n    },\n    {\n      \"key\": \"legacy_approval\",\n      \"name\": \"تأیید گزارش روزانه\",\n      \"step_type\": \"approval\",\n      \"is_start\": false,\n      \"is_terminal\": false,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {\n        \"decision_policy\": \"any\"\n      },\n      \"routing\": [\n        {\n          \"resolver_type\": \"business_permission\",\n          \"configuration\": {\n            \"permission\": \"daily_reports.approve\"\n          },\n          \"order\": 0,\n          \"is_fallback\": false\n        },\n        {\n          \"resolver_type\": \"organization_owner\",\n          \"configuration\": {},\n          \"order\": 1,\n          \"is_fallback\": true\n        }\n      ]\n    },\n    {\n      \"key\": \"start\",\n      \"name\": \"شروع\",\n      \"step_type\": \"start\",\n      \"is_start\": true,\n      \"is_terminal\": false,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {},\n      \"routing\": []\n    }\n  ],\n  \"transitions\": [\n    {\n      \"source\": \"legacy_approval\",\n      \"target\": \"approved\",\n      \"outcome\": \"approved\",\n      \"domain_command\": \"daily_reports.daily_report.approve\",\n      \"required_permission\": \"daily_reports.approve\",\n      \"priority\": 0,\n      \"is_default\": false,\n      \"conditions\": []\n    },\n    {\n      \"source\": \"start\",\n      \"target\": \"legacy_approval\",\n      \"outcome\": \"submitted\",\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"priority\": 0,\n      \"is_default\": true,\n      \"conditions\": []\n    }\n  ]\n}",
+      "clientWidth": 375,
+      "dir": "rtl",
+      "duplicateIds": [],
+      "focus": {
+        "outline": "rgb(15, 23, 42) none 2.4px",
+        "tag": "BODY",
+        "text": null
+      },
+      "h1": 1,
+      "lang": "fa",
+      "mainCount": 1,
+      "pageWidth": 375,
+      "primaryText": "نمای فرایند\n\nمسیرهای ثبت‌شده میان گام‌ها را بررسی کنید. فهرست گام‌ها ترتیب اجرای آن‌ها را تعیین نمی‌کند.\n\nگام‌ها\nتأییدشده\nتأیید گزارش روزانه\nشروع\nانتقال‌ها\nمسیرهای ثبت‌شدهٔ فرایند\nاز گام\tبه گام\tنتیجه\nتأیید گزارش روزانه\tتأییدشده\tتأیید\nشروع\tتأیید گزارش روزانه\tارسال‌شده",
+      "table": {
+        "clientWidth": 302,
+        "headers": [
+          {
+            "text": "از گام"
+          },
+          {
+            "text": "به گام"
+          },
+          {
+            "text": "نتیجه"
+          }
+        ],
+        "overflowX": "auto",
+        "scrollLeft": 0,
+        "scrollWidth": 560
+      },
+      "title": "سازگاری تأیید گزارش روزانه | گردش‌کار"
+    }
+  },
+  {
+    "name": "review_mobile_keyboard_table",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "at": "2026-10-23T06:15:17.641Z",
+    "url": "http://127.0.0.1:8000/workflows/administration/versions/521eb6af-b641-4c39-9024-c60c1ed2fda0/",
+    "actor": "uiux.persona.tenant-admin",
+    "facts": {
+      "advancedOpen": false,
+      "advancedText": "پیکربندی پیشرفته و شناسه‌های فنی\ndaily-report-legacy-compatibility · daily_reports.daily_report_approval\nمحدودهٔ انتخابمحدودهٔ عمومی شرکت\nپیکربندی کامل ثبت‌شدهٔ این نسخه{\n  \"steps\": [\n    {\n      \"key\": \"approved\",\n      \"name\": \"تأییدشده\",\n      \"step_type\": \"end\",\n      \"is_start\": false,\n      \"is_terminal\": true,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {},\n      \"routing\": []\n    },\n    {\n      \"key\": \"legacy_approval\",\n      \"name\": \"تأیید گزارش روزانه\",\n      \"step_type\": \"approval\",\n      \"is_start\": false,\n      \"is_terminal\": false,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {\n        \"decision_policy\": \"any\"\n      },\n      \"routing\": [\n        {\n          \"resolver_type\": \"business_permission\",\n          \"configuration\": {\n            \"permission\": \"daily_reports.approve\"\n          },\n          \"order\": 0,\n          \"is_fallback\": false\n        },\n        {\n          \"resolver_type\": \"organization_owner\",\n          \"configuration\": {},\n          \"order\": 1,\n          \"is_fallback\": true\n        }\n      ]\n    },\n    {\n      \"key\": \"start\",\n      \"name\": \"شروع\",\n      \"step_type\": \"start\",\n      \"is_start\": true,\n      \"is_terminal\": false,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {},\n      \"routing\": []\n    }\n  ],\n  \"transitions\": [\n    {\n      \"source\": \"legacy_approval\",\n      \"target\": \"approved\",\n      \"outcome\": \"approved\",\n      \"domain_command\": \"daily_reports.daily_report.approve\",\n      \"required_permission\": \"daily_reports.approve\",\n      \"priority\": 0,\n      \"is_default\": false,\n      \"conditions\": []\n    },\n    {\n      \"source\": \"start\",\n      \"target\": \"legacy_approval\",\n      \"outcome\": \"submitted\",\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"priority\": 0,\n      \"is_default\": true,\n      \"conditions\": []\n    }\n  ]\n}",
+      "clientWidth": 375,
+      "dir": "rtl",
+      "duplicateIds": [],
+      "focus": {
+        "outline": "rgb(16, 16, 16) auto 0.8px",
+        "tag": "DIV",
+        "text": "workflow-transitions-title"
+      },
+      "h1": 1,
+      "lang": "fa",
+      "mainCount": 1,
+      "pageWidth": 375,
+      "primaryText": "نمای فرایند\n\nمسیرهای ثبت‌شده میان گام‌ها را بررسی کنید. فهرست گام‌ها ترتیب اجرای آن‌ها را تعیین نمی‌کند.\n\nگام‌ها\nتأییدشده\nتأیید گزارش روزانه\nشروع\nانتقال‌ها\nمسیرهای ثبت‌شدهٔ فرایند\nاز گام\tبه گام\tنتیجه\nتأیید گزارش روزانه\tتأییدشده\tتأیید\nشروع\tتأیید گزارش روزانه\tارسال‌شده",
+      "table": {
+        "clientWidth": 302,
+        "headers": [
+          {
+            "text": "از گام"
+          },
+          {
+            "text": "به گام"
+          },
+          {
+            "text": "نتیجه"
+          }
+        ],
+        "overflowX": "auto",
+        "scrollLeft": 0,
+        "scrollWidth": 560
+      },
+      "title": "سازگاری تأیید گزارش روزانه | گردش‌کار"
+    }
+  },
+  {
+    "name": "review_mobile_advanced",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "at": "2026-10-23T06:15:33.040Z",
+    "url": "http://127.0.0.1:8000/workflows/administration/versions/521eb6af-b641-4c39-9024-c60c1ed2fda0/",
+    "actor": "uiux.persona.tenant-admin",
+    "facts": {
+      "advancedOpen": true,
+      "advancedText": "پیکربندی پیشرفته و شناسه‌های فنی\ndaily-report-legacy-compatibility · daily_reports.daily_report_approval\nمحدودهٔ انتخابمحدودهٔ عمومی شرکت\nپیکربندی کامل ثبت‌شدهٔ این نسخه{\n  \"steps\": [\n    {\n      \"key\": \"approved\",\n      \"name\": \"تأییدشده\",\n      \"step_type\": \"end\",\n      \"is_start\": false,\n      \"is_terminal\": true,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {},\n      \"routing\": []\n    },\n    {\n      \"key\": \"legacy_approval\",\n      \"name\": \"تأیید گزارش روزانه\",\n      \"step_type\": \"approval\",\n      \"is_start\": false,\n      \"is_terminal\": false,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {\n        \"decision_policy\": \"any\"\n      },\n      \"routing\": [\n        {\n          \"resolver_type\": \"business_permission\",\n          \"configuration\": {\n            \"permission\": \"daily_reports.approve\"\n          },\n          \"order\": 0,\n          \"is_fallback\": false\n        },\n        {\n          \"resolver_type\": \"organization_owner\",\n          \"configuration\": {},\n          \"order\": 1,\n          \"is_fallback\": true\n        }\n      ]\n    },\n    {\n      \"key\": \"start\",\n      \"name\": \"شروع\",\n      \"step_type\": \"start\",\n      \"is_start\": true,\n      \"is_terminal\": false,\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"configuration\": {},\n      \"routing\": []\n    }\n  ],\n  \"transitions\": [\n    {\n      \"source\": \"legacy_approval\",\n      \"target\": \"approved\",\n      \"outcome\": \"approved\",\n      \"domain_command\": \"daily_reports.daily_report.approve\",\n      \"required_permission\": \"daily_reports.approve\",\n      \"priority\": 0,\n      \"is_default\": false,\n      \"conditions\": []\n    },\n    {\n      \"source\": \"start\",\n      \"target\": \"legacy_approval\",\n      \"outcome\": \"submitted\",\n      \"domain_command\": \"\",\n      \"required_permission\": \"\",\n      \"priority\": 0,\n      \"is_default\": true,\n      \"conditions\": []\n    }\n  ]\n}",
+      "clientWidth": 375,
+      "dir": "rtl",
+      "duplicateIds": [],
+      "focus": {
+        "outline": "rgb(59, 130, 246) solid 1.6px",
+        "tag": "SUMMARY",
+        "text": null
+      },
+      "h1": 1,
+      "lang": "fa",
+      "mainCount": 1,
+      "pageWidth": 375,
+      "primaryText": "نمای فرایند\n\nمسیرهای ثبت‌شده میان گام‌ها را بررسی کنید. فهرست گام‌ها ترتیب اجرای آن‌ها را تعیین نمی‌کند.\n\nگام‌ها\nتأییدشده\nتأیید گزارش روزانه\nشروع\nانتقال‌ها\nمسیرهای ثبت‌شدهٔ فرایند\nاز گام\tبه گام\tنتیجه\nتأیید گزارش روزانه\tتأییدشده\tتأیید\nشروع\tتأیید گزارش روزانه\tارسال‌شده",
+      "table": {
+        "clientWidth": 302,
+        "headers": [
+          {
+            "text": "از گام"
+          },
+          {
+            "text": "به گام"
+          },
+          {
+            "text": "نتیجه"
+          }
+        ],
+        "overflowX": "auto",
+        "scrollLeft": -40,
+        "scrollWidth": 560
+      },
+      "title": "سازگاری تأیید گزارش روزانه | گردش‌کار"
+    }
+  }
+]

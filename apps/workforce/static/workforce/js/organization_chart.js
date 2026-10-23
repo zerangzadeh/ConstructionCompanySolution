@@ -19,6 +19,7 @@
     const statusFilter = shell.querySelector("[data-status-filter]");
     const noResults = shell.querySelector("[data-no-results]");
     let zoom = 1;
+    let detailsTrigger = null;
 
     const normalize = (value) => value.trim().toLocaleLowerCase("fa").replaceAll("ي", "ی").replaceAll("ك", "ک");
 
@@ -27,6 +28,7 @@
             const owner = card.closest("[data-chart-node]");
             const cardDepartmentId = owner?.dataset.departmentId || card.dataset.departmentId;
             card.classList.toggle("is-selected", cardDepartmentId === departmentId);
+            if (departmentId && cardDepartmentId === departmentId) detailsTrigger = card;
         });
         panels.forEach((panel) => { panel.hidden = panel.dataset.departmentId !== departmentId; });
         if (placeholder) placeholder.hidden = Boolean(departmentId);
@@ -154,9 +156,17 @@
         if (!document.fullscreenElement) canvas?.requestFullscreen();
         else document.exitFullscreen();
     });
-    shell.querySelector("[data-close-details]")?.addEventListener("click", () => {
+    const closeDetails = () => {
         drawer?.classList.remove("is-open");
         showDetails("");
+        detailsTrigger?.focus();
+    };
+    shell.querySelector("[data-close-details]")?.addEventListener("click", closeDetails);
+    drawer?.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            event.preventDefault();
+            closeDetails();
+        }
     });
 
     if (nodes.length) showDetails(nodes[0].dataset.departmentId);

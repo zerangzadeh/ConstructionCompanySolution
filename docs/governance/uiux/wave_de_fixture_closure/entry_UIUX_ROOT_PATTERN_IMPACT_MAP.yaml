@@ -1,0 +1,1202 @@
+schema_version: '1.8'
+document:
+  id: BONIRA-UIUX-ROOT-PATTERN-IMPACT-MAP
+  title: BONIRA UI/UX Root Pattern Impact Map
+  status: STATIC_COVERAGE_REVIEW_READY
+  repository: zerangzadeh/ConstructionCompanySolution
+  branch: main
+  audit_baseline_commit: 43ac319c6e73e48ca9626461b73987922c498ec3
+  canonical_path: docs/governance/uiux/UIUX_ROOT_PATTERN_IMPACT_MAP.yaml
+scope_note: Only evidence-backed directly reviewed surfaces are listed. Representative-equivalent surfaces are not silently
+  treated as defect-free.
+patterns:
+- pattern_id: RP-C01-TECHNICAL-LANGUAGE-LEAK
+  finding_ids:
+  - UIUX-F-001
+  - UIUX-F-003
+  - UIUX-F-004
+  - UIUX-F-005
+  - UIUX-F-007
+  - UIUX-F-009
+  - UIUX-F-010
+  - UIUX-F-011
+  - UIUX-F-014
+  - UIUX-F-015
+  - UIUX-F-019
+  - UIUX-F-020
+  - UIUX-F-021
+  - UIUX-F-023
+  - UIUX-F-024
+  - UIUX-F-026
+  - UIUX-F-027
+  - UIUX-F-030
+  - UIUX-F-031
+  - UIUX-F-032
+  - UIUX-F-033
+  - UIUX-F-035
+  - UIUX-F-036
+  - UIUX-F-037
+  - UIUX-F-038
+  - UIUX-F-039
+  - UIUX-F-041
+  - UIUX-F-042
+  - UIUX-F-043
+  - UIUX-F-045
+  - UIUX-F-046
+  - UIUX-F-048
+  - UIUX-F-051
+  - UIUX-F-052
+  - UIUX-F-059
+  - UIUX-F-060
+  - UIUX-F-061
+  - UIUX-F-062
+  - UIUX-F-067
+  - UIUX-F-068
+  - UIUX-F-069
+  - UIUX-F-070
+  - UIUX-F-073
+  - UIUX-F-092
+  - UIUX-F-096
+  - UIUX-F-098
+  - UIUX-F-099
+  - UIUX-F-100
+  - UIUX-F-102
+  - UIUX-F-103
+  - UIUX-F-105
+  - UIUX-F-106
+  surfaces:
+  - surface_id: SHARED-CONTEXT-SELECTOR
+    route: GLOBAL_AUTHENTICATED_SHELL
+    page_title: Shared Company / Project / Site Context Selector
+  - surface_id: SURF-224
+    route: /timekeeping/calendars/new/
+    page_title: تقویم کاری جدید
+  - surface_id: SURF-240
+    route: /payroll/
+    page_title: کارگاه حقوق و دستمزد
+  - surface_id: SURF-270
+    route: /procurement/rfqs/<uuid:rfq_id>/buyer/
+    page_title: پیشنهاد، مقایسه و انتخاب
+  - surface_id: SURF-058
+    route: /parties/governance/
+    page_title: حاکمیت طرف‌های تجاری
+  - surface_id: SURF-148
+    route: /documents/
+    page_title: اسناد شرکت
+  - surface_id: SURF-052
+    route: /subledgers/
+    page_title: میزکار دریافتنی‌ها و پرداختنی‌ها
+  - surface_id: SURF-002
+    route: /search/
+    page_title: جستجو
+  - surface_id: SURF-082
+    route: /projects/<uuid:project_id>/controls/
+    page_title: ساختار شکست و فعالیت‌ها
+  - surface_id: SURF-023
+    route: /organizations/members/<uuid:membership_id>/authorization/
+    page_title: نقش‌ها و دامنه‌های عضو
+  - surface_id: SURF-179
+    route: /workforce/ess/
+    page_title: داشبورد خدمات من
+  - surface_id: SURF-292
+    route: /inventory/custody/
+    page_title: کنترل مقدار و امانت موجودی
+  - surface_id: SURF-293
+    route: /inventory/valuation/
+    page_title: ارزش میانگین موزون متحرک
+  - surface_id: SURF-309
+    route: /equipment/operations/
+    page_title: تجهیزات عملیاتی
+  - surface_id: SURF-326
+    route: /fixed-assets/
+    page_title: دارایی‌های ثابت مالی
+  - surface_id: SURF-036
+    route: /accounting/journals/<uuid:journal_id>/
+    page_title: جزئیات سند حسابداری
+  - surface_id: SURF-045
+    route: /treasury/
+    page_title: خزانه‌داری
+  - surface_id: SURF-050
+    route: /treasury/statements/
+    page_title: صورت‌حساب و مغایرت‌های بانکی
+  - surface_id: SURF-157
+    route: /reporting/
+    page_title: داشبورد شاخص‌های حاکم‌شده
+  - surface_id: SURF-351
+    route: /compliance/
+    page_title: کارگاه بازرسی، HSE، QA/QC و CAPA
+  - surface_id: SURF-366
+    route: /knowledge/
+    page_title: فهرست دانش منتشرشده
+  - surface_id: SURF-357
+    route: /support/
+    page_title: اعلان‌ها و پشتیبانی
+  - surface_id: SURF-094
+    route: /contracts/<uuid:contract_id>/commercial-review/
+    page_title: خط زمانی و مقایسه تجاری قرارداد
+  - surface_id: SURF-125
+    route: /billing/claims/<uuid:claim_id>/
+    page_title: جزئیات صورت‌وضعیت
+  - surface_id: SURF-223
+    route: /timekeeping/
+    page_title: حضور، درخواست‌ها و کارکرد
+  - surface_id: SURF-241
+    route: /payroll/ess/
+    page_title: سوابق حقوق من
+  - surface_id: SURF-159
+    route: /reporting/reconciliations/
+    page_title: کارگاه تطبیق و مغایرت‌ها
+  - surface_id: SURF-163
+    route: /reporting/project-closeout/<uuid:case_id>/
+    page_title: پرونده اختتام پروژه
+  - surface_id: SURF-379
+    route: /workflows/administration/versions/<uuid:version_id>/
+    page_title: جزئیات نسخه گردش‌کار
+  - surface_id: SURF-065
+    route: /materials/governance/
+    page_title: حاکمیت مصالح و واحدهای اندازه‌گیری
+  - surface_id: SURF-041
+    route: /accounting/reconciliations/<uuid:run_id>/
+    page_title: شواهد تطبیق نگهداری‌شده
+  - surface_id: SHARED-PAYROLL-FORMS
+    route: MULTI_PAYROLL_FORMS
+    page_title: فرم‌های پیکربندی و اجرای حقوق
+  - surface_id: SURF-273
+    route: /procurement/portal/grants/<uuid:grant_id>/
+    page_title: استعلام دعوت‌شده
+  - surface_id: SHARED-EQUIPMENT-OPERATION-FORMS
+    route: MULTI_EQUIPMENT_OPERATION_FORMS
+    page_title: فرم‌های عملیات تجهیزات
+  - surface_id: SURF-354
+    route: /compliance/<str:kind>/<uuid:record_id>/
+    page_title: جزئیات رکورد انطباق
+  - surface_id: SURF-252
+    route: /payroll/runs/<uuid:run_id>/
+    page_title: جزئیات اجرای حقوق
+  - surface_id: SURF-257
+    route: /payroll/statutory/
+    page_title: کارگاه مقرراتی مالیات و بیمه کارکنان
+  - surface_id: SURF-262
+    route: /payroll/financial-handoffs/
+    page_title: تحویل مالی حقوق
+  - surface_id: SHARED-BILLING-STATUTORY-FORMS
+    route: MULTI_BILLING_STATUTORY_FORMS
+    page_title: فرم‌های ارسال قانونی
+  - surface_id: SHARED-FORM-FIELD-COMPONENT
+    route: GLOBAL_FORM_COMPONENT
+    page_title: Shared form field rendering
+  - surface_id: SURF-042
+    route: /accounting/statements/
+    page_title: تراز و صورت‌های مالی
+  - surface_id: SURF-310
+    route: /equipment/cost/
+    page_title: کاربرگ هزینه پیشنهادی تجهیز
+  - surface_id: SURF-196
+    route: /workforce/foundation/
+    page_title: توانمندی، صلاحیت و توسعه
+  - surface_id: SURF-371
+    route: /knowledge/publications/<uuid:version_id>/
+    page_title: دانش منتشرشده
+  - surface_id: SURF-375
+    route: /knowledge/platform/promotions/
+    page_title: صف ترویج دانش Platform
+  - surface_id: SURF-046
+    route: /treasury/operations/
+    page_title: عملیات خزانه‌داری
+  - surface_id: SURF-372
+    route: /knowledge/publications/<uuid:version_id>/history/
+    page_title: منشأ و تاریخچه دانش
+  - surface_id: SURF-134
+    route: /estimates/create/
+    page_title: ثبت برآورد جدید
+  - surface_id: SURF-356
+    route: /partners/
+    page_title: صلاحیت و عملکرد همکاران
+  modules:
+  - Shared Shell
+  - Timekeeping
+  - Payroll
+  - Procurement
+  - Parties
+  - Documents
+  - Subledgers
+  - Core
+  - Projects
+  - Organizations
+  - Workforce / ESS
+  - Inventory
+  - Equipment
+  - Fixed Assets
+  - Accounting
+  - Treasury
+  - Reporting
+  - Compliance
+  - Knowledge
+  - Support
+  - Contracts
+  - Billing
+  - Payroll / ESS
+  - Workflow Administration
+  - Materials
+  - Procurement Supplier Portal
+  - Billing / Statutory
+  - Shared Forms
+  - Workforce
+  - Estimates
+  - Partner Qualification
+- pattern_id: RP-C02-MODEL-REPRESENTATION-EXPOSED
+  finding_ids:
+  - UIUX-F-002
+  - UIUX-F-012
+  - UIUX-F-021
+  - UIUX-F-024
+  - UIUX-F-030
+  - UIUX-F-036
+  - UIUX-F-037
+  - UIUX-F-039
+  - UIUX-F-041
+  - UIUX-F-042
+  - UIUX-F-045
+  - UIUX-F-046
+  - UIUX-F-048
+  - UIUX-F-050
+  - UIUX-F-052
+  - UIUX-F-053
+  - UIUX-F-064
+  - UIUX-F-071
+  - UIUX-F-072
+  - UIUX-F-079
+  - UIUX-F-080
+  - UIUX-F-087
+  - UIUX-F-092
+  - UIUX-F-093
+  - UIUX-F-094
+  - UIUX-F-095
+  - UIUX-F-096
+  - UIUX-F-099
+  - UIUX-F-103
+  - UIUX-F-104
+  surfaces:
+  - surface_id: SURF-224
+    route: /timekeeping/calendars/new/
+    page_title: تقویم کاری جدید
+  - surface_id: SURF-052
+    route: /subledgers/
+    page_title: میزکار دریافتنی‌ها و پرداختنی‌ها
+  - surface_id: SURF-179
+    route: /workforce/ess/
+    page_title: داشبورد خدمات من
+  - surface_id: SURF-293
+    route: /inventory/valuation/
+    page_title: ارزش میانگین موزون متحرک
+  - surface_id: SURF-036
+    route: /accounting/journals/<uuid:journal_id>/
+    page_title: جزئیات سند حسابداری
+  - surface_id: SURF-366
+    route: /knowledge/
+    page_title: فهرست دانش منتشرشده
+  - surface_id: SURF-357
+    route: /support/
+    page_title: اعلان‌ها و پشتیبانی
+  - surface_id: SURF-125
+    route: /billing/claims/<uuid:claim_id>/
+    page_title: جزئیات صورت‌وضعیت
+  - surface_id: SURF-223
+    route: /timekeeping/
+    page_title: حضور، درخواست‌ها و کارکرد
+  - surface_id: SURF-241
+    route: /payroll/ess/
+    page_title: سوابق حقوق من
+  - surface_id: SURF-163
+    route: /reporting/project-closeout/<uuid:case_id>/
+    page_title: پرونده اختتام پروژه
+  - surface_id: SURF-379
+    route: /workflows/administration/versions/<uuid:version_id>/
+    page_title: جزئیات نسخه گردش‌کار
+  - surface_id: SURF-172
+    route: /daily-reports/<uuid:report_id>/
+    page_title: گزارش روزانه
+  - surface_id: SURF-041
+    route: /accounting/reconciliations/<uuid:run_id>/
+    page_title: شواهد تطبیق نگهداری‌شده
+  - surface_id: SURF-049
+    route: /treasury/movements/<uuid:movement_id>/
+    page_title: حرکت خزانه‌داری
+  - surface_id: SURF-362
+    route: /support/cases/<uuid:case_id>/
+    page_title: درخواست پشتیبانی
+  - surface_id: SURF-203
+    route: /workforce/foundation/performance/create/
+    page_title: ثبت ارزیابی عملکرد
+  - surface_id: SURF-109
+    route: /billing/commercial-controls/
+    page_title: ضمانت، انطباق و مواجهه
+  - surface_id: SURF-103
+    route: /commercial/<uuid:tender_id>/evidence/
+    page_title: شواهد مناقصه
+  - surface_id: SHARED-KNOWLEDGE-REFERENCE-FORMS
+    route: MULTI_KNOWLEDGE_FORMS
+    page_title: فرم‌های منبع، تکرار و بازاستفاده دانش
+  - surface_id: SURF-322
+    route: /equipment/operations/work-orders/<uuid:work_order_id>/spares/create/
+    page_title: افزودن قطعه به دستورکار
+  - surface_id: SURF-042
+    route: /accounting/statements/
+    page_title: تراز و صورت‌های مالی
+  - surface_id: SURF-043
+    route: /accounting/statements/<uuid:run_id>/
+    page_title: صورت مالی نگهداری‌شده
+  - surface_id: SURF-128
+    route: /billing/payable-certificates/<uuid:certificate_id>/
+    page_title: گواهی پرداخت پیمان جزء
+  - surface_id: SHARED-COMPLIANCE-TEMPLATE-CONFIG
+    route: COMPLIANCE_TEMPLATE_PUBLISH
+    page_title: انتشار نسخه الگوی بازرسی
+  - surface_id: SURF-310
+    route: /equipment/cost/
+    page_title: کاربرگ هزینه پیشنهادی تجهیز
+  - surface_id: SURF-371
+    route: /knowledge/publications/<uuid:version_id>/
+    page_title: دانش منتشرشده
+  - surface_id: SURF-372
+    route: /knowledge/publications/<uuid:version_id>/history/
+    page_title: منشأ و تاریخچه دانش
+  - surface_id: SURF-026
+    route: /audit/
+    page_title: فعالیت‌های شرکت
+  modules:
+  - Timekeeping
+  - Subledgers
+  - Workforce / ESS
+  - Inventory
+  - Accounting
+  - Knowledge
+  - Support
+  - Billing
+  - Payroll / ESS
+  - Reporting
+  - Workflow Administration
+  - Daily Reports
+  - Treasury
+  - Workforce
+  - Commercial
+  - Equipment
+  - Compliance
+  - Audit
+- pattern_id: RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  finding_ids:
+  - UIUX-F-002
+  - UIUX-F-012
+  - UIUX-F-046
+  - UIUX-F-056
+  - UIUX-F-059
+  - UIUX-F-060
+  - UIUX-F-061
+  - UIUX-F-070
+  - UIUX-F-071
+  - UIUX-F-075
+  - UIUX-F-078
+  - UIUX-F-079
+  - UIUX-F-080
+  surfaces:
+  - surface_id: SURF-224
+    route: /timekeeping/calendars/new/
+    page_title: تقویم کاری جدید
+  - surface_id: SURF-052
+    route: /subledgers/
+    page_title: میزکار دریافتنی‌ها و پرداختنی‌ها
+  - surface_id: SURF-163
+    route: /reporting/project-closeout/<uuid:case_id>/
+    page_title: پرونده اختتام پروژه
+  - surface_id: SURF-172
+    route: /daily-reports/<uuid:report_id>/
+    page_title: گزارش روزانه
+  - surface_id: SHARED-PAYROLL-FORMS
+    route: MULTI_PAYROLL_FORMS
+    page_title: فرم‌های پیکربندی و اجرای حقوق
+  - surface_id: SURF-273
+    route: /procurement/portal/grants/<uuid:grant_id>/
+    page_title: استعلام دعوت‌شده
+  - surface_id: SHARED-EQUIPMENT-OPERATION-FORMS
+    route: MULTI_EQUIPMENT_OPERATION_FORMS
+    page_title: فرم‌های عملیات تجهیزات
+  - surface_id: SHARED-BILLING-STATUTORY-FORMS
+    route: MULTI_BILLING_STATUTORY_FORMS
+    page_title: فرم‌های ارسال قانونی
+  - surface_id: SURF-203
+    route: /workforce/foundation/performance/create/
+    page_title: ثبت ارزیابی عملکرد
+  - surface_id: SURF-034
+    route: /accounting/journals/create/
+    page_title: ایجاد سند حسابداری
+  - surface_id: SURF-321
+    route: /equipment/operations/work-orders/create/
+    page_title: ایجاد دستورکار نگهداری
+  - surface_id: SURF-103
+    route: /commercial/<uuid:tender_id>/evidence/
+    page_title: شواهد مناقصه
+  - surface_id: SHARED-KNOWLEDGE-REFERENCE-FORMS
+    route: MULTI_KNOWLEDGE_FORMS
+    page_title: فرم‌های منبع، تکرار و بازاستفاده دانش
+  modules:
+  - Timekeeping
+  - Subledgers
+  - Reporting
+  - Daily Reports
+  - Payroll
+  - Procurement Supplier Portal
+  - Equipment
+  - Billing / Statutory
+  - Workforce
+  - Accounting
+  - Commercial
+  - Knowledge
+- pattern_id: RP-C04-WEAK-ACTION-HIERARCHY
+  finding_ids:
+  - UIUX-F-006
+  - UIUX-F-008
+  - UIUX-F-013
+  - UIUX-F-022
+  - UIUX-F-025
+  - UIUX-F-028
+  - UIUX-F-035
+  - UIUX-F-040
+  surfaces:
+  - surface_id: SURF-240
+    route: /payroll/
+    page_title: کارگاه حقوق و دستمزد
+  - surface_id: SURF-270
+    route: /procurement/rfqs/<uuid:rfq_id>/buyer/
+    page_title: پیشنهاد، مقایسه و انتخاب
+  - surface_id: SURF-052
+    route: /subledgers/
+    page_title: میزکار دریافتنی‌ها و پرداختنی‌ها
+  - surface_id: SURF-179
+    route: /workforce/ess/
+    page_title: خدمات کارکنان
+  - surface_id: SURF-309
+    route: /equipment/operations/
+    page_title: تجهیزات عملیاتی
+  - surface_id: SURF-326
+    route: /fixed-assets/
+    page_title: دارایی‌های ثابت مالی
+  - surface_id: SURF-351
+    route: /compliance/
+    page_title: کارگاه بازرسی، HSE، QA/QC و CAPA
+  - surface_id: SURF-223
+    route: /timekeeping/
+    page_title: حضور، درخواست‌ها و کارکرد
+  modules:
+  - Payroll
+  - Procurement
+  - Subledgers
+  - Workforce / ESS
+  - Equipment
+  - Fixed Assets
+  - Compliance
+  - Timekeeping
+- pattern_id: RP-C05-TASK-GUIDANCE-DEFICIT
+  finding_ids:
+  - UIUX-F-001
+  - UIUX-F-004
+  - UIUX-F-005
+  - UIUX-F-009
+  - UIUX-F-014
+  - UIUX-F-015
+  - UIUX-F-019
+  - UIUX-F-020
+  - UIUX-F-023
+  - UIUX-F-032
+  - UIUX-F-033
+  - UIUX-F-041
+  - UIUX-F-105
+  - UIUX-F-106
+  surfaces:
+  - surface_id: SHARED-CONTEXT-SELECTOR
+    route: GLOBAL_AUTHENTICATED_SHELL
+    page_title: Shared Company / Project / Site Context Selector
+  - surface_id: SURF-224
+    route: /timekeeping/calendars/new/
+    page_title: تقویم کاری جدید
+  - surface_id: SURF-240
+    route: /payroll/
+    page_title: کارگاه حقوق و دستمزد
+  - surface_id: SURF-270
+    route: /procurement/rfqs/<uuid:rfq_id>/buyer/
+    page_title: پیشنهاد، مقایسه و انتخاب
+  - surface_id: SURF-052
+    route: /subledgers/
+    page_title: میزکار دریافتنی‌ها و پرداختنی‌ها
+  - surface_id: SURF-002
+    route: /search/
+    page_title: جستجو
+  - surface_id: SURF-082
+    route: /projects/<uuid:project_id>/controls/
+    page_title: ساختار شکست و فعالیت‌ها
+  - surface_id: SURF-023
+    route: /organizations/members/<uuid:membership_id>/authorization/
+    page_title: نقش‌ها و دامنه‌های عضو
+  - surface_id: SURF-292
+    route: /inventory/custody/
+    page_title: کنترل مقدار و امانت موجودی
+  - surface_id: SURF-050
+    route: /treasury/statements/
+    page_title: صورت‌حساب و مغایرت‌های بانکی
+  - surface_id: SURF-157
+    route: /reporting/
+    page_title: داشبورد شاخص‌های حاکم‌شده
+  - surface_id: SURF-223
+    route: /timekeeping/
+    page_title: حضور، درخواست‌ها و کارکرد
+  - surface_id: SURF-134
+    route: /estimates/create/
+    page_title: ثبت برآورد جدید
+  - surface_id: SURF-356
+    route: /partners/
+    page_title: صلاحیت و عملکرد همکاران
+  modules:
+  - Shared Shell
+  - Timekeeping
+  - Payroll
+  - Procurement
+  - Subledgers
+  - Core
+  - Projects
+  - Organizations
+  - Inventory
+  - Treasury
+  - Reporting
+  - Estimates
+  - Partner Qualification
+- pattern_id: RP-C06-GENERIC-FORM-ACTION
+  finding_ids:
+  - UIUX-F-003
+  - UIUX-F-082
+  - UIUX-F-101
+  surfaces:
+  - surface_id: SURF-224
+    route: /timekeeping/calendars/new/
+    page_title: تقویم کاری جدید
+  - surface_id: SHARED-GENERIC-FORM-ACTIONS
+    route: MULTI_GENERIC_FORMS
+    page_title: Generic create/edit forms
+  - surface_id: SHARED-BILLING-PAYABLE-FORMS
+    route: MULTI_BILLING_PAYABLE_FORMS
+    page_title: فرم‌های اندازه‌گیری و گواهی پرداخت پیمان جزء
+  modules:
+  - Timekeeping
+  - Shared Forms
+  - Billing
+- pattern_id: RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
+  finding_ids:
+  - UIUX-F-006
+  - UIUX-F-008
+  - UIUX-F-013
+  - UIUX-F-025
+  - UIUX-F-027
+  - UIUX-F-028
+  - UIUX-F-040
+  - UIUX-F-062
+  - UIUX-F-068
+  surfaces:
+  - surface_id: SURF-240
+    route: /payroll/
+    page_title: کارگاه حقوق و دستمزد
+  - surface_id: SURF-270
+    route: /procurement/rfqs/<uuid:rfq_id>/buyer/
+    page_title: پیشنهاد، مقایسه و انتخاب
+  - surface_id: SURF-052
+    route: /subledgers/
+    page_title: میزکار دریافتنی‌ها و پرداختنی‌ها
+  - surface_id: SURF-309
+    route: /equipment/operations/
+    page_title: تجهیزات عملیاتی
+  - surface_id: SURF-326
+    route: /fixed-assets/
+    page_title: دارایی‌های ثابت مالی
+  - surface_id: SURF-223
+    route: /timekeeping/
+    page_title: حضور، درخواست‌ها و کارکرد
+  - surface_id: SURF-354
+    route: /compliance/<str:kind>/<uuid:record_id>/
+    page_title: جزئیات رکورد انطباق
+  - surface_id: SURF-257
+    route: /payroll/statutory/
+    page_title: کارگاه مقرراتی مالیات و بیمه کارکنان
+  modules:
+  - Payroll
+  - Procurement
+  - Subledgers
+  - Equipment
+  - Fixed Assets
+  - Timekeeping
+  - Compliance
+- pattern_id: RP-C08-WEAK-EMPTY-STATE
+  finding_ids:
+  - UIUX-F-007
+  - UIUX-F-015
+  - UIUX-F-021
+  - UIUX-F-042
+  surfaces:
+  - surface_id: SURF-240
+    route: /payroll/
+    page_title: کارگاه حقوق و دستمزد
+  - surface_id: SURF-002
+    route: /search/
+    page_title: جستجو
+  - surface_id: SURF-179
+    route: /workforce/ess/
+    page_title: داشبورد خدمات من
+  - surface_id: SURF-241
+    route: /payroll/ess/
+    page_title: سوابق حقوق من
+  modules:
+  - Payroll
+  - Core
+  - Workforce / ESS
+  - Payroll / ESS
+- pattern_id: RP-C09-INCONSISTENT-DETAIL-AFFORDANCE
+  finding_ids:
+  - UIUX-F-018
+  surfaces:
+  - surface_id: SHARED-LIST-DETAIL-AFFORDANCE
+    route: MULTI_SURFACE
+    page_title: فهرست‌های عملیاتی
+  modules:
+  - Shared List Pattern
+- pattern_id: RP-C10-NAVIGATION-STATE-INCONSISTENCY
+  finding_ids:
+  - UIUX-F-016
+  - UIUX-F-017
+  surfaces:
+  - surface_id: SHARED-MAIN-NAVIGATION
+    route: GLOBAL_AUTHENTICATED_SHELL
+    page_title: ناوبری اصلی
+  modules:
+  - Shared Navigation
+- pattern_id: RP-C11-INFORMATION-ARCHITECTURE-MISMATCH
+  finding_ids:
+  - UIUX-F-017
+  - UIUX-F-022
+  - UIUX-F-037
+  - UIUX-F-040
+  - UIUX-F-106
+  - UIUX-F-108
+  surfaces:
+  - surface_id: SHARED-MAIN-NAVIGATION
+    route: GLOBAL_AUTHENTICATED_SHELL
+    page_title: ناوبری اصلی
+  - surface_id: SURF-179
+    route: /workforce/ess/
+    page_title: خدمات کارکنان
+  - surface_id: SURF-357
+    route: /support/
+    page_title: اعلان‌ها و پشتیبانی
+  - surface_id: SURF-223
+    route: /timekeeping/
+    page_title: حضور، درخواست‌ها و کارکرد
+  - surface_id: SURF-356
+    route: /partners/
+    page_title: صلاحیت و عملکرد همکاران
+  - surface_id: SURF-218
+    route: /workforce/teams/
+    page_title: گروه‌های کاری
+  modules:
+  - Shared Navigation
+  - Workforce / ESS
+  - Support
+  - Timekeeping
+  - Partner Qualification
+  - Workforce
+- pattern_id: RP-C12-POST_RENDER_LOCALIZATION
+  finding_ids:
+  - UIUX-F-029
+  - UIUX-F-036
+  - UIUX-F-072
+  surfaces:
+  - surface_id: SHARED-LOCALIZATION
+    route: GLOBAL_AUTHENTICATED_SHELL
+    page_title: Shared runtime localization
+  - surface_id: SURF-366
+    route: /knowledge/
+    page_title: فهرست دانش منتشرشده
+  - surface_id: SURF-109
+    route: /billing/commercial-controls/
+    page_title: ضمانت، انطباق و مواجهه
+  modules:
+  - Shared Localization
+  - Knowledge
+  - Billing
+- pattern_id: RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  finding_ids:
+  - UIUX-F-030
+  - UIUX-F-031
+  - UIUX-F-032
+  - UIUX-F-033
+  - UIUX-F-038
+  - UIUX-F-039
+  - UIUX-F-043
+  - UIUX-F-045
+  - UIUX-F-051
+  - UIUX-F-052
+  - UIUX-F-062
+  - UIUX-F-064
+  - UIUX-F-067
+  - UIUX-F-068
+  - UIUX-F-069
+  - UIUX-F-075
+  - UIUX-F-093
+  - UIUX-F-094
+  - UIUX-F-096
+  - UIUX-F-098
+  - UIUX-F-099
+  - UIUX-F-100
+  - UIUX-F-102
+  surfaces:
+  - surface_id: SURF-036
+    route: /accounting/journals/<uuid:journal_id>/
+    page_title: جزئیات سند حسابداری
+  - surface_id: SURF-045
+    route: /treasury/
+    page_title: خزانه‌داری
+  - surface_id: SURF-050
+    route: /treasury/statements/
+    page_title: صورت‌حساب و مغایرت‌های بانکی
+  - surface_id: SURF-157
+    route: /reporting/
+    page_title: داشبورد شاخص‌های حاکم‌شده
+  - surface_id: SURF-094
+    route: /contracts/<uuid:contract_id>/commercial-review/
+    page_title: خط زمانی و مقایسه تجاری قرارداد
+  - surface_id: SURF-125
+    route: /billing/claims/<uuid:claim_id>/
+    page_title: جزئیات صورت‌وضعیت
+  - surface_id: SURF-159
+    route: /reporting/reconciliations/
+    page_title: کارگاه تطبیق و مغایرت‌ها
+  - surface_id: SURF-163
+    route: /reporting/project-closeout/<uuid:case_id>/
+    page_title: پرونده اختتام پروژه
+  - surface_id: SURF-065
+    route: /materials/governance/
+    page_title: حاکمیت مصالح و واحدهای اندازه‌گیری
+  - surface_id: SURF-041
+    route: /accounting/reconciliations/<uuid:run_id>/
+    page_title: شواهد تطبیق نگهداری‌شده
+  - surface_id: SURF-354
+    route: /compliance/<str:kind>/<uuid:record_id>/
+    page_title: جزئیات رکورد انطباق
+  - surface_id: SURF-362
+    route: /support/cases/<uuid:case_id>/
+    page_title: درخواست پشتیبانی
+  - surface_id: SURF-252
+    route: /payroll/runs/<uuid:run_id>/
+    page_title: جزئیات اجرای حقوق
+  - surface_id: SURF-257
+    route: /payroll/statutory/
+    page_title: کارگاه مقرراتی مالیات و بیمه کارکنان
+  - surface_id: SURF-262
+    route: /payroll/financial-handoffs/
+    page_title: تحویل مالی حقوق
+  - surface_id: SURF-034
+    route: /accounting/journals/create/
+    page_title: ایجاد سند حسابداری
+  - surface_id: SURF-043
+    route: /accounting/statements/<uuid:run_id>/
+    page_title: صورت مالی نگهداری‌شده
+  - surface_id: SURF-128
+    route: /billing/payable-certificates/<uuid:certificate_id>/
+    page_title: گواهی پرداخت پیمان جزء
+  - surface_id: SURF-310
+    route: /equipment/cost/
+    page_title: کاربرگ هزینه پیشنهادی تجهیز
+  - surface_id: SURF-196
+    route: /workforce/foundation/
+    page_title: توانمندی، صلاحیت و توسعه
+  - surface_id: SURF-371
+    route: /knowledge/publications/<uuid:version_id>/
+    page_title: دانش منتشرشده
+  - surface_id: SURF-375
+    route: /knowledge/platform/promotions/
+    page_title: صف ترویج دانش Platform
+  - surface_id: SURF-046
+    route: /treasury/operations/
+    page_title: عملیات خزانه‌داری
+  modules:
+  - Accounting
+  - Treasury
+  - Reporting
+  - Contracts
+  - Billing
+  - Materials
+  - Compliance
+  - Support
+  - Payroll
+  - Equipment
+  - Workforce
+  - Knowledge
+- pattern_id: RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
+  finding_ids:
+  - UIUX-F-034
+  - UIUX-F-044
+  - UIUX-F-047
+  - UIUX-F-049
+  - UIUX-F-107
+  surfaces:
+  - surface_id: SURF-157
+    route: /reporting/
+    page_title: داشبورد شاخص‌های حاکم‌شده
+  - surface_id: SURF-159
+    route: /reporting/reconciliations/
+    page_title: کارگاه تطبیق و مغایرت‌ها
+  - surface_id: SURF-163
+    route: /reporting/project-closeout/<uuid:case_id>/
+    page_title: پرونده اختتام پروژه
+  - surface_id: SURF-207
+    route: /workforce/employees/<uuid:employee_id>/
+    page_title: پرونده پرسنلی
+  - surface_id: SURF-004
+    route: /accounts/login/
+    page_title: ورود به بنیرا
+  modules:
+  - Reporting
+  - Workforce
+  - Accounts
+- pattern_id: RP-C15-SHARED-FORM-PATTERN-BYPASS
+  finding_ids:
+  - UIUX-F-037
+  - UIUX-F-063
+  - UIUX-F-089
+  - UIUX-F-099
+  - UIUX-F-101
+  surfaces:
+  - surface_id: SURF-357
+    route: /support/
+    page_title: اعلان‌ها و پشتیبانی
+  - surface_id: SURF-369
+    route: /knowledge/candidates/<uuid:candidate_id>/
+    page_title: کاندید دانش
+  - surface_id: SURF-110
+    route: /billing/guarantees/new/
+    page_title: ثبت تضمین
+  - surface_id: SURF-371
+    route: /knowledge/publications/<uuid:version_id>/
+    page_title: دانش منتشرشده
+  - surface_id: SHARED-BILLING-PAYABLE-FORMS
+    route: MULTI_BILLING_PAYABLE_FORMS
+    page_title: فرم‌های اندازه‌گیری و گواهی پرداخت پیمان جزء
+  modules:
+  - Support
+  - Knowledge
+  - Billing
+- pattern_id: RP-C16-DEVELOPMENT-ARTEFACT-LEAK
+  finding_ids:
+  - UIUX-F-038
+  - UIUX-F-043
+  - UIUX-F-096
+  surfaces:
+  - surface_id: SURF-094
+    route: /contracts/<uuid:contract_id>/commercial-review/
+    page_title: خط زمانی و مقایسه تجاری قرارداد
+  - surface_id: SURF-159
+    route: /reporting/reconciliations/
+    page_title: کارگاه تطبیق و مغایرت‌ها
+  - surface_id: SURF-310
+    route: /equipment/cost/
+    page_title: کاربرگ هزینه پیشنهادی تجهیز
+  modules:
+  - Contracts
+  - Reporting
+  - Equipment
+- pattern_id: RP-C17-CONFIGURATION-NOT-VISUALIZED
+  finding_ids:
+  - UIUX-F-048
+  - UIUX-F-071
+  - UIUX-F-095
+  surfaces:
+  - surface_id: SURF-379
+    route: /workflows/administration/versions/<uuid:version_id>/
+    page_title: جزئیات نسخه گردش‌کار
+  - surface_id: SURF-203
+    route: /workforce/foundation/performance/create/
+    page_title: ثبت ارزیابی عملکرد
+  - surface_id: SHARED-COMPLIANCE-TEMPLATE-CONFIG
+    route: COMPLIANCE_TEMPLATE_PUBLISH
+    page_title: انتشار نسخه الگوی بازرسی
+  modules:
+  - Workflow Administration
+  - Workforce
+  - Compliance
+- pattern_id: RP-C18-CASCADE-FILTERING-INCONSISTENT
+  finding_ids:
+  - UIUX-F-054
+  - UIUX-F-055
+  - UIUX-F-057
+  - UIUX-F-058
+  - UIUX-F-074
+  - UIUX-F-076
+  - UIUX-F-077
+  - UIUX-F-078
+  - UIUX-F-081
+  - UIUX-F-084
+  - UIUX-F-086
+  - UIUX-F-087
+  - UIUX-F-088
+  surfaces:
+  - surface_id: SURF-282
+    route: /procurement/orders/create/
+    page_title: ایجاد سفارش خرید
+  - surface_id: SURF-171
+    route: /daily-reports/create/
+    page_title: ایجاد گزارش روزانه
+  - surface_id: SURF-306
+    route: /equipment/assignments/create/
+    page_title: ایجاد تخصیص تجهیز
+  - surface_id: SURF-247
+    route: /payroll/configuration/employment/new/
+    page_title: پیکربندی پرداخت
+  - surface_id: SURF-034
+    route: /accounting/journals/create/
+    page_title: ایجاد سند حسابداری
+  - surface_id: SURF-038
+    route: /accounting/openings/create/
+    page_title: ایجاد مانده افتتاحیه
+  - surface_id: SURF-362
+    route: /support/cases/<uuid:case_id>/
+    page_title: درخواست پشتیبانی
+  - surface_id: SURF-321
+    route: /equipment/operations/work-orders/create/
+    page_title: ایجاد دستورکار نگهداری
+  - surface_id: SHARED-BILLING-COMPLIANCE-FORMS
+    route: MULTI_BILLING_COMPLIANCE_FORMS
+    page_title: فرم‌های مفاصاحساب و انطباق پیمانکار
+  - surface_id: SURF-353
+    route: /compliance/create/<str:kind>/
+    page_title: ایجاد رکورد انطباق
+  - surface_id: SURF-323
+    route: /equipment/operations/qualifications/create/
+    page_title: ثبت صلاحیت اپراتور
+  - surface_id: SURF-322
+    route: /equipment/operations/work-orders/<uuid:work_order_id>/spares/create/
+    page_title: افزودن قطعه به دستورکار
+  - surface_id: SURF-048
+    route: /treasury/movements/new/
+    page_title: ثبت دریافت یا پرداخت
+  modules:
+  - Procurement
+  - Daily Reports
+  - Equipment
+  - Payroll
+  - Accounting
+  - Support
+  - Billing
+  - Compliance
+  - Treasury
+- pattern_id: RP-C19-DERIVABLE-DATA-REENTRY
+  finding_ids:
+  - UIUX-F-054
+  - UIUX-F-056
+  - UIUX-F-059
+  - UIUX-F-060
+  - UIUX-F-061
+  - UIUX-F-070
+  - UIUX-F-075
+  - UIUX-F-076
+  - UIUX-F-078
+  - UIUX-F-079
+  - UIUX-F-080
+  - UIUX-F-088
+  surfaces:
+  - surface_id: SURF-282
+    route: /procurement/orders/create/
+    page_title: ایجاد سفارش خرید
+  - surface_id: SURF-172
+    route: /daily-reports/<uuid:report_id>/
+    page_title: گزارش روزانه
+  - surface_id: SHARED-PAYROLL-FORMS
+    route: MULTI_PAYROLL_FORMS
+    page_title: فرم‌های پیکربندی و اجرای حقوق
+  - surface_id: SURF-273
+    route: /procurement/portal/grants/<uuid:grant_id>/
+    page_title: استعلام دعوت‌شده
+  - surface_id: SHARED-EQUIPMENT-OPERATION-FORMS
+    route: MULTI_EQUIPMENT_OPERATION_FORMS
+    page_title: فرم‌های عملیات تجهیزات
+  - surface_id: SHARED-BILLING-STATUTORY-FORMS
+    route: MULTI_BILLING_STATUTORY_FORMS
+    page_title: فرم‌های ارسال قانونی
+  - surface_id: SURF-034
+    route: /accounting/journals/create/
+    page_title: ایجاد سند حسابداری
+  - surface_id: SURF-038
+    route: /accounting/openings/create/
+    page_title: ایجاد مانده افتتاحیه
+  - surface_id: SURF-321
+    route: /equipment/operations/work-orders/create/
+    page_title: ایجاد دستورکار نگهداری
+  - surface_id: SURF-103
+    route: /commercial/<uuid:tender_id>/evidence/
+    page_title: شواهد مناقصه
+  - surface_id: SHARED-KNOWLEDGE-REFERENCE-FORMS
+    route: MULTI_KNOWLEDGE_FORMS
+    page_title: فرم‌های منبع، تکرار و بازاستفاده دانش
+  - surface_id: SURF-048
+    route: /treasury/movements/new/
+    page_title: ثبت دریافت یا پرداخت
+  modules:
+  - Procurement
+  - Daily Reports
+  - Payroll
+  - Procurement Supplier Portal
+  - Equipment
+  - Billing / Statutory
+  - Accounting
+  - Commercial
+  - Knowledge
+  - Treasury
+- pattern_id: RP-C20-HOME-LINK-DIRECTORY
+  finding_ids:
+  - UIUX-F-065
+  - UIUX-F-066
+  surfaces:
+  - surface_id: SURF-001
+    route: /
+    page_title: خانه
+  modules:
+  - Core / Home
+- pattern_id: RP-C21-SHARED-LABEL-OVERRIDE
+  finding_ids:
+  - UIUX-F-073
+  surfaces:
+  - surface_id: SHARED-FORM-FIELD-COMPONENT
+    route: GLOBAL_FORM_COMPONENT
+    page_title: Shared form field rendering
+  modules:
+  - Shared Forms
+- pattern_id: RP-C23-JALALI-INPUT-INCONSISTENCY
+  finding_ids:
+  - UIUX-F-083
+  - UIUX-F-101
+  surfaces:
+  - surface_id: SURF-110
+    route: /billing/guarantees/new/
+    page_title: ثبت تضمین
+  - surface_id: SHARED-BILLING-PAYABLE-FORMS
+    route: MULTI_BILLING_PAYABLE_FORMS
+    page_title: فرم‌های اندازه‌گیری و گواهی پرداخت پیمان جزء
+  modules:
+  - Billing
+- pattern_id: RP-C24-PAGINATION-QUERY-STATE-LOSS
+  finding_ids:
+  - UIUX-F-085
+  surfaces:
+  - surface_id: SHARED-TABLE-PAGINATION
+    route: GLOBAL_TABLE_PAGINATION
+    page_title: Shared bounded table pagination
+  modules:
+  - Shared Tables
+- pattern_id: RP-C25-STATUS-SEMANTICS-INCOMPLETE
+  finding_ids:
+  - UIUX-F-090
+  surfaces:
+  - surface_id: SHARED-STATUS-BADGE
+    route: GLOBAL_STATUS_BADGE
+    page_title: Semantic status badge
+  modules:
+  - Shared Status Presentation
+- pattern_id: RP-C26-JALALI-DISPLAY-INCONSISTENCY
+  finding_ids:
+  - UIUX-F-091
+  - UIUX-F-097
+  surfaces:
+  - surface_id: SHARED-DATE-DISPLAY
+    route: MULTI_SURFACE
+    page_title: User-facing date display
+  - surface_id: SURF-307
+    route: /equipment/maintenance/
+    page_title: سرویس و تعمیرات
+  modules:
+  - Shared Date Presentation
+  - Equipment
+
+runtime_wave_a_delta:
+  assessed_at: '2026-10-21T20:25:20.188000+03:30'
+  status: PARTIAL_RUNTIME_COVERAGE_ONLY
+  evidence_results: UIUX_RUNTIME_VALIDATION_RESULTS.yaml
+  pattern_evidence:
+  - pattern_id: RP-C01-TECHNICAL-LANGUAGE-LEAK
+    evidence_ids:
+    - RV-EV-008
+    - RV-EV-013
+  - pattern_id: RP-C02-MODEL-REPRESENTATION-EXPOSED
+    evidence_ids:
+    - RV-EV-013
+  - pattern_id: RP-C10-NAVIGATION-STATE-INCONSISTENCY
+    evidence_ids:
+    - RV-EV-006
+    - RV-EV-007
+  - pattern_id: RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
+    evidence_ids:
+    - RV-EV-001
+    - RV-EV-010
+  - pattern_id: RP-C20-HOME-LINK-DIRECTORY
+    evidence_ids:
+    - RV-EV-002
+  new_finding_candidates:
+    UIUX-F-109:
+    - RP-C02-MODEL-REPRESENTATION-EXPOSED
+    UIUX-F-110: []
+  unmapped_new_finding_note: F-110 accessible-name ambiguity awaits later pattern consolidation; no new root pattern
+    inferred.
+  pagination_pattern: RP-C24 remains NOT_EVALUATED; 9/25 rows.
+wave_c_runtime:
+  report: UIUX_RUNTIME_VALIDATION_WAVE_C_REPORT.md
+  decision: WAVE_C_BLOCKED
+  bounded_retests:
+  - UIUX-F-009
+  - UIUX-F-011
+  - UIUX-F-014
+  - UIUX-F-019
+  - UIUX-F-023
+  - UIUX-F-024
+  - UIUX-F-038
+  - UIUX-F-041
+  - UIUX-F-092
+  - UIUX-F-093
+  new_findings:
+  - UIUX-F-129
+  - UIUX-F-130
+  notes: Historical pattern catalogue preserved. Retest metadata closes only identified presentation/access
+    defects; no blocked scenario inherits PASS.
+  pattern_links:
+  - pattern_id: RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
+    finding_id: UIUX-F-129
+    source: templates/procurement/portal_accept.html
+  - pattern_id: RP-C05-TASK-GUIDANCE-DEFICIT
+    finding_id: UIUX-F-130
+    source: apps/inventory/p8_views.py
+
+wave_d_bounded_runtime_delta:
+  {
+    "recorded_on": "2026-10-23",
+    "pattern": "RP-C25-STATUS-SEMANTICS-INCOMPLETE",
+    "finding": "UIUX-F-090",
+    "scope": "Only demonstrated action_in_progress, verified and closed badge cases on Safety/Quality; remaining status coverage not inferred",
+    "report": "wave_d_e/COMPLETION_REPORT.md",
+    "evidence": "wave_d_e/EVIDENCE_RECORDS.json",
+    "wave_e": "NOT_STARTED_DUE_TO_WAVE_D_DEPENDENCY"
+  }
+
+rv022_approved_business_review_delta:
+  {
+    "recorded_on": "2026-10-23",
+    "finding": "UIUX-F-048",
+    "patterns": [
+      "RP-C01-TECHNICAL-LANGUAGE-LEAK",
+      "RP-C02-MODEL-REPRESENTATION-EXPOSED",
+      "RP-C17-CONFIGURATION-NOT-VISUALIZED"
+    ],
+    "scope": "Registered business names and read-only labelled transition paths on Workflow version review; no graphical designer or authoring/runtime semantics changed",
+    "evidence": "rv022_business_labels/EVIDENCE_RECORD.json",
+    "report": "rv022_business_labels/COMPLETION_REPORT.md"
+  }

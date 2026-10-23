@@ -1,0 +1,431 @@
+schema_version: '1.2'
+document:
+  id: BONIRA-UIUX-REFERENCE-PERSONA-CATALOGUE
+  status: APPROVED_GOVERNANCE_CATALOGUE_RECONCILED
+  approved_at: '2026-10-21'
+  checkpoint: UIUX_REFERENCE_PERSONA_DOCUMENTATION_RECONCILIATION_CHECKPOINT_15.md
+  purpose: Persistent reusable BONIRA UI/UX reference persona catalogue with reconciled existing identities, readiness state,
+    and non-binding target aliases.
+governance:
+  persona_is_not_role: true
+  reference_personas_are_persistent: true
+  delete_after_validation: false
+  automatic_deactivation_after_validation: false
+  persian_display_title_required: false
+  credentials_must_not_be_stored_here: true
+  authority_must_be_evidence_based: true
+  authority_must_not_be_broadened_to_force_pass: true
+  production_provisioning_is_not_implied: true
+  ui_visibility_requirement:
+    required: true
+    intended_surface: Governed administration/reference-persona catalogue
+    minimum_visible_fields:
+    - persona_id or stable username
+    - provisioning/readiness state
+    - organization/context summary
+    - role/scope summary
+    - validation coverage/readiness state
+    forbidden_visible_secrets:
+    - password
+    - token
+    - session
+    - cookie
+    - csrf secret
+    display_label_language_requirement: NONE
+  display_label_policy: No Persian display-title requirement. UI may use stable username/persona ID; human-readable display
+    labels are optional.
+  alias_policy: Existing identities are retained for evidence continuity. Proposed uiux.persona.* aliases are not naming requirements
+    and must not trigger duplicate account creation.
+  historical_evidence_mutation: FORBIDDEN_FOR_RECONCILIATION
+  cleanup_supersession_document: runtime_evidence/RETENTION_SUPERSESSION_CHECKPOINT_15.md
+personas:
+- persona_id: P-01
+  reference_username_target: uiux.persona.ordinary-user
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PROVISIONED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کاربر عادی شرکت
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: uiux.audit.project
+  authority_summary: viewer assignment; explicit project scope PRJ-01-01; preserved empty/no-workspace/no-context variants
+  retention_decision: RETAIN_EXISTING_IDENTITIES
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-02
+  reference_username_target: uiux.persona.project-operations
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PARTIAL
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کاربر عملیاتی پروژه / مهندس کارگاه
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: uiux.audit.project
+  authority_summary: project-scoped read subset; creation authority absent
+  retention_decision: RETAIN_PARTIAL_CANDIDATE
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-03
+  reference_username_target: uiux.persona.procurement-buyer
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PARTIAL
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کارشناس تدارکات
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: uiux.audit.project
+  authority_summary: RFQ/request read subset; buyer lifecycle authority unprepared
+  retention_decision: RETAIN_PARTIAL_CANDIDATE
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-04
+  reference_username_target: uiux.persona.equipment-fleet
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: NOT_PROVISIONED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کارشناس تجهیزات و ناوگان
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: null
+  authority_summary: no suitable equipment/fleet identity mapped
+  retention_decision: PRESERVE_CATALOGUE_ENTRY
+  alias_disposition: NO_EXISTING_IDENTITY
+- persona_id: P-05
+  reference_username_target: uiux.persona.accountant
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PARTIAL
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: حسابدار
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: account.demo-construction-01.accountant
+  authority_summary: existing candidate is tenant_manager, quarantined with no scope; username does not prove accounting authority
+  retention_decision: RETAIN_CANDIDATE_UNCHANGED
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-06
+  reference_username_target: uiux.persona.treasury
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: NOT_PROVISIONED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کارشناس خزانه‌داری
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: null
+  authority_summary: no bounded Treasury identity mapped
+  retention_decision: PRESERVE_CATALOGUE_ENTRY
+  alias_disposition: NO_EXISTING_IDENTITY
+- persona_id: P-07
+  reference_username_target: uiux.persona.billing-claims
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PARTIAL
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کارشناس صورتحساب، مطالبات و پرداخت‌های پیمان
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: uiux.audit.project
+  authority_summary: claim/certificate read subset; subledger settlement authority unavailable
+  retention_decision: RETAIN_PARTIAL_CANDIDATE
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-08
+  reference_username_target: uiux.persona.hr-operations
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: NOT_PROVISIONED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کارشناس عملیات منابع انسانی و پرونده پرسنلی
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: null
+  authority_summary: no bounded HR administration identity; ordinary project identity lacks effective employee access
+  retention_decision: PRESERVE_CATALOGUE_ENTRY
+  alias_disposition: NO_EXISTING_IDENTITY
+- persona_id: P-09
+  reference_username_target: uiux.persona.ess-employee
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: NOT_PROVISIONED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کارمند در خودخدمتی
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: null
+  authority_summary: no explicit Person-to-User link available
+  retention_decision: PRESERVE_CATALOGUE_ENTRY
+  alias_disposition: NO_EXISTING_IDENTITY
+- persona_id: P-10
+  reference_username_target: uiux.persona.timekeeping
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PARTIAL
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کارشناس حضور و غیاب و کارکرد
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: uiux.audit.project
+  authority_summary: attendance read subset; calendar/operational administration unavailable
+  retention_decision: RETAIN_PARTIAL_CANDIDATE
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-11
+  reference_username_target: uiux.persona.hse-safety
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PARTIAL
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کارشناس HSE و ایمنی
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: uiux.audit.project
+  authority_summary: Safety read subset; lifecycle authority unprepared
+  retention_decision: RETAIN_PARTIAL_CANDIDATE
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-12
+  reference_username_target: uiux.persona.knowledge-curator
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: NOT_PROVISIONED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: متولی دانش
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: null
+  authority_summary: no effective bounded Knowledge-curation identity mapped
+  retention_decision: PRESERVE_CATALOGUE_ENTRY
+  alias_disposition: NO_EXISTING_IDENTITY
+- persona_id: P-13
+  reference_username_target: uiux.persona.workflow-admin
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: NOT_PROVISIONED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: مدیر گردش‌کار
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: null
+  authority_summary: no bounded Workflow-administration identity mapped
+  retention_decision: PRESERVE_CATALOGUE_ENTRY
+  alias_disposition: NO_EXISTING_IDENTITY
+- persona_id: P-14
+  reference_username_target: uiux.persona.accessibility
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: BLOCKED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کاربر آزمون دسترس‌پذیری
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: uiux.audit.reporting
+  authority_summary: reporting identity active but quarantined; zero effective permissions/scope; no closeout case
+  retention_decision: RETAIN_BLOCKED_FIXTURE
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-15
+  reference_username_target: uiux.persona.tenant-owner
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PROVISIONED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: مالک شرکت / Tenant Owner
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: account.demo-construction-01.owner
+  authority_summary: actual tenant_owner; organization scope; no Platform authority
+  retention_decision: RETAIN_IN_PLACE
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-16
+  reference_username_target: uiux.persona.tenant-admin
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: BLOCKED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: ادمین شرکت / Tenant Admin
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: null
+  authority_summary: no Tenant Admin assignment exists; Owner is not a substitute
+  retention_decision: PRESERVE_CATALOGUE_ENTRY
+  alias_disposition: NO_EXISTING_IDENTITY
+- persona_id: P-17
+  reference_username_target: uiux.persona.project-manager
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: BLOCKED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: مدیر پروژه / Project Manager
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: uiux.audit.project
+  authority_summary: project reads only; managerial comparison/exception authority absent
+  retention_decision: RETAIN_WITHOUT_MANAGER_CLAIM
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-18
+  reference_username_target: uiux.persona.platform-admin
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PROVISIONED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: ادمین پلتفرم / Platform Admin
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: admin
+  authority_summary: actual Platform Admin assignment; tenant memberships are separate authorities
+  retention_decision: RETAIN_IN_PLACE
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-19
+  reference_username_target: uiux.persona.document-controller
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PARTIAL
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: مسئول کنترل اسناد / Document Controller
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: uiux.audit.project
+  authority_summary: document view/download subset; upload/version/link authority absent
+  retention_decision: RETAIN_PARTIAL_CANDIDATE
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-20
+  reference_username_target: uiux.persona.payroll
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: NOT_PROVISIONED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کارشناس حقوق و دستمزد
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: null
+  authority_summary: Owner has payroll authority but is not substituted for a bounded payroll specialist
+  retention_decision: PRESERVE_CATALOGUE_ENTRY
+  alias_disposition: NO_EXISTING_IDENTITY
+- persona_id: P-21
+  reference_username_target: uiux.persona.employment-records
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: NEEDS_PRODUCT_REVIEW
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کارشناس احکام و سوابق استخدامی
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: null
+  authority_summary: governed backend exists; internal employment-record management surface absent
+  retention_decision: PRESERVE_CATALOGUE_ENTRY
+  alias_disposition: NO_EXISTING_IDENTITY
+- persona_id: P-22
+  reference_username_target: uiux.persona.inventory-storekeeper
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PARTIAL
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: انباردار / کارشناس کنترل موجودی
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: uiux.audit.project
+  authority_summary: warehouse/stock read subset; operational and valuation coverage incomplete
+  retention_decision: RETAIN_PARTIAL_CANDIDATE
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-23
+  reference_username_target: uiux.persona.contracts-commercial
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PARTIAL
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کارشناس قراردادها و امور تجاری
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: uiux.audit.project
+  authority_summary: contract/tender read subset; contractual-record and preparation authority incomplete
+  retention_decision: RETAIN_PARTIAL_CANDIDATE
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-24
+  reference_username_target: uiux.persona.project-controls
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PARTIAL
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کارشناس کنترل پروژه / دفتر فنی
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: uiux.audit.project
+  authority_summary: controls/estimate read subset; comparison, exception and preparation authority absent
+  retention_decision: RETAIN_PARTIAL_CANDIDATE
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-25
+  reference_username_target: uiux.persona.quality-qaqc
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: PARTIAL
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: کارشناس کیفیت / QA-QC
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: uiux.audit.project
+  authority_summary: Quality read subset; create/review authority absent; no Safety substitution
+  retention_decision: RETAIN_PARTIAL_CANDIDATE
+  alias_disposition: EXISTING_IDENTITY_RETAINED_FOR_EVIDENCE_CONTINUITY
+- persona_id: P-26
+  reference_username_target: uiux.persona.external-supplier
+  lifecycle: PERSISTENT_REFERENCE
+  provisioning_status: BLOCKED
+  role_policy: USE_EXISTING_GOVERNED_ROLES_AND_SCOPES; DO_NOT_INVENT_PRODUCT_ROLE_FOR_PERSONA
+  ui_visibility: REQUIRED
+  reusable_for_future_validation: true
+  delete_on_cleanup: false
+  documentation_label_fa: تأمین‌کننده / شریک بیرونی در پرتال
+  ui_display_title_required: false
+  preferred_ui_identifier: reference_username_target_or_persona_id
+  reconciled_identity: null
+  authority_summary: no portal principal, invitation or grant; no tenant-member substitution
+  retention_decision: PRESERVE_CATALOGUE_ENTRY
+  alias_disposition: NO_EXISTING_IDENTITY

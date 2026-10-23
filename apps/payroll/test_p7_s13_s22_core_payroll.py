@@ -919,7 +919,7 @@ class CorePayrollTests(TestCase):
             .exists()
         )
 
-    def test_payroll_registry_is_complete_and_default_roles_are_denied(self) -> None:
+    def test_payroll_registry_is_complete_and_owner_admin_are_denied(self) -> None:
         model_labels = {
             model._meta.label
             for model in django_apps.get_app_config("payroll").get_models()
@@ -927,7 +927,9 @@ class CorePayrollTests(TestCase):
         self.assertLessEqual(model_labels, registered_model_labels())
         permission_codes = {code.value for code in PAYROLL_PERMISSION_CODES}
         self.assertLessEqual(permission_codes, registered_permission_codes())
-        for default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
+        for default_permissions in (
+            DEFAULT_ROLE_PERMISSIONS[role] for role in ("tenant_owner", "tenant_admin")
+        ):
             self.assertTrue(permission_codes.isdisjoint(default_permissions))
 
     def test_core_and_statutory_audit_permissions_do_not_imply_each_other(self) -> None:
@@ -1010,7 +1012,7 @@ class CorePayrollTests(TestCase):
         response = self.client.get(reverse("payroll:workbench"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<html lang="fa" dir="rtl">', html=False)
-        self.assertContains(response, "کارگاه حقوق و دستمزد")
+        self.assertContains(response, "حقوق و دستمزد")
         self.assertEqual(
             self.client.get(reverse("payroll:configuration")).status_code, 200
         )

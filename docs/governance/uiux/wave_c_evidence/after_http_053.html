@@ -1,0 +1,81 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+ 
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">تراز و صورت‌های مالی</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">حسابداری</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">تراز و صورت‌های مالی</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">فقط بر پایه ردیف‌های قطعی و تصاویر نگهداری‌شده دفترکل</p>
+        
+    </div>
+    
+</header>
+
+<nav class="mt-5 flex flex-wrap gap-2" aria-label="بخش‌های حسابداری">
+    <a class="erp-btn erp-btn--secondary" href="/accounting/">نمای کلی</a>
+    <a class="erp-btn erp-btn--secondary" href="/accounting/accounts/">کدینگ حساب‌ها</a>
+    <a class="erp-btn erp-btn--secondary" href="/accounting/periods/">سال و دوره مالی</a>
+    <a class="erp-btn erp-btn--secondary" href="/accounting/journals/">اسناد حسابداری</a>
+    <a class="erp-btn erp-btn--secondary" href="/accounting/openings/">مانده افتتاحیه</a>
+    <a class="erp-btn erp-btn--secondary" href="/accounting/reconciliations/">تطبیق‌ها</a>
+    <a class="erp-btn erp-btn--secondary" href="/accounting/statements/">تراز و صورت‌های مالی</a>
+</nav>
+
+<form class="erp-surface mt-5 rounded-xl p-5" method="get">
+    
+
+    <div class="grid gap-4 sm:grid-cols-3">
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_kind">
+        نوع گزارش<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="kind" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" id="id_kind">
+  <option value="trial_balance" selected>تراز آزمایشی</option>
+
+  <option value="balance_sheet">ترازنامه</option>
+
+  <option value="profit_loss">صورت سود و زیان</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_starts_on">
+        شروع بازه
+    </label>
+    <input type="text" name="starts_on" value="" data-jalali-date="date" data-input-mask="####/##/##" inputmode="numeric" autocomplete="off" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" id="id_starts_on">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_ends_on">
+        پایان / تاریخ برش<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="ends_on" value="1405/07/30" data-jalali-date="date" data-input-mask="####/##/##" inputmode="numeric" autocomplete="off" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" required id="id_ends_on">
+    
+    
+</div>
+</div>
+    <button class="erp-btn erp-btn--secondary mt-4" type="submit">پیش‌نمایش خواندنی</button>
+</form>
+
+<section class="erp-surface mt-5 overflow-hidden rounded-xl">
+    <div class="erp-panel-header"><div><h2 class="font-semibold text-slate-900">پیش‌نمایش تراز آزمایشی</h2><p class="text-xs text-slate-500">0 ردیف قطعی · IRR</p></div><form method="post" action="/accounting/statements/run/"><!-- CSRF omitted --><input type="hidden" name="kind" value="trial_balance"><input type="hidden" name="starts_on" value=""><input type="hidden" name="ends_on" value="2026-10-22"><button class="erp-btn erp-btn--primary" type="submit">نگهداری نسخه تغییرناپذیر</button></form></div>
+    <div class="erp-table-wrap"><table class="w-full min-w-[980px] text-right text-sm"><thead><tr><th class="px-4 py-3">حساب</th><th class="px-4 py-3">نوع</th><th class="px-4 py-3">افتتاح بدهکار</th><th class="px-4 py-3">افتتاح بستانکار</th><th class="px-4 py-3">گردش بدهکار</th><th class="px-4 py-3">گردش بستانکار</th><th class="px-4 py-3">مانده / مبلغ</th></tr></thead><tbody class="divide-y divide-slate-100"><tr><td colspan="7" class="px-4 py-8 text-center text-slate-500">ردیف قطعی در این دامنه وجود ندارد.</td></tr></tbody></table></div>
+</section>
+
+<section class="erp-surface mt-5 overflow-hidden rounded-xl"><div class="erp-panel-header"><div><h2 class="font-semibold text-slate-900">نسخه‌های نگهداری‌شده</h2><p class="text-xs text-slate-500">نتیجه و شواهد پس از ایجاد قابل ویرایش نیستند.</p></div></div><div class="erp-table-wrap"><table class="w-full min-w-[760px] text-right text-sm"><thead><tr><th class="px-4 py-3">نوع</th><th class="px-4 py-3">بازه / برش</th><th class="px-4 py-3">ایجادکننده</th><th class="px-4 py-3">ردیف منبع</th><th class="px-4 py-3">زمان</th></tr></thead><tbody class="divide-y divide-slate-100"><tr><td class="px-4 py-3"><a class="font-semibold text-blue-700" href="/accounting/statements/76e93194-0887-4096-9ac3-9a287c8ad9cb/">تراز آزمایشی</a></td><td class="px-4 py-3" dir="ltr">1405/07/30</td><td class="px-4 py-3">account.demo-construction-01.accountant</td><td class="px-4 py-3">0</td><td class="px-4 py-3" dir="ltr">1405/07/30 11:16</td></tr></tbody></table></div></section>
+
+        </main>

@@ -1,0 +1,280 @@
+{
+  "started_at": "2026-10-23T14:43:50.024613+03:30",
+  "ended_at": "2026-10-23T14:44:52.358062+03:30",
+  "command": [
+    "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "core/test_home.py::HomeTests::test_normal_home_has_context_and_only_links_not_business_facts",
+    "core/test_home.py::HomeTests::test_scope_removes_business_link_even_with_permission",
+    "core/test_home.py::HomeTests::test_error_state_is_safe",
+    "apps/organizations/test_cep016_context.py::CEP016ContextTests::test_valid_project_and_site_context_persist_and_render_in_rtl_shell",
+    "apps/organizations/test_cep016_context.py::CEP016ContextTests::test_context_route_rejects_unauthorized_and_cross_tenant_ids_without_leak",
+    "apps/organizations/test_cep016_context.py::CEP016ContextTests::test_bound_stale_project_and_phase_are_rejected_server_side",
+    "apps/organizations/test_cep016_context.py::CEP016ContextTests::test_cascade_endpoint_returns_only_authorized_parent_choices",
+    "core/test_cep003_localization_accessibility.py::Cep003LocalizationAccessibilityTests::test_persian_jalali_date_input_preserves_gregorian_storage_semantics",
+    "core/test_cep003_localization_accessibility.py::Cep003LocalizationAccessibilityTests::test_shared_field_component_associates_help_and_errors_without_dropping_existing_ids",
+    "core/test_cep017_navigation.py::Cep017NavigationTemplateTests::test_canonical_navigation_register_is_complete_and_persian_first",
+    "core/test_cep017_navigation.py::Cep017NavigationTemplateTests::test_shared_breadcrumb_and_mobile_close_contract_are_present",
+    "apps/workflows/test_cep018_workspaces.py::Cep018WorkspaceTests::test_my_requests_is_own_identity_scoped_and_source_owned",
+    "apps/workflows/test_cep018_workspaces.py::Cep018WorkspaceTests::test_manager_workspace_requires_explicit_team_lead_and_filters_team",
+    "apps/workflows/test_cep018_workspaces.py::Cep018WorkspaceTests::test_missing_authorization_scope_fails_closed",
+    "apps/workforce/test_cep026_ess_privacy.py::ESSOwnDataPrivacyTests::test_username_email_and_employee_number_similarity_never_infer_identity",
+    "apps/workforce/test_cep026_ess_privacy.py::ESSOwnDataPrivacyTests::test_other_person_and_cross_tenant_relationships_are_denied",
+    "apps/workforce/test_cep026_ess_privacy.py::ESSOwnDataPrivacyTests::test_direct_url_masks_sensitive_field_and_discloses_no_other_object",
+    "apps/workflows/test_cep046_administration.py::AdministrationTests::test_complete_lifecycle_uses_existing_services_and_preserves_old_graph",
+    "apps/workflows/test_cep046_administration.py::AdministrationTests::test_permissions_are_independent_and_direct_actions_fail_closed",
+    "apps/workflows/test_cep046_administration.py::AdministrationTests::test_cross_tenant_objects_and_selected_context_do_not_expand_authority",
+    "apps/workforce/test_cep053.py::ESSDashboardTests::test_dashboard_localizes_source_status_and_retains_own_links",
+    "apps/workforce/test_cep053.py::ESSDashboardTests::test_independent_profile_survives_source_error",
+    "apps/workforce/test_cep053.py::ESSDashboardTests::test_current_person_relationship_bridge_filters_legacy_source_rows",
+    "apps/payroll/test_cep054.py::ESSPayrollTests::test_finalized_own_artifact_and_export_preserve_source",
+    "apps/payroll/test_cep054.py::ESSPayrollTests::test_own_identity_and_source_state_fail_closed",
+    "apps/payroll/test_cep054.py::ESSPayrollTests::test_missing_configuration_or_route_never_creates_orphan",
+    "apps/payroll/test_cep054.py::ESSPayrollTests::test_assigned_response_atomicity_privacy_and_no_financial_mutation",
+    "apps/workforce/test_cep055.py::PersonalChangeTests::test_all_five_governed_enrollment_rows_apply_only_own_source_after_acceptance",
+    "apps/workforce/test_cep055.py::PersonalChangeTests::test_permission_tenant_assignment_and_sensitive_fields_fail_closed",
+    "apps/workforce/test_cep055.py::PersonalChangeTests::test_own_status_adapters_preserve_source_scope_and_hide_internal_metadata",
+    "apps/workforce/test_cep056.py::CertificateTests::test_missing_renderer_or_activation_cannot_be_enabled_or_generate",
+    "apps/workforce/test_cep056.py::CertificateTests::test_evidence_is_own_source_read_only_without_broad_backoffice_grant",
+    "apps/workforce/test_cep056.py::CertificateTests::test_generic_dms_and_employee_paths_cannot_bypass_certificate_case_scope",
+    "apps/workforce/test_cep063.py::ESSTimekeepingTests::test_empty_index_policy_absence_and_rtl_jalali_ui",
+    "apps/workforce/test_cep063.py::ESSTimekeepingTests::test_own_leave_reservation_and_source_submit_without_balance_manager",
+    "apps/workforce/test_cep063.py::ESSTimekeepingTests::test_attendance_original_and_correction_request_remain_source_owned",
+    "apps/workforce/test_cep063.py::ESSTimekeepingTests::test_timesheet_create_add_submit_tracks_authoritative_source",
+    "apps/workforce/test_cep068.py::ESSOvertimeTests::test_source_create_submit_status_and_identity_audit_remain_atomic",
+    "apps/workforce/test_cep068.py::ESSOvertimeTests::test_own_source_filter_and_missing_or_foreign_urls_have_same_denial",
+    "apps/workforce/test_cep068_mission.py::ESSMissionTests::test_persian_jalali_http_empty_form_error_draft_and_submit",
+    "apps/workforce/test_cep068_mission.py::ESSMissionTests::test_approved_request_does_not_activate_unapproved_monetary_policy",
+    "apps/workforce/test_cep068_mission.py::ESSMissionTests::test_own_routing_link_is_projection_only_and_hides_financial_reviewer_data",
+    "-q",
+    "--reuse-db",
+    "--disable-warnings",
+    "--tb=no",
+    "-p",
+    "no:cacheprovider",
+    "--junitxml=E:\\Construction_Company_Solution\\docs\\governance\\cep\\evidence\\CEP-078_REENTRY_01\\GATE07_FOCUSED.xml"
+  ],
+  "guard": "Configured Development/DEBUG/loopback PostgreSQL and fully migrated development schema; normal existing test_construction_erp reused; no business DB fixture mutation",
+  "requested_test_nodes": 42,
+  "exit_code": 1,
+  "cases": [
+    {
+      "test": "core.test_home.HomeTests.test_normal_home_has_context_and_only_links_not_business_facts",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "core.test_home.HomeTests.test_scope_removes_business_link_even_with_permission",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "core.test_home.HomeTests.test_error_state_is_safe",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.organizations.test_cep016_context.CEP016ContextTests.test_valid_project_and_site_context_persist_and_render_in_rtl_shell",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.organizations.test_cep016_context.CEP016ContextTests.test_context_route_rejects_unauthorized_and_cross_tenant_ids_without_leak",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.organizations.test_cep016_context.CEP016ContextTests.test_bound_stale_project_and_phase_are_rejected_server_side",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.organizations.test_cep016_context.CEP016ContextTests.test_cascade_endpoint_returns_only_authorized_parent_choices",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workflows.test_cep018_workspaces.Cep018WorkspaceTests.test_my_requests_is_own_identity_scoped_and_source_owned",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workflows.test_cep018_workspaces.Cep018WorkspaceTests.test_manager_workspace_requires_explicit_team_lead_and_filters_team",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workflows.test_cep018_workspaces.Cep018WorkspaceTests.test_missing_authorization_scope_fails_closed",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests.test_username_email_and_employee_number_similarity_never_infer_identity",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests.test_other_person_and_cross_tenant_relationships_are_denied",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep026_ess_privacy.ESSOwnDataPrivacyTests.test_direct_url_masks_sensitive_field_and_discloses_no_other_object",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workflows.test_cep046_administration.AdministrationTests.test_complete_lifecycle_uses_existing_services_and_preserves_old_graph",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workflows.test_cep046_administration.AdministrationTests.test_permissions_are_independent_and_direct_actions_fail_closed",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workflows.test_cep046_administration.AdministrationTests.test_cross_tenant_objects_and_selected_context_do_not_expand_authority",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep053.ESSDashboardTests.test_dashboard_localizes_source_status_and_retains_own_links",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep053.ESSDashboardTests.test_independent_profile_survives_source_error",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep053.ESSDashboardTests.test_current_person_relationship_bridge_filters_legacy_source_rows",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.payroll.test_cep054.ESSPayrollTests.test_finalized_own_artifact_and_export_preserve_source",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.payroll.test_cep054.ESSPayrollTests.test_own_identity_and_source_state_fail_closed",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.payroll.test_cep054.ESSPayrollTests.test_missing_configuration_or_route_never_creates_orphan",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.payroll.test_cep054.ESSPayrollTests.test_assigned_response_atomicity_privacy_and_no_financial_mutation",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep055.PersonalChangeTests.test_all_five_governed_enrollment_rows_apply_only_own_source_after_acceptance",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep055.PersonalChangeTests.test_permission_tenant_assignment_and_sensitive_fields_fail_closed",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep055.PersonalChangeTests.test_own_status_adapters_preserve_source_scope_and_hide_internal_metadata",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep056.CertificateTests.test_missing_renderer_or_activation_cannot_be_enabled_or_generate",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep056.CertificateTests.test_evidence_is_own_source_read_only_without_broad_backoffice_grant",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep056.CertificateTests.test_generic_dms_and_employee_paths_cannot_bypass_certificate_case_scope",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep063.ESSTimekeepingTests.test_empty_index_policy_absence_and_rtl_jalali_ui",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep063.ESSTimekeepingTests.test_own_leave_reservation_and_source_submit_without_balance_manager",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep063.ESSTimekeepingTests.test_attendance_original_and_correction_request_remain_source_owned",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep063.ESSTimekeepingTests.test_timesheet_create_add_submit_tracks_authoritative_source",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep068.ESSOvertimeTests.test_source_create_submit_status_and_identity_audit_remain_atomic",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep068.ESSOvertimeTests.test_own_source_filter_and_missing_or_foreign_urls_have_same_denial",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep068_mission.ESSMissionTests.test_persian_jalali_http_empty_form_error_draft_and_submit",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep068_mission.ESSMissionTests.test_approved_request_does_not_activate_unapproved_monetary_policy",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "apps.workforce.test_cep068_mission.ESSMissionTests.test_own_routing_link_is_projection_only_and_hides_financial_reviewer_data",
+      "result": "FAIL",
+      "diagnostic": "UnicodeEncodeError: 'charmap' codec can't encode characters in position 288-296: character maps to <undefined>"
+    },
+    {
+      "test": "core.test_cep003_localization_accessibility.Cep003LocalizationAccessibilityTests.test_persian_jalali_date_input_preserves_gregorian_storage_semantics",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "core.test_cep003_localization_accessibility.Cep003LocalizationAccessibilityTests.test_shared_field_component_associates_help_and_errors_without_dropping_existing_ids",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "core.test_cep017_navigation.Cep017NavigationTemplateTests.test_canonical_navigation_register_is_complete_and_persian_first",
+      "result": "PASS",
+      "diagnostic": null
+    },
+    {
+      "test": "core.test_cep017_navigation.Cep017NavigationTemplateTests.test_shared_breadcrumb_and_mobile_close_contract_are_present",
+      "result": "PASS",
+      "diagnostic": null
+    }
+  ],
+  "counts": {
+    "PASS": 41,
+    "FAIL": 1,
+    "SKIP": 0
+  },
+  "scope": "GATE07 convergence evidence only; no browser runtime or AC PASS implied",
+  "failure_html_csrf_redacted": true
+}

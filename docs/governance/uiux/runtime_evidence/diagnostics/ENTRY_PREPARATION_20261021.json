@@ -1,0 +1,56 @@
+{
+  "record_type": "ENTRY_PREPARATION_ONLY_NOT_RUNTIME_RESULTS",
+  "prepared_at": "2026-10-21T13:00:50.162441+03:30",
+  "baseline": "43ac319c6e73e48ca9626461b73987922c498ec3",
+  "human_authorization": "2026-10-21 bounded Development/Test identity, data/state and evidence preparation request",
+  "database": "configured loopback Development PostgreSQL; no production",
+  "created_users": [
+    {
+      "alias": "P-01-PROJECT",
+      "username": "uiux.audit.project",
+      "organization": "demo-construction-01",
+      "membership": "active",
+      "existing_role": "viewer",
+      "scope": "project",
+      "project_alias": "PRJ-01-01",
+      "target_scenarios": [
+        "RV-002",
+        "RV-005"
+      ],
+      "mechanisms": [
+        "create_organization_account",
+        "initialize_personal_password",
+        "assign_membership_role",
+        "grant_membership_scope"
+      ]
+    },
+    {
+      "alias": "P-01-EMPTY",
+      "username": "uiux.audit.empty",
+      "organization": null,
+      "membership": null,
+      "existing_role": null,
+      "scope": null,
+      "target_scenarios": [
+        "RV-003"
+      ],
+      "mechanisms": [
+        "User.objects.create_user",
+        "initialize_personal_password"
+      ]
+    }
+  ],
+  "grant_actor": "account.demo-construction-01.owner",
+  "independent_approver": "admin membership in demo-construction-01",
+  "protected_states_unchanged": true,
+  "protected_state_digest": "ce50e111579b9dba85974e879c7238c08b4eb0ba5783302ed97231bb849ef610",
+  "case_created": false,
+  "case_blocker": "No existing active or inactive role contains required reporting view/prepare permissions; new roles/role edits prohibited; domain service authorization cannot be satisfied",
+  "error_state": "UTV_RUNTIME_ERROR_STATE",
+  "cleanup": "Retain audit identities and grant for authorized runtime validation; afterwards use governed grant/role revocation and account deactivation; preserve audit records; no business record cleanup required",
+  "credential_storage": "Windows current-user DPAPI encrypted PSCredential files outside repository; no secrets in evidence",
+  "runtime_scenarios_executed": false,
+  "product_code_changed": false,
+  "migration": false,
+  "registry_changed": false
+}

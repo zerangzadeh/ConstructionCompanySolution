@@ -1,0 +1,94 @@
+schema_version: '1.0'
+document:
+  id: BONIRA-UIUX-RV-EV-001
+  status: WAVE_A_RUNTIME_EVIDENCE
+record:
+  evidence_id: RV-EV-001
+  scenario_id: RV-001
+  executed_at: '2026-10-21T20:13:45.013000+03:30'
+  runtime:
+    environment_name: Development
+    base_url: http://127.0.0.1:8001/
+    git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+    browser: Microsoft Edge (real headless browser)
+    browser_version: 155.0.4283.62
+    viewport:
+    - width: 1440
+      height: 900
+    - width: 1440
+      height: 900
+    - width: 390
+      height: 844
+    - width: 1440
+      height: 900
+    - width: 1440
+      height: 900
+    - width: 1440
+      height: 900
+    - width: 1440
+      height: 900
+    - width: 390
+      height: 844
+    device_scale_factor: 1
+  persona:
+    persona_id: P-01
+    test_user_alias: uiux.audit.project
+    organization_alias: null
+    project_context_alias: null
+    site_context_alias: null
+    effective_permission_bundle_reference: runtime_evidence/diagnostics/WAVE_A_AUTHORITY_BEFORE_20261021.json#uiux.audit.project
+  target: Authentication and personal settings
+  preconditions:
+  - Frozen baseline verified; Development runtime; preserved identity; actual authority reverified read-only.
+  - Only authentication and governed session-context POSTs permitted; business/admin mutation blocked by browser
+    guard.
+  steps:
+  - Open login; Tab through controls; toggle blank password visibility twice; submit required fields blank.
+  - Authenticate using retained local credential; GET settings; inspect desktop/mobile without submitting settings.
+  expected_result:
+  - Understandable task/context, accessible controls and authoritative tenant/object/permission boundaries.
+  actual_result:
+  - Persian lang/RTL, labelled inputs, visible focused username border and keyboard order observed.
+  - Required-field errors rendered in Persian; toggle changed password/text type, aria-pressed and label; no populated
+    password captured.
+  - Login has two nested main landmarks. Settings reachable, one main, labelled profile/password fields; mobile
+    fits viewport.
+  accessibility:
+    keyboard_only: true
+    focus_visible: true
+    landmarks_ok: false
+    labels_ok: true
+    notes: DOM semantics, browser accessibility snapshot and representative keyboard checks; no assistive-technology
+      certification.
+  responsive:
+    desktop: true
+    tablet_or_narrow: false
+    mobile: true
+    notes: Representative captured viewports only; absence means not sampled, not a failure.
+  authorization:
+    ui_visibility_observed: true
+    server_authorization_verified_when_applicable: false
+    cross_tenant_leakage_observed: false
+    notes: Claims limited to sampled URLs/queries. Platform admin also has superuser and separate tenant_owner memberships;
+      these are recorded independently.
+  result: FAIL_ACCESSIBILITY
+  existing_finding_ids:
+  - UIUX-F-107
+  new_finding_ids: []
+  needs_domain_review: false
+  screenshots:
+  - screenshots/RV-001__P-01__login__1440x900__01.png
+  - screenshots/RV-001__P-01__required-errors__1440x900__01.png
+  - screenshots/RV-001__P-01__login-mobile__390x844__01.png
+  - screenshots/RV-001__P-01__settings__1440x900__01.png
+  - screenshots/RV-001__P-01__required-errors-settled__1440x900__01.png
+  - screenshots/RV-001__P-01__keyboard-focus__1440x900__01.png
+  - screenshots/RV-001__P-01__username-focus__1440x900__01.png
+  - screenshots/RV-001__P-01__settings-mobile__390x844__01.png
+  network_or_console_evidence:
+  - diagnostics/WAVE_A_BROWSER_OBSERVATIONS_20261021.json
+  mutation_performed: true
+  mutation_record_or_cleanup: Authentication/session bookkeeping only; context selection where noted. No product/business/admin
+    mutation; accounts and role/scope retained.
+  notes: Initial required-errors screenshot raced navigation; required-errors-settled and mobile error screenshots
+    support error assertions. Account/profile/password settings were not submitted.

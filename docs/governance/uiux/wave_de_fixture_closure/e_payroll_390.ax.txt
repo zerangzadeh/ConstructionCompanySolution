@@ -1,0 +1,111 @@
+- link "رفتن به محتوای اصلی":
+  - /url: "#main-content"
+- banner:
+  - generic "باز کردن فهرست":
+  - link "شرکت سازه‌پردازان پارس":
+    - /url: /organizations/
+    - generic: شرکت سازه‌پردازان پارس
+  - link "تنظیمات شخصی":
+    - /url: /accounts/settings/
+    - generic: U
+- region "دامنه کاری مؤثر":
+  - generic: شرکت
+  - generic: شرکت سازه‌پردازان پارس
+  - generic: پروژه
+  - combobox "پروژه":
+    - option "بدون پروژه / همه دامنه مجاز" [selected]
+    - option "PRJ-01-03 — بازسازی کارخانه نوآوران"
+    - option "PRJ-01-04 — ساختمان اداری آفتاب"
+    - option "PRJ-01-01 — مجتمع مسکونی باغستان"
+    - option "PRJ-01-02 — مرکز درمانی مهر"
+  - button "اعمال دامنه"
+- main:
+  - navigation "مسیر صفحه":
+    - link "خانه":
+      - /url: /
+    - generic: حقوق و دستمزد
+  - generic "حقوق و دستمزد":
+    - paragraph: حقوق و دستمزد
+    - heading "حقوق و دستمزد" [level=1]
+    - paragraph: دوره را انتخاب کنید، اجرا و نتایج را بررسی کنید و مراحل تأیید و صدور فیش را پیگیری کنید.
+  - link "پیکربندی و قواعد":
+    - /url: /payroll/configuration/
+  - link "دوره جدید":
+    - /url: /payroll/periods/new/
+  - link "اجرای جدید":
+    - /url: /payroll/runs/new/
+  - link "سوابق بررسی حقوق":
+    - /url: /payroll/history/
+  - link "نسخه‌های مقرراتی":
+    - /url: /payroll/statutory/policies/
+  - link "مالیات و بیمه کارکنان":
+    - /url: /payroll/statutory/
+  - link "تحویل مالی حقوق":
+    - /url: /payroll/financial-handoffs/
+  - paragraph: برای اجرای حقوق، ابتدا دوره و پیکربندی پرداخت لازم است. ثبت ورودی، محاسبه، بررسی مستقل و قطعی‌سازی در صفحه هر اجرا انجام می‌شود.
+  - generic "محدودیت محاسبه و ارسال"
+  - text: مالیات و بیمه فقط با نسخه مقرراتی رسمیِ منتشرشده محاسبه می‌شوند. هیچ بدهی، سند حسابداری، خزانه، وجه نقد، هزینه پروژه یا ارسال زنده ایجاد نمی‌شود.
+  - article:
+    - heading "اجراهای حقوق" [level=2]
+    - table:
+      - rowgroup:
+        - row "کد دوره نوع وضعیت تاریخچه":
+          - columnheader "کد"
+          - columnheader "دوره"
+          - columnheader "نوع"
+          - columnheader "وضعیت"
+          - columnheader "تاریخچه"
+      - rowgroup:
+        - row "WCD-VARIABLE Wave C synthetic period خارج از چرخه در بررسی —":
+          - cell "WCD-VARIABLE":
+            - link "WCD-VARIABLE":
+              - /url: /payroll/runs/e8cb4c8c-4dd0-44a6-8fc0-d55fb065ee3e/
+          - cell "Wave C synthetic period"
+          - cell "خارج از چرخه"
+          - cell "در بررسی"
+          - cell "—"
+        - row "WAVE-C-EXAMPLE Wave C synthetic period عادی قطعی —":
+          - cell "WAVE-C-EXAMPLE":
+            - link "WAVE-C-EXAMPLE":
+              - /url: /payroll/runs/78ec311e-3d9c-4702-bfd8-37db6da18f78/
+          - cell "Wave C synthetic period"
+          - cell "عادی"
+          - cell "قطعی"
+          - cell "—"
+  - article:
+    - heading "موارد نیازمند بررسی" [level=2]
+    - list:
+      - listitem: استثنای بازی در دامنه دسترسی نیست.
+  - article:
+    - heading "نتایج حقوق" [level=2]
+    - table:
+      - rowgroup:
+        - row "کارمند اجرا دامنه ناخالص کسور خالص وضعیت":
+          - columnheader "کارمند"
+          - columnheader "اجرا"
+          - columnheader "دامنه"
+          - columnheader "ناخالص"
+          - columnheader "کسور"
+          - columnheader "خالص"
+          - columnheader "وضعیت"
+      - rowgroup:
+        - row "WAVE-C-HR - Wave C Synthetic WAVE-C-EXAMPLE شرکت 1 ریال 0 ریال 1 ریال قطعی":
+          - cell "WAVE-C-HR - Wave C Synthetic"
+          - cell "WAVE-C-EXAMPLE":
+            - link "WAVE-C-EXAMPLE":
+              - /url: /payroll/runs/78ec311e-3d9c-4702-bfd8-37db6da18f78/
+          - cell "شرکت"
+          - cell "1 ریال"
+          - cell "0 ریال"
+          - cell "1 ریال"
+          - cell "قطعی"
+        - row "WAVE-C-HR - Wave C Synthetic WCD-VARIABLE شرکت 1 ریال 0 ریال 1 ریال محاسبه‌شده":
+          - cell "WAVE-C-HR - Wave C Synthetic"
+          - cell "WCD-VARIABLE":
+            - link "WCD-VARIABLE":
+              - /url: /payroll/runs/e8cb4c8c-4dd0-44a6-8fc0-d55fb065ee3e/
+          - cell "شرکت"
+          - cell "1 ریال"
+          - cell "0 ریال"
+          - cell "1 ریال"
+          - cell "محاسبه‌شده"

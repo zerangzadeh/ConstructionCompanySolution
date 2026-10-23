@@ -1,0 +1,154 @@
+[
+  {
+    "actor": "uiux.persona.project-manager",
+    "case": "GET",
+    "options": [
+      {
+        "label": "---------",
+        "value": ""
+      },
+      {
+        "label": "TrainingRequirement object (0973406a-5200-4ae2-9cea-cadd536cefa8)",
+        "value": "0973406a-5200-4ae2-9cea-cadd536cefa8"
+      },
+      {
+        "label": "TrainingRequirement object (7fa1c95a-f28b-4167-834c-7e1c3947cdf4)",
+        "value": "7fa1c95a-f28b-4167-834c-7e1c3947cdf4"
+      },
+      {
+        "label": "TrainingRequirement object (3c584241-1bde-40fa-a834-1cd97af75391)",
+        "value": "3c584241-1bde-40fa-a834-1cd97af75391"
+      }
+    ],
+    "allowed": "ABO",
+    "protectedAbsent": [
+      "C",
+      "D",
+      "X"
+    ]
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "case": "invalid date client validation",
+    "serverPost": false,
+    "optionsUnchanged": true
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "case": "valid B service-denied POST redisplay",
+    "options": [
+      {
+        "label": "---------",
+        "selected": false,
+        "value": ""
+      },
+      {
+        "label": "TrainingRequirement object (0973406a-5200-4ae2-9cea-cadd536cefa8)",
+        "selected": false,
+        "value": "0973406a-5200-4ae2-9cea-cadd536cefa8"
+      },
+      {
+        "label": "TrainingRequirement object (7fa1c95a-f28b-4167-834c-7e1c3947cdf4)",
+        "selected": true,
+        "value": "7fa1c95a-f28b-4167-834c-7e1c3947cdf4"
+      },
+      {
+        "label": "TrainingRequirement object (3c584241-1bde-40fa-a834-1cd97af75391)",
+        "selected": false,
+        "value": "3c584241-1bde-40fa-a834-1cd97af75391"
+      }
+    ],
+    "serverPost": true,
+    "errors": [
+      "اجازه مشاهده اطلاعات نیروی انسانی این شرکت را ندارید."
+    ]
+  },
+  {
+    "actor": "uiux.reference.batch03.site-only",
+    "case": "GET",
+    "options": [
+      {
+        "label": "---------",
+        "value": ""
+      },
+      {
+        "label": "TrainingRequirement object (3c584241-1bde-40fa-a834-1cd97af75391)",
+        "value": "3c584241-1bde-40fa-a834-1cd97af75391"
+      }
+    ],
+    "allowed": "O",
+    "protectedAbsent": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "X"
+    ]
+  },
+  {
+    "actor": "uiux.reference.batch03.site-only",
+    "case": "projectless O denied POST redisplay",
+    "options": [
+      {
+        "label": "---------",
+        "selected": false,
+        "value": ""
+      },
+      {
+        "label": "TrainingRequirement object (3c584241-1bde-40fa-a834-1cd97af75391)",
+        "selected": true,
+        "value": "3c584241-1bde-40fa-a834-1cd97af75391"
+      }
+    ],
+    "serverPost": true,
+    "errors": [
+      "اجازه مشاهده اطلاعات نیروی انسانی این شرکت را ندارید."
+    ]
+  },
+  {
+    "actor": "uiux.persona.tenant-admin",
+    "case": "authorized GET",
+    "options": [
+      {
+        "label": "---------",
+        "value": ""
+      },
+      {
+        "label": "TrainingRequirement object (0973406a-5200-4ae2-9cea-cadd536cefa8)",
+        "value": "0973406a-5200-4ae2-9cea-cadd536cefa8"
+      },
+      {
+        "label": "TrainingRequirement object (7fa1c95a-f28b-4167-834c-7e1c3947cdf4)",
+        "value": "7fa1c95a-f28b-4167-834c-7e1c3947cdf4"
+      },
+      {
+        "label": "TrainingRequirement object (b35435b8-87c2-4fa0-adc9-6d755c677d7d)",
+        "value": "b35435b8-87c2-4fa0-adc9-6d755c677d7d"
+      },
+      {
+        "label": "TrainingRequirement object (ab96f57f-a801-4992-b743-3e6980e616b9)",
+        "value": "ab96f57f-a801-4992-b743-3e6980e616b9"
+      },
+      {
+        "label": "TrainingRequirement object (3c584241-1bde-40fa-a834-1cd97af75391)",
+        "value": "3c584241-1bde-40fa-a834-1cd97af75391"
+      }
+    ],
+    "allowed": "ABCDO",
+    "protectedAbsent": [
+      "X"
+    ]
+  },
+  {
+    "actor": "uiux.persona.tenant-admin",
+    "case": "authorized A browser POST",
+    "serverPost": true,
+    "success": true,
+    "successText": [
+      "سابقه آموزش ثبت شد."
+    ],
+    "trainingText": [
+      "SP031 synthetic requirement A · شرکت‌کرده · ۱۴۰۵/۰۷/۳۰ · افزودن شاهد"
+    ]
+  }
+]

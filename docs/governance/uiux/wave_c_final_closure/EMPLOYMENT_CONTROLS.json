@@ -1,0 +1,39 @@
+{
+  "identity_probes": [
+    {
+      "case": "missing Employee.user",
+      "service": "PermissionDenied",
+      "http_layer": 403,
+      "rollback": true
+    },
+    {
+      "case": "mismatched Employee.user",
+      "service": "PermissionDenied",
+      "http_layer": 403,
+      "rollback": true
+    }
+  ],
+  "explicit_identity_preserved": true,
+  "append_only_write_denied": true,
+  "source_integrity": [
+    {
+      "record": "0529b500-4812-40b0-a978-86b8a83ded31",
+      "version": 1,
+      "source_version": "22ea076d-7b87-4f93-8a92-10ed2deb49a5",
+      "sha256": "001d98cf2c5ce5c1553b5744ca26278996271b3a01d1180216dde6d2fed6461f",
+      "supersedes": null,
+      "effective_from": "2026-10-22",
+      "effective_to": "2026-10-22"
+    },
+    {
+      "record": "e48b57cb-6162-41a1-802e-567174716997",
+      "version": 2,
+      "source_version": "a42c2a01-5f96-4408-aead-014875719277",
+      "sha256": "e164d20ad8cac3a51c4b09831e383a6e975e041df83775137bf854e359e47679",
+      "supersedes": "0529b500-4812-40b0-a978-86b8a83ded31",
+      "effective_from": "2026-10-23",
+      "effective_to": null
+    }
+  ],
+  "no_real_person_or_production_data": true
+}

@@ -1,0 +1,127 @@
+- link "رفتن به محتوای اصلی":
+  - /url: "#main-content"
+- banner:
+  - generic "باز کردن فهرست":
+  - link "شرکت سازه‌پردازان پارس":
+    - /url: /organizations/
+    - generic: شرکت سازه‌پردازان پارس
+  - link "تنظیمات شخصی":
+    - /url: /accounts/settings/
+    - generic: U
+- region "دامنه کاری مؤثر":
+  - generic: شرکت
+  - generic: شرکت سازه‌پردازان پارس
+  - generic: پروژه
+  - combobox "پروژه":
+    - option "بدون پروژه / همه دامنه مجاز" [selected]
+    - option "PRJ-01-01 — مجتمع مسکونی باغستان"
+  - generic: کارگاه مرتبط
+  - combobox "کارگاه مرتبط" [disabled]:
+    - option "بدون کارگاه" [selected]
+  - button "اعمال دامنه"
+- main [active]:
+  - form "فیلترهای جدول":
+    - button "اعمال فیلتر"
+  - navigation "مسیر صفحه":
+    - link "خانه":
+      - /url: /
+    - generic: مسائل کیفیت
+  - generic "مسائل کیفیت":
+    - paragraph: کنترل کیفیت
+    - heading "مسائل کیفیت" [level=1]
+    - paragraph: شرکت سازه‌پردازان پارس
+  - region "فهرست مسائل کیفیت":
+    - table:
+      - rowgroup:
+        - row "مرتب‌سازی شماره مرتب‌سازی پروژه مرتب‌سازی نوع مرتب‌سازی شدت مرتب‌سازی وضعیت مرتب‌سازی زمان شناسایی":
+          - columnheader "مرتب‌سازی شماره":
+            - link "مرتب‌سازی شماره":
+              - /url: /quality/?sort=number&direction=asc
+              - generic: شماره
+              - generic: ↕
+          - columnheader "مرتب‌سازی پروژه":
+            - link "مرتب‌سازی پروژه":
+              - /url: /quality/?sort=project&direction=asc
+              - generic: پروژه
+              - generic: ↕
+          - columnheader "مرتب‌سازی نوع":
+            - link "مرتب‌سازی نوع":
+              - /url: /quality/?sort=issue_type&direction=asc
+              - generic: نوع
+              - generic: ↕
+          - columnheader "مرتب‌سازی شدت":
+            - link "مرتب‌سازی شدت":
+              - /url: /quality/?sort=severity&direction=asc
+              - generic: شدت
+              - generic: ↕
+          - columnheader "مرتب‌سازی وضعیت":
+            - link "مرتب‌سازی وضعیت":
+              - /url: /quality/?sort=status&direction=asc
+              - generic: وضعیت
+              - generic: ↕
+          - columnheader "مرتب‌سازی زمان شناسایی":
+            - link "مرتب‌سازی زمان شناسایی":
+              - /url: /quality/?sort=identified_at&direction=asc
+              - generic: زمان شناسایی
+              - generic: ↕
+        - 'row "فیلتر شماره فیلتر پروژه فیلتر نوع همه فیلتر شدت همه فیلتر وضعیت همه فیلتر زمان شناسایی از باز کردن تقویم شمسی: فیلتر زمان شناسایی از فیلتر زمان شناسایی تا باز کردن تقویم شمسی: فیلتر زمان شناسایی تا"':
+          - columnheader "فیلتر شماره":
+            - generic: فیلتر شماره
+            - searchbox "فیلتر شماره"
+          - columnheader "فیلتر پروژه":
+            - generic: فیلتر پروژه
+            - searchbox "فیلتر پروژه"
+          - columnheader "فیلتر نوع همه":
+            - generic: فیلتر نوع
+            - combobox "فیلتر نوع":
+              - option "همه" [selected]
+              - option "عدم انطباق"
+              - option "نقص اجرایی"
+              - option "مصالح"
+              - option "کیفیت اجرا"
+              - option "بازرسی"
+              - option "نتیجه آزمون"
+              - option "مستندات"
+              - option "سایر"
+          - columnheader "فیلتر شدت همه":
+            - generic: فیلتر شدت
+            - combobox "فیلتر شدت":
+              - option "همه" [selected]
+              - option "جزئی"
+              - option "عمده"
+              - option "بحرانی"
+          - columnheader "فیلتر وضعیت همه":
+            - generic: فیلتر وضعیت
+            - combobox "فیلتر وضعیت":
+              - option "همه" [selected]
+              - option "ثبت‌شده"
+              - option "در حال بررسی"
+              - option "تخصیص‌یافته"
+              - option "اقدام اصلاحی در حال انجام"
+              - option "در انتظار راستی‌آزمایی"
+              - option "راستی‌آزمایی‌شده"
+              - option "بسته‌شده"
+          - 'columnheader "فیلتر زمان شناسایی از باز کردن تقویم شمسی: فیلتر زمان شناسایی از فیلتر زمان شناسایی تا باز کردن تقویم شمسی: فیلتر زمان شناسایی تا"':
+            - generic: فیلتر زمان شناسایی از
+            - textbox "فیلتر زمان شناسایی از":
+              - /placeholder: ۱۴۰۵/۰۶/۲۳
+            - 'button "باز کردن تقویم شمسی: فیلتر زمان شناسایی از"':
+              - generic: ▦
+            - generic: فیلتر زمان شناسایی تا
+            - textbox "فیلتر زمان شناسایی تا":
+              - /placeholder: ۱۴۰۵/۰۶/۲۳
+            - 'button "باز کردن تقویم شمسی: فیلتر زمان شناسایی تا"':
+              - generic: ▦
+      - rowgroup:
+        - row "QLT-01-01-01 مجتمع مسکونی باغستان کارگاه اصلی پروژه عدم انطباق عمده بسته‌شده ۱۴۰۴/۰۲/۱۵، ساعت 0:00":
+          - cell "QLT-01-01-01":
+            - link "QLT-01-01-01":
+              - /url: /quality/0715f881-12b0-4171-b784-264252597b24/
+          - cell "مجتمع مسکونی باغستان کارگاه اصلی پروژه":
+            - text: مجتمع مسکونی باغستان
+            - paragraph: کارگاه اصلی پروژه
+          - cell "عدم انطباق"
+          - cell "عمده"
+          - cell "بسته‌شده":
+            - generic: بسته‌شده
+          - cell "۱۴۰۴/۰۲/۱۵، ساعت 0:00"

@@ -312,6 +312,7 @@ class PriceBookServiceTests(PriceBookFixture, TestCase):
         self.assertFalse(
             OrganizationRole.objects.filter(
                 is_system=True,
+                code__in=("tenant_owner", "tenant_admin"),
                 permissions__code__in=[
                     P.PRICE_BOOKS_MANAGE,
                     P.PRICE_BOOKS_ACTIVATE,

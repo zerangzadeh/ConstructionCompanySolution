@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\docs\governance\uiux\rv007_controlled_time\http_checks.py", line 53, in <module>
+    check(site, base, 403, "Site-only scope cannot read Project-level buyer workspace")
+  File "E:\Construction_Company_Solution\docs\governance\uiux\rv007_controlled_time\http_checks.py", line 39, in check
+    assert status == expected, observations[-1]
+           ^^^^^^^^^^^^^^^^^^
+AssertionError: {'case': 'Site-only scope cannot read Project-level buyer workspace', 'actor': 'uiux.reference.batch03.site-only', 'path': '/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/', 'method': 'GET', 'status': 404, 'expected': 403, 'passed': False, 'body_sha256': 'c0f005968c65478a4c0ab1bfbd0f7a98d2bb7ce5b3de970d1c32fff99cc9cb52', 'final_path': '/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/', 'application_clock': {'application_now': '2026-10-23T22:46:58.091314+00:00', 'phase': 'protected_opening_and_comparison_after_24h', 'actual_wall_clock': '2026-10-22 22:46:12.003546+00:00', 'test_only': True, 'os_clock_modified': False}}

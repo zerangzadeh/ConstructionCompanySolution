@@ -1,0 +1,120 @@
+{
+  "at": "2026-10-22 00:41:17.671690+00:00",
+  "branch": "main",
+  "head": "43ac319c6e73e48ca9626461b73987922c498ec3",
+  "upstream": "43ac319c6e73e48ca9626461b73987922c498ec3",
+  "divergence": "0\t0",
+  "dirty": "M apps/billing/forms.py\n M apps/billing/views.py\n M apps/daily_reports/forms.py\n M apps/daily_reports/views.py\n M apps/equipment/forms.py\n M apps/equipment/views.py\n M apps/procurement/forms.py\n M apps/procurement/views.py\n M apps/workforce/forms.py\n M apps/workforce/views.py\n?? docs/governance/uiux/\n?? graphify-out/\n?? protected_documents/organizations/9a252256-9434-41f2-8823-7bc6ae7de500/\n?? protected_documents/organizations/a6ee1035-4439-4daa-afb6-9c9a818ff953/\n?? protected_documents/organizations/ca79bb2b-56a3-47ab-9a38-8f90f02f5dc6/\n?? protected_documents/organizations/cca028cb-a2ff-4485-83ab-a9c1bd1e47b2/\n?? tests/test_uiux_f111_pattern_clearance_scope.py\n?? tests/test_uiux_f111_pattern_commercial_scope.py\n?? tests/test_uiux_f111_scope.py",
+  "diff_names": "M\tapps/billing/forms.py\nM\tapps/billing/views.py\nM\tapps/daily_reports/forms.py\nM\tapps/daily_reports/views.py\nM\tapps/equipment/forms.py\nM\tapps/equipment/views.py\nM\tapps/procurement/forms.py\nM\tapps/procurement/views.py\nM\tapps/workforce/forms.py\nM\tapps/workforce/views.py",
+  "diff_stat": "apps/billing/forms.py       | 97 ++++++++++++++++++++++++++++++++++++++++-----\n apps/billing/views.py       | 30 ++++++++++++--\n apps/daily_reports/forms.py | 50 ++++++++++++++++-------\n apps/daily_reports/views.py |  9 ++++-\n apps/equipment/forms.py     | 34 ++++++++++++----\n apps/equipment/views.py     |  7 +++-\n apps/procurement/forms.py   | 33 +++++++++++----\n apps/procurement/views.py   | 13 +++++-\n apps/workforce/forms.py     | 43 +++++++++++++++-----\n apps/workforce/views.py     | 41 +++++++++++++++----\n 10 files changed, 292 insertions(+), 65 deletions(-)",
+  "accepted_source_evidence_drift": [],
+  "accepted_validation_repeated": false,
+  "actors": [
+    {
+      "id": "a4384116-c206-446a-b164-a2891309736e",
+      "username": "superuser",
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": true
+    },
+    {
+      "id": "93b49bd5-e72c-4234-98d8-df6dfa1a3ff1",
+      "username": "account.demo-construction-03.viewer",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false
+    },
+    {
+      "id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+      "username": "admin",
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": true
+    }
+  ],
+  "sources": [
+    {
+      "key": "C",
+      "organization": "demo-construction-01",
+      "contract": "f9b7fc25-711b-410f-a1e8-90408bc5b882",
+      "contract_number": "CTR-01-03-05",
+      "project": "PRJ-01-03",
+      "document": "4aca096c-7043-4ff3-bae9-b388041e38b1",
+      "version": "6486923f-41c7-4964-b052-4447d7323a5f",
+      "version_sha256": "b8274cd2f933ba897ac5a626e96063aa6ed45d4389b105279661a55aedd2bc6f",
+      "version_available": false,
+      "writer": "account.demo-construction-01.owner",
+      "approver": "admin",
+      "eligible_actors": [
+        {
+          "actor": "account.demo-construction-01.owner",
+          "permissions": {
+            "compliance_evidence.manage": true,
+            "compliance_evidence.submit": true,
+            "compliance_evidence.approve": true
+          }
+        },
+        {
+          "actor": "admin",
+          "permissions": {
+            "compliance_evidence.manage": true,
+            "compliance_evidence.submit": true,
+            "compliance_evidence.approve": true
+          }
+        },
+        {
+          "actor": "uiux.persona.tenant-admin",
+          "permissions": {
+            "compliance_evidence.manage": true,
+            "compliance_evidence.submit": true,
+            "compliance_evidence.approve": true
+          }
+        }
+      ],
+      "existing_approved_clearances": [],
+      "published_workflow_versions": []
+    },
+    {
+      "key": "X",
+      "organization": "demo-construction-02",
+      "contract": "8501279f-1a66-4c55-a4a5-c6a2ba6b2db9",
+      "contract_number": "CTR-02-01-05",
+      "project": "PRJ-02-01",
+      "document": "31437d59-08a7-4040-8929-0c14f2b95cbd",
+      "version": "7e87f907-619a-4d2e-ac9f-f11f0a1c5686",
+      "version_sha256": "b8274cd2f933ba897ac5a626e96063aa6ed45d4389b105279661a55aedd2bc6f",
+      "version_available": false,
+      "writer": "account.demo-construction-02.owner",
+      "approver": "admin",
+      "eligible_actors": [
+        {
+          "actor": "account.demo-construction-02.owner",
+          "permissions": {
+            "compliance_evidence.manage": true,
+            "compliance_evidence.submit": true,
+            "compliance_evidence.approve": true
+          }
+        },
+        {
+          "actor": "admin",
+          "permissions": {
+            "compliance_evidence.manage": true,
+            "compliance_evidence.submit": true,
+            "compliance_evidence.approve": true
+          }
+        }
+      ],
+      "existing_approved_clearances": [],
+      "published_workflow_versions": []
+    }
+  ],
+  "authority": "Human 2026-10-22 bounded BATCH-02 canonical readiness-review execution",
+  "touch_set": [
+    "one temporary Operations assignment plus canonical revocation",
+    "two synthetic documents/versions and truthful scanner assessments",
+    "two canonical clearance create/submit/independent approval histories",
+    "BATCH-02 runtime HTTP/browser sessions",
+    "closure evidence/report and F-122 only"
+  ],
+  "no_product_code_schema_or_permission_semantics_changes": true
+}

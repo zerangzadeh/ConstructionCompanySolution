@@ -1,0 +1,131 @@
+{
+  "status": "PASS_ZERO_NEW_REGRESSIONS",
+  "tests": 67,
+  "passed": 37,
+  "baseline_failures": {
+    "('apps.workforce.tests.WorkforceModelTests', 'test_position_parent_must_be_active_and_position_with_active_child_cannot_archive')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_archival_preserves_records_and_blocks_active_dependencies')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_create_workforce_structure_employee_and_assignment_are_audited')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_employee_account_link_rejects_a_foreign_tenant_user')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_employee_and_assignment_transitions_are_atomic_and_audited')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_employee_can_be_created_from_an_active_member_account')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_employee_can_hold_multiple_positions_and_change_primary')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_employee_profile_image_update_is_tenant_scoped_and_audited')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_ending_primary_position_promotes_remaining_active_position')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_job_position_does_not_grant_system_workflow_permission')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_owner_links_and_unlinks_only_an_active_tenant_member')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_position_assignment_service_rejects_cross_tenant_employee')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_reads_and_mutations_enforce_tenant_scope')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_single_holder_position_rejects_a_second_active_employee')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_small_tenant_can_create_employee_without_structure_or_user')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforceServiceTests', 'test_viewer_can_read_but_cannot_mutate_workforce')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_department_chart_excludes_positions_and_is_tenant_scoped')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_department_list_links_to_editable_tenant_scoped_detail')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_department_page_renders_hierarchical_organization_chart')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_employee_account_card_reveals_selector_on_demand')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_employee_detail_can_add_and_end_a_second_position')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_employee_form_can_create_employee_without_user_account')": {
+      "status": "failure",
+      "message": "apps.workforce.models.Employee.DoesNotExist: Employee matching query does not exist."
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_employee_form_creates_from_an_existing_company_account')": {
+      "status": "failure",
+      "message": "AssertionError: 403 != 200"
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_employee_form_filters_positions_by_selected_department')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_owner_can_open_workforce_pages_and_not_see_foreign_employee')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_owner_can_update_position_from_its_detail_page')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_owner_can_upload_and_privately_view_employee_profile_image')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_position_list_links_to_tenant_scoped_position_detail')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_position_list_renders_chart_and_is_tenant_scoped')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    },
+    "('apps.workforce.tests.WorkforcePanelTests', 'test_position_parent_form_and_update_are_tenant_scoped')": {
+      "status": "failure",
+      "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت نیروی انسانی این شرکت را ندارید."
+    }
+  },
+  "new_failures": [],
+  "exact_dirty_entry_replay": true,
+  "scope": "Workforce tests.py, P7 foundation, existing TrainingRequirement project selector matrix",
+  "product_sources_swapped": false
+}

@@ -6,6 +6,25 @@
 
 **User goals:** `USER_CAPABILITY_MAP.md`
 
+**Current V1 role reconciliation (2026-10-22):** the Human
+[Product Decision](../governance/uiux/authorization_reconciliation/PRODUCT_DECISION.md)
+authorizes explicit operational/specialist catalogue mappings and the bounded
+Platform Initial Grant. The complete
+[Role-Permission Matrix](../governance/uiux/authorization_reconciliation/ROLE_PERMISSION_MATRIX.csv)
+reflects `role_defaults.py` and `role_reconciliation.py`. Historical statements
+below about unassigned default permissions are superseded only for those explicit
+catalogue mappings. Tenant Owner/Admin receive no additional permissions.
+Unresolved domain activation, financial/SoD policy and statutory gates remain
+closed; catalogue assignment alone does not activate them.
+
+An existing active Platform Admin may assign an active approved role to an exact
+active Tenant membership and explicit scope only when the ordinary delegation
+path has no lawful delegator/independent tenant approver pair. The dedicated
+`platform_initial_grant` service forbids self-grants, checks existing scope union,
+re-reads authority under locks and records correlated before/after audit evidence.
+It requires no second Platform approver and creates no Tenant authority for its
+actor. Ordinary `assign_membership_role()` retains its existing contract.
+
 ## 1. Purpose
 
 This document keeps lifecycle, permission, responsibility and separation rules

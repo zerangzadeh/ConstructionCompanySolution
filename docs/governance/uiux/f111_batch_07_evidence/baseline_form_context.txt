@@ -1,0 +1,257 @@
+.                                                             [100%]
+================================== FAILURES ===================================
+_ RecurrenceScopeTests.test_manipulated_projects_and_missing_fields_redisplay_safely (case='forced C') _
+tests\test_uiux_f111_pattern_recurrence_scope.py:160: in test_manipulated_projects_and_missing_fields_redisplay_safely
+    self.assert_page(response)
+tests\test_uiux_f111_pattern_recurrence_scope.py:111: in assert_page
+    self.assertSetEqual(
+E   AssertionError: Items in the first set but not the second:
+E   <Project: B07-P-D - B07 distinct Project D>
+E   <Project: B07-P-C - B07 distinct Project C>
+_ RecurrenceScopeTests.test_manipulated_projects_and_missing_fields_redisplay_safely (case='forced D') _
+tests\test_uiux_f111_pattern_recurrence_scope.py:160: in test_manipulated_projects_and_missing_fields_redisplay_safely
+    self.assert_page(response)
+tests\test_uiux_f111_pattern_recurrence_scope.py:111: in assert_page
+    self.assertSetEqual(
+E   AssertionError: Items in the first set but not the second:
+E   <Project: B07-P-D - B07 distinct Project D>
+E   <Project: B07-P-C - B07 distinct Project C>
+_ RecurrenceScopeTests.test_manipulated_projects_and_missing_fields_redisplay_safely (case='forced X') _
+tests\test_uiux_f111_pattern_recurrence_scope.py:159: in test_manipulated_projects_and_missing_fields_redisplay_safely
+    response = self.client.post(reverse("expenses:recurrences"), data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1156: in post
+    response = super().post(
+.venv\Lib\site-packages\django\test\client.py:499: in post
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:52: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:77: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\expenses\views.py:484: in recurrence_list
+    if request.method == "POST" and form.is_valid():
+                                    ^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\forms\forms.py:206: in is_valid
+    return self.is_bound and not self.errors
+                                 ^^^^^^^^^^^
+.venv\Lib\site-packages\django\forms\forms.py:201: in errors
+    self.full_clean()
+.venv\Lib\site-packages\django\forms\forms.py:339: in full_clean
+    self._post_clean()
+.venv\Lib\site-packages\django\forms\models.py:498: in _post_clean
+    self.instance.full_clean(exclude=exclude, validate_unique=False)
+.venv\Lib\site-packages\django\db\models\base.py:1654: in full_clean
+    self.clean()
+apps\expenses\models.py:670: in clean
+    validate_related_organizations(self, project=self.project)
+                                                 ^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:271: in __get__
+    raise self.RelatedObjectDoesNotExist(
+E   apps.expenses.models.RecurringExpenseTemplate.project.RelatedObjectDoesNotExist: RecurringExpenseTemplate has no project.
+_ RecurrenceScopeTests.test_manipulated_projects_and_missing_fields_redisplay_safely (case='malformed') _
+tests\test_uiux_f111_pattern_recurrence_scope.py:159: in test_manipulated_projects_and_missing_fields_redisplay_safely
+    response = self.client.post(reverse("expenses:recurrences"), data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1156: in post
+    response = super().post(
+.venv\Lib\site-packages\django\test\client.py:499: in post
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:52: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:77: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\expenses\views.py:484: in recurrence_list
+    if request.method == "POST" and form.is_valid():
+                                    ^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\forms\forms.py:206: in is_valid
+    return self.is_bound and not self.errors
+                                 ^^^^^^^^^^^
+.venv\Lib\site-packages\django\forms\forms.py:201: in errors
+    self.full_clean()
+.venv\Lib\site-packages\django\forms\forms.py:339: in full_clean
+    self._post_clean()
+.venv\Lib\site-packages\django\forms\models.py:498: in _post_clean
+    self.instance.full_clean(exclude=exclude, validate_unique=False)
+.venv\Lib\site-packages\django\db\models\base.py:1654: in full_clean
+    self.clean()
+apps\expenses\models.py:670: in clean
+    validate_related_organizations(self, project=self.project)
+                                                 ^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:271: in __get__
+    raise self.RelatedObjectDoesNotExist(
+E   apps.expenses.models.RecurringExpenseTemplate.project.RelatedObjectDoesNotExist: RecurringExpenseTemplate has no project.
+_ RecurrenceScopeTests.test_manipulated_projects_and_missing_fields_redisplay_safely (case='missing project') _
+tests\test_uiux_f111_pattern_recurrence_scope.py:159: in test_manipulated_projects_and_missing_fields_redisplay_safely
+    response = self.client.post(reverse("expenses:recurrences"), data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1156: in post
+    response = super().post(
+.venv\Lib\site-packages\django\test\client.py:499: in post
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:52: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:77: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\expenses\views.py:484: in recurrence_list
+    if request.method == "POST" and form.is_valid():
+                                    ^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\forms\forms.py:206: in is_valid
+    return self.is_bound and not self.errors
+                                 ^^^^^^^^^^^
+.venv\Lib\site-packages\django\forms\forms.py:201: in errors
+    self.full_clean()
+.venv\Lib\site-packages\django\forms\forms.py:339: in full_clean
+    self._post_clean()
+.venv\Lib\site-packages\django\forms\models.py:498: in _post_clean
+    self.instance.full_clean(exclude=exclude, validate_unique=False)
+.venv\Lib\site-packages\django\db\models\base.py:1654: in full_clean
+    self.clean()
+apps\expenses\models.py:670: in clean
+    validate_related_organizations(self, project=self.project)
+                                                 ^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:271: in __get__
+    raise self.RelatedObjectDoesNotExist(
+E   apps.expenses.models.RecurringExpenseTemplate.project.RelatedObjectDoesNotExist: RecurringExpenseTemplate has no project.
+_ RecurrenceScopeTests.test_manipulated_projects_and_missing_fields_redisplay_safely (case='missing description') _
+tests\test_uiux_f111_pattern_recurrence_scope.py:160: in test_manipulated_projects_and_missing_fields_redisplay_safely
+    self.assert_page(response)
+tests\test_uiux_f111_pattern_recurrence_scope.py:111: in assert_page
+    self.assertSetEqual(
+E   AssertionError: Items in the first set but not the second:
+E   <Project: B07-P-D - B07 distinct Project D>
+E   <Project: B07-P-C - B07 distinct Project C>
+_ RecurrenceScopeTests.test_manipulated_projects_and_missing_fields_redisplay_safely (case='missing amount') _
+tests\test_uiux_f111_pattern_recurrence_scope.py:160: in test_manipulated_projects_and_missing_fields_redisplay_safely
+    self.assert_page(response)
+tests\test_uiux_f111_pattern_recurrence_scope.py:111: in assert_page
+    self.assertSetEqual(
+E   AssertionError: Items in the first set but not the second:
+E   <Project: B07-P-D - B07 distinct Project D>
+E   <Project: B07-P-C - B07 distinct Project C>
+_ RecurrenceScopeTests.test_manipulated_projects_and_missing_fields_redisplay_safely (case='missing classification') _
+tests\test_uiux_f111_pattern_recurrence_scope.py:160: in test_manipulated_projects_and_missing_fields_redisplay_safely
+    self.assert_page(response)
+tests\test_uiux_f111_pattern_recurrence_scope.py:111: in assert_page
+    self.assertSetEqual(
+E   AssertionError: Items in the first set but not the second:
+E   <Project: B07-P-D - B07 distinct Project D>
+E   <Project: B07-P-C - B07 distinct Project C>
+_ RecurrenceScopeTests.test_manipulated_projects_and_missing_fields_redisplay_safely (case='missing frequency') _
+tests\test_uiux_f111_pattern_recurrence_scope.py:160: in test_manipulated_projects_and_missing_fields_redisplay_safely
+    self.assert_page(response)
+tests\test_uiux_f111_pattern_recurrence_scope.py:111: in assert_page
+    self.assertSetEqual(
+E   AssertionError: Items in the first set but not the second:
+E   <Project: B07-P-D - B07 distinct Project D>
+E   <Project: B07-P-C - B07 distinct Project C>
+_ RecurrenceScopeTests.test_manipulated_projects_and_missing_fields_redisplay_safely (case='missing starts_on') _
+tests\test_uiux_f111_pattern_recurrence_scope.py:159: in test_manipulated_projects_and_missing_fields_redisplay_safely
+    response = self.client.post(reverse("expenses:recurrences"), data)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1156: in post
+    response = super().post(
+.venv\Lib\site-packages\django\test\client.py:499: in post
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:52: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:77: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\expenses\views.py:484: in recurrence_list
+    if request.method == "POST" and form.is_valid():
+                                    ^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\forms\forms.py:206: in is_valid
+    return self.is_bound and not self.errors
+                                 ^^^^^^^^^^^
+.venv\Lib\site-packages\django\forms\forms.py:201: in errors
+    self.full_clean()
+.venv\Lib\site-packages\django\forms\forms.py:339: in full_clean
+    self._post_clean()
+.venv\Lib\site-packages\django\forms\models.py:498: in _post_clean
+    self.instance.full_clean(exclude=exclude, validate_unique=False)
+.venv\Lib\site-packages\django\db\models\base.py:1654: in full_clean
+    self.clean()
+apps\expenses\models.py:677: in clean
+    if self.ends_on and self.ends_on < self.starts_on:
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: '<' not supported between instances of 'datetime.date' and 'NoneType'
+_ RecurrenceScopeTests.test_manipulated_projects_and_missing_fields_redisplay_safely (case='missing source_reference_prefix') _
+tests\test_uiux_f111_pattern_recurrence_scope.py:160: in test_manipulated_projects_and_missing_fields_redisplay_safely
+    self.assert_page(response)
+tests\test_uiux_f111_pattern_recurrence_scope.py:111: in assert_page
+    self.assertSetEqual(
+E   AssertionError: Items in the first set but not the second:
+E   <Project: B07-P-D - B07 distinct Project D>
+E   <Project: B07-P-C - B07 distinct Project C>
+=========================== short test summary info ===========================
+SUBFAILED(case='forced C') tests/test_uiux_f111_pattern_recurrence_scope.py::RecurrenceScopeTests::test_manipulated_projects_and_missing_fields_redisplay_safely
+SUBFAILED(case='forced D') tests/test_uiux_f111_pattern_recurrence_scope.py::RecurrenceScopeTests::test_manipulated_projects_and_missing_fields_redisplay_safely
+SUBFAILED(case='forced X') tests/test_uiux_f111_pattern_recurrence_scope.py::RecurrenceScopeTests::test_manipulated_projects_and_missing_fields_redisplay_safely
+SUBFAILED(case='malformed') tests/test_uiux_f111_pattern_recurrence_scope.py::RecurrenceScopeTests::test_manipulated_projects_and_missing_fields_redisplay_safely
+SUBFAILED(case='missing project') tests/test_uiux_f111_pattern_recurrence_scope.py::RecurrenceScopeTests::test_manipulated_projects_and_missing_fields_redisplay_safely
+SUBFAILED(case='missing description') tests/test_uiux_f111_pattern_recurrence_scope.py::RecurrenceScopeTests::test_manipulated_projects_and_missing_fields_redisplay_safely
+SUBFAILED(case='missing amount') tests/test_uiux_f111_pattern_recurrence_scope.py::RecurrenceScopeTests::test_manipulated_projects_and_missing_fields_redisplay_safely
+SUBFAILED(case='missing classification') tests/test_uiux_f111_pattern_recurrence_scope.py::RecurrenceScopeTests::test_manipulated_projects_and_missing_fields_redisplay_safely
+SUBFAILED(case='missing frequency') tests/test_uiux_f111_pattern_recurrence_scope.py::RecurrenceScopeTests::test_manipulated_projects_and_missing_fields_redisplay_safely
+SUBFAILED(case='missing starts_on') tests/test_uiux_f111_pattern_recurrence_scope.py::RecurrenceScopeTests::test_manipulated_projects_and_missing_fields_redisplay_safely
+SUBFAILED(case='missing source_reference_prefix') tests/test_uiux_f111_pattern_recurrence_scope.py::RecurrenceScopeTests::test_manipulated_projects_and_missing_fields_redisplay_safely
+11 failed, 1 passed, 12 deselected in 30.55s

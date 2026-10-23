@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="41" time="28.111" timestamp="2026-10-22T03:34:59.939155+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_uiux_f111_pattern_clearance_scope.ClearanceCreateScopeTests" name="test_absent_revoked_expired_future_and_site_only_scope_fail_closed" time="8.493" /><testcase classname="tests.test_uiux_f111_pattern_clearance_scope.ClearanceCreateScopeTests" name="test_existing_clearance_contract_date_kind_and_approval_validation" time="0.185" /><testcase classname="tests.test_uiux_f111_pattern_clearance_scope.ClearanceCreateScopeTests" name="test_existing_term_amount_and_contract_service_gates" time="1.540"><failure message="django.db.utils.IntegrityError: new row for relation &quot;contracts_contracttermversion&quot; violates check constraint &quot;contract_term_approval_state&quot;&#10;DETAIL:  Failing row contains (f6365c2a-14a1-48af-8909-b9ac52a3cda4, 2026-10-22 00:05:07.71167+00, 2026-10-22 00:05:07.71167+00, 1, 2026-01-01, draft, 10.000000, 100.0000, gross, 0.000000, 0.0000, gross, 0.000000, 0.0000, gross, Disposable explicit approved release terms, 2026-10-22 00:05:07.71167+00, Disposable approved snapshot, 0001c5f7-9415-4eac-a15a-e767dbc5c250, b34986c9-e058-474c-ba64-3fc7bd4fe9ae, 548a0749-93b4-41e8-b7e4-fb91a1b0aa05, f9c0d67c-a2b8-4f3f-b869-9b1d0667a42b, null, 0, 100.0000, approved_clearance).">.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.CheckViolation: new row for relation "contracts_contracttermversion" violates check constraint "contract_term_approval_state"
+E   DETAIL:  Failing row contains (f6365c2a-14a1-48af-8909-b9ac52a3cda4, 2026-10-22 00:05:07.71167+00, 2026-10-22 00:05:07.71167+00, 1, 2026-01-01, draft, 10.000000, 100.0000, gross, 0.000000, 0.0000, gross, 0.000000, 0.0000, gross, Disposable explicit approved release terms, 2026-10-22 00:05:07.71167+00, Disposable approved snapshot, 0001c5f7-9415-4eac-a15a-e767dbc5c250, b34986c9-e058-474c-ba64-3fc7bd4fe9ae, 548a0749-93b4-41e8-b7e4-fb91a1b0aa05, f9c0d67c-a2b8-4f3f-b869-9b1d0667a42b, null, 0, 100.0000, approved_clearance).
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.IntegrityError: new row for relation "contracts_contracttermversion" violates check constraint "contract_term_approval_state"
+E   DETAIL:  Failing row contains (f6365c2a-14a1-48af-8909-b9ac52a3cda4, 2026-10-22 00:05:07.71167+00, 2026-10-22 00:05:07.71167+00, 1, 2026-01-01, draft, 10.000000, 100.0000, gross, 0.000000, 0.0000, gross, 0.000000, 0.0000, gross, Disposable explicit approved release terms, 2026-10-22 00:05:07.71167+00, Disposable approved snapshot, 0001c5f7-9415-4eac-a15a-e767dbc5c250, b34986c9-e058-474c-ba64-3fc7bd4fe9ae, 548a0749-93b4-41e8-b7e4-fb91a1b0aa05, f9c0d67c-a2b8-4f3f-b869-9b1d0667a42b, null, 0, 100.0000, approved_clearance).</failure><failure message="django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.">.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.CheckViolation: new row for relation "contracts_contracttermversion" violates check constraint "contract_term_approval_state"
+E   DETAIL:  Failing row contains (f6365c2a-14a1-48af-8909-b9ac52a3cda4, 2026-10-22 00:05:07.71167+00, 2026-10-22 00:05:07.71167+00, 1, 2026-01-01, draft, 10.000000, 100.0000, gross, 0.000000, 0.0000, gross, 0.000000, 0.0000, gross, Disposable explicit approved release terms, 2026-10-22 00:05:07.71167+00, Disposable approved snapshot, 0001c5f7-9415-4eac-a15a-e767dbc5c250, b34986c9-e058-474c-ba64-3fc7bd4fe9ae, 548a0749-93b4-41e8-b7e4-fb91a1b0aa05, f9c0d67c-a2b8-4f3f-b869-9b1d0667a42b, null, 0, 100.0000, approved_clearance).
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.IntegrityError: new row for relation "contracts_contracttermversion" violates check constraint "contract_term_approval_state"
+E   DETAIL:  Failing row contains (f6365c2a-14a1-48af-8909-b9ac52a3cda4, 2026-10-22 00:05:07.71167+00, 2026-10-22 00:05:07.71167+00, 1, 2026-01-01, draft, 10.000000, 100.0000, gross, 0.000000, 0.0000, gross, 0.000000, 0.0000, gross, Disposable explicit approved release terms, 2026-10-22 00:05:07.71167+00, Disposable approved snapshot, 0001c5f7-9415-4eac-a15a-e767dbc5c250, b34986c9-e058-474c-ba64-3fc7bd4fe9ae, 548a0749-93b4-41e8-b7e4-fb91a1b0aa05, f9c0d67c-a2b8-4f3f-b869-9b1d0667a42b, null, 0, 100.0000, approved_clearance).
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:99: in _execute
+    self.db.validate_no_broken_transaction()
+.venv\Lib\site-packages\django\db\backends\base\base.py:521: in validate_no_broken_transaction
+    raise TransactionManagementError(
+E   django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.</failure><failure message="django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.">.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.CheckViolation: new row for relation "contracts_contracttermversion" violates check constraint "contract_term_approval_state"
+E   DETAIL:  Failing row contains (f6365c2a-14a1-48af-8909-b9ac52a3cda4, 2026-10-22 00:05:07.71167+00, 2026-10-22 00:05:07.71167+00, 1, 2026-01-01, draft, 10.000000, 100.0000, gross, 0.000000, 0.0000, gross, 0.000000, 0.0000, gross, Disposable explicit approved release terms, 2026-10-22 00:05:07.71167+00, Disposable approved snapshot, 0001c5f7-9415-4eac-a15a-e767dbc5c250, b34986c9-e058-474c-ba64-3fc7bd4fe9ae, 548a0749-93b4-41e8-b7e4-fb91a1b0aa05, f9c0d67c-a2b8-4f3f-b869-9b1d0667a42b, null, 0, 100.0000, approved_clearance).
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.IntegrityError: new row for relation "contracts_contracttermversion" violates check constraint "contract_term_approval_state"
+E   DETAIL:  Failing row contains (f6365c2a-14a1-48af-8909-b9ac52a3cda4, 2026-10-22 00:05:07.71167+00, 2026-10-22 00:05:07.71167+00, 1, 2026-01-01, draft, 10.000000, 100.0000, gross, 0.000000, 0.0000, gross, 0.000000, 0.0000, gross, Disposable explicit approved release terms, 2026-10-22 00:05:07.71167+00, Disposable approved snapshot, 0001c5f7-9415-4eac-a15a-e767dbc5c250, b34986c9-e058-474c-ba64-3fc7bd4fe9ae, 548a0749-93b4-41e8-b7e4-fb91a1b0aa05, f9c0d67c-a2b8-4f3f-b869-9b1d0667a42b, null, 0, 100.0000, approved_clearance).
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:99: in _execute
+    self.db.validate_no_broken_transaction()
+.venv\Lib\site-packages\django\db\backends\base\base.py:521: in validate_no_broken_transaction
+    raise TransactionManagementError(
+E   django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:99: in _execute
+    self.db.validate_no_broken_transaction()
+.venv\Lib\site-packages\django\db\backends\base\base.py:521: in validate_no_broken_transaction
+    raise TransactionManagementError(
+E   django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.</failure><failure message="django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.">.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.CheckViolation: new row for relation "contracts_contracttermversion" violates check constraint "contract_term_approval_state"
+E   DETAIL:  Failing row contains (f6365c2a-14a1-48af-8909-b9ac52a3cda4, 2026-10-22 00:05:07.71167+00, 2026-10-22 00:05:07.71167+00, 1, 2026-01-01, draft, 10.000000, 100.0000, gross, 0.000000, 0.0000, gross, 0.000000, 0.0000, gross, Disposable explicit approved release terms, 2026-10-22 00:05:07.71167+00, Disposable approved snapshot, 0001c5f7-9415-4eac-a15a-e767dbc5c250, b34986c9-e058-474c-ba64-3fc7bd4fe9ae, 548a0749-93b4-41e8-b7e4-fb91a1b0aa05, f9c0d67c-a2b8-4f3f-b869-9b1d0667a42b, null, 0, 100.0000, approved_clearance).
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.IntegrityError: new row for relation "contracts_contracttermversion" violates check constraint "contract_term_approval_state"
+E   DETAIL:  Failing row contains (f6365c2a-14a1-48af-8909-b9ac52a3cda4, 2026-10-22 00:05:07.71167+00, 2026-10-22 00:05:07.71167+00, 1, 2026-01-01, draft, 10.000000, 100.0000, gross, 0.000000, 0.0000, gross, 0.000000, 0.0000, gross, Disposable explicit approved release terms, 2026-10-22 00:05:07.71167+00, Disposable approved snapshot, 0001c5f7-9415-4eac-a15a-e767dbc5c250, b34986c9-e058-474c-ba64-3fc7bd4fe9ae, 548a0749-93b4-41e8-b7e4-fb91a1b0aa05, f9c0d67c-a2b8-4f3f-b869-9b1d0667a42b, null, 0, 100.0000, approved_clearance).
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:99: in _execute
+    self.db.validate_no_broken_transaction()
+.venv\Lib\site-packages\django\db\backends\base\base.py:521: in validate_no_broken_transaction
+    raise TransactionManagementError(
+E   django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:99: in _execute
+    self.db.validate_no_broken_transaction()
+.venv\Lib\site-packages\django\db\backends\base\base.py:521: in validate_no_broken_transaction
+    raise TransactionManagementError(
+E   django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:99: in _execute
+    self.db.validate_no_broken_transaction()
+.venv\Lib\site-packages\django\db\backends\base\base.py:521: in validate_no_broken_transaction
+    raise TransactionManagementError(
+E   django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.</failure><failure message="django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.">.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.CheckViolation: new row for relation "contracts_contracttermversion" violates check constraint "contract_term_approval_state"
+E   DETAIL:  Failing row contains (f6365c2a-14a1-48af-8909-b9ac52a3cda4, 2026-10-22 00:05:07.71167+00, 2026-10-22 00:05:07.71167+00, 1, 2026-01-01, draft, 10.000000, 100.0000, gross, 0.000000, 0.0000, gross, 0.000000, 0.0000, gross, Disposable explicit approved release terms, 2026-10-22 00:05:07.71167+00, Disposable approved snapshot, 0001c5f7-9415-4eac-a15a-e767dbc5c250, b34986c9-e058-474c-ba64-3fc7bd4fe9ae, 548a0749-93b4-41e8-b7e4-fb91a1b0aa05, f9c0d67c-a2b8-4f3f-b869-9b1d0667a42b, null, 0, 100.0000, approved_clearance).
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.IntegrityError: new row for relation "contracts_contracttermversion" violates check constraint "contract_term_approval_state"
+E   DETAIL:  Failing row contains (f6365c2a-14a1-48af-8909-b9ac52a3cda4, 2026-10-22 00:05:07.71167+00, 2026-10-22 00:05:07.71167+00, 1, 2026-01-01, draft, 10.000000, 100.0000, gross, 0.000000, 0.0000, gross, 0.000000, 0.0000, gross, Disposable explicit approved release terms, 2026-10-22 00:05:07.71167+00, Disposable approved snapshot, 0001c5f7-9415-4eac-a15a-e767dbc5c250, b34986c9-e058-474c-ba64-3fc7bd4fe9ae, 548a0749-93b4-41e8-b7e4-fb91a1b0aa05, f9c0d67c-a2b8-4f3f-b869-9b1d0667a42b, null, 0, 100.0000, approved_clearance).
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:99: in _execute
+    self.db.validate_no_broken_transaction()
+.venv\Lib\site-packages\django\db\backends\base\base.py:521: in validate_no_broken_transaction
+    raise TransactionManagementError(
+E   django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:99: in _execute
+    self.db.validate_no_broken_transaction()
+.venv\Lib\site-packages\django\db\backends\base\base.py:521: in validate_no_broken_transaction
+    raise TransactionManagementError(
+E   django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:416: in test_existing_term_amount_and_contract_service_gates
+    ContractTermVersion.objects.filter(pk=term.pk).update(**attrs)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:99: in _execute
+    self.db.validate_no_broken_transaction()
+.venv\Lib\site-packages\django\db\backends\base\base.py:521: in validate_no_broken_transaction
+    raise TransactionManagementError(
+E   django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.
+
+The above exception was the direct cause of the following exception:
+tests\test_uiux_f111_pattern_clearance_scope.py:421: in test_existing_term_amount_and_contract_service_gates
+    self.service(amount=Decimal(101))
+tests\test_uiux_f111_pattern_clearance_scope.py:369: in service
+    return create_retention_release(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\commercial_services.py:712: in create_retention_release
+    locked_contract = _locked_contract(organization=organization, contract=contract)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\commercial_services.py:88: in _locked_contract
+    .get(pk=contract.pk, organization=organization, deleted_at__isnull=True)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:631: in get
+    num = len(clone)
+          ^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:368: in __len__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:99: in _execute
+    self.db.validate_no_broken_transaction()
+.venv\Lib\site-packages\django\db\backends\base\base.py:521: in validate_no_broken_transaction
+    raise TransactionManagementError(
+E   django.db.transaction.TransactionManagementError: An error occurred in the current transaction. You can't execute queries until the end of the 'atomic' block.</failure></testcase><testcase classname="tests.test_uiux_f111_pattern_clearance_scope.ClearanceCreateScopeTests" name="test_forced_same_tenant_and_cross_tenant_post_rejected_without_leak_or_write" time="7.675" /><testcase classname="tests.test_uiux_f111_pattern_clearance_scope.ClearanceCreateScopeTests" name="test_inactive_context_and_capability_absence_deny_http" time="0.221" /><testcase classname="tests.test_uiux_f111_pattern_clearance_scope.ClearanceCreateScopeTests" name="test_limited_actor_with_view_capability_has_no_clearances_in_form_or_get" time="1.251" /><testcase classname="tests.test_uiux_f111_pattern_clearance_scope.ClearanceCreateScopeTests" name="test_missing_required_field_and_service_rejection_redisplay_stay_scoped" time="1.457"><failure message="AssertionError: [] is not true">tests\test_uiux_f111_pattern_clearance_scope.py:355: in test_missing_required_field_and_service_rejection_redisplay_stay_scoped
+    self.assertTrue(response.context["form"].non_field_errors())
+E   AssertionError: [] is not true</failure></testcase><testcase classname="tests.test_uiux_f111_pattern_clearance_scope.ClearanceCreateScopeTests" name="test_missing_wrong_tenant_and_mismatched_contexts_fail_closed" time="0.018" /><testcase classname="tests.test_uiux_f111_pattern_clearance_scope.ClearanceCreateScopeTests" name="test_organization_http_success_uses_approved_terms_and_retained_capacity" time="1.102" /><testcase classname="tests.test_uiux_f111_pattern_clearance_scope.ClearanceCreateScopeTests" name="test_organization_view_positive_preserves_kind_approval_and_tenant_filters" time="2.708" /><testcase classname="tests.test_uiux_f111_pattern_clearance_scope.ClearanceCreateScopeTests" name="test_organization_without_view_permission_has_empty_choices" time="1.839" /><testcase classname="tests.test_uiux_f111_pattern_clearance_scope.ClearanceCreateScopeTests" name="test_writer_reader_separation_and_correction_behavior_unchanged" time="1.005" /></testsuite></testsuites>

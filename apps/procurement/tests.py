@@ -73,6 +73,15 @@ class ProcurementFixtureMixin:
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
+        # Legacy role strings alone grant no access in Development fixtures.
+        from apps.organizations.models import (
+            OrganizationSettings,
+        )
+
+        for organization in (self.organization, self.other_organization):
+            OrganizationSettings.objects.get_or_create(organization=organization)
+            for membership in organization.memberships.all():
+                self.establish_test_membership_authority(membership)
         self.project = Project.objects.create(
             organization=self.organization, code="PROC", name="Procurement Project"
         )
@@ -126,6 +135,40 @@ class ProcurementFixtureMixin:
             organization=self.other_organization,
             party=self.other_supplier,
             role=PartyRoleType.SUPPLIER,
+        )
+
+    def establish_test_membership_authority(self, membership):
+        from apps.organizations.models import (
+            MembershipRoleAssignment,
+            MembershipScopeGrant,
+            OrganizationRole,
+        )
+
+        role_definition = OrganizationRole.objects.get(
+            organization=None, code=membership.role
+        )
+        membership.role_definition = role_definition
+        membership.authorization_migrated_at = timezone.now()
+        membership.save(update_fields=["role_definition", "authorization_migrated_at"])
+        MembershipRoleAssignment.objects.get_or_create(
+            organization=membership.organization,
+            membership=membership,
+            role=role_definition,
+            revoked_at__isnull=True,
+            defaults={
+                "reason": "Explicit Procurement test role",
+                "source": "test_fixture",
+            },
+        )
+        MembershipScopeGrant.objects.get_or_create(
+            organization=membership.organization,
+            membership=membership,
+            scope_type="organization",
+            revoked_at__isnull=True,
+            defaults={
+                "reason": "Explicit Procurement test scope",
+                "source": "test_fixture",
+            },
         )
 
     def create_approved_request(

@@ -1,0 +1,128 @@
+{
+  "focused": {
+    "tests": 9,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "failed_cases": [],
+    "pytest_summary": "9 passed in 71.12s (0:01:11)"
+  },
+  "affected": {
+    "tests": 56,
+    "failures": 27,
+    "errors": 0,
+    "skipped": 0,
+    "failed_cases": [
+      {
+        "test": "apps.procurement.test_rfq_close.RFQCloseManifestTests.test_close_permission_is_intersected_with_project_scope",
+        "message": "django.db.utils.IntegrityError: duplicate key value violates unique constraint \"membership_one_unrevoked_role\"\nDETAIL:  Key (membership_id, role_id)=(1ad9caba-6e7e-4632-bebb-d8b12bdf1149, 362add8a-8795-409d-bcd4-f9c647788851) already exists."
+      },
+      {
+        "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_approve_requires_policy_independent_permission_and_keeps_approved_immutable",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_correction_supersedes_without_mutating_decision",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_cross_tenant_and_missing_prerequisite_fail_closed",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_policy_can_explicitly_allow_self_approval",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_policy_controls_self_approval_and_withdrawal_blocks_approval",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_prepare_requires_open_confidential_scope_and_retains_exact_evidence",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_reason_catalog_and_access_fail_closed",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_revoked_confidential_access_blocks_preparation",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s11_comparison_award.P5S11ComparisonAwardTests.test_no_award_is_explicit_has_no_allocations_and_does_not_mutate_downstream",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s11_comparison_award.P5S11SelfFinalizationPolicyTests.test_tenant_policy_explicitly_allows_s11_comparison_and_award_self_finalization",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_award_is_sourcing_only_conserves_quantity_and_self_finalization_is_policy_gated",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_conflict_cannot_self_clear_and_blocks_evaluation_until_disposed",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_exception_closed_catalogue_and_independent_lifecycle",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_reproducible_asserted_input_lineage_and_immutable_finalization",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_split_award_is_explicit_and_allocation_inputs_are_governing",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_tie_requires_explicit_resolution_and_split_award_retains_exact_revisions",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_authorized_action_forms_render_without_mutating_sources",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0628\u0633\u062a\u0646 \u062b\u0628\u062a\u06cc \u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_comparison_award_flow_preserves_separation_history_and_no_downstream",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0628\u0633\u062a\u0646 \u062b\u0628\u062a\u06cc \u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_conflict_blocks_evaluation_and_requires_independent_disposition",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0628\u0633\u062a\u0646 \u062b\u0628\u062a\u06cc \u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_explicit_no_award_and_cross_comparison_allocation_rejection",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0628\u0633\u062a\u0646 \u062b\u0628\u062a\u06cc \u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_opening_and_admissibility_actions_retain_independent_decisions",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0628\u0633\u062a\u0646 \u062b\u0628\u062a\u06cc \u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_permission_tenant_csrf_and_get_do_not_mutate",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0628\u0633\u062a\u0646 \u062b\u0628\u062a\u06cc \u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_quote_capture_submit_withdraw_retry_and_foreign_rfq_rejected",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0628\u0633\u062a\u0646 \u062b\u0628\u062a\u06cc \u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_revoked_confidential_grant_hides_values_and_rejects_assertions",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0628\u0633\u062a\u0646 \u062b\u0628\u062a\u06cc \u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityConcurrencyTests.test_concurrent_approval_creates_one_decision",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      },
+      {
+        "test": "apps.procurement.test_p5_s11_comparison_award.P5S11ConcurrencyTests.test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity",
+        "message": "django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f."
+      }
+    ],
+    "pytest_summary": "27 failed, 25 passed, 4 subtests passed in 158.81s (0:02:38)"
+  }
+}
+Evidence reconciled; Wave C blocked; STOP.

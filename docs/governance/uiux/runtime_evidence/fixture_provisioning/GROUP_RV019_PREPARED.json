@@ -1,0 +1,68 @@
+{
+  "status": "PARTIAL_DATA_READY_P04_ROLE_GAP",
+  "records": [
+    {
+      "model": "equipment.Equipment",
+      "id": "aa70efc4-34eb-4624-a51d-8e035c2dec1c",
+      "created": false,
+      "canonical_path": "Existing canonical Development seed",
+      "organization": "demo-construction-01",
+      "status": "assigned"
+    },
+    {
+      "model": "equipment.EquipmentAssignment",
+      "id": "4856f302-4027-4c49-8996-c749f273c24c",
+      "created": false,
+      "canonical_path": "Existing canonical Development seed",
+      "organization": "demo-construction-01",
+      "status": "active"
+    },
+    {
+      "model": "equipment.EquipmentMeter",
+      "id": "69be31ae-a971-40ed-8c5c-e86c66e76eca",
+      "created": true,
+      "canonical_path": "EquipmentMeter.full_clean/save + canonical permission check + audit",
+      "organization": "demo-construction-01",
+      "status": null
+    },
+    {
+      "model": "equipment.MeterReading",
+      "id": "72087ad9-2305-4d50-baff-d70556147aca",
+      "created": true,
+      "canonical_path": "apps.equipment.p8_services.record_meter_reading",
+      "organization": "demo-construction-01",
+      "status": null
+    },
+    {
+      "model": "equipment.EquipmentUsageLog",
+      "id": "fb2254b0-a70b-4348-8d39-2e20c6e9f6eb",
+      "created": true,
+      "canonical_path": "apps.equipment.p8_services.record_usage",
+      "organization": "demo-construction-01",
+      "status": null
+    },
+    {
+      "model": "equipment.MaintenancePlan",
+      "id": "a259dbdf-7a33-4593-9ac8-36c4beaf3a8d",
+      "created": true,
+      "canonical_path": "apps.equipment.p8_services.create_maintenance_plan",
+      "organization": "demo-construction-01",
+      "status": null
+    },
+    {
+      "model": "equipment.EquipmentWorkOrder",
+      "id": "03d97bff-bc31-4d88-9fd3-905217a7de65",
+      "created": true,
+      "canonical_path": "apps.equipment.p8_services.create_work_order",
+      "organization": "demo-construction-01",
+      "status": "draft"
+    }
+  ],
+  "actor": "uiux.persona.project-manager",
+  "actor_capacity": "Actual Project Manager on authorized deployment; not P04 substitution",
+  "remaining": [
+    "P04 bounded canonical fleet role absent",
+    "No approved workforce qualification linked; no inferred operator identity",
+    "No approved equipment cost policy/rate; no invented cost policy or allocations"
+  ]
+}

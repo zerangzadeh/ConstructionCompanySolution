@@ -1,0 +1,25 @@
+[
+  {
+    "id": "PD-WD-022",
+    "classification": "PRODUCT_DECISION_REQUIRED",
+    "scenario": "RV-022",
+    "finding": "UIUX-F-048",
+    "surface": "/workflows/administration/versions/521eb6af-b641-4c39-9024-c60c1ed2fda0/",
+    "observed": "Step names appear alongside raw keys/types. Transitions require reading legacy_approval -> approved / start -> legacy_approval and machine outcome codes. JSON is already in a keyboard-operable disclosure.",
+    "canonical_gap": "The matrix asks to assess process comprehension and visual representation need. F-048 recommends a visual model, but is a finding/recommendation, not an approved choice of the primary administrative information hierarchy. The generic UI guidelines do not select between a business process review view and a technical configuration review view for this administrator surface.",
+    "exact_human_question": "Which should be the primary Workflow version review view: a business-labelled process overview with technical configuration in a disclosure, or technical configuration for administrators?",
+    "options": [
+      {
+        "choice": "Business-labelled overview first",
+        "impact": "Requires bounded presentation design/remediation and a runtime retest; preserve the registered declarative model, routes and lifecycle services."
+      },
+      {
+        "choice": "Technical configuration primary",
+        "impact": "Requires explicit product disposition of F-048 and its comprehension expectations; does not itself prove usability PASS or accept security/business risk."
+      }
+    ],
+    "other_scenarios_can_continue": true,
+    "wave_e_semantic_dependency": "No direct target dependency: RV-025 does not designate this Workflow detail as a representative surface. Wave E is nevertheless gated off by separate RV-016/RV-021 fixture blockers.",
+    "status": "PENDING_HUMAN_RESPONSE; no decision inferred"
+  }
+]

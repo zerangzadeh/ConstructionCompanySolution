@@ -1,0 +1,104 @@
+schema_version: '1.0'
+record:
+  evidence_id: RV-EV-020
+  scenario_id: RV-023
+  wave: A
+  target: Pagination and date-filter accessibility
+  executed_at: '2026-10-21T22:49:10.324000+03:30'
+  runtime:
+    environment_name: Development
+    base_url: http://127.0.0.1:8001
+    git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+    browser: Microsoft Edge (isolated real headless browser)
+    browser_version: 155.0.4283.62
+    viewport:
+    - width: 390
+      height: 844
+    - width: 1440
+      height: 900
+    device_scale_factor: 1
+  persona:
+    persona_id: P-01
+    test_user_alias: uiux.audit.project
+    organization_alias: demo-construction-01
+    project_context_alias: Exact fields/session in linked observations; authority in BEFORE snapshot
+    site_context_alias: null
+    effective_permission_bundle_reference: diagnostics/TARGETED_RUNTIME_BEFORE.json#identities
+  preconditions:
+  - Frozen baseline and Development verified; provisioning authorization and 514 model digests match.
+  - Same retained actual identities; no role/fixture changes.
+  steps:
+  - page-one
+  - page-two
+  - filtered-page-one
+  - project-filter-page-one
+  - filtered-next-keyboard
+  - filtered-sorted-page-one
+  - sorted-next
+  - cleared-filters
+  - pagination-mobile
+  - styled-page-one
+  - styled-page-two
+  - styled-filter-sort-one
+  - styled-filter-sort-two
+  - styled-clear-filter
+  - styled-mobile
+  - styled-pagination-focused
+  expected_result:
+  - Scoped choices/context, preserved query/business dimensions, accessible task guidance.
+  actual_result:
+  - Browser pages contain 25/5 rows. Filter, ascending report-date sort and aria-sort survive next/previous. Clear
+    empties filters and retains sort. Keyboard activation works; styled mobile has no page-level overflow. Pagination
+    subset PASS. Indistinguishable date-range labels remain. F085 not reproduced on this route.
+  accessibility:
+    keyboard_only: false
+    focus_visible: Representative focus samples in diagnostics; no assistive-technology certification
+    landmarks_ok: true
+    labels_ok: false
+    notes: Styled replacements govern visual claims. Early unstyled layout evidence excluded.
+  responsive:
+    desktop: true
+    tablet_or_narrow: false
+    mobile: true
+    notes: Representative viewports only.
+  authorization:
+    ui_visibility_observed: true
+    server_authorization_verified_when_applicable: false
+    cross_tenant_leakage_observed: false
+    object_scope_leakage_observed: false
+    unauthorized_access_observed: false
+    notes: Selector metadata leak; unauthorized write/direct-object bypass not proved. No business POST submitted.
+  result: FAIL_ACCESSIBILITY
+  previous_status: 'BLOCKED_TEST_DATA: 9 rows'
+  existing_finding_ids:
+  - UIUX-F-085
+  - UIUX-F-110
+  new_finding_ids: []
+  needs_domain_review: false
+  screenshots:
+  - screenshots/RV-EV-020__styled-page-one__1440x900.png
+  - screenshots/RV-EV-020__styled-page-two__1440x900.png
+  - screenshots/RV-EV-020__styled-filter-sort-one__1440x900.png
+  - screenshots/RV-EV-020__styled-filter-sort-two__1440x900.png
+  - screenshots/RV-EV-020__styled-clear-filter__1440x900.png
+  - screenshots/RV-EV-020__styled-mobile__390x844.png
+  - screenshots/RV-EV-020__styled-pagination-focused__1440x900.png
+  excluded_visual_captures:
+  - screenshots/RV-EV-020__page-one__1440x900.png
+  - screenshots/RV-EV-020__page-two__1440x900.png
+  - screenshots/RV-EV-020__filtered-page-one__1440x900.png
+  - screenshots/RV-EV-020__project-filter-page-one__1440x900.png
+  - screenshots/RV-EV-020__filtered-next-keyboard__1440x900.png
+  - screenshots/RV-EV-020__filtered-sorted-page-one__1440x900.png
+  - screenshots/RV-EV-020__sorted-next__1440x900.png
+  - screenshots/RV-EV-020__cleared-filters__1440x900.png
+  - screenshots/RV-EV-020__pagination-mobile__390x844.png
+  network_or_console_evidence:
+  - diagnostics/TARGETED_RUNTIME_BROWSER_OBSERVATIONS.json
+  - diagnostics/TARGETED_RUNTIME_CAPTURE_EXCEPTION.json
+  mutation_performed: true
+  mutation_record_or_cleanup: Authentication/session bookkeeping and governed context selection only. No business/admin
+    write, fixture/authority change or cleanup.
+  coverage_limits:
+  - Separate bounded-pagination static finding retained; no global reclassification.
+  notes: Original Wave A history preserved; initial unstyled/transient captures are not final visual conclusions.

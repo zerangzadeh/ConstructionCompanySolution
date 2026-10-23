@@ -1,0 +1,12 @@
+criterion,requirement,result,evidence,limitation
+AC1,Approved target runtime outcome,PARTIAL,RUNTIME_SUMMARY.json; SCENARIO_RECONCILIATION.csv,Required source/fixture and unexecuted state gaps remain
+AC2,Exact scenario environment and version,PASS,ENTRY.json; SOURCE_MANIFEST.json; RUNTIME_IDENTITIES.json; retained EXT0024_MATRIX.json,Provider PID binding inferred; CSS emulation not physical devices
+AC3,Actual complete scenario execution rather than inference,PARTIAL,RUNTIME_RESULTS.json; retained REENTRY03 actual results,Actual cells proved; missing qualified states never inferred
+AC4,Measured timestamped artifacts with explicit outcomes,PASS,RUNTIME_RESULTS.json; CEP-078_EVIDENCE_MANIFEST.csv,Original FAIL/UTV and new actual rechecks retained
+AC5,Failed required scenarios stay evidence gaps,PASS,FINDINGS.md; CEP-078_COMPLETION_REPORT.md,Actual supersession only; no waiver
+AC6,UTV persists until executed,PASS,SCENARIO_RECONCILIATION.csv; VARIANT_PREFLIGHT.json,Full remaining approved dimensions explicit
+DoD1,Exact target outcome within approved scope,PARTIAL,CEP-078_COMPLETION_REPORT.md,No complete outcome while required gaps remain
+DoD2,Environment and scenario documented,PASS,CEP-078_EXECUTION_MANIFEST.md; SOURCE_MANIFEST.json,Retained approved matrix unchanged
+DoD3,Execution procedure prepared,PASS,CEP-078_EXECUTION_MANIFEST.md; retained browser_procedure.mjs,Current actual calls measured in RUNTIME_RESULTS.json
+DoD4,Explicit evidence and result format,PASS,RUNTIME_RESULTS.json; CEP-078_EVIDENCE_MANIFEST.csv,Bounded evidence identities and hashes
+DoD5,Actual complete scoped execution evidence,PARTIAL,RUNTIME_SUMMARY.json; SCENARIO_RECONCILIATION.csv,Preparation/partial actual evidence does not complete DoD

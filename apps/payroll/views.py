@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.audit.models import AuditEvent
@@ -186,11 +187,13 @@ def workbench(request: HttpRequest) -> HttpResponse:
         run_id__in=run_ids,
         is_resolved=False,
     ).select_related("run", "run_employee", "run_employee__employee")[:30]
+    visible_runs = list(runs)
     return render(
         request,
         "payroll/workbench.html",
         {
-            "runs": runs,
+            "runs": visible_runs,
+            "journey_run": visible_runs[0] if len(visible_runs) == 1 else None,
             "results": results[:40],
             "exceptions": exceptions,
             "periods": PayrollPeriod.objects.filter(organization=request.organization)[
@@ -239,9 +242,13 @@ def configuration(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.PAYROLL_CONFIGURATION_MANAGE)
 def employment_configuration_create(request: HttpRequest) -> HttpResponse:
     form = EmploymentConfigurationForm(
-        request.POST or None, organization=request.organization
+        request.POST or None, organization=request.organization, actor=request.user
     )
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and "_refresh_context" not in request.POST
+        and form.is_valid()
+    ):
         data = form.cleaned_data.copy()
         data["evidence"] = data.pop("evidence_json")
         try:
@@ -309,8 +316,14 @@ def component_create(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.PAYROLL_CONFIGURATION_MANAGE)
 def rule_create(request: HttpRequest) -> HttpResponse:
-    form = RuleForm(request.POST or None, organization=request.organization)
-    if request.method == "POST" and form.is_valid():
+    form = RuleForm(
+        request.POST or None, organization=request.organization, actor=request.user
+    )
+    if (
+        request.method == "POST"
+        and "_refresh_context" not in request.POST
+        and form.is_valid()
+    ):
         data = form.cleaned_data.copy()
         data["evidence"] = data.pop("evidence_json")
         try:
@@ -427,27 +440,32 @@ def run_detail(request: HttpRequest, run_id) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.PAYROLL_PREPARE)
 def input_create(request: HttpRequest, run_id) -> HttpResponse:
     run = get_object_or_404(PayrollRun, pk=run_id, organization=request.organization)
-    form = InputForm(request.POST or None, organization=request.organization, run=run)
+    form = InputForm(
+        request.POST or None,
+        organization=request.organization,
+        run=run,
+        actor=request.user,
+    )
     if request.method == "POST" and form.is_valid():
-        data = form.cleaned_data.copy()
-        data["source_payload"] = data.pop("source_payload_json")
+        from .timesheet_inputs import record_timesheet_input
+
         try:
-            services.record_input(
+            record_timesheet_input(
                 organization=request.organization,
                 actor=request.user,
                 run=run,
-                **data,
+                **form.cleaned_data,
             )
         except (ValidationError, PermissionDenied) as exc:
             form.add_error(None, _error_message(exc))
         else:
-            messages.success(request, "ورودی صریح حقوق ثبت شد.")
+            messages.success(request, "ورودی کارکرد تأییدشده ثبت شد.")
             return redirect("payroll:run_detail", run_id=run.pk)
     return _form_page(
         request,
         form=form,
         title="ورودی حقوق",
-        description="فقط منبع صریح با وضعیت تأیید یا قطعی و snapshot کامل پذیرفته می‌شود.",
+        description="کارکرد تأییدشده و قاعده دارای نگاشت واحد را انتخاب کنید؛ شواهد منبع را سامانه ثبت می‌کند.",
     )
 
 
@@ -606,9 +624,13 @@ def payslip_export(request: HttpRequest, payslip_id) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.PAYROLL_AUDIT_VIEW)
 @require_GET
 def audit_history(request: HttpRequest) -> HttpResponse:
-    events = AuditEvent.objects.filter(
-        organization=request.organization, action__startswith="payroll."
-    ).exclude(action__startswith="payroll.statutory_").select_related("actor")[:100]
+    events = (
+        AuditEvent.objects.filter(
+            organization=request.organization, action__startswith="payroll."
+        )
+        .exclude(action__startswith="payroll.statutory_")
+        .select_related("actor")[:100]
+    )
     return render(request, "payroll/audit_history.html", {"events": events})
 
 
@@ -642,6 +664,8 @@ def statutory_policies(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @require_GET
 def statutory_workbench(request: HttpRequest) -> HttpResponse:
+    from .readiness import statutory_prerequisites
+
     _require_any_statutory_permission(request)
     visible_run_ids = _scoped_results(request).values_list("run_id", flat=True)
     calculations = (
@@ -664,7 +688,11 @@ def statutory_workbench(request: HttpRequest) -> HttpResponse:
     return render(
         request,
         "payroll/statutory_workbench.html",
-        {"calculations": calculations, "outputs": outputs},
+        {
+            "calculations": calculations,
+            "outputs": outputs,
+            "prerequisites": statutory_prerequisites(on_date=timezone.localdate()),
+        },
     )
 
 

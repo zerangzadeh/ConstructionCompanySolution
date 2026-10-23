@@ -1,0 +1,279 @@
+FFFFFFFFFFFFFFF                                                          [100%]
+================================== FAILURES ===================================
+_ ProcurementModelTests.test_issued_order_and_posted_receipt_details_are_immutable _
+apps\procurement\tests.py:255: in test_issued_order_and_posted_receipt_details_are_immutable
+    order, order_item = self.create_issued_order()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ProcurementServiceTests.test_order_amount_is_decimal_and_request_cannot_be_over_ordered _
+apps\procurement\tests.py:416: in test_order_amount_is_decimal_and_request_cannot_be_over_ordered
+    request, request_item = self.create_approved_request(Decimal(5))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ProcurementServiceTests.test_purchase_order_requires_approved_request_and_supplier_role _
+apps\procurement\tests.py:381: in test_purchase_order_requires_approved_request_and_supplier_role
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_____ ProcurementServiceTests.test_reads_and_mutations_are_tenant_scoped ______
+apps\procurement\tests.py:550: in test_reads_and_mutations_are_tenant_scoped
+    request, _ = self.create_approved_request()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ProcurementServiceTests.test_receipt_cannot_exceed_order_and_void_reopens_order _
+apps\procurement\tests.py:495: in test_receipt_cannot_exceed_order_and_void_reopens_order
+    order, order_item = self.create_issued_order(Decimal(5))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ProcurementServiceTests.test_receipts_complete_order_without_creating_inventory _
+apps\procurement\tests.py:449: in test_receipts_complete_order_without_creating_inventory
+    order, order_item = self.create_issued_order()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+___ ProcurementServiceTests.test_rejection_requires_reason_and_is_terminal ____
+apps\procurement\tests.py:338: in test_rejection_requires_reason_and_is_terminal
+    request, _ = self.create_approved_request()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ProcurementServiceTests.test_request_workflow_is_role_controlled_and_audited _
+apps\procurement\tests.py:292: in test_request_workflow_is_role_controlled_and_audited
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_____ ProcurementPanelTests.test_owner_can_open_scoped_procurement_pages ______
+apps\procurement\tests.py:619: in test_owner_can_open_scoped_procurement_pages
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S12S17SourceToPayTests.test_invoice_approval_and_exact_three_way_match_are_independent _
+apps\procurement\test_p5_s12_s17_source_to_pay.py:228: in test_invoice_approval_and_exact_three_way_match_are_independent
+    order, item = self.create_issued_order(quantity=Decimal("5.0000"))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S12S17SourceToPayTests.test_issue_versions_order_and_independent_change_supersedes _
+apps\procurement\test_p5_s12_s17_source_to_pay.py:141: in test_issue_versions_order_and_independent_change_supersedes
+    order, _ = self.create_issued_order()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S12S17SourceToPayTests.test_missing_policy_and_cross_tenant_invoice_fail_closed _
+apps\procurement\test_p5_s12_s17_source_to_pay.py:250: in test_missing_policy_and_cross_tenant_invoice_fail_closed
+    order, _ = self.create_issued_order()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S12S17SourceToPayTests.test_service_acceptance_is_version_pinned_and_conserved _
+apps\procurement\test_p5_s12_s17_source_to_pay.py:180: in test_service_acceptance_is_version_pinned_and_conserved
+    order, _ = self.create_issued_order(quantity=Decimal("5.0000"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S12S17SourceToPayTests.test_tolerance_classifies_but_charges_and_overbilling_block _
+apps\procurement\test_p5_s12_s17_source_to_pay.py:286: in test_tolerance_classifies_but_charges_and_overbilling_block
+    order, item = self.create_issued_order(quantity=Decimal("10.0000"))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S12AwardConsumptionTests.test_final_award_requires_explicit_conserved_po_consumption _
+apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:56: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:121: in _closed_revision
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+=========================== short test summary info ===========================
+FAILED apps/procurement/tests.py::ProcurementModelTests::test_issued_order_and_posted_receipt_details_are_immutable
+FAILED apps/procurement/tests.py::ProcurementServiceTests::test_order_amount_is_decimal_and_request_cannot_be_over_ordered
+FAILED apps/procurement/tests.py::ProcurementServiceTests::test_purchase_order_requires_approved_request_and_supplier_role
+FAILED apps/procurement/tests.py::ProcurementServiceTests::test_reads_and_mutations_are_tenant_scoped
+FAILED apps/procurement/tests.py::ProcurementServiceTests::test_receipt_cannot_exceed_order_and_void_reopens_order
+FAILED apps/procurement/tests.py::ProcurementServiceTests::test_receipts_complete_order_without_creating_inventory
+FAILED apps/procurement/tests.py::ProcurementServiceTests::test_rejection_requires_reason_and_is_terminal
+FAILED apps/procurement/tests.py::ProcurementServiceTests::test_request_workflow_is_role_controlled_and_audited
+FAILED apps/procurement/tests.py::ProcurementPanelTests::test_owner_can_open_scoped_procurement_pages
+FAILED apps/procurement/test_p5_s12_s17_source_to_pay.py::P5S12S17SourceToPayTests::test_invoice_approval_and_exact_three_way_match_are_independent
+FAILED apps/procurement/test_p5_s12_s17_source_to_pay.py::P5S12S17SourceToPayTests::test_issue_versions_order_and_independent_change_supersedes
+FAILED apps/procurement/test_p5_s12_s17_source_to_pay.py::P5S12S17SourceToPayTests::test_missing_policy_and_cross_tenant_invoice_fail_closed
+FAILED apps/procurement/test_p5_s12_s17_source_to_pay.py::P5S12S17SourceToPayTests::test_service_acceptance_is_version_pinned_and_conserved
+FAILED apps/procurement/test_p5_s12_s17_source_to_pay.py::P5S12S17SourceToPayTests::test_tolerance_classifies_but_charges_and_overbilling_block
+FAILED apps/procurement/test_p5_s12_s17_source_to_pay.py::P5S12AwardConsumptionTests::test_final_award_requires_explicit_conserved_po_consumption
+15 failed in 8.18s

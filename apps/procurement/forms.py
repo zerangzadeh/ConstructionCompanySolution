@@ -2,6 +2,8 @@ from django import forms
 from django.utils import timezone
 
 from apps.materials.models import Material
+from apps.organizations.authorization import scope_queryset
+from apps.organizations.models import OrganizationMembership
 from apps.parties.models import BusinessParty, PartyRoleType
 from apps.procurement.models import (
     PurchaseOrder,
@@ -10,7 +12,7 @@ from apps.procurement.models import (
     PurchaseRequestItem,
 )
 from apps.projects.models import Project
-from core.forms import JalaliDateMixin
+from core.forms import JalaliDateMixin, attach_parent_choice_ui
 
 
 class _StyledForm(JalaliDateMixin, forms.Form):
@@ -38,10 +40,22 @@ class PurchaseRequestForm(_StyledForm):
         label="یادداشت‌ها", required=False, widget=forms.Textarea(attrs={"rows": 3})
     )
 
-    def __init__(self, *args: object, organization, **kwargs: object) -> None:
+    def __init__(
+        self,
+        *args: object,
+        organization,
+        membership: OrganizationMembership | None = None,
+        **kwargs: object,
+    ) -> None:
         super().__init__(*args, **kwargs)
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization, deleted_at__isnull=True
+        if not isinstance(membership, OrganizationMembership) or (
+            membership.organization_id != organization.pk
+        ):
+            return
+        self.fields["project"].queryset = scope_queryset(
+            Project.objects.filter(organization=organization, deleted_at__isnull=True),
+            membership=membership,
+            project_lookup="pk",
         ).order_by("name")
 
 
@@ -89,16 +103,33 @@ class PurchaseOrderForm(_StyledForm):
         label="یادداشت‌ها", required=False, widget=forms.Textarea(attrs={"rows": 3})
     )
 
-    def __init__(self, *args: object, organization, **kwargs: object) -> None:
+    def __init__(
+        self,
+        *args: object,
+        organization,
+        membership: OrganizationMembership | None = None,
+        **kwargs: object,
+    ) -> None:
         super().__init__(*args, **kwargs)
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization, deleted_at__isnull=True
+        if not isinstance(membership, OrganizationMembership) or (
+            membership.organization_id != organization.pk
+        ):
+            return
+        # PO services require project authority; a site grant cannot add its parent.
+        self.fields["project"].queryset = scope_queryset(
+            Project.objects.filter(organization=organization, deleted_at__isnull=True),
+            membership=membership,
+            project_lookup="pk",
         ).order_by("name")
         self.fields["purchase_request"].queryset = (
-            PurchaseRequest.objects.filter(
-                organization=organization,
-                status="approved",
-                project__deleted_at__isnull=True,
+            scope_queryset(
+                PurchaseRequest.objects.filter(
+                    organization=organization,
+                    status="approved",
+                    project__deleted_at__isnull=True,
+                ),
+                membership=membership,
+                project_lookup="project_id",
             )
             .select_related("project")
             .order_by("-created_at")
@@ -112,6 +143,8 @@ class PurchaseOrderForm(_StyledForm):
             .distinct()
             .order_by("display_name")
         )
+
+        attach_parent_choice_ui(self, "purchase_request", "project", "project_id")
 
     def clean(self):
         cleaned = super().clean()
@@ -175,13 +208,27 @@ class GoodsReceiptForm(_StyledForm):
         label="یادداشت‌ها", required=False, widget=forms.Textarea(attrs={"rows": 3})
     )
 
-    def __init__(self, *args: object, organization, **kwargs: object) -> None:
+    def __init__(
+        self,
+        *args: object,
+        organization,
+        membership: OrganizationMembership | None = None,
+        **kwargs: object,
+    ) -> None:
         super().__init__(*args, **kwargs)
+        if not isinstance(membership, OrganizationMembership) or (
+            membership.organization_id != organization.pk
+        ):
+            return
         self.fields["purchase_order"].queryset = (
-            PurchaseOrder.objects.filter(
-                organization=organization,
-                status="issued",
-                project__deleted_at__isnull=True,
+            scope_queryset(
+                PurchaseOrder.objects.filter(
+                    organization=organization,
+                    status="issued",
+                    project__deleted_at__isnull=True,
+                ),
+                membership=membership,
+                project_lookup="project_id",
             )
             .select_related("project", "supplier")
             .order_by("-order_date")
@@ -232,9 +279,9 @@ class SupplierPortalInvitationForm(_StyledForm):
 
 
 class SupplierPortalSubmissionForm(_StyledForm):
-    integrity_fingerprint = forms.CharField(
-        label="هش یکپارچگی SHA-256", min_length=64, max_length=64
-    )
+    upload = forms.FileField(label="اصل پیشنهاد (PDF یا DOCX)")
+    # Optional client comparison metadata; intentionally not rendered by the portal.
+    integrity_fingerprint = forms.CharField(required=False, widget=forms.HiddenInput())
     source_reference = forms.CharField(
         label="مرجع تأمین‌کننده", required=False, max_length=255
     )
@@ -242,12 +289,6 @@ class SupplierPortalSubmissionForm(_StyledForm):
         max_length=128,
         widget=forms.HiddenInput(),
     )
-
-    def clean_integrity_fingerprint(self):
-        value = self.cleaned_data["integrity_fingerprint"].strip().lower()
-        if len(value) != 64 or any(char not in "0123456789abcdef" for char in value):
-            raise forms.ValidationError("هش SHA-256 باید شامل ۶۴ نویسهٔ شانزدهی باشد.")
-        return value
 
 
 class SealedEvidenceUploadForm(_StyledForm):

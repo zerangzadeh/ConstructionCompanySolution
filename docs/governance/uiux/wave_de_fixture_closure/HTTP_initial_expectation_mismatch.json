@@ -1,0 +1,148 @@
+[
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/workforce/ess/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "explicit linked own subject and existing permissions",
+    "passed": true,
+    "final_path": "/workforce/ess/",
+    "body_sha256": "ebed17581b8d6c96e9d9e51ca401ab44993b085b3741a978db1664af4bdfa3db"
+  },
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/workforce/ess/profile/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "explicit linked own subject and existing permissions",
+    "passed": true,
+    "final_path": "/workforce/ess/profile/",
+    "body_sha256": "541e695db7705309a5095b0eaa1f0f9a3c41fa7e4db827ea25cd52e3ce68b340"
+  },
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/payroll/ess/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "explicit linked own subject and existing permissions",
+    "passed": true,
+    "final_path": "/payroll/ess/",
+    "body_sha256": "a380c46a4fa32c66395f5c16d8daa662ff12dd60cc86cbccf5e787d9992ecb1c"
+  },
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/payroll/ess/payslips/686e18b3-8d06-4e05-93bc-afe9bec64183/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "another employee finalized payslip unavailable",
+    "passed": true,
+    "final_path": "/payroll/ess/payslips/686e18b3-8d06-4e05-93bc-afe9bec64183/",
+    "body_sha256": "96c011f3d1e5aa1ac23d2cd12a377eb053982fa1977457c61e951dc20373f146"
+  },
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/workforce/ess/profile/b17e6726-c27e-4525-8d88-6db97dac8880/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "other worker / foreign tenant relationship unavailable",
+    "passed": true,
+    "final_path": "/workforce/ess/profile/b17e6726-c27e-4525-8d88-6db97dac8880/",
+    "body_sha256": "96c011f3d1e5aa1ac23d2cd12a377eb053982fa1977457c61e951dc20373f146"
+  },
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/workforce/ess/profile/227831d7-fca2-4d3e-99e1-c4a8250c08f1/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "other worker / foreign tenant relationship unavailable",
+    "passed": true,
+    "final_path": "/workforce/ess/profile/227831d7-fca2-4d3e-99e1-c4a8250c08f1/",
+    "body_sha256": "96c011f3d1e5aa1ac23d2cd12a377eb053982fa1977457c61e951dc20373f146"
+  },
+  {
+    "actor": "uiux.wavec.time",
+    "path": "/payroll/ess/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "case": "linked identity without payroll ESS permission remains denied",
+    "passed": true,
+    "final_path": "/payroll/ess/",
+    "body_sha256": "96c011f3d1e5aa1ac23d2cd12a377eb053982fa1977457c61e951dc20373f146"
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/workforce/ess/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "case": "unlinked identity remains denied",
+    "passed": true,
+    "final_path": "/workforce/ess/",
+    "body_sha256": "96c011f3d1e5aa1ac23d2cd12a377eb053982fa1977457c61e951dc20373f146"
+  },
+  {
+    "actor": "account.demo-construction-01.owner",
+    "path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "prepared publication article",
+    "passed": true,
+    "final_path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/",
+    "body_sha256": "41d522a495fcc89be306dd5aa951abe9b8e3984a389e5795128ab5700f2869ab"
+  },
+  {
+    "actor": "account.demo-construction-01.owner",
+    "path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/history/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "authorized source traceability",
+    "passed": true,
+    "final_path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/history/",
+    "body_sha256": "b76d3c44d1a95dd4add19b4a9d7005798e1f87dff8da6cb86b5b616111270fab"
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      200
+    ],
+    "case": "reader article without curator actions",
+    "passed": false,
+    "final_path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/",
+    "body_sha256": "8f1efce6ff1b755116928e677cf5f4b5edd9e199098f77d0e231c315832d87fb"
+  }
+]

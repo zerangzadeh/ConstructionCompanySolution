@@ -216,7 +216,7 @@ class P10S02S06AcceptanceTests(TestCase):
             ]
             self.assertTrue(all(value is None for value in metric_values))
 
-    def test_03_sixteen_permissions_are_default_denied(self) -> None:
+    def test_03_reporting_permissions_do_not_expand_owner_admin_defaults(self) -> None:
         self.assertEqual(len(METRIC_REPORTING_PERMISSIONS), 16)
         registered = {
             str(code)
@@ -225,11 +225,14 @@ class P10S02S06AcceptanceTests(TestCase):
             for code in resource.permissions
         }
         self.assertEqual(registered, REPORTING_PERMISSIONS)
-        for defaults in DEFAULT_ROLE_PERMISSIONS.values():
+        for defaults in (
+            DEFAULT_ROLE_PERMISSIONS[role] for role in ("tenant_owner", "tenant_admin")
+        ):
             self.assertFalse(METRIC_REPORTING_PERMISSIONS & defaults)
         self.assertFalse(
             OrganizationRole.objects.filter(
                 organization__isnull=True,
+                code__in=("tenant_owner", "tenant_admin"),
                 permissions__code__in=METRIC_REPORTING_PERMISSIONS,
             ).exists()
         )

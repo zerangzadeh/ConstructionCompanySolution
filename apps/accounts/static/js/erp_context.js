@@ -1,4 +1,22 @@
 (() => {
+    // Metadata is emitted only for choices already scoped by the server form.
+    document.querySelectorAll("select[data-local-parent]").forEach((select) => {
+        const parent = document.getElementById(select.dataset.localParent);
+        if (!parent || parent.form !== select.form) return;
+        const choices = [...select.options].map((option) => option.cloneNode(true));
+        const render = () => {
+            const previous = select.value;
+            select.replaceChildren(...choices.filter((option) =>
+                !option.value || (parent.value && option.dataset.parentValue === parent.value)
+            ).map((option) => option.cloneNode(true)));
+            select.value = [...select.options].some((option) => option.value === previous) ? previous : "";
+            select.disabled = !parent.value;
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+        };
+        parent.addEventListener("change", render);
+        render();
+    });
+
     const replaceOptions = (select, options, emptyLabel) => {
         const previous = select.value;
         select.replaceChildren(new Option(emptyLabel, ""));

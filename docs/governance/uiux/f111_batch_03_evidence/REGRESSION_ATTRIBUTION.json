@@ -1,0 +1,21 @@
+{
+  "classification": "BASELINE TEST DEBT",
+  "entry_replay": "Captured dirty-entry apps.billing.forms loaded in memory; no checkout replacement",
+  "failures": [
+    "apps.billing.test_payable_certificates.PayableCertificateConcurrencyTests.test_concurrent_duplicate_period_creates_only_one_certificate",
+    "apps.billing.test_payable_certificates.PayableCertificateTests.test_audit_failure_rolls_back_workflow_and_domain_decision",
+    "apps.billing.test_payable_certificates.PayableCertificateTests.test_cumulative_second_certificate_consumes_recovery_caps",
+    "apps.billing.test_payable_certificates.PayableCertificateTests.test_explicit_ap_and_non_operational_posting_handoffs",
+    "apps.billing.test_payable_certificates.PayableCertificateTests.test_linked_replacement_and_cancellation_preserve_history",
+    "apps.billing.test_payable_certificates.PayableCertificateTests.test_measurement_calculation_caps_back_charge_and_stable_line",
+    "apps.billing.test_payable_certificates.PayableCertificateTests.test_operational_ui_creates_measurement_and_certificate",
+    "apps.billing.test_payable_certificates.PayableCertificateTests.test_permission_tenant_isolation_and_rtl_ui",
+    "apps.billing.test_payable_certificates.PayableCertificateTests.test_recalculation_rejects_contract_ceiling_breach",
+    "apps.billing.test_payable_certificates.PayableCertificateTests.test_return_creates_linked_draft_revision",
+    "apps.billing.test_payable_certificates.PayableCertificateTests.test_workflow_candidacy_sod_immutability_and_audit"
+  ],
+  "identical_failure_attributes_and_tracebacks": 11,
+  "boundary": "Project creation in legacy fixture setup, before payable forms/views",
+  "attributable_regressions": 0,
+  "legacy_downstream_behavior": "UNVERIFIED_BY_BLOCKED_LEGACY_TESTS"
+}

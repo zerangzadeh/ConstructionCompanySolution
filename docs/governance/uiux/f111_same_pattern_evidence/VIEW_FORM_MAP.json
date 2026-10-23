@@ -1,0 +1,2347 @@
+[
+  {
+    "module": "procurement",
+    "view": "supplier_portal_context",
+    "line": 168,
+    "end": 184,
+    "decorators": [
+      "login_required",
+      "never_cache",
+      "require_GET"
+    ],
+    "forms": [
+      "SupplierPortalSubmissionForm(initial={'idempotency_key': str(uuid4())})"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "supplier_portal_submit",
+    "line": 190,
+    "end": 211,
+    "decorators": [
+      "login_required",
+      "never_cache",
+      "require_POST"
+    ],
+    "forms": [
+      "SupplierPortalSubmissionForm(request.POST)"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "portal_invitation_manage",
+    "line": 235,
+    "end": 272,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.SUPPLIER_PORTAL_INVITATIONS_MANAGE)"
+    ],
+    "forms": [
+      "SupplierPortalInvitationForm(request.POST or None)",
+      "SupplierPortalInvitationForm()"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "sealed_evidence_custody",
+    "line": 300,
+    "end": 330,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.RFQS_CUSTODY_SEALED_EVIDENCE)"
+    ],
+    "forms": [
+      "SealedEvidenceUploadForm(request.POST or None, request.FILES or None)"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "purchase_request_create",
+    "line": 395,
+    "end": 416,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PURCHASE_REQUESTS_CREATE)"
+    ],
+    "forms": [
+      "PurchaseRequestForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "purchase_request_detail",
+    "line": 422,
+    "end": 434,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PURCHASE_REQUESTS_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "RequestItemForm(organization=request.organization)",
+      "ReasonForm()"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "purchase_request_item_add",
+    "line": 440,
+    "end": 460,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PURCHASE_REQUEST_ITEMS_ADD)",
+      "require_POST"
+    ],
+    "forms": [
+      "RequestItemForm(request.POST, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "_request_decision",
+    "line": 482,
+    "end": 505,
+    "decorators": [],
+    "forms": [
+      "ReasonForm(request.POST)"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "purchase_request_cancel",
+    "line": 525,
+    "end": 543,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PURCHASE_REQUESTS_CANCEL)",
+      "require_POST"
+    ],
+    "forms": [
+      "ReasonForm(request.POST)"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "purchase_order_create",
+    "line": 602,
+    "end": 629,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PURCHASE_ORDERS_CREATE)"
+    ],
+    "forms": [
+      "PurchaseOrderForm(request.POST or None, organization=request.organization, membership=get_active_membership(user=request.user, organization=request.organization))"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "purchase_order_detail",
+    "line": 635,
+    "end": 649,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PURCHASE_ORDERS_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "OrderItemForm(organization=request.organization, purchase_order=record)",
+      "ReasonForm()"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "purchase_order_item_add",
+    "line": 655,
+    "end": 677,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PURCHASE_ORDER_ITEMS_ADD)",
+      "require_POST"
+    ],
+    "forms": [
+      "OrderItemForm(request.POST, organization=request.organization, purchase_order=record)"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "purchase_order_cancel",
+    "line": 700,
+    "end": 718,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PURCHASE_ORDERS_CANCEL)",
+      "require_POST"
+    ],
+    "forms": [
+      "ReasonForm(request.POST)"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "goods_receipt_create",
+    "line": 777,
+    "end": 798,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.GOODS_RECEIPTS_CREATE)"
+    ],
+    "forms": [
+      "GoodsReceiptForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "goods_receipt_detail",
+    "line": 804,
+    "end": 816,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.GOODS_RECEIPTS_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "ReceiptItemForm(purchase_order=record.purchase_order)",
+      "ReasonForm()"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "goods_receipt_item_add",
+    "line": 822,
+    "end": 840,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.GOODS_RECEIPT_ITEMS_ADD)",
+      "require_POST"
+    ],
+    "forms": [
+      "ReceiptItemForm(request.POST, purchase_order=record.purchase_order)"
+    ]
+  },
+  {
+    "module": "procurement",
+    "view": "goods_receipt_void",
+    "line": 863,
+    "end": 881,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.GOODS_RECEIPTS_VOID)",
+      "require_POST"
+    ],
+    "forms": [
+      "ReasonForm(request.POST)"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "cost_allocation_reverse",
+    "line": 327,
+    "end": 354,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EQUIPMENT_COST_ALLOCATION_REVERSE)"
+    ],
+    "forms": [
+      "CostAllocationReversalForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "cost_handoff_reconcile",
+    "line": 391,
+    "end": 418,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EQUIPMENT_COST_HANDOFF_RECONCILE)"
+    ],
+    "forms": [
+      "CostReconciliationForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "operator_qualification_create",
+    "line": 425,
+    "end": 448,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EQUIPMENT_QUALIFICATIONS_MANAGE)"
+    ],
+    "forms": [
+      "OperatorQualificationForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "downtime_create",
+    "line": 453,
+    "end": 474,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EQUIPMENT_DOWNTIME_MANAGE)"
+    ],
+    "forms": [
+      "DowntimeForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "work_order_evidence_create",
+    "line": 479,
+    "end": 508,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EQUIPMENT_WORK_ORDERS_MANAGE)"
+    ],
+    "forms": [
+      "WorkOrderEvidenceForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "work_order_transition",
+    "line": 578,
+    "end": 605,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EQUIPMENT_WORK_ORDERS_COMPLETE)"
+    ],
+    "forms": [
+      "WorkOrderTransitionForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "spare_link_create",
+    "line": 610,
+    "end": 637,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EQUIPMENT_SPARE_LINKS_MANAGE)"
+    ],
+    "forms": [
+      "SpareLinkForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "equipment_create",
+    "line": 642,
+    "end": 659,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EQUIPMENT_CREATE)"
+    ],
+    "forms": [
+      "EquipmentForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "equipment_detail",
+    "line": 665,
+    "end": 689,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EQUIPMENT_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "EquipmentStatusForm()"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "equipment_status_change",
+    "line": 695,
+    "end": 713,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EQUIPMENT_CHANGE_STATUS)",
+      "require_POST"
+    ],
+    "forms": [
+      "EquipmentStatusForm(request.POST)"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "assignment_create",
+    "line": 791,
+    "end": 815,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EQUIPMENT_ASSIGNMENTS_CREATE)"
+    ],
+    "forms": [
+      "EquipmentAssignmentForm(request.POST or None, organization=request.organization, membership=get_active_membership(user=request.user, organization=request.organization))"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "assignment_status_change",
+    "line": 822,
+    "end": 863,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EQUIPMENT_ASSIGNMENTS_TRANSITION)"
+    ],
+    "forms": [
+      "StatusTransitionForm(request.POST or None, choices=choices)"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "maintenance_create",
+    "line": 926,
+    "end": 950,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.MAINTENANCE_RECORDS_CREATE)"
+    ],
+    "forms": [
+      "MaintenanceRecordForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "equipment",
+    "view": "maintenance_status_change",
+    "line": 955,
+    "end": 999,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.MAINTENANCE_RECORDS_TRANSITION)"
+    ],
+    "forms": [
+      "StatusTransitionForm(request.POST or None, choices=choices, include_cost=True)"
+    ]
+  },
+  {
+    "module": "contracts",
+    "view": "contract_create",
+    "line": 105,
+    "end": 131,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.CONTRACTS_CREATE)"
+    ],
+    "forms": [
+      "ContractForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "contracts",
+    "view": "contractual_record_create",
+    "line": 186,
+    "end": 222,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.CONTRACTUAL_RECORDS_PREPARE)"
+    ],
+    "forms": [
+      "ContractualRecordForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "contracts",
+    "view": "contractual_record_detail",
+    "line": 236,
+    "end": 265,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.CONTRACTUAL_RECORDS_VIEW)"
+    ],
+    "forms": [
+      "ContractualDecisionForm()",
+      "ContractualRevisionForm()",
+      "ContractualWithdrawalForm()"
+    ]
+  },
+  {
+    "module": "contracts",
+    "view": "contractual_record_decide",
+    "line": 282,
+    "end": 300,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.CONTRACTUAL_RECORDS_APPROVE)"
+    ],
+    "forms": [
+      "ContractualDecisionForm(request.POST)"
+    ]
+  },
+  {
+    "module": "contracts",
+    "view": "contractual_record_revision",
+    "line": 305,
+    "end": 322,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.CONTRACTUAL_RECORDS_PREPARE)"
+    ],
+    "forms": [
+      "ContractualRevisionForm(request.POST)"
+    ]
+  },
+  {
+    "module": "contracts",
+    "view": "contractual_record_withdraw",
+    "line": 327,
+    "end": 339,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.CONTRACTUAL_RECORDS_PREPARE)"
+    ],
+    "forms": [
+      "ContractualWithdrawalForm(request.POST)"
+    ]
+  },
+  {
+    "module": "inventory",
+    "view": "warehouse_create",
+    "line": 115,
+    "end": 128,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.WAREHOUSES_CREATE)"
+    ],
+    "forms": [
+      "WarehouseForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "inventory",
+    "view": "transaction_create",
+    "line": 266,
+    "end": 281,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.STOCK_TRANSACTIONS_CREATE)"
+    ],
+    "forms": [
+      "StockTransactionForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "inventory",
+    "view": "transaction_reverse",
+    "line": 326,
+    "end": 346,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.STOCK_TRANSACTIONS_REVERSE)"
+    ],
+    "forms": [
+      "ReversalForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "expenses",
+    "view": "expense_category_create",
+    "line": 149,
+    "end": 164,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EXPENSE_CATEGORIES_CREATE)"
+    ],
+    "forms": [
+      "ExpenseCategoryForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "expenses",
+    "view": "expense_category_detail",
+    "line": 169,
+    "end": 204,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EXPENSE_CATEGORIES_VIEW)"
+    ],
+    "forms": [
+      "ExpenseCategoryForm(request.POST or None, instance=category)"
+    ]
+  },
+  {
+    "module": "expenses",
+    "view": "platform_expense_group_create",
+    "line": 243,
+    "end": 255,
+    "decorators": [
+      "login_required"
+    ],
+    "forms": [
+      "PlatformExpenseGroupForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "expenses",
+    "view": "platform_expense_group_detail",
+    "line": 259,
+    "end": 274,
+    "decorators": [
+      "login_required"
+    ],
+    "forms": [
+      "PlatformExpenseGroupForm(request.POST or None, instance=group)"
+    ]
+  },
+  {
+    "module": "expenses",
+    "view": "expense_create",
+    "line": 292,
+    "end": 324,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EXPENSES_CREATE)"
+    ],
+    "forms": [
+      "ExpenseForm(request.POST or None, organization=request.organization, membership=membership, active_project=request.active_project)"
+    ]
+  },
+  {
+    "module": "expenses",
+    "view": "expense_draft_create",
+    "line": 329,
+    "end": 366,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EXPENSES_CREATE)"
+    ],
+    "forms": [
+      "ExpenseDraftForm(request.POST or None, organization=request.organization, membership=membership, active_project=request.active_project, initial=initial)"
+    ]
+  },
+  {
+    "module": "expenses",
+    "view": "expense_detail",
+    "line": 371,
+    "end": 385,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EXPENSES_VIEW)"
+    ],
+    "forms": [
+      "ExpenseAllocationForm(organization=request.organization)",
+      "ExpenseReturnForm()",
+      "ExpenseVoidForm()"
+    ]
+  },
+  {
+    "module": "expenses",
+    "view": "expense_allocate",
+    "line": 390,
+    "end": 406,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EXPENSES_ALLOCATE)"
+    ],
+    "forms": [
+      "ExpenseAllocationForm(request.POST, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "expenses",
+    "view": "expense_return",
+    "line": 441,
+    "end": 459,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EXPENSES_RETURN)"
+    ],
+    "forms": [
+      "ExpenseReturnForm(request.POST)"
+    ]
+  },
+  {
+    "module": "expenses",
+    "view": "recurrence_list",
+    "line": 464,
+    "end": 489,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EXPENSE_RECURRENCES_MANAGE)"
+    ],
+    "forms": [
+      "RecurringExpenseTemplateForm(request.POST or None, organization=request.organization)",
+      "RecurringExpenseProposalForm()"
+    ]
+  },
+  {
+    "module": "expenses",
+    "view": "recurrence_propose",
+    "line": 494,
+    "end": 513,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EXPENSE_RECURRENCES_MANAGE)"
+    ],
+    "forms": [
+      "RecurringExpenseProposalForm(request.POST)"
+    ]
+  },
+  {
+    "module": "expenses",
+    "view": "expense_void",
+    "line": 518,
+    "end": 541,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EXPENSES_VOID)"
+    ],
+    "forms": [
+      "ExpenseVoidForm(request.POST)"
+    ]
+  },
+  {
+    "module": "fixed_assets",
+    "view": "class_create",
+    "line": 164,
+    "end": 170,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.FIXED_ASSET_CLASS_POLICY_MANAGE)"
+    ],
+    "forms": [
+      "AssetClassForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "fixed_assets",
+    "view": "book_create",
+    "line": 177,
+    "end": 183,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.FIXED_ASSET_CLASS_POLICY_MANAGE)"
+    ],
+    "forms": [
+      "BookPolicyForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "fixed_assets",
+    "view": "asset_create",
+    "line": 188,
+    "end": 194,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.FIXED_ASSET_CANDIDATE_PREPARE)"
+    ],
+    "forms": [
+      "AssetForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "fixed_assets",
+    "view": "source_create",
+    "line": 231,
+    "end": 250,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.FIXED_ASSET_CANDIDATE_PREPARE)"
+    ],
+    "forms": [
+      "SourceForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "fixed_assets",
+    "view": "asset_capitalize",
+    "line": 271,
+    "end": 292,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.FIXED_ASSET_CAPITALIZE)"
+    ],
+    "forms": [
+      "CapitalizeForm(request.POST or None, asset=asset)"
+    ]
+  },
+  {
+    "module": "fixed_assets",
+    "view": "depreciation_preview",
+    "line": 299,
+    "end": 307,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.FIXED_ASSET_DEPRECIATION_PREVIEW)"
+    ],
+    "forms": [
+      "DepreciationPreviewForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "fixed_assets",
+    "view": "transaction_create",
+    "line": 330,
+    "end": 336,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.FIXED_ASSETS_VIEW)"
+    ],
+    "forms": [
+      "AssetTransactionForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "fixed_assets",
+    "view": "transaction_reverse",
+    "line": 361,
+    "end": 382,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.FIXED_ASSET_TRANSACTION_REVERSE)"
+    ],
+    "forms": [
+      "ReversalForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "fixed_assets",
+    "view": "depreciation_reverse",
+    "line": 389,
+    "end": 410,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.FIXED_ASSET_DEPRECIATION_REVERSE)"
+    ],
+    "forms": [
+      "ReversalForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "fixed_assets",
+    "view": "handoff_create",
+    "line": 415,
+    "end": 421,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.FIXED_ASSET_HANDOFF_PREPARE)"
+    ],
+    "forms": [
+      "HandoffForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "fixed_assets",
+    "view": "handoff_reconcile",
+    "line": 442,
+    "end": 463,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.FIXED_ASSET_HANDOFF_RECONCILE)"
+    ],
+    "forms": [
+      "ReconciliationForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "account_create",
+    "line": 178,
+    "end": 194,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_ACCOUNTS_MANAGE)"
+    ],
+    "forms": [
+      "AccountForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "fiscal_year_create",
+    "line": 214,
+    "end": 229,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_PERIODS_MANAGE)"
+    ],
+    "forms": [
+      "FiscalYearForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "fiscal_period_create",
+    "line": 234,
+    "end": 249,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_PERIODS_MANAGE)"
+    ],
+    "forms": [
+      "FiscalPeriodForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "_period_protected_action",
+    "line": 252,
+    "end": 279,
+    "decorators": [],
+    "forms": [
+      "ProtectedReasonForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "journal_create",
+    "line": 327,
+    "end": 343,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_JOURNALS_PREPARE)"
+    ],
+    "forms": [
+      "JournalForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "journal_detail",
+    "line": 349,
+    "end": 380,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "JournalLineForm(organization=request.organization)",
+      "ReasonForm()",
+      "ProtectedReasonForm(organization=request.organization)",
+      "ReplacementJournalForm(organization=request.organization)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "journal_line_add",
+    "line": 386,
+    "end": 421,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_JOURNALS_PREPARE)",
+      "require_POST"
+    ],
+    "forms": [
+      "JournalLineForm(request.POST, organization=request.organization)",
+      "ReasonForm()",
+      "ProtectedReasonForm(organization=request.organization)",
+      "ReplacementJournalForm(organization=request.organization)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "journal_post",
+    "line": 442,
+    "end": 458,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_JOURNALS_POST)",
+      "require_POST"
+    ],
+    "forms": [
+      "ReasonForm(request.POST)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "journal_reverse",
+    "line": 464,
+    "end": 482,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_JOURNALS_POST)",
+      "require_POST"
+    ],
+    "forms": [
+      "ProtectedReasonForm(request.POST, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "journal_replacement",
+    "line": 488,
+    "end": 504,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_JOURNALS_PREPARE)",
+      "require_POST"
+    ],
+    "forms": [
+      "ReplacementJournalForm(request.POST, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "opening_create",
+    "line": 547,
+    "end": 562,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_JOURNALS_PREPARE)"
+    ],
+    "forms": [
+      "OpeningImportForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "opening_detail",
+    "line": 568,
+    "end": 585,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "JournalLineForm(organization=request.organization)",
+      "ReasonForm()"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "opening_line_add",
+    "line": 591,
+    "end": 607,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_JOURNALS_PREPARE)",
+      "require_POST"
+    ],
+    "forms": [
+      "JournalLineForm(request.POST, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "opening_accept",
+    "line": 630,
+    "end": 646,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_JOURNALS_POST)",
+      "require_POST"
+    ],
+    "forms": [
+      "ReasonForm(request.POST)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "reconciliation_list",
+    "line": 652,
+    "end": 662,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "ReconciliationRunForm()"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "reconciliation_run",
+    "line": 668,
+    "end": 682,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_RECONCILIATIONS_RUN)",
+      "require_POST"
+    ],
+    "forms": [
+      "ReconciliationRunForm(request.POST)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "reconciliation_detail",
+    "line": 688,
+    "end": 704,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "DispositionForm()",
+      "ReasonForm()"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "reconciliation_dispose",
+    "line": 712,
+    "end": 730,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_RECONCILIATIONS_DISPOSE)",
+      "require_POST"
+    ],
+    "forms": [
+      "DispositionForm(request.POST)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "reconciliation_sign_off",
+    "line": 738,
+    "end": 752,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_RECONCILIATIONS_SIGN_OFF)",
+      "require_POST"
+    ],
+    "forms": [
+      "ReasonForm(request.POST)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "statement_list",
+    "line": 758,
+    "end": 780,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_REPORTS_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "StatementRunForm(request.GET or None)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "statement_run",
+    "line": 786,
+    "end": 801,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_STATEMENTS_RUN)",
+      "require_POST"
+    ],
+    "forms": [
+      "StatementRunForm(request.POST)"
+    ]
+  },
+  {
+    "module": "accounting",
+    "view": "controlled_adjustment_create",
+    "line": 851,
+    "end": 878,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.ACCOUNTING_ADJUSTMENTS_PREPARE)"
+    ],
+    "forms": [
+      "ControlledAdjustmentForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "claim_detail",
+    "line": 304,
+    "end": 350,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.CLAIMS_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "ClaimSettlementAllocationForm(organization=request.organization, claim=claim)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "claim_settlement_allocate",
+    "line": 356,
+    "end": 383,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.CLAIM_SETTLEMENTS_ALLOCATE)",
+      "require_POST"
+    ],
+    "forms": [
+      "ClaimSettlementAllocationForm(request.POST, organization=request.organization, claim=claim)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "payable_certificate_create",
+    "line": 411,
+    "end": 436,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYABLE_CERTIFICATES_CREATE)",
+      "require_http_methods(['GET', 'POST'])"
+    ],
+    "forms": [
+      "PayableCertificateForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "payable_certificate_detail",
+    "line": 442,
+    "end": 463,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYABLE_CERTIFICATES_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "PayableBackChargeForm()",
+      "PayableCertificateCorrectionForm()"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "payable_certificate_back_charge",
+    "line": 536,
+    "end": 559,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYABLE_CERTIFICATES_REVISE)",
+      "require_POST"
+    ],
+    "forms": [
+      "PayableBackChargeForm(request.POST)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "payable_certificate_correct",
+    "line": 565,
+    "end": 588,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYABLE_CERTIFICATES_REVISE)",
+      "require_POST"
+    ],
+    "forms": [
+      "PayableCertificateCorrectionForm(request.POST)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "payable_measurement_create",
+    "line": 609,
+    "end": 635,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYABLE_MEASUREMENTS_RECORD)",
+      "require_http_methods(['GET', 'POST'])"
+    ],
+    "forms": [
+      "PayableMeasurementForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "guarantee_create",
+    "line": 742,
+    "end": 760,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.GUARANTEES_MANAGE)",
+      "require_http_methods(['GET', 'POST'])"
+    ],
+    "forms": [
+      "GuaranteeForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "guarantee_detail",
+    "line": 766,
+    "end": 779,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.GUARANTEES_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "GuaranteeRevisionForm(organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "guarantee_revise",
+    "line": 785,
+    "end": 805,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.GUARANTEES_MANAGE)",
+      "require_POST"
+    ],
+    "forms": [
+      "GuaranteeRevisionForm(request.POST, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "compliance_evidence_create",
+    "line": 898,
+    "end": 920,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.COMPLIANCE_EVIDENCE_MANAGE)",
+      "require_http_methods(['GET', 'POST'])"
+    ],
+    "forms": [
+      "ComplianceEvidenceForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "compliance_evidence_detail",
+    "line": 926,
+    "end": 941,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.COMPLIANCE_EVIDENCE_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "ComplianceEvidenceRevisionForm(organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "compliance_evidence_revise",
+    "line": 947,
+    "end": 971,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.COMPLIANCE_EVIDENCE_MANAGE)",
+      "require_POST"
+    ],
+    "forms": [
+      "ComplianceEvidenceRevisionForm(request.POST, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "retention_release_create",
+    "line": 998,
+    "end": 1016,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.RETENTION_RELEASES_CREATE)",
+      "require_http_methods(['GET', 'POST'])"
+    ],
+    "forms": [
+      "RetentionReleaseForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "retention_release_detail",
+    "line": 1022,
+    "end": 1037,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.RETENTION_RELEASES_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "RetentionReleaseCorrectionForm(organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "retention_release_correct",
+    "line": 1043,
+    "end": 1068,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.RETENTION_RELEASES_CREATE)",
+      "require_POST"
+    ],
+    "forms": [
+      "RetentionReleaseCorrectionForm(request.POST, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "taxpayer_invoice_create",
+    "line": 1156,
+    "end": 1174,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.TAXPAYER_INVOICES_PREPARE)",
+      "require_http_methods(['GET', 'POST'])"
+    ],
+    "forms": [
+      "TaxpayerInvoiceForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "taxpayer_invoice_detail",
+    "line": 1189,
+    "end": 1207,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.TAXPAYER_INVOICES_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "StatutorySubmissionForm()"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "taxpayer_invoice_export",
+    "line": 1262,
+    "end": 1280,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.STATUTORY_SUBMISSIONS_EXECUTE)",
+      "require_POST"
+    ],
+    "forms": [
+      "StatutorySubmissionForm(request.POST)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "contractor_compliance_create",
+    "line": 1286,
+    "end": 1308,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.CONTRACTOR_COMPLIANCE_PREPARE)",
+      "require_http_methods(['GET', 'POST'])"
+    ],
+    "forms": [
+      "ContractorComplianceAssessmentForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "contractor_compliance_detail",
+    "line": 1327,
+    "end": 1347,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.CONTRACTOR_COMPLIANCE_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "StatutorySubmissionForm()"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "contractor_compliance_export",
+    "line": 1410,
+    "end": 1430,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.STATUTORY_SUBMISSIONS_EXECUTE)",
+      "require_POST"
+    ],
+    "forms": [
+      "StatutorySubmissionForm(request.POST)"
+    ]
+  },
+  {
+    "module": "billing",
+    "view": "statutory_submission_resolve",
+    "line": 1436,
+    "end": 1456,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.STATUTORY_SUBMISSIONS_RESOLVE)",
+      "require_POST"
+    ],
+    "forms": [
+      "SubmissionResolutionForm(request.POST)"
+    ]
+  },
+  {
+    "module": "documents",
+    "view": "_detail_context",
+    "line": 42,
+    "end": 54,
+    "decorators": [],
+    "forms": [
+      "DocumentArchiveForm()",
+      "DocumentVersionForm()",
+      "DocumentLinkForm(organization=request.organization, user=request.user, document=document)"
+    ]
+  },
+  {
+    "module": "documents",
+    "view": "document_upload",
+    "line": 124,
+    "end": 153,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.DOCUMENTS_UPLOAD)"
+    ],
+    "forms": [
+      "DocumentCreateForm(request.POST or None, request.FILES or None, organization=request.organization, user=request.user)"
+    ]
+  },
+  {
+    "module": "documents",
+    "view": "document_version_add",
+    "line": 290,
+    "end": 315,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.DOCUMENTS_UPLOAD)"
+    ],
+    "forms": [
+      "DocumentVersionForm(request.POST, request.FILES)"
+    ]
+  },
+  {
+    "module": "documents",
+    "view": "document_link_add",
+    "line": 320,
+    "end": 350,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.DOCUMENTS_UPLOAD)"
+    ],
+    "forms": [
+      "DocumentLinkForm(request.POST, organization=request.organization, user=request.user, document=document)"
+    ]
+  },
+  {
+    "module": "documents",
+    "view": "document_archive",
+    "line": 355,
+    "end": 380,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.DOCUMENTS_ARCHIVE)"
+    ],
+    "forms": [
+      "DocumentArchiveForm(request.POST)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "employee_create",
+    "line": 229,
+    "end": 270,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EMPLOYEES_CREATE)"
+    ],
+    "forms": [
+      "EmployeeForm(request.POST or None, organization=request.organization, can_link_account=can_link_account)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "employee_detail",
+    "line": 295,
+    "end": 402,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EMPLOYEES_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "EmployeePositionAssignmentForm(organization=request.organization)",
+      "StatusTransitionForm(choices=transitions)",
+      "EmployeeAccountLinkForm(organization=request.organization)",
+      "EmployeeProfileImageForm(instance=employee)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "employee_profile_image_update",
+    "line": 435,
+    "end": 456,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EMPLOYEES_CHANGE_PROFILE_IMAGE)",
+      "require_POST"
+    ],
+    "forms": [
+      "EmployeeProfileImageForm(request.POST, request.FILES, instance=employee)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "employee_account_link",
+    "line": 462,
+    "end": 481,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EMPLOYEES_LINK_ACCOUNT)",
+      "require_POST"
+    ],
+    "forms": [
+      "EmployeeAccountLinkForm(request.POST, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "employee_position_assign",
+    "line": 505,
+    "end": 527,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EMPLOYEE_POSITIONS_ASSIGN)",
+      "require_POST"
+    ],
+    "forms": [
+      "EmployeePositionAssignmentForm(request.POST, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "employee_position_end",
+    "line": 533,
+    "end": 561,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EMPLOYEE_POSITIONS_END)",
+      "require_POST"
+    ],
+    "forms": [
+      "EmployeePositionEndForm(request.POST)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "employee_status_change",
+    "line": 567,
+    "end": 595,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.EMPLOYEES_CHANGE_STATUS)",
+      "require_POST"
+    ],
+    "forms": [
+      "StatusTransitionForm(request.POST, choices=choices)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "department_detail",
+    "line": 953,
+    "end": 972,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.DEPARTMENTS_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "DepartmentForm(initial=_department_form_initial(department), organization=request.organization, exclude_department=department)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "department_update",
+    "line": 978,
+    "end": 1008,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.DEPARTMENTS_CHANGE)",
+      "require_POST"
+    ],
+    "forms": [
+      "DepartmentForm(request.POST, organization=request.organization, exclude_department=department)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "department_create",
+    "line": 1013,
+    "end": 1035,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.DEPARTMENTS_CREATE)"
+    ],
+    "forms": [
+      "DepartmentForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "position_detail",
+    "line": 1113,
+    "end": 1132,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.POSITIONS_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "PositionForm(initial=_position_form_initial(position), organization=request.organization, exclude_position=position)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "position_update",
+    "line": 1138,
+    "end": 1166,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.POSITIONS_CHANGE)",
+      "require_POST"
+    ],
+    "forms": [
+      "PositionForm(request.POST, organization=request.organization, exclude_position=position)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "position_create",
+    "line": 1171,
+    "end": 1189,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.POSITIONS_CREATE)"
+    ],
+    "forms": [
+      "PositionForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "work_team_create",
+    "line": 1244,
+    "end": 1266,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.WORK_TEAMS_CREATE)"
+    ],
+    "forms": [
+      "WorkTeamForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "assignment_create",
+    "line": 1356,
+    "end": 1376,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PROJECT_ASSIGNMENTS_CREATE)"
+    ],
+    "forms": [
+      "EmployeeAssignmentForm(request.POST or None, organization=request.organization, membership=get_active_membership(user=request.user, organization=request.organization))"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "assignment_status_change",
+    "line": 1413,
+    "end": 1450,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PROJECT_ASSIGNMENTS_CHANGE_STATUS)",
+      "require_POST"
+    ],
+    "forms": [
+      "AssignmentStatusTransitionForm(request.POST, choices=choices)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "workforce_skill_create",
+    "line": 1499,
+    "end": 1509,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.WORKFORCE_SKILLS_MANAGE)"
+    ],
+    "forms": [
+      "WorkforceCatalogueForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "workforce_competency_create",
+    "line": 1514,
+    "end": 1524,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.WORKFORCE_SKILLS_MANAGE)"
+    ],
+    "forms": [
+      "WorkforceCatalogueForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "workforce_employee_skill_create",
+    "line": 1529,
+    "end": 1539,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.WORKFORCE_SKILLS_MANAGE)"
+    ],
+    "forms": [
+      "EmployeeSkillRecordForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "workforce_qualification_create",
+    "line": 1544,
+    "end": 1554,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE)"
+    ],
+    "forms": [
+      "EmployeeQualificationForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "workforce_qualification_revoke",
+    "line": 1559,
+    "end": 1587,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_REVOKE)"
+    ],
+    "forms": [
+      "QualificationRevocationForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "workforce_training_requirement_create",
+    "line": 1592,
+    "end": 1602,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE)"
+    ],
+    "forms": [
+      "TrainingRequirementForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "workforce_training_record_create",
+    "line": 1607,
+    "end": 1617,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE)"
+    ],
+    "forms": [
+      "EmployeeTrainingRecordForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "workforce_performance_create",
+    "line": 1622,
+    "end": 1632,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.WORKFORCE_PERFORMANCE_MANAGE)"
+    ],
+    "forms": [
+      "PerformanceEvaluationForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "workforce_evidence_upload",
+    "line": 1653,
+    "end": 1709,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.DOCUMENTS_UPLOAD)"
+    ],
+    "forms": [
+      "WorkforceEvidenceUploadForm(request.POST or None, request.FILES or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "workforce",
+    "view": "workforce_labor_rate_create",
+    "line": 1714,
+    "end": 1724,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.WORKFORCE_LABOR_RATES_MANAGE)"
+    ],
+    "forms": [
+      "LaborRateVersionForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "employment_configuration_create",
+    "line": 240,
+    "end": 261,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_CONFIGURATION_MANAGE)"
+    ],
+    "forms": [
+      "EmploymentConfigurationForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "component_create",
+    "line": 287,
+    "end": 306,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_CONFIGURATION_MANAGE)"
+    ],
+    "forms": [
+      "ComponentForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "rule_create",
+    "line": 311,
+    "end": 330,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_CONFIGURATION_MANAGE)"
+    ],
+    "forms": [
+      "RuleForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "period_create",
+    "line": 350,
+    "end": 369,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_PREPARE)"
+    ],
+    "forms": [
+      "PeriodForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "run_create",
+    "line": 374,
+    "end": 393,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_PREPARE)"
+    ],
+    "forms": [
+      "RunForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "run_detail",
+    "line": 399,
+    "end": 423,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_RESULTS_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "ReversalForm()"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "input_create",
+    "line": 428,
+    "end": 451,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_PREPARE)"
+    ],
+    "forms": [
+      "InputForm(request.POST or None, organization=request.organization, run=run)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "adjustment_create",
+    "line": 456,
+    "end": 479,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_ADJUST)"
+    ],
+    "forms": [
+      "AdjustmentForm(request.POST or None, organization=request.organization, run=run)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "run_reverse",
+    "line": 536,
+    "end": 554,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_ADJUST)",
+      "require_POST"
+    ],
+    "forms": [
+      "ReversalForm(request.POST)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "statutory_calculation_create",
+    "line": 673,
+    "end": 694,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_STATUTORY_PREPARE)"
+    ],
+    "forms": [
+      "StatutoryCalculationForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "statutory_identity_create",
+    "line": 699,
+    "end": 722,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_STATUTORY_PREPARE)"
+    ],
+    "forms": [
+      "StatutoryIdentityForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "statutory_calculation_review",
+    "line": 727,
+    "end": 752,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_STATUTORY_REVIEW)"
+    ],
+    "forms": [
+      "StatutoryReviewForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "statutory_output_generate",
+    "line": 759,
+    "end": 784,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_STATUTORY_OUTPUT_GENERATE)"
+    ],
+    "forms": [
+      "StatutoryOutputForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "statutory_export_record",
+    "line": 789,
+    "end": 812,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_STATUTORY_EXPORT)"
+    ],
+    "forms": [
+      "StatutoryExportForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "statutory_export_resolve",
+    "line": 817,
+    "end": 842,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.PAYROLL_STATUTORY_CORRECT)"
+    ],
+    "forms": [
+      "StatutoryResolutionForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "financial_handoff_prepare",
+    "line": 862,
+    "end": 888,
+    "decorators": [
+      "active_organization_required"
+    ],
+    "forms": [
+      "FinancialHandoffPrepareForm(request.POST or None, organization=request.organization, allowed_families=allowed_families)"
+    ]
+  },
+  {
+    "module": "payroll",
+    "view": "financial_handoff_review",
+    "line": 908,
+    "end": 934,
+    "decorators": [
+      "active_organization_required"
+    ],
+    "forms": [
+      "FinancialHandoffReviewForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "quality",
+    "view": "issue_create",
+    "line": 126,
+    "end": 139,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.QUALITY_ISSUES_CREATE)"
+    ],
+    "forms": [
+      "QualityIssueForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "quality",
+    "view": "issue_detail",
+    "line": 145,
+    "end": 164,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.QUALITY_ISSUES_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "QualityIssueAssignmentForm(organization=request.organization)",
+      "CorrectiveActionForm()",
+      "VerificationSubmissionForm()",
+      "VerificationForm()",
+      "ClosureForm()"
+    ]
+  },
+  {
+    "module": "quality",
+    "view": "issue_assign",
+    "line": 204,
+    "end": 212,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.QUALITY_ISSUES_REVIEW)",
+      "require_POST"
+    ],
+    "forms": [
+      "QualityIssueAssignmentForm(request.POST, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "quality",
+    "view": "corrective_action_start",
+    "line": 218,
+    "end": 224,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.QUALITY_ISSUES_MANAGE)",
+      "require_POST"
+    ],
+    "forms": [
+      "CorrectiveActionForm(request.POST)"
+    ]
+  },
+  {
+    "module": "quality",
+    "view": "issue_submit_for_verification",
+    "line": 230,
+    "end": 236,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.QUALITY_ISSUES_MANAGE)",
+      "require_POST"
+    ],
+    "forms": [
+      "VerificationSubmissionForm(request.POST)"
+    ]
+  },
+  {
+    "module": "quality",
+    "view": "issue_verify",
+    "line": 242,
+    "end": 248,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.QUALITY_ISSUES_VERIFY)",
+      "require_POST"
+    ],
+    "forms": [
+      "VerificationForm(request.POST)"
+    ]
+  },
+  {
+    "module": "quality",
+    "view": "issue_close",
+    "line": 254,
+    "end": 260,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.QUALITY_ISSUES_CLOSE)",
+      "require_POST"
+    ],
+    "forms": [
+      "ClosureForm(request.POST)"
+    ]
+  },
+  {
+    "module": "safety",
+    "view": "incident_create",
+    "line": 118,
+    "end": 131,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.SAFETY_INCIDENTS_CREATE)"
+    ],
+    "forms": [
+      "SafetyIncidentForm(request.POST or None, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "safety",
+    "view": "incident_detail",
+    "line": 137,
+    "end": 155,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.SAFETY_INCIDENTS_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "SafetyIncidentAssignmentForm(organization=request.organization)",
+      "CorrectiveActionForm()",
+      "ResolutionForm()",
+      "ClosureForm()"
+    ]
+  },
+  {
+    "module": "safety",
+    "view": "incident_assign",
+    "line": 195,
+    "end": 203,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.SAFETY_INCIDENTS_REVIEW)",
+      "require_POST"
+    ],
+    "forms": [
+      "SafetyIncidentAssignmentForm(request.POST, organization=request.organization)"
+    ]
+  },
+  {
+    "module": "safety",
+    "view": "corrective_action_start",
+    "line": 209,
+    "end": 215,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.SAFETY_INCIDENTS_MANAGE)",
+      "require_POST"
+    ],
+    "forms": [
+      "CorrectiveActionForm(request.POST)"
+    ]
+  },
+  {
+    "module": "safety",
+    "view": "incident_resolve",
+    "line": 221,
+    "end": 227,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.SAFETY_INCIDENTS_MANAGE)",
+      "require_POST"
+    ],
+    "forms": [
+      "ResolutionForm(request.POST)"
+    ]
+  },
+  {
+    "module": "safety",
+    "view": "incident_close",
+    "line": 233,
+    "end": 239,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.SAFETY_INCIDENTS_CLOSE)",
+      "require_POST"
+    ],
+    "forms": [
+      "ClosureForm(request.POST)"
+    ]
+  },
+  {
+    "module": "compliance",
+    "view": "template_publish",
+    "line": 267,
+    "end": 289,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.COMPLIANCE_TEMPLATES_PUBLISH)",
+      "require_http_methods(['GET', 'POST'])"
+    ],
+    "forms": [
+      "TemplatePublishForm(request.POST or None)"
+    ]
+  },
+  {
+    "module": "compliance",
+    "view": "record_detail",
+    "line": 295,
+    "end": 335,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.COMPLIANCE_VIEW)",
+      "require_GET"
+    ],
+    "forms": [
+      "TransitionForm(initial={'expected_status': record.status, 'to_status': status})",
+      "EvidenceForm(organization=request.organization)"
+    ]
+  },
+  {
+    "module": "compliance",
+    "view": "record_transition",
+    "line": 340,
+    "end": 360,
+    "decorators": [
+      "active_organization_required",
+      "require_POST"
+    ],
+    "forms": [
+      "TransitionForm(request.POST)"
+    ]
+  },
+  {
+    "module": "compliance",
+    "view": "evidence_link",
+    "line": 366,
+    "end": 395,
+    "decorators": [
+      "active_organization_required",
+      "organization_permission_required(BusinessPermissionCode.COMPLIANCE_EVIDENCE_LINK)",
+      "require_POST"
+    ],
+    "forms": [
+      "EvidenceForm(request.POST, organization=request.organization)"
+    ]
+  }
+]

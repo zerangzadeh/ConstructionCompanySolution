@@ -1,0 +1,71 @@
+schema_version: '1.0'
+record:
+  evidence_id: RV-EV-016
+  scenario_id: RV-004
+  wave: A
+  target: Owner navigation
+  executed_at: '2026-10-21T22:48:21.268000+03:30'
+  runtime:
+    environment_name: Development
+    base_url: http://127.0.0.1:8001
+    git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+    browser: Microsoft Edge (isolated real headless browser)
+    browser_version: 155.0.4283.62
+    viewport:
+    - width: 1440
+      height: 900
+    device_scale_factor: 1
+  persona:
+    persona_id: P-15
+    test_user_alias: account.demo-construction-01.owner
+    organization_alias: demo-construction-01
+    project_context_alias: Exact fields/session in linked observations; authority in BEFORE snapshot
+    site_context_alias: null
+    effective_permission_bundle_reference: diagnostics/TARGETED_RUNTIME_BEFORE.json#identities
+  preconditions:
+  - Frozen baseline and Development verified; provisioning authorization and 514 model digests match.
+  - Same retained actual identities; no role/fixture changes.
+  steps:
+  - owner-navigation
+  - styled-navigation
+  expected_result:
+  - Scoped choices/context, preserved query/business dimensions, accessible task guidance.
+  actual_result:
+  - Enabled/disabled RFQ duplicate and unavailable navigation placeholders persist; representative Tab focus sampled.
+  accessibility:
+    keyboard_only: false
+    focus_visible: Representative focus samples in diagnostics; no assistive-technology certification
+    landmarks_ok: true
+    labels_ok: null
+    notes: Styled replacements govern visual claims. Early unstyled layout evidence excluded.
+  responsive:
+    desktop: true
+    tablet_or_narrow: false
+    mobile: false
+    notes: Representative viewports only.
+  authorization:
+    ui_visibility_observed: true
+    server_authorization_verified_when_applicable: false
+    cross_tenant_leakage_observed: false
+    object_scope_leakage_observed: false
+    unauthorized_access_observed: false
+    notes: Selector metadata leak; unauthorized write/direct-object bypass not proved. No business POST submitted.
+  result: FAIL_UIUX
+  previous_status: 'BLOCKED_ENVIRONMENT: credential'
+  existing_finding_ids:
+  - UIUX-F-016
+  - UIUX-F-017
+  new_finding_ids: []
+  needs_domain_review: false
+  screenshots:
+  - screenshots/RV-EV-016__styled-navigation__1440x900.png
+  excluded_visual_captures:
+  - screenshots/RV-EV-016__owner-navigation__1440x900.png
+  network_or_console_evidence:
+  - diagnostics/TARGETED_RUNTIME_BROWSER_OBSERVATIONS.json
+  - diagnostics/TARGETED_RUNTIME_CAPTURE_EXCEPTION.json
+  mutation_performed: true
+  mutation_record_or_cleanup: Authentication/session bookkeeping and governed context selection only. No business/admin
+    write, fixture/authority change or cleanup.
+  coverage_limits: []
+  notes: Original Wave A history preserved; initial unstyled/transient captures are not final visual conclusions.

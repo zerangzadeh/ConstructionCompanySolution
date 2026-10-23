@@ -6,7 +6,7 @@
 {% include "components/page_header.html" with page_eyebrow="مدیریت اسناد" page_title="اسناد شرکت" page_description=request.organization.name page_action_url=upload_url page_action_label="ایجاد سند" only %}
 <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست اسناد">
   {% if documents %}
-  <div class="erp-panel-header"><div><h2 class="text-sm font-semibold text-slate-900">مخزن اسناد خصوصی</h2><p class="mt-0.5 text-[11px] text-slate-500">نسخه‌های immutable با دسترسی مبتنی بر context</p></div><span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{{ documents|length }} سند</span></div>
+  <div class="erp-panel-header"><div><h2 class="text-sm font-semibold text-slate-900">مخزن اسناد خصوصی</h2><p class="mt-0.5 text-[11px] text-slate-500">اسناد نسخه‌بندی‌شده با دسترسی بر اساس شرکت و پروژه</p></div><span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{{ documents|length }} سند</span></div>
   <div class="erp-table-wrap"><table class="w-full min-w-[950px] text-right"><thead><tr><th class="border-b border-slate-200 px-4 py-3">سند</th><th class="border-b border-slate-200 px-4 py-3">ارتباط‌ها</th><th class="border-b border-slate-200 px-4 py-3">نوع</th><th class="border-b border-slate-200 px-4 py-3">نسخه جاری</th><th class="border-b border-slate-200 px-4 py-3">عملیات</th></tr></thead>
   <tbody class="divide-y divide-slate-100">{% for document in documents %}<tr>
     <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'documents:detail' document.id %}">{{ document.title }}</a>{% if document.reference %}<p class="mt-0.5 text-[11px] text-slate-500" dir="ltr">{{ document.reference }}</p>{% endif %}</td>

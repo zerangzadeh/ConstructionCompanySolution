@@ -27,6 +27,7 @@ from apps.accounting.forms import (
 )
 from apps.accounting.models import (
     Account,
+    AccountType,
     FinancialStatementRun,
     FiscalPeriod,
     FiscalYear,
@@ -773,6 +774,7 @@ def statement_list(request: HttpRequest) -> HttpResponse:
         {
             "form": form,
             "preview": preview,
+            "account_type_choices": AccountType.choices,
             "runs": FinancialStatementRun.objects.filter(
                 organization=request.organization
             ).select_related("created_by__user")[:50],

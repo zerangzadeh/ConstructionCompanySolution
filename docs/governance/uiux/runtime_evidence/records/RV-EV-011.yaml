@@ -1,0 +1,75 @@
+schema_version: '1.0'
+document:
+  id: BONIRA-UIUX-RV-EV-011
+  status: WAVE_A_RUNTIME_EVIDENCE
+record:
+  evidence_id: RV-EV-011
+  scenario_id: RV-026
+  executed_at: '2026-10-21T20:24:13.524000+03:30'
+  runtime:
+    environment_name: Development
+    base_url: http://127.0.0.1:8001/
+    git_sha: 43ac319c6e73e48ca9626461b73987922c498ec3
+    browser: Microsoft Edge (real headless browser)
+    browser_version: 155.0.4283.62
+    viewport:
+    - width: 1440
+      height: 900
+    device_scale_factor: 1
+  persona:
+    persona_id: P-15
+    test_user_alias: account.demo-construction-01.owner
+    organization_alias: demo-construction-01
+    project_context_alias: null
+    site_context_alias: null
+    effective_permission_bundle_reference: runtime_evidence/diagnostics/WAVE_A_AUTHORITY_BEFORE_20261021.json#account.demo-construction-01.owner
+  target: Designated Tenant Owner credential prerequisite
+  preconditions:
+  - Frozen baseline verified; Development runtime; preserved identity; actual authority reverified read-only.
+  - Only authentication and governed session-context POSTs permitted; business/admin mutation blocked by browser
+    guard.
+  steps:
+  - Reverify preserved identity, independent tenant_owner and p7_demo_payroll_assurance assignments, organization
+    grant.
+  - Attempt existing seed credential once; inspect rejection without capturing password; check local credential-store
+    availability.
+  expected_result:
+  - Understandable task/context, accessible controls and authoritative tenant/object/permission boundaries.
+  actual_result:
+  - Active identity, 546-code role union and organization scope verified read-only.
+  - Existing seed credential rejected; no current local Owner credential file available. No reset, additional guesses,
+    impersonation or replacement identity.
+  - Owner administration and Owner comparisons in RV-002/004/005 NOT_EXECUTED.
+  accessibility:
+    keyboard_only: null
+    focus_visible: null
+    landmarks_ok: null
+    labels_ok: null
+    notes: DOM semantics, browser accessibility snapshot and representative keyboard checks; no assistive-technology
+      certification.
+  responsive:
+    desktop: true
+    tablet_or_narrow: false
+    mobile: false
+    notes: Representative captured viewports only; absence means not sampled, not a failure.
+  authorization:
+    ui_visibility_observed: true
+    server_authorization_verified_when_applicable: false
+    cross_tenant_leakage_observed: false
+    notes: Claims limited to sampled URLs/queries. Platform admin also has superuser and separate tenant_owner memberships;
+      these are recorded independently.
+  result: BLOCKED_ENVIRONMENT
+  existing_finding_ids: []
+  new_finding_ids: []
+  needs_domain_review: false
+  screenshots:
+  - screenshots/RV-026__P-15__credential-unavailable__1440x900__01.png
+  network_or_console_evidence:
+  - diagnostics/WAVE_A_BROWSER_OBSERVATIONS_20261021.json
+  mutation_performed: false
+  mutation_record_or_cleanup: One rejected authentication attempt only; no credential reset.
+  notes: This is a credential/environment gap, not missing identity or permission. P-16 comparison remains BLOCKED_IDENTITY.
+    Human clarification requested while unrelated work continued; no supplied credential before evidence closure.
+  blocker_reason_code: CURRENT_CREDENTIAL_UNAVAILABLE
+  subsequent_human_disposition: Human confirmed BLOCKED_ENVIRONMENT — CURRENT_CREDENTIAL_UNAVAILABLE. Preserve account
+    unchanged; no credential reset, replacement, regeneration or authority/identity substitution.

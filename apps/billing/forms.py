@@ -1,5 +1,7 @@
 from django import forms
+from django.core.exceptions import PermissionDenied
 
+from apps.accounts.models import User
 from apps.contracts.models import (
     Contract,
     ContractDirection,
@@ -8,6 +10,12 @@ from apps.contracts.models import (
     ContractType,
 )
 from apps.documents.models import DocumentVersion
+from apps.documents.services import (
+    get_organization_document,
+    get_organization_documents,
+)
+from apps.organizations.authorization import scope_queryset
+from apps.organizations.models import Organization, OrganizationMembership
 from apps.treasury.models import (
     TreasuryMovement,
     TreasuryMovementKind,
@@ -15,6 +23,7 @@ from apps.treasury.models import (
 )
 from core.forms import JalaliDateMixin
 
+from .commercial_services import get_compliance_evidence
 from .models import (
     AssuranceRevisionAction,
     ComplianceEvidenceKind,
@@ -32,6 +41,53 @@ from .models import (
 
 
 class _CommercialEvidenceForm(forms.Form):
+    def _configure_create(
+        self,
+        *,
+        organization: Organization,
+        membership: OrganizationMembership | None,
+        actor: User | None,
+    ) -> None:
+        """Restrict create choices through existing Contract and DMS authority."""
+        for name in ("contract", "document_version", "evidence_document_version"):
+            if name in self.fields:
+                self.fields[name].queryset = self.fields[name].queryset.none()
+        if (
+            not isinstance(membership, OrganizationMembership)
+            or membership.organization_id != organization.pk
+            or actor is None
+            or membership.user_id != actor.pk
+        ):
+            return
+        self._configure(organization)
+        self.fields["contract"].queryset = scope_queryset(
+            self.fields["contract"].queryset,
+            membership=membership,
+            project_lookup="project_id",
+        )
+        visible_document_ids = []
+        try:
+            candidates = get_organization_documents(
+                user=actor, organization=organization
+            )
+            for document_id in candidates.values_list("pk", flat=True):
+                try:
+                    get_organization_document(
+                        user=actor,
+                        organization=organization,
+                        document_id=str(document_id),
+                    )
+                except PermissionDenied:
+                    continue
+                visible_document_ids.append(document_id)
+        except PermissionDenied:
+            pass
+        for name in ("document_version", "evidence_document_version"):
+            if name in self.fields:
+                self.fields[name].queryset = self.fields[name].queryset.filter(
+                    document_id__in=visible_document_ids
+                )
+
     def _configure(self, organization) -> None:
         if "contract" in self.fields:
             self.fields["contract"].queryset = Contract.objects.filter(
@@ -78,9 +134,11 @@ class GuaranteeForm(_CommercialEvidenceForm):
     )
     reason = forms.CharField(label="دلیل ثبت", widget=forms.Textarea(attrs={"rows": 3}))
 
-    def __init__(self, *args, organization, **kwargs):
+    def __init__(self, *args, organization, membership=None, actor=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self._configure(organization)
+        self._configure_create(
+            organization=organization, membership=membership, actor=actor
+        )
 
 
 class GuaranteeRevisionForm(_CommercialEvidenceForm):
@@ -154,9 +212,15 @@ class ComplianceEvidenceForm(_CommercialEvidenceForm):
     )
     reason = forms.CharField(label="دلیل ثبت", widget=forms.Textarea(attrs={"rows": 3}))
 
-    def __init__(self, *args, organization, **kwargs):
+    def __init__(self, *args, organization, membership=None, actor=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self._configure(organization)
+        if "contract" in self.fields:
+            self._configure_create(
+                organization=organization, membership=membership, actor=actor
+            )
+        else:
+            # Revision forms inherit this initializer behind their existing reader gate.
+            self._configure(organization)
 
 
 class ComplianceEvidenceRevisionForm(ComplianceEvidenceForm):
@@ -188,19 +252,30 @@ class RetentionReleaseForm(_CommercialEvidenceForm):
         required=False,
     )
 
-    def __init__(self, *args, organization, **kwargs):
+    def __init__(self, *args, organization, membership=None, actor=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self._configure(organization)
+        self._configure_create(
+            organization=organization, membership=membership, actor=actor
+        )
         self.fields["contract"].queryset = self.fields["contract"].queryset.filter(
             direction=ContractDirection.PAYABLE, contract_type=ContractType.SUBCONTRACT
         )
         self.fields[
             "clearance_evidence"
-        ].queryset = ContractComplianceEvidence.objects.filter(
-            organization=organization,
-            evidence_kind=ComplianceEvidenceKind.CLEARANCE,
-            status="approved",
-        ).select_related("contract")
+        ].queryset = ContractComplianceEvidence.objects.none()
+        if (
+            not isinstance(membership, OrganizationMembership)
+            or membership.organization_id != organization.pk
+            or actor is None
+            or membership.user_id != actor.pk
+        ):
+            return
+        try:
+            self.fields["clearance_evidence"].queryset = get_compliance_evidence(
+                actor=actor, organization=organization
+            ).filter(evidence_kind=ComplianceEvidenceKind.CLEARANCE, status="approved")
+        except PermissionDenied:
+            pass
 
 
 class RetentionReleaseCorrectionForm(_CommercialEvidenceForm):
@@ -353,9 +428,15 @@ class PayableMeasurementForm(forms.Form):
     )
     evidence_reference = forms.CharField(label="مرجع شواهد", max_length=255)
 
-    def __init__(self, *args, organization, **kwargs):
+    def __init__(self, *args, organization, membership=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["contract_item"].queryset = (
+        self.fields["contract_item"].queryset = ContractItem.objects.none()
+        if (
+            not isinstance(membership, OrganizationMembership)
+            or membership.organization_id != organization.pk
+        ):
+            return
+        self.fields["contract_item"].queryset = scope_queryset(
             ContractItem.objects.filter(
                 organization=organization,
                 contract__direction=ContractDirection.PAYABLE,
@@ -364,7 +445,9 @@ class PayableMeasurementForm(forms.Form):
                 contract__deleted_at__isnull=True,
             )
             .select_related("contract")
-            .order_by("contract__contract_number", "sort_order")
+            .order_by("contract__contract_number", "sort_order"),
+            membership=membership,
+            project_lookup="contract__project_id",
         )
 
 
@@ -383,15 +466,25 @@ class PayableCertificateForm(forms.Form):
         widget=forms.DateInput(attrs={"type": "date"}),
     )
 
-    def __init__(self, *args, organization, **kwargs):
+    def __init__(self, *args, organization, membership=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["contract"].queryset = Contract.objects.filter(
-            organization=organization,
-            direction=ContractDirection.PAYABLE,
-            contract_type=ContractType.SUBCONTRACT,
-            status=ContractStatus.ACTIVE,
-            deleted_at__isnull=True,
-        ).order_by("contract_number")
+        self.fields["contract"].queryset = Contract.objects.none()
+        if (
+            not isinstance(membership, OrganizationMembership)
+            or membership.organization_id != organization.pk
+        ):
+            return
+        self.fields["contract"].queryset = scope_queryset(
+            Contract.objects.filter(
+                organization=organization,
+                direction=ContractDirection.PAYABLE,
+                contract_type=ContractType.SUBCONTRACT,
+                status=ContractStatus.ACTIVE,
+                deleted_at__isnull=True,
+            ).order_by("contract_number"),
+            membership=membership,
+            project_lookup="project_id",
+        )
 
 
 class PayableBackChargeForm(forms.Form):

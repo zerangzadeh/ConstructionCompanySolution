@@ -1,0 +1,79 @@
+- banner:
+  - heading "Page not found (404)" [level=1]
+  - generic: زمینه مجاز درگاه یافت نشد.
+  - table:
+    - rowgroup:
+      - 'row "Request Method: GET"':
+        - rowheader "Request Method:"
+        - cell "GET"
+      - 'row "Request URL: http://127.0.0.1:8000/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/"':
+        - rowheader "Request URL:"
+        - cell "http://127.0.0.1:8000/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/"
+      - 'row "Raised by: apps.procurement.views.supplier_portal_context"':
+        - rowheader "Raised by:"
+        - cell "apps.procurement.views.supplier_portal_context"
+- main:
+  - paragraph:
+    - text: Using the URLconf defined in
+    - code: config.urls
+    - text: ", Django tried these URL patterns, in this order:"
+  - list:
+    - code: "[name='home']"
+    - code: search/ [name='global_search']
+    - code: admin/
+    - code: accounts/
+    - code: organizations/
+    - code: audit/
+    - code: accounting/
+    - code: treasury/
+    - code: subledgers/
+    - code: parties/
+    - code: materials/
+    - code: projects/
+    - code: contracts/
+    - code: commercial/
+    - code: billing/
+    - code: estimates/
+    - code: expenses/
+    - code: documents/
+    - code: financials/
+    - code: reporting/
+    - code: daily-reports/
+    - code: workforce/
+    - code: timekeeping/
+    - code: payroll/
+    - code: procurement/
+    - code: rfqs/ [name='rfq_list']
+    - code: procurement/
+    - code: rfqs/create/ [name='rfq_create']
+    - code: procurement/
+    - code: rfqs/<uuid:rfq_id>/ [name='rfq_detail']
+    - code: procurement/
+    - code: rfqs/<uuid:rfq_id>/buyer/ [name='rfq_buyer_workspace']
+    - code: procurement/
+    - code: rfqs/<uuid:rfq_id>/buyer/<slug:action>/ [name='rfq_buyer_action']
+    - code: procurement/
+    - code: rfqs/<uuid:rfq_id>/lines/ [name='rfq_line_add']
+    - code: procurement/
+    - code: rfqs/<uuid:rfq_id>/submit/ [name='rfq_submit']
+    - code: procurement/
+    - code: rfqs/<uuid:rfq_id>/issue/ [name='rfq_issue']
+    - code: procurement/
+    - code: rfqs/<uuid:rfq_id>/close/ [name='rfq_close']
+    - code: procurement/
+    - code: rfqs/<uuid:rfq_id>/cancel/ [name='rfq_cancel']
+    - code: procurement/
+    - code: portal/accept/ [name='portal_accept']
+    - code: procurement/
+    - code: portal/grants/<uuid:grant_id>/ [name='portal_context']
+  - paragraph:
+    - text: The current path,
+    - code: procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/
+    - text: ", matched the last one."
+- contentinfo:
+  - paragraph:
+    - text: You’re seeing this error because you have
+    - code: DEBUG = True
+    - text: in your Django settings file. Change that to
+    - code: "False"
+    - text: ", and Django will display a standard 404 page."

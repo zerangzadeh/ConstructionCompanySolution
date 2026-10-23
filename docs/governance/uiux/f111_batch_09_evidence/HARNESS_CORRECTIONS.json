@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-22 Asia/Tehran",
+  "initial_focused": {
+    "database": "test_bonira_uiux_batch01 (pre-existing reusable disposable DB)",
+    "result": "39 tests and 202 subtests PASS; nine failure/subfailure observations retained in initial_focused_fixture_failure.txt",
+    "correction": "Prior disposable DB lacked Quality/Safety WorkflowTemplate rows despite migration markers; rebuilt fresh dedicated test_bonira_uiux_batch09 through canonical migrations. Consistent sibling child set now isolates authorization from earlier Quality structure rejection."
+  },
+  "preparation": {
+    "initial_attempt": "Entire canonical sibling fixture transaction rolled back when DailyReport rejected a planning Phase",
+    "correction": "Canonical create_project_phase status active; all four fixtures then created atomically via existing services; no bypass or extra authority"
+  },
+  "browser": {
+    "initial_connection": "Browser attempted localhost before fresh server was listening; retried successfully after server start",
+    "date_control": "First Maintenance submit click normalized its Jalali date; not counted as server rejection. Subsequent real submit returned canonical Site relationship error. Quality returned canonical Phase error."
+  },
+  "cleanup": "Guard initially rejected conhost helper without killing anything; final cleanup selects and verifies only own Python server processes. Port 8012 listener absent.",
+  "baseline_metadata": "Copied evidence-directory label corrected from 08 to 09; entry hashes and source byte captures unchanged.",
+  "scope": "Harness/fixture corrections only; no services, global helpers, models, schema, authorization semantics or workflow changes",
+  "fresh_db_existing_gate": {
+    "retained_log": "fresh_db_existing_workflow_gate.txt",
+    "finding": "Quality/Safety workflow load_*_subject requires VIEW with organization scope, without project/site arguments; existing limited actors therefore denied after valid form validation",
+    "resolution": "Preserve actual service gate; assert valid limited forms and safe denial with full rollback; prove actual successful creation with organization actor. No service/helper/role/grant changes.",
+    "runtime": "Four additional real-CSRF valid-form HTTP controls added under existing Project-only and Site-only actors"
+  },
+  "browser_final_comparison": {
+    "actor_metadata": "Three Site-only logging records corrected from stale captured actor variable, supported by explicit authentication actions, screenshot account headers and exact Site-only option sets. Raw ledger preserved as initial_RUNTIME_BROWSER.json.",
+    "labels": "Existing browser Jalali localization normalized using unchanged core.jalali.gregorian_to_jalali plus Persian/Arabic digits; all option UUIDs, order, full labels and parent context still compared."
+  }
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "missing_parameter_or_source": "tax_rate",
+    "required_authority_provenance": "Applicable external statutory/tax authority; accepted professional review; published/effective Platform policy",
+    "affected_uat_cases": [
+      "UAT-CASE-009",
+      "UAT-CASE-016 (AR branch)",
+      "UAT-CASE-023"
+    ],
+    "minimum_decision_evidence": "Approved effective Decimal rate value"
+  },
+  {
+    "missing_parameter_or_source": "tax_basis",
+    "required_authority_provenance": "Same external authority and accepted review; an allowed enum is not an approved selection",
+    "affected_uat_cases": [
+      "UAT-CASE-009",
+      "UAT-CASE-016 (AR branch)",
+      "UAT-CASE-023"
+    ],
+    "minimum_decision_evidence": "Approved applicable gross or after_contractual selection"
+  },
+  {
+    "missing_parameter_or_source": "insurance_rate",
+    "required_authority_provenance": "Applicable external insurance authority; accepted professional review; published/effective Platform policy",
+    "affected_uat_cases": [
+      "UAT-CASE-009",
+      "UAT-CASE-016 (AR branch)",
+      "UAT-CASE-023"
+    ],
+    "minimum_decision_evidence": "Approved effective Decimal statutory-insurance rate value"
+  },
+  {
+    "missing_parameter_or_source": "insurance_basis",
+    "required_authority_provenance": "Same external authority and accepted review; no engineering default",
+    "affected_uat_cases": [
+      "UAT-CASE-009",
+      "UAT-CASE-016 (AR branch)",
+      "UAT-CASE-023"
+    ],
+    "minimum_decision_evidence": "Approved applicable gross or after_contractual selection"
+  },
+  {
+    "missing_parameter_or_source": "effective_source_provenance",
+    "required_authority_provenance": "External authority; PlatformPolicyVersionSource and effective version lifecycle",
+    "affected_uat_cases": [
+      "UAT-CASE-009",
+      "UAT-CASE-016 (AR branch)",
+      "UAT-CASE-023"
+    ],
+    "minimum_decision_evidence": "Citable source identity/version and effective applicability tied to the four parameters"
+  },
+  {
+    "missing_parameter_or_source": "accepted_professional_review",
+    "required_authority_provenance": "Authorized qualified reviewer; not a fictional test approval or Codex Human Sign-off",
+    "affected_uat_cases": [
+      "UAT-CASE-009",
+      "UAT-CASE-016 (AR branch)",
+      "UAT-CASE-023"
+    ],
+    "minimum_decision_evidence": "Real accepted review evidence on the same effective regulatory version"
+  },
+  {
+    "missing_parameter_or_source": "ContractTermVersion",
+    "required_authority_provenance": "Authorized contract/commercial owner; preserve explicit payment, retention, advance-recovery and contractual-insurance terms",
+    "affected_uat_cases": [
+      "UAT-CASE-009",
+      "UAT-CASE-016 (AR branch)",
+      "UAT-CASE-023"
+    ],
+    "minimum_decision_evidence": "Applicable independently approved effective contract terms for the isolated receivable contract"
+  },
+  {
+    "missing_parameter_or_source": "TenantBillingConfiguration",
+    "required_authority_provenance": "Existing governed Tenant configuration authority; no invented commercial/statutory ownership",
+    "affected_uat_cases": [
+      "UAT-CASE-009",
+      "UAT-CASE-016 (AR branch)",
+      "UAT-CASE-023"
+    ],
+    "minimum_decision_evidence": "Applicable authorized tenant numbering/period/precision configuration"
+  }
+]

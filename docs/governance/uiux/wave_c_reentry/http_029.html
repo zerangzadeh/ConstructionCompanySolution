@@ -1,0 +1,60 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+ 
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">درون‌ریزی حضور</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">حضور و کارکرد</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">درون‌ریزی حضور</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">این قرارداد فقط ردیف‌های نرمال‌شده و idempotent را می‌پذیرد؛ هیچ اتصال زنده دستگاه یا فراهم‌کننده‌ای فعال نیست.</p>
+        
+    </div>
+    
+</header>
+
+<section class="erp-surface mx-auto mt-5 max-w-3xl rounded-2xl p-5 sm:p-7">
+  <form method="post" class="space-y-4" novalidate>
+    <!-- CSRF omitted -->
+    
+    
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_idempotency_key">
+        کلید یکتای درخواست<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="idempotency_key" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" required id="id_idempotency_key">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_source_label">
+        عنوان منبع<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="source_label" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" required id="id_source_label">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_rows_json">
+        ردیف‌های نرمال‌شده JSON<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <textarea name="rows_json" cols="40" rows="10" dir="ltr" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" required id="id_rows_json">
+</textarea>
+    
+    
+</div>
+
+    <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-5"><button class="erp-btn erp-btn--primary" type="submit">ثبت کنترل‌شده</button><a class="erp-btn erp-btn--secondary" href="/timekeeping/">بازگشت</a></div>
+  </form>
+</section>
+
+        </main>

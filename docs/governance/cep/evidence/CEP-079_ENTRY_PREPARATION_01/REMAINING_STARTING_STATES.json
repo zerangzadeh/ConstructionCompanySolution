@@ -1,0 +1,97 @@
+{
+  "groups": [
+    {
+      "group": "Native cash/advance",
+      "result": "ROLLED_BACK",
+      "exception": "ValidationError",
+      "message": "['Movement does not match an approved reimbursement request.']"
+    },
+    {
+      "group": "AP source",
+      "result": "PREPARED",
+      "records": [
+        {
+          "model": "subledgers.Obligation",
+          "id": "ec09053f-f138-46b8-ae47-ce1736b425de",
+          "status": null,
+          "purpose": "New source-owned AP obligation under existing control-account mapping; no settlement or GL policy added"
+        }
+      ]
+    },
+    {
+      "group": "Disposable fiscal close/reopen",
+      "result": "PREPARED",
+      "records": [
+        {
+          "model": "accounting.FiscalYear",
+          "id": "cf972d6d-17b7-48da-9c39-7319ee72dce0",
+          "status": "active",
+          "purpose": "Isolated explicit synthetic interval using existing calendar-version contract; no current fiscal period changed"
+        },
+        {
+          "model": "accounting.FiscalPeriod",
+          "id": "5b592098-cd9d-4e41-bfd5-e2f0abd12ed8",
+          "status": "open",
+          "purpose": "New empty period for protected close/reopen; accepted periods untouched"
+        }
+      ]
+    },
+    {
+      "group": "Inventory destination",
+      "result": "PREPARED",
+      "records": [
+        {
+          "model": "inventory.Warehouse",
+          "id": "761d238f-2197-4acb-9273-4aac7f6aff73",
+          "status": null,
+          "purpose": "Dedicated destination; no old warehouse used as a mutable target"
+        }
+      ]
+    },
+    {
+      "group": "Non-statutory Payroll source",
+      "result": "ROLLED_BACK",
+      "exception": "ValidationError",
+      "message": "['کارمند 9a4904d8-c421-4919-9162-0084aa9a9b0f: ورودی قاعده WCD-TIMESHEET موجود نیست.']"
+    }
+  ],
+  "data_changes": {
+    "audit.AuditEvent": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "661636dc-1e67-49b5-a15c-7ec07297d6e6",
+        "a20d4f24-2dc1-4836-b333-36f4d0f09327",
+        "6efcf42d-dbe1-4d45-a820-329367196ad3",
+        "ed129c7d-8c9e-4779-b359-eeb0000f4839"
+      ]
+    },
+    "accounting.FiscalYear": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "cf972d6d-17b7-48da-9c39-7319ee72dce0"
+      ]
+    },
+    "accounting.FiscalPeriod": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "5b592098-cd9d-4e41-bfd5-e2f0abd12ed8"
+      ]
+    },
+    "subledgers.Obligation": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "ec09053f-f138-46b8-ae47-ce1736b425de"
+      ]
+    },
+    "inventory.Warehouse": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "761d238f-2197-4acb-9273-4aac7f6aff73"
+      ]
+    }
+  },
+  "no_uat_scenarios_executed": true,
+  "no_policy_authority_role_or_statutory_changes": true,
+  "bank_gap": "No active bank account. No invented bank-to-GL mapping or changes to existing accounts.",
+  "retention": "Retain identified new synthetic Development records; no raw deletion or accepted source reversal."
+}

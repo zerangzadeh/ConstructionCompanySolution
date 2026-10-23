@@ -1,0 +1,87 @@
+{
+  "decision": "BATCH_05_RUNTIME_VERIFIED_RESOLVED",
+  "finding": "UIUX-F-118",
+  "status": "RUNTIME_VERIFIED_RESOLVED",
+  "baseline_files_compared": 5141,
+  "changed_existing_files": [
+    "apps/inventory/forms.py",
+    "apps/inventory/views.py",
+    "docs/governance/uiux/UIUX_FINDINGS_REGISTER.yaml"
+  ],
+  "final_source_sha256": {
+    "apps/inventory/forms.py": "c8f10b3b5bb32eaf80a3629f3595292ca2495ee9fe8043fd276b2ca5a4a90192",
+    "apps/inventory/views.py": "d18b05c284a4b2e7341478b284ad06c4e12f884a97224d0163313bb08ce82f0b",
+    "tests/test_uiux_f111_pattern_stock_scope.py": "adb619567542082dbb0509e7e032a6a4526006b4ef0acd04ecf29c9d8415a517",
+    "docs/governance/uiux/UIUX_F111_BATCH_05_REMEDIATION_REPORT.md": "5136264fa1f2660b6451b477811d45577eb23d20eed4177d69ea248cdc8f4517",
+    "docs/governance/uiux/UIUX_FINDINGS_REGISTER.yaml": "cfd090e270f390274b5428677a80c342060f06ae6c6b0c09d702512a2ccd1d0b"
+  },
+  "product_ast_boundaries_only": true,
+  "other_findings_prior_batches_graph_registry_roadmap_preserved": true,
+  "focused": {
+    "tests": 12,
+    "subtests": 43,
+    "status": "PASS"
+  },
+  "regression": {
+    "tests": 76,
+    "subtests": 77,
+    "status": "PASS",
+    "attribution": "No failures; no baseline waiver or replay required"
+  },
+  "http_observations": 41,
+  "browser_observations": 5,
+  "direct_service_denials": 8,
+  "authorized_live_drafts": 2,
+  "integrity": {
+    "tables": 519,
+    "preexisting_rows_changed": [],
+    "preparation_and_authorized_runtime_additions": {
+      "sessions.Session": 7,
+      "audit.AuditEvent": 37,
+      "procurement.PurchaseOrder": 5,
+      "procurement.PurchaseOrderItem": 5,
+      "procurement.GoodsReceipt": 5,
+      "procurement.GoodsReceiptItem": 5,
+      "procurement.PurchaseOrderVersion": 5,
+      "procurement.PurchaseOrderVersionLine": 5,
+      "inventory.Warehouse": 2,
+      "inventory.StockTransaction": 2
+    },
+    "runtime_deltas": [
+      "sessions.Session",
+      "audit.AuditEvent",
+      "inventory.StockTransaction"
+    ],
+    "authorized_drafts": [
+      {
+        "kind": "transfer",
+        "id": "15d27cc7-3348-4076-9a0c-4139cffa795a",
+        "status": "draft",
+        "project": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+        "real_authenticated_csrf": true,
+        "posted": false
+      },
+      {
+        "kind": "receipt",
+        "id": "964c000c-9f5d-40f5-8ecf-1c957d5d15c0",
+        "status": "draft",
+        "project": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+        "real_authenticated_csrf": true,
+        "posted": false
+      }
+    ],
+    "unauthorized_mutations": 0,
+    "retained_failure_audits": 3,
+    "unauthorized_success_audits": 0,
+    "posted_stock_or_value_changes": 0,
+    "authority_unchanged": true,
+    "authority_fingerprint_before": "91bfa62e7a5f5fe8a0bc3a0966c6dce67912ea325d2a47d9e1d4db5c43df5c76",
+    "authority_fingerprint_after": "91bfa62e7a5f5fe8a0bc3a0966c6dce67912ea325d2a47d9e1d4db5c43df5c76",
+    "temporary_authority": "NONE; cleanup not required",
+    "last_login_excluded": true
+  },
+  "migrations": "NO",
+  "batch06_to09": "NOT_EXECUTED",
+  "wave_c": "NOT_STARTED",
+  "production_cep078_079_git_writes": "NOT_EXECUTED"
+}

@@ -1,0 +1,22 @@
+[
+  "tests/test_uiux_f111_scope.py",
+  "apps/daily_reports",
+  "apps/equipment",
+  "apps/procurement",
+  "apps/workforce",
+  "apps/organizations/test_cep016_context.py",
+  "apps/organizations/test_p1_1_authorization.py",
+  "apps/projects/tests.py",
+  "tests/test_tenant_model_validation.py",
+  "apps/expenses/tests.py",
+  "apps/estimates/tests.py",
+  "--ignore=apps/workforce/test_cep022_migration.py",
+  "--ignore=apps/workforce/test_cep023_migration.py",
+  "--ignore=apps/workforce/test_cep029_migration.py",
+  "--ignore=apps/workforce/test_cep055_migration.py",
+  "--ignore=apps/workforce/test_cep056_migration.py",
+  "-q",
+  "--tb=short",
+  "--reuse-db",
+  "--junitxml=output/f111_clean_validation.xml"
+]

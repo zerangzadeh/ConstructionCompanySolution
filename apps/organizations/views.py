@@ -36,6 +36,7 @@ from apps.organizations.authorization import (
     is_platform_admin,
     membership_has_permission,
     membership_has_role,
+    membership_has_scope,
     membership_is_tenant_owner,
 )
 from apps.organizations.configuration_profiles import (
@@ -322,6 +323,16 @@ def organization_members(request: HttpRequest) -> HttpResponse:
         },
         default_ordering=("user__username", "pk"),
     )
+    memberships = memberships.prefetch_related("role_assignments__role", "scope_grants")
+    for member in memberships:
+        role_candidates = {item.role.code: item.role for item in member.role_assignments.all()}
+        if member.role_definition_id:
+            role_candidates.setdefault(member.role_definition.code, member.role_definition)
+        member.display_effective_role_names = [
+            role.name for code, role in sorted(role_candidates.items())
+            if membership_has_role(member, code)
+        ]
+        member.display_has_scope = membership_has_scope(member, allow_any_scope=True)
     return render(
         request,
         "organizations/members.html",

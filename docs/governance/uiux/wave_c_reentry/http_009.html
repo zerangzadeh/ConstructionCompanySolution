@@ -1,0 +1,215 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+
+<div class="mb-3 flex items-center justify-end gap-2" data-table-filter-controls="table-filters">
+    <form id="table-filters" method="get" class="flex items-center gap-2" aria-label="فیلترهای جدول" data-table-filter-form>
+        <button class="h-8 rounded-md border border-slate-200 bg-white px-2.5 text-[11px] font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-700" type="submit">اعمال فیلتر</button>
+        
+    </form>
+</div>
+<template id="table-filters-row">
+<tr class="bg-slate-50/70 align-top text-right">
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-employee">فیلتر کارمند</label>
+            
+                <input id="table-filters-employee" type="search" name="employee" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-position">فیلتر واحد و سمت</label>
+            
+                <input id="table-filters-position" type="search" name="position" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-team">فیلتر گروه کاری</label>
+            
+                <input id="table-filters-team" type="search" name="team" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-status">فیلتر وضعیت</label>
+            
+                <select id="table-filters-status" name="status" form="table-filters" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                    <option value="">همه</option>
+                    <option value="active">فعال</option><option value="inactive">غیرفعال</option><option value="terminated">خاتمه همکاری</option>
+                </select>
+            
+        
+    </th>
+    
+</tr>
+
+</template>
+
+ 
+
+
+
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">کارکنان</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">منابع انسانی</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">کارکنان</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">پرونده پرسنلی، ساختار و تخصیص نیروی پروژه</p>
+        
+    </div>
+    
+        <a class="erp-page-header__action erp-btn erp-btn--primary shrink-0" href="/workforce/employees/create/">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>کارمند جدید
+        </a>
+    
+</header>
+
+
+<nav class="mt-5 flex flex-wrap gap-2" aria-label="بخش‌های منابع انسانی">
+    <a class="erp-btn erp-btn--secondary erp-btn--active" href="/workforce/" aria-current="page">کارکنان</a>
+    <a class="erp-btn erp-btn--secondary" href="/workforce/foundation/">توانمندی و توسعه</a>
+    
+    <a class="erp-btn erp-btn--secondary" href="/workforce/departments/">واحدها</a>
+    <a class="erp-btn erp-btn--secondary" href="/workforce/positions/">سمت‌ها</a>
+    <a class="erp-btn erp-btn--secondary" href="/workforce/teams/">گروه‌های کاری</a>
+</nav>
+
+
+<section class="erp-surface mt-4 overflow-hidden rounded-xl">
+
+<div class="erp-table-wrap">
+    <table class="w-full min-w-[900px] text-right">
+        <thead>
+            <tr>
+                <th class="border-b border-slate-200 px-4 py-3">کارمند</th>
+                <th class="border-b border-slate-200 px-4 py-3">واحد و سمت</th>
+                <th class="border-b border-slate-200 px-4 py-3">گروه کاری</th>
+                <th class="border-b border-slate-200 px-4 py-3">وضعیت</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            
+            <tr>
+                <td class="px-4 py-3.5">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-black text-blue-700" aria-label="Wave C Synthetic">WS</span>
+                        
+                        <div>
+                            <a class="font-semibold text-slate-900 hover:text-blue-700" href="/workforce/employees/9a4904d8-c421-4919-9162-0084aa9a9b0f/">Wave C Synthetic</a>
+                            <p class="text-[11px] text-slate-500" dir="ltr">WAVE-C-HR</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-4 py-3.5">Wave C synthetic department<p class="text-xs text-slate-500">Wave C synthetic position</p></td>
+                <td class="px-4 py-3.5">Wave C synthetic team</td>
+                <td class="px-4 py-3.5"><span class="erp-badge erp-badge--success">
+    فعال
+</span>
+</td>
+            </tr>
+            
+            <tr>
+                <td class="px-4 py-3.5">
+                    <div class="flex items-center gap-3">
+                        
+                        <img class="h-9 w-9 shrink-0 rounded-full border border-slate-200 object-cover" src="/workforce/employees/56a63728-2278-41c6-84b5-0f8d4179c11d/profile-image/" alt="عکس محسن جاوید">
+                        
+                        <div>
+                            <a class="font-semibold text-slate-900 hover:text-blue-700" href="/workforce/employees/56a63728-2278-41c6-84b5-0f8d4179c11d/">محسن جاوید</a>
+                            <p class="text-[11px] text-slate-500" dir="ltr">۱۳۰</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-4 py-3.5">دفتر نظارت<p class="text-xs text-slate-500">کارشناس ناظر</p></td>
+                <td class="px-4 py-3.5">—</td>
+                <td class="px-4 py-3.5"><span class="erp-badge erp-badge--success">
+    فعال
+</span>
+</td>
+            </tr>
+            
+            <tr>
+                <td class="px-4 py-3.5">
+                    <div class="flex items-center gap-3">
+                        
+                        <img class="h-9 w-9 shrink-0 rounded-full border border-slate-200 object-cover" src="/workforce/employees/58deb1bc-7802-4aa9-821f-ea80c8903f6e/profile-image/" alt="عکس علی رضایی">
+                        
+                        <div>
+                            <a class="font-semibold text-slate-900 hover:text-blue-700" href="/workforce/employees/58deb1bc-7802-4aa9-821f-ea80c8903f6e/">علی رضایی</a>
+                            <p class="text-[11px] text-slate-500" dir="ltr">۲۲۲۲۲</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-4 py-3.5">دفتر فنی و مهندسی<p class="text-xs text-slate-500">مدیرعامل</p></td>
+                <td class="px-4 py-3.5">گروه اجرای سازه</td>
+                <td class="px-4 py-3.5"><span class="erp-badge erp-badge--success">
+    فعال
+</span>
+</td>
+            </tr>
+            
+            <tr>
+                <td class="px-4 py-3.5">
+                    <div class="flex items-center gap-3">
+                        
+                        <img class="h-9 w-9 shrink-0 rounded-full border border-slate-200 object-cover" src="/workforce/employees/6cafa5b7-9a7a-4d2c-bf5a-be8b77054dfb/profile-image/" alt="عکس مدیر سامانه">
+                        
+                        <div>
+                            <a class="font-semibold text-slate-900 hover:text-blue-700" href="/workforce/employees/6cafa5b7-9a7a-4d2c-bf5a-be8b77054dfb/">مدیر سامانه</a>
+                            <p class="text-[11px] text-slate-500" dir="ltr">EMP-001</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-4 py-3.5">مدیریت اجرا<p class="text-xs text-slate-500">مدیر کارگاه</p></td>
+                <td class="px-4 py-3.5">—</td>
+                <td class="px-4 py-3.5"><span class="erp-badge erp-badge--success">
+    فعال
+</span>
+</td>
+            </tr>
+            
+            <tr>
+                <td class="px-4 py-3.5">
+                    <div class="flex items-center gap-3">
+                        
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-black text-blue-700" aria-label="مریم کاظمی">مک</span>
+                        
+                        <div>
+                            <a class="font-semibold text-slate-900 hover:text-blue-700" href="/workforce/employees/c1312008-8583-41d7-9ffb-ffd56e738e9b/">مریم کاظمی</a>
+                            <p class="text-[11px] text-slate-500" dir="ltr">EMP-002</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-4 py-3.5">دفتر فنی و مهندسی<p class="text-xs text-slate-500">مدیر دفتر فنی</p></td>
+                <td class="px-4 py-3.5">گروه اجرای سازه</td>
+                <td class="px-4 py-3.5"><span class="erp-badge erp-badge--success">
+    فعال
+</span>
+</td>
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+
+</section>
+
+
+        </main>

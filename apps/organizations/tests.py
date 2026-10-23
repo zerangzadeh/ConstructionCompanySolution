@@ -252,6 +252,27 @@ class OrganizationTenantIsolationTests(TestCase):
         self.assertContains(response, other_member.username)
         self.assertNotContains(response, self.other_organization.name)
 
+    def test_members_view_separates_compatibility_role_from_effective_authority(self) -> None:
+        member = OrganizationMembership.objects.create(
+            user=self.other_user,
+            organization=self.organization,
+            role=MembershipRole.MEMBER,
+            status=MembershipStatus.ACTIVE,
+            authorization_migrated_at=timezone.now(),
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("organizations:members"))
+
+        self.assertEqual(response.status_code, 200)
+        displayed = next(row for row in response.context["memberships"] if row.pk == member.pk)
+        self.assertEqual(displayed.display_effective_role_names, [])
+        self.assertFalse(displayed.display_has_scope)
+        self.assertContains(response, "نقش فعال ثبت نشده")
+        self.assertContains(response, "اطلاعات سازگاری:")
+        member.refresh_from_db()
+        self.assertEqual(member.role, MembershipRole.MEMBER)
+
     def test_members_view_links_member_name_to_the_edit_page_for_managers(self) -> None:
         membership = self.user.organization_memberships.get(
             organization=self.organization,

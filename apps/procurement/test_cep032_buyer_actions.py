@@ -8,6 +8,7 @@ from django.urls import reverse
 from apps.organizations.models import (
     AuthorizationScopeType,
     BusinessPermission,
+    MembershipRoleAssignment,
     MembershipScopeGrant,
     OrganizationRole,
 )
@@ -38,6 +39,14 @@ class BuyerActionTests(P5S11FixtureMixin, TestCase):
         )
         membership.role_definition = role
         membership.save(update_fields=["role_definition"])
+        # Migrated memberships read active assignments, not the compatibility
+        # field. Make the fixture's existing custom-role intent effective.
+        MembershipRoleAssignment.objects.create(
+            organization=self.organization,
+            membership=membership,
+            role=role,
+            reason="CEP-032 explicit isolated custom test role",
+        )
         MembershipScopeGrant.objects.create(
             organization=self.organization,
             membership=membership,

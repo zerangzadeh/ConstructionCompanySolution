@@ -21,8 +21,8 @@ from apps.commercial.services import (
     revise_tender_bid,
     transition_tender_bid,
 )
-from apps.documents.models import DocumentVersion
 from apps.documents.services import get_organization_document
+from apps.organizations.authorization import get_active_membership
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -58,7 +58,7 @@ def _context(request: HttpRequest, tender):
             except PermissionDenied:
                 continue
             evidence.append((link, document))
-    transition_form = TenderBidTransitionForm()
+    transition_form = TenderBidTransitionForm(auto_id="transition_%s")
     transition_form.fields["target"].choices = [
         (code, label)
         for code, label in TenderBidStatus.choices
@@ -77,6 +77,7 @@ def _context(request: HttpRequest, tender):
         .exclude(policy_reference="")
         .exists(),
         "revision_form": TenderBidRevisionForm(
+            auto_id="revision_%s",
             initial={
                 "title": latest.title,
                 "description": latest.description,
@@ -84,10 +85,12 @@ def _context(request: HttpRequest, tender):
                 "result_reference": latest.result_reference,
                 "bid_bond_reference": latest.bid_bond_reference,
                 "bid_cost_reference": latest.bid_cost_reference,
-            }
+            },
         ),
         "transition_form": transition_form,
-        "evidence_form": TenderBidEvidenceForm(),
+        "evidence_form": TenderBidEvidenceForm(
+            organization=request.organization, user=request.user, auto_id="evidence_%s"
+        ),
     }
 
 
@@ -120,7 +123,13 @@ def tender_list(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(P.TENDER_BIDS_PREPARE)
 @require_http_methods(["GET", "POST"])
 def tender_create(request: HttpRequest) -> HttpResponse:
-    form = TenderBidCreateForm(request.POST or None)
+    form = TenderBidCreateForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+    )
     if request.method == "POST" and form.is_valid():
         try:
             tender = create_tender_bid(
@@ -154,7 +163,7 @@ def tender_detail(request: HttpRequest, tender_id: str) -> HttpResponse:
 def tender_revise(request: HttpRequest, tender_id: str) -> HttpResponse:
     tender = _tender(request, tender_id)
     context = _context(request, tender)
-    form = TenderBidRevisionForm(request.POST)
+    form = TenderBidRevisionForm(request.POST, auto_id="revision_%s")
     context["revision_form"] = form
     if form.is_valid():
         try:
@@ -177,7 +186,7 @@ def tender_revise(request: HttpRequest, tender_id: str) -> HttpResponse:
 def tender_transition(request: HttpRequest, tender_id: str) -> HttpResponse:
     tender = _tender(request, tender_id)
     context = _context(request, tender)
-    form = TenderBidTransitionForm(request.POST)
+    form = TenderBidTransitionForm(request.POST, auto_id="transition_%s")
     form.fields["target"].choices = [
         (code, label)
         for code, label in TenderBidStatus.choices
@@ -205,13 +214,16 @@ def tender_transition(request: HttpRequest, tender_id: str) -> HttpResponse:
 def tender_evidence(request: HttpRequest, tender_id: str) -> HttpResponse:
     tender = _tender(request, tender_id)
     context = _context(request, tender)
-    form = TenderBidEvidenceForm(request.POST)
+    form = TenderBidEvidenceForm(
+        request.POST,
+        organization=request.organization,
+        user=request.user,
+        auto_id="evidence_%s",
+    )
     context["evidence_form"] = form
     if form.is_valid():
         try:
-            version = DocumentVersion.objects.get(
-                pk=form.cleaned_data["document_version_id"]
-            )
+            version = form.cleaned_data["document_version_id"]
             link_tender_evidence(
                 actor=request.user,
                 organization=request.organization,
@@ -219,13 +231,8 @@ def tender_evidence(request: HttpRequest, tender_id: str) -> HttpResponse:
                 document_version=version,
                 description=form.cleaned_data["description"],
             )
-        except (DocumentVersion.DoesNotExist, PermissionDenied, ValueError) as exc:
-            form.add_error(
-                None,
-                "نسخه سند مجاز یافت نشد."
-                if isinstance(exc, DocumentVersion.DoesNotExist)
-                else str(exc),
-            )
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
         else:
             return redirect("commercial:tender_detail", tender_id=tender.pk)
     return render(request, "commercial/tender_detail.html", context, status=400)

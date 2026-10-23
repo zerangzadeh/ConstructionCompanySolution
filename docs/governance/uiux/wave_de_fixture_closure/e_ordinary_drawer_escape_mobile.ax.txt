@@ -1,0 +1,147 @@
+- link "رفتن به محتوای اصلی":
+  - /url: "#main-content"
+- banner:
+  - generic "باز کردن فهرست" [active]:
+  - link "شرکت سازه‌پردازان پارس":
+    - /url: /organizations/
+    - generic: شرکت سازه‌پردازان پارس
+  - link "تنظیمات شخصی":
+    - /url: /accounts/settings/
+    - generic: U
+- region "دامنه کاری مؤثر":
+  - generic: شرکت
+  - generic: شرکت سازه‌پردازان پارس
+  - generic: پروژه
+  - combobox "پروژه":
+    - option "بدون پروژه / همه دامنه مجاز" [selected]
+    - option "PRJ-01-01 — مجتمع مسکونی باغستان"
+    - option "PRJ-01-02 — مرکز درمانی مهر"
+  - button "اعمال دامنه"
+- main:
+  - form "فیلترهای جدول":
+    - button "اعمال فیلتر"
+  - navigation "مسیر صفحه":
+    - link "خانه":
+      - /url: /
+    - generic: پروژه‌ها
+  - generic "پروژه‌ها":
+    - paragraph: مدیریت پروژه‌ها
+    - heading "پروژه‌ها" [level=1]
+    - paragraph: شرکت سازه‌پردازان پارس
+  - region "فهرست پروژه‌ها":
+    - heading "فهرست پروژه‌ها" [level=2]
+    - paragraph: اطلاعات کلیدی و وضعیت اجرایی
+    - generic: 2 پروژه
+    - table:
+      - rowgroup:
+        - row "مرتب‌سازی کد پروژه مرتب‌سازی نام پروژه مرتب‌سازی وضعیت مرتب‌سازی تاریخ شروع مرتب‌سازی تاریخ پایان مرتب‌سازی بودجه تخمینی (ریال) مرتب‌سازی بودجه واقعی (ریال) عملیات":
+          - columnheader "مرتب‌سازی کد پروژه":
+            - link "مرتب‌سازی کد پروژه":
+              - /url: /projects/?sort=code&direction=asc
+              - generic: کد پروژه
+              - generic: ↕
+          - columnheader "مرتب‌سازی نام پروژه":
+            - link "مرتب‌سازی نام پروژه":
+              - /url: /projects/?sort=name&direction=asc
+              - generic: نام پروژه
+              - generic: ↕
+          - columnheader "مرتب‌سازی وضعیت":
+            - link "مرتب‌سازی وضعیت":
+              - /url: /projects/?sort=status&direction=asc
+              - generic: وضعیت
+              - generic: ↕
+          - columnheader "مرتب‌سازی تاریخ شروع":
+            - link "مرتب‌سازی تاریخ شروع":
+              - /url: /projects/?sort=start_date&direction=asc
+              - generic: تاریخ شروع
+              - generic: ↕
+          - columnheader "مرتب‌سازی تاریخ پایان":
+            - link "مرتب‌سازی تاریخ پایان":
+              - /url: /projects/?sort=end_date&direction=asc
+              - generic: تاریخ پایان
+              - generic: ↕
+          - columnheader "مرتب‌سازی بودجه تخمینی (ریال)":
+            - link "مرتب‌سازی بودجه تخمینی":
+              - /url: /projects/?sort=estimated_budget&direction=asc
+              - generic: بودجه تخمینی
+              - generic: ↕
+            - text: (ریال)
+          - columnheader "مرتب‌سازی بودجه واقعی (ریال)":
+            - link "مرتب‌سازی بودجه واقعی":
+              - /url: /projects/?sort=actual_budget&direction=asc
+              - generic: بودجه واقعی
+              - generic: ↕
+            - text: (ریال)
+          - columnheader "عملیات"
+        - row "فیلتر کد پروژه فیلتر نام پروژه فیلتر وضعیت همه فیلتر تاریخ شروع باز کردن تقویم شمسی باز کردن تقویم شمسی فیلتر تاریخ پایان باز کردن تقویم شمسی باز کردن تقویم شمسی":
+          - columnheader "فیلتر کد پروژه":
+            - generic: فیلتر کد پروژه
+            - searchbox "فیلتر کد پروژه"
+          - columnheader "فیلتر نام پروژه":
+            - generic: فیلتر نام پروژه
+            - searchbox "فیلتر نام پروژه"
+          - columnheader "فیلتر وضعیت همه":
+            - generic: فیلتر وضعیت
+            - combobox "فیلتر وضعیت":
+              - option "همه" [selected]
+              - option "در حال برنامه‌ریزی"
+              - option "فعال"
+              - option "متوقف‌شده"
+              - option "تکمیل‌شده"
+              - option "لغوشده"
+          - columnheader "فیلتر تاریخ شروع باز کردن تقویم شمسی باز کردن تقویم شمسی":
+            - generic: فیلتر تاریخ شروع
+            - textbox "۱۴۰۵/۰۶/۲۳"
+            - button "باز کردن تقویم شمسی":
+              - generic: ▦
+            - textbox "۱۴۰۵/۰۶/۲۳"
+            - button "باز کردن تقویم شمسی":
+              - generic: ▦
+          - columnheader "فیلتر تاریخ پایان باز کردن تقویم شمسی باز کردن تقویم شمسی":
+            - generic: فیلتر تاریخ پایان
+            - textbox "۱۴۰۵/۰۶/۲۳"
+            - button "باز کردن تقویم شمسی":
+              - generic: ▦
+            - textbox "۱۴۰۵/۰۶/۲۳"
+            - button "باز کردن تقویم شمسی":
+              - generic: ▦
+          - columnheader
+          - columnheader
+          - columnheader
+      - rowgroup:
+        - row "PRJ-01-01 مجتمع مسکونی باغستان احداث مجموعه مسکونی با رویکرد کاهش مصرف انرژی و محوطه‌سازی کامل فعال ۱۴۰۴/۰۲/۰۵ ۱۴۰۵/۰۷/۲۵ 987,500,000,000 0 مشاهده مجتمع مسکونی باغستان":
+          - cell "PRJ-01-01":
+            - link "PRJ-01-01":
+              - /url: /projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/
+          - cell "مجتمع مسکونی باغستان احداث مجموعه مسکونی با رویکرد کاهش مصرف انرژی و محوطه‌سازی کامل":
+            - link "مجتمع مسکونی باغستان":
+              - /url: /projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/
+            - paragraph: احداث مجموعه مسکونی با رویکرد کاهش مصرف انرژی و محوطه‌سازی کامل
+          - cell "فعال":
+            - generic: فعال
+          - cell "۱۴۰۴/۰۲/۰۵"
+          - cell "۱۴۰۵/۰۷/۲۵"
+          - cell "987,500,000,000"
+          - cell "0"
+          - cell "مشاهده مجتمع مسکونی باغستان":
+            - link "مشاهده مجتمع مسکونی باغستان":
+              - /url: /projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/
+        - row "PRJ-01-02 مرکز درمانی مهر ساخت مرکز درمانی تخصصی همراه با تأسیسات مکانیکی و برقی پیشرفته فعال ۱۴۰۴/۰۳/۰۹ ۱۴۰۵/۰۸/۳۰ 647,500,000,000 0 مشاهده مرکز درمانی مهر":
+          - cell "PRJ-01-02":
+            - link "PRJ-01-02":
+              - /url: /projects/de3b5756-9d3e-4e67-a08b-97dbd2824c2f/
+          - cell "مرکز درمانی مهر ساخت مرکز درمانی تخصصی همراه با تأسیسات مکانیکی و برقی پیشرفته":
+            - link "مرکز درمانی مهر":
+              - /url: /projects/de3b5756-9d3e-4e67-a08b-97dbd2824c2f/
+            - paragraph: ساخت مرکز درمانی تخصصی همراه با تأسیسات مکانیکی و برقی پیشرفته
+          - cell "فعال":
+            - generic: فعال
+          - cell "۱۴۰۴/۰۳/۰۹"
+          - cell "۱۴۰۵/۰۸/۳۰"
+          - cell "647,500,000,000"
+          - cell "0"
+          - cell "مشاهده مرکز درمانی مهر":
+            - link "مشاهده مرکز درمانی مهر":
+              - /url: /projects/de3b5756-9d3e-4e67-a08b-97dbd2824c2f/
+    - generic: نمایش 2 پروژه
+    - generic: مرتب‌شده براساس نام پروژه

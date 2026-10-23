@@ -269,16 +269,18 @@ def publication_detail(request, version_id):
         "knowledge/publication_detail.html",
         {
             "item": item,
-            "reuse_form": ReuseForm(),
+            "reuse_form": ReuseForm(auto_id="reuse_%s"),
             "can_reuse": has_business_permission(
                 user=request.user,
                 organization=request.organization,
                 permission=BusinessPermissionCode.KNOWLEDGE_REUSE_RECORD,
             ),
             "correction_form": PublicationCorrectionForm(
+                auto_id="correction_%s",
                 initial={"title": item.title, "body": item.body}
             ),
             "promotion_form": PromotionRequestForm(
+                auto_id="promotion_%s",
                 initial={
                     "title": item.title,
                     "body": item.body,

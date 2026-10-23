@@ -1,0 +1,11 @@
+{
+  "event": "Legacy selected test exporter opened an existing historical trace with default cp1252, then UnicodeEncodeError occurred after business projection assertions. Restored exact pre-session index bytes; path was not dirty at entry.",
+  "path": "docs/governance/cep/evidence/CEP-068_MISSION_LINK_TRACE.json",
+  "observed_truncated_bytes": 0,
+  "restored_sha256": "766311c9f1426c0ad18b1fee27a06b99cd8ee5bb13e9ca855ea52a4369f9d8be",
+  "source": "Read-only git cat-file --filters :path restores the unchanged index through configured working-tree filters; no Git-write command",
+  "product_semantics_changed": false,
+  "resolution": "Isolate exporter in reentry harness; rerun only original failed test; preserve failed run evidence.",
+  "restored_worktree_bytes": 645,
+  "raw_entry_hash_limitation": "This historical path was clean at entry, but raw pre-session bytes were not separately captured; restoration uses the unchanged index and configured filters, not a fabricated pre-entry hash."
+}

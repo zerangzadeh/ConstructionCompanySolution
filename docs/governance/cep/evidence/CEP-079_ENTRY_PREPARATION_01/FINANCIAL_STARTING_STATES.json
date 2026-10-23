@@ -1,0 +1,75 @@
+{
+  "recovery": "Metadata serialization failure after canonical transactions committed; NO mutation rerun. Before/after fingerprint artifacts retained. Exact committed records recovered read-only.",
+  "serializer_error": "TypeError: SupplierInvoiceVersion is not JSON serializable; metadata-only serialization corrected",
+  "records": [
+    {
+      "model": "subledgers.SupplierInvoice",
+      "id": "6e4cf5e3-af9f-4b23-876d-21f95460991b",
+      "status": ""
+    },
+    {
+      "model": "subledgers.SupplierInvoiceVersion",
+      "id": "ad38d5e2-906c-4920-8070-909749126bed",
+      "status": "approved"
+    },
+    {
+      "model": "subledgers.SupplierInvoiceLine",
+      "id": "f6b82573-d586-4330-a469-f20587cb06d7",
+      "status": ""
+    },
+    {
+      "model": "subledgers.SupplierInvoiceMatch",
+      "id": "55f1f74d-9405-4dd5-9a20-bbb122a787be",
+      "status": "matched"
+    },
+    {
+      "model": "subledgers.SupplierInvoiceMatchLine",
+      "id": "04c2c267-290a-477b-8f9b-1dc2c699bab4",
+      "status": "matched"
+    }
+  ],
+  "data_changes": {
+    "audit.AuditEvent": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "b9a34fe8-d2f1-4b71-a946-09159158a006",
+        "431b8e5f-209c-4c01-986a-04982e3a86cc",
+        "c05bd28b-852e-41f3-9d20-02e514820999"
+      ]
+    },
+    "subledgers.SupplierInvoice": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "6e4cf5e3-af9f-4b23-876d-21f95460991b"
+      ]
+    },
+    "subledgers.SupplierInvoiceVersion": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "ad38d5e2-906c-4920-8070-909749126bed"
+      ]
+    },
+    "subledgers.SupplierInvoiceLine": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "f6b82573-d586-4330-a469-f20587cb06d7"
+      ]
+    },
+    "subledgers.SupplierInvoiceMatch": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "55f1f74d-9405-4dd5-9a20-bbb122a787be"
+      ]
+    },
+    "subledgers.SupplierInvoiceMatchLine": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "04c2c267-290a-477b-8f9b-1dc2c699bab4"
+      ]
+    }
+  },
+  "no_uat_scenarios_executed": true,
+  "roles_permissions_scopes_policies_unchanged": true,
+  "no_billing_parameters_created": true,
+  "bank_statement_transport_file_exists": false
+}

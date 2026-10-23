@@ -1,0 +1,65 @@
+[
+  {
+    "actor": "uiux.persona.inventory",
+    "path": "/inventory/",
+    "status": 200,
+    "method": "GET",
+    "sha256": "f4580b397f3d0ca8287a9015e37d39df1031816c199f358b3b1a18a03f5ac74d"
+  },
+  {
+    "actor": "uiux.persona.inventory",
+    "path": "/inventory/custody/",
+    "status": 200,
+    "method": "GET",
+    "sha256": "61f535fa51359f35a5d8796f0414c905e1d27d2ab77aa53bf2d4458e3190ead1"
+  },
+  {
+    "actor": "uiux.persona.inventory",
+    "path": "/inventory/valuation/",
+    "status": 200,
+    "method": "GET",
+    "sha256": "7dbca3d00dbd671ee64aea545928a3a5b27fd21e70553f74c119212605c149b8"
+  },
+  {
+    "actor": "uiux.persona.inventory",
+    "path": "/inventory/valuation/",
+    "status": 405,
+    "method": "POST",
+    "case": "valid CSRF, read-only method rejected; no audit mutation"
+  },
+  {
+    "actor": "uiux.persona.inventory",
+    "path": "/inventory/custody/",
+    "status": 405,
+    "method": "POST",
+    "case": "valid CSRF, read-only method rejected; no audit mutation"
+  },
+  {
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/subledgers/",
+    "status": 200,
+    "method": "GET",
+    "sha256": "9e49f449b210afa5ed355643135316cdc0e1d88cff95b8e4739f7ca57f743756"
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/contracts/1c869bb0-cb4b-4a47-8210-87167b90ee6f/commercial-review/",
+    "status": 200,
+    "method": "GET",
+    "sha256": "19952011ee96e2d0724f1008ccf77d99e97851a7665f8c635cc4540df07e1631"
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/",
+    "status": 200,
+    "method": "GET",
+    "sha256": "33129a6d4914bcfbb194a181d16b044170d1ddff1d7443f4c2207b460784ddc4"
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/procurement/rfqs/7dd5036e-e20a-481a-ad43-dabaa692a166/buyer/",
+    "status": 200,
+    "method": "GET",
+    "sha256": "c17f5baad8baf29cc0efbefd0ba615f638741bebe2beae22f1c808893a164de5"
+  }
+]

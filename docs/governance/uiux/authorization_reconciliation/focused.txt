@@ -1,0 +1,81 @@
+......F.................F..........................F..... [ 86%]
+.....F...                                                          [100%]
+================================== FAILURES ===================================
+_ PlatformInitialGrantTests.test_inactive_tenant_membership_and_target_user_rejected_from_fresh_state _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.CheckViolation: new row for relation "organizations_organization" violates check constraint "organization_archive_state_consistent"
+E   DETAIL:  Failing row contains (11b3a23d-5e70-4df8-a60d-b16ccc2df709, 2026-10-22 16:15:18.458237+00, 2026-10-22 16:15:18.458237+00, Initial Grant, , initial-grant, archived, UTC, USD, null, 292fab0a-b76e-47f0-9f66-8c47fd3ce7e5, 292fab0a-b76e-47f0-9f66-8c47fd3ce7e5, , null, , , , , , , , , ).
+
+The above exception was the direct cause of the following exception:
+apps\organizations\test_platform_initial_grant.py:170: in test_inactive_tenant_membership_and_target_user_rejected_from_fresh_state
+    events[0].metadata["target_membership_id"], str(self.target.pk)
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.IntegrityError: new row for relation "organizations_organization" violates check constraint "organization_archive_state_consistent"
+E   DETAIL:  Failing row contains (11b3a23d-5e70-4df8-a60d-b16ccc2df709, 2026-10-22 16:15:18.458237+00, 2026-10-22 16:15:18.458237+00, Initial Grant, , initial-grant, archived, UTC, USD, null, 292fab0a-b76e-47f0-9f66-8c47fd3ce7e5, 292fab0a-b76e-47f0-9f66-8c47fd3ce7e5, , null, , , , , , , , , ).
+---------------------------- Captured stdout call -----------------------------
+uu
+_ P11AuthorizationTests.test_role_and_grant_services_require_independent_approval_and_audit _
+apps\organizations\test_p1_1_authorization.py:264: in test_role_and_grant_services_require_independent_approval_and_audit
+    assignment = assign_membership_role(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\organizations\access_services.py:484: in assign_membership_role
+    raise PermissionDenied("\u0627\u0646\u062a\u0642\u0627\u0644 \u0645\u062c\u0648\u0632\u06cc \u062e\u0627\u0631\u062c \u0627\u0632 \u0627\u062e\u062a\u06cc\u0627\u0631 \u0639\u0627\u0645\u0644 \u0645\u0645\u0646\u0648\u0639 \u0627\u0633\u062a.")
+E   django.core.exceptions.PermissionDenied: \u0627\u0646\u062a\u0642\u0627\u0644 \u0645\u062c\u0648\u0632\u06cc \u062e\u0627\u0631\u062c \u0627\u0632 \u0627\u062e\u062a\u06cc\u0627\u0631 \u0639\u0627\u0645\u0644 \u0645\u0645\u0646\u0648\u0639 \u0627\u0633\u062a.
+____________ EmploymentManagementTests.test_no_new_default_grants _____________
+apps\workforce\test_cep022.py:474: in test_no_new_default_grants
+    self.assertFalse(new & set(codes))
+E   AssertionError: {BusinessPermissionCode.ROSTERS_MANAGE, BusinessPermissionCode.ROSTERS_VIEW} is not false
+_ ReconciledMatrixTests.test_all_registered_permissions_are_explicitly_represented _
+apps\organizations\test_platform_initial_grant.py:50: in test_all_registered_permissions_are_explicitly_represented
+    ???
+E   AssertionError: Items in the first set but not the second:
+E   'support.notifications_acknowledge'
+E   'support.access_use'
+E   'support.evidence_sensitive_view'
+E   'support.case_create'
+E   'support.access_tenant_confirm'
+E   'support.case_view'
+E   'support.case_update'
+E   'support.calendar_view'
+E   'support.access_platform_approve'
+E   'support.audit_reconcile'
+E   'support.case_resolve'
+E   'support.notifications_view'
+E   'support.case_reopen'
+E   'support.access_revoke'
+E   'support.evidence_link'
+E   'support.case_assign'
+E   'support.access_request'
+=========================== short test summary info ===========================
+FAILED apps/organizations/test_platform_initial_grant.py::PlatformInitialGrantTests::test_inactive_tenant_membership_and_target_user_rejected_from_fresh_state
+FAILED apps/organizations/test_p1_1_authorization.py::P11AuthorizationTests::test_role_and_grant_services_require_independent_approval_and_audit
+FAILED tests/test_uiux_wave_c_reentry.py::EmploymentManagementTests::test_no_new_default_grants
+FAILED apps/organizations/test_platform_initial_grant.py::ReconciledMatrixTests::test_all_registered_permissions_are_explicitly_represented
+4 failed, 62 passed, 21 subtests passed in 189.12s (0:03:09)

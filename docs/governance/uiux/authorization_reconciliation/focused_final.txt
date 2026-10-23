@@ -1,0 +1,38 @@
+........................................................ [ 75%]
+..........F.F.F...                     [100%]
+================================== FAILURES ===================================
+_ PermissionRegistryArchitectureTests.test_every_managed_business_model_is_registered_exactly_once _
+apps\organizations\test_permission_registry.py:92: in test_every_managed_business_model_is_registered_exactly_once
+    if model._meta.app_label in PERMISSION_MANAGED_APPS
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Lists differ: ['payroll.FinancialHandoffLine', 'payroll.[74 chars]lip'] != []
+E   
+E   First list contains 4 additional elements.
+E   First extra element 0:
+E   'payroll.FinancialHandoffLine'
+E   
+E   + []
+E   - ['payroll.FinancialHandoffLine',
+E   -  'payroll.FinancialHandoffProposal',
+E   -  'payroll.FinancialHandoffReview',
+E   -  'payroll.Payslip']
+_ PermissionRegistryArchitectureTests.test_every_registered_permission_is_referenced_by_its_enforcement_module _
+apps\organizations\test_permission_registry.py:109: in test_every_registered_permission_is_referenced_by_its_enforcement_module
+    if absent:
+E   AssertionError: {'support': ['SUPPORT_AUDIT_RECONCILE'], '[1806 chars]EN']} != {}
+E   Diff is 2564 characters long. Set self.maxDiff to None to see it.
+_ PermissionRegistryArchitectureTests.test_resource_keys_are_unique_and_match_permission_namespaces _
+apps\organizations\test_permission_registry.py:75: in test_resource_keys_are_unique_and_match_permission_namespaces
+    )
+E   AssertionError: Lists differ: ['billing_variation_eligibility.retry', 'b[2223 chars]age'] != []
+E   
+E   First list contains 77 additional elements.
+E   First extra element 0:
+E   'billing_variation_eligibility.retry'
+E   
+E   Diff is 2506 characters long. Set self.maxDiff to None to see it.
+=========================== short test summary info ===========================
+FAILED apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_every_managed_business_model_is_registered_exactly_once
+FAILED apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_every_registered_permission_is_referenced_by_its_enforcement_module
+FAILED apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_resource_keys_are_unique_and_match_permission_namespaces
+3 failed, 71 passed, 50 subtests passed in 218.66s (0:03:38)

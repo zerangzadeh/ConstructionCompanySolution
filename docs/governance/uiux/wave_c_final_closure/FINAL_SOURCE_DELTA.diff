@@ -1,0 +1,106 @@
+--- entry/apps/procurement/test_p5_s08_sealed_custody.py
++++ final/apps/procurement/test_p5_s08_sealed_custody.py
+@@ -272,12 +272,18 @@
+         other_project = Project.objects.create(
+             organization=self.organization, code="OTHER-CUSTODY", name="Other"
+         )
+-        MembershipRoleAssignment.objects.create(
++        MembershipRoleAssignment.objects.get_or_create(
+             organization=self.organization,
+             membership=membership,
+             role=membership.role_definition,
+-            reason="P5-S08 scope test",
+-        )
++            revoked_at__isnull=True,
++            defaults={"reason": "P5-S08 scope test"},
++        )
++        # The shared fixture now establishes explicit organization authority.
++        # Remove that scope so this remains an actual unrelated-project denial.
++        MembershipScopeGrant.objects.filter(
++            membership=membership, revoked_at__isnull=True
++        ).update(revoked_at=timezone.now())
+         MembershipScopeGrant.objects.create(
+             organization=self.organization,
+             membership=membership,
+--- entry/apps/subledgers/test_cep033_invoice_handoff.py
++++ final/apps/subledgers/test_cep033_invoice_handoff.py
+@@ -28,6 +28,7 @@
+     BusinessPermission,
+     BusinessPermissionCode,
+     MembershipRole,
++    MembershipRoleAssignment,
+     MembershipScopeGrant,
+     MembershipStatus,
+     OrganizationRole,
+@@ -80,6 +81,14 @@
+             role.permissions.set(BusinessPermission.objects.filter(is_active=True))
+             membership.role_definition = role
+             membership.save(update_fields=["role_definition"])
++            # The compatibility pointer cannot replace a migrated active role.
++            MembershipRoleAssignment.objects.create(
++                organization=self.organization,
++                membership=membership,
++                role=role,
++                source="test_fixture",
++                reason="CEP-033 isolated explicit authority",
++            )
+             MembershipScopeGrant.objects.create(
+                 organization=self.organization,
+                 membership=membership,
+@@ -344,12 +353,15 @@
+         self.assertEqual(m.SettlementAllocation.objects.count(), 1)
+         self.assertIsNone(m.Obligation.objects.get(pk=target.pk).recognition_journal_id)
+ 
+-    def test_reversal_permission_has_no_implicit_system_role_grants(self):
+-        self.assertFalse(
+-            OrganizationRole.objects.filter(
+-                is_system=True,
+-                permissions__code=BusinessPermissionCode.SUBLEDGERS_SOURCES_REVERSE,
+-            ).exists()
++    def test_reversal_permission_has_only_reviewed_system_role_grants(self):
++        self.assertEqual(
++            set(
++                OrganizationRole.objects.filter(
++                    is_system=True,
++                    permissions__code=BusinessPermissionCode.SUBLEDGERS_SOURCES_REVERSE,
++                ).values_list("code", flat=True)
++            ),
++            {"accountant"},
+         )
+ 
+     def test_exactly_once_explicit_ap_acceptance_preserves_source_and_has_no_gl(self):
+--- entry/apps/workforce/employment_forms.py
++++ final/apps/workforce/employment_forms.py
+@@ -36,7 +36,8 @@
+         ).select_related("person")
+         self.fields["relationship"].queryset = relationships
+         self.fields["relationship"].label_from_instance = lambda item: (
+-            f"{item.person} · {item.effective_start}"
++            f"{item.person.first_name} {item.person.last_name} · "
++            f"{item.employee_number} · {item.effective_start}"
+         )
+         value = (
+             self.data.get("relationship")
+--- entry/templates/workforce/employment_manage.html
++++ final/templates/workforce/employment_manage.html
+@@ -24,7 +24,7 @@
+ <section class="erp-surface mt-5 rounded-xl p-5" aria-labelledby="employment-records">
+   <h2 id="employment-records" class="font-bold">سوابق قابل دسترسی</h2>
+   <ul class="mt-3 space-y-3">{% for record in records %}
+-    <li class="rounded-lg bg-slate-50 p-3 text-sm"><b>{{ record.relationship.person }}</b> · {{ record.get_kind_display }} · نسخه {{ record.version|erp_number }}<span class="block text-slate-600">{{ record.effective_from|jalali_date }} تا {{ record.effective_to|jalali_date|default:"ثبت نشده" }}</span></li>
++    <li class="rounded-lg bg-slate-50 p-3 text-sm"><b>{{ record.relationship.person.first_name }} {{ record.relationship.person.last_name }} · {{ record.relationship.employee_number }}</b> · {{ record.get_kind_display }} · نسخه {{ record.version|erp_number }}<span class="block text-slate-600">{{ record.effective_from|jalali_date }} تا {{ record.effective_to|jalali_date|default:"ثبت نشده" }}</span></li>
+   {% empty %}<li class="text-sm text-slate-600">سابقه مجازی برای نمایش وجود ندارد.</li>{% endfor %}</ul>
+ </section>
+ {% endblock %}
+--- entry/tests/test_uiux_wave_c_reentry.py
++++ final/tests/test_uiux_wave_c_reentry.py
+@@ -25,6 +25,9 @@
+         self.assertEqual(response.status_code, 200)
+         self.assertEqual(response["Cache-Control"], "private, no-store")
+         self.assertContains(response, self.document.title)
++        self.assertContains(response, self.person.first_name)
++        self.assertContains(response, self.relationship.employee_number)
++        self.assertNotContains(response, "Person object (")
+         data = {
+             "relationship": self.relationship.pk,
+             "record_key": "ui-contract",

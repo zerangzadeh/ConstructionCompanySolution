@@ -1,10 +1,12 @@
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
+from tempfile import TemporaryDirectory
 from threading import Barrier
 
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import close_old_connections
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase, TransactionTestCase, override_settings
 from django.utils import timezone
 
 from apps.accounts.models import User
@@ -35,6 +37,8 @@ from apps.procurement.test_quotes import QuoteFixtureMixin
 class SupplierPortalFixtureMixin(QuoteFixtureMixin):
     def setUp(self) -> None:
         super().setUp()
+        root = self.enterContext(TemporaryDirectory())
+        self.enterContext(override_settings(DOCUMENT_PROTECTED_ROOT=root))
         self.external = User.objects.create_user(
             username="external-supplier", email="supplier@example.test"
         )
@@ -62,6 +66,22 @@ class SupplierPortalFixtureMixin(QuoteFixtureMixin):
 
 
 class SupplierPortalFoundationTests(SupplierPortalFixtureMixin, TestCase):
+    def test_authorized_invitation_management_view_rechecks_object_scope(self):
+        from django.urls import reverse
+
+        from apps.organizations.services import set_active_organization
+
+        self._grant_internal_management()
+        invitation = self._issued_invitation()
+        self.client.force_login(self.owner)
+        session = self.client.session
+        set_active_organization(session=session, organization=self.organization)
+        session.save()
+        response = self.client.get(
+            reverse("procurement:portal_invitation_manage", args=[invitation.pk])
+        )
+        self.assertEqual(response.status_code, 200)
+
     def test_invitation_management_is_default_ungranted_and_token_hash_only(self):
         rfq_invitation = self._issued_invitation()
         with self.assertRaises(PermissionDenied):
@@ -159,14 +179,18 @@ class SupplierPortalFoundationTests(SupplierPortalFixtureMixin, TestCase):
         receipt = submit_supplier_portal_quote(
             actor=self.external,
             grant=grant,
-            integrity_fingerprint="a" * 64,
+            upload=SimpleUploadedFile(
+                "bid.pdf", b"%PDF-1.4\na\n%%EOF", content_type="application/pdf"
+            ),
             source_reference="SUPPLIER-1",
             idempotency_key="portal-submit-1",
         )
         retry = submit_supplier_portal_quote(
             actor=self.external,
             grant=grant,
-            integrity_fingerprint="a" * 64,
+            upload=SimpleUploadedFile(
+                "bid.pdf", b"%PDF-1.4\na\n%%EOF", content_type="application/pdf"
+            ),
             source_reference="SUPPLIER-1",
             idempotency_key="portal-submit-1",
         )
@@ -177,7 +201,9 @@ class SupplierPortalFoundationTests(SupplierPortalFixtureMixin, TestCase):
             submit_supplier_portal_quote(
                 actor=self.external,
                 grant=grant,
-                integrity_fingerprint="b" * 64,
+                upload=SimpleUploadedFile(
+                    "bid.pdf", b"%PDF-1.4\nb\n%%EOF", content_type="application/pdf"
+                ),
                 source_reference="SUPPLIER-1",
                 idempotency_key="portal-submit-1",
             )
@@ -193,13 +219,17 @@ class SupplierPortalFoundationTests(SupplierPortalFixtureMixin, TestCase):
         first = submit_supplier_portal_quote(
             actor=self.external,
             grant=grant,
-            integrity_fingerprint="a" * 64,
+            upload=SimpleUploadedFile(
+                "bid.pdf", b"%PDF-1.4\na\n%%EOF", content_type="application/pdf"
+            ),
             idempotency_key="portal-submit-1",
         )
         second = submit_supplier_portal_quote(
             actor=self.external,
             grant=grant,
-            integrity_fingerprint="b" * 64,
+            upload=SimpleUploadedFile(
+                "bid.pdf", b"%PDF-1.4\nb\n%%EOF", content_type="application/pdf"
+            ),
             idempotency_key="portal-submit-2",
         )
         first.quote_revision.refresh_from_db()
@@ -244,7 +274,9 @@ class SupplierPortalConcurrencyTests(SupplierPortalFixtureMixin, TransactionTest
                 receipt = submit_supplier_portal_quote(
                     actor=User.objects.get(pk=self.external.pk),
                     grant=SupplierPortalGrant.objects.get(pk=grant.pk),
-                    integrity_fingerprint="c" * 64,
+                    upload=SimpleUploadedFile(
+                        "bid.pdf", b"%PDF-1.4\nc\n%%EOF", content_type="application/pdf"
+                    ),
                     idempotency_key="portal-concurrent",
                 )
                 return str(receipt.pk)

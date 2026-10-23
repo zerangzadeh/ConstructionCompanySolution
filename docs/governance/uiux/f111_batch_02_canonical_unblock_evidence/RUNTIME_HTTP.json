@@ -1,0 +1,118 @@
+[
+  {
+    "actor": "uiux.persona.project-manager",
+    "control": "limited source-backed GET",
+    "method": "GET",
+    "status": 200,
+    "url": "http://127.0.0.1:8004/billing/retention-releases/new/",
+    "clearance_options": [
+      {
+        "value": "",
+        "label": "---------"
+      }
+    ],
+    "errors": [],
+    "forbidden_full_response_leaks": [],
+    "model_deltas": [],
+    "response_sha256": "dfc2ff459eb10e1e95009a2232ba82eed08cbd72b5c37ecc5eecd203ed8e0638",
+    "authenticated_csrf_middleware": true,
+    "retention_release_delta": 0,
+    "unauthorized_success_audit_delta": 0,
+    "result": "PASS"
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "control": "same-tenant C manipulated unauthorized clearance POST",
+    "method": "POST",
+    "status": 200,
+    "url": "http://127.0.0.1:8004/billing/retention-releases/new/",
+    "clearance_options": [
+      {
+        "value": "",
+        "label": "---------"
+      }
+    ],
+    "errors": [
+      "یک گزینهٔ معتبر انتخاب کنید. آن گزینه از گزینه‌های موجود نیست."
+    ],
+    "forbidden_full_response_leaks": [],
+    "model_deltas": [],
+    "response_sha256": "2ba05c03a6b0819f786798e0993902763e66a0c017a09e478a37f1e1e21837e1",
+    "authenticated_csrf_middleware": true,
+    "retention_release_delta": 0,
+    "unauthorized_success_audit_delta": 0,
+    "result": "PASS"
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "control": "cross-tenant X manipulated unauthorized clearance POST",
+    "method": "POST",
+    "status": 200,
+    "url": "http://127.0.0.1:8004/billing/retention-releases/new/",
+    "clearance_options": [
+      {
+        "value": "",
+        "label": "---------"
+      }
+    ],
+    "errors": [
+      "یک گزینهٔ معتبر انتخاب کنید. آن گزینه از گزینه‌های موجود نیست."
+    ],
+    "forbidden_full_response_leaks": [],
+    "model_deltas": [],
+    "response_sha256": "77a59543817170a3ec46d186ced5b55e26c37ec42fc62ce9f08fcd3b0aea6bb3",
+    "authenticated_csrf_middleware": true,
+    "retention_release_delta": 0,
+    "unauthorized_success_audit_delta": 0,
+    "result": "PASS"
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "control": "source-backed invalid amount redisplay",
+    "method": "POST",
+    "status": 200,
+    "url": "http://127.0.0.1:8004/billing/retention-releases/new/",
+    "clearance_options": [
+      {
+        "value": "",
+        "label": "---------"
+      }
+    ],
+    "errors": [
+      "این فیلد لازم است.",
+      "یک گزینهٔ معتبر انتخاب کنید. آن گزینه از گزینه‌های موجود نیست."
+    ],
+    "forbidden_full_response_leaks": [],
+    "model_deltas": [],
+    "response_sha256": "b57406e387a47c46cd3a4080d936ed991cd7135ff8c38113dc306d3eb791cbea",
+    "authenticated_csrf_middleware": true,
+    "retention_release_delta": 0,
+    "unauthorized_success_audit_delta": 0,
+    "result": "PASS"
+  },
+  {
+    "actor": "uiux.persona.tenant-admin",
+    "control": "organization/view source-positive GET",
+    "method": "GET",
+    "status": 200,
+    "url": "http://127.0.0.1:8004/billing/retention-releases/new/",
+    "clearance_options": [
+      {
+        "value": "",
+        "label": "---------"
+      },
+      {
+        "value": "c056db10-28a5-48e2-998b-de963dc4091a",
+        "label": "ContractComplianceEvidence object (c056db10-28a5-48e2-998b-de963dc4091a)"
+      }
+    ],
+    "errors": [],
+    "forbidden_full_response_leaks": [],
+    "model_deltas": [],
+    "response_sha256": "a13f93b15cdad9bc1d9650a2c60b8ca41420d832aac5e38ffd2f254a8d586b1e",
+    "authenticated_csrf_middleware": true,
+    "retention_release_delta": 0,
+    "unauthorized_success_audit_delta": 0,
+    "result": "PASS"
+  }
+]

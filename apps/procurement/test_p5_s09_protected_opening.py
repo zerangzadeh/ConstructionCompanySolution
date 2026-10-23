@@ -67,11 +67,12 @@ class ProtectedOpeningTests(SealedCustodyFixtureMixin, TestCase):
 
     def _make_actor(self, username: str, role: str) -> User:
         user = User.objects.create_user(username=username)
-        self.organization.memberships.create(
+        membership = self.organization.memberships.create(
             user=user,
             role=role,
             status=MembershipStatus.ACTIVE,
         )
+        self.establish_test_membership_authority(membership)
         return user
 
     def _request(self, *, actor=None, key="open-request-1", reason="scheduled opening"):
@@ -178,11 +179,14 @@ class ProtectedOpeningTests(SealedCustodyFixtureMixin, TestCase):
             code="OTHER-OPENING",
             name="Other opening project",
         )
-        MembershipRoleAssignment.objects.create(
+        MembershipRoleAssignment.objects.get_or_create(
             organization=self.organization,
             membership=membership,
             role=membership.role_definition,
-            reason="P5-S09 scope test",
+            defaults={"reason": "P5-S09 scope test"},
+        )
+        membership.scope_grants.filter(revoked_at__isnull=True).update(
+            revoked_at=timezone.now(), revocation_reason="Replace test Organization scope"
         )
         MembershipScopeGrant.objects.create(
             organization=self.organization,
@@ -426,6 +430,7 @@ class ProtectedOpeningConcurrencyTests(SealedCustodyFixtureMixin, TransactionTes
             role=MembershipRole.TENANT_MANAGER,
             status=MembershipStatus.ACTIVE,
         )
+        self.establish_test_membership_authority(approver_membership)
         approver_membership.role_definition.permissions.add(
             BusinessPermission.objects.get(
                 code=BusinessPermissionCode.RFQ_QUOTES_APPROVE_OPEN

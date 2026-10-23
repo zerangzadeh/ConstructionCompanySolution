@@ -1,0 +1,179 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+ 
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">پیکربندی پرداخت کارمند</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">حقوق و دستمزد محرمانه</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">پیکربندی پرداخت کارمند</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">مدل پرداخت یک دسته پیکربندی کسب‌وکار است و تفسیر قانونی ایجاد نمی‌کند.</p>
+        
+    </div>
+    
+</header>
+
+<section class="erp-surface mx-auto mt-5 max-w-3xl rounded-2xl p-5 sm:p-7">
+  <form method="post" class="space-y-4" novalidate>
+    <!-- CSRF omitted -->
+    
+    
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_employee">
+        کارمند<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="employee" aria-describedby="id_employee-errors" aria-invalid="true" required id="id_employee">
+  <option value="" selected>---------</option>
+
+  <option value="9a4904d8-c421-4919-9162-0084aa9a9b0f">WAVE-C-HR - Wave C Synthetic</option>
+
+  <option value="56a63728-2278-41c6-84b5-0f8d4179c11d">۱۳۰ - محسن جاوید</option>
+
+  <option value="58deb1bc-7802-4aa9-821f-ea80c8903f6e">۲۲۲۲۲ - علی رضایی</option>
+
+  <option value="6cafa5b7-9a7a-4d2c-bf5a-be8b77054dfb">EMP-001 - مدیر سامانه</option>
+
+  <option value="c1312008-8583-41d7-9ffb-ffd56e738e9b">EMP-002 - مریم کاظمی</option>
+
+</select>
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_employee-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_pay_model">
+        مدل پرداخت<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="pay_model" aria-describedby="id_pay_model-errors" aria-invalid="true" id="id_pay_model">
+  <option value="salaried">حقوق ثابت</option>
+
+  <option value="hourly">ساعتی</option>
+
+  <option value="daily">روزانه</option>
+
+  <option value="project_linked">وابسته به پروژه</option>
+
+  <option value="other">سایر تنظیم صریح</option>
+
+</select>
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_pay_model-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_base_rate">
+        نرخ مبنا<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="number" name="base_rate" min="0" step="1e-8" aria-describedby="id_base_rate-errors" aria-invalid="true" required id="id_base_rate">
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_base_rate-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_rate_unit">
+        واحد نرخ<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="rate_unit" maxlength="40" aria-describedby="id_rate_unit-errors" aria-invalid="true" required id="id_rate_unit">
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_rate_unit-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_effective_from">
+        شروع اثر<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="date" name="effective_from" aria-describedby="id_effective_from-errors" aria-invalid="true" required id="id_effective_from">
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_effective_from-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_effective_to">
+        پایان اثر
+    </label>
+    <input type="date" name="effective_to" id="id_effective_to">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_project">
+        پروژه
+        
+    </label>
+    <select name="project" id="id_project">
+  <option value="">---------</option>
+
+  <option value="f61f52ed-3c85-4570-af2b-5e89c025ab4e">PRJ-01-03 - بازسازی کارخانه نوآوران</option>
+
+  <option value="623b4e02-b751-495f-b0e7-7e1601b9ccdf">PRJ-01-04 - ساختمان اداری آفتاب</option>
+
+  <option value="58f517da-2139-45ac-8b7b-4f3d3a3d26e8" selected>PRJ-01-01 - مجتمع مسکونی باغستان</option>
+
+  <option value="de3b5756-9d3e-4e67-a08b-97dbd2824c2f">PRJ-01-02 - مرکز درمانی مهر</option>
+
+</select>
+    
+    
+</div>
+<button type="submit" name="_refresh_context" value="1" formnovalidate class="erp-btn erp-btn--secondary">نمایش کارگاه‌های پروژه</button>
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_site">
+        کارگاه
+        
+    </label>
+    <select name="site" aria-describedby="id_site-help" id="id_site">
+  <option value="" selected>---------</option>
+
+  <option value="de1707c9-a4d1-42a3-bef3-0a86e6e62370">PRJ-01-01 · B09-SIBLING - B09 synthetic ungranted sibling</option>
+
+  <option value="eef2f5d7-dc51-44d3-8414-8dc480f500c0">PRJ-01-01 · SITE-01 - کارگاه اصلی پروژه</option>
+
+</select>
+    
+        <p class="erp-field-help mt-1 text-sm text-slate-500" id="id_site-help">پس از انتخاب پروژه، کارگاه‌های همان پروژه را نمایش دهید.</p>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_source_reference">
+        مرجع منبع<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="source_reference" value="preserve synthetic field" maxlength="255" required id="id_source_reference">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_evidence_json">
+        شواهد JSON
+    </label>
+    <textarea name="evidence_json" cols="40" rows="3" dir="ltr" id="id_evidence_json">
+</textarea>
+    
+    
+</div>
+
+    <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-5"><button class="erp-btn erp-btn--primary" type="submit">ثبت کنترل‌شده</button><a class="erp-btn erp-btn--secondary" href="/payroll/">بازگشت</a></div>
+  </form>
+</section>
+
+        </main>

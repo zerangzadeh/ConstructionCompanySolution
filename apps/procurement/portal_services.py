@@ -1,4 +1,4 @@
-"""P5-S18–S22 invite-scoped external portal foundation (no UI or uploads)."""
+"""Invite-scoped external portal and immutable original-payload submission."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import Any
 
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.files.uploadedfile import UploadedFile
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
@@ -24,7 +25,10 @@ from apps.organizations.models import (
 )
 from apps.procurement.models import (
     QuoteEnvelope,
+    QuoteEvidenceSourceChannel,
+    QuoteEvidenceType,
     QuoteRevision,
+    QuoteRevisionEvidence,
     QuoteRevisionStatus,
     QuoteRevisionTransition,
     QuoteSourceChannel,
@@ -197,10 +201,7 @@ def accept_supplier_portal_invitation(
     if invitation.status != SupplierPortalInvitationStatus.PENDING:
         raise PermissionDenied("دعوت‌نامه لغو شده است.")
     now = timezone.now()
-    if (
-        not invitation.organization.is_active
-        or now >= invitation.expires_at
-    ):
+    if not invitation.organization.is_active or now >= invitation.expires_at:
         raise PermissionDenied("هویت یا زمان دعوت‌نامه معتبر نیست.")
     _validate_open_rfq_invitation(invitation.rfq_invitation)
     principal, _ = SupplierPortalPrincipal.objects.get_or_create(
@@ -371,7 +372,7 @@ def _submission_payload_fingerprint(
 
 
 @transaction.atomic
-def submit_supplier_portal_quote(
+def _submit_supplier_portal_revision(
     *,
     actor: User,
     grant: SupplierPortalGrant,
@@ -493,3 +494,165 @@ def submit_supplier_portal_quote(
         },
     )
     return receipt
+
+
+def submit_supplier_portal_quote(
+    *,
+    actor: User,
+    grant: SupplierPortalGrant,
+    upload: UploadedFile,
+    idempotency_key: str,
+    source_reference: str = "",
+    integrity_fingerprint: str = "",
+    supplier_submitted_at: datetime | None = None,
+) -> SupplierPortalSubmissionReceipt:
+    """PD-WC-D04: one retained original; only server-derived bytes are authoritative.
+
+    The optional caller digest is checked, never used as the content authority.
+    The internal post-close custody command keeps its separate authorization path.
+    """
+    from pathlib import Path
+
+    from apps.documents.models import DocumentVersion
+    from apps.documents.sealed_services import create_quarantined_sealed_document
+    from apps.procurement.custody_services import _stage_upload
+
+    # Reject an unauthorized principal before creating even temporary custody.
+    with transaction.atomic():
+        grant = _locked_active_grant(actor=actor, grant=grant)
+        if timezone.now() > grant.rfq_invitation.rfq_version.closing_at:
+            raise ValueError("پس از مهلت، پیشنهاد جدید پذیرفته نمی‌شود.")
+    staged = None
+    completed = False
+    stored_names: list[str] = []
+    try:
+        if Path(upload.name).suffix.lower() not in {".pdf", ".docx"}:
+            raise ValueError("اصل پیشنهاد باید PDF یا DOCX باشد.")
+        staged = _stage_upload(upload)
+        expected = integrity_fingerprint.strip().lower()
+        if expected and expected != staged.sha256:
+            raise ValueError("هش ارسالی با بایت‌های اصل پیشنهاد یکسان نیست.")
+        with transaction.atomic():
+            locked = _locked_active_grant(actor=actor, grant=grant)
+            receipt = _submit_supplier_portal_revision(
+                actor=actor,
+                grant=locked,
+                integrity_fingerprint=staged.sha256,
+                idempotency_key=idempotency_key,
+                source_reference=source_reference,
+                supplier_submitted_at=supplier_submitted_at,
+            )
+            existing = QuoteRevisionEvidence.objects.filter(
+                quote_revision=receipt.quote_revision,
+                evidence_type=QuoteEvidenceType.SUPPLIER_ORIGINAL,
+            ).first()
+            if existing:
+                if (
+                    existing.source_channel
+                    != QuoteEvidenceSourceChannel.EXTERNAL_PORTAL_UPLOAD
+                    or existing.canonical_sha256 != staged.sha256
+                ):
+                    raise ValueError("شاهد اصل پیشنهاد با ارسال تکراری سازگار نیست.")
+                retained = hashlib.sha256()
+                with existing.document_version.file.open("rb") as content:
+                    for chunk in iter(lambda: content.read(65536), b""):
+                        retained.update(chunk)
+                if retained.hexdigest() != staged.sha256:
+                    raise ValueError("یکپارچگی اصل نگهداری‌شده معتبر نیست.")
+                completed = True
+                return receipt
+            # An old metadata-only receipt must not silently acquire new evidence.
+            if receipt.created_at < staged.received_at:
+                raise ValueError(
+                    "رسید فاقد اصل پیشنهاد قابل تکمیل ضمنی نیست؛ ارسال جدید لازم است."
+                )
+            document, version, custody = create_quarantined_sealed_document(
+                organization=locked.organization,
+                actor=actor,
+                staged_path=staged.path,
+                original_file_name=staged.original_file_name,
+                content_type=staged.content_type,
+                file_size=staged.file_size,
+                canonical_sha256=staged.sha256,
+                received_at=staged.received_at,
+                stored_names=stored_names,
+            )
+            evidence = QuoteRevisionEvidence.objects.create(
+                organization=locked.organization,
+                quote_revision=receipt.quote_revision,
+                document=document,
+                document_version=version,
+                sealed_custody=custody,
+                evidence_type=QuoteEvidenceType.SUPPLIER_ORIGINAL,
+                evidence_slot="primary",
+                canonical_sha256=staged.sha256,
+                revision_fingerprint=staged.sha256,
+                source_channel=QuoteEvidenceSourceChannel.EXTERNAL_PORTAL_UPLOAD,
+                captured_by=actor,
+                received_at=staged.received_at,
+                custodied_at=custody.custodied_at,
+                idempotency_key=idempotency_key,
+                payload_fingerprint=receipt.payload_fingerprint,
+            )
+            _locked_active_grant(actor=actor, grant=locked)
+            if timezone.now() > locked.rfq_invitation.rfq_version.closing_at:
+                raise ValueError("پس از مهلت، پیشنهاد جدید پذیرفته نمی‌شود.")
+            record_audit_event(
+                action=AuditAction.RFQ_SEALED_EVIDENCE_CUSTODIED,
+                entity_type="procurement.QuoteRevisionEvidence",
+                entity_id=evidence.pk,
+                organization=locked.organization,
+                actor=None,
+                metadata={
+                    "external_user_id": str(actor.pk),
+                    "source_channel": QuoteEvidenceSourceChannel.EXTERNAL_PORTAL_UPLOAD,
+                    "receipt_id": str(receipt.pk),
+                    "quote_revision_id": str(receipt.quote_revision_id),
+                    "document_version_id": str(version.pk),
+                    "canonical_sha256": staged.sha256,
+                    "state": custody.state,
+                },
+            )
+            completed = True
+            return receipt
+    except Exception as exc:
+        completed = False
+        storage = DocumentVersion._meta.get_field("file").storage
+        cleanup_failed = False
+        for name in stored_names:
+            try:
+                storage.delete(name)
+            except OSError:
+                cleanup_failed = True
+        record_audit_event(
+            action=AuditAction.RFQ_SEALED_EVIDENCE_REJECTED,
+            entity_type="procurement.SupplierPortalGrant",
+            entity_id=grant.pk,
+            organization=grant.organization,
+            actor=None,
+            metadata={
+                "external_user_id": str(actor.pk),
+                "failure_code": type(exc).__name__,
+                "content_recorded": False,
+                "cleanup_failed": cleanup_failed,
+            },
+        )
+        raise
+    finally:
+        if staged is not None:
+            try:
+                staged.path.unlink(missing_ok=True)
+            except OSError:
+                record_audit_event(
+                    action=AuditAction.RFQ_SEALED_EVIDENCE_REJECTED,
+                    entity_type="procurement.SupplierPortalGrant",
+                    entity_id=grant.pk,
+                    organization=grant.organization,
+                    actor=None,
+                    metadata={
+                        "external_user_id": str(actor.pk),
+                        "failure_code": "TemporaryCleanupFailure",
+                        "content_recorded": completed,
+                        "cleanup_failed": True,
+                    },
+                )

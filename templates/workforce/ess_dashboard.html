@@ -6,7 +6,7 @@
 <header class="erp-surface rounded-2xl p-5 sm:p-6">
   <p class="text-xs font-bold text-blue-700">خدمات کارکنان</p>
   <h1 class="mt-2 text-2xl font-black text-slate-950">داشبورد خدمات من</h1>
-  <p class="mt-2 text-sm text-slate-600">اطلاعات شخصی و وضعیت درخواست‌ها از منابع مجاز شما نمایش داده می‌شود.</p>
+  <p class="mt-2 text-sm text-slate-600">اطلاعات شخصی و وضعیت درخواست‌های شما در این بخش نمایش داده می‌شود.</p>
   <p class="mt-2 text-xs text-slate-500">زمان مشاهده: {{ dashboard.observed_at|jalali_datetime }}</p>
 </header>
 <div class="mt-5 grid gap-5 lg:grid-cols-2">
@@ -26,20 +26,20 @@
         {% for row in dashboard.requests %}
           <li class="py-3 text-sm" data-source-id="{{ row.source_id }}">
             <p class="font-bold">{{ row.source_label }}</p>
-            <p class="mt-1 text-slate-600">وضعیت منبع: {{ row.status_label }} · <bdi>{{ row.status }}</bdi></p>
-            <p class="mt-1 text-xs text-slate-500">آخرین تغییر منبع: {{ row.occurred_at|jalali_datetime }}</p>
-            {% if row.source_url %}<a class="mt-2 inline-flex font-bold text-blue-700" href="{{ row.source_url }}">مشاهده در منبع</a>{% endif %}
+            <p class="mt-1 text-slate-600">وضعیت درخواست: {{ row.status_label }}</p>
+            <p class="mt-1 text-xs text-slate-500">آخرین تغییر: {{ row.occurred_at|jalali_datetime }}</p>
+            {% if row.source_url %}<a class="mt-2 inline-flex font-bold text-blue-700" href="{{ row.source_url }}">مشاهده درخواست</a>{% endif %}
           </li>
         {% endfor %}
       </ul>
       <a class="mt-4 inline-flex font-bold text-blue-700" href="{% url 'workflows:my_requests' %}">همه درخواست‌های من</a>
     {% elif dashboard.requests_state == "empty" %}
-      <p class="mt-4 text-sm text-slate-600" role="status">درخواست مجازی برای نمایش ثبت نشده است.</p>
+      <p class="mt-4 text-sm text-slate-600" role="status">هنوز درخواستی برای نمایش ندارید.</p>
       <a class="mt-4 inline-flex font-bold text-blue-700" href="{% url 'workflows:my_requests' %}">ورود به درخواست‌های من</a>
     {% elif dashboard.requests_state == "error" %}
       <p class="mt-4 text-sm text-slate-600" role="status">دریافت وضعیت درخواست‌ها ممکن نشد. دوباره تلاش کنید.</p>
     {% else %}
-      <p class="mt-4 text-sm text-slate-600" role="status">این منبع برای حساب شما در دسترس نیست.</p>
+      <p class="mt-4 text-sm text-slate-600" role="status">نمایش درخواست‌ها برای حساب شما در دسترس نیست.</p>
     {% endif %}
   </section>
 </div>

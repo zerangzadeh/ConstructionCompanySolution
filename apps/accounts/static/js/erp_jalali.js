@@ -133,7 +133,8 @@
             trigger = document.createElement("button");
             trigger.type = "button";
             trigger.className = "erp-jalali-trigger";
-            trigger.setAttribute("aria-label", "باز کردن تقویم شمسی");
+            const fieldLabel = Array.from(input.labels || []).map((label) => label.textContent.trim()).join(" ") || input.getAttribute("aria-label") || "";
+            trigger.setAttribute("aria-label", fieldLabel ? `باز کردن تقویم شمسی: ${fieldLabel}` : "باز کردن تقویم شمسی");
             trigger.innerHTML = "<span aria-hidden=\"true\">▦</span>";
             wrap.appendChild(trigger);
         }
@@ -185,12 +186,16 @@
     }
 
     function changeMonth(offset) {
+        const focusedMonth = document.activeElement?.dataset.month;
         let [year, month] = visibleMonth;
         month += offset;
         if (month < 1) { year -= 1; month = 12; }
         if (month > 12) { year += 1; month = 1; }
         visibleMonth = [year, month];
         renderPicker();
+        if (focusedMonth) {
+            activeInput.closest(".erp-jalali-wrap")?.querySelector(`[data-month="${focusedMonth}"]`)?.focus();
+        }
     }
 
     function openPicker(input) {
@@ -283,8 +288,19 @@
     document.addEventListener("submit", (event) => {
         if (!prepareForm(event.target)) event.preventDefault();
     }, true);
+    document.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape" || !activeInput) return;
+        const wrap = activeInput.closest(".erp-jalali-wrap");
+        const popover = wrap?.querySelector(":scope > .erp-jalali-popover");
+        if (!popover || popover.hidden) return;
+        const returnFocus = popover.contains(document.activeElement);
+        popover.hidden = true;
+        event.preventDefault();
+        if (returnFocus) wrap.querySelector(":scope > .erp-jalali-trigger")?.focus();
+    });
     document.addEventListener("click", (event) => {
-        if (!event.target.closest(".erp-jalali-wrap")) document.querySelectorAll(".erp-jalali-popover").forEach((item) => { item.hidden = true; });
+        const insidePicker = event.composedPath().some((item) => item.classList?.contains("erp-jalali-wrap"));
+        if (!insidePicker) document.querySelectorAll(".erp-jalali-popover").forEach((item) => { item.hidden = true; });
     });
     document.addEventListener("DOMContentLoaded", () => {
         initialize();

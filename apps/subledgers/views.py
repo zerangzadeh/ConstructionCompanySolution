@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from datetime import date
 from decimal import Decimal, InvalidOperation
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
@@ -33,6 +33,7 @@ from apps.subledgers.services import (
     review_subledger_reconciliation,
     run_aging,
     run_subledger_reconciliation,
+    settlement_movement_choices,
     supplier_invoice_match_queryset,
 )
 from apps.treasury.models import (
@@ -86,11 +87,20 @@ def _direction(request: HttpRequest) -> str:
 def workbench(request: HttpRequest) -> HttpResponse:
     obligations = obligation_queryset(organization=request.organization, actor=request.user)
     obligation_ids = obligations.values("pk")
+    visible_obligations = list(obligations.select_related("project", "contract")[:75])
+    for obligation in visible_obligations:
+        obligation.allocation_key = str(uuid4())
+        try:
+            obligation.settlement_choices = settlement_movement_choices(
+                organization=request.organization, actor=request.user, obligation=obligation,
+            )
+        except (PermissionDenied, ValidationError):
+            obligation.settlement_choices = ()
     return render(
         request,
         "subledgers/workbench.html",
         {
-            "obligations": obligations.select_related("project", "contract")[:75],
+            "obligations": visible_obligations,
             "allocations": SettlementAllocation.objects.filter(
                 organization=request.organization, obligation_id__in=obligation_ids
             ).select_related("obligation", "treasury_movement")[:50],
@@ -152,13 +162,17 @@ def supplier_invoice_match_review(
 @require_POST
 def allocate(request: HttpRequest, obligation_id) -> HttpResponse:
     obligation = _scoped_obligation(request, obligation_id)
+    try:
+        movement_id = UUID(str(request.POST.get("treasury_movement_id", "")))
+    except ValueError as exc:
+        raise Http404("تراکنش قطعی معتبر انتخاب نشده است.") from exc
     movement = get_object_or_404(
         TreasuryMovement.objects.filter(
             organization=request.organization,
             status=TreasuryMovementStatus.POSTED,
             kind=(TreasuryMovementKind.RECEIPT if obligation.direction == ObligationDirection.RECEIVABLE else TreasuryMovementKind.DISBURSEMENT),
         ),
-        pk=request.POST.get("treasury_movement_id"),
+        pk=movement_id,
     )
     try:
         allocate_settlement(

@@ -1,16 +1,26 @@
 from __future__ import annotations
 
 import json
+from uuid import uuid4
 
 from django import forms
+from django.db.models import Q
 
+from apps.organizations.authorization import get_active_membership, scope_queryset
+from apps.organizations.form_scoping import (
+    scope_project_related_choices,
+    scoped_projects_for_form,
+    selected_form_project,
+)
 from apps.organizations.models import PlatformPolicyVersion
 from apps.organizations.policy_specs import (
     EMPLOYEE_INSURANCE_OUTPUT_SCHEMA_POLICY_CODE,
     PAYROLL_TAX_OUTPUT_SCHEMA_POLICY_CODE,
 )
 from apps.projects.models import Project, ProjectSite
+from apps.timekeeping.models import Timesheet
 from apps.workforce.models import Employee
+from core.jalali import format_jalali
 
 from .models import (
     AdjustmentKind,
@@ -20,7 +30,6 @@ from .models import (
     NetEffect,
     PayModel,
     PayrollComponent,
-    PayrollInputSource,
     PayrollPeriod,
     PayrollRule,
     PayrollRun,
@@ -38,9 +47,55 @@ from .models import (
 
 
 class OrganizationForm(forms.Form):
-    def __init__(self, *args, organization, **kwargs):
+    def __init__(self, *args, organization, actor=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.organization = organization
+        self.actor = actor
+        run_field = self.fields.get("run")
+        if isinstance(run_field, forms.ModelChoiceField):
+            run_field.label_from_instance = lambda run: f"{run.code} · {run.get_kind_display()}"
+        if "idempotency_key" in self.fields:
+            self.fields["idempotency_key"].widget = forms.HiddenInput()
+            self.initial.setdefault("idempotency_key", str(uuid4()))
+
+    def project_sites(self):
+        projects = Project.objects.filter(
+            organization=self.organization, deleted_at__isnull=True
+        )
+        sites = ProjectSite.objects.filter(
+            organization=self.organization, is_active=True
+        )
+        membership = None
+        if self.actor is not None:
+            membership = get_active_membership(
+                user=self.actor, organization=self.organization
+            )
+            projects = scoped_projects_for_form(
+                organization=self.organization, membership=membership
+            )
+        project = selected_form_project(
+            data=self.data if self.is_bound else self.initial,
+            field_name="project",
+            projects=projects,
+            active_project=None,
+        )
+        self.fields["project"].queryset = projects
+        self.fields["site"].queryset = (
+            scope_project_related_choices(
+                sites,
+                membership=membership,
+                project_lookup="project_id",
+                site_lookup="pk",
+                project=project,
+            )
+            if membership is not None
+            else sites.filter(project=project)
+            if project
+            else sites.none()
+        )
+        self.fields[
+            "site"
+        ].help_text = "پس از انتخاب پروژه، کارگاه‌های همان پروژه را نمایش دهید."
 
 
 class FinancialHandoffPrepareForm(OrganizationForm):
@@ -125,6 +180,7 @@ class EmploymentConfigurationForm(OrganizationForm):
         self.fields["site"].queryset = ProjectSite.objects.filter(
             organization=organization
         )
+        self.project_sites()
 
     def clean_evidence_json(self) -> dict:
         raw = self.cleaned_data["evidence_json"].strip()
@@ -151,6 +207,11 @@ class ComponentForm(OrganizationForm):
 
 
 class RuleForm(OrganizationForm):
+    timesheet_quantity_unit = forms.ChoiceField(
+        choices=(("", "بدون نگاشت کارکرد"), ("minute", "دقیقه"), ("hour", "ساعت")),
+        required=False,
+        label="واحد مقدار کارکرد تأییدشده",
+    )
     component = forms.ModelChoiceField(
         queryset=PayrollComponent.objects.none(), label="جزء حقوق"
     )
@@ -211,6 +272,7 @@ class RuleForm(OrganizationForm):
         self.fields["site"].queryset = ProjectSite.objects.filter(
             organization=organization
         )
+        self.project_sites()
 
     def clean_evidence_json(self) -> dict:
         raw = self.cleaned_data["evidence_json"].strip()
@@ -223,6 +285,16 @@ class RuleForm(OrganizationForm):
         if not isinstance(value, dict):
             raise forms.ValidationError("شواهد باید یک شیء JSON باشد.")
         return value
+
+    def clean(self):
+        data = super().clean()
+        unit = data.pop("timesheet_quantity_unit", "")
+        if unit:
+            if data.get("method") != CalculationMethod.QUANTITY_TIMES_RATE:
+                self.add_error("method", "نگاشت کارکرد فقط برای مقدار × نرخ مجاز است.")
+            evidence = data.setdefault("evidence_json", {})
+            evidence["timesheet_input_mapping"] = {"version": 1, "quantity_unit": unit}
+        return data
 
 
 class PeriodForm(OrganizationForm):
@@ -269,54 +341,56 @@ class RunForm(OrganizationForm):
 
 
 class InputForm(OrganizationForm):
-    employee = forms.ModelChoiceField(queryset=Employee.objects.none(), label="کارمند")
-    rule = forms.ModelChoiceField(queryset=PayrollRule.objects.none(), label="قاعده")
-    quantity = forms.DecimalField(
-        max_digits=24, decimal_places=8, min_value=0, label="مقدار"
+    timesheet = forms.ModelChoiceField(
+        queryset=Timesheet.objects.none(), label="کارکرد تأییدشده"
     )
-    source_type = forms.ChoiceField(
-        choices=PayrollInputSource.choices, label="نوع منبع"
-    )
-    source_reference = forms.CharField(max_length=255, label="مرجع منبع")
-    source_version = forms.CharField(max_length=100, label="نسخه منبع")
-    source_status = forms.ChoiceField(
-        choices=(("approved", "تأییدشده"), ("final", "قطعی")), label="وضعیت منبع"
-    )
-    source_payload_json = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": 3, "dir": "ltr"}),
-        label="snapshot منبع JSON",
-    )
-    project = forms.ModelChoiceField(
-        queryset=Project.objects.none(), required=False, label="پروژه"
-    )
-    site = forms.ModelChoiceField(
-        queryset=ProjectSite.objects.none(), required=False, label="کارگاه"
+    rule = forms.ModelChoiceField(
+        queryset=PayrollRule.objects.none(), label="قاعده و واحد مقدار"
     )
 
     def __init__(self, *args, organization, run: PayrollRun, **kwargs):
+        from .timesheet_inputs import eligible_timesheets
+
         super().__init__(*args, organization=organization, **kwargs)
-        employee_ids = run.employee_results.values_list("employee_id", flat=True)
-        self.fields["employee"].queryset = Employee.objects.filter(pk__in=employee_ids)
+        self.fields["timesheet"].queryset = eligible_timesheets(
+            organization=organization,
+            actor=self.actor,
+            run=run,
+        )
+        self.fields["timesheet"].label_from_instance = lambda sheet: (
+            f"{sheet.employee} · {format_jalali(sheet.period_start)} — {format_jalali(sheet.period_end)} · نسخه {sheet.revision}"
+        )
         self.fields["rule"].queryset = PayrollRule.objects.filter(
             organization=organization,
             status="active",
             method=CalculationMethod.QUANTITY_TIMES_RATE,
+            evidence__timesheet_input_mapping__version=1,
+            evidence__timesheet_input_mapping__quantity_unit__in=["minute", "hour"],
         )
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization
+        self.fields["rule"].label_from_instance = lambda rule: (
+            f"{rule.name} · { {'minute': 'دقیقه', 'hour': 'ساعت'}[rule.evidence['timesheet_input_mapping']['quantity_unit']] }"
         )
-        self.fields["site"].queryset = ProjectSite.objects.filter(
-            organization=organization
+        membership = (
+            get_active_membership(user=self.actor, organization=organization)
+            if self.actor
+            else None
         )
-
-    def clean_source_payload_json(self) -> dict:
-        try:
-            value = json.loads(self.cleaned_data["source_payload_json"])
-        except json.JSONDecodeError as exc:
-            raise forms.ValidationError("JSON معتبر نیست.") from exc
-        if not isinstance(value, dict):
-            raise forms.ValidationError("snapshot باید یک شیء JSON باشد.")
-        return value
+        rules = self.fields["rule"].queryset
+        self.fields["rule"].queryset = (
+            rules.none()
+            if membership is None
+            else rules.filter(
+                Q(project__isnull=True, site__isnull=True)
+                | Q(
+                    pk__in=scope_queryset(
+                        rules,
+                        membership=membership,
+                        project_lookup="project_id",
+                        site_lookup="site_id",
+                    )
+                )
+            )
+        )
 
 
 class AdjustmentForm(OrganizationForm):

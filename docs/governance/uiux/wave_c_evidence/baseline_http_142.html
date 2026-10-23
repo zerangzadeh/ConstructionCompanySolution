@@ -1,0 +1,219 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+
+<div class="mb-3 flex items-center justify-end gap-2" data-table-filter-controls="table-filters">
+    <form id="table-filters" method="get" class="flex items-center gap-2" aria-label="فیلترهای جدول" data-table-filter-form>
+        <button class="h-8 rounded-md border border-slate-200 bg-white px-2.5 text-[11px] font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-700" type="submit">اعمال فیلتر</button>
+        
+    </form>
+</div>
+<template id="table-filters-row">
+<tr class="bg-slate-50/70 align-top text-right">
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-number">فیلتر شماره برآورد</label>
+            
+                <input id="table-filters-number" type="search" name="number" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-title">فیلتر عنوان</label>
+            
+                <input id="table-filters-title" type="search" name="title" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-project">فیلتر پروژه یا فاز</label>
+            
+                <input id="table-filters-project" type="search" name="project" form="table-filters" value="" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="جست‌وجو">
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+            <label class="sr-only" for="table-filters-status">فیلتر وضعیت</label>
+            
+                <select id="table-filters-status" name="status" form="table-filters" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                    <option value="">همه</option>
+                    <option value="draft">پیش‌نویس</option><option value="approved">تأییدشده</option><option value="revised">بازنگری‌شده</option><option value="archived">بایگانی‌شده</option>
+                </select>
+            
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+    </th>
+    
+    <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
+        
+    </th>
+    
+</tr>
+
+</template>
+
+ 
+
+
+    
+    <nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">فهرست برآوردها</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">مدیریت برآوردها</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">فهرست برآوردها</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">شرکت سازه‌پردازان پارس</p>
+        
+    </div>
+    
+        <a class="erp-page-header__action erp-btn erp-btn--primary shrink-0" href="/estimates/create/">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>برآورد جدید
+        </a>
+    
+</header>
+
+
+    <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست برآوردها">
+        
+            <div class="erp-panel-header"><div><h2 class="text-sm font-semibold text-slate-900">برآوردهای پروژه</h2><p class="mt-0.5 text-[11px] text-slate-500">مبالغ و وضعیت آخرین نسخهٔ هر برآورد</p></div><span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">8 رکورد</span></div>
+            <div class="erp-table-wrap">
+                <table class="w-full min-w-[920px] text-right">
+                    <thead><tr><th class="border-b border-slate-200 px-4 py-3"><a href="/estimates/?sort=number&amp;direction=asc" class="inline-flex items-center gap-1 rounded px-1 py-0.5 transition hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1" aria-label="مرتب‌سازی شماره برآورد" aria-sort="none" data-sort-state="none">
+    <span>شماره برآورد</span><span class="text-[10px] leading-none text-slate-400" aria-hidden="true">↕</span>
+</a>
+</th><th class="border-b border-slate-200 px-4 py-3"><a href="/estimates/?sort=title&amp;direction=asc" class="inline-flex items-center gap-1 rounded px-1 py-0.5 transition hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1" aria-label="مرتب‌سازی عنوان" aria-sort="none" data-sort-state="none">
+    <span>عنوان</span><span class="text-[10px] leading-none text-slate-400" aria-hidden="true">↕</span>
+</a>
+</th><th class="border-b border-slate-200 px-4 py-3"><a href="/estimates/?sort=project&amp;direction=asc" class="inline-flex items-center gap-1 rounded px-1 py-0.5 transition hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1" aria-label="مرتب‌سازی پروژه / فاز" aria-sort="none" data-sort-state="none">
+    <span>پروژه / فاز</span><span class="text-[10px] leading-none text-slate-400" aria-hidden="true">↕</span>
+</a>
+</th><th class="border-b border-slate-200 px-4 py-3"><a href="/estimates/?sort=status&amp;direction=asc" class="inline-flex items-center gap-1 rounded px-1 py-0.5 transition hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1" aria-label="مرتب‌سازی وضعیت" aria-sort="none" data-sort-state="none">
+    <span>وضعیت</span><span class="text-[10px] leading-none text-slate-400" aria-hidden="true">↕</span>
+</a>
+</th><th class="border-b border-slate-200 px-4 py-3 text-left"><a href="/estimates/?sort=amount&amp;direction=asc" class="inline-flex items-center gap-1 rounded px-1 py-0.5 transition hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1" aria-label="مرتب‌سازی مبلغ" aria-sort="none" data-sort-state="none">
+    <span>مبلغ</span><span class="text-[10px] leading-none text-slate-400" aria-hidden="true">↕</span>
+</a>
+</th><th class="w-24 border-b border-slate-200 px-4 py-3 text-center">عملیات</th></tr></thead>
+                    <tbody class="divide-y divide-slate-100">
+                        
+                            <tr>
+                                <td class="whitespace-nowrap px-4 py-3.5 font-medium text-slate-700" dir="ltr">B06-E-A</td>
+                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="/estimates/6a8ba8c3-16f7-450c-8261-4b1ed00e344d/">B06 synthetic estimate A</a></td>
+                                <td class="px-4 py-3.5"><p class="font-medium text-slate-700">مجتمع مسکونی باغستان</p><p class="mt-0.5 text-[11px] text-slate-500"></p></td>
+                                <td class="px-4 py-3.5"><span class="erp-badge erp-badge--success">
+    تأییدشده
+</span>
+</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums text-slate-900" dir="ltr">100 <span class="font-normal text-slate-500" dir="rtl">IRR</span></td>
+                                <td class="px-4 py-3.5 text-center"><a class="text-xs font-semibold text-blue-700 hover:text-blue-900" href="/estimates/6a8ba8c3-16f7-450c-8261-4b1ed00e344d/">جزئیات</a></td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="whitespace-nowrap px-4 py-3.5 font-medium text-slate-700" dir="ltr">B06-E-B</td>
+                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="/estimates/0fcae61d-554e-4ee1-b423-675187a94ba3/">B06 synthetic estimate B</a></td>
+                                <td class="px-4 py-3.5"><p class="font-medium text-slate-700">مرکز درمانی مهر</p><p class="mt-0.5 text-[11px] text-slate-500"></p></td>
+                                <td class="px-4 py-3.5"><span class="erp-badge erp-badge--success">
+    تأییدشده
+</span>
+</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums text-slate-900" dir="ltr">100 <span class="font-normal text-slate-500" dir="rtl">IRR</span></td>
+                                <td class="px-4 py-3.5 text-center"><a class="text-xs font-semibold text-blue-700 hover:text-blue-900" href="/estimates/0fcae61d-554e-4ee1-b423-675187a94ba3/">جزئیات</a></td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="whitespace-nowrap px-4 py-3.5 font-medium text-slate-700" dir="ltr">UIUX-RUNTIME-20261021-PRJ-01-01</td>
+                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="/estimates/b73c20b4-2d05-42cb-b035-f755ce784870/">UIUX runtime reference estimate PRJ-01-01</a><p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500">Development fixture; retained draft; not an approved budget</p></td>
+                                <td class="px-4 py-3.5"><p class="font-medium text-slate-700">مجتمع مسکونی باغستان</p><p class="mt-0.5 text-[11px] text-slate-500">عملیات زیرسازی و سازه</p></td>
+                                <td class="px-4 py-3.5"><span class="erp-badge erp-badge--neutral">
+    پیش‌نویس
+</span>
+</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums text-slate-900" dir="ltr">0 <span class="font-normal text-slate-500" dir="rtl">IRR</span></td>
+                                <td class="px-4 py-3.5 text-center"><a class="text-xs font-semibold text-blue-700 hover:text-blue-900" href="/estimates/b73c20b4-2d05-42cb-b035-f755ce784870/">جزئیات</a></td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="whitespace-nowrap px-4 py-3.5 font-medium text-slate-700" dir="ltr">UIUX-RUNTIME-20261021-PRJ-01-02</td>
+                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="/estimates/f9d36a32-0900-4889-9786-329b270138c8/">UIUX runtime reference estimate PRJ-01-02</a><p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500">Development fixture; retained draft; not an approved budget</p></td>
+                                <td class="px-4 py-3.5"><p class="font-medium text-slate-700">مرکز درمانی مهر</p><p class="mt-0.5 text-[11px] text-slate-500">عملیات زیرسازی و سازه</p></td>
+                                <td class="px-4 py-3.5"><span class="erp-badge erp-badge--neutral">
+    پیش‌نویس
+</span>
+</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums text-slate-900" dir="ltr">0 <span class="font-normal text-slate-500" dir="rtl">IRR</span></td>
+                                <td class="px-4 py-3.5 text-center"><a class="text-xs font-semibold text-blue-700 hover:text-blue-900" href="/estimates/f9d36a32-0900-4889-9786-329b270138c8/">جزئیات</a></td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="whitespace-nowrap px-4 py-3.5 font-medium text-slate-700" dir="ltr">EST-01-01-01</td>
+                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="/estimates/3f126511-191a-4656-9042-8fe20eb09e36/">برآورد عملیات سازه و فونداسیون</a><p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500">مقادیر بر پایه آخرین نقشه‌های اجرایی و استعلام‌های معتبر تنظیم شده است.</p></td>
+                                <td class="px-4 py-3.5"><p class="font-medium text-slate-700">مجتمع مسکونی باغستان</p><p class="mt-0.5 text-[11px] text-slate-500">عملیات زیرسازی و سازه · <span dir="ltr">CTR-01-01-01</span></p></td>
+                                <td class="px-4 py-3.5"><span class="erp-badge erp-badge--success">
+    تأییدشده
+</span>
+</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums text-slate-900" dir="ltr">75,572,000,000 <span class="font-normal text-slate-500" dir="rtl">IRR</span></td>
+                                <td class="px-4 py-3.5 text-center"><a class="text-xs font-semibold text-blue-700 hover:text-blue-900" href="/estimates/3f126511-191a-4656-9042-8fe20eb09e36/">جزئیات</a></td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="whitespace-nowrap px-4 py-3.5 font-medium text-slate-700" dir="ltr">EST-01-02-01</td>
+                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="/estimates/f230ed64-8e59-44df-8437-55f84e4947e1/">برآورد عملیات سازه و فونداسیون</a><p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500">مقادیر بر پایه آخرین نقشه‌های اجرایی و استعلام‌های معتبر تنظیم شده است.</p></td>
+                                <td class="px-4 py-3.5"><p class="font-medium text-slate-700">مرکز درمانی مهر</p><p class="mt-0.5 text-[11px] text-slate-500">عملیات زیرسازی و سازه · <span dir="ltr">CTR-01-02-01</span></p></td>
+                                <td class="px-4 py-3.5"><span class="erp-badge erp-badge--success">
+    تأییدشده
+</span>
+</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums text-slate-900" dir="ltr">75,572,000,000 <span class="font-normal text-slate-500" dir="rtl">IRR</span></td>
+                                <td class="px-4 py-3.5 text-center"><a class="text-xs font-semibold text-blue-700 hover:text-blue-900" href="/estimates/f230ed64-8e59-44df-8437-55f84e4947e1/">جزئیات</a></td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="whitespace-nowrap px-4 py-3.5 font-medium text-slate-700" dir="ltr">EST-01-01-02</td>
+                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="/estimates/4678c9db-59f0-4bc8-8725-55601e95f9f2/">برآورد نازک‌کاری و تأسیسات</a><p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500">مقادیر بر پایه آخرین نقشه‌های اجرایی و استعلام‌های معتبر تنظیم شده است.</p></td>
+                                <td class="px-4 py-3.5"><p class="font-medium text-slate-700">مجتمع مسکونی باغستان</p><p class="mt-0.5 text-[11px] text-slate-500">نازک‌کاری و تأسیسات · <span dir="ltr">CTR-01-01-01</span></p></td>
+                                <td class="px-4 py-3.5"><span class="erp-badge erp-badge--neutral">
+    پیش‌نویس
+</span>
+</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums text-slate-900" dir="ltr">75,572,000,000 <span class="font-normal text-slate-500" dir="rtl">IRR</span></td>
+                                <td class="px-4 py-3.5 text-center"><a class="text-xs font-semibold text-blue-700 hover:text-blue-900" href="/estimates/4678c9db-59f0-4bc8-8725-55601e95f9f2/">جزئیات</a></td>
+                            </tr>
+                        
+                            <tr>
+                                <td class="whitespace-nowrap px-4 py-3.5 font-medium text-slate-700" dir="ltr">EST-01-02-02</td>
+                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="/estimates/df3dd89a-6550-4805-b463-cc9d4fdd32ba/">برآورد نازک‌کاری و تأسیسات</a><p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500">مقادیر بر پایه آخرین نقشه‌های اجرایی و استعلام‌های معتبر تنظیم شده است.</p></td>
+                                <td class="px-4 py-3.5"><p class="font-medium text-slate-700">مرکز درمانی مهر</p><p class="mt-0.5 text-[11px] text-slate-500">نازک‌کاری و تأسیسات · <span dir="ltr">CTR-01-02-01</span></p></td>
+                                <td class="px-4 py-3.5"><span class="erp-badge erp-badge--neutral">
+    پیش‌نویس
+</span>
+</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums text-slate-900" dir="ltr">75,572,000,000 <span class="font-normal text-slate-500" dir="rtl">IRR</span></td>
+                                <td class="px-4 py-3.5 text-center"><a class="text-xs font-semibold text-blue-700 hover:text-blue-900" href="/estimates/df3dd89a-6550-4805-b463-cc9d4fdd32ba/">جزئیات</a></td>
+                            </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+            
+<div class="border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500">نمایش 8 برآورد</div>
+        
+    </section>
+
+        </main>

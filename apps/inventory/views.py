@@ -28,6 +28,7 @@ from apps.inventory.workflow import (
     request_stock_transaction_posting,
     request_stock_transaction_reversal,
 )
+from apps.organizations.authorization import get_active_membership
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -113,7 +114,13 @@ def warehouse_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.WAREHOUSES_CREATE)
 def warehouse_create(request: HttpRequest) -> HttpResponse:
-    form = WarehouseForm(request.POST or None, organization=request.organization)
+    form = WarehouseForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+    )
     if request.method == "POST" and form.is_valid():
         try:
             warehouse = create_warehouse(
@@ -264,7 +271,13 @@ def transaction_detail(request: HttpRequest, transaction_id: str) -> HttpRespons
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.STOCK_TRANSACTIONS_CREATE)
 def transaction_create(request: HttpRequest) -> HttpResponse:
-    form = StockTransactionForm(request.POST or None, organization=request.organization)
+    form = StockTransactionForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+    )
     if request.method == "POST" and form.is_valid():
         data = form.cleaned_data
         try:

@@ -36,7 +36,7 @@
                     </tbody>
                 </table>
             </div>
-            {% include "components/table_pagination.html" with page_obj=page_obj pagination_query=pagination_query only %}<div class="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500"><span>نمایش {{ projects|length }} پروژه</span><span>مرتب‌شده براساس نام پروژه</span></div>
+            {% include "components/table_pagination.html" with page_obj=page_obj pagination_query=pagination_query only %}<div class="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500"><span>نمایش {{ projects|length }} پروژه در این صفحه</span></div>
         {% else %}
             {% include "components/empty_state.html" with empty_title="هنوز پروژه‌ای ثبت نشده است" empty_description="اولین پروژه این شرکت را ایجاد کنید." empty_action_url=project_create_url empty_action_label="ایجاد پروژه" only %}
         {% endif %}

@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "record": {
+    "evidence_id": "RV-EV-032",
+    "scenario_id": "UIUX-F-111_RUNTIME_RETEST",
+    "target": "Stale runtime exception",
+    "executed_at": "2026-10-22T01:23:01.876060+03:30",
+    "runtime": {
+      "environment_name": "Development",
+      "base_url": "http://127.0.0.1:8001",
+      "git_sha": "43ac319c6e73e48ca9626461b73987922c498ec3",
+      "branch": "main",
+      "browser": "Codex in-app browser",
+      "browser_version": "155.0.8059.80",
+      "browser_version_source": "diagnostics/F111_RETEST_BROWSER_VERSION.json",
+      "source_dirty": true
+    },
+    "persona": {
+      "persona_id": "P-17",
+      "test_user_alias": "uiux.persona.project-manager",
+      "organization_alias": "demo-construction-01",
+      "authorized_projects": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ],
+      "authority_reference": "diagnostics/F111_RETEST_BEFORE.json#authority"
+    },
+    "result": "STALE_RUNTIME_EXCLUDED_FROM_REMEDIATION_ASSESSMENT",
+    "actual_result": "Port 8001 served old in-memory code. Process 28704 started 2026-10-21 09:41:29 +03:30 with --noreload, before the remediation files changed. C/D project/site/phase UUIDs observed. No business POST to this process. Preserved exception; not a test of current remediation.",
+    "screenshots": [
+      "screenshots/RV-EV-032__initial-runtime-daily.png"
+    ],
+    "diagnostics": [
+      "diagnostics/F111_RETEST_INITIAL_RUNTIME_DOM.json"
+    ],
+    "product_mutation": false,
+    "business_mutation": false,
+    "historical_evidence_overwritten": false
+  }
+}

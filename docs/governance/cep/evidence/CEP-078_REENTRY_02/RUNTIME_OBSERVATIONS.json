@@ -1,0 +1,336 @@
+[
+  {
+    "browser": "Edge",
+    "scenario": "CEP-078-SC-001",
+    "viewport": "1440x900",
+    "probe": {
+      "at": "2026-10-23T11:51:42.479Z",
+      "computedStyleAPI": "function",
+      "dir": "rtl",
+      "documentScrollWidth": 1440,
+      "focus": {
+        "id": "",
+        "tag": "BODY"
+      },
+      "headings": [
+        {
+          "level": "H1",
+          "text": "Bonira - ورود به بنیرا"
+        }
+      ],
+      "inputs": [
+        {
+          "id": "id_username",
+          "labelIds": [
+            "id_username"
+          ],
+          "required": true,
+          "type": "text"
+        },
+        {
+          "id": "id_password",
+          "labelIds": [
+            "id_password"
+          ],
+          "required": true,
+          "type": "password"
+        }
+      ],
+      "lang": "fa",
+      "mains": [
+        {
+          "id": "main-content",
+          "label": null,
+          "labelledBy": null,
+          "nestedInMain": false
+        },
+        {
+          "id": "",
+          "label": null,
+          "labelledBy": "login-title",
+          "nestedInMain": true
+        }
+      ],
+      "url": "http://127.0.0.1:8000/accounts/login/",
+      "viewport": {
+        "height": 900,
+        "width": 1440
+      }
+    },
+    "result": "FAIL",
+    "reason": "Exactly one document main landmark required; nested duplicate is existing UIUX-F-107"
+  },
+  {
+    "browser": "Edge",
+    "scenario": "CEP-078-SC-001",
+    "requested": {
+      "width": 1440,
+      "height": 900
+    },
+    "observation": {
+      "at": "2026-10-23T11:52:38.776Z",
+      "dir": "rtl",
+      "focused": {
+        "boxShadow": "rgba(21, 99, 214, 0.05) 0px 0px 0px 1.52786px",
+        "id": "id_username",
+        "outlineColor": "rgb(0, 0, 0)",
+        "outlineStyle": "none",
+        "outlineWidth": "2.4px",
+        "type": "text"
+      },
+      "h1Count": 1,
+      "labels": [
+        {
+          "id": "id_username",
+          "labelled": true,
+          "required": true,
+          "type": "text"
+        },
+        {
+          "id": "id_password",
+          "labelled": true,
+          "required": true,
+          "type": "password"
+        }
+      ],
+      "lang": "fa",
+      "mains": [
+        {
+          "id": "main-content",
+          "nestedInMain": false
+        },
+        {
+          "id": "",
+          "nestedInMain": true
+        }
+      ],
+      "scrollWidth": 1440,
+      "url": "http://127.0.0.1:8000/accounts/login/",
+      "viewport": {
+        "height": 900,
+        "width": 1440
+      }
+    },
+    "nextFocus": {
+      "id": "",
+      "type": null
+    },
+    "assertions": {
+      "singleMain": "FAIL",
+      "viewport": "PASS",
+      "noHorizontalPageOverflow": "PASS",
+      "persianRTL": "PASS",
+      "oneH1": "PASS",
+      "associatedRequiredLabels": "PASS",
+      "skipLinkTabToUsername": "PASS",
+      "visibleUsernameFocus": "PASS",
+      "tabToPassword": "FAIL"
+    },
+    "result": "FAIL",
+    "finding": "CEP-078-FINDING-006 / existing UIUX-F-107"
+  },
+  {
+    "browser": "Chrome",
+    "scenario": "CEP-078-SC-001",
+    "requested": {
+      "width": 1440,
+      "height": 900
+    },
+    "observation": {
+      "at": "2026-10-23T11:52:38.992Z",
+      "dir": "rtl",
+      "lang": "fa",
+      "mainCount": 1,
+      "scrollWidth": 1440,
+      "url": "http://127.0.0.1:8000/",
+      "viewport": {
+        "height": 900,
+        "width": 1440
+      }
+    },
+    "result": "UTV",
+    "reason": "Existing authenticated browser session redirects Login to Home; anonymous login precondition not met. Session/persona not altered after required Edge scenario failure; no Chrome Login PASS inferred."
+  },
+  {
+    "browser": "Edge",
+    "scenario": "CEP-078-SC-001",
+    "requested": {
+      "width": 1024,
+      "height": 768
+    },
+    "observation": {
+      "at": "2026-10-23T11:52:39.073Z",
+      "dir": "rtl",
+      "focused": {
+        "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px",
+        "id": "id_username",
+        "outlineColor": "rgb(0, 0, 0)",
+        "outlineStyle": "none",
+        "outlineWidth": "2.4px",
+        "type": "text"
+      },
+      "h1Count": 1,
+      "labels": [
+        {
+          "id": "id_username",
+          "labelled": true,
+          "required": true,
+          "type": "text"
+        },
+        {
+          "id": "id_password",
+          "labelled": true,
+          "required": true,
+          "type": "password"
+        }
+      ],
+      "lang": "fa",
+      "mains": [
+        {
+          "id": "main-content",
+          "nestedInMain": false
+        },
+        {
+          "id": "",
+          "nestedInMain": true
+        }
+      ],
+      "scrollWidth": 1024,
+      "url": "http://127.0.0.1:8000/accounts/login/",
+      "viewport": {
+        "height": 768,
+        "width": 1024
+      }
+    },
+    "nextFocus": {
+      "id": "",
+      "type": null
+    },
+    "assertions": {
+      "singleMain": "FAIL",
+      "viewport": "PASS",
+      "noHorizontalPageOverflow": "PASS",
+      "persianRTL": "PASS",
+      "oneH1": "PASS",
+      "associatedRequiredLabels": "PASS",
+      "skipLinkTabToUsername": "PASS",
+      "visibleUsernameFocus": "PASS",
+      "tabToPassword": "FAIL"
+    },
+    "result": "FAIL",
+    "finding": "CEP-078-FINDING-006 / existing UIUX-F-107"
+  },
+  {
+    "browser": "Chrome",
+    "scenario": "CEP-078-SC-001",
+    "requested": {
+      "width": 1024,
+      "height": 768
+    },
+    "observation": {
+      "at": "2026-10-23T11:52:39.221Z",
+      "dir": "rtl",
+      "lang": "fa",
+      "mainCount": 1,
+      "scrollWidth": 1024,
+      "url": "http://127.0.0.1:8000/",
+      "viewport": {
+        "height": 768,
+        "width": 1024
+      }
+    },
+    "result": "UTV",
+    "reason": "Existing authenticated browser session redirects Login to Home; anonymous login precondition not met. Session/persona not altered after required Edge scenario failure; no Chrome Login PASS inferred."
+  },
+  {
+    "browser": "Edge",
+    "scenario": "CEP-078-SC-001",
+    "requested": {
+      "width": 390,
+      "height": 844
+    },
+    "observation": {
+      "at": "2026-10-23T11:52:39.317Z",
+      "dir": "rtl",
+      "focused": {
+        "boxShadow": "rgba(21, 99, 214, 0.016) 0px 0px 0px 0.5049px",
+        "id": "id_username",
+        "outlineColor": "rgb(0, 0, 0)",
+        "outlineStyle": "none",
+        "outlineWidth": "2.4px",
+        "type": "text"
+      },
+      "h1Count": 1,
+      "labels": [
+        {
+          "id": "id_username",
+          "labelled": true,
+          "required": true,
+          "type": "text"
+        },
+        {
+          "id": "id_password",
+          "labelled": true,
+          "required": true,
+          "type": "password"
+        }
+      ],
+      "lang": "fa",
+      "mains": [
+        {
+          "id": "main-content",
+          "nestedInMain": false
+        },
+        {
+          "id": "",
+          "nestedInMain": true
+        }
+      ],
+      "scrollWidth": 390,
+      "url": "http://127.0.0.1:8000/accounts/login/",
+      "viewport": {
+        "height": 844,
+        "width": 390
+      }
+    },
+    "nextFocus": {
+      "id": "",
+      "type": null
+    },
+    "assertions": {
+      "singleMain": "FAIL",
+      "viewport": "PASS",
+      "noHorizontalPageOverflow": "PASS",
+      "persianRTL": "PASS",
+      "oneH1": "PASS",
+      "associatedRequiredLabels": "PASS",
+      "skipLinkTabToUsername": "PASS",
+      "visibleUsernameFocus": "PASS",
+      "tabToPassword": "FAIL"
+    },
+    "result": "FAIL",
+    "finding": "CEP-078-FINDING-006 / existing UIUX-F-107"
+  },
+  {
+    "browser": "Chrome",
+    "scenario": "CEP-078-SC-001",
+    "requested": {
+      "width": 390,
+      "height": 844
+    },
+    "observation": {
+      "at": "2026-10-23T11:52:39.505Z",
+      "dir": "rtl",
+      "lang": "fa",
+      "mainCount": 1,
+      "scrollWidth": 390,
+      "url": "http://127.0.0.1:8000/",
+      "viewport": {
+        "height": 844,
+        "width": 390
+      }
+    },
+    "result": "UTV",
+    "reason": "Existing authenticated browser session redirects Login to Home; anonymous login precondition not met. Session/persona not altered after required Edge scenario failure; no Chrome Login PASS inferred."
+  }
+]

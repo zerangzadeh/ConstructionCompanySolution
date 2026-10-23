@@ -1,0 +1,105 @@
+{
+  "credentials": [
+    {
+      "identity": "account.demo-construction-01.owner",
+      "result": "CONTROLLED_CREDENTIAL_RESET",
+      "authorization_unchanged": true,
+      "credential_store": "Existing current-user Windows DPAPI store outside repository",
+      "password_verified_in_memory": true
+    },
+    {
+      "identity": "account.demo-construction-01.supervisor",
+      "result": "CONTROLLED_CREDENTIAL_RESET",
+      "authorization_unchanged": true,
+      "credential_store": "Existing current-user Windows DPAPI store outside repository",
+      "password_verified_in_memory": true
+    },
+    {
+      "identity": "account.demo-construction-01.accountant",
+      "result": "CONTROLLED_CREDENTIAL_RESET",
+      "authorization_unchanged": true,
+      "credential_store": "Existing current-user Windows DPAPI store outside repository",
+      "password_verified_in_memory": true
+    }
+  ],
+  "personas": [
+    {
+      "identity": "uiux.persona.project-operations",
+      "role": "member",
+      "scope": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ],
+      "result": "PROVISIONED",
+      "membership_id": "5e5ab718-6fc0-47c8-a50e-366a5c1ad79d"
+    },
+    {
+      "identity": "uiux.persona.project-manager",
+      "role": "project_manager",
+      "scope": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ],
+      "result": "PROVISIONED",
+      "membership_id": "44d93beb-f174-4fdf-be94-a1a3fdc3d5f1"
+    },
+    {
+      "identity": "uiux.persona.tenant-admin",
+      "role": "tenant_admin",
+      "scope": [
+        "organization"
+      ],
+      "result": "PROVISIONED",
+      "membership_id": "3e1a1e18-9319-4408-9389-c2b7b982f6be"
+    },
+    {
+      "identity": "uiux.persona.treasury",
+      "role": "accountant",
+      "scope": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ],
+      "result": "PROVISIONED",
+      "membership_id": "b8ce24f6-0a52-4978-bed9-13152701fc22"
+    },
+    {
+      "identity": "account.demo-construction-01.accountant",
+      "role": "accountant",
+      "scope": [
+        "organization"
+      ],
+      "result": "PROVISIONED",
+      "membership_id": "381e4525-6f98-4b4d-ad6f-44008dbb9643",
+      "previous_role": "tenant_manager",
+      "previous_permission_count": 402,
+      "new_permission_count": 167,
+      "legacy_compatibility_field_retained": true
+    }
+  ],
+  "history": [
+    {
+      "assignment_id": "259ef84e-3b5b-4b62-9b4f-cd3b14005a02",
+      "state": "FUTURE_EFFECTIVE",
+      "starts_at": "2099-01-01 00:00:00+00:00",
+      "ends_at": "2099-01-08 00:00:00+00:00",
+      "identity": "uiux.persona.tenant-admin"
+    },
+    {
+      "assignment_id": "6663e1db-421f-4377-9bdc-4638a5c9ba26",
+      "state": "REVOKED",
+      "identity": "uiux.persona.tenant-admin"
+    }
+  ],
+  "reporting": {
+    "status": "BLOCKED_AUTHORIZATION_FIXTURE",
+    "assigner": "account.demo-construction-01.owner",
+    "reason": "Canonical assigner permission-subset check denied; transaction rolled back",
+    "missing_permission_codes": [
+      "accounting_recognition.view",
+      "reporting.metric_result.view",
+      "reporting.project_closeout_case.prepare",
+      "reporting.project_closeout_case.view",
+      "reporting.reconciliation_run.view"
+    ]
+  }
+}

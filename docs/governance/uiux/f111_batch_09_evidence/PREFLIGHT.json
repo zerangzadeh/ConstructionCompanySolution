@@ -1,0 +1,1392 @@
+{
+  "settings": "config.settings.development",
+  "database": "construction_erp",
+  "vendor": "postgresql",
+  "pending_migrations": 0,
+  "actors": [
+    {
+      "actor": "uiux.persona.project-manager",
+      "member": "44d93beb-f174-4fdf-be94-a1a3fdc3d5f1",
+      "staff": false,
+      "superuser": false,
+      "roles": [
+        "project_manager"
+      ],
+      "grants": [
+        {
+          "id": "132126e9-15dc-4bea-8474-e451091ecbaf",
+          "scope_type": "project",
+          "project__code": "PRJ-01-01",
+          "site__code": null
+        },
+        {
+          "id": "443730f0-f563-4a1f-9ff6-1655736c042f",
+          "scope_type": "project",
+          "project__code": "PRJ-01-02",
+          "site__code": null
+        }
+      ],
+      "permissions": {
+        "maintenance_records.create": true,
+        "quality_issues.create": true,
+        "safety_incidents.create": true
+      }
+    },
+    {
+      "actor": "uiux.persona.tenant-admin",
+      "member": "3e1a1e18-9319-4408-9389-c2b7b982f6be",
+      "staff": false,
+      "superuser": false,
+      "roles": [
+        "tenant_admin"
+      ],
+      "grants": [
+        {
+          "id": "eb0b5009-e07c-4bec-ad35-e141215cd6b7",
+          "scope_type": "organization",
+          "project__code": null,
+          "site__code": null
+        }
+      ],
+      "permissions": {
+        "maintenance_records.create": true,
+        "quality_issues.create": true,
+        "safety_incidents.create": true
+      }
+    },
+    {
+      "actor": "uiux.reference.batch03.site-only",
+      "member": "78945e45-ca3c-47ac-97de-bb8c85e64b00",
+      "staff": false,
+      "superuser": false,
+      "roles": [
+        "operations_manager"
+      ],
+      "grants": [
+        {
+          "id": "190285aa-a4f7-44bf-8e8f-30d33f5b579a",
+          "scope_type": "site",
+          "project__code": "PRJ-01-01",
+          "site__code": "SITE-01"
+        }
+      ],
+      "permissions": {
+        "maintenance_records.create": true,
+        "quality_issues.create": true,
+        "safety_incidents.create": true
+      }
+    }
+  ],
+  "Project": [
+    {
+      "id": "7806a619-7ca4-42ac-90f7-fb585c39f112",
+      "code": "PRJ-02-03",
+      "name": "بازسازی کارخانه نوآوران",
+      "organization__slug": "demo-construction-02",
+      "deleted_at": null
+    },
+    {
+      "id": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+      "code": "PRJ-01-03",
+      "name": "بازسازی کارخانه نوآوران",
+      "organization__slug": "demo-construction-01",
+      "deleted_at": null
+    },
+    {
+      "id": "0ea2308c-2f8c-4258-9e51-625e4e938810",
+      "code": "PRJ-02-04",
+      "name": "ساختمان اداری آفتاب",
+      "organization__slug": "demo-construction-02",
+      "deleted_at": null
+    },
+    {
+      "id": "623b4e02-b751-495f-b0e7-7e1601b9ccdf",
+      "code": "PRJ-01-04",
+      "name": "ساختمان اداری آفتاب",
+      "organization__slug": "demo-construction-01",
+      "deleted_at": null
+    },
+    {
+      "id": "63063dae-394e-46e4-9abb-09284e821561",
+      "code": "PRJ-02-01",
+      "name": "مجتمع مسکونی باغستان",
+      "organization__slug": "demo-construction-02",
+      "deleted_at": null
+    },
+    {
+      "id": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+      "code": "PRJ-01-01",
+      "name": "مجتمع مسکونی باغستان",
+      "organization__slug": "demo-construction-01",
+      "deleted_at": null
+    },
+    {
+      "id": "c015e314-b120-425e-9f79-a5263d529b8e",
+      "code": "PRJ-02-02",
+      "name": "مرکز درمانی مهر",
+      "organization__slug": "demo-construction-02",
+      "deleted_at": null
+    },
+    {
+      "id": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+      "code": "PRJ-01-02",
+      "name": "مرکز درمانی مهر",
+      "organization__slug": "demo-construction-01",
+      "deleted_at": null
+    }
+  ],
+  "ProjectSite": [
+    {
+      "id": "eef2f5d7-dc51-44d3-8414-8dc480f500c0",
+      "code": "SITE-01",
+      "name": "کارگاه اصلی پروژه",
+      "project__code": "PRJ-01-01",
+      "is_active": true
+    },
+    {
+      "id": "b83c65c4-5739-4076-b0aa-d892a14b8d60",
+      "code": "SITE-01",
+      "name": "کارگاه اصلی پروژه",
+      "project__code": "PRJ-01-02",
+      "is_active": true
+    },
+    {
+      "id": "1dfe7a20-143b-4db2-92c7-929745d8e521",
+      "code": "SITE-01",
+      "name": "کارگاه اصلی پروژه",
+      "project__code": "PRJ-01-03",
+      "is_active": true
+    },
+    {
+      "id": "4f195bba-4013-4cb3-acfa-53edfb3ef357",
+      "code": "SITE-01",
+      "name": "کارگاه اصلی پروژه",
+      "project__code": "PRJ-01-04",
+      "is_active": true
+    },
+    {
+      "id": "6ed52845-54e4-4d7f-b777-0db6dde3e762",
+      "code": "SITE-01",
+      "name": "کارگاه اصلی پروژه",
+      "project__code": "PRJ-02-01",
+      "is_active": true
+    },
+    {
+      "id": "374f0456-9a65-41d1-95e2-59d429f95188",
+      "code": "SITE-01",
+      "name": "کارگاه اصلی پروژه",
+      "project__code": "PRJ-02-02",
+      "is_active": true
+    },
+    {
+      "id": "780fdf96-61c3-4dc8-8bae-d8b782a6b4d9",
+      "code": "SITE-01",
+      "name": "کارگاه اصلی پروژه",
+      "project__code": "PRJ-02-03",
+      "is_active": true
+    },
+    {
+      "id": "948096f8-4ef1-427a-ac8b-a53585b19f80",
+      "code": "SITE-01",
+      "name": "کارگاه اصلی پروژه",
+      "project__code": "PRJ-02-04",
+      "is_active": true
+    }
+  ],
+  "ProjectPhase": [
+    {
+      "id": "6e051d90-25d5-4bb0-8248-5a4d7bb7885e",
+      "code": "PH-01",
+      "name": "عملیات زیرسازی و سازه",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-01-01"
+    },
+    {
+      "id": "ce509fcf-7930-46ab-8225-8e604146ee2c",
+      "code": "PH-01",
+      "name": "عملیات زیرسازی و سازه",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-01-02"
+    },
+    {
+      "id": "0cb736a2-b504-4b2c-8294-2f2a40622041",
+      "code": "PH-01",
+      "name": "عملیات زیرسازی و سازه",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-01-03"
+    },
+    {
+      "id": "65945c1f-f1ec-4772-bd72-a65d599a0150",
+      "code": "PH-01",
+      "name": "عملیات زیرسازی و سازه",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-01-04"
+    },
+    {
+      "id": "ac0d4b53-3e82-4563-8f50-dfbeb6169df6",
+      "code": "PH-01",
+      "name": "عملیات زیرسازی و سازه",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-02-01"
+    },
+    {
+      "id": "dfa04d8d-ee16-4f13-9994-4a9bfcdb54ab",
+      "code": "PH-01",
+      "name": "عملیات زیرسازی و سازه",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-02-02"
+    },
+    {
+      "id": "1c17c542-6569-4745-9529-ed4cd8a91494",
+      "code": "PH-01",
+      "name": "عملیات زیرسازی و سازه",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-02-03"
+    },
+    {
+      "id": "4c6e2233-f565-4518-806d-174e812a3ff9",
+      "code": "PH-01",
+      "name": "عملیات زیرسازی و سازه",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-02-04"
+    },
+    {
+      "id": "9154bd4b-0e0a-4e73-bf5d-3152e74297cf",
+      "code": "PH-02",
+      "name": "نازک‌کاری و تأسیسات",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-02-04"
+    },
+    {
+      "id": "968eacc3-20b9-4f11-a236-ae0f38865383",
+      "code": "PH-02",
+      "name": "نازک‌کاری و تأسیسات",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-01-01"
+    },
+    {
+      "id": "fa206663-b57d-4d93-bd2b-55a970ac4ef9",
+      "code": "PH-02",
+      "name": "نازک‌کاری و تأسیسات",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-02-01"
+    },
+    {
+      "id": "0a8c2f3a-6abf-410c-a4a7-39636fc0f2cf",
+      "code": "PH-02",
+      "name": "نازک‌کاری و تأسیسات",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-01-02"
+    },
+    {
+      "id": "9e402d84-4246-4269-b1ae-7bb23c8791ce",
+      "code": "PH-02",
+      "name": "نازک‌کاری و تأسیسات",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-02-03"
+    },
+    {
+      "id": "e1e9d00b-ec18-45a4-b818-cebddd37400f",
+      "code": "PH-02",
+      "name": "نازک‌کاری و تأسیسات",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-01-03"
+    },
+    {
+      "id": "a7fbab1d-711b-4d9f-87ed-3a2d4941aba5",
+      "code": "PH-02",
+      "name": "نازک‌کاری و تأسیسات",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-02-02"
+    },
+    {
+      "id": "36a4e59c-3e36-4ecd-9c96-205d607f6bd5",
+      "code": "PH-02",
+      "name": "نازک‌کاری و تأسیسات",
+      "site__code": "SITE-01",
+      "site__project__code": "PRJ-01-04"
+    }
+  ],
+  "Activity": [
+    {
+      "id": "1a65a7e9-3b46-4909-a658-13319e9345cd",
+      "code": "ACT-01",
+      "name": "تجهیز و حصارکشی کارگاه",
+      "project__code": "PRJ-02-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "5c393418-c6ca-44b2-8294-4a70db517b6e",
+      "code": "ACT-01",
+      "name": "تجهیز و حصارکشی کارگاه",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "d38cfaad-b4cc-444e-b377-c5fe8f977c23",
+      "code": "ACT-01",
+      "name": "تجهیز و حصارکشی کارگاه",
+      "project__code": "PRJ-02-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "c2b47d48-f56a-469e-baa7-d1f9ba15e915",
+      "code": "ACT-01",
+      "name": "تجهیز و حصارکشی کارگاه",
+      "project__code": "PRJ-02-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "67894fd2-dc75-4e7d-8814-fcc9445d8919",
+      "code": "ACT-01",
+      "name": "تجهیز و حصارکشی کارگاه",
+      "project__code": "PRJ-01-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "5a270a6e-0a27-4072-9eb0-1aaebb803d60",
+      "code": "ACT-01",
+      "name": "تجهیز و حصارکشی کارگاه",
+      "project__code": "PRJ-01-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "5d7cb29d-68e8-418b-984c-fec555355649",
+      "code": "ACT-01",
+      "name": "تجهیز و حصارکشی کارگاه",
+      "project__code": "PRJ-01-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "37d9a4b5-a214-40f0-a63f-6ffe7f6af553",
+      "code": "ACT-01",
+      "name": "تجهیز و حصارکشی کارگاه",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "c5d44d3f-f386-48ef-8433-b04eefa24519",
+      "code": "ACT-02",
+      "name": "خاک‌برداری و آماده‌سازی بستر",
+      "project__code": "PRJ-01-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "76ae879d-2183-42f6-aef8-2d04e9b57ab7",
+      "code": "ACT-02",
+      "name": "خاک‌برداری و آماده‌سازی بستر",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "2c54070d-03ad-4656-b69b-8480ab75cb98",
+      "code": "ACT-02",
+      "name": "خاک‌برداری و آماده‌سازی بستر",
+      "project__code": "PRJ-01-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "06720c75-547d-489f-9477-1794f21f781a",
+      "code": "ACT-02",
+      "name": "خاک‌برداری و آماده‌سازی بستر",
+      "project__code": "PRJ-02-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "5f3920e7-01ac-4c1e-a0ba-855cfbfa262f",
+      "code": "ACT-02",
+      "name": "خاک‌برداری و آماده‌سازی بستر",
+      "project__code": "PRJ-02-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "633270a6-d5d6-47d8-aafb-acf12929567e",
+      "code": "ACT-02",
+      "name": "خاک‌برداری و آماده‌سازی بستر",
+      "project__code": "PRJ-01-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "c6ded324-585d-41dc-acb6-7c71698dfff9",
+      "code": "ACT-02",
+      "name": "خاک‌برداری و آماده‌سازی بستر",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "e3bc705b-e646-436e-a4ca-c5a0068d209e",
+      "code": "ACT-02",
+      "name": "خاک‌برداری و آماده‌سازی بستر",
+      "project__code": "PRJ-02-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "be31f36c-0d81-4fab-9707-5716744f8ed1",
+      "code": "ACT-03",
+      "name": "آرماتوربندی و بتن‌ریزی فونداسیون",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "a5fdbfde-e45c-4481-a3e2-bd6f996b2b35",
+      "code": "ACT-03",
+      "name": "آرماتوربندی و بتن‌ریزی فونداسیون",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "367f7850-7183-4c30-bc7d-2689ce890d13",
+      "code": "ACT-03",
+      "name": "آرماتوربندی و بتن‌ریزی فونداسیون",
+      "project__code": "PRJ-01-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "87741619-284b-4c7e-95b5-8597cc0ba11b",
+      "code": "ACT-03",
+      "name": "آرماتوربندی و بتن‌ریزی فونداسیون",
+      "project__code": "PRJ-01-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "baa1ead2-a442-47ad-904a-60b40cdc6c25",
+      "code": "ACT-03",
+      "name": "آرماتوربندی و بتن‌ریزی فونداسیون",
+      "project__code": "PRJ-01-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "6289e58b-4c0e-40d5-967e-0d032b6d6f5b",
+      "code": "ACT-03",
+      "name": "آرماتوربندی و بتن‌ریزی فونداسیون",
+      "project__code": "PRJ-02-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "6d83da81-0b68-4d03-9100-b47d170103c4",
+      "code": "ACT-03",
+      "name": "آرماتوربندی و بتن‌ریزی فونداسیون",
+      "project__code": "PRJ-02-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "a3429566-6e6b-4510-abd3-051ab5ec6bca",
+      "code": "ACT-03",
+      "name": "آرماتوربندی و بتن‌ریزی فونداسیون",
+      "project__code": "PRJ-02-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "27ff99c0-bb37-4dbb-8fd7-0f8d9dbb6c1a",
+      "code": "ACT-04",
+      "name": "اجرای اسکلت و سقف طبقات",
+      "project__code": "PRJ-01-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "423fe81b-e3c6-4323-8f10-756801114636",
+      "code": "ACT-04",
+      "name": "اجرای اسکلت و سقف طبقات",
+      "project__code": "PRJ-01-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "5e794fdb-086e-44ae-844a-b7eae0face33",
+      "code": "ACT-04",
+      "name": "اجرای اسکلت و سقف طبقات",
+      "project__code": "PRJ-01-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "97506f5c-9b42-4887-9e28-3b16f50d88ec",
+      "code": "ACT-04",
+      "name": "اجرای اسکلت و سقف طبقات",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "73a82e8c-036a-4e12-a218-f4d819559be3",
+      "code": "ACT-04",
+      "name": "اجرای اسکلت و سقف طبقات",
+      "project__code": "PRJ-02-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "630b928e-3166-45f8-90de-b6ab493fb37e",
+      "code": "ACT-04",
+      "name": "اجرای اسکلت و سقف طبقات",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "c9831385-0c2c-46eb-a376-6881e3244011",
+      "code": "ACT-04",
+      "name": "اجرای اسکلت و سقف طبقات",
+      "project__code": "PRJ-02-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "8a7b084a-6a9f-4e90-9345-248c7ee32ac4",
+      "code": "ACT-04",
+      "name": "اجرای اسکلت و سقف طبقات",
+      "project__code": "PRJ-02-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "caf56d7f-a3d3-4015-acec-346c546a1155",
+      "code": "B06-A-A",
+      "name": "B06 synthetic Activity A",
+      "project__code": "PRJ-01-01",
+      "site__code": null,
+      "phase__code": null,
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "809564ff-f13c-4a28-9c99-3eb9cf9f0ca1",
+      "code": "B06-A-B",
+      "name": "B06 synthetic Activity B",
+      "project__code": "PRJ-01-02",
+      "site__code": null,
+      "phase__code": null,
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "57c0e622-9f88-4be7-b246-9370a47276ee",
+      "code": "B06-A-C",
+      "name": "B06 synthetic Activity C",
+      "project__code": "PRJ-01-03",
+      "site__code": null,
+      "phase__code": null,
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "3e1625f1-c09a-42e4-99c3-0020344fb1ee",
+      "code": "B06-A-D",
+      "name": "B06 synthetic Activity D",
+      "project__code": "PRJ-01-04",
+      "site__code": null,
+      "phase__code": null,
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "id": "9f1932ea-6be0-49f5-b115-6d2a0557bf38",
+      "code": "B06-A-X",
+      "name": "B06 synthetic Activity X",
+      "project__code": "PRJ-02-01",
+      "site__code": null,
+      "phase__code": null,
+      "is_active": true,
+      "archived_at": null
+    }
+  ],
+  "DailyReport": [
+    {
+      "id": "ba570e1f-6d53-45e1-a1a1-38a9b5760a29",
+      "reporting_date": "2026-10-21",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "6de4770f-2af6-44ee-9edd-df5cbcc12b63",
+      "reporting_date": "2026-10-20",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "af6baaa4-9d68-4583-a4cf-2612dadf85a9",
+      "reporting_date": "2026-10-19",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "1a993610-e291-45bf-899e-08c1a5c69a25",
+      "reporting_date": "2026-10-18",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "d5309e79-485a-4caf-be92-62263e453bdc",
+      "reporting_date": "2026-10-17",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "9e08b091-82dd-4cb6-9c3a-0a0dd97ce1ce",
+      "reporting_date": "2026-10-16",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "b1eb3cf3-014f-4848-9296-956e8a7b31c5",
+      "reporting_date": "2026-10-15",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "96fbfa1b-f8ba-4f08-ba5b-2d811c834d86",
+      "reporting_date": "2026-10-14",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "aa70867f-26cc-492e-b220-11fbf278d11c",
+      "reporting_date": "2026-10-13",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "59ddd5e2-373d-40f0-824e-798f1335b2a6",
+      "reporting_date": "2026-10-12",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "74225ca0-98e5-4291-b645-fdc446794711",
+      "reporting_date": "2026-10-11",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "59911474-3ee8-4532-ab45-1943da7a7ae9",
+      "reporting_date": "2026-10-10",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "287bdebb-0175-44f7-aa85-69ce4d155ff1",
+      "reporting_date": "2026-10-09",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "b7dab0b5-5981-49a3-9213-71a33c737fde",
+      "reporting_date": "2026-10-08",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "13a4ec01-2d35-4e0d-b7fc-9e0063cc5c41",
+      "reporting_date": "2026-10-07",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "77124738-1a2a-495a-8b50-980fa44a1a62",
+      "reporting_date": "2026-10-06",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "5ed827e5-bc28-4ab0-baad-24db2420df43",
+      "reporting_date": "2026-10-05",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "d876c8c4-62c4-4480-8998-9fd9de6ac080",
+      "reporting_date": "2026-10-04",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "55ba8d98-cf38-4045-b3a9-54334d942613",
+      "reporting_date": "2026-10-03",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "64f3bf4e-029b-4724-818d-3bc2697f81b6",
+      "reporting_date": "2026-10-02",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "242a2cf6-3538-4901-a0d7-c64e15da4dbe",
+      "reporting_date": "2026-10-01",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "d6bba4c6-9960-48fe-8353-4bacb4db108f",
+      "reporting_date": "2025-09-11",
+      "project__code": "PRJ-02-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "5c3121a2-737a-4053-88d7-c9c571fda503",
+      "reporting_date": "2025-09-11",
+      "project__code": "PRJ-01-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "d611b056-91a5-4ef7-90b0-cf0152e66576",
+      "reporting_date": "2025-09-01",
+      "project__code": "PRJ-02-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "43cc0269-c983-4e16-9b95-e24107e95715",
+      "reporting_date": "2025-09-01",
+      "project__code": "PRJ-01-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "d555cf8c-167f-450b-8168-32054b754c8b",
+      "reporting_date": "2025-08-29",
+      "project__code": "PRJ-02-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "27168f87-c0fe-4ca3-826b-9400ea13c5fe",
+      "reporting_date": "2025-08-29",
+      "project__code": "PRJ-01-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "ca0e1e16-4974-4654-ad66-127ddd872266",
+      "reporting_date": "2025-08-26",
+      "project__code": "PRJ-02-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "5b2051cc-4ab1-452f-96f6-332d257bb77f",
+      "reporting_date": "2025-08-26",
+      "project__code": "PRJ-01-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "c32e55fa-3acb-4c24-8ada-f6354b50d476",
+      "reporting_date": "2025-08-23",
+      "project__code": "PRJ-02-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "11b2b350-5922-465a-93d8-0ce8307b6a71",
+      "reporting_date": "2025-08-23",
+      "project__code": "PRJ-01-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "ebf1cead-f11b-4e49-a8d7-4c5ca1a3764d",
+      "reporting_date": "2025-08-20",
+      "project__code": "PRJ-02-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "7df6be5e-82a3-4b10-8fec-ef4374bf652c",
+      "reporting_date": "2025-08-20",
+      "project__code": "PRJ-01-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "39721ad0-1450-40a5-aee7-eba34153d0a4",
+      "reporting_date": "2025-08-17",
+      "project__code": "PRJ-02-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "c26449a1-2333-4c29-ad84-a988165fc782",
+      "reporting_date": "2025-08-17",
+      "project__code": "PRJ-01-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "27321026-9e26-4958-ba85-cfbef08e4b55",
+      "reporting_date": "2025-08-14",
+      "project__code": "PRJ-02-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "4a7dc103-f7a0-45ec-906b-9eeef1bd2f9b",
+      "reporting_date": "2025-08-14",
+      "project__code": "PRJ-01-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "a0b8a232-88d3-4f98-910f-de479b032d04",
+      "reporting_date": "2025-08-11",
+      "project__code": "PRJ-02-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "5aeeafca-4149-4aba-a4aa-42d8bd6405e5",
+      "reporting_date": "2025-08-11",
+      "project__code": "PRJ-01-04",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "dfaccd49-d5f8-4f54-861e-0ea845572e41",
+      "reporting_date": "2025-08-06",
+      "project__code": "PRJ-02-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "be6d708e-a6d5-475d-b6a2-24f8dd936367",
+      "reporting_date": "2025-08-06",
+      "project__code": "PRJ-01-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "a57586bc-5d07-466c-88c5-54de87bb56a5",
+      "reporting_date": "2025-07-28",
+      "project__code": "PRJ-02-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "973ab866-49c7-462d-acb1-f0ab0a86ff5d",
+      "reporting_date": "2025-07-28",
+      "project__code": "PRJ-01-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "f2300dc9-8d37-412b-bdb6-1709782d72fe",
+      "reporting_date": "2025-07-25",
+      "project__code": "PRJ-02-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "6e661a2d-5bd6-4f57-add6-50fd69c0b9c9",
+      "reporting_date": "2025-07-25",
+      "project__code": "PRJ-01-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "ec9806e5-acf2-44a3-b788-240e75a1eca9",
+      "reporting_date": "2025-07-22",
+      "project__code": "PRJ-02-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "5df32050-31a0-4d7e-a998-a32a0655a821",
+      "reporting_date": "2025-07-22",
+      "project__code": "PRJ-01-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "8fc50eb9-75f0-4349-b149-5700ed483bcb",
+      "reporting_date": "2025-07-19",
+      "project__code": "PRJ-02-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "f3f35a1d-884e-4cf5-b085-c3e9c6b603ce",
+      "reporting_date": "2025-07-19",
+      "project__code": "PRJ-01-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "5c0e661e-1bfe-4d67-85f7-e247656605f0",
+      "reporting_date": "2025-07-16",
+      "project__code": "PRJ-02-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "7abe7dc3-6d29-46be-8625-1efff5b9a62b",
+      "reporting_date": "2025-07-16",
+      "project__code": "PRJ-01-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "88baa478-0bd3-4486-9d00-5f0414aafb7d",
+      "reporting_date": "2025-07-13",
+      "project__code": "PRJ-02-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "ca78ab12-7b6d-4f59-a7aa-77b7fc8852bf",
+      "reporting_date": "2025-07-13",
+      "project__code": "PRJ-01-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "92bd55f7-9d7c-4ef2-b818-202016ddbd14",
+      "reporting_date": "2025-07-10",
+      "project__code": "PRJ-02-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "00efe6d6-58f8-42e2-8ec1-ad8aeafd02a0",
+      "reporting_date": "2025-07-10",
+      "project__code": "PRJ-01-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "a3748813-3f83-4da8-8187-82306d25be4c",
+      "reporting_date": "2025-07-07",
+      "project__code": "PRJ-02-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "8760f272-074c-406f-af0a-f3a3753bf951",
+      "reporting_date": "2025-07-07",
+      "project__code": "PRJ-01-03",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "c06ee32e-8f8d-4b61-ad6e-9121371c2d70",
+      "reporting_date": "2025-07-01",
+      "project__code": "PRJ-02-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "0383ad95-7014-4aae-aee3-24c0ddf5f607",
+      "reporting_date": "2025-07-01",
+      "project__code": "PRJ-01-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "0d8b5bb9-aed8-45ca-8406-bf3757c89119",
+      "reporting_date": "2025-06-23",
+      "project__code": "PRJ-02-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "ab631fab-178b-4455-b8b9-32078d6241e7",
+      "reporting_date": "2025-06-23",
+      "project__code": "PRJ-01-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "0c1ca531-aab0-43aa-96ca-82522cfecfbb",
+      "reporting_date": "2025-06-20",
+      "project__code": "PRJ-02-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "e5717b65-df5a-4865-81ec-d19ad560657f",
+      "reporting_date": "2025-06-20",
+      "project__code": "PRJ-01-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "6f32632b-7a21-4598-be4c-9a006b0291b7",
+      "reporting_date": "2025-06-17",
+      "project__code": "PRJ-02-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "b822754e-22da-4385-b4d2-28173c474aa6",
+      "reporting_date": "2025-06-17",
+      "project__code": "PRJ-01-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "110175b5-c998-421c-a8f0-fbe764dd379c",
+      "reporting_date": "2025-06-14",
+      "project__code": "PRJ-02-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "db82a933-11f9-4557-9ffa-94bbda012d31",
+      "reporting_date": "2025-06-14",
+      "project__code": "PRJ-01-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "347a29ed-bfe9-4774-9c8a-d05bc84e27c4",
+      "reporting_date": "2025-06-11",
+      "project__code": "PRJ-02-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "c6841432-7b89-4401-87fb-2e65482c3327",
+      "reporting_date": "2025-06-11",
+      "project__code": "PRJ-01-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "bd987ff8-15de-4b7b-9030-c005c1fda4e9",
+      "reporting_date": "2025-06-08",
+      "project__code": "PRJ-02-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "2f36e62a-40ff-4294-af6a-640be99d6ce4",
+      "reporting_date": "2025-06-08",
+      "project__code": "PRJ-01-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "093ea176-7dbf-4609-ad60-2532256f834a",
+      "reporting_date": "2025-06-05",
+      "project__code": "PRJ-02-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "823d66ee-6ae5-4e44-b53a-0bc6784930d4",
+      "reporting_date": "2025-06-05",
+      "project__code": "PRJ-01-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "8b4e7edc-2406-4a56-90d9-48b9eca07f84",
+      "reporting_date": "2025-06-02",
+      "project__code": "PRJ-02-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "aec5f5f6-9ddb-4763-a00f-d47f83f443f4",
+      "reporting_date": "2025-06-02",
+      "project__code": "PRJ-01-02",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "7b0f2804-c96a-4ec4-b4d4-f2ce312e94e0",
+      "reporting_date": "2025-05-26",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "949682ae-66e5-4611-97f9-9aa89787979d",
+      "reporting_date": "2025-05-26",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "33dd6cfc-661a-4357-95fe-613133c13687",
+      "reporting_date": "2025-05-19",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "1f02d7e1-cae2-42f2-8c39-e4d7a2350ff4",
+      "reporting_date": "2025-05-19",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "1777a615-97a1-4db1-bbd4-cf16d294506f",
+      "reporting_date": "2025-05-16",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "33d75e4c-2464-4acc-9dc4-6d175ea24e21",
+      "reporting_date": "2025-05-16",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "0e7099e2-80df-4411-a2a5-d0898c2ffcfe",
+      "reporting_date": "2025-05-13",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "9cf25cc8-0d9b-41d1-ab6b-deae8fe36e11",
+      "reporting_date": "2025-05-13",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "8e43bbba-ee0c-41c4-a320-9ca07fc9ef97",
+      "reporting_date": "2025-05-10",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "9f320f74-c701-41d9-ae4c-166df80f0b63",
+      "reporting_date": "2025-05-10",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "92df6e18-0dd9-45dc-b4ac-b5f9e33762e1",
+      "reporting_date": "2025-05-07",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "f2d0c1a4-2297-488a-ba91-4e18695ac957",
+      "reporting_date": "2025-05-07",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "dda4e55d-4f7f-4d05-af59-0842e7aa83da",
+      "reporting_date": "2025-05-04",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "a5e2d7d0-25f1-4126-bcb4-747f102916e2",
+      "reporting_date": "2025-05-04",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "347ae9db-15b3-4642-aab7-c4e37f169f46",
+      "reporting_date": "2025-05-01",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "232152cf-8f6e-4b59-940b-9ac557ebd830",
+      "reporting_date": "2025-05-01",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "bf0547b8-5905-46ff-a6cd-0e651e732c1d",
+      "reporting_date": "2025-04-28",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    },
+    {
+      "id": "afe7f0bd-7cfa-40b0-96fe-b11e10e6d813",
+      "reporting_date": "2025-04-28",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01",
+      "phase__code": "PH-01"
+    }
+  ],
+  "Equipment": [
+    {
+      "id": "aa70efc4-34eb-4624-a51d-8e035c2dec1c",
+      "code": "EQ-01-EXC",
+      "name": "بیل مکانیکی زنجیری",
+      "organization__slug": "demo-construction-01",
+      "status": "assigned",
+      "archived_at": null
+    },
+    {
+      "id": "cc7891c5-b9ed-4d23-b9d1-d8c47d9a780a",
+      "code": "EQ-02-EXC",
+      "name": "بیل مکانیکی زنجیری",
+      "organization__slug": "demo-construction-02",
+      "status": "assigned",
+      "archived_at": null
+    },
+    {
+      "id": "d1f2920d-21b5-41d9-82b6-39c236be99e1",
+      "code": "EQ-01-CRN",
+      "name": "جرثقیل کارگاهی",
+      "organization__slug": "demo-construction-01",
+      "status": "assigned",
+      "archived_at": null
+    },
+    {
+      "id": "bd70d969-92d1-41ff-addc-c440841365cb",
+      "code": "EQ-02-CRN",
+      "name": "جرثقیل کارگاهی",
+      "organization__slug": "demo-construction-02",
+      "status": "available",
+      "archived_at": null
+    }
+  ],
+  "MaintenanceRecord": [
+    {
+      "id": "9aa6250f-3639-475a-938b-adb58927462c",
+      "record_number": "MNT-02-001",
+      "equipment__code": "EQ-02-EXC",
+      "project__code": "PRJ-02-01",
+      "site__code": "SITE-01"
+    },
+    {
+      "id": "995ce16b-4b1b-4ed1-af8f-bc05c2480237",
+      "record_number": "MNT-01-001",
+      "equipment__code": "EQ-01-EXC",
+      "project__code": "PRJ-01-01",
+      "site__code": "SITE-01"
+    },
+    {
+      "id": "fdb9c368-f6f7-49c2-8d9e-0dcc8cb239c3",
+      "record_number": "222222",
+      "equipment__code": "EQ-01-EXC",
+      "project__code": null,
+      "site__code": null
+    }
+  ]
+}

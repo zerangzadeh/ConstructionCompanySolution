@@ -1,0 +1,1204 @@
+FFFFFFFFFFFFFFF...............................................                   [100%]
+================================== FAILURES ===================================
+__ ExpenseServiceTests.test_create_expense_records_decimal_amount_and_audit ___
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_create_expense_records_decimal_amount_and_audit>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+_____ ExpenseServiceTests.test_expense_create_view_limits_project_choices _____
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_expense_create_view_limits_project_choices>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+________ ExpenseServiceTests.test_expense_create_view_records_expense _________
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_expense_create_view_records_expense>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+_____ ExpenseServiceTests.test_expense_list_requires_active_organization ______
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_expense_list_requires_active_organization>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+____ ExpenseServiceTests.test_expense_optionally_scopes_to_a_project_phase ____
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_expense_optionally_scopes_to_a_project_phase>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+_________ ExpenseServiceTests.test_expense_queryset_is_tenant_scoped __________
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_expense_queryset_is_tenant_scoped>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+________ ExpenseServiceTests.test_expense_rejects_cross_tenant_project ________
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_expense_rejects_cross_tenant_project>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+__________ ExpenseServiceTests.test_expense_rejects_negative_amount ___________
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_expense_rejects_negative_amount>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+_____ ExpenseServiceTests.test_expense_rejects_phase_from_another_project _____
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_expense_rejects_phase_from_another_project>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+__ ExpenseServiceTests.test_expense_uses_scoped_party_and_category_snapshots __
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_expense_uses_scoped_party_and_category_snapshots>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+_ ExpenseServiceTests.test_expense_void_view_rejects_blank_reason_without_mutation _
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_expense_void_view_rejects_blank_reason_without_mutation>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+_ ExpenseServiceTests.test_expense_void_view_rejects_cross_tenant_expense_identifier _
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_expense_void_view_rejects_cross_tenant_expense_identifier>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+____________ ExpenseServiceTests.test_member_cannot_create_expense ____________
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_member_cannot_create_expense>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+_____________ ExpenseServiceTests.test_member_cannot_void_expense _____________
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_member_cannot_void_expense>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+__ ExpenseServiceTests.test_void_expense_preserves_amount_and_records_audit ___
+
+self = <apps.expenses.tests.ExpenseServiceTests testMethod=test_void_expense_preserves_amount_and_records_audit>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="expense-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="other-expense-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Expense Company",
+            slug="expense-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Expense Company",
+            slug="other-expense-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-EXPENSE",
+            name="Expense project",
+        )
+
+apps\expenses\tests.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Expense Company>, actor = <User: expense-owner>
+code = 'P-EXPENSE', name = 'Expense project', description = ''
+status = ProjectStatus.PLANNING, start_date = None, end_date = None
+estimated_budget = Decimal('0.00'), actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied
+=========================== short test summary info ===========================
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_create_expense_records_decimal_amount_and_audit
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_create_view_limits_project_choices
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_create_view_records_expense
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_list_requires_active_organization
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_optionally_scopes_to_a_project_phase
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_queryset_is_tenant_scoped
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_rejects_cross_tenant_project
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_rejects_negative_amount
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_rejects_phase_from_another_project
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_uses_scoped_party_and_category_snapshots
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_void_view_rejects_blank_reason_without_mutation
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_void_view_rejects_cross_tenant_expense_identifier
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_member_cannot_create_expense
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_member_cannot_void_expense
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_void_expense_preserves_amount_and_records_audit
+15 failed, 47 passed, 64 subtests passed in 32.83s

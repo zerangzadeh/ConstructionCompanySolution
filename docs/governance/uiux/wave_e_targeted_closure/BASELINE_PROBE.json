@@ -1,0 +1,34 @@
+{
+  "result": "SAME_FAILURE_WITH_ENTRY_TEMPLATES",
+  "method": "Filesystem template loader returns immutable HEAD versions for the three changed templates in memory; they were clean at session entry. No repository file/Git/DB restoration.",
+  "results": [
+    {
+      "nodeid": "apps/projects/tests.py::ProjectServiceTests::test_project_list_is_tenant_scoped",
+      "outcome": "failed",
+      "failure_excerpt": "apps\\projects\\tests.py:269: in test_project_list_is_tenant_scoped\n    self.assertContains(response, reverse(\"projects:all_site_list\"))\nE   AssertionError: False is not true : Couldn't find '/projects/sites/' "
+    }
+  ],
+  "unchanged_hashes": {
+    "apps/projects/tests.py": {
+      "entry": "503c5fed8d8b10c183ea9d9fa9a86c22893548832eb59846b34da9104feef67d",
+      "current": "503c5fed8d8b10c183ea9d9fa9a86c22893548832eb59846b34da9104feef67d",
+      "unchanged": true
+    },
+    "apps/projects/views.py": {
+      "entry": "bb12fe7ee449709fcd4558ac717550cd8ad4d1dfaba53e04b5b1917ee81d864d",
+      "current": "bb12fe7ee449709fcd4558ac717550cd8ad4d1dfaba53e04b5b1917ee81d864d",
+      "unchanged": true
+    },
+    "templates/projects/list.html": {
+      "entry": "8087e89f655887189d2c1fc273d54034c4e8bf1472461ea7b70c311e6fa13b66",
+      "current": "8087e89f655887189d2c1fc273d54034c4e8bf1472461ea7b70c311e6fa13b66",
+      "unchanged": true
+    },
+    "apps/organizations/authorization.py": {
+      "entry": "581e6592f55fef7e2b1ad13b2c2b0a0c38ae877bf9925a98bd5b17af485ff81d",
+      "current": "581e6592f55fef7e2b1ad13b2c2b0a0c38ae877bf9925a98bd5b17af485ff81d",
+      "unchanged": true
+    }
+  },
+  "html_and_csrf_saved": false
+}

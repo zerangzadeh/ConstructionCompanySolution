@@ -1,0 +1,72 @@
+{
+  "models_compared": 519,
+  "deltas": [
+    "sessions.Session"
+  ],
+  "user_last_login_excluded": true,
+  "business_audit_authority_unchanged": true,
+  "preflight": {
+    "at": "2026-10-22 00:08:58.063243+00:00",
+    "authority": [
+      {
+        "actor": "uiux.persona.project-manager",
+        "staff": false,
+        "superuser": false,
+        "membership": "44d93beb-f174-4fdf-be94-a1a3fdc3d5f1",
+        "roles": [
+          "project_manager"
+        ],
+        "grants": [
+          {
+            "scope_type": "project",
+            "project__code": "PRJ-01-01",
+            "starts_at": "2026-10-21 18:37:16.289227+00:00",
+            "ends_at": null
+          },
+          {
+            "scope_type": "project",
+            "project__code": "PRJ-01-02",
+            "starts_at": "2026-10-21 18:37:16.464271+00:00",
+            "ends_at": null
+          }
+        ],
+        "permissions": {
+          "retention_releases.create": true,
+          "compliance_evidence.view": true
+        },
+        "canonical_reader": "DENIED"
+      },
+      {
+        "actor": "uiux.persona.tenant-admin",
+        "staff": false,
+        "superuser": false,
+        "membership": "3e1a1e18-9319-4408-9389-c2b7b982f6be",
+        "roles": [
+          "tenant_admin"
+        ],
+        "grants": [
+          {
+            "scope_type": "organization",
+            "project__code": null,
+            "starts_at": "2026-10-21 18:37:21.999587+00:00",
+            "ends_at": null
+          }
+        ],
+        "permissions": {
+          "retention_releases.create": true,
+          "compliance_evidence.view": true
+        },
+        "canonical_reader": 0
+      }
+    ],
+    "all_evidence_count": 0,
+    "qualifying_clearances": [],
+    "settings": "config.settings.development",
+    "database": "construction_erp",
+    "database_host": "loopback",
+    "pending_migrations": 0,
+    "fixture_preparation": "NOT_AUTHORIZED_NOT_PERFORMED",
+    "runtime_positive": "PENDING_NO_QUALIFYING_SOURCE",
+    "runtime_same_and_cross_tenant_negatives": "PENDING_NO_QUALIFYING_SOURCES"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "focused": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/wave_c_evidence/run_validation.py tests/test_uiux_wave_c.py -q --reuse-db --tb=short --junitxml=docs/governance/uiux/wave_c_evidence/focused_final.xml",
+    "result": "9 tests + 15 subtests PASS"
+  },
+  "regression": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/wave_c_evidence/run_validation.py apps/accounting/test_p2_s28_s34.py::AccountingStatementsCloseAdjustmentTests tests/test_uiux_f111_pattern_stock_scope.py -q --reuse-db --tb=short --junitxml=docs/governance/uiux/wave_c_evidence/regression.xml",
+    "result": "19 tests + 43 subtests PASS"
+  },
+  "entry_reproduction": "run_validation.py --entry tests/test_uiux_wave_c.py: intentionally reproduced three failures + fifteen failing subtests; five pass; earlier focused suite",
+  "runtime": [
+    "runtime.py ground",
+    "runtime.py prepare: first attempt failed atomically (portal permission); revised bounded RFQ/statement preparation succeeded",
+    "runtime.py inventory_persona: canonical persistent P-22 Viewer organization read scope",
+    "runtime.py http baseline: 165",
+    "runtime.py http after: 165",
+    "runtime.py delta: 9 HTTP + 20 direct services",
+    "runtime.py populated_statement: canonical policy gate, rolled back",
+    "runtime.py readiness: tender policy gate, rolled back",
+    "browser.cjs final: 20 observations, 40 screenshots",
+    "runtime.py integrity: 519 models",
+    "verify.py",
+    "document_validation.py"
+  ],
+  "checks": [
+    "manage.py check",
+    "manage.py makemigrations --check --dry-run",
+    "ruff check apps/accounting/views.py apps/inventory/p8_views.py tests/test_uiux_wave_c.py",
+    "ruff format --check same three files",
+    "git diff --check"
+  ],
+  "diagnostic_exclusions": [
+    "before_HTTP.json: incomplete harness run, accountant login-body assertion; not closure",
+    "before2_HTTP.json: stopped slow localhost harness run",
+    "before_fixed_HTTP.json: incomplete harness run, incorrect diagnostic Contract field; not closure",
+    "Early direct delta process interrupted by own server restart; retried successfully",
+    "Earlier browser passes retain before/intermediate source observations; only final_BROWSER.json governs final visual claims"
+  ],
+  "dependency_tooling": "PyYAML installed only to temporary directory bonira-wave-c-tools; no project dependency or lockfile change",
+  "migration": "NO",
+  "decision": "WAVE_C_BLOCKED"
+}

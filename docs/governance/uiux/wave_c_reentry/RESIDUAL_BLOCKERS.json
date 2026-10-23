@@ -1,0 +1,44 @@
+[
+  {
+    "scenario": "RV-007",
+    "missing": "A governed tenant first-grant/delegator for rfq_quotes.open and rfq_quotes.view_confidential (and the independently assigned opening duties required by the canonical closed-RFQ lifecycle).",
+    "why": "The full custom role was created, but assign_membership_role rejected transfer of permissions absent from the assigning tenant actor. No active tenant holder exists. The available receiving/preparation subset now captures and submits a genuine hashed synthetic source; it cannot open/confidentially compare it. F-008 does not invent precedence among concurrent permitted commands.",
+    "minimum_input": "Provide a governed authorized tenant delegator, or approve a bounded first-grant mechanism preserving independent approval and exact project scope."
+  },
+  {
+    "scenario": "RV-011",
+    "missing": "Currently effective accounting-money-precision and accounting-rounding versions.",
+    "why": "Both existing published code-owned versions start on 2026-12-22. Canonical selection rejects them on 2026-10-22. Advancing an existing accounting effective date is not determined by PD-WC-06. The activation attempt rolled back; no journal was fabricated.",
+    "minimum_input": "Approve a specific currently effective Development version/date for the existing closed values, or wait for the published effective date and apply it canonically."
+  },
+  {
+    "scenario": "RV-013",
+    "missing": "One eligible approved AP/AR source and a canonically postable Treasury source: approved source policy, treasury-self-approval.allow_self_approval, cash/clearing ledger mappings, and effective accounting policies.",
+    "why": "All four source adapters are registered, but no eligible source exists. The invoice route requires an approved MatchTolerancePolicy with explicit quantity_tolerance_bps and unit_price_tolerance_bps; none exists. Treasury has no policy version or account mapping. Neither allowed boolean alternatives, account-code guesses nor test tolerance values select a business policy.",
+    "minimum_input": "Supply one governed eligible source/policy configuration and the explicit Treasury approval/mapping decisions; also resolve RV-011's accounting effective-date gate."
+  },
+  {
+    "scenario": "RV-018",
+    "missing": "Effective monetary policies for the prepared non-statutory run; reviewed official tax/insurance rules and output schemas for statutory journeys; a governed source-payload selection contract for the remaining F-059 input derivation.",
+    "why": "A separate Payroll-only specialist, synthetic configuration/rule/period/run are provisioned. Input lock reaches the canonical missing active policy gate. No published statutory rule/source was supplied. Current source snapshot inputs are caller-supplied; hiding them or inventing their content cannot establish source integrity. Run/statutory/handoff presentation is improved, but their populated downstream runtime remains unverified.",
+    "minimum_input": "Resolve RV-011, provide reviewed canonical statutory source/schema evidence, and specify the authoritative input producer/selection contract for source snapshots."
+  },
+  {
+    "scenario": "RV-029",
+    "missing": "A governed tenant first-grant/delegator for employment_records.manage and employment_records.view_own.",
+    "why": "Both custom roles exist, but canonical assignment rejects permissions held by no tenant delegator. The management UI and explicit Employee.user plus existing Person/WorkRelationship linkage are implemented and tested; there is no permitted live specialist to complete the management/own-history positive journey. Platform privilege cannot supply that tenant authority.",
+    "minimum_input": "Provide an authorized tenant delegator or approve a bounded first-grant path with independent approval. No new identity model is needed."
+  },
+  {
+    "scenario": "RV-030",
+    "missing": "An approved canonical Development Tender policy reference and its governed activation contract.",
+    "why": "The Commercial specialist is provisioned. There is no TenderBidActivation row, approved policy_reference or code-owned default activation. The placeholder approved-test-policy in isolated tests is not a Product Decision; writing it would fabricate activation evidence.",
+    "minimum_input": "Supply the approved policy/version reference and bounded canonical activation instructions; define any required tender values rather than deriving them from test fixtures."
+  },
+  {
+    "scenario": "RV-032",
+    "missing": "A governed tenant first-grant/delegator for supplier_portal.invitations_manage; an external submitted/uploaded-payload custody/hash contract for F-060.",
+    "why": "The tenant custom role exists but canonical assignment rejects the unavailable permission transfer. The portal accepts only a precomputed integrity fingerprint and metadata, not original bytes. Its metadata fingerprint includes that supplied hash. Existing sealed-file custody requires tenant authority and a closed RFQ, so it cannot be reused as an external pre-submission upload path without an approved contract change. Hashing a reference string would weaken integrity.",
+    "minimum_input": "Provide the governed first-grant authority and approve/identify the external payload-custody interface from which the server can compute the canonical hash. External users must remain outside tenant membership."
+  }
+]

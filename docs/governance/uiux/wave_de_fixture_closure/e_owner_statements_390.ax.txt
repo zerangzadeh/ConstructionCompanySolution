@@ -1,0 +1,89 @@
+- link "رفتن به محتوای اصلی":
+  - /url: "#main-content"
+- banner:
+  - generic "باز کردن فهرست":
+  - link "شرکت سازه‌پردازان پارس":
+    - /url: /organizations/
+    - generic: شرکت سازه‌پردازان پارس
+  - link "تنظیمات شخصی":
+    - /url: /accounts/settings/
+- region "دامنه کاری مؤثر":
+  - generic: شرکت
+  - generic: شرکت سازه‌پردازان پارس
+  - generic: پروژه
+  - combobox "پروژه":
+    - option "بدون پروژه / همه دامنه مجاز" [selected]
+    - option "PRJ-01-03 — بازسازی کارخانه نوآوران"
+    - option "PRJ-01-04 — ساختمان اداری آفتاب"
+    - option "PRJ-01-01 — مجتمع مسکونی باغستان"
+    - option "PRJ-01-02 — مرکز درمانی مهر"
+  - button "اعمال دامنه"
+- main:
+  - navigation "مسیر صفحه":
+    - link "خانه":
+      - /url: /
+    - generic: تراز و صورت‌های مالی
+  - generic "تراز و صورت‌های مالی":
+    - paragraph: حسابداری
+    - heading "تراز و صورت‌های مالی" [level=1]
+    - paragraph: فقط بر پایه ردیف‌های قطعی و تصاویر نگهداری‌شده دفترکل
+  - navigation "بخش‌های حسابداری":
+    - link "نمای کلی":
+      - /url: /accounting/
+    - link "کدینگ حساب‌ها":
+      - /url: /accounting/accounts/
+    - link "سال و دوره مالی":
+      - /url: /accounting/periods/
+    - link "اسناد حسابداری":
+      - /url: /accounting/journals/
+    - link "مانده افتتاحیه":
+      - /url: /accounting/openings/
+    - link "تطبیق‌ها":
+      - /url: /accounting/reconciliations/
+    - link "تراز و صورت‌های مالی":
+      - /url: /accounting/statements/
+  - text: نوع گزارش*
+  - generic: (الزامی)
+  - combobox "نوع گزارش (الزامی)":
+    - option "تراز آزمایشی" [selected]
+    - option "ترازنامه"
+    - option "صورت سود و زیان"
+  - generic: شروع بازه
+  - textbox "شروع بازه":
+    - /placeholder: ۱۴۰۵/۰۶/۲۳
+  - button "باز کردن تقویم شمسی":
+    - generic: ▦
+  - text: پایان / تاریخ برش*
+  - generic: (الزامی)
+  - textbox "پایان / تاریخ برش (الزامی)":
+    - /placeholder: ۱۴۰۵/۰۶/۲۳
+  - button "باز کردن تقویم شمسی":
+    - generic: ▦
+  - button "پیش‌نمایش خواندنی"
+  - heading "نسخه‌های نگهداری‌شده" [level=2]
+  - paragraph: نتیجه و شواهد پس از ایجاد قابل ویرایش نیستند.
+  - table:
+    - rowgroup:
+      - row "نوع بازه / برش ایجادکننده ردیف منبع زمان":
+        - columnheader "نوع"
+        - columnheader "بازه / برش"
+        - columnheader "ایجادکننده"
+        - columnheader "ردیف منبع"
+        - columnheader "زمان"
+    - rowgroup:
+      - row "تراز آزمایشی 1405/07/30 account.demo-construction-01.accountant 4 1405/07/30 17:52":
+        - cell "تراز آزمایشی":
+          - link "تراز آزمایشی":
+            - /url: /accounting/statements/096c3e8b-1322-44a5-9bc5-2a953f64c82b/
+        - cell "1405/07/30"
+        - cell "account.demo-construction-01.accountant"
+        - cell "4"
+        - cell "1405/07/30 17:52"
+      - row "تراز آزمایشی 1405/07/30 account.demo-construction-01.accountant 0 1405/07/30 11:16":
+        - cell "تراز آزمایشی":
+          - link "تراز آزمایشی":
+            - /url: /accounting/statements/76e93194-0887-4096-9ac3-9a287c8ad9cb/
+        - cell "1405/07/30"
+        - cell "account.demo-construction-01.accountant"
+        - cell "0"
+        - cell "1405/07/30 11:16"

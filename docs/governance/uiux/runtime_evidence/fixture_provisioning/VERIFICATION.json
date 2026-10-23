@@ -1,0 +1,428 @@
+{
+  "type": "READ_ONLY_FIXTURE_INTEGRITY_VERIFICATION_NOT_WAVE_RUN",
+  "checks": [
+    {
+      "check": "Frozen branch and HEAD preserved",
+      "result": "PASS"
+    },
+    {
+      "check": "Role definitions, permission catalogue and role permission links unchanged",
+      "result": "PASS"
+    },
+    {
+      "check": "All 111 pre-existing UIUX artifact hashes unchanged",
+      "result": "PASS"
+    },
+    {
+      "check": "Exactly four approved identities added; none removed",
+      "result": "PASS"
+    },
+    {
+      "check": "All existing authorization unchanged except approved accountant correction",
+      "result": "PASS"
+    },
+    {
+      "check": "New identities have no platform, superuser, staff, group or direct permission authority",
+      "result": "PASS"
+    },
+    {
+      "check": "Exact canonical role and active non-quarantined tenant membership: uiux.persona.project-operations",
+      "result": "PASS"
+    },
+    {
+      "check": "Exact canonical role and active non-quarantined tenant membership: uiux.persona.project-manager",
+      "result": "PASS"
+    },
+    {
+      "check": "Exact canonical role and active non-quarantined tenant membership: uiux.persona.tenant-admin",
+      "result": "PASS"
+    },
+    {
+      "check": "Exact canonical role and active non-quarantined tenant membership: uiux.persona.treasury",
+      "result": "PASS"
+    },
+    {
+      "check": "Exact canonical role and active non-quarantined tenant membership: account.demo-construction-01.accountant",
+      "result": "PASS"
+    },
+    {
+      "check": "P05 legacy tenant_manager assignment canonically revoked with history retained",
+      "result": "PASS"
+    },
+    {
+      "check": "DPAPI credential usable and first-login initialization complete: uiux.persona.project-operations",
+      "result": "PASS"
+    },
+    {
+      "check": "DPAPI credential usable and first-login initialization complete: uiux.persona.project-manager",
+      "result": "PASS"
+    },
+    {
+      "check": "DPAPI credential usable and first-login initialization complete: uiux.persona.treasury",
+      "result": "PASS"
+    },
+    {
+      "check": "DPAPI credential usable and first-login initialization complete: uiux.persona.tenant-admin",
+      "result": "PASS"
+    },
+    {
+      "check": "DPAPI credential usable and first-login initialization complete: account.demo-construction-01.owner",
+      "result": "PASS"
+    },
+    {
+      "check": "DPAPI credential usable and first-login initialization complete: account.demo-construction-01.supervisor",
+      "result": "PASS"
+    },
+    {
+      "check": "DPAPI credential usable and first-login initialization complete: account.demo-construction-01.accountant",
+      "result": "PASS"
+    },
+    {
+      "check": "P01 pagination exact 30 rows",
+      "result": "PASS"
+    },
+    {
+      "check": "Exactly 21 identifiable UIUX report fixtures",
+      "result": "PASS"
+    },
+    {
+      "check": "Positive A plus same-tenant C and cross-tenant negative scope: uiux.audit.project",
+      "result": "PASS"
+    },
+    {
+      "check": "B scope stays intentional: uiux.audit.project",
+      "result": "PASS"
+    },
+    {
+      "check": "Positive A plus same-tenant C and cross-tenant negative scope: uiux.persona.project-operations",
+      "result": "PASS"
+    },
+    {
+      "check": "B scope stays intentional: uiux.persona.project-operations",
+      "result": "PASS"
+    },
+    {
+      "check": "Positive A plus same-tenant C and cross-tenant negative scope: uiux.persona.project-manager",
+      "result": "PASS"
+    },
+    {
+      "check": "B scope stays intentional: uiux.persona.project-manager",
+      "result": "PASS"
+    },
+    {
+      "check": "Positive A plus same-tenant C and cross-tenant negative scope: uiux.persona.treasury",
+      "result": "PASS"
+    },
+    {
+      "check": "B scope stays intentional: uiux.persona.treasury",
+      "result": "PASS"
+    },
+    {
+      "check": "Reporting remains quarantined with zero effective roles and scope",
+      "result": "PASS"
+    },
+    {
+      "check": "Canonical future interval bounded and not effective",
+      "result": "PASS"
+    },
+    {
+      "check": "Canonical revoked assignment retains actor, reason and history",
+      "result": "PASS"
+    },
+    {
+      "check": "Journal draft with two balanced dimension-bearing lines",
+      "result": "PASS"
+    },
+    {
+      "check": "Open current period and active fiscal year reused",
+      "result": "PASS"
+    },
+    {
+      "check": "Approved request has two eligible items and active supplier reused",
+      "result": "PASS"
+    },
+    {
+      "check": "No journal posted or Treasury movement created",
+      "result": "PASS"
+    },
+    {
+      "check": "Treasury account is retained draft with scoped custodian",
+      "result": "PASS"
+    },
+    {
+      "check": "Only planned model surface changed",
+      "result": "PASS"
+    },
+    {
+      "check": "Remaining 494 model fingerprints unchanged",
+      "result": "PASS"
+    },
+    {
+      "check": "No pending Development migrations",
+      "result": "PASS"
+    },
+    {
+      "check": "Business fixtures did not change authorization",
+      "result": "PASS"
+    },
+    {
+      "check": "Tracked source and Git index unchanged",
+      "result": "PASS"
+    }
+  ],
+  "pass": 42,
+  "fail": 0,
+  "model_deltas": {
+    "accounts.User": {
+      "before": {
+        "count": 25,
+        "sha256": "a44b17626e25538498da8e8dcc7d46f564ab744de2ac2305da4dc7899d16564b"
+      },
+      "after": {
+        "count": 29,
+        "sha256": "d24cbbfb0f5e1ca7b31a300b6b6d7068afcc8fe6f641f79acbe1d63864ac7454"
+      }
+    },
+    "organizations.OrganizationMembership": {
+      "before": {
+        "count": 27,
+        "sha256": "780c71c8c3bf4d858d666e388d2731c1df7a0a3252ebbe97bcdf99ee67eb1055"
+      },
+      "after": {
+        "count": 31,
+        "sha256": "cdb208d82ca31107d4bb13d22f196642d0d980e1112d641c17da96866da6be53"
+      }
+    },
+    "organizations.MembershipRoleAssignment": {
+      "before": {
+        "count": 27,
+        "sha256": "fa85932972d799f9f966874cda4c06653f0f526a192c76ee97da48c29a566e3f"
+      },
+      "after": {
+        "count": 34,
+        "sha256": "27dcc0ddefed6a9593a0345939371e77e88e5b1208d6b37a696ad89a3a4aa403"
+      }
+    },
+    "organizations.MembershipScopeGrant": {
+      "before": {
+        "count": 9,
+        "sha256": "20d23c70494b211d8a50d2121185aa2848de6040661662e51113b965cb6c54b7"
+      },
+      "after": {
+        "count": 17,
+        "sha256": "c3377bad8025dc511d07854b726b73a79ebbd267807410a74b3081bc1210ea0b"
+      }
+    },
+    "organizations.AuthorizationMigrationIssue": {
+      "before": {
+        "count": 19,
+        "sha256": "a089af7be3db3728877622a26d068a1a3e521351f97916579f924b62156240cd"
+      },
+      "after": {
+        "count": 23,
+        "sha256": "0daa0a44d49fb583111496f03e834789b7d37df28c17101000c2f13e19d80c0f"
+      }
+    },
+    "audit.AuditEvent": {
+      "before": {
+        "count": 5220,
+        "sha256": "d88ee6fb42aeee89bc04d73b31560a007e8dcb94d327e7e3b881b79bb1ef3574"
+      },
+      "after": {
+        "count": 5284,
+        "sha256": "e66c3c62d7a605f41fb63016a0983ce37bd3e0c5f588ebc516491f48e3efb57f"
+      }
+    },
+    "accounting.JournalEntry": {
+      "before": {
+        "count": 1,
+        "sha256": "9ca83f65d0362121a4dc4f330fe09f9ac800ad6f4bb681e8d4c6e9bc81b45db3"
+      },
+      "after": {
+        "count": 2,
+        "sha256": "2d33f469684ef02ad26f7ece2a3daae54c93f4f3146e857daef953f88099375d"
+      }
+    },
+    "accounting.JournalLine": {
+      "before": {
+        "count": 2,
+        "sha256": "b6c27c2a10db50ff2b8daf2658510ddfbc7ada04d1f474084ca1453128be1e8c"
+      },
+      "after": {
+        "count": 4,
+        "sha256": "ffc0204d694049a373872c0508819f0dbca176d1fa108d515cc6cfa18732aed0"
+      }
+    },
+    "treasury.TreasuryAccount": {
+      "before": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "after": {
+        "count": 1,
+        "sha256": "2fbc602a1b556dd199b0e5cfc6b96ac15883580b47669678fc7ef779c3d24cf2"
+      }
+    },
+    "estimates.Estimate": {
+      "before": {
+        "count": 32,
+        "sha256": "ccb0f17992350700782d50e946dbaccd86fb5bfe6a00b5f07e9f3678d8cae874"
+      },
+      "after": {
+        "count": 34,
+        "sha256": "020fc5213a3d26116878382601fcccbcb400fcd1b7adb4af1a0e00058b082064"
+      }
+    },
+    "estimates.EstimateRevision": {
+      "before": {
+        "count": 32,
+        "sha256": "c5d5403968910512e002b7238105469825db5a093edf24b5a255d895b86ef5f0"
+      },
+      "after": {
+        "count": 34,
+        "sha256": "5850014332274d23a334c7710ea564228e584588f8e41f6bddbb36c619d6bde3"
+      }
+    },
+    "expenses.Expense": {
+      "before": {
+        "count": 80,
+        "sha256": "a8154c0fcc9cc2746f2ba625df42ea7c8a49c28557af7805c9d40b4230de804d"
+      },
+      "after": {
+        "count": 82,
+        "sha256": "0d22d8d6661abc5c71cadf6aae7a095d7291b360df9d3e431a3df5df9d3129d6"
+      }
+    },
+    "daily_reports.DailyReport": {
+      "before": {
+        "count": 144,
+        "sha256": "658199417ecc6012f782a8f51416ca5d8dd016d7791af4597ef84bb40a89401d"
+      },
+      "after": {
+        "count": 165,
+        "sha256": "8735576518eaedddc015e4edf2e33a6fc4a9826e1d991d2af0e5902060c384dc"
+      }
+    },
+    "equipment.Equipment": {
+      "before": {
+        "count": 8,
+        "sha256": "c572cc159490d6ac4e24f708a6d12d48bf6ef63fd9729edf2894e7b6e828741d"
+      },
+      "after": {
+        "count": 8,
+        "sha256": "1d00094285063a8b656926844d3a653174e5466366b062e373f524135b245506"
+      }
+    },
+    "equipment.EquipmentAssignment": {
+      "before": {
+        "count": 4,
+        "sha256": "9ce185597a513ff1677c8c3baa4a8eb3219717cee23c14aad473fd3fcaea0e54"
+      },
+      "after": {
+        "count": 5,
+        "sha256": "d38a2890ea4ea84797997fcf326190adb44df44779b144a107f4cf2fc189288d"
+      }
+    },
+    "equipment.EquipmentMeter": {
+      "before": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "after": {
+        "count": 1,
+        "sha256": "64ad937e54a65f161b5ae8135be5aa4254b9db05907ae9e03afccf342ec0a43f"
+      }
+    },
+    "equipment.MeterReading": {
+      "before": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "after": {
+        "count": 1,
+        "sha256": "953062f5edea30e8c8399cabae799d73311f274956b5340c25caec785f6e320f"
+      }
+    },
+    "equipment.EquipmentUsageLog": {
+      "before": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "after": {
+        "count": 1,
+        "sha256": "043b14383d20fc37f3d018072e6860d994df5a3e29d6ab2e2881b161fe614841"
+      }
+    },
+    "equipment.MaintenancePlan": {
+      "before": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "after": {
+        "count": 1,
+        "sha256": "58fe344d03c8e2dffe3efe6177c4bff60da4a53edec324e03b2e8d8d549e1905"
+      }
+    },
+    "equipment.EquipmentWorkOrder": {
+      "before": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "after": {
+        "count": 1,
+        "sha256": "57533e08e9e00a58e1f970048afa5facf1481b4150478c271e6cd02407fb16cb"
+      }
+    }
+  },
+  "readiness_authority_only": {
+    "uiux.persona.project-manager": {
+      "estimates.create": {
+        "permission_and_scope_at_entry": true,
+        "in_project_A": true
+      },
+      "expenses.create": {
+        "permission_and_scope_at_entry": true,
+        "in_project_A": true
+      },
+      "daily_reports.create": {
+        "permission_and_scope_at_entry": true,
+        "in_project_A": true
+      },
+      "equipment_assignments.create": {
+        "permission_and_scope_at_entry": true,
+        "in_project_A": true
+      },
+      "purchase_orders.create": {
+        "permission_and_scope_at_entry": true,
+        "in_project_A": true
+      },
+      "project_controls.compare": {
+        "permission_and_scope_at_entry": false,
+        "in_project_A": false
+      },
+      "project_controls.exceptions_view": {
+        "permission_and_scope_at_entry": false,
+        "in_project_A": false
+      }
+    },
+    "account.demo-construction-01.accountant": {
+      "accounting.journals_prepare": {
+        "permission_and_scope_at_entry": true,
+        "in_project_A": true
+      }
+    },
+    "uiux.persona.treasury": {
+      "treasury.view": {
+        "permission_and_scope_at_entry": false,
+        "in_project_A": true
+      },
+      "treasury.movements_create": {
+        "permission_and_scope_at_entry": false,
+        "in_project_A": true
+      }
+    }
+  },
+  "authorization_before": "89beb3e15e6a0340fced57485ad31073558c6252d9dd82a37f32a370beb5d01e",
+  "authorization_after": "dc41830339a943bd6aab2820da7340fc3e7d361f2e3643cae153b5abf3393007",
+  "runtime_executed": false
+}

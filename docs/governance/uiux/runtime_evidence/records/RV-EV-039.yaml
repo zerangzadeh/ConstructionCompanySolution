@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "record": {
+    "evidence_id": "RV-EV-039",
+    "scenario_id": "UIUX-F-111_RUNTIME_RETEST",
+    "target": "Direct URL/search/context regression controls",
+    "executed_at": "2026-10-22T01:23:01.876060+03:30",
+    "runtime": {
+      "environment_name": "Development",
+      "base_url": "http://127.0.0.1:8002",
+      "git_sha": "43ac319c6e73e48ca9626461b73987922c498ec3",
+      "branch": "main",
+      "browser": "Codex in-app browser",
+      "browser_version": "155.0.8059.80",
+      "browser_version_source": "diagnostics/F111_RETEST_BROWSER_VERSION.json",
+      "source_dirty": true
+    },
+    "persona": {
+      "persona_id": "P-17",
+      "test_user_alias": "uiux.persona.project-manager",
+      "organization_alias": "demo-construction-01",
+      "authorized_projects": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ],
+      "authority_reference": "diagnostics/F111_RETEST_BEFORE.json#authority"
+    },
+    "result": "PASS",
+    "actual_result": "A/B direct read 200, C/D/X 403; PRJ-01 search returns A/B, PRJ-02 search empty. Three context variants tested for A/B/C/D/X; forbidden parents return {options: []}. Direct-read navigation can echo the caller-supplied project UUID in next; fetched forbidden labels/children remain absent.",
+    "screenshots": [
+      "screenshots/RV-EV-039__search-cross-tenant.png",
+      "screenshots/RV-EV-039__search-own-tenant.png"
+    ],
+    "diagnostics": [
+      "diagnostics/F111_RETEST_BROWSER_DOM.json",
+      "diagnostics/F111_RETEST_HTTP.json",
+      "diagnostics/F111_RETEST_BEFORE.json",
+      "diagnostics/F111_RETEST_AFTER.json"
+    ],
+    "product_mutation": false,
+    "business_mutation": false,
+    "historical_evidence_overwritten": false
+  }
+}

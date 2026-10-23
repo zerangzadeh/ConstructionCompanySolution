@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load erp_format %}
+{% block title %}سوابق استخدام | نیروی انسانی{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_title="مدیریت سوابق استخدام" page_eyebrow="نیروی انسانی" page_description="قرارداد و حکم را با نسخه ایمن سند مرتبط ثبت کنید؛ سوابق قبلی حفظ می‌شوند." only %}
+<section class="erp-surface mt-5 rounded-xl p-5" aria-labelledby="select-relationship">
+  <h2 id="select-relationship" class="font-bold">انتخاب رابطه کاری</h2>
+  <form method="get" class="mt-3 flex flex-wrap items-end gap-3">
+    <label for="relationship-selection">رابطه کاری</label>
+    <select id="relationship-selection" name="relationship" class="rounded-lg border px-3 py-2">{% for value, label in form.fields.relationship.choices %}<option value="{{ value }}"{% if value|stringformat:"s" == form.relationship.value|stringformat:"s" %} selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <button class="erp-btn erp-btn--secondary">نمایش اسناد مرتبط</button>
+  </form>
+</section>
+<section class="erp-surface mt-5 rounded-xl p-5" aria-labelledby="new-record">
+  <h2 id="new-record" class="font-bold">ثبت نسخه سابقه</h2>
+  <form method="post" class="mt-4 space-y-4" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
+    <p class="text-sm text-slate-600">برای تغییر سابقه، نسخه پیشین را صریحاً انتخاب کنید. سند باید به همین رابطه کاری متصل و برای دریافت ایمن باشد.</p>
+    <button class="erp-btn erp-btn--primary">ثبت نسخه جدید</button>
+  </form>
+</section>
+<section class="erp-surface mt-5 rounded-xl p-5" aria-labelledby="employment-records">
+  <h2 id="employment-records" class="font-bold">سوابق قابل دسترسی</h2>
+  <ul class="mt-3 space-y-3">{% for record in records %}
+    <li class="rounded-lg bg-slate-50 p-3 text-sm"><b>{{ record.relationship.person }}</b> · {{ record.get_kind_display }} · نسخه {{ record.version|erp_number }}<span class="block text-slate-600">{{ record.effective_from|jalali_date }} تا {{ record.effective_to|jalali_date|default:"ثبت نشده" }}</span></li>
+  {% empty %}<li class="text-sm text-slate-600">سابقه مجازی برای نمایش وجود ندارد.</li>{% endfor %}</ul>
+</section>
+{% endblock %}

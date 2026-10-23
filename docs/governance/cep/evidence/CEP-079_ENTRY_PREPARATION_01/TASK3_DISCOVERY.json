@@ -1,0 +1,109 @@
+{
+  "environment": "LOCAL_DEVELOPMENT_POSTGRESQL_MIGRATIONS_CURRENT",
+  "accounts": [
+    {
+      "id": "abddceb8-a1be-4f12-85da-5b2d6269c063",
+      "code": "UIUX-CASH-01",
+      "kind": "cash",
+      "status": "draft",
+      "created_by_id": "381e4525-6f98-4b4d-ad6f-44008dbb9643"
+    },
+    {
+      "id": "3afc57b7-49af-4a16-8478-8d16f734e87b",
+      "code": "WCD-CASH",
+      "kind": "cash",
+      "status": "active",
+      "created_by_id": "381e4525-6f98-4b4d-ad6f-44008dbb9643"
+    }
+  ],
+  "mappings": [
+    {
+      "id": "1a385857-61ed-49cb-ae57-a5f8c3062aff",
+      "treasury_account_id": "3afc57b7-49af-4a16-8478-8d16f734e87b",
+      "treasury_account__kind": "cash",
+      "version": 1,
+      "is_active": true,
+      "effective_from": "2026-10-22",
+      "effective_to": null,
+      "cash_ledger_account_id": "3fbeab2f-258b-494d-9bfd-23f45996d59b",
+      "clearing_ledger_account_id": "50713ab0-e338-40b0-bf48-6b582144dab1",
+      "created_by_id": "381e4525-6f98-4b4d-ad6f-44008dbb9643",
+      "approved_by_id": "dd40accc-ac0d-4ff4-8df2-a5372933ce49",
+      "approval_policy_version_id": "bb0f11a8-61e4-42ac-9f57-8ab506de92af",
+      "reason": "PD-WC-D01 UIUX_TEST_ONLY_NON_AUTHORITATIVE"
+    }
+  ],
+  "control_mappings": [
+    {
+      "id": "cbc04eba-89d0-4c75-bd94-d6c1b2fe36a2",
+      "created_at": "2026-10-22 17:47:38.597406+00:00",
+      "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "source_kind": "procurement.supplier_invoice_match.v1",
+      "direction": "payable",
+      "version": 1,
+      "control_account_id": "562d06e1-b878-4d2b-bf61-9a7c9dad1dfc",
+      "effective_from": "2026-10-22",
+      "effective_to": "2026-12-22",
+      "reason": "PD-WC-D01 UIUX_TEST_ONLY_NON_AUTHORITATIVE",
+      "created_by_id": "381e4525-6f98-4b4d-ad6f-44008dbb9643"
+    }
+  ],
+  "period": {
+    "id": "5b592098-cd9d-4e41-bfd5-e2f0abd12ed8",
+    "starts_on": "2027-03-21",
+    "ends_on": "2027-06-21",
+    "status": "open"
+  },
+  "period_journals": [],
+  "synthetic_journal": [
+    {
+      "id": "e6e69433-d65d-40f7-8cd0-c090065b081b",
+      "created_at": "2026-10-23 18:04:55.349070+00:00",
+      "updated_at": "2026-10-23 18:04:55.527360+00:00",
+      "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "period_id": "47c2e583-15a1-4dbd-8a34-873af35b42d9",
+      "kind": "manual",
+      "status": "posted",
+      "number": 3,
+      "document_date": "2026-10-22",
+      "accounting_date": "2026-10-22",
+      "currency": "IRR",
+      "description": "CEP079 isolated synthetic Development fixture; no production or statutory authority; no UAT result.",
+      "source_key": "CEP079-PREP-01-JOURNAL",
+      "source_kind": "manual",
+      "source_uuid": "e6e69433-d65d-40f7-8cd0-c090065b081b",
+      "source_version": 1,
+      "event_kind": "manual_entry",
+      "occurrence_id": "e6e69433-d65d-40f7-8cd0-c090065b081b",
+      "payload_hash": "8da6afce9b9bcaeda76d92b7ec4df4f9e5e163fd64eaaacb6157188275b0adf6",
+      "posting_rule_code": "core.manual-journal",
+      "posting_rule_version": 1,
+      "evidence_reference": "CEP079-PREP-01",
+      "reconciliation_reference": "",
+      "cutoff_date": null,
+      "precision_policy_version_id": "2ec33df0-a358-4c72-ac59-3a82df4d2d3c",
+      "rounding_policy_version_id": "7964956c-80ba-4613-857c-4d53ab6201e6",
+      "prepared_by_id": "381e4525-6f98-4b4d-ad6f-44008dbb9643",
+      "submitted_by_id": "381e4525-6f98-4b4d-ad6f-44008dbb9643",
+      "submitted_at": "2026-10-23 18:04:55.432079+00:00",
+      "posted_by_id": "dd40accc-ac0d-4ff4-8df2-a5372933ce49",
+      "posted_at": "2026-10-23 18:04:55.527360+00:00",
+      "reverses_id": null,
+      "replaces_id": null,
+      "adjusts_id": null,
+      "adjustment_reason": ""
+    }
+  ],
+  "existing_reconciliation_runs": [],
+  "read_only_period_end_report": {
+    "source_count": 4,
+    "journal_count": 3,
+    "posted_count": 1,
+    "pending_count": 3,
+    "debit_total": "1.000000",
+    "credit_total": "1.000000",
+    "exceptions": [],
+    "tie_out_count": 4
+  },
+  "mutation": "NONE"
+}

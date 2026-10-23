@@ -1,0 +1,195 @@
+[
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/workforce/ess/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "explicit linked own subject and existing permissions",
+    "passed": true,
+    "final_path": "/workforce/ess/",
+    "body_sha256": "7e9c6f2bd62ddf26a6031720cad7f80ba811936a6517f69214cf1ab9429bed26"
+  },
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/workforce/ess/profile/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "explicit linked own subject and existing permissions",
+    "passed": true,
+    "final_path": "/workforce/ess/profile/",
+    "body_sha256": "e053070d31f6d0fd28a0d66649ca90cd1ae062c0c0c6fbedef927d9b861edde3"
+  },
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/payroll/ess/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "explicit linked own subject and existing permissions",
+    "passed": true,
+    "final_path": "/payroll/ess/",
+    "body_sha256": "3786251436703b615c6cb1d13bb922ce7d387a15aeb110f1f0536f4913a95ad9"
+  },
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/payroll/ess/payslips/686e18b3-8d06-4e05-93bc-afe9bec64183/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "another employee finalized payslip unavailable",
+    "passed": true,
+    "final_path": "/payroll/ess/payslips/686e18b3-8d06-4e05-93bc-afe9bec64183/",
+    "body_sha256": "96c011f3d1e5aa1ac23d2cd12a377eb053982fa1977457c61e951dc20373f146"
+  },
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/workforce/ess/profile/b17e6726-c27e-4525-8d88-6db97dac8880/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "other worker / foreign tenant relationship unavailable",
+    "passed": true,
+    "final_path": "/workforce/ess/profile/b17e6726-c27e-4525-8d88-6db97dac8880/",
+    "body_sha256": "96c011f3d1e5aa1ac23d2cd12a377eb053982fa1977457c61e951dc20373f146"
+  },
+  {
+    "actor": "uiux.persona.project-operations",
+    "path": "/workforce/ess/profile/227831d7-fca2-4d3e-99e1-c4a8250c08f1/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "other worker / foreign tenant relationship unavailable",
+    "passed": true,
+    "final_path": "/workforce/ess/profile/227831d7-fca2-4d3e-99e1-c4a8250c08f1/",
+    "body_sha256": "96c011f3d1e5aa1ac23d2cd12a377eb053982fa1977457c61e951dc20373f146"
+  },
+  {
+    "actor": "uiux.wavec.time",
+    "path": "/payroll/ess/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "case": "linked identity without payroll ESS permission remains denied",
+    "passed": true,
+    "final_path": "/payroll/ess/",
+    "body_sha256": "96c011f3d1e5aa1ac23d2cd12a377eb053982fa1977457c61e951dc20373f146"
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/workforce/ess/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "case": "unlinked identity remains denied",
+    "passed": true,
+    "final_path": "/workforce/ess/",
+    "body_sha256": "96c011f3d1e5aa1ac23d2cd12a377eb053982fa1977457c61e951dc20373f146"
+  },
+  {
+    "actor": "account.demo-construction-01.owner",
+    "path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "prepared publication article",
+    "passed": true,
+    "final_path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/",
+    "body_sha256": "36098dbc6b5e97b33afc8da524c84aead72d5806a9044ff8110fb5a8c298a4fe"
+  },
+  {
+    "actor": "account.demo-construction-01.owner",
+    "path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/history/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "authorized source traceability",
+    "passed": true,
+    "final_path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/history/",
+    "body_sha256": "4d590946161a620aa88595c65e80aff27a21eff2952448456eb3a3fddb85e6b1"
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "case": "project-only reader cannot expand to organization-scoped knowledge",
+    "passed": true,
+    "final_path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/",
+    "body_sha256": "2f9c2e8ba6c2e151716334d3612ffc33248c60b08228847fbe1ab5e93dc69dd4"
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/history/",
+    "method": "GET",
+    "status": 404,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "reader without history grant cannot open traceability",
+    "passed": true,
+    "final_path": "/knowledge/publications/a4468fd4-72fb-4410-91fb-b8f83d0d46d8/history/",
+    "body_sha256": "e901db7efda49e7386d535f96187d0e59033893944ce55b6c39c742cba095da9"
+  },
+  {
+    "actor": "uiux.persona.tenant-admin",
+    "path": "/knowledge/platform/promotions/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "case": "tenant administration is not platform authority",
+    "passed": true,
+    "final_path": "/knowledge/platform/promotions/",
+    "body_sha256": "a1f4a84fff1e39d9987ac7ab71c0dca4d953d04bdee82475d949b9bf410eaf55"
+  },
+  {
+    "actor": "admin",
+    "path": "/knowledge/platform/promotions/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "separately assigned platform admin sees sanitized queue",
+    "passed": true,
+    "final_path": "/knowledge/platform/promotions/",
+    "body_sha256": "1f32f5d6b55a3f837fee1fbba62b346523a181590ff1dcdf816fd5cfcd00719f"
+  },
+  {
+    "actor": "admin",
+    "case": "platform session has no implicit tenant source access",
+    "status": 200,
+    "final_path": "/organizations/",
+    "passed": true
+  }
+]

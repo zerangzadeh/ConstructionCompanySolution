@@ -238,7 +238,7 @@ class ESSPayrollTests(baseline.StatutoryPayrollTests):
             "apps.payroll.ess_views.services.own_payroll_history", return_value=()
         ):
             empty = self.client.get(reverse("payroll:ess_history"))
-        self.assertContains(empty, "فیش قطعی مجازی برای نمایش موجود نیست.")
+        self.assertContains(empty, "هنوز فیش قطعی برای شما در دسترس نیست.")
         self._capture("empty", empty)
         # A forged retained artifact for a draft run is never surfaced.
         PayrollRun.objects.filter(pk=self.run.pk).update(
@@ -362,7 +362,7 @@ class ESSPayrollTests(baseline.StatutoryPayrollTests):
             PayrollRunEmployee.objects.get(pk=self.run_employee.pk).net_amount, 1000
         )
 
-    def test_new_sensitive_permissions_have_no_builtin_default_grants(self):
+    def test_sensitive_permissions_do_not_expand_owner_admin_defaults(self):
         from apps.organizations.role_defaults import DEFAULT_ROLE_PERMISSIONS
 
         codes = set(map(str, OWN + HANDLER)) & {
@@ -372,7 +372,9 @@ class ESSPayrollTests(baseline.StatutoryPayrollTests):
             "payroll_inquiries.request",
             "payroll_inquiries.respond",
         }
-        for grants in DEFAULT_ROLE_PERMISSIONS.values():
+        for grants in (
+            DEFAULT_ROLE_PERMISSIONS[role] for role in ("tenant_owner", "tenant_admin")
+        ):
             self.assertFalse(codes & grants)
 
     def test_foreign_inquiry_and_payslip_urls_are_uniformly_denied(self):

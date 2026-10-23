@@ -18,6 +18,7 @@ from apps.organizations.models import BusinessPermissionCode as P
 from . import services
 from .administration import configuration_payload, visible_versions
 from .administration_forms import DefinitionForm, DraftForm, LifecycleForm
+from .administration_presentation import business_review
 from .models import WorkflowVersionStatus
 from .registry import registry
 
@@ -103,6 +104,7 @@ def version_detail(request: HttpRequest, version_id) -> HttpResponse:
             "version": version,
             "siblings": siblings,
             "configuration": configuration,
+            "business_review": business_review(configuration),
             "configuration_text": json.dumps(
                 configuration, ensure_ascii=False, indent=2
             ),

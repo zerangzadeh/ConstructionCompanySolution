@@ -1,0 +1,163 @@
+FFFFFFFFFF                                                               [100%]
+================================== FAILURES ===================================
+____ SealedCustodyTests.test_permission_is_intersected_with_project_scope _____
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UniqueViolation: duplicate key value violates unique constraint "membership_one_unrevoked_role"
+E   DETAIL:  Key (membership_id, role_id)=(23298acb-1e3a-41a1-8264-5b30ac8e9435, 17e4ffc9-73ae-43d1-98ea-6291a20f7b0c) already exists.
+
+The above exception was the direct cause of the following exception:
+docs\governance\uiux\wave_c_final_closure\entry_sources\apps\procurement\test_p5_s08_sealed_custody.py:275: in test_permission_is_intersected_with_project_scope
+    MembershipRoleAssignment.objects.create(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+.venv\Lib\site-packages\django\db\models\base.py:902: in save
+    self.save_base(
+.venv\Lib\site-packages\django\db\models\base.py:1008: in save_base
+    updated = self._save_table(
+.venv\Lib\site-packages\django\db\models\base.py:1169: in _save_table
+    results = self._do_insert(
+.venv\Lib\site-packages\django\db\models\base.py:1210: in _do_insert
+    return manager._insert(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:1873: in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1882: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.IntegrityError: duplicate key value violates unique constraint "membership_one_unrevoked_role"
+E   DETAIL:  Key (membership_id, role_id)=(23298acb-1e3a-41a1-8264-5b30ac8e9435, 17e4ffc9-73ae-43d1-98ea-6291a20f7b0c) already exists.
+_ CorePayrollTests.test_payroll_registry_is_complete_and_owner_admin_are_denied _
+apps\payroll\test_p7_s13_s22_core_payroll.py:927: in test_payroll_registry_is_complete_and_owner_admin_are_denied
+    self.assertLessEqual(model_labels, registered_model_labels())
+E   AssertionError: {'payroll.StatutoryCalculationLine', 'payroll.PayrollCumulativeState', 'payroll.PayrollReversal', 'payroll.PayrollInquiryCategory', 'payroll.FinancialHandoffLine', 'payroll.PayrollInquiry', 'payroll.StatutoryReviewEvidence', 'payroll.StatutoryEmployeeResult', 'payroll.PayrollRun', 'payroll.StatutoryReconciliation', 'payroll.PayrollResultLine', 'payroll.Payslip', 'payroll.FinancialHandoffReview', 'payroll.FinancialHandoffAcknowledgement', 'payroll.StatutoryExportEvidence', 'payroll.FinancialHandoffReconciliation', 'payroll.StatutoryCalculation', 'payroll.PayrollInputSnapshot', 'payroll.EmploymentPayConfiguration', 'payroll.PayrollYearInterval', 'payroll.FinancialHandoffReconciliationReview', 'payroll.PayrollAdjustment', 'payroll.PayrollPeriod', 'payroll.PayrollRule', 'payroll.PayrollRunEmployee', 'payroll.StatutoryOutput', 'payroll.PayrollComponent', 'payroll.StatutoryIdentityEvidence', 'payroll.PayrollException', 'payroll.PayrollInput', 'payroll.StatutorySubmissionResolution', 'payroll.PayrollInquiryResponse', 'payroll.StatutorySourcePackage', 'payroll.FinancialHandoffProposal', 'payroll.PayrollInquiryEvidenceLink'} not less than or equal to {'parties.PartyAlias', 'compliance.InspectionTemplate', 'fixed_assets.FixedAsset', 'procurement.SupplierPortalGrantRevocation', 'projects.ProjectControlStatusEvent', 'fixed_assets.AssetReconciliationEvidence', 'projects.ProjectPhase', 'expenses.ExpenseAllocation', 'workflows.WorkItemCandidate', 'treasury.BankReconciliationRun', 'procurement.EvaluatorAppointment', 'treasury.StatementMatchProposal', 'workflows.WorkItemAssignmentHistory', 'workforce.EmployeeTrainingDocumentLink', 'timekeeping.LaborDistributionPreviewLine', 'daily_reports.DelayEvent', 'compliance.InspectionFinding', 'accounting.FiscalPeriod', 'safety.SafetyIncident', 'treasury.ChequeInstrument', 'knowledge.KnowledgePublicationVersion', 'treasury.TreasuryGLReconciliationSliceInvalidation', 'support.SupportEvidence', 'procurement.PurchaseOrderItem', 'documents.DocumentRetentionPolicy', 'timekeeping.WorkCalendar', 'compliance.Permit', 'parties.PartyRepresentative', 'reporting.ProjectCloseoutExportManifest', 'workforce.PerformanceEvaluationDocumentLink', 'subledgers.MatchTolerancePolicy', 'workforce.PersonalDataRequest', 'procurement.RFQCloseManifestEntry', 'compliance.QualityTest', 'equipment.EquipmentCostPolicyVersion', 'subledgers.SubledgerReconciliationReview', 'compliance.Nonconformance', 'workforce.EmployeePositionAssignment', 'knowledge.KnowledgeSourcePin', 'procurement.ServiceAcceptanceItem', 'procurement.RequestForQuotationLine', 'accounting.JournalNumberSequence', 'projects.ProjectForecastTransition', 'treasury.TreasuryAdvance', 'fixed_assets.FixedAssetSourceEnvelope', 'procurement.RequestForQuotation', 'procurement.SourcingAward', 'inventory.InventoryCount', 'treasury.TreasuryGLReconciliationSlice', 'treasury.PaymentRequestTransition', 'commercial.TenderBidRevision', 'procurement.PurchaseOrderChangeRequest', 'workforce.Employee', 'organizations.OrganizationSettings', 'workforce.HRCertificateCancellation', 'materials.MaterialAttributeDefinition', 'reporting.MetricResult', 'subledgers.SupplierInvoiceVersion', 'reporting.ReconciliationSideSnapshot', 'subledgers.PayrollAPOperation', 'parties.PartyRestriction', 'subledgers.MatchDiscrepancy', 'audit.AuditEvent', 'timekeeping.CalendarHoliday', 'parties.PartyIdentitySnapshot', 'payroll.PayrollInput', 'payroll.FinancialHandoffProposal', 'projects.ScheduleRebaselineProposal', 'knowledge.KnowledgePromotionEvent', 'reporting.ReconciliationPairVersion', 'timekeeping.ShiftDefinition', 'treasury.AdvanceSettlementTransition', 'daily_reports.DailyReportEquipmentEntry', 'payroll.PayrollInquiry', 'reporting.ReconciliationRun', 'daily_reports.FieldDownstreamProposal', 'knowledge.KnowledgePublication', 'timekeeping.Timesheet', 'billing.ProjectBaseline', 'safety.SafetyReviewRevision', 'timekeeping.AttendanceCorrectionRequest', 'knowledge.KnowledgeRecurrenceEvidence', 'payroll.PayrollAdjustment', 'subledgers.PayrollAPEnrollment', 'accounting.FinancialStatementRun', 'estimates.PriceBookActivation', 'knowledge.KnowledgeCandidateRevision', 'projects.CostCenter', 'support.SupportAccessRequest', 'procurement.CommercialComparison', 'projects.ProjectSite', 'fixed_assets.AssetBookPolicyVersion', 'fixed_assets.AssetTransaction', 'compliance.CapaAction', 'treasury.TreasuryGLReconciliationReview', 'workflows.WorkflowInstance', 'documents.SealedDocumentCustody', 'procurement.QuoteRevisionTransition', 'procurement.SupplierPortalPrincipal', 'treasury.BankStatementImport', 'procurement.QuoteRevisionEvidence', 'fixed_assets.FixedAssetEquipmentLink', 'reporting.MetricRefreshRun', 'workforce.EmployeeProjectAssignment', 'workflows.WorkItem', 'knowledge.KnowledgeRecurrenceSource', 'procurement.CommercialException', 'procurement.SourcingAwardPreparationAllocation', 'payroll.StatutoryOutput', 'daily_reports.FieldObservation', 'accounting.OpeningBalanceImport', 'contracts.ContractAmendment', 'payroll.PayrollException', 'payroll.StatutorySubmissionResolution', 'subledgers.PayrollAPDraft', 'documents.RetiredPaymentEvidence', 'payroll.PayrollInquiryResponse', 'treasury.TreasuryMovementClearing', 'procurement.QuoteRevision', 'fixed_assets.AssetSourceReference', 'inventory.InventoryTransfer', 'accounting.FinancialStatementLineSnapshot', 'procurement.RequestForQuotationVersionLine', 'subledgers.Obligation', 'payroll.StatutoryCalculationLine', 'payroll.PayrollCumulativeState', 'expenses.Expense', 'inventory.InventoryReservationAllocation', 'materials.Material', 'payroll.StatutoryEmployeeResult', 'quality.QualityReviewRevision', 'subledgers.WriteOffReversal', 'subledgers.SettlementAllocation', 'support.Notification', 'billing.ContractGuarantee', 'workforce.Department', 'accounting.FiscalPeriodControlEvent', 'reporting.ReconciliationExceptionEvent', 'procurement.PurchaseRequestItem', 'workforce.TrainingRequirement', 'accounting.ReconciliationReview', 'payroll.FinancialHandoffReconciliation', 'reporting.ProjectCloseoutEvent', 'reporting.ReportingSavedView', 'billing.ContractComplianceEvidence', 'reporting.ReconciliationRunReview', 'projects.ProjectCostCoverage', 'procurement.ServiceAcceptance', 'treasury.BankStatementLine', 'daily_reports.DailyReportLaborEntry', 'partner_qualification.PartnerCategoryApproval', 'treasury.TreasuryAccountLifecycleEvent', 'procurement.PurchaseOrder', 'workforce.WorkTeam', 'compliance.InspectionTemplateVersion', 'procurement.QuoteEvidencePackageFreezeItem', 'accounting.RecognitionMappingVersion', 'procurement.PurchaseOrderVersionLine', 'estimates.PriceBookVersion', 'workforce.EmployeeSkillRecord', 'billing.TaxpayerInvoice', 'documents.DocumentRetentionPolicyVersion', 'estimates.EstimatePriceBookMapping', 'timekeeping.TimesheetEntry', 'subledgers.SubledgerReconciliationRun', 'daily_reports.FieldObservationDraftRevision', 'treasury.ChequeTransition', 'reporting.ProjectCloseoutEvidenceLink', 'documents.DocumentKeyCustodyAttestation', 'inventory.InventorySerial', 'fixed_assets.DepreciationRun', 'documents.RetiredPaymentDocumentLink', 'daily_reports.DailyReport', 'reporting.ProjectCloseoutProfileVersion', 'timekeeping.TimesheetReview', 'partner_qualification.PartnerProfile', 'equipment.EquipmentAssignment', 'equipment.EquipmentCostRate', 'reporting.ReconciliationEvidenceLink', 'projects.CBSNode', 'projects.Project', 'billing.ProgressClaimSource', 'projects.ProjectForecastReview', 'estimates.EstimateRevision', 'reporting.MetricResultReview', 'payroll.PayrollReversal', 'procurement.QuoteEnvelope', 'procurement.SupplierPortalSubmissionReceipt', 'projects.ProjectBudgetControl', 'billing.VariationBillingEligibility', 'billing.RetentionRelease', 'expenses.ExpenseCategory', 'subledgers.WriteOffDecision', 'materials.MaterialAttributeDefinitionVersion', 'procurement.QuoteConfidentialAccessRevocation', 'equipment.EquipmentCostSourceEnvelope', 'projects.WBSNode', 'expenses.RecurringExpenseTemplate', 'quality.QualityReviewEvidence', 'accounting.ReconciliationRun', 'procurement.PurchaseOrderVersion', 'reporting.ReconciliationPairDefinition', 'payroll.PayrollYearInterval', 'compliance.ComplianceLifecycleEvent', 'subledgers.SupplierInvoiceLine', 'compliance.ComplianceDownstreamProposal', 'timekeeping.RosterVersion', 'billing.ContractorComplianceAssessment', 'workforce.OffboardingCase', 'projects.ProjectScheduleItem', 'reporting.ReconciliationTieOut', 'workforce.EmployeeQualification', 'quality.QualityIssue', 'subledgers.SupplierInvoiceMatch', 'workforce.EmploymentRecord', 'treasury.AdvanceSettlement', 'subledgers.PayrollAPEnrollmentEvent', 'procurement.QuoteEvidencePackageFreeze', 'subledgers.SupplierInvoiceAPReversal', 'reporting.MetricExportManifest', 'reporting.ProjectCloseoutAssessment', 'treasury.TreasuryGLReconciliationLegEvidence', 'workforce.Skill', 'payroll.PayrollRun', 'procurement.QuoteOpeningRequest', 'billing.PayableCertificateAdjustment', 'payroll.StatutoryExportEvidence', 'workforce.PersonalDataEnrollment', 'procurement.GoodsReceiptItem', 'documents.DocumentLink', 'reporting.ProjectCloseoutItemSnapshot', 'fixed_assets.FixedAssetClassVersion', 'contracts.ContractualRecord', 'projects.BudgetSourceManifest', 'organizations.OrganizationMembership', 'estimates.EstimateRate', 'procurement.RFQCommercialScope', 'estimates.EstimateResource', 'equipment.MaintenanceRecord', 'documents.DocumentProcessingAssessment', 'workforce.LaborRateVersion', 'billing.StatutorySubmissionResolution', 'accounting.JournalEntry', 'workflows.WorkflowRoutingRule', 'projects.BudgetAllocation', 'partner_qualification.PartnerEvidence', 'equipment.EquipmentCostAllocation', 'documents.DocumentVersion', 'workforce.PersonalDataDecision', 'projects.CostStructureVersion', 'payroll.PayrollResultLine', 'materials.MaterialPriceObservation', 'estimates.PriceBookRow', 'subledgers.SupplierInvoice', 'procurement.PurchaseRequest', 'documents.DocumentRetentionApplication', 'payroll.FinancialHandoffReview', 'treasury.TreasuryMovementDocumentLink', 'safety.SafetyReviewEvidence', 'accounting.OpeningBalanceImportLine', 'daily_reports.FieldProposalTransition', 'support.SupportCase', 'billing.StatutorySubmissionEvidence', 'workforce.HRCertificateRequest', 'organizations.AuthorizationMigrationIssue', 'commercial.TenderBidEvidence', 'inventory.WarehouseBin', 'billing.ClaimAdjustment', 'estimates.EstimatePriceSource', 'workflows.WorkflowVersion', 'subledgers.WriteOffProposal', 'projects.ProjectCashflowSupplement', 'procurement.QuoteAdmissibilityWithdrawal', 'documents.DocumentDisposalIntent', 'timekeeping.ShiftBreak', 'billing.IndexationRuleVersion', 'materials.MaterialAttributeValue', 'projects.ProjectControlItem', 'procurement.SupplierPortalGrant', 'subledgers.AgingRun', 'treasury.TreasuryAdvanceReconciliationRun', 'equipment.EquipmentWorkOrder', 'subledgers.SettlementReversal', 'accounting.ReconciliationExceptionDisposition', 'projects.ProjectCostFact', 'reporting.MetricDefinitionVersion', 'payroll.FinancialHandoffLine', 'procurement.QuoteAdmissibilityPreparation', 'procurement.SupplierPortalInvitation', 'payroll.StatutoryReviewEvidence', 'inventory.InventoryValuationEvent', 'accounting.RecognitionMappingApproval', 'contracts.ContractualRecordEvidence', 'treasury.BankReconciliationRunProvenance', 'billing.IndexationCalculation', 'inventory.InventoryReservation', 'projects.ProjectCashflowSnapshot', 'workforce.PerformanceEvaluation', 'inventory.StockTraceAllocation', 'procurement.QuoteConfidentialAccessGrant', 'inventory.Warehouse', 'payroll.FinancialHandoffReconciliationReview', 'projects.BudgetManifestLine', 'fixed_assets.DepreciationLine', 'organizations.OrganizationAccountConnectionRequest', 'procurement.QuoteCommercialAssertion', 'parties.PartyContact', 'treasury.TreasuryMovementTransition', 'organizations.MembershipScopeGrant', 'reporting.ReconciliationException', 'organizations.TenantPolicySelection', 'organizations.Organization', 'timekeeping.AttendanceAdjustment', 'documents.DocumentRecoveryManifest', 'inventory.InventoryTransferLine', 'contracts.Contract', 'subledgers.SubledgerReconciliationObligationEvidence', 'partner_qualification.PartnerQualification', 'parties.PartyClassificationAssignment', 'treasury.TreasuryGLReconciliationRun', 'parties.PartyClassification', 'materials.MaterialAttributeImportRun', 'timekeeping.LeaveMissionRequest', 'partner_qualification.PartnerEvaluationAppeal', 'treasury.TreasuryMovementLeg', 'billing.ProgressRecord', 'workflows.WorkflowStepInstance', 'estimates.EstimateItem', 'workforce.HRCertificateType', 'subledgers.SubledgerReconciliationSliceInvalidation', 'timekeeping.AttendanceRecord', 'payroll.PayrollPeriod', 'projects.ProjectChangeProposal', 'daily_reports.FieldObservationEvidenceLink', 'subledgers.SupplierInvoiceMatchLine', 'daily_reports.DailyActivity', 'subledgers.PayrollAPReversal', 'timekeeping.AttendanceImportRow', 'support.SupportCaseEvent', 'knowledge.KnowledgePublicationEvent', 'procurement.PurchaseOrderChangeLine', 'reporting.ProjectCloseoutProfileDefinition', 'treasury.TreasuryAccount', 'payroll.PayrollInquiryCategory', 'workflows.WorkflowStepDefinition', 'documents.DocumentLegalHold', 'procurement.RequestForQuotationVersion', 'workforce.EmployeeTrainingRecord', 'procurement.PurchaseOrderChangeDecisionEvidence', 'equipment.Equipment', 'partner_qualification.QualificationRequirement', 'workforce.HRCertificateReview', 'payroll.FinancialHandoffAcknowledgement', 'estimates.Estimate', 'workforce.Position', 'inventory.InventoryCountLine', 'treasury.TreasuryPostingEvidence', 'billing.PayableCertificateItem', 'payroll.PayrollRule', 'accounting.JournalLine', 'payroll.StatutoryIdentityEvidence', 'materials.MaterialCategory', 'projects.ProjectCostSourceContract', 'workforce.LeavePolicyVersion', 'inventory.MaterialTraceabilityProfile', 'accounting.Account', 'treasury.TreasuryMovementClearingReversal', 'estimates.PriceBook', 'documents.DocumentSignatureEvidence', 'procurement.SourcingAwardPreparation', 'timekeeping.RosterSlot', 'payroll.Payslip', 'workflows.WorkflowDelegation', 'payroll.PayrollInputSnapshot', 'parties.PartyRole', 'billing.PayableCertificate', 'documents.Document', 'documents.DocumentNumberSequence', 'billing.BaselineItem', 'projects.ProjectScheduleRevision', 'reporting.ProjectCloseoutCase', 'billing.TenantBillingConfiguration', 'equipment.EquipmentMeter', 'workforce.EmployeeQualificationLifecycleEvent', 'billing.ProgressClaimItem', 'workforce.Competency', 'inventory.StockTransaction', 'treasury.TreasuryAccountMappingVersion', 'procurement.QuoteAdmissibilityDecision', 'contracts.ContractTermVersion', 'knowledge.KnowledgeCandidate', 'treasury.BankReconciliationRunInvalidation', 'projects.ProjectScheduleDependency', 'compliance.ComplianceEvidenceLink', 'procurement.SourcingAwardAllocation', 'inventory.InventoryLot', 'subledgers.SubledgerReconciliationRunProvenance', 'timekeeping.AttendanceImportBatch', 'timekeeping.AttendanceReconciliation', 'payroll.StatutoryCalculation', 'timekeeping.OvertimeRequest', 'contracts.ContractItem', 'workflows.WorkflowTransitionDefinition', 'knowledge.KnowledgeReuseEvidence', 'procurement.RequestForQuotationInvitation', 'treasury.AdvanceSettlementReversal', 'workforce.LeaveBalanceEntry', 'materials.UnitOfMeasure', 'billing.PayableMeasurement', 'daily_reports.FieldObservationTransition', 'payroll.PayrollInquiryEvidenceLink', 'commercial.TenderBid', 'treasury.TreasuryMovement', 'workflows.WorkflowDefinition', 'procurement.GoodsReceipt', 'knowledge.KnowledgeReview', 'procurement.RFQCloseManifest', 'treasury.TreasuryGLReconciliationJournalLineEvidence', 'subledgers.SubledgerReconciliationJournalLineEvidence', 'timekeeping.LaborDistributionPreview', 'payroll.StatutoryReconciliation', 'accounting.FiscalYear', 'organizations.MembershipRoleAssignment', 'workforce.OffboardingReview', 'payroll.EmploymentPayConfiguration', 'projects.ProjectCostForecast', 'accounting.SourceRecognitionDraft', 'reporting.ReconciliationRebuildCheck', 'accounting.ReconciliationExceptionSnapshot', 'billing.ProgressClaim', 'compliance.Inspection', 'inventory.DownstreamCostSourceEnvelope', 'documents.DocumentCategory', 'treasury.TreasuryGLReconciliationRunProvenance', 'knowledge.KnowledgePromotion', 'workforce.EmployeeQualificationDocumentLink', 'documents.DocumentExportManifest', 'accounting.ControlAccountMappingVersion', 'partner_qualification.PartnerEvaluation', 'procurement.EvaluatorConflictDeclaration', 'accounting.ReconciliationTieOutSnapshot', 'estimates.EstimateAssumption', 'reporting.MetricDefinition', 'parties.BusinessParty', 'projects.Activity', 'subledgers.SubledgerReconciliationAccountSlice', 'compliance.TestResult', 'daily_reports.DailyReportMaterialEntry', 'treasury.PaymentRequest', 'partner_qualification.PartnerEligibilityProposal', 'workflows.WorkflowCondition', 'expenses.ExpenseBudgetAssessment', 'procurement.CommercialComparisonInput', 'payroll.PayrollRunEmployee', 'payroll.PayrollComponent', 'procurement.QuoteOpeningEvent', 'projects.BudgetVersion', 'procurement.CommercialEvaluation', 'workforce.HRCertificateGeneration'}
+_ P5S26S27MatchReviewTests.test_review_is_permissioned_read_only_and_preserves_downstream_state _
+apps\subledgers\test_p5_s26_s27_match_review.py:46: in setUp
+    self.match = self._retained_match()
+                 ^^^^^^^^^^^^^^^^^^^^^^
+apps\subledgers\test_p5_s26_s27_match_review.py:79: in _retained_match
+    approve_match_tolerance_policy(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\subledgers\services.py:1510: in approve_match_tolerance_policy
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062e\u062a\u06cc\u0627\u0631 \u062a\u0623\u06cc\u06cc\u062f \u0633\u06cc\u0627\u0633\u062a \u0631\u0648\u0627\u062f\u0627\u0631\u06cc \u062a\u0637\u0628\u06cc\u0642 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S26S27MatchReviewTests.test_tenant_permission_and_project_scope_hide_match_evidence _
+apps\subledgers\test_p5_s26_s27_match_review.py:46: in setUp
+    self.match = self._retained_match()
+                 ^^^^^^^^^^^^^^^^^^^^^^
+apps\subledgers\test_p5_s26_s27_match_review.py:79: in _retained_match
+    approve_match_tolerance_policy(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\subledgers\services.py:1510: in approve_match_tolerance_policy
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062e\u062a\u06cc\u0627\u0631 \u062a\u0623\u06cc\u06cc\u062f \u0633\u06cc\u0627\u0633\u062a \u0631\u0648\u0627\u062f\u0627\u0631\u06cc \u062a\u0637\u0628\u06cc\u0642 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ SupplierInvoiceAPHandoffTests.test_correction_is_atomic_and_reconciles_versions_without_overwriting_history _
+docs\governance\uiux\wave_c_final_closure\entry_sources\apps\subledgers\test_cep033_invoice_handoff.py:515: in test_correction_is_atomic_and_reconciles_versions_without_overwriting_history
+    self.handoff(replacement, key="correct033", **kwargs)
+docs\governance\uiux\wave_c_final_closure\entry_sources\apps\subledgers\test_cep033_invoice_handoff.py:112: in handoff
+    return handoff_supplier_invoice_match(
+apps\subledgers\supplier_invoice_handoffs.py:370: in handoff_supplier_invoice_match
+    _reverse(
+apps\subledgers\supplier_invoice_handoffs.py:238: in _reverse
+    membership = require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062e\u062a\u06cc\u0627\u0631 \u0628\u0631\u06af\u0634\u062a \u0645\u0646\u0628\u0639 AP \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ SupplierInvoiceAPHandoffTests.test_explicit_reversal_is_idempotent_and_cannot_reactivate_or_post _
+docs\governance\uiux\wave_c_final_closure\entry_sources\apps\subledgers\test_cep033_invoice_handoff.py:574: in test_explicit_reversal_is_idempotent_and_cannot_reactivate_or_post
+    reversal = self.reverse(target)
+               ^^^^^^^^^^^^^^^^^^^^
+docs\governance\uiux\wave_c_final_closure\entry_sources\apps\subledgers\test_cep033_invoice_handoff.py:160: in reverse
+    return reverse_supplier_invoice_obligation(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\subledgers\supplier_invoice_handoffs.py:439: in reverse_supplier_invoice_obligation
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062e\u062a\u06cc\u0627\u0631 \u0628\u0631\u06af\u0634\u062a \u0645\u0646\u0628\u0639 AP \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ SupplierInvoiceAPHandoffTests.test_reversal_permission_has_no_implicit_system_role_grants _
+docs\governance\uiux\wave_c_final_closure\entry_sources\apps\subledgers\test_cep033_invoice_handoff.py:348: in test_reversal_permission_has_no_implicit_system_role_grants
+    self.assertFalse(
+E   AssertionError: True is not false
+_ SupplierInvoiceAPHandoffTests.test_reversal_preserves_aging_cutoff_and_reconciliation_amount _
+docs\governance\uiux\wave_c_final_closure\entry_sources\apps\subledgers\test_cep033_invoice_handoff.py:613: in test_reversal_preserves_aging_cutoff_and_reconciliation_amount
+    reversal = reverse_supplier_invoice_obligation(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\subledgers\supplier_invoice_handoffs.py:439: in reverse_supplier_invoice_obligation
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062e\u062a\u06cc\u0627\u0631 \u0628\u0631\u06af\u0634\u062a \u0645\u0646\u0628\u0639 AP \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ SupplierInvoiceAPHandoffTests.test_settlement_writeoff_and_source_reversal_keep_their_own_authorities _
+docs\governance\uiux\wave_c_final_closure\entry_sources\apps\subledgers\test_cep033_invoice_handoff.py:302: in test_settlement_writeoff_and_source_reversal_keep_their_own_authorities
+    self.reverse(target)
+docs\governance\uiux\wave_c_final_closure\entry_sources\apps\subledgers\test_cep033_invoice_handoff.py:160: in reverse
+    return reverse_supplier_invoice_obligation(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\subledgers\supplier_invoice_handoffs.py:439: in reverse_supplier_invoice_obligation
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062e\u062a\u06cc\u0627\u0631 \u0628\u0631\u06af\u0634\u062a \u0645\u0646\u0628\u0639 AP \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ InvoiceAPMigrationTests.test_additive_migration_preserves_existing_obligation_and_source_history _
+docs\governance\uiux\wave_c_final_closure\entry_sources\apps\subledgers\test_cep033_invoice_handoff.py:717: in test_additive_migration_preserves_existing_obligation_and_source_history
+    self.assertEqual(self.reverse(target).obligation_id, target.pk)
+                     ^^^^^^^^^^^^^^^^^^^^
+docs\governance\uiux\wave_c_final_closure\entry_sources\apps\subledgers\test_cep033_invoice_handoff.py:160: in reverse
+    return reverse_supplier_invoice_obligation(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\subledgers\supplier_invoice_handoffs.py:439: in reverse_supplier_invoice_obligation
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062e\u062a\u06cc\u0627\u0631 \u0628\u0631\u06af\u0634\u062a \u0645\u0646\u0628\u0639 AP \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+=========================== short test summary info ===========================
+FAILED apps/procurement/test_p5_s08_sealed_custody.py::SealedCustodyTests::test_permission_is_intersected_with_project_scope
+FAILED apps/payroll/test_p7_s13_s22_core_payroll.py::CorePayrollTests::test_payroll_registry_is_complete_and_owner_admin_are_denied
+FAILED apps/subledgers/test_cep033_invoice_handoff.py::P5S26S27MatchReviewTests::test_review_is_permissioned_read_only_and_preserves_downstream_state
+FAILED apps/subledgers/test_cep033_invoice_handoff.py::P5S26S27MatchReviewTests::test_tenant_permission_and_project_scope_hide_match_evidence
+FAILED apps/subledgers/test_cep033_invoice_handoff.py::SupplierInvoiceAPHandoffTests::test_correction_is_atomic_and_reconciles_versions_without_overwriting_history
+FAILED apps/subledgers/test_cep033_invoice_handoff.py::SupplierInvoiceAPHandoffTests::test_explicit_reversal_is_idempotent_and_cannot_reactivate_or_post
+FAILED apps/subledgers/test_cep033_invoice_handoff.py::SupplierInvoiceAPHandoffTests::test_reversal_permission_has_no_implicit_system_role_grants
+FAILED apps/subledgers/test_cep033_invoice_handoff.py::SupplierInvoiceAPHandoffTests::test_reversal_preserves_aging_cutoff_and_reconciliation_amount
+FAILED apps/subledgers/test_cep033_invoice_handoff.py::SupplierInvoiceAPHandoffTests::test_settlement_writeoff_and_source_reversal_keep_their_own_authorities
+FAILED apps/subledgers/test_cep033_invoice_handoff.py::InvoiceAPMigrationTests::test_additive_migration_preserves_existing_obligation_and_source_history
+10 failed in 57.41s

@@ -1,0 +1,711 @@
+[
+  {
+    "id": "c253c35d-82c2-4d69-810f-f6f46cc4747a",
+    "created_at": "2026-10-22 00:41:31.744019+00:00",
+    "organization_id": null,
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "authorization.platform_role_assigned",
+    "entity_type": "organizations.PlatformRoleAssignment",
+    "entity_id": "783e95b6-9a95-4c77-9305-c8f1b9d9928b",
+    "correlation_id": "75208ad0-7a73-4ade-a0ae-9abd7375ba76",
+    "changes": {},
+    "metadata": {
+      "role": "platform_operations",
+      "reason": "BATCH_02_RUNTIME_CLOSURE_FIXTURE: Development-only preparation",
+      "target_user_id": "93b49bd5-e72c-4234-98d8-df6dfa1a3ff1",
+      "approver_user_id": "a4384116-c206-446a-b164-a2891309736e"
+    }
+  },
+  {
+    "id": "62e20df1-2cab-45f4-baa3-e59b610a39f1",
+    "created_at": "2026-10-22 00:41:34.561807+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "801a7a89-fd6c-46c2-bc1b-a678bc0bf5ce",
+    "action": "document.uploaded",
+    "entity_type": "document",
+    "entity_id": "f64e5b6b-a99e-4501-895b-7ef68cc75c95",
+    "correlation_id": "16a72d07-17a9-4e4b-9f2f-bd2d3af0fc71",
+    "changes": {},
+    "metadata": {
+      "sha256": "e878950f8091ec010cf5cc723bdea027a8539cf7147cfea199c2f666232dcd4e",
+      "file_size": 69,
+      "target_id": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+      "version_id": "7b12e5bd-394a-49e4-b16e-442ba869ca05",
+      "target_type": "project",
+      "document_type": "general",
+      "version_number": 1,
+      "confidentiality": "internal",
+      "document_number": "DOC-000010"
+    }
+  },
+  {
+    "id": "96a935cf-3c71-4349-a724-bdf2517effe7",
+    "created_at": "2026-10-22 00:41:34.581351+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "93b49bd5-e72c-4234-98d8-df6dfa1a3ff1",
+    "action": "document.processing_assessed",
+    "entity_type": "document_version",
+    "entity_id": "7b12e5bd-394a-49e4-b16e-442ba869ca05",
+    "correlation_id": "8920d7a7-1023-4760-ae33-6c24c44411bd",
+    "changes": {
+      "availability": {
+        "to": "clean"
+      }
+    },
+    "metadata": {
+      "sequence": 1,
+      "adapter_code": "microsoft-defender-development-fixture",
+      "input_sha256": "e878950f8091ec010cf5cc723bdea027a8539cf7147cfea199c2f666232dcd4e",
+      "assessment_id": "22d58638-31e0-451a-a49f-854bb9de7d8b"
+    }
+  },
+  {
+    "id": "2ba263ab-9920-4794-9255-01cff3b52c62",
+    "created_at": "2026-10-22 00:41:34.637737+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "801a7a89-fd6c-46c2-bc1b-a678bc0bf5ce",
+    "action": "compliance_evidence.created",
+    "entity_type": "billing.ContractComplianceEvidence",
+    "entity_id": "c056db10-28a5-48e2-998b-de963dc4091a",
+    "correlation_id": "519a8d22-81e1-4256-9366-4f8fdca7e21d",
+    "changes": {},
+    "metadata": {
+      "version": 1,
+      "series_id": "77ab1f64-00eb-419e-9f6f-bdd69208cd1c",
+      "contract_id": "f9b7fc25-711b-410f-a1e8-90408bc5b882",
+      "evidence_kind": "clearance"
+    }
+  },
+  {
+    "id": "5b7368c1-0203-4324-9685-fc6b37401454",
+    "created_at": "2026-10-22 00:41:34.824320+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "801a7a89-fd6c-46c2-bc1b-a678bc0bf5ce",
+    "action": "workflow_definition.created",
+    "entity_type": "workflows.WorkflowDefinition",
+    "entity_id": "d8b6f466-ab21-4a2c-96d7-d9f30b2df398",
+    "correlation_id": "6a0f3cfe-8fb6-4ce1-b167-81bc9ce89b8a",
+    "changes": {},
+    "metadata": {
+      "starter": true,
+      "workflow_type": "billing.compliance_evidence_approval"
+    }
+  },
+  {
+    "id": "3b4635ba-8d00-4af4-8134-7178f260668f",
+    "created_at": "2026-10-22 00:41:34.826744+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "801a7a89-fd6c-46c2-bc1b-a678bc0bf5ce",
+    "action": "workflow_version.published",
+    "entity_type": "workflows.WorkflowVersion",
+    "entity_id": "d6aa08f8-adfd-4900-b19a-eb90cbb35234",
+    "correlation_id": "46ef99b6-67e8-4e63-a63f-b5a937124092",
+    "changes": {},
+    "metadata": {
+      "starter": true,
+      "workflow_type": "billing.compliance_evidence_approval"
+    }
+  },
+  {
+    "id": "1d87f425-f1aa-4ff3-ae21-765ffcd47980",
+    "created_at": "2026-10-22 00:41:34.886753+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "801a7a89-fd6c-46c2-bc1b-a678bc0bf5ce",
+    "action": "workflow_instance.started",
+    "entity_type": "workflows.WorkflowInstance",
+    "entity_id": "a8a738ce-78f0-4691-8e55-7ac91ea2c877",
+    "correlation_id": "4288c7bb-e64a-4273-b139-4f2041e43ade",
+    "changes": {},
+    "metadata": {
+      "new_state": "active",
+      "subject_id": "c056db10-28a5-48e2-998b-de963dc4091a",
+      "version_id": "d6aa08f8-adfd-4900-b19a-eb90cbb35234",
+      "subject_type": "billing.contract_compliance_evidence",
+      "previous_state": null,
+      "actor_membership_id": "dd40accc-ac0d-4ff4-8df2-a5372933ce49"
+    }
+  },
+  {
+    "id": "72c4dc55-23b1-4f93-bb4b-faf9101643ea",
+    "created_at": "2026-10-22 00:41:34.917454+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "801a7a89-fd6c-46c2-bc1b-a678bc0bf5ce",
+    "action": "workflow_step.activated",
+    "entity_type": "workflows.WorkflowStepInstance",
+    "entity_id": "56a00472-b65b-437e-bb35-b0b40ded2825",
+    "correlation_id": "237373d5-3e99-4689-8a3f-292b296946cd",
+    "changes": {},
+    "metadata": {
+      "sequence": 1,
+      "step_key": "start",
+      "actor_membership_id": "dd40accc-ac0d-4ff4-8df2-a5372933ce49"
+    }
+  },
+  {
+    "id": "ae54e953-167f-4112-8feb-b267d4f3fd24",
+    "created_at": "2026-10-22 00:41:34.922160+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "801a7a89-fd6c-46c2-bc1b-a678bc0bf5ce",
+    "action": "workflow_instance.advanced",
+    "entity_type": "workflows.WorkflowInstance",
+    "entity_id": "a8a738ce-78f0-4691-8e55-7ac91ea2c877",
+    "correlation_id": "07cf0647-343b-4ed1-aee1-a86162567b44",
+    "changes": {},
+    "metadata": {
+      "to_step": "approval",
+      "from_step": "start",
+      "actor_membership_id": "dd40accc-ac0d-4ff4-8df2-a5372933ce49"
+    }
+  },
+  {
+    "id": "65fec371-b661-4d6a-a79a-adc99d608700",
+    "created_at": "2026-10-22 00:41:34.929160+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "801a7a89-fd6c-46c2-bc1b-a678bc0bf5ce",
+    "action": "workflow_step.activated",
+    "entity_type": "workflows.WorkflowStepInstance",
+    "entity_id": "67dccb8a-7b8f-436c-a60c-f3ea9b297d93",
+    "correlation_id": "95b2dc2f-fdb5-4046-8dac-9cd123a95655",
+    "changes": {},
+    "metadata": {
+      "sequence": 2,
+      "step_key": "approval",
+      "actor_membership_id": "dd40accc-ac0d-4ff4-8df2-a5372933ce49"
+    }
+  },
+  {
+    "id": "5b8d2ef7-6e61-4ae4-b515-2342aa7236c3",
+    "created_at": "2026-10-22 00:41:35.072927+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "801a7a89-fd6c-46c2-bc1b-a678bc0bf5ce",
+    "action": "workflow_routing.fallback",
+    "entity_type": "workflows.WorkflowStepInstance",
+    "entity_id": "67dccb8a-7b8f-436c-a60c-f3ea9b297d93",
+    "correlation_id": "e5ace42b-9edd-449b-b658-9414b322ba1a",
+    "changes": {},
+    "metadata": {
+      "candidate_ids": [
+        "3e1a1e18-9319-4408-9389-c2b7b982f6be",
+        "9447ba0f-12c1-41ce-af63-8536575d1c19"
+      ],
+      "routing_basis": [
+        {
+          "rule_id": "0623449a-8538-4587-9c23-9a92574b05e1",
+          "fallback": "true",
+          "resolver": "business_permission"
+        },
+        {
+          "rule_id": "0623449a-8538-4587-9c23-9a92574b05e1",
+          "fallback": "true",
+          "resolver": "business_permission"
+        }
+      ],
+      "attempted_rule_ids": [
+        "dd1fad83-9057-4de3-b77d-6d703b01fc24",
+        "0623449a-8538-4587-9c23-9a92574b05e1"
+      ],
+      "actor_membership_id": "dd40accc-ac0d-4ff4-8df2-a5372933ce49"
+    }
+  },
+  {
+    "id": "202e8046-3ab7-41f5-89ca-327285399997",
+    "created_at": "2026-10-22 00:41:35.114138+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "801a7a89-fd6c-46c2-bc1b-a678bc0bf5ce",
+    "action": "workflow_candidates.changed",
+    "entity_type": "workflows.WorkflowStepInstance",
+    "entity_id": "67dccb8a-7b8f-436c-a60c-f3ea9b297d93",
+    "correlation_id": "59847cbc-7e51-46f1-acc5-f809633959ca",
+    "changes": {},
+    "metadata": {
+      "change": "created",
+      "candidates": [
+        {
+          "membership_id": "3e1a1e18-9319-4408-9389-c2b7b982f6be",
+          "routing_basis": [
+            {
+              "rule_id": "0623449a-8538-4587-9c23-9a92574b05e1",
+              "fallback": "true",
+              "resolver": "business_permission"
+            }
+          ],
+          "position_assignment_id": null
+        },
+        {
+          "membership_id": "9447ba0f-12c1-41ce-af63-8536575d1c19",
+          "routing_basis": [
+            {
+              "rule_id": "0623449a-8538-4587-9c23-9a92574b05e1",
+              "fallback": "true",
+              "resolver": "business_permission"
+            }
+          ],
+          "position_assignment_id": null
+        }
+      ],
+      "actor_membership_id": "dd40accc-ac0d-4ff4-8df2-a5372933ce49"
+    }
+  },
+  {
+    "id": "5197c149-da0c-4052-b1bc-54b12acb4984",
+    "created_at": "2026-10-22 00:41:35.124733+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "801a7a89-fd6c-46c2-bc1b-a678bc0bf5ce",
+    "action": "compliance_evidence.submitted",
+    "entity_type": "billing.ContractComplianceEvidence",
+    "entity_id": "c056db10-28a5-48e2-998b-de963dc4091a",
+    "correlation_id": "ce22eb6b-8d47-43ea-ade1-61777237e3b0",
+    "changes": {},
+    "metadata": {
+      "workflow_instance_id": "a8a738ce-78f0-4691-8e55-7ac91ea2c877"
+    }
+  },
+  {
+    "id": "e79a1d57-c9ba-4fab-beeb-52f98597fd36",
+    "created_at": "2026-10-22 00:41:35.204351+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "work_item.claimed",
+    "entity_type": "workflows.WorkItem",
+    "entity_id": "67d67ce9-a880-4a23-b615-95dee52a8207",
+    "correlation_id": "19f7fd3a-a03d-4950-b431-6a98e99dad6f",
+    "changes": {},
+    "metadata": {
+      "new_state": "claimed",
+      "permission": "work_items.claim",
+      "previous_state": "open",
+      "actor_membership_id": "9447ba0f-12c1-41ce-af63-8536575d1c19",
+      "qualifying_position_assignment_id": null
+    }
+  },
+  {
+    "id": "5efe849b-ea42-4f56-8067-cc727d85ec3a",
+    "created_at": "2026-10-22 00:41:35.294359+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "compliance_evidence.approved",
+    "entity_type": "billing.ContractComplianceEvidence",
+    "entity_id": "c056db10-28a5-48e2-998b-de963dc4091a",
+    "correlation_id": "a9b9ffb7-c603-4804-8af3-b49a6f3daa81",
+    "changes": {},
+    "metadata": {
+      "reason": "BATCH_02_RUNTIME_CLOSURE_FIXTURE: independent synthetic Development fixture approval"
+    }
+  },
+  {
+    "id": "eaf061de-03c5-45b1-8bde-1cd23d260662",
+    "created_at": "2026-10-22 00:41:35.304271+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "work_item.completed",
+    "entity_type": "workflows.WorkItem",
+    "entity_id": "67d67ce9-a880-4a23-b615-95dee52a8207",
+    "correlation_id": "3a64839a-d073-4f7d-bc10-c32aec80cf51",
+    "changes": {},
+    "metadata": {
+      "outcome": "approved",
+      "new_state": "completed",
+      "permission": "compliance_evidence.approve",
+      "previous_state": "claimed",
+      "actor_membership_id": "9447ba0f-12c1-41ce-af63-8536575d1c19",
+      "qualifying_position_assignment_id": null
+    }
+  },
+  {
+    "id": "68b265f5-4159-425a-bf72-10b1e6efd681",
+    "created_at": "2026-10-22 00:41:35.322585+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "workflow_instance.advanced",
+    "entity_type": "workflows.WorkflowInstance",
+    "entity_id": "a8a738ce-78f0-4691-8e55-7ac91ea2c877",
+    "correlation_id": "eb9800ad-fcdf-493d-91ad-12054e2cfc46",
+    "changes": {},
+    "metadata": {
+      "outcome": "approved",
+      "to_step": "approved",
+      "from_step": "approval",
+      "new_state": "active",
+      "previous_state": "active",
+      "actor_membership_id": "9447ba0f-12c1-41ce-af63-8536575d1c19"
+    }
+  },
+  {
+    "id": "a8d79b3c-364d-456f-845a-a37d18ca2408",
+    "created_at": "2026-10-22 00:41:35.329659+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "workflow_step.activated",
+    "entity_type": "workflows.WorkflowStepInstance",
+    "entity_id": "60064a87-5a53-4893-a191-3a56e1bb1663",
+    "correlation_id": "a937c0be-5b61-417a-98c1-04e03bfb7d9d",
+    "changes": {},
+    "metadata": {
+      "sequence": 3,
+      "step_key": "approved",
+      "actor_membership_id": "9447ba0f-12c1-41ce-af63-8536575d1c19"
+    }
+  },
+  {
+    "id": "70c357ab-3364-40d4-81e9-c294bd1d2df9",
+    "created_at": "2026-10-22 00:41:35.334875+00:00",
+    "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "workflow_instance.completed",
+    "entity_type": "workflows.WorkflowInstance",
+    "entity_id": "a8a738ce-78f0-4691-8e55-7ac91ea2c877",
+    "correlation_id": "f7a4422c-3d7f-457a-91db-c8c5c16debeb",
+    "changes": {},
+    "metadata": {
+      "new_state": "completed",
+      "previous_state": "active",
+      "actor_membership_id": "9447ba0f-12c1-41ce-af63-8536575d1c19"
+    }
+  },
+  {
+    "id": "f3058cc4-1c22-460b-873e-80f635233ec9",
+    "created_at": "2026-10-22 00:41:35.400213+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "05874a25-dd4d-4ff3-8661-a18f2a876974",
+    "action": "document.uploaded",
+    "entity_type": "document",
+    "entity_id": "52127753-fe11-4fe6-bc8b-a072549d7c31",
+    "correlation_id": "9382e7bb-fc71-4141-bb2d-2ed533fafdcb",
+    "changes": {},
+    "metadata": {
+      "sha256": "e878950f8091ec010cf5cc723bdea027a8539cf7147cfea199c2f666232dcd4e",
+      "file_size": 69,
+      "target_id": "63063dae-394e-46e4-9abb-09284e821561",
+      "version_id": "affa8b47-084e-43a8-ac82-754942ab1242",
+      "target_type": "project",
+      "document_type": "general",
+      "version_number": 1,
+      "confidentiality": "internal",
+      "document_number": "DOC-000009"
+    }
+  },
+  {
+    "id": "e3532601-3d80-4c24-aad3-84ecbaef5e80",
+    "created_at": "2026-10-22 00:41:35.406536+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "93b49bd5-e72c-4234-98d8-df6dfa1a3ff1",
+    "action": "document.processing_assessed",
+    "entity_type": "document_version",
+    "entity_id": "affa8b47-084e-43a8-ac82-754942ab1242",
+    "correlation_id": "af0f452c-40d4-472b-9611-ec0bee07e9aa",
+    "changes": {
+      "availability": {
+        "to": "clean"
+      }
+    },
+    "metadata": {
+      "sequence": 1,
+      "adapter_code": "microsoft-defender-development-fixture",
+      "input_sha256": "e878950f8091ec010cf5cc723bdea027a8539cf7147cfea199c2f666232dcd4e",
+      "assessment_id": "d5f7e618-00b4-4992-bf99-c0654bc0a852"
+    }
+  },
+  {
+    "id": "0ebc6331-1f51-45de-94b3-f554ddc3f8a2",
+    "created_at": "2026-10-22 00:41:35.438104+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "05874a25-dd4d-4ff3-8661-a18f2a876974",
+    "action": "compliance_evidence.created",
+    "entity_type": "billing.ContractComplianceEvidence",
+    "entity_id": "ac681e32-8a99-4922-852d-4c4a6d8586c0",
+    "correlation_id": "2a74db31-d5a7-4ff8-a5f3-4c789258b283",
+    "changes": {},
+    "metadata": {
+      "version": 1,
+      "series_id": "d43c14d8-0dc5-4353-9e7d-e907cda24d8a",
+      "contract_id": "8501279f-1a66-4c55-a4a5-c6a2ba6b2db9",
+      "evidence_kind": "clearance"
+    }
+  },
+  {
+    "id": "e11b52f2-1397-4204-a7a7-17bed689a6d0",
+    "created_at": "2026-10-22 00:41:35.578868+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "05874a25-dd4d-4ff3-8661-a18f2a876974",
+    "action": "workflow_definition.created",
+    "entity_type": "workflows.WorkflowDefinition",
+    "entity_id": "26787e61-042c-4b7d-b5b2-f5f2ab84139e",
+    "correlation_id": "e70f77ae-d7e2-4f8a-aa46-10ab54dca6a1",
+    "changes": {},
+    "metadata": {
+      "starter": true,
+      "workflow_type": "billing.compliance_evidence_approval"
+    }
+  },
+  {
+    "id": "26436de8-e032-447c-9619-9a9842725736",
+    "created_at": "2026-10-22 00:41:35.580866+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "05874a25-dd4d-4ff3-8661-a18f2a876974",
+    "action": "workflow_version.published",
+    "entity_type": "workflows.WorkflowVersion",
+    "entity_id": "3c06fa43-781e-4499-99ab-d6af952b84af",
+    "correlation_id": "2445c863-1899-4eb2-825c-79b81006dbe0",
+    "changes": {},
+    "metadata": {
+      "starter": true,
+      "workflow_type": "billing.compliance_evidence_approval"
+    }
+  },
+  {
+    "id": "57034476-b3ac-4c6a-ae2b-0648146d7c6a",
+    "created_at": "2026-10-22 00:41:35.636634+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "05874a25-dd4d-4ff3-8661-a18f2a876974",
+    "action": "workflow_instance.started",
+    "entity_type": "workflows.WorkflowInstance",
+    "entity_id": "9287fd8d-03bf-4cf7-b558-60e66dfda241",
+    "correlation_id": "4e71daa0-31df-46e0-9009-37701dd6f1a2",
+    "changes": {},
+    "metadata": {
+      "new_state": "active",
+      "subject_id": "ac681e32-8a99-4922-852d-4c4a6d8586c0",
+      "version_id": "3c06fa43-781e-4499-99ab-d6af952b84af",
+      "subject_type": "billing.contract_compliance_evidence",
+      "previous_state": null,
+      "actor_membership_id": "3d49e350-6c2e-4583-a027-b940341597a6"
+    }
+  },
+  {
+    "id": "88d4d14a-4ff2-42a0-ad92-3c3849052925",
+    "created_at": "2026-10-22 00:41:35.646301+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "05874a25-dd4d-4ff3-8661-a18f2a876974",
+    "action": "workflow_step.activated",
+    "entity_type": "workflows.WorkflowStepInstance",
+    "entity_id": "cef68319-a0e0-4db6-8947-e193d338c0bb",
+    "correlation_id": "2d03967e-5244-48d8-a405-c2449b65d269",
+    "changes": {},
+    "metadata": {
+      "sequence": 1,
+      "step_key": "start",
+      "actor_membership_id": "3d49e350-6c2e-4583-a027-b940341597a6"
+    }
+  },
+  {
+    "id": "f3e73ef7-f472-4109-b64a-7b5a05bebc6b",
+    "created_at": "2026-10-22 00:41:35.655559+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "05874a25-dd4d-4ff3-8661-a18f2a876974",
+    "action": "workflow_instance.advanced",
+    "entity_type": "workflows.WorkflowInstance",
+    "entity_id": "9287fd8d-03bf-4cf7-b558-60e66dfda241",
+    "correlation_id": "ce2f7526-1b02-45fa-bda1-ab4c6f4b2f7d",
+    "changes": {},
+    "metadata": {
+      "to_step": "approval",
+      "from_step": "start",
+      "actor_membership_id": "3d49e350-6c2e-4583-a027-b940341597a6"
+    }
+  },
+  {
+    "id": "82a5c723-91a1-47e0-858d-97c883bb24e9",
+    "created_at": "2026-10-22 00:41:35.664511+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "05874a25-dd4d-4ff3-8661-a18f2a876974",
+    "action": "workflow_step.activated",
+    "entity_type": "workflows.WorkflowStepInstance",
+    "entity_id": "ff0224af-c4d1-49de-a605-8c9ce3d08375",
+    "correlation_id": "316f6fbb-ae2d-41cb-b682-2fde95505ac6",
+    "changes": {},
+    "metadata": {
+      "sequence": 2,
+      "step_key": "approval",
+      "actor_membership_id": "3d49e350-6c2e-4583-a027-b940341597a6"
+    }
+  },
+  {
+    "id": "1d41a505-c308-4bc5-92e7-084818db9a3f",
+    "created_at": "2026-10-22 00:41:35.792305+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "05874a25-dd4d-4ff3-8661-a18f2a876974",
+    "action": "workflow_routing.fallback",
+    "entity_type": "workflows.WorkflowStepInstance",
+    "entity_id": "ff0224af-c4d1-49de-a605-8c9ce3d08375",
+    "correlation_id": "7cd3c1c1-a607-4cc8-997a-bb12e82c85c5",
+    "changes": {},
+    "metadata": {
+      "candidate_ids": [
+        "e8e9d50f-7ba4-435f-8947-d301dbc1c3d9"
+      ],
+      "routing_basis": [
+        {
+          "rule_id": "3564be05-74b2-4765-ada2-af58910a5154",
+          "fallback": "true",
+          "resolver": "business_permission"
+        }
+      ],
+      "attempted_rule_ids": [
+        "8d917c2b-f4b6-456a-a6c1-88ab4733b5b8",
+        "3564be05-74b2-4765-ada2-af58910a5154"
+      ],
+      "actor_membership_id": "3d49e350-6c2e-4583-a027-b940341597a6"
+    }
+  },
+  {
+    "id": "4c29b287-bf7e-44a9-89c4-71ddc05ff817",
+    "created_at": "2026-10-22 00:41:35.810361+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "05874a25-dd4d-4ff3-8661-a18f2a876974",
+    "action": "workflow_candidates.changed",
+    "entity_type": "workflows.WorkflowStepInstance",
+    "entity_id": "ff0224af-c4d1-49de-a605-8c9ce3d08375",
+    "correlation_id": "19260473-f84e-409b-94c4-b85019647574",
+    "changes": {},
+    "metadata": {
+      "change": "created",
+      "candidates": [
+        {
+          "membership_id": "e8e9d50f-7ba4-435f-8947-d301dbc1c3d9",
+          "routing_basis": [
+            {
+              "rule_id": "3564be05-74b2-4765-ada2-af58910a5154",
+              "fallback": "true",
+              "resolver": "business_permission"
+            }
+          ],
+          "position_assignment_id": null
+        }
+      ],
+      "actor_membership_id": "3d49e350-6c2e-4583-a027-b940341597a6"
+    }
+  },
+  {
+    "id": "219d1085-1754-403c-8209-6f48193c625f",
+    "created_at": "2026-10-22 00:41:35.825156+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "05874a25-dd4d-4ff3-8661-a18f2a876974",
+    "action": "compliance_evidence.submitted",
+    "entity_type": "billing.ContractComplianceEvidence",
+    "entity_id": "ac681e32-8a99-4922-852d-4c4a6d8586c0",
+    "correlation_id": "7a05fc63-5e40-44f3-8404-347ed1bfa972",
+    "changes": {},
+    "metadata": {
+      "workflow_instance_id": "9287fd8d-03bf-4cf7-b558-60e66dfda241"
+    }
+  },
+  {
+    "id": "bf264027-3c47-432e-a72c-4d0c82a028f3",
+    "created_at": "2026-10-22 00:41:36.020482+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "work_item.claimed",
+    "entity_type": "workflows.WorkItem",
+    "entity_id": "3d8eedd6-060d-4ba9-b8d6-5a5e3c56d5e8",
+    "correlation_id": "baddcbb1-4c59-442a-8f14-b951c4b7572c",
+    "changes": {},
+    "metadata": {
+      "new_state": "claimed",
+      "permission": "work_items.claim",
+      "previous_state": "open",
+      "actor_membership_id": "e8e9d50f-7ba4-435f-8947-d301dbc1c3d9",
+      "qualifying_position_assignment_id": null
+    }
+  },
+  {
+    "id": "216edf7c-ffe0-4ee2-a977-39fb08ad9740",
+    "created_at": "2026-10-22 00:41:36.104155+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "compliance_evidence.approved",
+    "entity_type": "billing.ContractComplianceEvidence",
+    "entity_id": "ac681e32-8a99-4922-852d-4c4a6d8586c0",
+    "correlation_id": "f601b3d0-6c9f-41d4-846c-41c20265d095",
+    "changes": {},
+    "metadata": {
+      "reason": "BATCH_02_RUNTIME_CLOSURE_FIXTURE: independent synthetic Development fixture approval"
+    }
+  },
+  {
+    "id": "289d8918-15b0-4779-a143-4df1caac4818",
+    "created_at": "2026-10-22 00:41:36.137477+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "work_item.completed",
+    "entity_type": "workflows.WorkItem",
+    "entity_id": "3d8eedd6-060d-4ba9-b8d6-5a5e3c56d5e8",
+    "correlation_id": "f80d8662-9bb0-47f1-8577-6ae832559b54",
+    "changes": {},
+    "metadata": {
+      "outcome": "approved",
+      "new_state": "completed",
+      "permission": "compliance_evidence.approve",
+      "previous_state": "claimed",
+      "actor_membership_id": "e8e9d50f-7ba4-435f-8947-d301dbc1c3d9",
+      "qualifying_position_assignment_id": null
+    }
+  },
+  {
+    "id": "946fe06c-9c68-486a-a48f-94de4daef13e",
+    "created_at": "2026-10-22 00:41:36.137477+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "workflow_instance.advanced",
+    "entity_type": "workflows.WorkflowInstance",
+    "entity_id": "9287fd8d-03bf-4cf7-b558-60e66dfda241",
+    "correlation_id": "aa7997e1-0358-43f4-ae08-7d1dea4b4aad",
+    "changes": {},
+    "metadata": {
+      "outcome": "approved",
+      "to_step": "approved",
+      "from_step": "approval",
+      "new_state": "active",
+      "previous_state": "active",
+      "actor_membership_id": "e8e9d50f-7ba4-435f-8947-d301dbc1c3d9"
+    }
+  },
+  {
+    "id": "03f43a4e-5155-4856-9354-77b520b620f6",
+    "created_at": "2026-10-22 00:41:36.156826+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "workflow_step.activated",
+    "entity_type": "workflows.WorkflowStepInstance",
+    "entity_id": "553207aa-6046-48e0-81ec-0dfb0eba2873",
+    "correlation_id": "3ddacf37-466c-42a5-9cd4-1586c1136686",
+    "changes": {},
+    "metadata": {
+      "sequence": 3,
+      "step_key": "approved",
+      "actor_membership_id": "e8e9d50f-7ba4-435f-8947-d301dbc1c3d9"
+    }
+  },
+  {
+    "id": "c2b4cf2d-5a25-4cfe-b7c0-fc40887689c2",
+    "created_at": "2026-10-22 00:41:36.159826+00:00",
+    "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "workflow_instance.completed",
+    "entity_type": "workflows.WorkflowInstance",
+    "entity_id": "9287fd8d-03bf-4cf7-b558-60e66dfda241",
+    "correlation_id": "a37a48f6-d1e0-4168-acbd-df5180e89d1d",
+    "changes": {},
+    "metadata": {
+      "new_state": "completed",
+      "previous_state": "active",
+      "actor_membership_id": "e8e9d50f-7ba4-435f-8947-d301dbc1c3d9"
+    }
+  },
+  {
+    "id": "bd816e1f-7c88-47a5-ac25-18c0a7d58086",
+    "created_at": "2026-10-22 00:41:38.868449+00:00",
+    "organization_id": null,
+    "actor_id": "26c1e6d4-7035-4c70-a4d7-c120ba7507a5",
+    "action": "authorization.platform_role_revoked",
+    "entity_type": "organizations.PlatformRoleAssignment",
+    "entity_id": "783e95b6-9a95-4c77-9305-c8f1b9d9928b",
+    "correlation_id": "335c9df6-78ba-470c-86a9-9480d6add213",
+    "changes": {},
+    "metadata": {
+      "role": "platform_operations",
+      "reason": "BATCH_02_RUNTIME_CLOSURE_FIXTURE: preparation ended; revoke temporary Operations duty and retain history",
+      "target_user_id": "93b49bd5-e72c-4234-98d8-df6dfa1a3ff1",
+      "approver_user_id": "a4384116-c206-446a-b164-a2891309736e"
+    }
+  }
+]

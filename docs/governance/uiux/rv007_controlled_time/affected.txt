@@ -1,0 +1,209 @@
+......................FFFFFFFFFFFFFFFF............F [ 98%]
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ QuoteAdmissibilityTests.test_approve_requires_policy_independent_permission_and_keeps_approved_immutable _
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ QuoteAdmissibilityTests.test_correction_supersedes_without_mutating_decision _
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ QuoteAdmissibilityTests.test_cross_tenant_and_missing_prerequisite_fail_closed _
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+___ QuoteAdmissibilityTests.test_policy_can_explicitly_allow_self_approval ____
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ QuoteAdmissibilityTests.test_policy_controls_self_approval_and_withdrawal_blocks_approval _
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ QuoteAdmissibilityTests.test_prepare_requires_open_confidential_scope_and_retains_exact_evidence _
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_____ QuoteAdmissibilityTests.test_reason_catalog_and_access_fail_closed ______
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ QuoteAdmissibilityTests.test_revoked_confidential_access_blocks_preparation _
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11ComparisonAwardTests.test_no_award_is_explicit_has_no_allocations_and_does_not_mutate_downstream _
+apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11SelfFinalizationPolicyTests.test_tenant_policy_explicitly_allows_s11_comparison_and_award_self_finalization _
+apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11TieAndSplitTests.test_award_is_sourcing_only_conserves_quantity_and_self_finalization_is_policy_gated _
+apps\procurement\test_p5_s11_comparison_award.py:386: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11TieAndSplitTests.test_conflict_cannot_self_clear_and_blocks_evaluation_until_disposed _
+apps\procurement\test_p5_s11_comparison_award.py:386: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11TieAndSplitTests.test_exception_closed_catalogue_and_independent_lifecycle _
+apps\procurement\test_p5_s11_comparison_award.py:386: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11TieAndSplitTests.test_reproducible_asserted_input_lineage_and_immutable_finalization _
+apps\procurement\test_p5_s11_comparison_award.py:386: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11TieAndSplitTests.test_split_award_is_explicit_and_allocation_inputs_are_governing _
+apps\procurement\test_p5_s11_comparison_award.py:386: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11TieAndSplitTests.test_tie_requires_explicit_resolution_and_split_award_retains_exact_revisions _
+apps\procurement\test_p5_s11_comparison_award.py:386: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ QuoteAdmissibilityConcurrencyTests.test_concurrent_approval_creates_one_decision _
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11ConcurrencyTests.test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity _
+apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+=========================== short test summary info ===========================
+FAILED apps/procurement/test_p5_s10_admissibility.py::QuoteAdmissibilityTests::test_approve_requires_policy_independent_permission_and_keeps_approved_immutable
+FAILED apps/procurement/test_p5_s10_admissibility.py::QuoteAdmissibilityTests::test_correction_supersedes_without_mutating_decision
+FAILED apps/procurement/test_p5_s10_admissibility.py::QuoteAdmissibilityTests::test_cross_tenant_and_missing_prerequisite_fail_closed
+FAILED apps/procurement/test_p5_s10_admissibility.py::QuoteAdmissibilityTests::test_policy_can_explicitly_allow_self_approval
+FAILED apps/procurement/test_p5_s10_admissibility.py::QuoteAdmissibilityTests::test_policy_controls_self_approval_and_withdrawal_blocks_approval
+FAILED apps/procurement/test_p5_s10_admissibility.py::QuoteAdmissibilityTests::test_prepare_requires_open_confidential_scope_and_retains_exact_evidence
+FAILED apps/procurement/test_p5_s10_admissibility.py::QuoteAdmissibilityTests::test_reason_catalog_and_access_fail_closed
+FAILED apps/procurement/test_p5_s10_admissibility.py::QuoteAdmissibilityTests::test_revoked_confidential_access_blocks_preparation
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11ComparisonAwardTests::test_no_award_is_explicit_has_no_allocations_and_does_not_mutate_downstream
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11SelfFinalizationPolicyTests::test_tenant_policy_explicitly_allows_s11_comparison_and_award_self_finalization
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11TieAndSplitTests::test_award_is_sourcing_only_conserves_quantity_and_self_finalization_is_policy_gated
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11TieAndSplitTests::test_conflict_cannot_self_clear_and_blocks_evaluation_until_disposed
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11TieAndSplitTests::test_exception_closed_catalogue_and_independent_lifecycle
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11TieAndSplitTests::test_reproducible_asserted_input_lineage_and_immutable_finalization
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11TieAndSplitTests::test_split_award_is_explicit_and_allocation_inputs_are_governing
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11TieAndSplitTests::test_tie_requires_explicit_resolution_and_split_award_retains_exact_revisions
+FAILED apps/procurement/test_p5_s10_admissibility.py::QuoteAdmissibilityConcurrencyTests::test_concurrent_approval_creates_one_decision
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11ConcurrencyTests::test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity
+18 failed, 34 passed, 21 subtests passed in 227.32s (0:03:47)

@@ -1,0 +1,218 @@
+[
+  {
+    "case": "Opened quote confidential populated comparison",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/",
+    "method": "GET",
+    "status": 200,
+    "expected": 200,
+    "passed": true,
+    "body_sha256": "c47245cecd8e981fe6a9aa786d6cca8991b0da1c47f9ae09fc5691740fff2106",
+    "final_path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/",
+    "application_clock": {
+      "application_now": "2026-10-23T22:46:58.091314+00:00",
+      "phase": "protected_opening_and_comparison_after_24h",
+      "actual_wall_clock": "2026-10-22 22:46:12.003546+00:00",
+      "test_only": true,
+      "os_clock_modified": false
+    }
+  },
+  {
+    "case": "Exact permitted source and comparison scope choices",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/prepare_comparison/",
+    "method": "GET",
+    "status": 200,
+    "expected": 200,
+    "passed": true,
+    "body_sha256": "3a5e45b200214a9353905303fa2a3f1287b654287b74a78cac16d1d2203063d1",
+    "final_path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/prepare_comparison/",
+    "application_clock": {
+      "application_now": "2026-10-23T22:46:58.091314+00:00",
+      "phase": "protected_opening_and_comparison_after_24h",
+      "actual_wall_clock": "2026-10-22 22:46:12.003546+00:00",
+      "test_only": true,
+      "os_clock_modified": false
+    }
+  },
+  {
+    "case": "Requester has no independent opening approval UI authority",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/approve_opening/",
+    "method": "GET",
+    "status": 403,
+    "expected": 403,
+    "passed": true,
+    "body_sha256": "faa3ae59b9481ac8ab8d73829c4af38eba930571d6c76f958f9f2a354c2fd917",
+    "final_path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/approve_opening/",
+    "application_clock": {
+      "application_now": "2026-10-23T22:46:58.091314+00:00",
+      "phase": "protected_opening_and_comparison_after_24h",
+      "actual_wall_clock": "2026-10-22 22:46:12.003546+00:00",
+      "test_only": true,
+      "os_clock_modified": false
+    }
+  },
+  {
+    "case": "Independent opening approver workspace without confidential values",
+    "actor": "uiux.wavec.opening-approver",
+    "path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/",
+    "method": "GET",
+    "status": 200,
+    "expected": 200,
+    "passed": true,
+    "body_sha256": "e885ec59a509f1b0a6bac2444a34b191596af905478d594a47afa2a2965275a0",
+    "final_path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/",
+    "application_clock": {
+      "application_now": "2026-10-23T22:46:58.091314+00:00",
+      "phase": "protected_opening_and_comparison_after_24h",
+      "actual_wall_clock": "2026-10-22 22:46:12.003546+00:00",
+      "test_only": true,
+      "os_clock_modified": false
+    }
+  },
+  {
+    "case": "Unauthorized same-tenant workspace denied",
+    "actor": "uiux.wavec.hr",
+    "path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/",
+    "method": "GET",
+    "status": 403,
+    "expected": 403,
+    "passed": true,
+    "body_sha256": "29fc2bf2ed1e90a39d8db3045f663e5551c52f513face042e6e56670d3a94075",
+    "final_path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/",
+    "application_clock": {
+      "application_now": "2026-10-23T22:46:58.091314+00:00",
+      "phase": "protected_opening_and_comparison_after_24h",
+      "actual_wall_clock": "2026-10-22 22:46:12.003546+00:00",
+      "test_only": true,
+      "os_clock_modified": false
+    }
+  },
+  {
+    "case": "Site-only scope cannot discover Project-level buyer workspace",
+    "actor": "uiux.reference.batch03.site-only",
+    "path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/",
+    "method": "GET",
+    "status": 404,
+    "expected": 404,
+    "passed": true,
+    "body_sha256": "c0f005968c65478a4c0ab1bfbd0f7a98d2bb7ce5b3de970d1c32fff99cc9cb52",
+    "final_path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/",
+    "application_clock": {
+      "application_now": "2026-10-23T22:46:58.091314+00:00",
+      "phase": "protected_opening_and_comparison_after_24h",
+      "actual_wall_clock": "2026-10-22 22:46:12.003546+00:00",
+      "test_only": true,
+      "os_clock_modified": false
+    }
+  },
+  {
+    "case": "Manipulated unregistered action denied",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/execute_arbitrary_action/",
+    "method": "GET",
+    "status": 404,
+    "expected": 404,
+    "passed": true,
+    "body_sha256": "657dc9ec3378e4f3d09a5847437d2012c8ca55be5af72ead71126c2ff8fddde4",
+    "final_path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/execute_arbitrary_action/",
+    "application_clock": {
+      "application_now": "2026-10-23T22:46:58.091314+00:00",
+      "phase": "protected_opening_and_comparison_after_24h",
+      "actual_wall_clock": "2026-10-22 22:46:12.003546+00:00",
+      "test_only": true,
+      "os_clock_modified": false
+    }
+  },
+  {
+    "case": "Buyer cannot read foreign tenant RFQ",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/fe5c60ff-9298-4fd9-942b-8e635a315098/buyer/",
+    "method": "GET",
+    "status": 404,
+    "expected": 404,
+    "passed": true,
+    "body_sha256": "66ab6e2a98e9aab439d600a1a27fd535915886909f345e9aa835e83a8e065c3b",
+    "final_path": "/procurement/rfqs/fe5c60ff-9298-4fd9-942b-8e635a315098/buyer/",
+    "application_clock": {
+      "application_now": "2026-10-23T22:46:58.091314+00:00",
+      "phase": "protected_opening_and_comparison_after_24h",
+      "actual_wall_clock": "2026-10-22 22:46:12.003546+00:00",
+      "test_only": true,
+      "os_clock_modified": false
+    }
+  },
+  {
+    "case": "CSRF-less opening POST denied",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/request_opening/",
+    "method": "POST",
+    "status": 403,
+    "expected": 403,
+    "passed": true,
+    "body_sha256": "a8c1c826df1bde8bf5b1c745b1529d708cdfc9d6d56b242b95185e513abaea27",
+    "final_path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/request_opening/",
+    "application_clock": {
+      "application_now": "2026-10-23T22:46:58.091314+00:00",
+      "phase": "protected_opening_and_comparison_after_24h",
+      "actual_wall_clock": "2026-10-22 22:46:12.003546+00:00",
+      "test_only": true,
+      "os_clock_modified": false
+    }
+  },
+  {
+    "case": "Forged other-RFQ quote rejected by RFQ-scoped form",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/request_opening/",
+    "method": "POST",
+    "status": 400,
+    "expected": 400,
+    "passed": true,
+    "body_sha256": "7836c0821722a64176289a92068fee295812b2ca2bf23ffc4b22bf80b7bec4bf",
+    "final_path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/request_opening/",
+    "application_clock": {
+      "application_now": "2026-10-23T22:46:58.091314+00:00",
+      "phase": "protected_opening_and_comparison_after_24h",
+      "actual_wall_clock": "2026-10-22 22:46:12.003546+00:00",
+      "test_only": true,
+      "os_clock_modified": false
+    }
+  },
+  {
+    "case": "Malformed quote selector bounded to validation",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/request_opening/",
+    "method": "POST",
+    "status": 400,
+    "expected": 400,
+    "passed": true,
+    "body_sha256": "2924e845cbda8b2140419f56eaf8d52da246e0e2f2af5ab7a37c645f47bc00ed",
+    "final_path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/request_opening/",
+    "application_clock": {
+      "application_now": "2026-10-23T22:46:58.091314+00:00",
+      "phase": "protected_opening_and_comparison_after_24h",
+      "actual_wall_clock": "2026-10-22 22:46:12.003546+00:00",
+      "test_only": true,
+      "os_clock_modified": false
+    }
+  },
+  {
+    "case": "Invalid comparison redisplays without mutation",
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/prepare_comparison/",
+    "method": "POST",
+    "status": 400,
+    "expected": 400,
+    "passed": true,
+    "body_sha256": "6316ac63cfdcdd888fe452a30c776a27d1952a100943e5a8d49bcbfd6d1e9f56",
+    "final_path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/prepare_comparison/",
+    "application_clock": {
+      "application_now": "2026-10-23T22:46:58.091314+00:00",
+      "phase": "protected_opening_and_comparison_after_24h",
+      "actual_wall_clock": "2026-10-22 22:46:12.003546+00:00",
+      "test_only": true,
+      "os_clock_modified": false
+    }
+  }
+]

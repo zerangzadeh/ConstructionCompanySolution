@@ -8,7 +8,10 @@ from django.shortcuts import redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from apps.organizations.authorization import require_business_permission
+from apps.organizations.authorization import (
+    get_active_membership,
+    require_business_permission,
+)
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -139,6 +142,7 @@ def _portal_invitation_for_management(
         organization=request.organization,
         permission=BusinessPermissionCode.SUPPLIER_PORTAL_INVITATIONS_MANAGE,
         project=invitation.rfq_version.rfq.project,
+        message="اجازه مدیریت دعوت‌نامه درگاه را ندارید.",
     )
     return invitation
 
@@ -186,7 +190,11 @@ def supplier_portal_context(request: HttpRequest, grant_id: str) -> HttpResponse
 @require_POST
 def supplier_portal_submit(request: HttpRequest, grant_id: str) -> HttpResponse:
     grant = _portal_grant(grant_id)
-    form = SupplierPortalSubmissionForm(request.POST)
+    form = SupplierPortalSubmissionForm(request.POST, request.FILES)
+    if request.FILES and (
+        set(request.FILES) != {"upload"} or len(request.FILES.getlist("upload")) != 1
+    ):
+        form.add_error("upload", "هر ارسال فقط یک اصل PDF یا DOCX می‌پذیرد.")
     if form.is_valid():
         try:
             receipt = submit_supplier_portal_quote(
@@ -390,7 +398,13 @@ def purchase_request_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.PURCHASE_REQUESTS_CREATE)
 def purchase_request_create(request: HttpRequest) -> HttpResponse:
-    form = PurchaseRequestForm(request.POST or None, organization=request.organization)
+    form = PurchaseRequestForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+    )
     if request.method == "POST" and form.is_valid():
         try:
             record = create_purchase_request(
@@ -597,7 +611,13 @@ def purchase_order_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.PURCHASE_ORDERS_CREATE)
 def purchase_order_create(request: HttpRequest) -> HttpResponse:
-    form = PurchaseOrderForm(request.POST or None, organization=request.organization)
+    form = PurchaseOrderForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+    )
     if request.method == "POST" and form.is_valid():
         try:
             record = create_purchase_order(
@@ -766,7 +786,13 @@ def goods_receipt_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.GOODS_RECEIPTS_CREATE)
 def goods_receipt_create(request: HttpRequest) -> HttpResponse:
-    form = GoodsReceiptForm(request.POST or None, organization=request.organization)
+    form = GoodsReceiptForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+    )
     if request.method == "POST" and form.is_valid():
         try:
             record = create_goods_receipt(

@@ -1,0 +1,102 @@
+[
+  {
+    "case": "Populated management list",
+    "actor": "uiux.wavec.employment",
+    "path": "/workforce/employment/",
+    "method": "GET",
+    "status": 200,
+    "expected": 200,
+    "passed": true,
+    "sha256": "94b5a6298c5489d5f7a9969d3d2d2fdda62daa4b25eb91338c86a0aa5a8bf444"
+  },
+  {
+    "case": "Selected relationship and business-labelled source",
+    "actor": "uiux.wavec.employment",
+    "path": "/workforce/employment/?relationship=cd2ac4b2-986e-489d-a65f-4d73720adbc3",
+    "method": "GET",
+    "status": 200,
+    "expected": 200,
+    "passed": true,
+    "sha256": "5c2256a767cf301c1eebf7c13299e31d405d63b25b0a990a0cf9ecff5158262e"
+  },
+  {
+    "case": "Management employee detail",
+    "actor": "uiux.wavec.employment",
+    "path": "/workforce/employees/4a7132ca-e702-41a0-9868-28a3747a7dcf/",
+    "method": "GET",
+    "status": 200,
+    "expected": 200,
+    "passed": true,
+    "sha256": "1c49629e5847dadc99894fb46d32d799e84cfe22ae0b3997a3b9d9d63808c59c"
+  },
+  {
+    "case": "Invalid POST redisplays and writes nothing",
+    "actor": "uiux.wavec.employment",
+    "path": "/workforce/employment/",
+    "method": "POST",
+    "status": 400,
+    "expected": 400,
+    "passed": true,
+    "sha256": "eb6abadb457407924b4fc846fc710eb753bdbc8ba3325392bc24b43802cd753e"
+  },
+  {
+    "case": "Populated own current and historical versions",
+    "actor": "uiux.wavec.time",
+    "path": "/workforce/ess/employment/",
+    "method": "GET",
+    "status": 200,
+    "expected": 200,
+    "passed": true,
+    "sha256": "67437d897cee8ceb492b1e31ac37b96f059f2cd33fc308df349a51a0929fa218"
+  },
+  {
+    "case": "Own actor cannot manage histories",
+    "actor": "uiux.wavec.time",
+    "path": "/workforce/employment/",
+    "method": "GET",
+    "status": 403,
+    "expected": 403,
+    "passed": true,
+    "sha256": "1c70635319830bd62d2009a845dcc86cedcd6b0b538e5f701790b29010560573"
+  },
+  {
+    "case": "Another employee detail denied",
+    "actor": "uiux.wavec.time",
+    "path": "/workforce/employees/9a4904d8-c421-4919-9162-0084aa9a9b0f/",
+    "method": "GET",
+    "status": 403,
+    "expected": 403,
+    "passed": true,
+    "sha256": "bcedc5825baf505233c5bb893142ef67b8c131ddcccefba0262d415023db8cca"
+  },
+  {
+    "case": "Cross-tenant employee identifier denied",
+    "actor": "uiux.wavec.employment",
+    "path": "/workforce/employees/5f897a65-d2ce-452f-ab80-e3367a5cbd1b/",
+    "method": "GET",
+    "status": 404,
+    "expected": 404,
+    "passed": true,
+    "sha256": "d985df5fd03c53f38d77417dd38ac515168e8a728e4b10864f418268f164b997"
+  },
+  {
+    "case": "Same-tenant unauthorized own history denied",
+    "actor": "uiux.wavec.commercial",
+    "path": "/workforce/ess/employment/",
+    "method": "GET",
+    "status": 403,
+    "expected": 403,
+    "passed": true,
+    "sha256": "eccdf2837425a5f59421115b61209330d86e86b26a7a1aa3ee51e2618669596d"
+  },
+  {
+    "case": "Forged own-history employee selector cannot widen identity",
+    "actor": "uiux.wavec.time",
+    "path": "/workforce/ess/employment/?employee=9a4904d8-c421-4919-9162-0084aa9a9b0f",
+    "method": "GET",
+    "status": 200,
+    "expected": 200,
+    "passed": true,
+    "sha256": "837d1688773bfbb6c606df7c6c6a0bc61e3ba7c0b0b15c366e81d2e98189dce0"
+  }
+]

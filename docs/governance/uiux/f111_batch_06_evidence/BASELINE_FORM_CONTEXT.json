@@ -1,0 +1,8 @@
+{
+  "source": "Captured exact dirty-entry forms.py via import loader; no working-tree replacement",
+  "exception": "ExpenseAllocation has no expense.",
+  "exception_type": "RelatedObjectDoesNotExist",
+  "cause": "ModelForm calls ExpenseAllocation.clean without required Expense context; also lacks governing budget",
+  "resolution": "Bound form receives trusted scoped Expense and resolves existing accepted governing-budget pointer for chosen authorized Project; incomplete fields return form errors before model.clean; complete model.clean and canonical service validation remain in force",
+  "business_financial_policy_change": false
+}

@@ -1,0 +1,437 @@
+{
+  "original_failure_count": 27,
+  "counts": {
+    "ATTRIBUTABLE_REGRESSION": 9,
+    "BASELINE_PREEXISTING": 18,
+    "INDETERMINATE": 0
+  },
+  "unresolved_attributable_regressions": 0,
+  "all_original_cases_accounted_for": true,
+  "new_failures": [],
+  "final_affected": "18 failed, 34 passed, 21 subtests passed in 227.32s (0:03:47)",
+  "final_focused": "9 passed in 32.78s",
+  "frozen_full_suite": "Not completed; migration replay superseded by exact immutable-HEAD authority probes; no full frozen-suite PASS claimed",
+  "evidence": [
+    "SOURCE_ATTRIBUTION.json",
+    "FROZEN_APPROVER_PROBE.json",
+    "../rv007_final_closure/affected.xml",
+    "affected.xml",
+    "focused.xml"
+  ],
+  "rows": [
+    {
+      "test": "apps.procurement.test_rfq_close.RFQCloseManifestTests.test_close_permission_is_intersected_with_project_scope",
+      "original": {
+        "result": "FAIL",
+        "message": "django.db.utils.IntegrityError: duplicate key value violates unique constraint \"membership_one_unrevoked_role\"\nDETAIL:  Key (membership_id, role_id)=(1ad9caba-6e7e-4632-bebb-d8b12bdf1149, 362add8a-8795-409d-bcd4-f9c647788851) already exists."
+      },
+      "final": {
+        "result": "PASS",
+        "message": ""
+      },
+      "classification": "ATTRIBUTABLE_REGRESSION",
+      "cause": "Accepted shared migrated fixture already creates the unrevoked role assignment; scenario unconditionally duplicates it. Shared Organization scope would also mask the intended unrelated-Project denial.",
+      "proof": "Original UniqueViolation membership_one_unrevoked_role; SOURCE_ATTRIBUTION.json captures earlier shared bootstrap; final exact denial assertion PASS after reusing assignment and removing broad fixture scope.",
+      "fix": "Reuse explicit assignment and revoke fixture Organization scope before granting the unrelated Project. Authorization denial assertion is preserved and made meaningful.",
+      "disposition": "RESOLVED"
+    },
+    {
+      "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_approve_requires_policy_independent_permission_and_keeps_approved_immutable",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_correction_supersedes_without_mutating_decision",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_cross_tenant_and_missing_prerequisite_fail_closed",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_policy_can_explicitly_allow_self_approval",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_policy_controls_self_approval_and_withdrawal_blocks_approval",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_prepare_requires_open_confidential_scope_and_retains_exact_evidence",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_reason_catalog_and_access_fail_closed",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests.test_revoked_confidential_access_blocks_preparation",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11ComparisonAwardTests.test_no_award_is_explicit_has_no_allocations_and_does_not_mutate_downstream",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11SelfFinalizationPolicyTests.test_tenant_policy_explicitly_allows_s11_comparison_and_award_self_finalization",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_award_is_sourcing_only_conserves_quantity_and_self_finalization_is_policy_gated",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_conflict_cannot_self_clear_and_blocks_evaluation_until_disposed",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_exception_closed_catalogue_and_independent_lifecycle",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_reproducible_asserted_input_lineage_and_immutable_finalization",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_split_award_is_explicit_and_allocation_inputs_are_governing",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_tie_requires_explicit_resolution_and_split_award_retains_exact_revisions",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_authorized_action_forms_render_without_mutating_sources",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید."
+      },
+      "final": {
+        "result": "PASS",
+        "message": ""
+      },
+      "classification": "ATTRIBUTABLE_REGRESSION",
+      "cause": "Accepted shared Procurement fixture marks membership migrated and creates active default-role assignments. Existing buyer override changes only compatibility role_definition, so its custom permissions cease to be effective; close fails before test assertions.",
+      "proof": "FROZEN_APPROVER_PROBE.json: exact old custom-role plus scope authorizes close under immutable HEAD; SOURCE_ATTRIBUTION.json: shared bootstrap changed but buyer intent and authorizer unchanged; original trace close denial; final same assertions PASS.",
+      "fix": "Add explicit MembershipRoleAssignment for the existing isolated custom test role. No permission set or assertions changed.",
+      "disposition": "RESOLVED"
+    },
+    {
+      "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_comparison_award_flow_preserves_separation_history_and_no_downstream",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید."
+      },
+      "final": {
+        "result": "PASS",
+        "message": ""
+      },
+      "classification": "ATTRIBUTABLE_REGRESSION",
+      "cause": "Accepted shared Procurement fixture marks membership migrated and creates active default-role assignments. Existing buyer override changes only compatibility role_definition, so its custom permissions cease to be effective; close fails before test assertions.",
+      "proof": "FROZEN_APPROVER_PROBE.json: exact old custom-role plus scope authorizes close under immutable HEAD; SOURCE_ATTRIBUTION.json: shared bootstrap changed but buyer intent and authorizer unchanged; original trace close denial; final same assertions PASS.",
+      "fix": "Add explicit MembershipRoleAssignment for the existing isolated custom test role. No permission set or assertions changed.",
+      "disposition": "RESOLVED"
+    },
+    {
+      "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_conflict_blocks_evaluation_and_requires_independent_disposition",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید."
+      },
+      "final": {
+        "result": "PASS",
+        "message": ""
+      },
+      "classification": "ATTRIBUTABLE_REGRESSION",
+      "cause": "Accepted shared Procurement fixture marks membership migrated and creates active default-role assignments. Existing buyer override changes only compatibility role_definition, so its custom permissions cease to be effective; close fails before test assertions.",
+      "proof": "FROZEN_APPROVER_PROBE.json: exact old custom-role plus scope authorizes close under immutable HEAD; SOURCE_ATTRIBUTION.json: shared bootstrap changed but buyer intent and authorizer unchanged; original trace close denial; final same assertions PASS.",
+      "fix": "Add explicit MembershipRoleAssignment for the existing isolated custom test role. No permission set or assertions changed.",
+      "disposition": "RESOLVED"
+    },
+    {
+      "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_explicit_no_award_and_cross_comparison_allocation_rejection",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید."
+      },
+      "final": {
+        "result": "PASS",
+        "message": ""
+      },
+      "classification": "ATTRIBUTABLE_REGRESSION",
+      "cause": "Accepted shared Procurement fixture marks membership migrated and creates active default-role assignments. Existing buyer override changes only compatibility role_definition, so its custom permissions cease to be effective; close fails before test assertions.",
+      "proof": "FROZEN_APPROVER_PROBE.json: exact old custom-role plus scope authorizes close under immutable HEAD; SOURCE_ATTRIBUTION.json: shared bootstrap changed but buyer intent and authorizer unchanged; original trace close denial; final same assertions PASS.",
+      "fix": "Add explicit MembershipRoleAssignment for the existing isolated custom test role. No permission set or assertions changed.",
+      "disposition": "RESOLVED"
+    },
+    {
+      "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_opening_and_admissibility_actions_retain_independent_decisions",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید."
+      },
+      "final": {
+        "result": "PASS",
+        "message": ""
+      },
+      "classification": "ATTRIBUTABLE_REGRESSION",
+      "cause": "Accepted shared Procurement fixture marks membership migrated and creates active default-role assignments. Existing buyer override changes only compatibility role_definition, so its custom permissions cease to be effective; close fails before test assertions.",
+      "proof": "FROZEN_APPROVER_PROBE.json: exact old custom-role plus scope authorizes close under immutable HEAD; SOURCE_ATTRIBUTION.json: shared bootstrap changed but buyer intent and authorizer unchanged; original trace close denial; final same assertions PASS.",
+      "fix": "Add explicit MembershipRoleAssignment for the existing isolated custom test role. No permission set or assertions changed.",
+      "disposition": "RESOLVED"
+    },
+    {
+      "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_permission_tenant_csrf_and_get_do_not_mutate",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید."
+      },
+      "final": {
+        "result": "PASS",
+        "message": ""
+      },
+      "classification": "ATTRIBUTABLE_REGRESSION",
+      "cause": "Accepted shared Procurement fixture marks membership migrated and creates active default-role assignments. Existing buyer override changes only compatibility role_definition, so its custom permissions cease to be effective; close fails before test assertions.",
+      "proof": "FROZEN_APPROVER_PROBE.json: exact old custom-role plus scope authorizes close under immutable HEAD; SOURCE_ATTRIBUTION.json: shared bootstrap changed but buyer intent and authorizer unchanged; original trace close denial; final same assertions PASS.",
+      "fix": "Add explicit MembershipRoleAssignment for the existing isolated custom test role. No permission set or assertions changed.",
+      "disposition": "RESOLVED"
+    },
+    {
+      "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_quote_capture_submit_withdraw_retry_and_foreign_rfq_rejected",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید."
+      },
+      "final": {
+        "result": "PASS",
+        "message": ""
+      },
+      "classification": "ATTRIBUTABLE_REGRESSION",
+      "cause": "Accepted shared Procurement fixture marks membership migrated and creates active default-role assignments. Existing buyer override changes only compatibility role_definition, so its custom permissions cease to be effective; close fails before test assertions.",
+      "proof": "FROZEN_APPROVER_PROBE.json: exact old custom-role plus scope authorizes close under immutable HEAD; SOURCE_ATTRIBUTION.json: shared bootstrap changed but buyer intent and authorizer unchanged; original trace close denial; final same assertions PASS.",
+      "fix": "Add explicit MembershipRoleAssignment for the existing isolated custom test role. No permission set or assertions changed.",
+      "disposition": "RESOLVED"
+    },
+    {
+      "test": "apps.procurement.test_cep032_buyer_actions.BuyerActionTests.test_revoked_confidential_grant_hides_values_and_rejects_assertions",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید."
+      },
+      "final": {
+        "result": "PASS",
+        "message": ""
+      },
+      "classification": "ATTRIBUTABLE_REGRESSION",
+      "cause": "Accepted shared Procurement fixture marks membership migrated and creates active default-role assignments. Existing buyer override changes only compatibility role_definition, so its custom permissions cease to be effective; close fails before test assertions.",
+      "proof": "FROZEN_APPROVER_PROBE.json: exact old custom-role plus scope authorizes close under immutable HEAD; SOURCE_ATTRIBUTION.json: shared bootstrap changed but buyer intent and authorizer unchanged; original trace close denial; final same assertions PASS.",
+      "fix": "Add explicit MembershipRoleAssignment for the existing isolated custom test role. No permission set or assertions changed.",
+      "disposition": "RESOLVED"
+    },
+    {
+      "test": "apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityConcurrencyTests.test_concurrent_approval_creates_one_decision",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11ConcurrencyTests.test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity",
+      "original": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "final": {
+        "result": "FAIL",
+        "message": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید."
+      },
+      "classification": "BASELINE_PREEXISTING",
+      "cause": "Unchanged AdmissibilityFixtureMixin._make_actor creates an active legacy Tenant Manager but no explicit scope. _grant adds the opening-approval permission, which does not supply scope. Shared setUp fails at independent opening approval before scenario assertions.",
+      "proof": "Frozen/current _make_actor and _grant AST identical; authorization permission/scope/require AST identical. FROZEN_APPROVER_PROBE.json reproduces exact permission-present, scope-absent input under immutable HEAD and returns PermissionDenied in a rolled-back isolated test transaction.",
+      "disposition": "RETAINED; no unrelated baseline repair or weakening"
+    }
+  ]
+}

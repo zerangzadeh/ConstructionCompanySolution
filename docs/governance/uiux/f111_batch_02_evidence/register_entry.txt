@@ -1,0 +1,4400 @@
+schema_version: '1.0'
+document:
+  id: BONIRA-UIUX-FINDINGS-REGISTER
+  title: BONIRA UI/UX Findings Register
+  status: PILOT_IN_PROGRESS
+  repository: zerangzadeh/ConstructionCompanySolution
+  branch: main
+  audit_baseline_commit: 43ac319c6e73e48ca9626461b73987922c498ec3
+  canonical_path: docs/governance/uiux/UIUX_FINDINGS_REGISTER.yaml
+register_status:
+  phase: STATIC_COVERAGE_REVIEW_READY
+  finding_count: 127
+  static_finding_count: 123
+  new_runtime_wave_a_findings: 2
+  severity_counts:
+    CRITICAL: 0
+    HIGH: 82
+    MEDIUM: 45
+    LOW: 0
+  domain_review_required: 0
+  note: Pilot findings are confirmed from frozen-baseline static templates/forms/views. Runtime behavior and role
+    variants remain to be validated.
+  cross_cutting_audit_lenses:
+  - Terminology and technical leakage
+  - Workflow/task hierarchy
+  - Interaction consistency
+  - Form Intelligence & Data Reuse
+  - Cascade Filtering & Context Defaults
+  - State/empty/error design
+  - Localization/accessibility
+  - Home / Dashboard Experience
+  new_targeted_runtime_findings: 2
+  targeted_runtime_disposition: Original assessments retained; later history appended; no remediation.
+  new_same_pattern_security_findings: 15
+  same_pattern_security_sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+root_pattern_candidates:
+- id: RP-C01-TECHNICAL-LANGUAGE-LEAK
+  status: CANDIDATE
+- id: RP-C02-MODEL-REPRESENTATION-EXPOSED
+  status: CANDIDATE
+- id: RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  status: CANDIDATE
+- id: RP-C04-WEAK-ACTION-HIERARCHY
+  status: CANDIDATE
+- id: RP-C05-TASK-GUIDANCE-DEFICIT
+  status: CANDIDATE
+- id: RP-C06-GENERIC-FORM-ACTION
+  status: CANDIDATE
+- id: RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
+  status: CANDIDATE
+- id: RP-C08-WEAK-EMPTY-STATE
+  status: CANDIDATE
+findings:
+- finding_id: UIUX-F-001
+  module: Shared Shell
+  surface_id: SHARED-CONTEXT-SELECTOR
+  route: GLOBAL_AUTHENTICATED_SHELL
+  page_title: Shared Company / Project / Site Context Selector
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The shared context selector exposes the internal term «دامنه» as a primary user concept, including «اعمال
+    دامنه» and «همه دامنه مجاز».
+  evidence:
+    source_paths:
+    - templates/components/context_selector.html
+    observed_literals:
+    - دامنه کاری مؤثر
+    - بدون پروژه / همه دامنه مجاز
+    - اعمال دامنه
+    - برای ثبت، یک پروژه مجاز را در دامنه یا فرم انتخاب کنید
+  user_impact: The technical authorization/context mental model is imposed on ordinary users on essentially every
+    authenticated page, increasing cognitive load before the actual business task begins.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  recommendation: Rename the interaction in task language such as work context / current project selection, keep
+    authorization semantics internal, and make the selector explain what the selection changes for the user.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-002
+  module: Timekeeping
+  surface_id: SURF-224
+  route: /timekeeping/calendars/new/
+  page_title: تقویم کاری جدید
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The work-calendar form requires users to type ISO weekday numbers as a comma-separated string.
+  evidence:
+    source_paths:
+    - apps/timekeeping/forms.py
+    - templates/timekeeping/form.html
+    observed_literals:
+    - روزهای کاری ISO
+    - 'نمونه: 1,2,3,4,5'
+    - روزها را به‌شکل اعداد جداشده با ویرگول وارد کنید.
+  user_impact: An HR/timekeeping user must understand a technical ISO encoding and manually serialize ordinary weekday
+    choices, creating avoidable error risk.
+  root_pattern_candidate:
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  recommendation: Replace the encoded text field with explicit Persian weekday choices. Preserve the existing canonical
+    weekday representation internally.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-003
+  module: Timekeeping
+  surface_id: SURF-224
+  route: /timekeeping/calendars/new/
+  page_title: تقویم کاری جدید
+  roles: []
+  category: TERMINOLOGY
+  severity: MEDIUM
+  status: PILOT_CONFIRMED_STATIC
+  problem: The primary form action is the generic label «ثبت کنترل‌شده» rather than an action-specific business
+    label.
+  evidence:
+    source_paths:
+    - templates/timekeeping/form.html
+    observed_literals:
+    - ثبت کنترل‌شده
+    - بازگشت
+    scope_note: The same shared form template is reused across multiple timekeeping creation tasks.
+  user_impact: Users cannot infer the exact result of the primary action from the button itself; the governance
+    adjective adds no task value.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C06-GENERIC-FORM-ACTION
+  recommendation: Use task-specific labels such as «ذخیره تقویم کاری», «ثبت شیفت», or «ثبت حضور» while preserving
+    server-side controls unchanged.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-004
+  module: Timekeeping
+  surface_id: SURF-224
+  route: /timekeeping/calendars/new/
+  page_title: تقویم کاری جدید
+  roles: []
+  category: HELP
+  severity: MEDIUM
+  status: PILOT_CONFIRMED_STATIC
+  problem: The calendar form description prioritizes internal/legal-boundary wording instead of helping the user
+    make the calendar decision.
+  evidence:
+    source_paths:
+    - apps/timekeeping/views.py
+    observed_literals:
+    - منطقه زمانی از تنظیمات شرکت خوانده می‌شود؛ مقدار قانونی یا تعطیلی پیش‌فرض ساخته نمی‌شود.
+  user_impact: The user is told what the system deliberately does not infer, but is not guided through normal calendar
+    setup such as effective dates and working weekdays.
+  root_pattern_candidate:
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  recommendation: Keep compliance caveats available as secondary help, but make the primary description explain
+    the task and expected inputs in business language.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-005
+  module: Payroll
+  surface_id: SURF-240
+  route: /payroll/
+  page_title: کارگاه حقوق و دستمزد
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The payroll landing page is dominated by governance/implementation language rather than a normal payroll-operating
+    vocabulary.
+  evidence:
+    source_paths:
+    - templates/payroll/workbench.html
+    observed_literals:
+    - کارگاه حقوق و دستمزد
+    - حریم خصوصی بالا
+    - محاسبه غیرقانونی‌محور، نسخه‌پذیر و غیرارسال‌شونده
+    - مرز حقوق
+    - تاریخچه حساس
+    - صف استثنا
+    - نتایج حساس
+    - دامنه دسترسی
+  user_impact: A payroll specialist must decode architecture, privacy, and boundary terminology before understanding
+    the ordinary payroll task.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  recommendation: Retain safety and authority boundaries, but move them to concise contextual help and rewrite the
+    primary page language around payroll periods, calculation, review, approval, payslips, and financial handoff.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-006
+  module: Payroll
+  surface_id: SURF-240
+  route: /payroll/
+  page_title: کارگاه حقوق و دستمزد
+  roles: []
+  category: WORKFLOW
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The payroll workbench presents several top-level destinations/actions without clearly expressing the
+    normal payroll sequence or prerequisite relationship.
+  evidence:
+    source_paths:
+    - templates/payroll/workbench.html
+    observed_literals:
+    - پیکربندی و قواعد
+    - دوره جدید
+    - اجرای جدید
+    - تاریخچه حساس
+    - نسخه‌های مقرراتی
+    - مالیات و بیمه کارکنان
+    - تحویل مالی حقوق
+    note: «اجرای جدید» is visually primary while «دوره جدید» is secondary; the page does not explain when a period
+      must exist before a run.
+  user_impact: A user can see many legitimate capabilities but cannot immediately determine the normal next step
+    for the current payroll state.
+  root_pattern_candidate:
+  - RP-C04-WEAK-ACTION-HIERARCHY
+  - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
+  recommendation: Introduce a state-aware payroll journey that identifies the current period/status and one recommended
+    next action, while keeping secondary configuration/history destinations subordinate.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-007
+  module: Payroll
+  surface_id: SURF-240
+  route: /payroll/
+  page_title: کارگاه حقوق و دستمزد
+  roles: []
+  category: STATE
+  severity: MEDIUM
+  status: PILOT_CONFIRMED_STATIC
+  problem: Payroll empty states describe authorization scope instead of the business state and next action.
+  evidence:
+    source_paths:
+    - templates/payroll/workbench.html
+    observed_literals:
+    - اجرایی در دامنه دسترسی نیست.
+    - استثنای بازی در دامنه دسترسی نیست.
+    - نتیجه‌ای وجود ندارد.
+  user_impact: The page does not distinguish «nothing has been created yet» from «records exist but are not authorized/visible»,
+    and does not guide the user to the appropriate next step.
+  root_pattern_candidate:
+  - RP-C08-WEAK-EMPTY-STATE
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  recommendation: Use explicit, state-aware empty messages and provide the next valid action when the user has permission.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-008
+  module: Procurement
+  surface_id: SURF-270
+  route: /procurement/rfqs/<uuid:rfq_id>/buyer/
+  page_title: پیشنهاد، مقایسه و انتخاب
+  roles: []
+  category: WORKFLOW
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The RFQ buyer workspace renders every currently allowed domain action as a visually equivalent button
+    under «عملیات مجاز» without identifying workflow stage or recommended next action.
+  evidence:
+    source_paths:
+    - templates/procurement/rfq_buyer_workspace.html
+    observed_structure: Loop over actions; every item rendered as erp-btn--secondary.
+    observed_literals:
+    - عملیات مجاز
+    - پیشنهاد، مقایسه و انتخاب
+  user_impact: Users must reconstruct the procurement state machine from a button set and can struggle to understand
+    sequence, progress, and which action matters now.
+  root_pattern_candidate:
+  - RP-C04-WEAK-ACTION-HIERARCHY
+  - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
+  recommendation: Present the current procurement stage, completed stages, blocking prerequisites, and one primary
+    next action. Move exceptional actions into contextual/secondary controls.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-009
+  module: Procurement
+  surface_id: SURF-270
+  route: /procurement/rfqs/<uuid:rfq_id>/buyer/
+  page_title: پیشنهاد، مقایسه و انتخاب
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The RFQ buyer page explains the process using governance and implementation vocabulary rather than operational
+    procurement language.
+  evidence:
+    source_paths:
+    - templates/procurement/rfq_buyer_workspace.html
+    observed_literals:
+    - ثبت مستند در منبع تدارکات، با مجوز مرحله و تفکیک وظایف
+    - دعوت‌نامه نسخه مؤثر استعلام
+    - گشایش پس از بستن ثبتی
+    - احراز سلامت شواهد
+    - دامنه تجاری حاکم
+    - سیاست فعال تفکیک وظایف شرکت
+  user_impact: Even a domain-experienced buyer must translate internal governance concepts before understanding
+    what must be done in the RFQ.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  recommendation: Rewrite primary guidance in buyer language. Preserve governance details as expandable explanation
+    or audit/help information.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-010
+  module: Parties
+  surface_id: SURF-058
+  route: /parties/governance/
+  page_title: حاکمیت طرف‌های تجاری
+  roles: []
+  category: TERMINOLOGY
+  severity: MEDIUM
+  status: PILOT_CONFIRMED_STATIC
+  problem: The Parties workspace uses abstract governance/source terminology for routine party management.
+  evidence:
+    source_paths:
+    - templates/parties/governance_list.html
+    observed_literals:
+    - حاکمیت طرف‌های تجاری
+    - مدیریت داده‌های پایه · شرکت فعال
+    - هویت، سوابق و اقدامات مجاز از همان منبع طرف‌های تجاری مدیریت می‌شوند.
+    - وضعیت منبع
+    - سوابق و اقدامات مجاز
+  user_impact: Routine master-data work is framed in architecture/governance terms, making the page feel more technical
+    than the user task requires.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  recommendation: Use a business-facing title and labels such as management/status/history, while keeping governance/source
+    semantics in help or audit metadata.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-011
+  module: Documents
+  surface_id: SURF-148
+  route: /documents/
+  page_title: اسناد شرکت
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The operational document list exposes English technical architecture terms directly in Persian UI.
+  evidence:
+    source_paths:
+    - templates/documents/list.html
+    observed_literals:
+    - نسخه‌های immutable با دسترسی مبتنی بر context
+  user_impact: Ordinary document users are forced to understand implementation/security terminology that is unnecessary
+    for finding and managing documents.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  recommendation: Rewrite the description in Persian task language, e.g. version-controlled private documents with
+    access based on current company/project context, without exposing internal terms.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-012
+  module: Subledgers
+  surface_id: SURF-052
+  route: /subledgers/
+  page_title: میزکار دریافتنی‌ها و پرداختنی‌ها
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: Settlement allocation requires the user to manually enter a raw Treasury Movement identifier.
+  evidence:
+    source_paths:
+    - apps/subledgers/templates/subledgers/workbench.html
+    - apps/subledgers/views.py
+    observed_literals:
+    - شناسه تراکنش خزانه‌داری
+    implementation_note: The POST value treasury_movement_id is resolved against authorized posted TreasuryMovement
+      records.
+  user_impact: Users must obtain and type/paste a technical UUID-like identifier instead of selecting a meaningful
+    authorized treasury transaction, increasing error and support burden.
+  root_pattern_candidate:
+  - RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  recommendation: Provide an authorized searchable selector using business-identifying information such as date,
+    reference, counterparty, amount, and movement type; submit the identifier internally.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-013
+  module: Subledgers
+  surface_id: SURF-052
+  route: /subledgers/
+  page_title: میزکار دریافتنی‌ها و پرداختنی‌ها
+  roles: []
+  category: WORKFLOW
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The subledger workbench combines allocation, write-off proposal, aging, reconciliation, reversal, and
+    independent review in one dense operational page without a clear task hierarchy.
+  evidence:
+    source_paths:
+    - apps/subledgers/templates/subledgers/workbench.html
+    observed_sections:
+    - اقلام دریافتنی و پرداختنی و تخصیص تراکنش‌های خزانه‌داری
+    - گزارش‌ها و کنترل‌ها در تاریخ مبنا
+    - تخصیص‌ها و سوابق ثبت‌شده
+    - بررسی مستقل تطبیق دریافتنی‌ها و پرداختنی‌ها
+  user_impact: Users must understand several distinct financial jobs and control stages simultaneously, making the
+    page difficult to learn and increasing the chance of acting in the wrong conceptual area.
+  root_pattern_candidate:
+  - RP-C04-WEAK-ACTION-HIERARCHY
+  - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
+  recommendation: 'Separate or progressively disclose distinct jobs: open obligations/settlement, aging, reconciliation,
+    exceptions, and review. Make the dominant task explicit for the user role.'
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-014
+  module: Subledgers
+  surface_id: SURF-052
+  route: /subledgers/
+  page_title: میزکار دریافتنی‌ها و پرداختنی‌ها
+  roles: []
+  category: HELP
+  severity: MEDIUM
+  status: PILOT_CONFIRMED_STATIC
+  problem: The subledger introduction leads with technical limitations and unavailable implementation capabilities
+    instead of explaining the user's task.
+  evidence:
+    source_paths:
+    - apps/subledgers/templates/subledgers/workbench.html
+    observed_literals:
+    - گزارش سنی دقیق در تاریخ مبنا، بدون بازه‌بندی.
+    - ثبت سند حسابداری و تأیید و برگشت حذف حسابداری مانده هنوز فعال نشده‌اند.
+  user_impact: The user starts on a page whose first explanation is what the system does not currently do, while
+    the normal business purpose remains implicit.
+  root_pattern_candidate:
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  recommendation: Lead with the user objective and current actionable capabilities. Move limitations to contextual
+    notices only where they affect the attempted task.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-015
+  module: Core
+  surface_id: SURF-002
+  route: /search/
+  page_title: جستجو
+  roles: []
+  category: TERMINOLOGY
+  severity: MEDIUM
+  status: PILOT_CONFIRMED_STATIC
+  problem: The search experience is framed around authorization semantics («جستجوی مجاز», «نتایج مجاز») rather than
+    the user's search task, and its empty-state copy contains «نتیجه مجازی یافت نشد».
+  evidence:
+    source_paths:
+    - templates/core/global_search.html
+    - templates/base.html
+    - templates/home.html
+    observed_literals:
+    - جستجوی مجاز
+    - نتایج مجاز
+    - نتیجه مجازی یافت نشد
+    - نتایج فاقد دسترسی نمایش داده نمی‌شوند.
+    - جستجوی پروژه و مصالح
+  user_impact: Users repeatedly see permission language instead of a simple statement of what can be searched; the
+    «مجازی» wording also reads as a copy defect.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  - RP-C08-WEAK-EMPTY-STATE
+  recommendation: Name the feature by its actual searchable content, such as «جستجوی پروژه و مصالح», keep authorization
+    filtering implicit, and use plain empty-state language.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-008
+    scope_note: Scoped search and no-result copy.
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-015
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-017
+    scope_note: Bounded observed portions only; original static/history retained.
+- finding_id: UIUX-F-016
+  module: Shared Navigation
+  surface_id: SHARED-MAIN-NAVIGATION
+  route: GLOBAL_AUTHENTICATED_SHELL
+  page_title: ناوبری اصلی
+  roles: []
+  category: NAVIGATION
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The main navigation can render a permitted RFQ link and an unconditional disabled duplicate with the
+    same label and the same NAV-019 identifier.
+  evidence:
+    source_paths:
+    - templates/components/navigation_links.html
+    observed_structure:
+    - Conditional active link for «استعلام و انتخاب تأمین‌کننده» when rfqs.view exists.
+    - Immediately following unconditional disabled span with the same label.
+    - Both use data-nav-id="NAV-019".
+  user_impact: A user who is authorized for RFQs can see the same navigation item twice, once enabled and once apparently
+    unavailable, directly undermining trust in permissions and navigation state.
+  root_pattern_candidate:
+  - RP-C10-NAVIGATION-STATE-INCONSISTENCY
+  recommendation: 'Render exactly one RFQ navigation state: enabled when authorized, otherwise disabled/omitted
+    according to the navigation policy. Keep navigation IDs unique.'
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-006
+    - RV-EV-007
+    scope_note: Enabled/disabled RFQ duplication.
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-016
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-016
+    - RV-EV-021
+    - RV-EV-022
+    scope_note: Bounded observed portions only; original static/history retained.
+- finding_id: UIUX-F-017
+  module: Shared Navigation
+  surface_id: SHARED-MAIN-NAVIGATION
+  route: GLOBAL_AUTHENTICATED_SHELL
+  page_title: ناوبری اصلی
+  roles: []
+  category: INFORMATION_ARCHITECTURE
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The sidebar contains unconditional unavailable placeholders for capabilities that are partly implemented
+    or reachable elsewhere, producing a misleading application map.
+  evidence:
+    source_paths:
+    - templates/components/navigation_links.html
+    - config/urls.py
+    observed_literals:
+    - کنترل پروژه
+    - تجاری و مناقصه
+    - HSE و کیفیت
+    observed_structure:
+    - «تجاری و مناقصه» appears once as an unavailable placeholder and again later as an enabled Commercial link
+      when permission exists.
+    - Project Controls is reachable from project routes but the sidebar item is hard-disabled.
+    - Safety and Quality application routes are included in the application router while the combined sidebar item
+      is hard-disabled.
+  user_impact: The sidebar can tell users that a capability is unavailable even though related functionality exists,
+    making discovery and mental mapping unreliable.
+  root_pattern_candidate:
+  - RP-C10-NAVIGATION-STATE-INCONSISTENCY
+  - RP-C11-INFORMATION-ARCHITECTURE-MISMATCH
+  recommendation: Make the sidebar reflect actual product destinations and permission state. Remove obsolete placeholders,
+    avoid duplicated concepts, and decide one canonical navigation location for each operational capability.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-006
+    - RV-EV-007
+    scope_note: Disabled placeholders and duplicate Commercial.
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-017
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-016
+    - RV-EV-021
+    - RV-EV-022
+    scope_note: Bounded observed portions only; original static/history retained.
+- finding_id: UIUX-F-018
+  module: Shared List Pattern
+  surface_id: SHARED-LIST-DETAIL-AFFORDANCE
+  route: MULTI_SURFACE
+  page_title: فهرست‌های عملیاتی
+  roles: []
+  category: INTERACTION
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The interaction used to open a record detail is inconsistent across modules.
+  evidence:
+    source_paths:
+    - templates/projects/list.html
+    - templates/equipment/list.html
+    - templates/inventory/warehouse_list.html
+    - templates/inventory/custody_workbench.html
+    observed_patterns:
+    - 'Projects: project code and project name are both links, plus a separate icon-only action in the Operations
+      column.'
+    - 'Equipment: only the equipment name is a detail link; the code is plain text.'
+    - 'Warehouses: only the warehouse name is a detail link.'
+    - 'Inventory count/transfer sections: the entire row-like block is a link.'
+  user_impact: Users must relearn where to click on every list. The same visual table/list language does not imply
+    the same interaction.
+  root_pattern_candidate:
+  - RP-C09-INCONSISTENT-DETAIL-AFFORDANCE
+  recommendation: Adopt one canonical list-to-detail convention for the ERP. Prefer a consistently identifiable
+    primary record link and one explicit accessible detail affordance; do not mix icon-only, whole-row, and arbitrary-cell
+    patterns without a documented reason.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-019
+  module: Projects
+  surface_id: SURF-082
+  route: /projects/<uuid:project_id>/controls/
+  page_title: ساختار شکست و فعالیت‌ها
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The Project Controls page exposes implementation/governance boundary language in the primary UI.
+  evidence:
+    source_paths:
+    - templates/projects/controls.html
+    observed_literals:
+    - شواهد محدود کنترل پروژه
+    - فقط بودجه پذیرفته‌شده و هزینه تأییدشده/ثبت‌شده کدگذاری‌شده نمایش یا صادر می‌شود.
+    - مشاهده‌ای؛ بدون هشدار، توقف یا رزرو
+    - تطبیق محدود چندمنبعی
+    - مجوز اختصاصی مقایسه، انحرافات بودجه‌ای، خروجی یا تطبیق چندمنبعی لازم است.
+  user_impact: A project-control user is asked to decode scope boundaries and control implementation terms before
+    understanding normal planning/cost-control tasks.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  recommendation: Lead with project-control tasks and business meaning. Move scope/authority caveats to secondary
+    contextual help or audit metadata.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-020
+  module: Organizations
+  surface_id: SURF-023
+  route: /organizations/members/<uuid:membership_id>/authorization/
+  page_title: نقش‌ها و دامنه‌های عضو
+  roles: []
+  category: TERMINOLOGY
+  severity: MEDIUM
+  status: PILOT_CONFIRMED_STATIC
+  problem: The access-administration screen uses governance vocabulary such as «دامنه صریح», «قرنطینه دسترسی» and
+    «تأیید دوگانه» as its primary task language.
+  evidence:
+    source_paths:
+    - templates/organizations/member_authorization.html
+    observed_literals:
+    - نقش‌ها و دامنه‌های عضو
+    - این عضویت تا ثبت حداقل یک نقش و یک دامنه صریح در قرنطینه دسترسی است.
+    - ثبت نقش با تأیید دوگانه
+    - اعطای دامنه صریح
+    - ثبت دامنه با تأیید دوگانه
+    - تاریخچه دامنه‌ها
+  user_impact: Even though this is an administrative screen, the operator must understand internal access-model
+    terms rather than being guided through who can access which company/project/site and who must approve it.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  recommendation: Keep governance guarantees intact but phrase the task around role assignment, project/site access,
+    effective dates, and required approver. Provide the formal access-model term as secondary help where useful.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-013
+    scope_note: Wording observed under separate actual tenant membership; not Owner journey execution.
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-020
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-018
+    - RV-EV-021
+    - RV-EV-023
+    scope_note: Bounded observed portions only; original static/history retained.
+- finding_id: UIUX-F-021
+  module: Workforce / ESS
+  surface_id: SURF-179
+  route: /workforce/ess/
+  page_title: داشبورد خدمات من
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The employee self-service dashboard exposes source-system terminology and raw status codes to ordinary
+    employees.
+  evidence:
+    source_paths:
+    - templates/workforce/ess_dashboard.html
+    observed_literals:
+    - اطلاعات شخصی و وضعیت درخواست‌ها از منابع مجاز شما نمایش داده می‌شود.
+    - 'وضعیت منبع:'
+    - '{{ row.status }}'
+    - 'آخرین تغییر منبع:'
+    - مشاهده در منبع
+    - درخواست مجازی برای نمایش ثبت نشده است.
+  user_impact: ESS users see technical provenance and raw machine status alongside their request state, even though
+    their goal is simply to know what they requested, its current status, and what happens next.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C08-WEAK-EMPTY-STATE
+  recommendation: Show a user-facing request type, localized status, last update, responsible stage, and next expected
+    step. Hide raw source/status identifiers from the normal employee view.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-022
+  module: Workforce / ESS
+  surface_id: SURF-179
+  route: /workforce/ess/
+  page_title: خدمات کارکنان
+  roles: []
+  category: INFORMATION_ARCHITECTURE
+  severity: MEDIUM
+  status: PILOT_CONFIRMED_STATIC
+  problem: ESS presents a flat navigation strip of many equally weighted destinations instead of grouping employee
+    tasks by intent.
+  evidence:
+    source_paths:
+    - templates/workforce/_ess_navigation.html
+    observed_destinations:
+    - مرخصی، حضور و کارکرد من
+    - داشبورد من
+    - پروفایل من
+    - قرارداد و احکام من
+    - سوابق حقوق من
+    - پرسش‌های حقوق
+    - درخواست‌های من
+    - تغییر اطلاعات شخصی
+    - سوابق و اسناد من
+    - گواهی‌های من
+  user_impact: The employee portal behaves more like a module link strip than a guided self-service portal, making
+    frequent tasks harder to scan on smaller screens or for occasional users.
+  root_pattern_candidate:
+  - RP-C11-INFORMATION-ARCHITECTURE-MISMATCH
+  - RP-C04-WEAK-ACTION-HIERARCHY
+  recommendation: Group ESS destinations into a small number of user intents such as «درخواست‌ها», «حقوق و مزایا»,
+    «اطلاعات شغلی», and «پروفایل و اسناد», with frequent actions surfaced on the dashboard.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-023
+  module: Inventory
+  surface_id: SURF-292
+  route: /inventory/custody/
+  page_title: کنترل مقدار و امانت موجودی
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The inventory custody workspace foregrounds internal reconciliation and boundary vocabulary instead of
+    warehouse tasks.
+  evidence:
+    source_paths:
+    - templates/inventory/custody_workbench.html
+    observed_literals:
+    - رزرو، شمارش، انتقال، رهگیری و تطبیق؛ بدون ارزش‌گذاری یا ثبت مالی
+    - مغایرت تخصیص
+    - مواضع بدون تخصیص
+    - تخصیص میراثی نامشخص
+    - این کارتابل فقط مقدار و امانت را کنترل می‌کند و هیچ ارزش‌گذاری، سند حسابداری، هزینه واقعی پروژه یا اثر دارایی
+      ثابت ایجاد نمی‌کند.
+  user_impact: A warehouse user is confronted with architecture boundaries and migration/reconciliation concepts
+    that distract from reservation, counting, transfer, and expiry work.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  recommendation: Keep the control boundaries enforced internally, but make the main UI about warehouse work. Move
+    reconciliation/migration diagnostics into an exception or admin view unless action is required.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-024
+  module: Inventory
+  surface_id: SURF-293
+  route: /inventory/valuation/
+  page_title: ارزش میانگین موزون متحرک
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The inventory valuation workspace exposes internal data structures and identifiers directly in the operational
+    UI.
+  evidence:
+    source_paths:
+    - templates/inventory/valuation_workbench.html
+    observed_literals:
+    - استخر ارزش‌گذاری نهایی‌شده‌ای نیست.
+    - نتایج تطبیق ارزش‌گذاری
+    - منبع نسخه‌دار
+    - پیشنهادهای پایین‌دستی
+    - '{{ item.consumer }} — {{ item.valuation_event_id }}'
+  user_impact: Finance/inventory users must interpret internal event/source/consumer concepts and raw identifiers
+    rather than business references such as transaction, document, warehouse, project, amount, and valuation result.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  recommendation: Render business-identifying references and plain valuation concepts. Keep event IDs, version IDs,
+    and consumer codes in technical/audit detail only.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-025
+  module: Equipment
+  surface_id: SURF-309
+  route: /equipment/operations/
+  page_title: تجهیزات عملیاتی
+  roles: []
+  category: ACTION_HIERARCHY
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The Equipment Operations workspace exposes up to eight top-level actions with nearly identical visual
+    weight and no role/state-aware recommended action.
+  evidence:
+    source_paths:
+    - templates/equipment/operations_workbench.html
+    observed_actions:
+    - قرائت کنتور
+    - ثبت کارکرد
+    - ثبت سوخت
+    - ثبت صلاحیت اپراتور
+    - ثبت توقف تجهیز
+    - برنامه نگهداری
+    - دستورکار نگهداری
+    - هزینه پیشنهادی
+    observed_structure: All top-level actions are rendered as erp-btn--secondary in one flat flex group.
+  user_impact: Operators and maintenance users must scan a command palette rather than being shown the task appropriate
+    to current equipment state, responsibility, or urgency.
+  root_pattern_candidate:
+  - RP-C04-WEAK-ACTION-HIERARCHY
+  - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
+  recommendation: Organize actions by user intent and equipment state, surface alerts/overdue work, and make one
+    or a small number of context-relevant actions primary.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-026
+  module: Equipment
+  surface_id: SURF-309
+  route: /equipment/operations/
+  page_title: تجهیزات عملیاتی
+  roles: []
+  category: TERMINOLOGY
+  severity: MEDIUM
+  status: PILOT_CONFIRMED_STATIC
+  problem: Equipment Operations uses evidence/reference vocabulary in the main operational interface.
+  evidence:
+    source_paths:
+    - templates/equipment/operations_workbench.html
+    observed_literals:
+    - شواهد عملیاتی غیرمالی و پیوندهای مرجع انبار
+    - پیوندهای قطعات یدکی و شواهد دستورکار
+    - پیوند مرجع انبار
+    - افزودن شاهد
+    - پیوند قطعه
+  user_impact: Maintenance work is described through governance/data-link concepts instead of normal concepts such
+    as parts used, attachments, meter readings, maintenance plans, and work-order progress.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  recommendation: Use maintenance vocabulary in the primary interface and reserve evidence/reference terminology
+    for audit context or advanced details.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-027
+  module: Fixed Assets
+  surface_id: SURF-326
+  route: /fixed-assets/
+  page_title: دارایی‌های ثابت مالی
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The fixed-assets workbench is dominated by internal lifecycle/governance terms that are difficult to
+    map to normal fixed-asset operations.
+  evidence:
+    source_paths:
+    - apps/fixed_assets/templates/fixed_assets/workbench.html
+    observed_literals:
+    - نامزد دارایی
+    - رویداد دارایی
+    - پیشنهاد تحویل
+    - نهایی‌سازی مستقل
+    - برگشت صریح
+    - پیشنهاد و تطبیق مصرف‌کننده
+    - این موارد فقط پیشنهاد هستند و سند دفترکل یا هزینه واقعی پروژه ایجاد نمی‌کنند.
+  user_impact: A fixed-assets accountant must translate system-boundary language before understanding asset registration,
+    capitalization, depreciation, disposal/adjustment, and accounting handoff.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
+  recommendation: 'Reframe the workspace around the asset lifecycle: register, review source, capitalize, depreciate,
+    adjust/dispose, and hand off to accounting. Keep boundary guarantees in secondary help.'
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-028
+  module: Fixed Assets
+  surface_id: SURF-326
+  route: /fixed-assets/
+  page_title: دارایی‌های ثابت مالی
+  roles: []
+  category: ACTION_HIERARCHY
+  severity: HIGH
+  status: PILOT_CONFIRMED_STATIC
+  problem: The fixed-assets landing page presents many preparation, policy, depreciation, handoff, and audit commands
+    at the same top-level hierarchy.
+  evidence:
+    source_paths:
+    - apps/fixed_assets/templates/fixed_assets/workbench.html
+    observed_actions:
+    - طبقه دارایی
+    - سیاست کتاب
+    - نامزد دارایی
+    - رویداد دارایی
+    - پیش‌نمایش استهلاک
+    - پیشنهاد تحویل
+    - شواهد ممیزی
+    observed_structure: All top actions are rendered as erp-btn--secondary in a single group, while later sections
+      contain additional inline workflow actions.
+  user_impact: The workspace exposes system capabilities rather than prioritizing what the accountant should do
+    next for the current period or asset lifecycle.
+  root_pattern_candidate:
+  - RP-C04-WEAK-ACTION-HIERARCHY
+  - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
+  recommendation: Separate setup from daily operations, surface period/exception status, and promote context-relevant
+    actions instead of a flat command surface.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-029
+  module: Shared Localization
+  surface_id: SHARED-LOCALIZATION
+  route: GLOBAL_AUTHENTICATED_SHELL
+  page_title: Shared runtime localization
+  roles: []
+  category: LOCALIZATION
+  severity: MEDIUM
+  status: PILOT_CONFIRMED_STATIC
+  problem: The base template performs a client-side DOM text sweep to translate a limited set of exact English labels
+    after rendering.
+  evidence:
+    source_paths:
+    - templates/base.html
+    observed_structure:
+    - A JavaScript Map translates exact text nodes such as Draft, Active, Approved, Equipment, Material, Planning
+      and Posted.
+    - The script walks document.body text nodes after DOM load and replaces exact matches.
+  user_impact: User-facing language can depend on JavaScript execution and exact source text, increasing the chance
+    of mixed Persian/English terminology and inconsistent status wording across modules.
+  root_pattern_candidate:
+  - RP-C12-POST_RENDER_LOCALIZATION
+  recommendation: Make localized display labels authoritative at the server/domain presentation layer or shared
+    status component. Use client-side translation only for genuinely dynamic client-originated content.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-030
+  module: Accounting
+  surface_id: SURF-036
+  route: /accounting/journals/<uuid:journal_id>/
+  page_title: جزئیات سند حسابداری
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The journal detail mixes ordinary accounting review with low-level source lineage and implementation
+    identifiers in the primary record view.
+  evidence:
+    source_paths:
+    - apps/accounting/templates/accounting/journal_detail.html
+    observed_literals:
+    - کلید و نسخه منبع
+    - قاعده ثبت
+    - ابعاد / شناسه منبع
+    - '{{ journal.source_key }} · v{{ journal.source_version }}'
+    - '{{ journal.posting_rule_code }}'
+    - '{{ line.dimension_snapshot }} · {{ line.source_line_uuid }}'
+  user_impact: Accountants must read technical source keys, version numbers, rule codes and source UUIDs alongside
+    normal journal data, even when those values are only useful for audit or troubleshooting.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: Keep accounting number, period, date, preparer, lines, debit/credit and business source visible.
+    Move source keys, UUIDs, rule codes, snapshots and lineage to an expandable «ردیابی و ممیزی» section.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-030
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-029
+    scope_note: Bounded observed portions only; original static/history retained.
+- finding_id: UIUX-F-031
+  module: Treasury
+  surface_id: SURF-045
+  route: /treasury/
+  page_title: خزانه‌داری
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The Treasury landing page foregrounds evidence, retained reconciliation and independent-control terminology
+    instead of normal treasury tasks.
+  evidence:
+    source_paths:
+    - apps/treasury/templates/treasury/workbench.html
+    observed_literals:
+    - شواهد حساب، حرکت و تطبیق
+    - تطبیق‌های بانکی نگهداری‌شده
+    - بررسی مستقل تطبیق خزانه با دفترکل
+    - شواهد نگهداری‌شده را امضا می‌کند
+    - '{{ run.evidence_hash|slice:'':12'' }}…'
+    - اجرای خزانه به دفترکل وجود ندارد.
+  user_impact: Treasury users are presented with control-framework language and hashes before the everyday objectives
+    of cash account review, receipts/payments, bank statement matching and exception handling.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: Make cash position, receipts/payments, bank reconciliation and exceptions the primary vocabulary.
+    Keep independent-review evidence and hashes in an audit/control detail layer.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-032
+  module: Treasury
+  surface_id: SURF-050
+  route: /treasury/statements/
+  page_title: صورت‌حساب و مغایرت‌های بانکی
+  roles: []
+  category: HELP
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The bank-statement workspace explains idempotency/source immutability controls in the primary page introduction
+    instead of guiding the reconciliation task.
+  evidence:
+    source_paths:
+    - apps/treasury/templates/treasury/statement_workbench.html
+    observed_literals:
+    - فقط تطبیق دقیق پیشنهاد می‌شود؛ شواهد منبع و حرکت هرگز ویرایش نمی‌شوند.
+    - فایل، ردیف ارائه‌دهنده، شواهد دقیق ردیف و کلید تکرارپذیری در برابر ورود تکراری کنترل می‌شوند.
+    - پیشنهاد دقیق
+    - تأیید دقیق
+    - ردیف و حرکت با شواهد دقیق پیوند دارند.
+  user_impact: The user must interpret implementation/control guarantees before understanding which bank lines are
+    unmatched, what candidate movement was found, and what action is required.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: Lead with unmatched/matched bank items and the reconciliation decision. Move duplicate-import
+    and immutable-evidence guarantees to concise help/audit information.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-033
+  module: Reporting
+  surface_id: SURF-157
+  route: /reporting/
+  page_title: داشبورد شاخص‌های حاکم‌شده
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The management dashboard is framed as a governed read-model/evidence surface rather than an executive
+    decision dashboard.
+  evidence:
+    source_paths:
+    - templates/reporting/dashboard.html
+    observed_literals:
+    - داشبورد شاخص‌های حاکم‌شده
+    - نتایج مدیریتی از شواهد حاکم‌شده
+    - هر نتیجه با زمان مبنا و مسیر منبع
+    - انتخاب شواهد تا
+    - لایه‌های گزارش
+    - کاتالوگ شاخص‌های مصوب
+    - دامنه منبع
+    - مالک منبع
+    - خروجی کنترل‌شده CSV
+  user_impact: Executives and managers are asked to think in governance/read-model terms rather than quickly understanding
+    performance, exceptions, trend, freshness and where attention is required.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  recommendation: Keep metric governance and lineage accessible but subordinate. Make the dashboard lead with business
+    questions, exceptions, trend, freshness and drill-down.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-034
+  module: Reporting
+  surface_id: SURF-157
+  route: /reporting/
+  page_title: داشبورد شاخص‌های حاکم‌شده
+  roles: []
+  category: ACCESSIBILITY
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The reporting dashboard template declares its own `<main>` element even though it is rendered inside
+    the global `<main id="main-content">` provided by `base.html`.
+  evidence:
+    source_paths:
+    - templates/base.html
+    - templates/reporting/dashboard.html
+    observed_structure: 'Nested main landmark: base.html renders <main id="main-content"> and reporting/dashboard.html
+      begins with another <main>.'
+  user_impact: Nested main landmarks create invalid/ambiguous document semantics for assistive technologies and
+    can make landmark navigation unreliable.
+  root_pattern_candidate:
+  - RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
+  recommendation: Use a section/div inside the global main landmark. Reserve exactly one primary main landmark per
+    rendered document.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-035
+  module: Compliance
+  surface_id: SURF-351
+  route: /compliance/
+  page_title: کارگاه بازرسی، HSE، QA/QC و CAPA
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The Compliance operational page leaks roadmap/implementation identifiers and presents acronym-heavy governance
+    concepts as primary user language.
+  evidence:
+    source_paths:
+    - templates/compliance/workbench.html
+    observed_literals:
+    - P9-S06–S11
+    - کارگاه بازرسی، HSE، QA/QC و CAPA
+    - NCR رسمی
+    - CAPA
+    - خروجی کنترل‌شده
+    - ممیزی و تطبیق
+    - الگوهای نسخه‌دار
+  user_impact: Operational HSE/QA users see internal roadmap identifiers and several unexplained specialist acronyms/actions
+    before being guided to inspection, nonconformance, corrective action and closure tasks.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C04-WEAK-ACTION-HIERARCHY
+  recommendation: Remove roadmap identifiers from production UI, expand or contextualize specialist acronyms, and
+    organize actions by inspection/nonconformance/corrective-action tasks and current role.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-036
+  module: Knowledge
+  surface_id: SURF-366
+  route: /knowledge/
+  page_title: فهرست دانش منتشرشده
+  roles: []
+  category: LOCALIZATION
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The Knowledge catalogue displays platform/tenant scope and authority metadata in mixed technical language.
+  evidence:
+    source_paths:
+    - apps/knowledge/templates/knowledge/catalogue.html
+    observed_literals:
+    - Platform
+    - Tenant
+    - '{{ item.metadata.authority }}'
+    - کاندیدها و صف بررسی
+  user_impact: Knowledge users can see English infrastructure/tenancy concepts and raw authority metadata rather
+    than a natural Persian description of publication scope and ownership.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C12-POST_RENDER_LOCALIZATION
+  recommendation: Present scope and authority using canonical Persian product terms; keep raw metadata codes out
+    of the normal catalogue view.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-037
+  module: Support
+  surface_id: SURF-357
+  route: /support/
+  page_title: اعلان‌ها و پشتیبانی
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The Support workspace mixes end-user support, notifications and privileged access administration in one
+    generic surface, with raw statuses and technical access terms exposed directly.
+  evidence:
+    source_paths:
+    - apps/support/templates/support/workbench.html
+    observed_literals:
+    - '{{ item.status }}'
+    - مشاهده منبع
+    - دامنه
+    - تأیید Tenant
+    - تأیید پلتفرم
+    - تقویم / میزکار نظارتی
+    observed_structure:
+    - Support case creation uses bare inputs with placeholders «دسته» and «شرح» rather than the shared form field
+      pattern.
+    - Access request uses bare fields purpose/scope/expires_at in the same template family.
+  user_impact: Ordinary support tasks and highly privileged access-governance tasks share one mental model, while
+    raw statuses and technical tenant/platform vocabulary make the experience harder to understand and less consistent
+    with the rest of the product.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C11-INFORMATION-ARCHITECTURE-MISMATCH
+  - RP-C15-SHARED-FORM-PATTERN-BYPASS
+  recommendation: Separate employee support from privileged access administration, localize statuses/scope language,
+    and use the canonical labeled form components for all data entry.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-038
+  module: Contracts
+  surface_id: SURF-094
+  route: /contracts/<uuid:contract_id>/commercial-review/
+  page_title: خط زمانی و مقایسه تجاری قرارداد
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The contract commercial-review surface exposes delivery-stage and evidence-lineage vocabulary as primary
+    page language.
+  evidence:
+    source_paths:
+    - templates/contracts/commercial_review.html
+    observed_literals:
+    - مرور مشورتی P6
+    - فقط شواهد و نسخه‌های موجود؛ بدون اثر خودکار بر قرارداد، برنامه یا مالی
+    - تبار شواهد قراردادی
+    - '{{ item.source_type }} / {{ item.source_id }}'
+    - استثناهای مشورتی
+  user_impact: A contract/commercial user must interpret roadmap phase identifiers and evidence-lineage concepts
+    before understanding contractual events, approved impacts and unresolved exceptions.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  - RP-C16-DEVELOPMENT-ARTEFACT-LEAK
+  recommendation: Remove P6 and raw source identifiers from normal presentation. Lead with contract change/events,
+    commercial impact and exceptions; keep lineage in an expandable audit section.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-039
+  module: Billing
+  surface_id: SURF-125
+  route: /billing/claims/<uuid:claim_id>/
+  page_title: جزئیات صورت‌وضعیت
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The claim detail exposes calculation snapshot internals and raw Treasury Movement identifiers in the
+    normal operational view.
+  evidence:
+    source_paths:
+    - apps/billing/templates/billing/claim_detail.html
+    observed_literals:
+    - نسخه مبنا
+    - نسخه شرایط قرارداد
+    - نسخه مقررات
+    - دقت نهایی ارز
+    - حد برش اندازه‌گیری
+    - '{{ settlement.treasury_movement.id }}'
+    section_titles:
+    - مبنای محاسبه
+    - ردیابی تسویه‌ها
+  user_impact: Billing users must parse version-control and implementation lineage fields, while settlement history
+    identifies receipts using raw movement IDs rather than human-recognizable treasury references.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: Keep commercially meaningful calculation basis visible, but move rule/version lineage to audit
+    detail and identify settlements with date/reference/counterparty/amount instead of raw IDs.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-040
+  module: Timekeeping
+  surface_id: SURF-223
+  route: /timekeeping/
+  page_title: حضور، درخواست‌ها و کارکرد
+  roles: []
+  category: INFORMATION_ARCHITECTURE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The Timekeeping workbench combines system configuration, attendance capture/import, exception review,
+    corrections, leave/mission, overtime and timesheets in one page with a broad top-level command strip.
+  evidence:
+    source_paths:
+    - templates/timekeeping/workbench.html
+    top_actions:
+    - تقویم جدید
+    - تعطیلی / روز جایگزین
+    - شیفت جدید
+    - استراحت شیفت
+    - ثبت حضور
+    - درون‌ریزی
+    - مرخصی / مأموریت
+    - اضافه‌کاری
+    - کارکرد جدید
+    sections:
+    - تقویم و شیفت
+    - صف استثنا و حضور
+    - اصلاحات در انتظار بررسی مستقل
+    - مرخصی و مأموریت
+    - اضافه‌کاری
+    - کارکرد و توزیع زمان
+  user_impact: HR/timekeeping operators face multiple distinct jobs and control levels simultaneously, making it
+    difficult to identify the dominant task for their role and current workload.
+  root_pattern_candidate:
+  - RP-C04-WEAK-ACTION-HIERARCHY
+  - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
+  - RP-C11-INFORMATION-ARCHITECTURE-MISMATCH
+  recommendation: Separate setup/configuration from daily operations and approvals. Use task-oriented workspaces
+    or tabs with counts, exceptions and a small number of role-relevant primary actions.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-041
+  module: Timekeeping
+  surface_id: SURF-223
+  route: /timekeeping/
+  page_title: حضور، درخواست‌ها و کارکرد
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The Timekeeping workbench exposes authorization, exception and subsystem-boundary language together with
+    raw exception codes.
+  evidence:
+    source_paths:
+    - templates/timekeeping/workbench.html
+    observed_literals:
+    - حضور واقعیت حضور است؛ کارکرد تخصیص مصوب زمان. تاریخچه قطعی فقط با اصلاح مستدل حفظ می‌شود.
+    - صف استثنا و حضور
+    - دامنه
+    - '{{ item.exception_code }}'
+    - رکوردی در دامنه دسترسی نیست.
+    - پیش‌نمایش فقط دقیقه‌ها را نگهداری می‌کند؛ نرخ، حقوق، هزینه پروژه، تعهد یا سند مالی ایجاد نمی‌شود.
+  user_impact: The user encounters architecture/control explanations and machine exception codes where plain attendance
+    reason/status and next actions would be more useful.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  recommendation: Translate exception codes to business explanations, hide raw codes behind details, and move cross-module
+    boundary statements to contextual help.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-042
+  module: Payroll / ESS
+  surface_id: SURF-241
+  route: /payroll/ess/
+  page_title: سوابق حقوق من
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The employee payroll-history page exposes source-system semantics and a raw payroll status code, and
+    its empty-state text uses «مجازی» rather than a natural business phrase.
+  evidence:
+    source_paths:
+    - templates/payroll/ess_history.html
+    observed_literals:
+    - فقط فیش‌های قطعی مجاز منبع حقوق نمایش داده می‌شوند.
+    - 'وضعیت منبع:'
+    - '{{ slip.run.status }}'
+    - فیش قطعی مجازی برای نمایش موجود نیست.
+  user_impact: An employee checking payslips is forced to see payroll engine/source terminology and an internal
+    status code rather than a simple period/status/payment document experience.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C08-WEAK-EMPTY-STATE
+  recommendation: Show period, payslip status and availability in plain Persian. Remove raw run status and source-system
+    language from ESS; use a clear empty state such as «فیش حقوقی قطعی برای نمایش وجود ندارد».
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-043
+  module: Reporting
+  surface_id: SURF-159
+  route: /reporting/reconciliations/
+  page_title: کارگاه تطبیق و مغایرت‌ها
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The reconciliation workbench exposes roadmap-stage metadata and governance model terms as core UI concepts.
+  evidence:
+    source_paths:
+    - templates/reporting/reconciliation_workbench.html
+    observed_literals:
+    - P10 — شاهد کنترلی بدون اثر عملیاتی یا مالی
+    - ۱۳ جفت حاکم‌شده
+    - سمت چپ
+    - سمت راست
+    - '{{ pair.left_authority }}'
+    - '{{ pair.right_authority }}'
+    - '{{ pair.code }}'
+    - جزئیات و شجره منبع
+  user_impact: 'Finance/control users must reason about governed pair definitions and source authorities rather
+    than the practical question: what two business totals/processes are being reconciled and which differences need
+    action?'
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  - RP-C16-DEVELOPMENT-ARTEFACT-LEAK
+  recommendation: Remove P10 and raw pair/authority codes from the primary view. Present reconciliation purpose,
+    business sources, cutoff, mismatch count and next action; keep pair version/source lineage in details.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: NOT_EVALUATED
+    evidence_ids: []
+    scope_note: Reporting/Closeout target blocked; no runtime conclusion changes static evidence.
+- finding_id: UIUX-F-044
+  module: Reporting
+  surface_id: SURF-159
+  route: /reporting/reconciliations/
+  page_title: کارگاه تطبیق و مغایرت‌ها
+  roles: []
+  category: ACCESSIBILITY
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The reconciliation workbench creates a second `<main>` landmark inside the global main landmark from
+    the base template.
+  evidence:
+    source_paths:
+    - templates/base.html
+    - templates/reporting/reconciliation_workbench.html
+    observed_structure: The page begins with <main ...> while base.html already wraps page content in <main id="main-content">.
+  user_impact: Assistive-technology landmark navigation can become ambiguous because the rendered document has nested
+    main landmarks.
+  root_pattern_candidate:
+  - RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
+  recommendation: Use section/div for the page wrapper and retain the global base-template main as the single document
+    main.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: NOT_EVALUATED
+    evidence_ids: []
+    scope_note: Reporting/Closeout target blocked; no runtime conclusion changes static evidence.
+- finding_id: UIUX-F-045
+  module: Reporting
+  surface_id: SURF-163
+  route: /reporting/project-closeout/<uuid:case_id>/
+  page_title: پرونده اختتام پروژه
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The project-closeout detail behaves like a control/evidence console, exposing hashes, source-domain codes,
+    revision internals and raw workflow transitions in the primary UI.
+  evidence:
+    source_paths:
+    - templates/reporting/project_closeout_detail.html
+    observed_literals:
+    - شاهد کنترل مشتق — بدون اثر پایین‌دستی
+    - نسخه وضعیت
+    - ارزیابی همگام ۹ خانواده منبع
+    - هش منبع
+    - '{{ item.family_code }}'
+    - '{{ item.authority_domain }}'
+    - '{{ item.source_hash }}'
+    - تاریخچه تغییرناپذیر
+    - '{{ event.action }}'
+    - '{{ event.previous_state }} → {{ event.new_state }}'
+  user_impact: A project closeout reviewer sees the implementation/control model instead of a clear readiness checklist
+    explaining which closeout conditions are satisfied, blocked or require action.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: Present closeout as a business readiness checklist with owner, status, blocker and evidence link.
+    Move hashes, internal family codes, raw states and event codes to technical/audit detail.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: NOT_EVALUATED
+    evidence_ids: []
+    scope_note: Reporting/Closeout target blocked; no runtime conclusion changes static evidence.
+- finding_id: UIUX-F-046
+  module: Reporting
+  surface_id: SURF-163
+  route: /reporting/project-closeout/<uuid:case_id>/
+  page_title: پرونده اختتام پروژه
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The closeout evidence form requires the user to type a raw DMS document-version identifier and an evidence-role
+    code.
+  evidence:
+    source_paths:
+    - templates/reporting/project_closeout_detail.html
+    observed_literals:
+    - پین نسخه دقیق سند DMS
+    - شناسه نسخه سند
+    - نقش شاهد
+    - closeout_support
+    - ثبت پین؛ بایت در DMS می‌ماند
+  user_impact: Business reviewers must know internal DMS version IDs and evidence-role codes to attach closeout
+    evidence, making an ordinary evidence-linking task technical and error-prone.
+  root_pattern_candidate:
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  recommendation: Provide an authorized document/version picker and business-labeled evidence-purpose choices. Submit
+    the canonical IDs/codes internally.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: NOT_EVALUATED
+    evidence_ids: []
+    scope_note: Reporting/Closeout target blocked; no runtime conclusion changes static evidence.
+- finding_id: UIUX-F-047
+  module: Reporting
+  surface_id: SURF-163
+  route: /reporting/project-closeout/<uuid:case_id>/
+  page_title: پرونده اختتام پروژه
+  roles: []
+  category: ACCESSIBILITY
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The project-closeout detail creates a nested `<main>` landmark inside the global base-template main.
+  evidence:
+    source_paths:
+    - templates/base.html
+    - templates/reporting/project_closeout_detail.html
+    observed_structure: The page begins with <main ...> inside base.html's existing main-content landmark.
+  user_impact: Landmark semantics are inconsistent for keyboard and assistive-technology users.
+  root_pattern_candidate:
+  - RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
+  recommendation: Retain one main landmark per document and use a section/div wrapper for this page.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: NOT_EVALUATED
+    evidence_ids: []
+    scope_note: Reporting/Closeout target blocked; no runtime conclusion changes static evidence.
+- finding_id: UIUX-F-048
+  module: Workflow Administration
+  surface_id: SURF-379
+  route: /workflows/administration/versions/<uuid:version_id>/
+  page_title: جزئیات نسخه گردش‌کار
+  roles: []
+  category: FORM
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: Workflow administration is strongly configuration/model-oriented and exposes step keys/types, raw transition
+    source/target/outcome values and complete configuration text instead of a visual process model.
+  evidence:
+    source_paths:
+    - templates/workflows/administration/detail.html
+    - templates/workflows/administration/form.html
+    observed_literals:
+    - گام‌ها و انتقال‌های ثبت‌شده
+    - '{{ step.key }} · {{ step.step_type }}'
+    - '{{ item.source }} → {{ item.target }} · {{ item.outcome }}'
+    - پیکربندی کامل ثبت‌شدهٔ این نسخه
+    - گام‌ها (steps) و انتقال‌ها (transitions)
+    - مسیریاب‌های ثبت‌شده
+  user_impact: A workflow administrator must mentally reconstruct a business process from configuration primitives
+    and codes, increasing setup difficulty and making review of process logic unnecessarily technical.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C17-CONFIGURATION-NOT-VISUALIZED
+  recommendation: Preserve the canonical configuration model, but add a visual step/transition representation and
+    business labels. Keep raw keys/resolvers/config text in an advanced technical view.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-049
+  module: Workforce
+  surface_id: SURF-207
+  route: /workforce/employees/<uuid:employee_id>/
+  page_title: پرونده پرسنلی
+  roles: []
+  category: ACCESSIBILITY
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The employee-detail page introduces a nested `<main>` landmark inside the global application main landmark.
+  evidence:
+    source_paths:
+    - templates/base.html
+    - templates/workforce/employee_detail.html
+    observed_structure: employee_detail.html contains <main class="min-w-0 space-y-5"> within base.html's <main
+      id="main-content">.
+  user_impact: Screen-reader landmark navigation sees inconsistent document structure on a major HR page.
+  root_pattern_candidate:
+  - RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
+  recommendation: Replace the inner main with section/div and preserve the single global main landmark.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-010
+    scope_note: Two nested main landmarks.
+- finding_id: UIUX-F-050
+  module: Daily Reports
+  surface_id: SURF-172
+  route: /daily-reports/<uuid:report_id>/
+  page_title: گزارش روزانه
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The daily-report detail prominently exposes the report's raw UUID as a business summary metric.
+  evidence:
+    source_paths:
+    - templates/daily_reports/detail.html
+    observed_literals:
+    - شناسه گزارش
+    - '{{ report.id }}'
+    observed_structure: The raw identifier is one of three top summary cards beside reporting date and labor count.
+  user_impact: A technical database identifier receives the same visual emphasis as meaningful site-report information,
+    while offering little value to normal site users.
+  root_pattern_candidate:
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  recommendation: Use a human-readable report number/reference if available; otherwise move the UUID to a secondary
+    technical/audit area.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-051
+  module: Materials
+  surface_id: SURF-065
+  route: /materials/governance/
+  page_title: حاکمیت مصالح و واحدهای اندازه‌گیری
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The material master-data governance surface is written primarily in versioning, segregation-of-duties
+    and immutable-source language rather than material-master tasks.
+  evidence:
+    source_paths:
+    - templates/materials/governance.html
+    observed_literals:
+    - مصالح و انبار / سطح ثانویه حاکمیت
+    - همه اقدامات از سرویس‌های منبع نسخه‌دار و ممیزی‌شده استفاده می‌کنند.
+    - نسخه‌های بررسی فنی و جداسازی وظایف
+    - ویژگی‌های نسخه‌دار و مقادیر ثبت‌شده
+    - ثبت مقدار غیرقابل‌ویرایش
+    - مدیریت خانواده و نسخه تبدیل
+  user_impact: Material-data stewards must understand governance implementation concepts before performing routine
+    tasks such as aliases, equivalents, technical approval, attributes and unit conversion.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: Organize the page around master-data tasks and approval state. Keep versioning, immutability and
+    segregation-of-duties guarantees as supporting details rather than the primary language.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-052
+  module: Accounting
+  surface_id: SURF-041
+  route: /accounting/reconciliations/<uuid:run_id>/
+  page_title: شواهد تطبیق نگهداری‌شده
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The accounting reconciliation detail is presented primarily as an immutable evidence/audit console and
+    exposes hashes, raw source UUIDs and internal exception codes.
+  evidence:
+    source_paths:
+    - apps/accounting/templates/accounting/reconciliation_detail.html
+    observed_literals:
+    - شواهد تطبیق نگهداری‌شده
+    - نتیجه و تصاویر منبع قابل تغییر نیستند.
+    - هش‌های شواهد
+    - '{{ run.result_hash }}'
+    - '{{ exception.code }}'
+    - '{{ exception.source_uuid }} / {{ exception.journal_uuid }}'
+    - ثبت تأیید محافظت‌شده
+  user_impact: Accounting reviewers must parse evidence hashes and source identifiers before understanding the practical
+    reconciliation result, unresolved differences and required disposition.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: Lead with reconciliation outcome, mismatches and disposition status. Move hashes, raw UUIDs and
+    audit lineage into an expandable traceability section.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-053
+  module: Treasury
+  surface_id: SURF-049
+  route: /treasury/movements/<uuid:movement_id>/
+  page_title: حرکت خزانه‌داری
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: Treasury movement detail presents raw movement and journal identifiers as normal business fields.
+  evidence:
+    source_paths:
+    - apps/treasury/templates/treasury/movement_detail.html
+    observed_literals:
+    - شناسه
+    - '{{ movement.pk }}'
+    - سند حسابداری
+    - '{{ movement.journal_id }}'
+  user_impact: Users see database-oriented identifiers instead of a human transaction/reference number or a direct
+    link to the related accounting document.
+  root_pattern_candidate:
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  recommendation: Show a human-readable movement reference and linked journal number. Keep raw IDs available only
+    in technical/audit details.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-054
+  module: Procurement
+  surface_id: SURF-282
+  route: /procurement/orders/create/
+  page_title: ایجاد سفارش خرید
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Project and approved Purchase Request are independent full-organization choices; the request list is
+    not filtered by the selected project and incompatibility is detected only during server validation.
+  evidence:
+    source_paths:
+    - apps/procurement/forms.py
+    - templates/procurement/form.html
+    implementation_observation:
+    - PurchaseOrderForm loads all active projects for the organization.
+    - PurchaseOrderForm loads all approved purchase requests for the organization.
+    - clean() rejects a request whose project differs from the selected project.
+    - The generic procurement form renders every field directly.
+  user_impact: Users can select combinations that the system already knows are invalid and only learn after submission,
+    creating unnecessary search effort and validation churn.
+  root_pattern_candidate:
+  - RP-C18-CASCADE-FILTERING-INCONSISTENT
+  - RP-C19-DERIVABLE-DATA-REENTRY
+  recommendation: After Project selection, restrict Purchase Request choices to that project. If the form is launched
+    from an approved request, derive/default the project and request rather than asking for both again.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-054
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: PARTIALLY_CONFIRMED
+    evidence_ids:
+    - RV-EV-028
+    scope_note: Initial independent organization-wide choices observed; security stop before cascade/submission
+      or maintenance follow-on.
+- finding_id: UIUX-F-055
+  module: Daily Reports
+  surface_id: SURF-171
+  route: /daily-reports/create/
+  page_title: ایجاد گزارش روزانه
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Project, Site and Phase are all populated with organization-wide choices rather than cascading Project
+    → Site → Phase; invalid combinations are rejected only in clean().
+  evidence:
+    source_paths:
+    - apps/daily_reports/forms.py
+    - templates/daily_reports/create.html
+    implementation_observation:
+    - Project queryset contains all organization projects.
+    - Site queryset contains all active organization sites across projects.
+    - Phase queryset contains all active organization phases across sites.
+    - clean() checks site.project and phase.site only after submission.
+  user_impact: Users must search long lists and can select impossible combinations that the system could prevent
+    immediately.
+  root_pattern_candidate:
+  - RP-C18-CASCADE-FILTERING-INCONSISTENT
+  recommendation: Implement live cascade filtering Project → Site → Phase using the same secure pattern already
+    used by Expense forms; preserve server-side relationship validation.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-055
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: PARTIALLY_CONFIRMED
+    evidence_ids:
+    - RV-EV-026
+    scope_note: Initial independent organization-wide choices observed; security stop before cascade/submission
+      or maintenance follow-on.
+- finding_id: UIUX-F-056
+  module: Daily Reports
+  surface_id: SURF-172
+  route: /daily-reports/<uuid:report_id>/
+  page_title: گزارش روزانه
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Material entry asks for both an existing Material and manually editable material name, unit of measure
+    and unit text even though selecting Material already determines those values.
+  evidence:
+    source_paths:
+    - apps/daily_reports/forms.py
+    - templates/daily_reports/detail.html
+    implementation_observation:
+    - DailyReportMaterialEntryForm includes material, material_name, quantity, unit_of_measure, unit and notes.
+    - clean() overwrites material_name, unit_of_measure and unit when material is selected.
+    - Those redundant fields remain part of the visible form.
+  user_impact: Users are asked to re-enter or review values the selected material already provides, increasing cognitive
+    load and creating misleading input fields whose submitted values may be overwritten.
+  root_pattern_candidate:
+  - RP-C19-DERIVABLE-DATA-REENTRY
+  - RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  recommendation: When an existing material is selected, derive name and unit automatically and hide/lock them.
+    Offer a separate explicit «مصالح خارج از فهرست» path only if the business genuinely requires free-text material.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-057
+  module: Equipment
+  surface_id: SURF-306
+  route: /equipment/assignments/create/
+  page_title: ایجاد تخصیص تجهیز
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Equipment assignment and maintenance forms load all organization sites independently of Project selection
+    and rely on post-submit validation for Project/Site consistency.
+  evidence:
+    source_paths:
+    - apps/equipment/forms.py
+    implementation_observation:
+    - EquipmentAssignmentForm loads all organization projects and all active sites.
+    - MaintenanceRecordForm does the same.
+    - clean() rejects a site not belonging to the selected project.
+  user_impact: For organizations with many projects/sites, users search irrelevant sites and can choose combinations
+    the system can already rule out.
+  root_pattern_candidate:
+  - RP-C18-CASCADE-FILTERING-INCONSISTENT
+  recommendation: Cascade Site by selected Project, preselect the active project where context is known, and retain
+    server-side validation as the authority.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-057
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: PARTIALLY_CONFIRMED
+    evidence_ids:
+    - RV-EV-027
+    scope_note: Initial independent organization-wide choices observed; security stop before cascade/submission
+      or maintenance follow-on.
+- finding_id: UIUX-F-058
+  module: Payroll
+  surface_id: SURF-247
+  route: /payroll/configuration/employment/new/
+  page_title: پیکربندی پرداخت
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Payroll configuration and rule forms expose Project and Site as independent organization-wide selections
+    rather than dependent choices.
+  evidence:
+    source_paths:
+    - apps/payroll/forms.py
+    - templates/payroll/form.html
+    implementation_observation:
+    - EmploymentConfigurationForm loads all organization Projects and Sites.
+    - RuleForm also loads all organization Projects and Sites.
+    - The generic payroll form renders every field directly.
+  user_impact: Payroll administrators can see irrelevant sites and are not protected from selecting a site unrelated
+    to the intended project at the point of interaction.
+  root_pattern_candidate:
+  - RP-C18-CASCADE-FILTERING-INCONSISTENT
+  recommendation: Apply Project → Site cascade filtering and context defaults. Validate the relationship server-side
+    even after the UI is narrowed.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-059
+  module: Payroll
+  surface_id: SHARED-PAYROLL-FORMS
+  route: MULTI_PAYROLL_FORMS
+  page_title: فرم‌های پیکربندی و اجرای حقوق
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Several normal payroll forms require operators to enter implementation/control metadata such as raw JSON
+    snapshots, source versions/statuses and idempotency keys.
+  evidence:
+    source_paths:
+    - apps/payroll/forms.py
+    - templates/payroll/form.html
+    observed_fields:
+    - evidence_json — «شواهد JSON»
+    - idempotency_key — «کلید تکرارناپذیری»
+    - source_version — «نسخه منبع»
+    - source_status — «وضعیت منبع»
+    - source_payload_json — «snapshot منبع JSON»
+    - mapping_reference — «مرجع نگاشت صریح»
+    template_observation: templates/payroll/form.html renders every form field with no progressive-disclosure layer.
+  user_impact: Payroll staff are required to behave like integration/debug operators and manually provide metadata
+    that should normally be derived from selected source records or generated by the system.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  - RP-C19-DERIVABLE-DATA-REENTRY
+  recommendation: Generate idempotency keys internally, derive source metadata from selected approved source records,
+    replace JSON entry with structured business controls, and place truly technical overrides behind an explicitly
+    privileged advanced path.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-060
+  module: Procurement Supplier Portal
+  surface_id: SURF-273
+  route: /procurement/portal/grants/<uuid:grant_id>/
+  page_title: استعلام دعوت‌شده
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Supplier-facing submission requires the user to provide a SHA-256 integrity fingerprint, and related
+    sealed-evidence forms define additional technical storage/integrity inputs.
+  evidence:
+    source_paths:
+    - apps/procurement/forms.py
+    - templates/procurement/portal_context.html
+    observed_fields:
+    - integrity_fingerprint — «هش یکپارچگی SHA-256»
+    - evidence_slot — «شناسه فنی پیوست»
+    - idempotency_key — «کلید یکتای نگهداری»
+    - expected_sha256 — «هش مورد انتظار SHA-256»
+    template_observation: The supplier portal renders submission_form.visible_fields directly.
+  user_impact: External suppliers are exposed to file-integrity/storage mechanics that should normally be computed
+    by the platform, making proposal submission unnecessarily technical and error-prone.
+  root_pattern_candidate:
+  - RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  - RP-C19-DERIVABLE-DATA-REENTRY
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  recommendation: Compute hashes and idempotency/integrity metadata server-side from the uploaded/submitted payload.
+    Keep technical verification results visible only as confirmation/audit information.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-061
+  module: Equipment
+  surface_id: SHARED-EQUIPMENT-OPERATION-FORMS
+  route: MULTI_EQUIPMENT_OPERATION_FORMS
+  page_title: فرم‌های عملیات تجهیزات
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Equipment operational forms require users to type source keys and other provenance references that the
+    system could generate or derive.
+  evidence:
+    source_paths:
+    - apps/equipment/forms.py
+    observed_fields:
+    - MeterReadingForm.source_key — «کلید منبع»
+    - UsageForm.source_key — «کلید منبع»
+    - FuelForm.source_key — «کلید منبع»
+    - evidence_reference — «مرجع مدرک»
+  user_impact: Operators recording meter readings, usage or fuel are burdened with provenance mechanics unrelated
+    to the physical operation they are recording.
+  root_pattern_candidate:
+  - RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  - RP-C19-DERIVABLE-DATA-REENTRY
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  recommendation: Generate canonical source keys from record identity/time/source context. Let users attach/select
+    evidence in business terms rather than manually creating provenance keys.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-062
+  module: Compliance
+  surface_id: SURF-354
+  route: /compliance/<str:kind>/<uuid:record_id>/
+  page_title: جزئیات رکورد انطباق
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Compliance detail exposes raw lifecycle states and immutable-control framing in the main user experience.
+  evidence:
+    source_paths:
+    - templates/compliance/detail.html
+    observed_literals:
+    - کنترل تغییرناپذیر
+    - اقدامات مجاز چرخه عمر
+    - ثبت گذار به {{ status }}
+    - تاریخچه تغییرناپذیر
+    - '{{ event.from_status }}'
+    - '{{ event.to_status }}'
+  user_impact: HSE/QA/compliance users see state-machine terminology and raw status values instead of a task-focused
+    case history and next action.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: Use business action labels and localized lifecycle history; retain immutable event/state details
+    in an audit view.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-063
+  module: Knowledge
+  surface_id: SURF-369
+  route: /knowledge/candidates/<uuid:candidate_id>/
+  page_title: کاندید دانش
+  roles: []
+  category: CONSISTENCY
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: Knowledge candidate forms bypass the shared ERP form components and use Django `form.as_p` plus generic
+    `btn` classes.
+  evidence:
+    source_paths:
+    - apps/knowledge/templates/knowledge/candidate_detail.html
+    observed_structure:
+    - '{{ source_form.as_p }}'
+    - '{{ review_form.as_p }}'
+    - class="btn btn-primary"
+    - class="btn btn-secondary"
+  user_impact: Validation, labels, spacing and button behavior can differ from the rest of BONIRA, reinforcing the
+    cross-module inconsistency already observed elsewhere.
+  root_pattern_candidate:
+  - RP-C15-SHARED-FORM-PATTERN-BYPASS
+  recommendation: Render Knowledge forms through the canonical form-field/error/button components while preserving
+    the existing workflow semantics.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-064
+  module: Support
+  surface_id: SURF-362
+  route: /support/cases/<uuid:case_id>/
+  page_title: درخواست پشتیبانی
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: Support case detail places DMS SHA-256 hashes in the ordinary case evidence list.
+  evidence:
+    source_paths:
+    - apps/support/templates/support/case_detail.html
+    observed_literals:
+    - شواهد DMS
+    - '{{ item.document.title }} — نسخه {{ item.document_version.version_number }} — {{ item.sha256 }}'
+  user_impact: Support users see cryptographic integrity metadata with the same prominence as document title/version,
+    although the hash is primarily an audit/troubleshooting detail.
+  root_pattern_candidate:
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  recommendation: Show document title/version and a simple integrity state in the normal view; place the full hash
+    in an audit/technical details disclosure.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-065
+  module: Core / Home
+  surface_id: SURF-001
+  route: /
+  page_title: خانه
+  roles: []
+  category: INFORMATION_ARCHITECTURE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The canonical Home is intentionally implemented as a permission-aware directory of destinations rather
+    than a role-aware operational dashboard.
+  evidence:
+    source_paths:
+    - templates/home.html
+    - core/views.py
+    - core/home.py
+    observed_structure:
+    - Home renders organization context plus a grid of authorized workspace links.
+    - Assigned work and alerts are represented as destination links, not workload/status summaries.
+    - 'core.views.home explicitly states: «Present authorized destinations without querying domain business facts.»'
+    - core.home defines a fixed WORKSPACE_LINKS catalogue plus single ASSIGNED_WORK and ALERTS links.
+  user_impact: After login, users are told where they may go but not what needs attention, what changed, which tasks
+    are due, or which project/process deserves priority. The page therefore behaves like a launch menu rather than
+    an ERP home workspace.
+  root_pattern_candidate:
+  - RP-C20-HOME-LINK-DIRECTORY
+  recommendation: 'Retain permission-safe destination logic, but redesign Home as a role-aware task dashboard: current
+    context, assigned work summary, alerts/exceptions, recent/relevant records, frequent actions and role-specific
+    business signals. Any new domain summaries require an explicit Product Decision and governed read-model contract.'
+  business_logic_impact: PRODUCT_DECISION_REQUIRED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: PARTIALLY_CONFIRMED
+    evidence_ids:
+    - RV-EV-002
+    scope_note: Ordinary Home confirmed; designated Owner/Project Manager comparison not evaluated.
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-065
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-015
+    - RV-EV-022
+    scope_note: Bounded observed portions only; original static/history retained.
+- finding_id: UIUX-F-066
+  module: Core / Home
+  surface_id: SURF-001
+  route: /
+  page_title: خانه
+  roles: []
+  category: VISUAL_HIERARCHY
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: 'The Home composition is visually flat: organization context, workspace destinations, assigned work and
+    alerts are mostly plain bordered cards/links with little differentiation by urgency, frequency or business importance.'
+  evidence:
+    source_paths:
+    - templates/home.html
+    observed_structure:
+    - Uniform rounded-xl bordered white blocks dominate the page.
+    - Workspace destinations are a simple 2/3-column grid of text links.
+    - Assigned work and alerts use nearly the same card treatment as ordinary navigation.
+    - No visual hierarchy exists for urgent work, KPIs, exceptions, recent activity or role-specific priority.
+  user_impact: The landing experience feels generic and administrative rather than like a professional ERP command
+    center, and important work is not visually distinguishable from ordinary navigation.
+  root_pattern_candidate:
+  - RP-C20-HOME-LINK-DIRECTORY
+  recommendation: Define a dedicated Home/Dashboard composition with stronger hierarchy, task/status cards, role-aware
+    priority, restrained KPIs, recent work and consistent enterprise visual rhythm. Treat the Product Owner's draft
+    as a reference design, not a mandatory pixel specification.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: PARTIALLY_CONFIRMED
+    evidence_ids:
+    - RV-EV-002
+    scope_note: Ordinary Home visual hierarchy confirmed; broader persona comparison missing.
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-066
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-015
+    - RV-EV-022
+    scope_note: Bounded observed portions only; original static/history retained.
+- finding_id: UIUX-F-067
+  module: Payroll
+  surface_id: SURF-252
+  route: /payroll/runs/<uuid:run_id>/
+  page_title: جزئیات اجرای حقوق
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Payroll run detail mixes normal payroll review with calculation lineage, hashes and implementation-oriented
+    terminology.
+  evidence:
+    source_paths:
+    - templates/payroll/run_detail.html
+    observed_literals:
+    - ورودی، نسخه قاعده، مبنا، مقدار، نرخ، نتیجه و lineage برای بازتولید نگهداری می‌شوند.
+    - هش محاسبه
+    - '{{ run.calculation_digest }}'
+    - محاسبه Decimal
+    - نسخه قاعده
+  user_impact: Payroll reviewers see reproducibility/audit mechanics with the same prominence as employee pay results
+    and workflow actions, increasing cognitive load during an already sensitive task.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: Keep payroll period, status, employee results, exceptions and next valid action primary. Move
+    digest, lineage and reproducibility metadata to an expandable audit/calculation-details view.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-068
+  module: Payroll
+  surface_id: SURF-257
+  route: /payroll/statutory/
+  page_title: کارگاه مقرراتی مالیات و بیمه کارکنان
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The statutory payroll workspace is dominated by implementation/integration language rather than statutory
+    payroll operations.
+  evidence:
+    source_paths:
+    - templates/payroll/statutory_workbench.html
+    observed_literals:
+    - correction lineage
+    - شواهد export
+    - provider-neutral
+    - credential، اتصال، زمان‌بند، filing خودکار، AP
+    - lineage
+    - حل انسانی
+  user_impact: Payroll/legal users must decode architecture and integration boundaries before understanding tax/insurance
+    calculation, review, output preparation and exception handling.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: 'Present the statutory journey in business terms: calculate, review, prepare official output,
+    record submission status, resolve exceptions and reconcile. Keep integration/provider limitations in secondary
+    technical help.'
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-069
+  module: Payroll
+  surface_id: SURF-262
+  route: /payroll/financial-handoffs/
+  page_title: تحویل مالی حقوق
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The payroll financial-handoff workspace exposes immutable-proposal, lineage and downstream-boundary concepts
+    as the primary operating model.
+  evidence:
+    source_paths:
+    - templates/payroll/financial_handoff_workbench.html
+    observed_literals:
+    - پیشنهادهای تغییرناپذیر
+    - بدون شناسایی بدهی، سند حسابداری، پرداخت یا هزینه واقعی پروژه
+    - lineage
+    - '{{ item.predecessor_id }}'
+  user_impact: Payroll/finance users must interpret technical handoff semantics rather than seeing a clear business
+    view of what payroll result is ready to send to liabilities, accounting, payment or project cost, and whether
+    it has been accepted.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: 'Organize by destination and business status: ready to hand off, reviewed, accepted/rejected,
+    exceptions and reconciliation. Keep immutable lineage/predecessor identifiers in traceability details.'
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-070
+  module: Billing / Statutory
+  surface_id: SHARED-BILLING-STATUTORY-FORMS
+  route: MULTI_BILLING_STATUTORY_FORMS
+  page_title: فرم‌های ارسال قانونی
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Statutory submission asks users to manually supply idempotency and correlation identifiers that should
+    normally be generated and managed by the platform.
+  evidence:
+    source_paths:
+    - apps/billing/forms.py
+    observed_fields:
+    - idempotency_key — «کلید تکرارناپذیری»
+    - correlation_id — «شناسه همبستگی»
+    - provider_reference — «مرجع provider»
+  user_impact: Business users are made responsible for integration-control identifiers, creating avoidable error
+    risk and exposing infrastructure concerns.
+  root_pattern_candidate:
+  - RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  - RP-C19-DERIVABLE-DATA-REENTRY
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  recommendation: Generate idempotency/correlation identifiers internally and show them only in technical traceability.
+    Ask users only for business submission decisions and any genuinely external provider reference when necessary.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-071
+  module: Workforce
+  surface_id: SURF-203
+  route: /workforce/foundation/performance/create/
+  page_title: ثبت ارزیابی عملکرد
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Performance evaluation requires the HR user to enter a non-empty JSON object as «شواهد معیارها».
+  evidence:
+    source_paths:
+    - apps/workforce/forms.py
+    observed_field: criteria_snapshot = JSONField(label='شواهد معیارها', help_text='یک شیء JSON غیرخالی وارد کنید.')
+  user_impact: A business HR process is exposed as raw structured-data entry, making evaluation setup error-prone
+    and inaccessible to normal HR users.
+  root_pattern_candidate:
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  - RP-C17-CONFIGURATION-NOT-VISUALIZED
+  recommendation: Represent criteria as structured business controls (criterion, rating/weight/comment/evidence)
+    and serialize the canonical snapshot internally. Keep raw JSON only in an advanced technical/audit view if still
+    required.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-072
+  module: Billing
+  surface_id: SURF-109
+  route: /billing/commercial-controls/
+  page_title: ضمانت، انطباق و مواجهه
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The commercial-control dashboard renders exposure grouping values directly (`exposure_side / guarantee_type`)
+    instead of consistently using localized display labels.
+  evidence:
+    source_paths:
+    - apps/billing/templates/billing/commercial_control_dashboard.html
+    observed_expression: '{{ row.exposure_side }} / {{ row.guarantee_type }}'
+    contrast: Guarantee list rows below use get_guarantee_type_display and get_exposure_side_display.
+  user_impact: The summary layer can expose machine-facing enum values while the detailed list uses human labels,
+    creating inconsistent terminology within the same page.
+  root_pattern_candidate:
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C12-POST_RENDER_LOCALIZATION
+  recommendation: Use the same canonical localized display labels in summary groups as in detailed guarantee rows.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-073
+  module: Shared Forms
+  surface_id: SHARED-FORM-FIELD-COMPONENT
+  route: GLOBAL_FORM_COMPONENT
+  page_title: Shared form field rendering
+  roles: []
+  category: CONSISTENCY
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The shared form-field component overrides domain-specific labels based only on generic field names, which
+    can silently replace more precise labels defined by the form.
+  evidence:
+    source_paths:
+    - templates/components/form_field.html
+    - apps/accounting/forms.py
+    observed_examples:
+    - field.name == description is rendered as «توضیحات» even when JournalForm defines label «شرح سند».
+    - field.name == code is rendered as generic «کد» even when the form defines «کد حساب», «کد سال مالی» or another
+      domain-specific code label.
+    - The component contains a long hard-coded if/elif dictionary instead of treating field.label as authoritative.
+  user_impact: Users can receive less precise or inconsistent terminology depending on field name rather than business
+    context, and form authors cannot reliably control the label they explicitly defined.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C21-SHARED-LABEL-OVERRIDE
+  recommendation: Make `field.label` authoritative by default. Use shared overrides only for a narrowly governed
+    exception dictionary where a product-wide label is intentionally required.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-074
+  module: Accounting
+  surface_id: SURF-034
+  route: /accounting/journals/create/
+  page_title: ایجاد سند حسابداری
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Journal line dimensions Project, Site and WBS are loaded independently across the organization instead
+    of being narrowed by the selected hierarchy.
+  evidence:
+    source_paths:
+    - apps/accounting/forms.py
+    implementation_observation:
+    - JournalLineForm loads all organization Projects.
+    - Site queryset includes all sites in organization projects.
+    - WBS queryset includes all WBS nodes in organization projects.
+    - No Project→Site→WBS cascade is configured in the form.
+  user_impact: Accountants can search and select irrelevant project dimensions, and the UI does not prevent cross-project
+    combinations as early as it could.
+  root_pattern_candidate:
+  - RP-C18-CASCADE-FILTERING-INCONSISTENT
+  recommendation: Cascade Project → Site and Project/Site → WBS while preserving authoritative server-side dimension
+    validation.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-074
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-029
+    scope_note: Bounded observed portions only; original static/history retained.
+- finding_id: UIUX-F-075
+  module: Accounting
+  surface_id: SURF-034
+  route: /accounting/journals/create/
+  page_title: ایجاد سند حسابداری
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Normal journal creation asks the accountant to enter provenance/control values such as source key, evidence
+    reference and reconciliation reference.
+  evidence:
+    source_paths:
+    - apps/accounting/forms.py
+    - apps/accounting/templates/accounting/form.html
+    observed_fields:
+    - source_key — «کلید منبع»
+    - evidence_reference — «مرجع مدرک»
+    - reconciliation_reference — «مرجع تطبیق»
+    template_observation: The generic Accounting form renders every field directly.
+  user_impact: The accountant is asked to manage provenance mechanics in the ordinary journal-entry flow instead
+    of focusing on date, description, accounts, amounts and business dimensions.
+  root_pattern_candidate:
+  - RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  - RP-C19-DERIVABLE-DATA-REENTRY
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: Derive/generate provenance keys where possible and provide business-facing document/evidence selectors.
+    Move optional technical traceability overrides to a privileged advanced section.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-075
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-029
+    scope_note: Bounded observed portions only; original static/history retained.
+- finding_id: UIUX-F-076
+  module: Accounting
+  surface_id: SURF-038
+  route: /accounting/openings/create/
+  page_title: ایجاد مانده افتتاحیه
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Opening import treats Fiscal Year and Opening Period as independent organization-wide selections and
+    also requires multiple provenance references as manual text.
+  evidence:
+    source_paths:
+    - apps/accounting/forms.py
+    observed_fields:
+    - fiscal_year
+    - period
+    - source_reference
+    - evidence_reference
+    - reconciliation_reference
+    implementation_observation: Both year and period querysets contain organization-wide records; period is not
+      narrowed to the selected year in the form.
+  user_impact: Users can choose a period unrelated to the selected fiscal year and must manually type several traceability
+    values the system could often derive or select.
+  root_pattern_candidate:
+  - RP-C18-CASCADE-FILTERING-INCONSISTENT
+  - RP-C19-DERIVABLE-DATA-REENTRY
+  recommendation: Cascade Fiscal Year → eligible opening periods and replace manual references with governed selectors
+    or derived metadata where a canonical source already exists.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-077
+  module: Support
+  surface_id: SURF-362
+  route: /support/cases/<uuid:case_id>/
+  page_title: درخواست پشتیبانی
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Support evidence asks users to choose Document and Document Version independently even though Version
+    is fully determined by the selected Document family.
+  evidence:
+    source_paths:
+    - apps/support/forms.py
+    implementation_observation:
+    - Document queryset and DocumentVersion queryset are both organization-wide (subject to sensitivity filtering).
+    - clean() rejects a selected version that belongs to a different document only after submit.
+  user_impact: Users search a potentially large version list and can select an invalid Document/Version pair that
+    the UI could prevent immediately.
+  root_pattern_candidate:
+  - RP-C18-CASCADE-FILTERING-INCONSISTENT
+  recommendation: Cascade Document → Version and show version number/date/status for only the selected document;
+    retain server-side ownership validation.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-078
+  module: Equipment
+  surface_id: SURF-321
+  route: /equipment/operations/work-orders/create/
+  page_title: ایجاد دستورکار نگهداری
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Work Order Equipment and Maintenance Plan are independent organization-wide selections; related cost/handoff
+    forms also ask users to manually create source/occurrence keys.
+  evidence:
+    source_paths:
+    - apps/equipment/forms.py
+    implementation_observation:
+    - WorkOrderForm loads all Equipment and all active MaintenancePlan records without filtering Plan by Equipment.
+    - CostAllocationForm asks for source_key («کلید رخداد»).
+    - CostHandoffForm asks for occurrence_key («کلید پیشنهاد»).
+    - CostAllocationReversalForm exposes reversal_source_key.
+  user_impact: Maintenance users can pair a plan with the wrong equipment at interaction time, while cost operators
+    are burdened with technical identity/provenance keys.
+  root_pattern_candidate:
+  - RP-C18-CASCADE-FILTERING-INCONSISTENT
+  - RP-C19-DERIVABLE-DATA-REENTRY
+  - RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  recommendation: Cascade Equipment → applicable Maintenance Plan and generate canonical source/occurrence/reversal
+    keys internally.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-079
+  module: Commercial
+  surface_id: SURF-103
+  route: /commercial/<uuid:tender_id>/evidence/
+  page_title: شواهد مناقصه
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Tender evidence linking requires a raw Document Version UUID instead of selecting an authorized document/version.
+  evidence:
+    source_paths:
+    - apps/commercial/forms.py
+    - apps/commercial/templates/commercial/tender_detail.html
+    observed_field: TenderBidEvidenceForm.document_version_id = UUIDField(label="شناسه نسخه سند")
+    template_observation: The tender page renders the evidence form directly for the user.
+  user_impact: Commercial users must know or copy an internal document-version identifier to attach evidence, making
+    a routine evidence task technical and error-prone.
+  root_pattern_candidate:
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  - RP-C19-DERIVABLE-DATA-REENTRY
+  recommendation: Use an authorized Document → Version selector and submit the canonical version UUID internally.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-080
+  module: Knowledge
+  surface_id: SHARED-KNOWLEDGE-REFERENCE-FORMS
+  route: MULTI_KNOWLEDGE_FORMS
+  page_title: فرم‌های منبع، تکرار و بازاستفاده دانش
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Knowledge workflows require users to type raw source/consumer UUIDs and even comma-formatted `type,uuid`
+    lines to express business references.
+  evidence:
+    source_paths:
+    - apps/knowledge/forms.py
+    observed_fields:
+    - SourceForm.source_id — «شناسه منبع»
+    - 'RecurrenceForm.sources — help text «هر خط: type,uuid»'
+    - ReuseForm.consumer_type / consumer_id / consumer_version
+  user_impact: Knowledge users must understand internal object types and identifiers rather than selecting the observation,
+    inspection, support case or other business source they want to cite/reuse.
+  root_pattern_candidate:
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  - RP-C19-DERIVABLE-DATA-REENTRY
+  recommendation: Provide source-type-aware search/select controls and derive IDs/versions internally. Represent
+    recurrence sources as structured rows rather than encoded text.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-081
+  module: Billing
+  surface_id: SHARED-BILLING-COMPLIANCE-FORMS
+  route: MULTI_BILLING_COMPLIANCE_FORMS
+  page_title: فرم‌های مفاصاحساب و انطباق پیمانکار
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Several Billing forms present related contract/certificate/clearance choices independently rather than
+    narrowing evidence to the selected business document or contract.
+  evidence:
+    source_paths:
+    - apps/billing/forms.py
+    implementation_observation:
+    - RetentionReleaseForm selects a subcontract and an approved clearance evidence list independently; clearance
+      evidence is not narrowed to the selected contract in the form.
+    - ContractorComplianceAssessmentForm selects an approved PayableCertificate and an approved clearance evidence
+      list independently.
+    - Relationship compatibility is therefore not expressed as an immediate UI constraint.
+  user_impact: Users can search irrelevant evidence and potentially choose combinations that require later business
+    validation instead of being guided to only compatible records.
+  root_pattern_candidate:
+  - RP-C18-CASCADE-FILTERING-INCONSISTENT
+  recommendation: Cascade evidence choices from the selected contract/certificate and show only compatible approved
+    records, while retaining service-layer validation.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-082
+  module: Shared Forms
+  surface_id: SHARED-GENERIC-FORM-ACTIONS
+  route: MULTI_GENERIC_FORMS
+  page_title: Generic create/edit forms
+  roles: []
+  category: INTERACTION
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: Several generic form templates use non-specific submit labels such as «ثبت» or «ثبت کنترل‌شده» regardless
+    of the business action.
+  evidence:
+    source_paths:
+    - apps/accounting/templates/accounting/form.html
+    - templates/procurement/form.html
+    - templates/payroll/form.html
+    observed_literals:
+    - ثبت
+    - ثبت کنترل‌شده
+  user_impact: The primary CTA does not tell the user what object/action will be created or saved, reducing confidence
+    on complex forms.
+  root_pattern_candidate:
+  - RP-C06-GENERIC-FORM-ACTION
+  recommendation: Pass a task-specific CTA label from the view/template context, such as «ایجاد سند حسابداری», «ثبت
+    سفارش خرید» or «ذخیره پیکربندی پرداخت».
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-083
+  module: Billing
+  surface_id: SURF-110
+  route: /billing/guarantees/new/
+  page_title: ثبت تضمین
+  roles: []
+  category: LOCALIZATION
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: A substantial set of Billing forms use native HTML date inputs directly instead of the canonical JalaliDateMixin
+    used across other BONIRA modules.
+  evidence:
+    source_paths:
+    - apps/billing/forms.py
+    - core/forms.py
+    - apps/billing/templates/billing/commercial_form.html
+    observed_structure:
+    - GuaranteeForm, ComplianceEvidenceForm, RetentionReleaseForm and related forms subclass forms.Form directly.
+    - 'Their date fields use forms.DateInput(attrs={''type'': ''date''}).'
+    - The canonical JalaliDateMixin replaces DateField widgets with data-jalali-date text inputs and server-side
+      Jalali parsing.
+    - commercial_form.html renders the supplied widgets directly.
+  user_impact: Persian-first users can receive browser-native Gregorian date controls in Billing while other modules
+    use Jalali entry, creating a major cross-module localization inconsistency and date-entry risk.
+  root_pattern_candidate:
+  - RP-C23-JALALI-INPUT-INCONSISTENCY
+  recommendation: Apply the canonical JalaliDateMixin or equivalent shared date component to all user-facing Billing
+    date/datetime forms, while preserving canonical Gregorian persistence internally.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-084
+  module: Compliance
+  surface_id: SURF-353
+  route: /compliance/create/<str:kind>/
+  page_title: ایجاد رکورد انطباق
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Compliance ScopedModelForm loads all active organization Sites independently of the selected Project.
+  evidence:
+    source_paths:
+    - apps/compliance/forms.py
+    implementation_observation:
+    - project queryset is organization-scoped.
+    - site queryset is organization-wide active sites.
+    - InspectionForm, PermitForm and other scoped model forms inherit this behavior.
+  user_impact: Inspection/HSE/QA users can see sites from unrelated projects and must rely on later validation or
+    domain controls rather than being guided to valid Project→Site choices.
+  root_pattern_candidate:
+  - RP-C18-CASCADE-FILTERING-INCONSISTENT
+  recommendation: Cascade Project → Site using the existing secure context-options pattern and retain server-side
+    tenant/project relationship validation.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-085
+  module: Shared Tables
+  surface_id: SHARED-TABLE-PAGINATION
+  route: GLOBAL_TABLE_PAGINATION
+  page_title: Shared bounded table pagination
+  roles: []
+  category: SEARCH_FILTER
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The shared pagination component builds previous/next links as `?page=N` and therefore does not preserve
+    existing filter or sort query parameters.
+  evidence:
+    source_paths:
+    - templates/components/bounded_table_pagination.html
+    - core/templatetags/table_filters.py
+    observed_structure:
+    - Pagination previous/next hrefs contain only the page parameter.
+    - Shared sorting explicitly copies request.GET and removes only page, demonstrating that filter/sort state is
+      represented in the query string.
+  user_impact: When pagination is combined with filtering/sorting, moving to the next page can silently reset the
+    user's result context, producing confusing result changes and repeated work.
+  root_pattern_candidate:
+  - RP-C24-PAGINATION-QUERY-STATE-LOSS
+  recommendation: Build pagination URLs from the current query string, replacing only `page`, exactly as the shared
+    sort helper already preserves existing query state.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: NOT_EVALUATED
+    evidence_ids:
+    - RV-EV-009
+    scope_note: Pagination unavailable at nine rows.
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-085
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: NOT_REPRODUCED
+    evidence_ids:
+    - RV-EV-020
+    scope_note: Daily Reports preserves filter/sort/page. REVIEW_FOR_RECLASSIFICATION of route applicability only;
+      separate static bounded-pagination component finding retained.
+  reclassification_review: 'REVIEW_FOR_RECLASSIFICATION: representative route unaffected; historical static component
+    evidence retained.'
+- finding_id: UIUX-F-086
+  module: Equipment
+  surface_id: SURF-323
+  route: /equipment/operations/qualifications/create/
+  page_title: ثبت صلاحیت اپراتور
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Operator qualification asks for Employee and Workforce Qualification independently; the qualification
+    list is not narrowed to the selected employee.
+  evidence:
+    source_paths:
+    - apps/equipment/forms.py
+    implementation_observation:
+    - OperatorQualificationForm exposes equipment, employee and workforce_qualification.
+    - employee queryset contains organization employees.
+    - workforce_qualification queryset contains all organization employee qualifications.
+  user_impact: The user can search or select qualifications belonging to another employee, a relationship the UI
+    already has enough information to constrain.
+  root_pattern_candidate:
+  - RP-C18-CASCADE-FILTERING-INCONSISTENT
+  recommendation: Cascade Employee → Employee Qualification and show only valid/current qualification records for
+    the chosen operator.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-087
+  module: Equipment
+  surface_id: SURF-322
+  route: /equipment/operations/work-orders/<uuid:work_order_id>/spares/create/
+  page_title: افزودن قطعه به دستورکار
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Adding a spare part to a work order exposes all organization StockTransaction records as the selectable
+    source transaction.
+  evidence:
+    source_paths:
+    - apps/equipment/forms.py
+    observed_field: SpareLinkForm.inventory_transaction
+    implementation_observation: The queryset is StockTransaction.objects.filter(organization=organization) with
+      no visible narrowing by work order, equipment deployment, warehouse/site, transaction state or material context.
+  user_impact: Maintenance users must search a broad technical transaction list and may be offered records irrelevant
+    to the current work order.
+  root_pattern_candidate:
+  - RP-C18-CASCADE-FILTERING-INCONSISTENT
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  recommendation: Offer only domain-eligible inventory transactions for the current work order and display business
+    identifiers such as material, warehouse/site, date, quantity and reference instead of transaction identity alone.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-088
+  module: Treasury
+  surface_id: SURF-048
+  route: /treasury/movements/new/
+  page_title: ثبت دریافت یا پرداخت
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Treasury Movement Project and approved origin Payment Request are selected independently even though
+    the request already carries project/site scope and business context.
+  evidence:
+    source_paths:
+    - apps/treasury/forms.py
+    - apps/treasury/views.py
+    implementation_observation:
+    - Project choices are permission-scoped.
+    - Origin Payment Request choices are separately permission-scoped approved reimbursement requests.
+    - The form does not narrow origin_request by the currently selected project.
+    - movement_create passes all cleaned form values directly to create_movement.
+  user_impact: Users can be asked to choose the project and source request separately even when the source request
+    already identifies the relevant business context, increasing selection effort and mismatch risk.
+  root_pattern_candidate:
+  - RP-C18-CASCADE-FILTERING-INCONSISTENT
+  - RP-C19-DERIVABLE-DATA-REENTRY
+  recommendation: When an origin request is selected, derive or lock compatible project/site context and prefill
+    other request-owned values where domain rules permit. Preserve service-layer validation and authority.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-089
+  module: Billing
+  surface_id: SURF-110
+  route: /billing/guarantees/new/
+  page_title: ثبت تضمین
+  roles: []
+  category: CONSISTENCY
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: Billing commercial forms bypass the canonical shared form-field/error/button components and render fields/labels/errors
+    with a separate local pattern.
+  evidence:
+    source_paths:
+    - apps/billing/templates/billing/commercial_form.html
+    - templates/components/README.md
+    - templates/components/form_field.html
+    observed_structure:
+    - commercial_form.html manually renders label, field, help text and errors.
+    - It uses `erp-button-primary` rather than the canonical `erp-btn erp-btn--primary` convention used widely elsewhere.
+    - The shared component README defines reusable presentation components for durable ERP UI patterns.
+  user_impact: Billing form validation, spacing, accessibility behavior and button styling can drift from the rest
+    of the ERP.
+  root_pattern_candidate:
+  - RP-C15-SHARED-FORM-PATTERN-BYPASS
+  recommendation: Migrate Billing commercial forms to the canonical shared form components, while first fixing the
+    shared label-authority issue so domain-specific labels remain intact.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-090
+  module: Shared Status Presentation
+  surface_id: SHARED-STATUS-BADGE
+  route: GLOBAL_STATUS_BADGE
+  page_title: Semantic status badge
+  roles: []
+  category: STATE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The shared semantic badge maps only a small fixed set of status codes; common lifecycle states used by
+    Safety and Quality therefore fall back to the neutral family even when they represent active progress, successful
+    resolution or closure.
+  evidence:
+    source_paths:
+    - templates/components/status_badge.html
+    - templates/safety/detail.html
+    - templates/quality/detail.html
+    observed_structure:
+    - Shared mapping knows under_review/in_progress but not reported, assigned, action_in_progress, resolved, closed,
+      awaiting_verification or verified.
+    - Safety and Quality detail pages pass their domain status to the shared component.
+    - Unknown statuses fall through to erp-badge--neutral.
+  user_impact: The text label remains correct, but color/semantic emphasis stops reflecting lifecycle meaning, weakening
+    rapid scanning across operational lists and detail pages.
+  root_pattern_candidate:
+  - RP-C25-STATUS-SEMANTICS-INCOMPLETE
+  recommendation: Centralize status-to-semantic-family mapping with explicit coverage for domain lifecycle statuses.
+    Keep only the five approved semantic families and never invent module-specific colors.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-091
+  module: Shared Date Presentation
+  surface_id: SHARED-DATE-DISPLAY
+  route: MULTI_SURFACE
+  page_title: User-facing date display
+  roles: []
+  category: LOCALIZATION
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: 'Jalali date presentation is applied inconsistently: some Accounting pages explicitly use `jalali_date`/`jalali_datetime`,
+    while Safety, Quality, Accounting periods and Billing payable pages render raw Date/DateTime values directly.'
+  evidence:
+    source_paths:
+    - apps/accounting/templates/accounting/statement_list.html
+    - apps/accounting/templates/accounting/statement_detail.html
+    - apps/accounting/templates/accounting/period_list.html
+    - templates/safety/detail.html
+    - templates/quality/detail.html
+    - apps/billing/templates/billing/payable_certificate_list.html
+    - apps/billing/templates/billing/payable_certificate_detail.html
+    contrast:
+    - Accounting statements use |jalali_date and |jalali_datetime.
+    - Accounting period list renders starts_on/ends_on raw.
+    - Safety/Quality render occurred_at/identified_at/due_date raw.
+    - Billing payable list renders period_start/period_end raw and detail renders due_date raw.
+  user_impact: The same Persian-first ERP can show dates in different calendar/display conventions depending on
+    module, increasing interpretation error in financial, HSE and contractual work.
+  root_pattern_candidate:
+  - RP-C26-JALALI-DISPLAY-INCONSISTENCY
+  recommendation: Create one canonical user-facing date/datetime presentation filter/component and apply it to all
+    non-technical dates. Keep canonical stored values unchanged and preserve LTR only where technically necessary.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-092
+  module: Accounting
+  surface_id: SURF-042
+  route: /accounting/statements/
+  page_title: تراز و صورت‌های مالی
+  roles: []
+  category: LOCALIZATION
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The financial-statement preview renders raw internal values for statement kind and account type instead
+    of their localized display labels.
+  evidence:
+    source_paths:
+    - apps/accounting/templates/accounting/statement_list.html
+    observed_expressions:
+    - پیش‌نمایش {{ form.cleaned_data.kind }}
+    - '{{ line.account_type }}'
+    contrast: Stored statement runs below use run.get_kind_display for the human-facing type.
+  user_impact: A Persian accounting user can see internal enum codes in a core financial report preview, producing
+    mixed terminology precisely where clarity should be strongest.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  recommendation: Render the selected statement kind and account type through canonical localized labels while keeping
+    enum values unchanged internally.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-093
+  module: Accounting
+  surface_id: SURF-043
+  route: /accounting/statements/<uuid:run_id>/
+  page_title: صورت مالی نگهداری‌شده
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The stored financial-statement detail places scope/input/result hashes directly in the primary report
+    header area.
+  evidence:
+    source_paths:
+    - apps/accounting/templates/accounting/statement_detail.html
+    observed_literals:
+    - هش‌های دامنه / ورودی / نتیجه
+    observed_expressions:
+    - '{{ run.scope_hash }}'
+    - '{{ run.input_hash }}'
+    - '{{ run.result_hash }}'
+  user_impact: Accountants reviewing balances and financial statements are confronted with cryptographic lineage
+    data that is useful for audit/debugging but not for routine financial interpretation.
+  root_pattern_candidate:
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  recommendation: Keep report period, currency, source-line count and financial lines primary. Move cryptographic
+    hashes into an expandable «ردیابی و ممیزی» section.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-094
+  module: Billing
+  surface_id: SURF-128
+  route: /billing/payable-certificates/<uuid:certificate_id>/
+  page_title: گواهی پرداخت پیمان جزء
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Payable-certificate detail mixes business payment-certificate review with internal calculation-snapshot
+    and stable-line identifiers.
+  evidence:
+    source_paths:
+    - apps/billing/templates/billing/payable_certificate_detail.html
+    observed_literals:
+    - نسخه شرایط
+    - شناسه پایدار ردیف
+    - زنجیره اصلاح و ابطال
+    observed_expressions:
+    - '{{ certificate.calculation_snapshot.contract_term_version }}'
+    - '{{ item.stable_line_id }}'
+    - '{{ item.unit_rate_snapshot }}'
+  user_impact: Commercial/payment reviewers must interpret calculation lineage and internal stable identifiers alongside
+    measured work, deductions and payable value.
+  root_pattern_candidate:
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  recommendation: Keep measured work, deductions, prior/current cumulative quantities and payable result primary.
+    Move stable IDs and calculation-version lineage to technical/audit detail.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-095
+  module: Compliance
+  surface_id: SHARED-COMPLIANCE-TEMPLATE-CONFIG
+  route: COMPLIANCE_TEMPLATE_PUBLISH
+  page_title: انتشار نسخه الگوی بازرسی
+  roles: []
+  category: FORM
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Inspection-template publication requires administrators to enter checklist, required evidence, outcome
+    rules and source references as raw JSON structures.
+  evidence:
+    source_paths:
+    - apps/compliance/forms.py
+    observed_fields:
+    - checklist = JSONField
+    - required_evidence = JSONField
+    - outcome_rules = JSONField
+    - source_references = JSONField
+  user_impact: Even a specialist compliance administrator must author process configuration as serialized data rather
+    than structured checklist/evidence/rule controls, making validation and review harder.
+  root_pattern_candidate:
+  - RP-C17-CONFIGURATION-NOT-VISUALIZED
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  recommendation: Provide structured editors for checklist items, evidence requirements and outcome rules; serialize
+    the same canonical JSON internally. Keep a raw JSON view only as advanced technical inspection if needed.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-096
+  module: Equipment
+  surface_id: SURF-310
+  route: /equipment/cost/
+  page_title: کاربرگ هزینه پیشنهادی تجهیز
+  roles: []
+  category: TERMINOLOGY
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: The equipment cost workbench exposes delivery-phase metadata, technical handoff keys and subsystem-boundary
+    language directly in the operational UI.
+  evidence:
+    source_paths:
+    - templates/equipment/cost_workbench.html
+    observed_literals:
+    - P8 · غیرتولیدی
+    - پیشنهاد Project Cost
+    - نهایی‌سازی مستقل
+    - برگشت صریح
+    - پیشنهادهای بدون اثر مالی
+    - بررسی مستقل
+    - ثبت تطبیق
+    observed_expressions:
+    - '{{ item.occurrence_key }}'
+    - '{{ item.consumer_reference }}'
+  user_impact: Equipment/cost users must interpret roadmap-stage and integration-boundary concepts instead of seeing
+    a straightforward costing/allocation/handoff journey.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  - RP-C16-DEVELOPMENT-ARTEFACT-LEAK
+  recommendation: Remove P8 and raw occurrence/consumer identifiers from the primary view. Reframe the workspace
+    around costing policy, applicable rate, calculated allocation, review status and downstream handoff; retain
+    traceability in audit details.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-097
+  module: Equipment
+  surface_id: SURF-307
+  route: /equipment/maintenance/
+  page_title: سرویس و تعمیرات
+  roles: []
+  category: LOCALIZATION
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The maintenance list renders scheduled dates directly instead of using the canonical Jalali display pattern.
+  evidence:
+    source_paths:
+    - templates/equipment/maintenance_list.html
+    observed_expression: '{{ item.scheduled_date }}'
+    contrast: Other BONIRA reporting surfaces already use the shared `jalali_date` filter.
+  user_impact: Maintenance users can see a date presentation convention different from other Persian-first modules.
+  root_pattern_candidate:
+  - RP-C26-JALALI-DISPLAY-INCONSISTENCY
+  recommendation: Render scheduled maintenance dates through the canonical Jalali date presentation filter/component.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-098
+  module: Workforce
+  surface_id: SURF-196
+  route: /workforce/foundation/
+  page_title: توانمندی، صلاحیت و توسعه
+  roles: []
+  category: TERMINOLOGY
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The Workforce foundation workspace explains permission/domain boundaries and tenancy implementation in
+    its primary copy.
+  evidence:
+    source_paths:
+    - templates/workforce/foundation.html
+    observed_literals:
+    - سوابق منابع انسانی با دسترسی کنترل‌شده؛ بدون اثر حقوق، مالی یا مجوز دسترسی
+    - تعاریف Tenant-local؛ هیچ‌کدام نقش یا دسترسی ایجاد نمی‌کنند.
+    - اعتبار، ابطال و شواهد در سابقه حفظ می‌شوند.
+    - مجوز مشاهده اطلاعات حساس به این عضویت اعطا نشده است.
+  user_impact: HR users are asked to process technical authorization and subsystem-boundary wording while performing
+    ordinary skills, training, qualification and performance tasks.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: Lead with employee development tasks and business meaning. Keep sensitivity/access explanations
+    concise and contextual, and replace tenancy/authority jargon with user-facing HR language.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-099
+  module: Knowledge
+  surface_id: SURF-371
+  route: /knowledge/publications/<uuid:version_id>/
+  page_title: دانش منتشرشده
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Published knowledge mixes normal article consumption with raw authority metadata, manifest hash and non-canonical
+    form rendering.
+  evidence:
+    source_paths:
+    - apps/knowledge/templates/knowledge/publication_detail.html
+    - apps/knowledge/forms.py
+    observed_literals:
+    - سطح اختیار
+    - هش مانیفست
+    - درخواست ترویج به Platform
+    - منشأ Tenant
+    observed_expressions:
+    - '{{ item.metadata.authority }}'
+    - '{{ item.manifest_hash }}'
+    - '{{ reuse_form.as_p }}'
+    - '{{ correction_form.as_p }}'
+    - '{{ promotion_form.as_p }}'
+  user_impact: Readers and knowledge curators see technical provenance/tenancy metadata and inconsistent form presentation
+    inside the same surface as the published article.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  - RP-C15-SHARED-FORM-PATTERN-BYPASS
+  recommendation: Keep article title/body/audience/current status primary. Move manifest/provenance details to the
+    existing history/traceability view, localize authority metadata, and render actions with canonical form components.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-100
+  module: Knowledge
+  surface_id: SURF-375
+  route: /knowledge/platform/promotions/
+  page_title: صف ترویج دانش Platform
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The platform-promotion queue places tenant/platform boundary explanation and the snapshot hash directly
+    in each operational review item.
+  evidence:
+    source_paths:
+    - apps/knowledge/templates/knowledge/platform_promotions.html
+    observed_literals:
+    - صف ترویج دانش Platform
+    - دسترسی Platform به این صفحه مجوز مشاهده اشیای منبع Tenant نیست.
+    - هش
+    observed_expression: '{{ item.snapshot_hash }}'
+  user_impact: Platform reviewers receive infrastructure/tenancy guarantees and cryptographic metadata with similar
+    visual weight to the actual sanitized knowledge and review decision.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  recommendation: Keep sanitized content, anonymization statement, status and review action primary; place tenant-boundary
+    assurances and snapshot hash in an audit/traceability disclosure.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-101
+  module: Billing
+  surface_id: SHARED-BILLING-PAYABLE-FORMS
+  route: MULTI_BILLING_PAYABLE_FORMS
+  page_title: فرم‌های اندازه‌گیری و گواهی پرداخت پیمان جزء
+  roles: []
+  category: LOCALIZATION
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  problem: Payable Measurement and Payable Certificate forms use native HTML date widgets and locally rendered generic
+    forms instead of the canonical Jalali/shared-form pattern.
+  evidence:
+    source_paths:
+    - apps/billing/forms.py
+    - apps/billing/templates/billing/payable_form.html
+    observed_fields:
+    - PayableMeasurementForm.measured_on
+    - PayableCertificateForm.period_start
+    - PayableCertificateForm.period_end
+    - PayableCertificateForm.measurement_cutoff
+    observed_structure:
+    - The fields use DateInput(type='date') in plain forms.Form classes.
+    - payable_form.html manually renders labels/errors and uses a generic «ثبت» CTA.
+  user_impact: Core payable workflows can fall back to browser-native Gregorian date entry and a separate form interaction
+    style, despite BONIRA being Persian-first.
+  root_pattern_candidate:
+  - RP-C23-JALALI-INPUT-INCONSISTENCY
+  - RP-C15-SHARED-FORM-PATTERN-BYPASS
+  - RP-C06-GENERIC-FORM-ACTION
+  recommendation: Apply the canonical Jalali date/input layer and shared form components, with task-specific CTAs
+    such as «ثبت اندازه‌گیری» or «ایجاد گواهی پرداخت».
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-102
+  module: Treasury
+  surface_id: SURF-046
+  route: /treasury/operations/
+  page_title: عملیات خزانه‌داری
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The Treasury operations page mixes ordinary operational records with retained-reconciliation evidence
+    language and a visible evidence hash.
+  evidence:
+    source_paths:
+    - apps/treasury/templates/treasury/operations.html
+    observed_literals:
+    - تطبیق‌های نگهداری‌شده تنخواه
+    - شواهد ثبت‌شده در زمان اجرا
+    - مانده در زمان اجرا
+    observed_expression: '{{ run.evidence_hash|slice:'':12'' }}'
+  user_impact: Treasury users reviewing requests, cheques and advances encounter audit evidence metadata in the
+    same operational workspace.
+  root_pattern_candidate:
+  - RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  recommendation: Keep advance reconciliation result and exceptions visible, but move evidence hash and retained-run
+    provenance into audit details.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-103
+  module: Knowledge
+  surface_id: SURF-372
+  route: /knowledge/publications/<uuid:version_id>/history/
+  page_title: منشأ و تاریخچه دانش
+  roles: []
+  category: LOCALIZATION
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: Even in the dedicated history view, some lifecycle/source fields are rendered as raw canonical values
+    instead of localized human labels.
+  evidence:
+    source_paths:
+    - apps/knowledge/templates/knowledge/publication_history.html
+    observed_expressions:
+    - '{{ review.outcome }}'
+    - '{{ pin.source_type }}'
+    - '{{ pin.source_id }}'
+    - '{{ pin.source_version }}'
+    - '{{ pin.source_status }}'
+    - '{{ pin.document_version_id }}'
+  user_impact: Authorized reviewers can trace provenance, but must decode raw outcome/source/status identifiers
+    rather than human-readable source references.
+  root_pattern_candidate:
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  recommendation: Retain the dedicated traceability view, but localize review outcomes/source statuses and render
+    business-recognizable source/document references alongside any raw technical identifiers.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-104
+  module: Audit
+  surface_id: SURF-026
+  route: /audit/
+  page_title: فعالیت‌های شرکت
+  roles: []
+  category: TECHNICAL_EXPOSURE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The user-facing audit log shows raw entity type and entity identifier values beneath otherwise human-readable
+    event actions.
+  evidence:
+    source_paths:
+    - templates/audit/log.html
+    observed_expressions:
+    - '{{ event.entity_type }}'
+    - '{{ event.entity_id }}'
+  user_impact: Authorized reviewers can understand the action but must decode model/entity identifiers to know what
+    business object the event concerns.
+  root_pattern_candidate:
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  recommendation: Keep the canonical identifier available for traceability, but show the business object type and
+    recognizable object reference/title first.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-105
+  module: Estimates
+  surface_id: SURF-134
+  route: /estimates/create/
+  page_title: ثبت برآورد جدید
+  roles: []
+  category: TERMINOLOGY
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: Estimate creation still foregrounds authorization/context mechanics in an otherwise well-structured business
+    form.
+  evidence:
+    source_paths:
+    - templates/estimates/create.html
+    observed_literals:
+    - پروژه مؤثر این ثبت
+    - انتخاب دامنه فقط گزینه‌ها را محدود می‌کند و مجوز تازه‌ای ایجاد نمی‌کند.
+  user_impact: Estimating users encounter permission/context language before completing a routine estimate-creation
+    task.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  recommendation: Keep the current-project context visible in business language, but remove the authorization disclaimer
+    from the primary task flow or move it to contextual help.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-105
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-024
+    scope_note: Bounded observed portions only; original static/history retained.
+- finding_id: UIUX-F-106
+  module: Partner Qualification
+  surface_id: SURF-356
+  route: /partners/
+  page_title: صلاحیت و عملکرد همکاران
+  roles: []
+  category: VISUAL_HIERARCHY
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The entire partner-qualification module is presented as a very sparse four-list workbench with minimal
+    hierarchy, no standard page-header structure, no task guidance and implementation-oriented wording.
+  evidence:
+    source_paths:
+    - apps/partner_qualification/templates/partner_qualification/workbench.html
+    observed_literals:
+    - طرف تجاری و نسخه سند در سامانه‌های مرجع باقی می‌مانند
+    - تصمیم‌ها و پیشنهادهای منبع‌پیوند
+    - الزامات نسخه‌دار
+    observed_structure: One heading, one explanatory paragraph and four bare list blocks for profiles, requirements,
+      qualifications and evaluations.
+  user_impact: Qualification users can inspect data, but the workspace does not clearly communicate priority, qualification
+    status, expiring requirements, evaluation history or the next useful task.
+  root_pattern_candidate:
+  - RP-C01-TECHNICAL-LANGUAGE-LEAK
+  - RP-C05-TASK-GUIDANCE-DEFICIT
+  - RP-C11-INFORMATION-ARCHITECTURE-MISMATCH
+  recommendation: Keep the existing read-model authority, but redesign the workspace around partner qualification
+    status, missing/expiring requirements, evaluations and next actions using canonical page/surface patterns.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-107
+  module: Accounts
+  surface_id: SURF-004
+  route: /accounts/login/
+  page_title: ورود به بنیرا
+  roles: []
+  category: ACCESSIBILITY
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The custom login page introduces its own `<main>` landmark inside the global application main content
+    landmark.
+  evidence:
+    source_paths:
+    - templates/accounts/login.html
+    - templates/base.html
+    observed_structure: login.html renders `<main class="bonira-login__layout">` while the base layout already provides
+      the document main landmark.
+  user_impact: Assistive-technology landmark navigation can encounter nested main regions on the login surface.
+  root_pattern_candidate:
+  - RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
+  recommendation: Keep the polished login composition but replace the inner main element with a section/div, leaving
+    the base layout as the single document main.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_assessment:
+    wave: A
+    assessed_at: '2026-10-21T20:25:20.188000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-001
+    scope_note: Login has two nested main landmarks.
+- finding_id: UIUX-F-108
+  module: Workforce
+  surface_id: SURF-218
+  route: /workforce/teams/
+  page_title: گروه‌های کاری
+  roles: []
+  category: SEARCH_FILTER
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  problem: The work-team filter controls are rendered after the result table rather than before the result workspace,
+    unlike the dominant list pattern elsewhere.
+  evidence:
+    source_paths:
+    - templates/workforce/work_team_list.html
+    observed_structure: '`{% table_filters filters "work-team-filters" %}` appears after the closing result section.'
+  user_impact: Users encounter the data before discovering the available filters, making the list feel inconsistent
+    with other BONIRA data workspaces.
+  root_pattern_candidate:
+  - RP-C11-INFORMATION-ARCHITECTURE-MISMATCH
+  recommendation: Render compact filter controls above the result surface, preserving the shared filter component
+    and existing query semantics.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-109
+  module: Organizations
+  surface_id: SURF-014
+  route: /organizations/members/
+  page_title: اعضای شرکت
+  roles:
+  - actual tenant_owner membership
+  category: ROLE
+  severity: MEDIUM
+  status: RUNTIME_CONFIRMED
+  runtime_classification: FAIL_UIUX
+  problem: The member list presents a legacy role label as the primary Role summary even when the independent effective
+    role assignments are empty. The reporting reference account appears active with a reporting-test role although
+    its authorization page shows quarantine and no roles/scopes.
+  evidence:
+    evidence_ids:
+    - RV-EV-013
+    runtime_paths:
+    - runtime_evidence/screenshots/RV-033__P-18__member-identities__1440x900__01.png
+    - runtime_evidence/screenshots/RV-033__P-18__quarantined-authorization__1440x900__01.png
+    - runtime_evidence/diagnostics/WAVE_A_AUTHORITY_BEFORE_20261021.json
+    observed_structure:
+    - Reporting member row displays UIUX Runtime Reporting Test - Development only.
+    - Actual assigned roles and scopes are empty; deeper authorization UI explicitly shows quarantine.
+  user_impact: An administrator can mistake a compatibility label and active membership for effective access while
+    deciding persona readiness; deeper navigation is required to discover the contradiction.
+  root_pattern_candidate:
+  - RP-C02-MODEL-REPRESENTATION-EXPOSED
+  recommendation: Present the actual effective assignment summary and access/quarantine state, identifying any compatibility
+    label separately. Preserve canonical authority and retained negative-state identity.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-109
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-021
+    - RV-EV-023
+    scope_note: Bounded observed portions only; original static/history retained.
+- finding_id: UIUX-F-110
+  module: Daily Reports / Shared Table Filters
+  surface_id: SURF-170
+  route: /daily-reports/
+  page_title: گزارش‌های روزانه
+  roles:
+  - viewer; project PRJ-01-01 only
+  category: ACCESSIBILITY
+  severity: MEDIUM
+  status: RUNTIME_CONFIRMED
+  runtime_classification: FAIL_ACCESSIBILITY
+  problem: The report-date range inputs have no associated labels or aria naming that distinguishes start from end;
+    both are exposed as textboxes named only by the same example-date placeholder.
+  evidence:
+    evidence_ids:
+    - RV-EV-009
+    runtime_paths:
+    - runtime_evidence/screenshots/RV-023__P-01__date-filter-labels__1440x900__01.png
+    - runtime_evidence/diagnostics/WAVE_A_BROWSER_OBSERVATIONS_20261021.json
+    observed_structure:
+    - Both reporting_date_from and reporting_date_to have labels=[], no aria-label/aria-labelledby/title.
+    - Browser accessibility snapshot exposes two identical example-date textbox names and two identically named
+      calendar buttons.
+  user_impact: Keyboard and assistive-technology users cannot reliably identify which boundary they are editing
+    from the accessible name.
+  root_pattern_candidate: []
+  root_pattern_review: UNMAPPED_RUNTIME_ACCESSIBLE_NAME_ISSUE; defer pattern consolidation, no static audit rerun.
+  recommendation: Provide distinct programmatically associated start/end report-date labels and corresponding calendar
+    action names using the established filter pattern.
+  business_logic_impact: NONE_EXPECTED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  runtime_revalidation_history:
+  - finding_id: UIUX-F-110
+    wave: A addendum / B
+    assessed_at: '2026-10-21T22:57:41.075000+03:30'
+    disposition: RUNTIME_CONFIRMED
+    evidence_ids:
+    - RV-EV-020
+    scope_note: Bounded observed portions only; original static/history retained.
+- finding_id: UIUX-F-111
+  module: Daily Reports / Equipment / Procurement
+  surface_id: MULTI_CREATE_SELECTORS
+  route:
+  - /daily-reports/create/
+  - /equipment/assignments/create/
+  - /procurement/orders/create/
+  page_title: Scoped choices
+  roles:
+  - actual project_manager A/B
+  category: SECURITY_SCOPE
+  severity: HIGH
+  status: RUNTIME_CONFIRMED
+  runtime_classification: FAIL_PERMISSION_OR_SCOPE
+  problem: A/B-scoped Project Manager receives ungranted same-tenant C/D project/site/request metadata in three
+    create selectors, while session selector excludes C/D.
+  implementation_status: REMEDIATION_IMPLEMENTED_PENDING_RUNTIME_RETEST
+  implementation_report: UIUX_F111_REMEDIATION_REPORT.md
+  implementation_authority: Explicit Human bounded Development remediation request for UIUX-F-111.
+  runtime_status: RUNTIME_VERIFIED_RESOLVED
+  runtime_retest_status: RUNTIME_VERIFIED_RESOLVED
+  runtime_retest_report: UIUX_F111_RUNTIME_RETEST_REPORT.md
+  runtime_retest_evidence_ids:
+  - RV-EV-032
+  - RV-EV-033
+  - RV-EV-034
+  - RV-EV-035
+  - RV-EV-036
+  - RV-EV-037
+  - RV-EV-038
+  - RV-EV-039
+  - RV-EV-040
+  runtime_retest_scope: Fresh Development runtime on port 8002; original three create surfaces, Workforce,
+    15 rejected manipulated POSTs, cross-tenant negatives, and direct/search/context/Expense/Estimate controls.
+  runtime_retest_exception: RV-EV-032 preserves the stale pre-remediation --noreload process on port 8001;
+    final remediation assessment uses the newly loaded process on port 8002. Original status/classification
+    above and historical failure evidence below remain historical facts.
+  evidence:
+    evidence_ids:
+    - RV-EV-026
+    - RV-EV-027
+    - RV-EV-028
+    runtime_paths:
+    - runtime_evidence/records/RV-EV-026.yaml
+    - runtime_evidence/records/RV-EV-027.yaml
+    - runtime_evidence/records/RV-EV-028.yaml
+    scope_note: Paths stopped on disclosure; raw DOM evidence valid despite excluded unstyled layout.
+  user_impact: Unauthorized same-tenant metadata disclosure. No successful unauthorized write or cross-tenant leakage
+    proved.
+  root_pattern_candidate: []
+  root_pattern_review: New runtime issue; no pattern redesign in this audit.
+  recommendation: Separate bounded remediation/review required. Preserve canonical scope and accounting/domain authority;
+    no remediation authorized here.
+  business_logic_impact: SEPARATE_BOUNDED_REVIEW_REQUIRED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-112
+  module: Accounting
+  surface_id: SURF-036
+  route: /accounting/journals/<uuid:journal_id>/
+  page_title: Journal dimensions
+  roles:
+  - actual accountant organization scope
+  category: DATA_PRESENTATION
+  severity: MEDIUM
+  status: RUNTIME_CONFIRMED
+  runtime_classification: FAIL_UIUX
+  problem: Draft journal lines have saved project/site/WBS values, but detail dimension summary renders dash plus
+    source-line UUID.
+  evidence:
+    evidence_ids:
+    - RV-EV-029
+    runtime_paths:
+    - runtime_evidence/records/RV-EV-029.yaml
+    - runtime_evidence/diagnostics/TARGETED_RUNTIME_DIMENSION_VERIFICATION.json
+    scope_note: Styled detail and independent read-only DB verification.
+  user_impact: Accountant cannot verify saved business dimensions in ordinary line summary.
+  root_pattern_candidate: []
+  root_pattern_review: New runtime issue; no pattern redesign in this audit.
+  recommendation: Separate bounded remediation/review required. Preserve canonical scope and accounting/domain authority;
+    no remediation authorized here.
+  business_logic_impact: SEPARATE_BOUNDED_REVIEW_REQUIRED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+
+- finding_id: UIUX-F-113
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route: /procurement/requests/create/
+  module: Procurement
+  surface_id: SP-001
+  page_title: Purchase Request create
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Ungranted Project codes/names and option UUIDs.
+  technical_root_cause: Tenant + non-deleted only; purchase_requests.create permits any effective grant at entry;
+    Projects require effective project authority. No subsequent GET object check narrows choices.
+  evidence:
+    source_paths:
+    - apps/procurement/forms.py
+    - apps/procurement/views.py
+    - templates/procurement/form.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-001
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-114
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route: /procurement/receipts/create/
+  module: Procurement
+  surface_id: SP-002
+  page_title: Goods Receipt issued-order selector
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Issued Purchase Order numbers and UUIDs from ungranted projects.
+  technical_root_cause: Tenant + issued + non-deleted parent only; goods_receipts.create admits limited grants.
+    Purchase Orders have project authority; status=issued is not an authorization predicate.
+  evidence:
+    source_paths:
+    - apps/procurement/forms.py
+    - apps/procurement/views.py
+    - templates/procurement/form.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-002
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-115
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route: /equipment/maintenance/create/
+  module: Equipment
+  surface_id: SP-003
+  page_title: Maintenance Record Project/Site
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Project code/name, Site code/name, parent-project label, and UUIDs.
+  technical_root_cause: Tenant/lifecycle only; maintenance_records.create supports object scope; capability entry
+    accepts any grant. Tenant Equipment/provider masters are separate from protected Project/Site choices.
+  evidence:
+    source_paths:
+    - apps/equipment/forms.py
+    - apps/equipment/views.py
+    - templates/equipment/form.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-003
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-116
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route: /contracts/create/
+  module: Contracts
+  surface_id: SP-007
+  page_title: Contract create Project
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Project code/name and UUID.
+  technical_root_cause: Tenant + non-deleted only; contracts.create permits limited grants; the Project field is
+    neither parent-bound nor scope-intersected. BusinessParty is a tenant master and is not the claimed leak.
+  evidence:
+    source_paths:
+    - apps/contracts/forms.py
+    - apps/contracts/views.py
+    - templates/contracts/create.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-007
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-117
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route: /inventory/create/
+  module: Inventory
+  surface_id: SP-009
+  page_title: Legacy Warehouse create Project
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Ungranted Project code/name and UUID.
+  technical_root_cause: Tenant + non-deleted only; warehouses.create admits limited grants. Existing warehouse readers
+    use scope_queryset(project_id). A central-warehouse empty choice does not grant visibility to other Projects.
+  evidence:
+    source_paths:
+    - apps/inventory/forms.py
+    - apps/inventory/views.py
+    - templates/inventory/warehouse_form.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-009
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-118
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route: /inventory/transactions/create/
+  module: Inventory
+  surface_id: SP-010
+  page_title: Legacy Stock Transaction selectors
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Ungranted Project/warehouse labels and IDs, and posted GoodsReceiptItem option IDs/labels.
+  technical_root_cause: Tenant/lifecycle/status only; stock_transactions.create accepts limited grants. Project-associated
+    warehouses, receipt items and Projects need their existing object-scope intersection; Material is a tenant master,
+    excluded from the finding.
+  evidence:
+    source_paths:
+    - apps/inventory/forms.py
+    - apps/inventory/views.py
+    - templates/inventory/transaction_form.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-010
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-119
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route:
+  - /expenses/<uuid:expense_id>/
+  - /expenses/<uuid:expense_id>/allocate/
+  module: Expenses
+  surface_id: SP-011
+  page_title: Allocation Project/WBS/Activity
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Other-project Project/WBS/Activity option labels and UUIDs.
+  technical_root_cause: Tenant + lifecycle only; parent expense lookup does not narrow form; expenses.view/allocate
+    support limited grants. An authorized draft/returned expense plus expenses.allocate renders the allocation form.
+    The context processor admits that capability with any applicable grant; it does not narrow child querysets.
+  evidence:
+    source_paths:
+    - apps/expenses/forms.py
+    - apps/expenses/views.py
+    - templates/expenses/detail.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-011
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-120
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route: /expenses/recurrences/
+  module: Expenses
+  surface_id: SP-013
+  page_title: Recurring template Project and same-page template list
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Project labels/UUIDs in choices; existing out-of-scope template description, project name and occurrence-form
+    identifier in the same page. No template amounts are rendered by this template.
+  technical_root_cause: Project choices and template collection are tenant-wide; expenses.recurrences_manage is
+    in the expenses scoped namespace. recurrence_list builds the tenant-wide form and template collection without
+    scope intersection. Both are rendered on this same bounded candidate surface.
+  evidence:
+    source_paths:
+    - apps/expenses/forms.py
+    - apps/expenses/views.py
+    - templates/expenses/recurrences.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-013
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-121
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: RESOLVED
+  route:
+  - /billing/guarantees/new/
+  - /billing/compliance-evidence/new/
+  - /billing/retention-releases/new/
+  module: Billing
+  surface_id: SP-019
+  page_title: Shared commercial create Contract / DocumentVersion choices (three create forms)
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  runtime_status: RUNTIME_VERIFIED_RESOLVED
+  runtime_classification: PASS_REQUIRED_CONTROLS
+  problem: Other-project Contract numbers/titles/UUIDs and Document titles/version numbers/UUIDs, including versions
+    not authorized through their linked context.
+  technical_root_cause: _CommercialEvidenceForm._configure uses organization/lifecycle only; Guarantee, compliance-evidence
+    and retention-release create namespaces admit limited grants directly. _configure does not use that membership
+    for Contracts or DocumentVersions. Revision/detail paths are separately organization-gated by their reader services
+    and are not included in this confirmation.
+  evidence:
+    source_paths:
+    - apps/billing/forms.py
+    - apps/billing/views.py
+    - apps/billing/templates/billing/commercial_form.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-019
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  implementation_status: REMEDIATION_IMPLEMENTED_PENDING_RUNTIME_RETEST
+  batch_01_execution:
+    date: 2026-10-22
+    report: UIUX_F111_BATCH_01_REMEDIATION_REPORT.md
+    evidence: f111_batch_01_evidence/
+    focused_validation: 18 tests and 67 subtests PASS
+    regression: 45 PASS; 13 baseline failures reproduced with identical tracebacks; no attributable regression
+    runtime_http: 24 passing observations across all three create routes
+    runtime_pending:
+    - Required mixed-link Development negative has no existing qualifying document; no fixture preparation authorized
+    - Representative browser interaction incomplete because local browser use is disabled in Work settings
+    disposition: Finding remains OPEN; original static confirmation and historical evidence retained
+  batch_01_runtime_closure_attempt:
+    date: 2026-10-22
+    report: UIUX_F111_BATCH_01_RUNTIME_CLOSURE_REPORT.md
+    evidence: f111_batch_01_runtime_closure_evidence/
+    fixture_label: BATCH_01_RUNTIME_CLOSURE_FIXTURE
+    mixed_link_runtime: PASS_CANONICAL_AND_ALL_THREE_LIVE_CREATE_ROUTES
+    representative_browser_status: BROWSER_RUNTIME_BLOCKED_ENVIRONMENT
+    disposition: Finding remains OPEN; accepted implementation and prior runtime evidence preserved
+    decision: BATCH_01_RUNTIME_CLOSURE_BLOCKED_ENVIRONMENT
+  batch_01_browser_closure:
+    date: 2026-10-22
+    report: UIUX_F111_BATCH_01_BROWSER_CLOSURE_REPORT.md
+    evidence: f111_batch_01_browser_closure_evidence/
+    reference_actor: uiux.persona.project-manager
+    representative_browser_status: PASS_GUARANTEE_AND_RETENTION_DOM_AND_INTERACTION
+    guarantee_choices: Six A/B Contracts and four authorized DocumentVersions; exact accepted option sets
+    retention_choices: Two A/B payable subcontracts and four authorized DocumentVersions; exact accepted option sets
+    unauthorized_metadata: C/D/X and retained mixed-link fixture absent from complete browser DOM
+    integrity: All 519 model-table digests unchanged; no form submission or business mutation
+    prior_evidence: Preserved unchanged; Compliance accepted HTTP evidence retained without browser repetition
+    disposition: Finding RESOLVED; original static and historical implementation/runtime evidence retained
+    decision: BATCH_01_RUNTIME_VERIFIED_RESOLVED
+
+- finding_id: UIUX-F-122
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route: /billing/retention-releases/new/
+  module: Billing
+  surface_id: SP-020
+  page_title: Retention release create approved clearance source
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Approved out-of-scope clearance evidence option UUIDs and labels.
+  technical_root_cause: Tenant + clearance kind + approved only; retention_releases.create accepts project-limited
+    grants. The constructor's additional clearance_evidence queryset bypasses both project scope and the canonical
+    get_compliance_evidence selector, independently of the shared Contract/DocumentVersion helper.
+  evidence:
+    source_paths:
+    - apps/billing/forms.py
+    - apps/billing/views.py
+    - apps/billing/templates/billing/commercial_form.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-020
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-123
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route: /billing/payable-measurements/new/
+  module: Billing
+  surface_id: SP-022
+  page_title: Payable measurement ContractItem selector
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Other-project payable ContractItem option identifiers and model labels. No item rate/amount disclosure
+    is asserted.
+  technical_root_cause: Tenant + payable/subcontract/active predicates only; payable_measurements.record supports
+    limited grants. ContractItem project authority is not intersected in the create form; lifecycle and payable
+    direction do not grant scope.
+  evidence:
+    source_paths:
+    - apps/billing/forms.py
+    - apps/billing/views.py
+    - apps/billing/templates/billing/payable_form.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-022
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-124
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route: /billing/payable-certificates/new/
+  module: Billing
+  surface_id: SP-023
+  page_title: Payable certificate Contract selector
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Other-project active subcontract number/title/UUID.
+  technical_root_cause: Tenant + payable/subcontract/active predicates only; payable_certificates.create supports
+    limited grants. get_payable_certificates uses project scope for reads; the Contract form choice remains tenant-wide
+    instead.
+  evidence:
+    source_paths:
+    - apps/billing/forms.py
+    - apps/billing/views.py
+    - apps/billing/templates/billing/payable_form.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-023
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-125
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route: /workforce/foundation/training-requirements/create/
+  module: Workforce
+  surface_id: SP-030
+  page_title: Training Requirement Project selector
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Other-project Project codes/names and UUIDs. Tenant competency/position masters are not included in the
+    claim.
+  technical_root_cause: Tenant + non-deleted only; workforce_qualifications.manage supports any effective grant
+    at the view. The Project selector is tenant-wide. The training service's later project check cannot protect
+    metadata already rendered by _foundation_form.
+  evidence:
+    source_paths:
+    - apps/workforce/forms.py
+    - apps/workforce/views.py
+    - templates/workforce/foundation_form.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-030
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-126
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route: /quality/create/
+  module: Quality
+  surface_id: SP-035
+  page_title: Quality issue Project/Site/Phase/Activity/DailyReport selectors
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Out-of-scope Project/Site/Phase/Activity/DailyReport option identifiers and labels; no issue description/content
+    read is asserted.
+  technical_root_cause: Tenant/lifecycle only; quality_issues.create admits limited project/site grants. The canonical
+    issue readers use scope_queryset; create choices do not intersect that scope. Generic form rendering includes
+    every field.
+  evidence:
+    source_paths:
+    - apps/quality/forms.py
+    - apps/quality/views.py
+    - templates/quality/create.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-035
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+- finding_id: UIUX-F-127
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route: /safety/create/
+  module: Safety
+  surface_id: SP-036
+  page_title: Safety incident Project/Site/Phase/Activity/DailyReport selectors
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: MEDIUM
+  status: STATIC_CONFIRMED
+  runtime_status: NOT_EXECUTED
+  runtime_classification: NOT_TESTED
+  problem: Out-of-scope Project/Site/Phase/Activity/DailyReport option identifiers and labels; no incident contents
+    are asserted.
+  technical_root_cause: Tenant/lifecycle only; safety_incidents.create admits limited project/site grants. The canonical
+    incident readers use scope_queryset, but initial and bound create choices do not.
+  evidence:
+    source_paths:
+    - apps/safety/forms.py
+    - apps/safety/views.py
+    - templates/safety/create.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-036
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+
+runtime_wave_a:
+  status: WAVE_A_PARTIAL
+  executed_at: '2026-10-21T20:25:20.188000+03:30'
+  scope: Wave A only; no static rerun, no remediation, no audit-wide closure.
+  results: UIUX_RUNTIME_VALIDATION_RESULTS.yaml
+  new_findings:
+  - UIUX-F-109
+  - UIUX-F-110

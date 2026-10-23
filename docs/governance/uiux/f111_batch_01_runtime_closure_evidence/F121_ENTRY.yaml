@@ -1,0 +1,56 @@
+- finding_id: UIUX-F-121
+  sweep_classification: AFFECTED_CONFIRMED
+  finding_status: OPEN
+  route:
+  - /billing/guarantees/new/
+  - /billing/compliance-evidence/new/
+  - /billing/retention-releases/new/
+  module: Billing
+  surface_id: SP-019
+  page_title: Shared commercial create Contract / DocumentVersion choices (three create forms)
+  roles:
+  - Authenticated nonprivileged membership with required capability and limited project/site grants
+  category: SECURITY_SCOPE
+  severity: HIGH
+  status: STATIC_CONFIRMED
+  runtime_status: REMEDIATION_IMPLEMENTED_PENDING_RUNTIME_RETEST
+  runtime_classification: PARTIAL_REQUIRED_CONTROLS_PENDING
+  problem: Other-project Contract numbers/titles/UUIDs and Document titles/version numbers/UUIDs, including versions
+    not authorized through their linked context.
+  technical_root_cause: _CommercialEvidenceForm._configure uses organization/lifecycle only; Guarantee, compliance-evidence
+    and retention-release create namespaces admit limited grants directly. _configure does not use that membership
+    for Contracts or DocumentVersions. Revision/detail paths are separately organization-gated by their reader services
+    and are not included in this confirmation.
+  evidence:
+    source_paths:
+    - apps/billing/forms.py
+    - apps/billing/views.py
+    - apps/billing/templates/billing/commercial_form.html
+    sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
+    trace: f111_same_pattern_evidence/SOURCE_TRACE.json
+    candidate_id: SP-019
+    scope_note: Static reachability/queryset/render proof. No browser/HTTP exploit or business mutation executed.
+      Cross-tenant exposure not tested.
+  user_impact: Unauthorized same-tenant metadata disclosure on the stated reachable rendering path. No successful
+    mutation or full document content access claimed.
+  root_pattern_candidate: []
+  root_pattern_review: F-111 same-pattern static confirmation; original F-111 remains RUNTIME_VERIFIED_RESOLVED.
+  recommendation: Separate bounded remediation authorization required; preserve domain-specific object authority
+    and tenant master visibility.
+  business_logic_impact: NO_CHANGE_AUTHORIZED
+  needs_domain_review: false
+  related_cep: []
+  related_standard: []
+  implementation_status: REMEDIATION_IMPLEMENTED_PENDING_RUNTIME_RETEST
+  batch_01_execution:
+    date: 2026-10-22
+    report: UIUX_F111_BATCH_01_REMEDIATION_REPORT.md
+    evidence: f111_batch_01_evidence/
+    focused_validation: 18 tests and 67 subtests PASS
+    regression: 45 PASS; 13 baseline failures reproduced with identical tracebacks; no attributable regression
+    runtime_http: 24 passing observations across all three create routes
+    runtime_pending:
+    - Required mixed-link Development negative has no existing qualifying document; no fixture preparation authorized
+    - Representative browser interaction incomplete because local browser use is disabled in Work settings
+    disposition: Finding remains OPEN; original static confirmation and historical evidence retained
+

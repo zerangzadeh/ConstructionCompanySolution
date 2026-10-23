@@ -1,0 +1,92 @@
+--- Registry_before_closure
++++ Registry_after_closure
+@@ -177,7 +177,7 @@
+     status: NOT_PASSED
+     source: OBJECTIVE_ENTRY_READINESS_REASSESSMENT
+     human_signoff_required: false
+-    evaluated_at: '2026-10-23'
++    evaluated_at: '2026-10-24'
+     evidence: docs/governance/cep/evidence/CEP-079_ENTRY_PREPARATION_01/ENTRY_REASSESSMENT.json
+     required_imb_status:
+       IMB-0001: SUPPORTED_RETAINED_SCOPED_EVIDENCE
+@@ -211,8 +211,8 @@
+       IMB-0094: SUPPORTED_RETAINED_SCOPED_EVIDENCE
+       IMB-0095: SUPPORTED_RETAINED_SCOPED_EVIDENCE
+     ext0025: NOT_READY
+-    note: 29 retained implementation outcomes supported; IMB0039 unverified; applicable Workforce runtime FAIL and scenario-specific data/authority gaps prevent entry. CEP078 COMPLETE
+-      and EXT0026 are not prerequisites.
++    note: 29 retained implementation outcomes supported; IMB0039 exact proof unverified. Workforce keyboard prerequisite six cells PASS; 33/44 starting contexts ready. Remaining evidence,
++      native Accounting fixture integrity and governed-input gaps prevent entry. CEP078 COMPLETE and EXT0026 are not prerequisites.
+ authorization_batches:
+   AUTH-BATCH-003:
+     execution_mode: SERIAL
+@@ -4510,11 +4510,9 @@
+     blockers:
+     - CEP079-PREP-B01 / UAT-CASE-012 / CEP040 / IMB0039 exact completion, AC/DoD and tests proving source reconciliation, version/as-of, duplicates/supersession, tenant/project aggregation
+       and no financial writes
+-    - CEP079-PREP-B02 / UAT-CASE-040 / Six browser/viewport cells fail Close and Escape focus
+     - CEP079-PREP-B03 / UAT-CASE-009,UAT-CASE-016 (AR branch),UAT-CASE-023 / Approved effective tax_rate, tax_basis, insurance_rate, insurance_basis; effective source provenance; real
+       ACCEPTED professional review; applicable ContractTermVersion and TenantBillingConfiguration
+-    - CEP079-PREP-B04 / UAT-CASE-018 / Signed independent native period-end reconciliation with verified statement/control coverage for the isolated fiscal period; distinct close/reopen
+-      requester and approver bindings
++    - CEP079-PREP-B04 / UAT-CASE-018 / Native period-end reconciliation result-hash verification rejects prepared evidence; signed reconciliation/statements are not qualified
+     - CEP079-PREP-B05 / UAT-CASE-019,UAT-CASE-020,UAT-CASE-022 / ACTIVE BANK Treasury account with approved effective bank/GL mapping; disposable statement and cleared cheque sources
+     - CEP079-PREP-B06 / UAT-CASE-029,UAT-CASE-044 / Qualified PartnerProfile, sourced QualificationRequirement and associated qualified partner context
+     - CEP079-PREP-B07 / UAT-CASE-043 / Qualified FixedAssetClassVersion, AssetBookPolicyVersion and positive asset candidate with sourced capitalization/monetary facts
+@@ -4532,15 +4530,20 @@
+     last_execution:
+       branch: null
+       sha: null
+-    updated_at: '2026-10-23'
++    updated_at: '2026-10-24'
+     history:
+     - date: '2026-10-23'
+       status: ENTRY_PREPARATION_BLOCKED
+       reason: Bounded Human-requested preparation only; exact remaining blockers in entry_preparation assessment. No scenario execution, Product remediation, Git writes, Production action
+         or Human Sign-off.
++    - date: '2026-10-24'
++      status: ENTRY_BLOCKER_DELTA_REASSESSED
++      reason: Tasks1-5 processed serially. B02 resolved by template asset v5 and six keyboard cells PASS; Edge mobile pointer probes retained as limitation. Prior32 ready rows and29 prerequisite
++        outcomes preserved.33of44 contexts ready. Native Accounting reconciliation fixture rolled back on result-hash verification failure; B04 remains. B01,B03,B05-B08 unresolved in bounded
++        sources. GATE09 NOT_PASSED EXT0025 NOT_READY. CEP079 NOT_STARTED; no UAT, Production, Human Sign-off or Git writes.
+     entry_preparation:
+-      date: '2026-10-23'
+-      authority: DIRECT_HUMAN_BOUNDED_DEVELOPMENT_ENTRY_PREPARATION_REQUEST_NO_UAT_EXECUTION
++      date: '2026-10-24'
++      authority: DIRECT_HUMAN_BOUNDED_TASKS_1_TO_5_DEVELOPMENT_CLOSURE_NO_UAT
+       result: BLOCKED
+       gate09: NOT_PASSED
+       ext0025: NOT_READY
+@@ -4548,12 +4551,13 @@
+       report: docs/governance/cep/evidence/CEP-079_ENTRY_PREPARATION_01/REPORT.md
+       readiness_matrix: docs/governance/cep/evidence/CEP-079_ENTRY_PREPARATION_01/44_CASE_READINESS_MATRIX.csv
+       prerequisites: 30_APPLY_29_SUPPORTED_1_UNVERIFIED
+-      starting_contexts: 32_QUALIFIED_12_BLOCKED
+-      workforce: 6_DISTINCT_REQUIRED_CELLS_FAIL_CLOSE_ESCAPE_FOCUS_NO_PRODUCT_CHANGE
++      starting_contexts: 33_QUALIFIED_11_BLOCKED
++      workforce: 6_DISTINCT_KEYBOARD_PREREQUISITE_CELLS_PASS_TEMPLATE_ASSET_VERSION_ONLY_POINTER_PROBES_RETAINED
+       personas: EXPLICIT_EXISTING_CANONICAL_ROLES_AND_SCOPES_QUALIFIED_NO_ROLE_DEFINITION_CHANGES
+-      test_data: MINIMAL_ISOLATED_SYNTHETIC_DEVELOPMENT_FIXTURES_VIA_CANONICAL_SERVICES
++      test_data: TASK3_CANONICAL_RECONCILIATION_HASH_FAILURE_ATOMIC_ROLLBACK_NO_NEW_QUALIFIED_FIXTURES
+       uat_scenarios_executed: 0
+       cep078_complete_required: false
++      blocker_closure: docs/governance/cep/evidence/CEP-079_ENTRY_PREPARATION_01/BLOCKER_CLOSURE_TASKS.json
+   CEP-080:
+     title: null
+     phase: POST_V1
+@@ -4859,12 +4863,11 @@
+   - CEP-073
+   - CEP-079
+   conditional_dependency_rule: Evaluate canonical scope conditions; no condition or execution authority inferred
+-  boundary_reason: 'Current bounded entry preparation: 29/30 implementation outcomes supported, 32/44 starting contexts qualified, 12 blocked; exact source/fixture/evidence/runtime blockers
+-    retained. No CEP079 UAT execution authorized by this preparation.'
++  boundary_reason: Tasks1-5 closure complete:29/30 implementation outcomes supported;33/44 starting contexts qualified;11 blocked. B02 resolved; B01,B03-B08 remain. No UAT execution.
+   resume_cep_after_blocker_resolution: CEP079_ENTRY_REASSESSMENT_ONLY_BEFORE_ANY_UAT_EXECUTION
+   independent_candidates_entry_status: NOT_EXECUTED_OUTSIDE_CURRENT_ENTRY_PREPARATION_SCOPE
+   cep057_resume_condition: COMPLETE
+   production_authorized: false
+   human_signoff_executed: false
+-  current_session_cep_range: CEP079_ENTRY_PREPARATION_ONLY_DEVELOPMENT
+-  excluded_this_session: CEP079_UAT_SCENARIO_EXECUTION;ALL_OTHER_CEP_EXECUTION;Product_REMEDIATION;Post-V1;Production;Human_Signoff;Certification;Git_WRITES
++  current_session_cep_range: CEP079_ENTRY_BLOCKER_CLOSURE_TASKS_1_TO_5_ONLY_DEVELOPMENT
++  excluded_this_session: CEP079_UAT_SCENARIO_EXECUTION;ALL_OTHER_CEP_EXECUTION;UNRELATED_REMEDIATION;Post-V1;Production;Human_Signoff;Certification;Git_WRITES

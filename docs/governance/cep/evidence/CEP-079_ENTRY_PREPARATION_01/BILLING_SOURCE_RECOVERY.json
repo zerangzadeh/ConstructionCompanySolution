@@ -1,0 +1,345 @@
+{
+  "at": "2026-10-23T18:45:54.378308+00:00",
+  "search_order": [
+    "Repository-local authoritative sources and configured versions",
+    "Approved consolidated recovery materials"
+  ],
+  "local_candidates": [
+    {
+      "source": "docs\\architecture\\ADR_P0_S06_REGULATORY_CONTRACT_POLICY.md",
+      "sha256": "02001aed10ee8a4791e56ab0a5d4dd2b6b7d1da332a1685cc1308e3ef64e2f4a",
+      "matching_lines": 3,
+      "sample": [
+        {
+          "line": 45,
+          "text": "- **Stored versus effective behavior:** `tax_basis`/`insurance_basis` accept"
+        },
+        {
+          "line": 69,
+          "text": "| `tax_rate`, `tax_basis` | Reviewed effective-dated regulatory rule version plus validated applicability facts. Contract tax presentation/classification may be input, never an unrestricted override of a mandatory rule. |"
+        },
+        {
+          "line": 70,
+          "text": "| `insurance_rate`, `insurance_basis` | Reviewed regulatory rule/applicability where statutory; explicitly classified contract terms where a commercial deduction. The generic legacy field is insufficient to decide which meaning applies. |"
+        }
+      ],
+      "classification": "Contract/schema/requirement or retained execution context, not automatically an approved effective statutory value"
+    },
+    {
+      "source": "docs\\architecture\\BILLING_AND_PROGRESS_CLAIMS.md",
+      "sha256": "832a9b163dc46fe4dd4a3c2ff95c3a7c3e4a2117a7706da3db6437f20cb89fae",
+      "matching_lines": 1,
+      "sample": [
+        {
+          "line": 57,
+          "text": "| `ContractorComplianceAssessment` | One approved payable certificate; Tenant/project/contract/party and reviewed effective policy; insurance basis/rate/deduction facts; optional pinned approved effective clearance; calculation/submission/decision snapshots | `draft → submitted → approved` or `returned`; it is evidence only and has no AP, journal, cost, Treasury or cash effect. |"
+        }
+      ],
+      "classification": "Contract/schema/requirement or retained execution context, not automatically an approved effective statutory value"
+    },
+    {
+      "source": "docs\\architecture\\P6_S01_S06_BILLING_TERMS_REGULATORY_IMPLEMENTATION.md",
+      "sha256": "f47398fb1cb1c87aa0dc5bb54eab504e349b2ccad189eeed201f2dae82ca1e68",
+      "matching_lines": 1,
+      "sample": [
+        {
+          "line": 31,
+          "text": "| Contracts | `ContractTermVersion` owns effective retention, advance recovery and contractual-insurance rates/bases/caps. Approval is permissioned, audited, row-locked and author/approver separated. Approved/superseded versions are immutable. |"
+        }
+      ],
+      "classification": "Contract/schema/requirement or retained execution context, not automatically an approved effective statutory value"
+    },
+    {
+      "source": "docs\\architecture\\P6_S26_S32_TAXPAYER_CONTRACTOR_COMPLIANCE_IMPLEMENTATION.md",
+      "sha256": "a9fa42d2adf99066f7a56470733f46d67880399007bff51b6671ae2780516b0f",
+      "matching_lines": 1,
+      "sample": [
+        {
+          "line": 34,
+          "text": "- `ContractorComplianceAssessment` records a policy-pinned insurance basis,"
+        }
+      ],
+      "classification": "Contract/schema/requirement or retained execution context, not automatically an approved effective statutory value"
+    },
+    {
+      "source": "docs\\architecture\\P7_S13_S22_CORE_PAYROLL_IMPLEMENTATION.md",
+      "sha256": "5acbcf501d726589b90ba143ab330cec3b651376292c8d8574f73a7c6358e990",
+      "matching_lines": 2,
+      "sample": [
+        {
+          "line": 200,
+          "text": "P7-S13–S22 contains no Iranian tax rate/bracket/exemption, employee/employer social"
+        },
+        {
+          "line": 201,
+          "text": "insurance rate/cap, minimum wage, statutory allowance, overtime formula, legal"
+        }
+      ],
+      "classification": "Contract/schema/requirement or retained execution context, not automatically an approved effective statutory value"
+    },
+    {
+      "source": "docs\\architecture\\history\\PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md",
+      "sha256": "cc0e23e97617cd1d3bb717e0ccc544ec51e1d949ff7d6547fa0d98c67b2ab14e",
+      "matching_lines": 1,
+      "sample": [
+        {
+          "line": 266,
+          "text": "| Social insurance | Employee wage/insurance list, contribution components, contractor Article 38 controls, clearance and retention evidence | P6-S26–S32 implements Platform-policy-pinned contractor insurance basis/rate/deduction and approved-clearance facts with no fixed global percentage or financial effect. Employee lists remain P7.2; Article 38 interpretation/effects, official schema/provider filing and legal activation remain missing. | Bounded contractor evidence accepted; **legal review r"
+        }
+      ],
+      "classification": "Contract/schema/requirement or retained execution context, not automatically an approved effective statutory value"
+    },
+    {
+      "source": "docs\\governance\\cep\\supporting\\synthetic-dev-v2\\docs\\DEV_PAYROLL_YTD_BINDING_v2.md",
+      "sha256": "d837ed6be0f9be1d8f8e16ee4eb2fdc562c9c46f20ce17acec73cacf619d4e21",
+      "matching_lines": 1,
+      "sample": [
+        {
+          "line": 36,
+          "text": "3. Do not attach statutory/tax/insurance rates or Production legal meaning."
+        }
+      ],
+      "classification": "Contract/schema/requirement or retained execution context, not automatically an approved effective statutory value"
+    },
+    {
+      "source": "docs\\governance\\uiux\\wave_c_domain_resolution\\COMPLETION_REPORT.md",
+      "sha256": "5aebb404afcb906289dce91f319b2fc7af3254ad28640e5560ef5a88be1fe3c1",
+      "matching_lines": 1,
+      "sample": [
+        {
+          "line": 59,
+          "text": "live banking/payment release, genuine Iranian tax/insurance rate and legal"
+        }
+      ],
+      "classification": "Contract/schema/requirement or retained execution context, not automatically an approved effective statutory value"
+    },
+    {
+      "source": "apps/organizations/policy_specs.py",
+      "sha256": "e0b3a314d351e1841c93d8ca6e5e111cddc36bb7a62e7f470df5d740e621c6b9",
+      "matching_lines": 5,
+      "sample": [
+        {
+          "line": 21,
+          "text": "RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE = \"receivable-claim-regulatory\""
+        },
+        {
+          "line": 187,
+          "text": "PolicyFieldSpec(\"tax_rate\", str, None),"
+        },
+        {
+          "line": 188,
+          "text": "PolicyFieldSpec(\"tax_basis\", str, (\"gross\", \"after_contractual\")),"
+        },
+        {
+          "line": 189,
+          "text": "PolicyFieldSpec(\"insurance_rate\", str, None),"
+        },
+        {
+          "line": 190,
+          "text": "PolicyFieldSpec(\"insurance_basis\", str, (\"gross\", \"after_contractual\")),"
+        }
+      ],
+      "classification": "Contract/schema/requirement or retained execution context, not automatically an approved effective statutory value"
+    },
+    {
+      "source": "apps/contracts/models.py",
+      "sha256": "4298da5236f13a049ca848647eaa1d0627b967fb3965bbdccdc5d780971ee169",
+      "matching_lines": 6,
+      "sample": [
+        {
+          "line": 281,
+          "text": "contractual_insurance_rate = models.DecimalField("
+        },
+        {
+          "line": 287,
+          "text": "contractual_insurance_basis = models.CharField("
+        },
+        {
+          "line": 340,
+          "text": "& models.Q(contractual_insurance_rate__gte=0)"
+        },
+        {
+          "line": 341,
+          "text": "& models.Q(contractual_insurance_rate__lte=100)"
+        },
+        {
+          "line": 435,
+          "text": "\"contractual_insurance_rate\","
+        }
+      ],
+      "classification": "Contract/schema/requirement or retained execution context, not automatically an approved effective statutory value"
+    },
+    {
+      "source": "apps/billing/services.py",
+      "sha256": "a3ccfedc2a0677e1188874830e9ad9c6cfef127933d48c8dae04292a8f86b9e2",
+      "matching_lines": 5,
+      "sample": [
+        {
+          "line": 1498,
+          "text": "rate=term.contractual_insurance_rate,"
+        },
+        {
+          "line": 1507,
+          "text": "if regulatory_parameters[\"tax_basis\"] == \"gross\""
+        },
+        {
+          "line": 1512,
+          "text": "if regulatory_parameters[\"insurance_basis\"] == \"gross\""
+        },
+        {
+          "line": 1518,
+          "text": "rate=Decimal(regulatory_parameters[\"tax_rate\"]),"
+        },
+        {
+          "line": 1525,
+          "text": "rate=Decimal(regulatory_parameters[\"insurance_rate\"]),"
+        }
+      ],
+      "classification": "Contract/schema/requirement or retained execution context, not automatically an approved effective statutory value"
+    }
+  ],
+  "approved_recovery_archives": [
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_CANDIDATE_CANONICALIZATION_CONSOLIDATED_LATEST.zip",
+      "sha256": "964ae57725ebe69c0123ad17465d97aab35435495eecc4bba345ae261e3546cc",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip",
+      "sha256": "15f8d71a3f3e14feed9e7162b81f74ad39b546df9aff3ec5b01e1a676deaf429",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_CODEX_EXECUTION_PROMPT_CONSOLIDATED_LATEST.zip",
+      "sha256": "0e4c91e3ce3899aa265fb57866ad2be9db019eed993003d59ef30befc8894a8e",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_CODEX_IMPLEMENTATION_PLAYBOOK_CONSOLIDATED_LATEST.zip",
+      "sha256": "f2b4a3e356595398bc81a67b26dc365cbca3dfca00e45074ff032bb8e7b986c8",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_CONTROLLED_CEP_AUTHORIZATION_CONSOLIDATED_LATEST.zip",
+      "sha256": "a77745fc409b81fc1e848406e2b62bbb8f356b5b145074a8e89a23bbf3cfa655",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_DOMAIN_TARGET_RECONCILIATION_CONSOLIDATED_LATEST.zip",
+      "sha256": "fd28d9c82fbdf4d5e7f20f5f6b58d2e11d4b86577e24863a36e7fd92a4db2abe",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_ESS_FUNCTIONAL_SPECIFICATION_CONSOLIDATED_LATEST.zip",
+      "sha256": "5b0ca33c0336ed3640de34715484b7b63f3ae59d116a3670795d6969af7cedc1",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG_CONSOLIDATED_LATEST.zip",
+      "sha256": "7cc3d73c1673b8d50cec337ea030514248ae0115cfc3aef260e212ad0a04b6be",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_IMPLEMENTATION_DEPENDENCY_GRAPH_CONSOLIDATED_LATEST.zip",
+      "sha256": "dc0d006be37dcf9f48051da7a878342e2397d0db3962d1b0ce50bfef539de5c6",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_IMPLEMENTATION_ROADMAP_CONSOLIDATED_LATEST.zip",
+      "sha256": "54082de6f32d9a26805aaa3050f24a9863d73f840d827274f0cd3145988b6784",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_PRE_FREEZE_CHANGE_MANIFEST_CONSOLIDATED_LATEST.zip",
+      "sha256": "2ee59c49cb08891fb5b0477cbf6dbf694fa787af67fb2a46a56808a97ef12bb5",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_PRODUCT_DECISION_FREEZE_CONSOLIDATED_LATEST.zip",
+      "sha256": "1c11429f2e0cc16c61b585832537e5035d19d008bccefc4e94f6d18839047599",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_PRODUCT_REVIEW_CONSOLIDATED_LATEST.zip",
+      "sha256": "51d9276179bf60065473cb425a161a210c7e46001849e11f36b1792d17cb9503",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip",
+      "sha256": "cf45d1f6db5821084205e3cdf0553cd68c036855cd4c1d5bbe1ee28c7e6693be",
+      "candidates": []
+    },
+    {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_UI_WORKSPACE_ARCHITECTURE_CONSOLIDATED_LATEST.zip",
+      "sha256": "d38decb2eec08ff20b4ac2fc012943dbb6c043addec3da4939f86b0f8c4a874b",
+      "candidates": []
+    }
+  ],
+  "database_evidence": {
+    "policy_code": "receivable-claim-regulatory",
+    "all_status_version_count": 0,
+    "versions": [],
+    "target_tenant_contract_term_versions": 0,
+    "all_tenant_contract_term_version_count": 0,
+    "target_tenant_billing_config_count": 0,
+    "target_tenant_claim_count": 0
+  },
+  "authoritative_semantics": "policy_specs approves schema/ranges only, explicitly not statutory values. policy_services resolver requires effective published/eligible retired external-authority version, source links and ACCEPTED review. Contract terms are independently approved; Tenant config has no statutory authority.",
+  "result": "BLOCKED_NO_QUALIFIED_EFFECTIVE_INPUTS_RECOVERED",
+  "affected_cases": [
+    "UAT-CASE-009",
+    "UAT-CASE-023"
+  ],
+  "conditional_intersection": "UAT-CASE-016 AR branch needs a registered receivable producer source; if Billing-backed it inherits these exact source inputs, not a new implementation dependency.",
+  "missing_obligations": [
+    {
+      "field": "tax_rate",
+      "missing": "Approved effective Decimal rate value",
+      "authority": "Applicable external statutory/tax authority; accepted professional review; published/effective Platform policy"
+    },
+    {
+      "field": "tax_basis",
+      "missing": "Approved applicable gross or after_contractual selection",
+      "authority": "Same external authority and accepted review; an allowed enum is not an approved selection"
+    },
+    {
+      "field": "insurance_rate",
+      "missing": "Approved effective Decimal statutory-insurance rate value",
+      "authority": "Applicable external insurance authority; accepted professional review; published/effective Platform policy"
+    },
+    {
+      "field": "insurance_basis",
+      "missing": "Approved applicable gross or after_contractual selection",
+      "authority": "Same external authority and accepted review; no engineering default"
+    },
+    {
+      "field": "effective_source_provenance",
+      "missing": "Citable source identity/version and effective applicability tied to the four parameters",
+      "authority": "External authority; PlatformPolicyVersionSource and effective version lifecycle"
+    },
+    {
+      "field": "accepted_professional_review",
+      "missing": "Real accepted review evidence on the same effective regulatory version",
+      "authority": "Authorized qualified reviewer; not a fictional test approval or Codex Human Sign-off"
+    },
+    {
+      "field": "ContractTermVersion",
+      "missing": "Applicable independently approved effective contract terms for the isolated receivable contract",
+      "authority": "Authorized contract/commercial owner; preserve explicit payment, retention, advance-recovery and contractual-insurance terms"
+    },
+    {
+      "field": "TenantBillingConfiguration",
+      "missing": "Applicable authorized tenant numbering/period/precision configuration",
+      "authority": "Existing governed Tenant configuration authority; no invented commercial/statutory ownership"
+    }
+  ],
+  "excluded_as_authority": [
+    "Illustrative/test rates and fixture professional-review stubs",
+    "Allowed schema enums and ranges",
+    "Financial defaults, zero substitutions or technical catalog existence",
+    "Historical documents without exact effective applicability and accepted source/review evidence"
+  ],
+  "no_values_created": true,
+  "no_contract_configuration_claim_or_statutory_activation_created": true,
+  "minimum_next_action": "Provide the governing external source/effective values and real accepted professional review, approved contract terms and tenant configuration. Publish/import only through existing governed lifecycles, then create minimal isolated claim/AR/settlement starting states. Do not broaden scope or infer Production authority."
+}

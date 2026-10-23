@@ -1,0 +1,40 @@
+{
+  "focused": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/sp031_f128_remediation_evidence/run_validation.py tests/test_uiux_sp031_training_requirement_scope.py -q --reuse-db --tb=short --junitxml=docs/governance/uiux/sp031_f128_remediation_evidence/focused.xml",
+    "exit_code": 0,
+    "tests": 19,
+    "subtests": 37
+  },
+  "regression": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/sp031_f128_remediation_evidence/run_validation.py apps/workforce/tests.py apps/workforce/test_p7_s01_s05_workforce_foundation.py tests/test_uiux_f111_pattern_project_scope.py::TrainingRequirementProjectScopeTests -q --reuse-db --tb=short --junitxml=docs/governance/uiux/sp031_f128_remediation_evidence/regression.xml",
+    "exit_code": 1,
+    "passed": 37,
+    "subtests_passed": 41,
+    "baseline_failures": 30,
+    "new_regressions": 0
+  },
+  "baseline_regression": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/sp031_f128_remediation_evidence/run_validation.py --entry apps/workforce/tests.py apps/workforce/test_p7_s01_s05_workforce_foundation.py tests/test_uiux_f111_pattern_project_scope.py::TrainingRequirementProjectScopeTests -q --reuse-db --tb=short --junitxml=docs/governance/uiux/sp031_f128_remediation_evidence/baseline_regression.xml",
+    "exit_code": 1,
+    "result": "Exact match of all 67 test outcomes and failure messages"
+  },
+  "runtime": {
+    "commands": [
+      "runtime.py prepare",
+      "manage.py runserver 127.0.0.1:8014 --noreload",
+      "runtime.py http",
+      "runtime.py direct",
+      "cua_repl browser verification",
+      "runtime.py after"
+    ],
+    "http": 40,
+    "direct": 18,
+    "browser": 7,
+    "server_browser_POSTs": 3,
+    "authorized_successes": 3,
+    "unauthorized_writes": 0
+  },
+  "checks": "CHECKS.json; SOURCE_BOUNDARY.json; VERIFICATION.json",
+  "migration": "NO",
+  "safety": "No global authorization/domain/schema changes, no F111 family updates, no Wave C/CEP078/079/Production/Git writes"
+}

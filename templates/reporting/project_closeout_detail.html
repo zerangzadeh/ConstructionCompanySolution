@@ -2,7 +2,7 @@
 {% load erp_format %}
 {% block title %}پرونده اختتام {{ case.project.code }}{% endblock %}
 {% block content %}
-<main class="mx-auto max-w-7xl space-y-6 px-4 py-6" dir="rtl">
+<section class="mx-auto max-w-7xl space-y-6 px-4 py-6" dir="rtl">
   <header class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
     <div class="flex flex-wrap items-start justify-between gap-3"><div><p class="text-xs font-semibold text-blue-700">شاهد کنترل مشتق — بدون اثر پایین‌دستی</p><h1 class="mt-2 text-2xl font-bold">{{ case.project.code }} — {{ case.project.name }}</h1></div><span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold">{{ case.get_status_display }}</span></div>
     <dl class="mt-4 grid gap-3 text-sm md:grid-cols-4"><div><dt class="text-slate-500">الگو</dt><dd dir="ltr">{{ case.profile_version.definition.code }} / v{{ case.profile_version.version }}</dd></div><div><dt class="text-slate-500">نسخه وضعیت</dt><dd dir="ltr">{{ case.revision }}</dd></div><div><dt class="text-slate-500">ایجادکننده</dt><dd>{{ case.created_by }}</dd></div><div><dt class="text-slate-500">آخرین تغییر</dt><dd>{{ case.updated_at|jalali_datetime }}</dd></div></dl>
@@ -31,5 +31,5 @@
 
   <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h2 class="font-bold">تاریخچه تغییرناپذیر</h2><div class="mt-3 overflow-x-auto"><table class="min-w-full text-right text-sm"><thead><tr class="border-b text-slate-500"><th class="p-2">زمان</th><th class="p-2">اقدام</th><th class="p-2">گذار</th><th class="p-2">عامل</th><th class="p-2">دلیل</th></tr></thead><tbody>{% for event in case.events.all %}<tr class="border-b border-slate-100"><td class="p-2">{{ event.created_at|jalali_datetime }}</td><td class="p-2" dir="ltr">{{ event.action }}</td><td class="p-2" dir="ltr">{{ event.previous_state }} → {{ event.new_state }}</td><td class="p-2">{{ event.actor }}</td><td class="p-2">{{ event.reason }}</td></tr>{% empty %}<tr><td class="p-4 text-slate-500" colspan="5">هنوز رویدادی ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div></section>
   <a class="inline-flex font-semibold text-blue-700" href="{% url 'reporting:project_closeout_workbench' %}">بازگشت به کارگاه اختتام</a>
-</main>
+</section>
 {% endblock %}

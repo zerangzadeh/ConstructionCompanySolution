@@ -1,0 +1,415 @@
+........................................................ [ 55%]
+............FFFFFFFFFFFFFFFF.FF..F.F.F.......                                                   [100%]
+================================== FAILURES ===================================
+______ ProtectedOpeningTests.test_audit_failure_rolls_back_opening_event ______
+apps\procurement\test_p5_s09_protected_opening.py:55: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:121: in _closed_revision
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ProtectedOpeningTests.test_earliest_boundary_permission_and_cross_tenant_fail_closed _
+apps\procurement\test_p5_s09_protected_opening.py:55: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:121: in _closed_revision
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ProtectedOpeningTests.test_hash_or_latest_non_clean_assessment_blocks_access _
+apps\procurement\test_p5_s09_protected_opening.py:55: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:121: in _closed_revision
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ProtectedOpeningTests.test_independent_approval_requires_clean_package_and_is_immutable _
+apps\procurement\test_p5_s09_protected_opening.py:55: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:121: in _closed_revision
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ProtectedOpeningTests.test_no_generic_storage_url_or_filesystem_path_is_returned _
+apps\procurement\test_p5_s09_protected_opening.py:55: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:121: in _closed_revision
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ProtectedOpeningTests.test_opening_permission_is_intersected_with_exact_project_scope _
+apps\procurement\test_p5_s09_protected_opening.py:55: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:121: in _closed_revision
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ProtectedOpeningTests.test_request_permanently_freezes_exact_package_and_is_idempotent _
+apps\procurement\test_p5_s09_protected_opening.py:55: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:121: in _closed_revision
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ProtectedOpeningTests.test_revision_grant_delivery_and_revocation_enforce_least_privilege _
+apps\procurement\test_p5_s09_protected_opening.py:55: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:121: in _closed_revision
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ SupplierPortalFoundationTests.test_acceptance_creates_no_membership_and_context_is_exact_scope _
+apps\procurement\test_p5_s18_s22_supplier_portal.py:88: in test_acceptance_creates_no_membership_and_context_is_exact_scope
+    rfq_invitation, _, grant = self._accepted_grant()
+                               ^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s18_s22_supplier_portal.py:52: in _accepted_grant
+    rfq_invitation = self._issued_invitation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_quotes.py:36: in _issued_invitation
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ SupplierPortalFoundationTests.test_accepted_identity_is_denied_after_email_rebind _
+apps\procurement\test_p5_s18_s22_supplier_portal.py:151: in test_accepted_identity_is_denied_after_email_rebind
+    _, _, grant = self._accepted_grant()
+                  ^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s18_s22_supplier_portal.py:52: in _accepted_grant
+    rfq_invitation = self._issued_invitation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_quotes.py:36: in _issued_invitation
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ SupplierPortalFoundationTests.test_ambiguous_email_and_internal_membership_fail_closed _
+apps\procurement\test_p5_s18_s22_supplier_portal.py:127: in test_ambiguous_email_and_internal_membership_fail_closed
+    rfq_invitation = self._issued_invitation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_quotes.py:36: in _issued_invitation
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ SupplierPortalFoundationTests.test_email_impersonation_and_cross_tenant_invitation_are_denied _
+apps\procurement\test_p5_s18_s22_supplier_portal.py:103: in test_email_impersonation_and_cross_tenant_invitation_are_denied
+    rfq_invitation = self._issued_invitation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_quotes.py:36: in _issued_invitation
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ SupplierPortalFoundationTests.test_invitation_management_is_default_ungranted_and_token_hash_only _
+apps\procurement\test_p5_s18_s22_supplier_portal.py:66: in test_invitation_management_is_default_ungranted_and_token_hash_only
+    rfq_invitation = self._issued_invitation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_quotes.py:36: in _issued_invitation
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ SupplierPortalFoundationTests.test_new_submission_supersedes_without_mutating_history _
+apps\procurement\test_p5_s18_s22_supplier_portal.py:192: in test_new_submission_supersedes_without_mutating_history
+    _, _, grant = self._accepted_grant()
+                  ^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s18_s22_supplier_portal.py:52: in _accepted_grant
+    rfq_invitation = self._issued_invitation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_quotes.py:36: in _issued_invitation
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ SupplierPortalFoundationTests.test_revocation_is_append_only_and_immediately_denies_access _
+apps\procurement\test_p5_s18_s22_supplier_portal.py:212: in test_revocation_is_append_only_and_immediately_denies_access
+    _, _, grant = self._accepted_grant()
+                  ^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s18_s22_supplier_portal.py:52: in _accepted_grant
+    rfq_invitation = self._issued_invitation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_quotes.py:36: in _issued_invitation
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ SupplierPortalFoundationTests.test_submission_reuses_quote_revision_and_is_idempotent _
+apps\procurement\test_p5_s18_s22_supplier_portal.py:158: in test_submission_reuses_quote_revision_and_is_idempotent
+    _, _, grant = self._accepted_grant()
+                  ^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s18_s22_supplier_portal.py:52: in _accepted_grant
+    rfq_invitation = self._issued_invitation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_quotes.py:36: in _issued_invitation
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ProtectedOpeningConcurrencyTests.test_equivalent_request_and_approval_retries_converge _
+apps\procurement\test_p5_s09_protected_opening.py:388: in test_equivalent_request_and_approval_retries_converge
+    revision, _ = self._closed_revision()
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:121: in _closed_revision
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ SupplierPortalConcurrencyTests.test_concurrent_identical_submission_creates_one_receipt _
+apps\procurement\test_p5_s18_s22_supplier_portal.py:237: in test_concurrent_identical_submission_creates_one_receipt
+    _, _, grant = self._accepted_grant()
+                  ^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s18_s22_supplier_portal.py:52: in _accepted_grant
+    rfq_invitation = self._issued_invitation()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_quotes.py:36: in _issued_invitation
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ PermissionRegistryArchitectureTests.test_every_managed_business_model_is_registered_exactly_once _
+apps\organizations\test_permission_registry.py:95: in test_every_managed_business_model_is_registered_exactly_once
+    self.assertEqual(duplicates, [])
+E   AssertionError: Lists differ: ['payroll.FinancialHandoffLine', 'payroll.[74 chars]lip'] != []
+E   
+E   First list contains 4 additional elements.
+E   First extra element 0:
+E   'payroll.FinancialHandoffLine'
+E   
+E   + []
+E   - ['payroll.FinancialHandoffLine',
+E   -  'payroll.FinancialHandoffProposal',
+E   -  'payroll.FinancialHandoffReview',
+E   -  'payroll.Payslip']
+_ PermissionRegistryArchitectureTests.test_every_registered_permission_is_referenced_by_its_enforcement_module _
+apps\organizations\test_permission_registry.py:112: in test_every_registered_permission_is_referenced_by_its_enforcement_module
+    self.assertEqual(missing, {})
+E   AssertionError: {'support': ['SUPPORT_AUDIT_RECONCILE'], '[1806 chars]EN']} != {}
+E   Diff is 2564 characters long. Set self.maxDiff to None to see it.
+_ PermissionRegistryArchitectureTests.test_resource_keys_are_unique_and_match_permission_namespaces _
+apps\organizations\test_permission_registry.py:78: in test_resource_keys_are_unique_and_match_permission_namespaces
+    self.assertEqual(namespace_mismatches, [])
+E   AssertionError: Lists differ: ['billing_variation_eligibility.retry', 'b[2223 chars]age'] != []
+E   
+E   First list contains 77 additional elements.
+E   First extra element 0:
+E   'billing_variation_eligibility.retry'
+E   
+E   Diff is 2506 characters long. Set self.maxDiff to None to see it.
+=========================== short test summary info ===========================
+FAILED apps/procurement/test_p5_s09_protected_opening.py::ProtectedOpeningTests::test_audit_failure_rolls_back_opening_event
+FAILED apps/procurement/test_p5_s09_protected_opening.py::ProtectedOpeningTests::test_earliest_boundary_permission_and_cross_tenant_fail_closed
+FAILED apps/procurement/test_p5_s09_protected_opening.py::ProtectedOpeningTests::test_hash_or_latest_non_clean_assessment_blocks_access
+FAILED apps/procurement/test_p5_s09_protected_opening.py::ProtectedOpeningTests::test_independent_approval_requires_clean_package_and_is_immutable
+FAILED apps/procurement/test_p5_s09_protected_opening.py::ProtectedOpeningTests::test_no_generic_storage_url_or_filesystem_path_is_returned
+FAILED apps/procurement/test_p5_s09_protected_opening.py::ProtectedOpeningTests::test_opening_permission_is_intersected_with_exact_project_scope
+FAILED apps/procurement/test_p5_s09_protected_opening.py::ProtectedOpeningTests::test_request_permanently_freezes_exact_package_and_is_idempotent
+FAILED apps/procurement/test_p5_s09_protected_opening.py::ProtectedOpeningTests::test_revision_grant_delivery_and_revocation_enforce_least_privilege
+FAILED apps/procurement/test_p5_s18_s22_supplier_portal.py::SupplierPortalFoundationTests::test_acceptance_creates_no_membership_and_context_is_exact_scope
+FAILED apps/procurement/test_p5_s18_s22_supplier_portal.py::SupplierPortalFoundationTests::test_accepted_identity_is_denied_after_email_rebind
+FAILED apps/procurement/test_p5_s18_s22_supplier_portal.py::SupplierPortalFoundationTests::test_ambiguous_email_and_internal_membership_fail_closed
+FAILED apps/procurement/test_p5_s18_s22_supplier_portal.py::SupplierPortalFoundationTests::test_email_impersonation_and_cross_tenant_invitation_are_denied
+FAILED apps/procurement/test_p5_s18_s22_supplier_portal.py::SupplierPortalFoundationTests::test_invitation_management_is_default_ungranted_and_token_hash_only
+FAILED apps/procurement/test_p5_s18_s22_supplier_portal.py::SupplierPortalFoundationTests::test_new_submission_supersedes_without_mutating_history
+FAILED apps/procurement/test_p5_s18_s22_supplier_portal.py::SupplierPortalFoundationTests::test_revocation_is_append_only_and_immediately_denies_access
+FAILED apps/procurement/test_p5_s18_s22_supplier_portal.py::SupplierPortalFoundationTests::test_submission_reuses_quote_revision_and_is_idempotent
+FAILED apps/procurement/test_p5_s09_protected_opening.py::ProtectedOpeningConcurrencyTests::test_equivalent_request_and_approval_retries_converge
+FAILED apps/procurement/test_p5_s18_s22_supplier_portal.py::SupplierPortalConcurrencyTests::test_concurrent_identical_submission_creates_one_receipt
+FAILED apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_every_managed_business_model_is_registered_exactly_once
+FAILED apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_every_registered_permission_is_referenced_by_its_enforcement_module
+FAILED apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_resource_keys_are_unique_and_match_permission_namespaces
+21 failed, 80 passed, 65 subtests passed in 274.00s (0:04:33)

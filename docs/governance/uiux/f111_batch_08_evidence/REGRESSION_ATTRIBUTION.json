@@ -1,0 +1,185 @@
+{
+  "baseline_identical_to_current": true,
+  "tests_compared": 105,
+  "passed": 83,
+  "failures": [
+    {
+      "test": "apps.procurement.tests.ProcurementModelTests.test_issued_order_and_posted_receipt_details_are_immutable",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy Procurement fixtures deny create_purchase_request",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.procurement.tests.ProcurementServiceTests.test_order_amount_is_decimal_and_request_cannot_be_over_ordered",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy Procurement fixtures deny create_purchase_request",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.procurement.tests.ProcurementServiceTests.test_purchase_order_requires_approved_request_and_supplier_role",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy Procurement fixtures deny create_purchase_request",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.procurement.tests.ProcurementServiceTests.test_reads_and_mutations_are_tenant_scoped",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy Procurement fixtures deny create_purchase_request",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.procurement.tests.ProcurementServiceTests.test_receipt_cannot_exceed_order_and_void_reopens_order",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy Procurement fixtures deny create_purchase_request",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.procurement.tests.ProcurementServiceTests.test_receipts_complete_order_without_creating_inventory",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy Procurement fixtures deny create_purchase_request",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.procurement.tests.ProcurementServiceTests.test_rejection_requires_reason_and_is_terminal",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy Procurement fixtures deny create_purchase_request",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.procurement.tests.ProcurementServiceTests.test_request_workflow_is_role_controlled_and_audited",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy Procurement fixtures deny create_purchase_request",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.procurement.tests.ProcurementPanelTests.test_owner_can_open_scoped_procurement_pages",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy Procurement fixtures deny create_purchase_request",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.contracts.tests.ContractServiceTests.test_active_member_without_view_permission_cannot_see_contracts",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy role-only ContractServiceTests setup denies create_project",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.contracts.tests.ContractServiceTests.test_contract_create_view_creates_contract",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy role-only ContractServiceTests setup denies create_project",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.contracts.tests.ContractServiceTests.test_contract_create_view_exposes_only_active_tenant_projects",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy role-only ContractServiceTests setup denies create_project",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.contracts.tests.ContractServiceTests.test_contract_detail_returns_not_found_for_another_organization",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy role-only ContractServiceTests setup denies create_project",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.contracts.tests.ContractServiceTests.test_contract_list_filters_can_be_combined_and_cleared",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy role-only ContractServiceTests setup denies create_project",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.contracts.tests.ContractServiceTests.test_contract_list_links_to_tenant_scoped_detail",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy role-only ContractServiceTests setup denies create_project",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.contracts.tests.ContractServiceTests.test_contract_list_requires_active_organization",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy role-only ContractServiceTests setup denies create_project",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.contracts.tests.ContractServiceTests.test_contract_number_is_unique_per_organization",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy role-only ContractServiceTests setup denies create_project",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.contracts.tests.ContractServiceTests.test_contract_queryset_is_tenant_scoped",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy role-only ContractServiceTests setup denies create_project",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.contracts.tests.ContractServiceTests.test_contract_rejects_negative_value",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy role-only ContractServiceTests setup denies create_project",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.contracts.tests.ContractServiceTests.test_contract_rejects_project_from_other_organization",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy role-only ContractServiceTests setup denies create_project",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.contracts.tests.ContractServiceTests.test_create_contract_scopes_project_and_records_audit",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy role-only ContractServiceTests setup denies create_project",
+      "exact_baseline_message_match": true
+    },
+    {
+      "test": "apps.contracts.tests.ContractServiceTests.test_view_permission_allows_read_but_not_contract_management",
+      "classification": "BASELINE TEST DEBT",
+      "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+      "source_not_reached": "BATCH-08 forms/views",
+      "cause": "Legacy role-only ContractServiceTests setup denies create_project",
+      "exact_baseline_message_match": true
+    }
+  ],
+  "new_failures": [],
+  "replay": "Import loader executes all eight captured dirty-entry source files; no working file replaced"
+}

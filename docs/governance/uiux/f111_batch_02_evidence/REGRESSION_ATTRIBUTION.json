@@ -1,0 +1,50 @@
+{
+  "legacy_passes": 53,
+  "legacy_subtests_passed": 131,
+  "baseline_failures_reproduced": 8,
+  "attributable_regressions": 0,
+  "comparison": "Exact dirty-entry Billing forms replayed in memory; other current source retained",
+  "cause": "CommercialControlTests.setUp -> create_project PermissionDenied before forms or target service",
+  "results": [
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_audit_records_lifecycle_without_financial_side_effect",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633"
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_clearance_requirement_is_explicit_and_effective_dated",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633"
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_expiry_and_compliance_renewal_preserve_history",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633"
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_guarantee_workflow_exposure_release_and_immutable_history",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633"
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_missing_contract_authority_unsafe_evidence_and_tenant_scope_fail_closed",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633"
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_retention_release_calculation_correction_and_fail_closed_cap",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633"
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_rtl_operational_dashboard_is_tenant_scoped",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633"
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_workflow_domain_and_audit_failure_roll_back_atomically",
+      "identical_failure": true,
+      "failure_sha256": "2dc788bdcd38fdb1149bb6ce31ddfecb9f60de559ff633e275c88bd828c93633"
+    }
+  ]
+}

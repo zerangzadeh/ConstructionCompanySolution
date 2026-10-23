@@ -1,0 +1,45 @@
+{
+  "focused": {
+    "command": "python f111_batch_02_evidence/run_validation.py tests/test_uiux_f111_pattern_clearance_scope.py --reuse-db -q --tb=short --junitxml=.../focused_final.xml",
+    "tests_passed": 12,
+    "subtests_passed": 32,
+    "exit_code": 0
+  },
+  "regression": {
+    "command": "python f111_batch_02_evidence/run_validation.py tests/test_uiux_f111_pattern_commercial_scope.py apps/billing/test_commercial_controls.py::CommercialControlTests tests/test_uiux_f111_scope.py --reuse-db -q --tb=short --junitxml=.../regression.xml",
+    "tests_passed": 53,
+    "subtests_passed": 131,
+    "baseline_failures": 8,
+    "exit_code": 1
+  },
+  "baseline_replay": {
+    "command": "python f111_batch_02_evidence/run_validation.py --entry-forms apps/billing/test_commercial_controls.py::CommercialControlTests --reuse-db -q --tb=short --junitxml=.../baseline.xml",
+    "identical_failure_records": 8,
+    "exit_code": 1
+  },
+  "environment": {
+    "python": "C:/Users/azera/AppData/Local/Programs/Python/Python311/python.exe",
+    "PYTHONPATH": "E:/Construction_Company_Solution/.venv/Lib/site-packages",
+    "BONIRA_BATCH02_TEST_DATABASE": "test_bonira_uiux_batch01",
+    "document_storage": "TemporaryDirectory, outside checkout"
+  },
+  "checks": {
+    "django_check": 0,
+    "ruff": 0,
+    "ruff_format": 0,
+    "whitespace": 0,
+    "migration_check": 0
+  },
+  "migration": "NO",
+  "runtime_http_available_controls": 4,
+  "runtime_required_positive_and_source_backed_negatives": "PENDING_NO_QUALIFYING_SOURCES",
+  "finding": "UIUX-F-122",
+  "finding_status": "OPEN",
+  "implementation_status": "REMEDIATION_IMPLEMENTED_PENDING_RUNTIME_RETEST",
+  "initial_fresh_test_database": "Owned test_bonira_uiux_batch02 partial schema setup stopped after cached acceptance PASS; own disposable database dropped after zero connections verified",
+  "test_fixture_iterations": [
+    "focused_fixture_failure: required revision_reason added",
+    "focused_harness_failure: draft approval metadata and message-based error assertions corrected",
+    "focused_term_fixture_failure: corrected term draft metadata; final suite PASS"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "record": {
+    "evidence_id": "RV-EV-038",
+    "scenario_id": "UIUX-F-111_RUNTIME_RETEST",
+    "target": "Manipulated POST and invalid redisplay",
+    "executed_at": "2026-10-22T01:23:01.876060+03:30",
+    "runtime": {
+      "environment_name": "Development",
+      "base_url": "http://127.0.0.1:8002",
+      "git_sha": "43ac319c6e73e48ca9626461b73987922c498ec3",
+      "branch": "main",
+      "browser": "Codex in-app browser",
+      "browser_version": "155.0.8059.80",
+      "browser_version_source": "diagnostics/F111_RETEST_BROWSER_VERSION.json",
+      "source_dirty": true
+    },
+    "persona": {
+      "persona_id": "P-17",
+      "test_user_alias": "uiux.persona.project-manager",
+      "organization_alias": "demo-construction-01",
+      "authorized_projects": [
+        "PRJ-01-01",
+        "PRJ-01-02"
+      ],
+      "authority_reference": "diagnostics/F111_RETEST_BEFORE.json#authority"
+    },
+    "result": "PASS",
+    "actual_result": "15 final HTTP POSTs: C/D/X against Daily, Equipment, PO and Workforce (12), plus A with C site/phase/request on original three surfaces (3). All HTTP 200 invalid, no rejected metadata redisplayed, no business/audit change. Otherwise-valid A payload checked without save for each form.",
+    "screenshots": [],
+    "diagnostics": [
+      "diagnostics/F111_RETEST_BROWSER_DOM.json",
+      "diagnostics/F111_RETEST_HTTP.json",
+      "diagnostics/F111_RETEST_BEFORE.json",
+      "diagnostics/F111_RETEST_AFTER.json"
+    ],
+    "product_mutation": false,
+    "business_mutation": false,
+    "historical_evidence_overwritten": false
+  }
+}

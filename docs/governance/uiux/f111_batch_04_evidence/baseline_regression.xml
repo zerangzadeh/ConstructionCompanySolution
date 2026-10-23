@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="15" skipped="0" tests="15" time="8.138" timestamp="2026-10-22T08:22:38.063462+03:30" hostname="Zerangzadeh"><testcase classname="apps.procurement.tests.ProcurementModelTests" name="test_issued_order_and_posted_receipt_details_are_immutable" time="5.566"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:255: in test_issued_order_and_posted_receipt_details_are_immutable
+    order, order_item = self.create_issued_order()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_order_amount_is_decimal_and_request_cannot_be_over_ordered" time="0.242"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:416: in test_order_amount_is_decimal_and_request_cannot_be_over_ordered
+    request, request_item = self.create_approved_request(Decimal(5))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_purchase_order_requires_approved_request_and_supplier_role" time="0.040"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:381: in test_purchase_order_requires_approved_request_and_supplier_role
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_reads_and_mutations_are_tenant_scoped" time="0.043"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:550: in test_reads_and_mutations_are_tenant_scoped
+    request, _ = self.create_approved_request()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_receipt_cannot_exceed_order_and_void_reopens_order" time="0.046"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:495: in test_receipt_cannot_exceed_order_and_void_reopens_order
+    order, order_item = self.create_issued_order(Decimal(5))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_receipts_complete_order_without_creating_inventory" time="0.061"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:449: in test_receipts_complete_order_without_creating_inventory
+    order, order_item = self.create_issued_order()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_rejection_requires_reason_and_is_terminal" time="0.062"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:338: in test_rejection_requires_reason_and_is_terminal
+    request, _ = self.create_approved_request()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementServiceTests" name="test_request_workflow_is_role_controlled_and_audited" time="0.055"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:292: in test_request_workflow_is_role_controlled_and_audited
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.tests.ProcurementPanelTests" name="test_owner_can_open_scoped_procurement_pages" time="0.154"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\tests.py:619: in test_owner_can_open_scoped_procurement_pages
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s12_s17_source_to_pay.P5S12S17SourceToPayTests" name="test_invoice_approval_and_exact_three_way_match_are_independent" time="0.134"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\test_p5_s12_s17_source_to_pay.py:228: in test_invoice_approval_and_exact_three_way_match_are_independent
+    order, item = self.create_issued_order(quantity=Decimal("5.0000"))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s12_s17_source_to_pay.P5S12S17SourceToPayTests" name="test_issue_versions_order_and_independent_change_supersedes" time="0.057"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\test_p5_s12_s17_source_to_pay.py:141: in test_issue_versions_order_and_independent_change_supersedes
+    order, _ = self.create_issued_order()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s12_s17_source_to_pay.P5S12S17SourceToPayTests" name="test_missing_policy_and_cross_tenant_invoice_fail_closed" time="0.052"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\test_p5_s12_s17_source_to_pay.py:250: in test_missing_policy_and_cross_tenant_invoice_fail_closed
+    order, _ = self.create_issued_order()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s12_s17_source_to_pay.P5S12S17SourceToPayTests" name="test_service_acceptance_is_version_pinned_and_conserved" time="0.047"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\test_p5_s12_s17_source_to_pay.py:180: in test_service_acceptance_is_version_pinned_and_conserved
+    order, _ = self.create_issued_order(quantity=Decimal("5.0000"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s12_s17_source_to_pay.P5S12S17SourceToPayTests" name="test_tolerance_classifies_but_charges_and_overbilling_block" time="0.048"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\test_p5_s12_s17_source_to_pay.py:286: in test_tolerance_classifies_but_charges_and_overbilling_block
+    order, item = self.create_issued_order(quantity=Decimal("10.0000"))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:163: in create_issued_order
+    request, request_item = self.create_approved_request(quantity)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s12_s17_source_to_pay.P5S12AwardConsumptionTests" name="test_final_award_requires_explicit_conserved_po_consumption" time="0.283"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:56: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:121: in _closed_revision
+    request, item = self.create_approved_request()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\tests.py:134: in create_approved_request
+    request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.</failure></testcase></testsuite></testsuites>

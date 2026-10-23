@@ -1,0 +1,934 @@
+[
+  {
+    "scenario": "RV-009",
+    "actor": "uiux.audit.project",
+    "path": "/inventory/",
+    "case": "quantity/custody/value read",
+    "method": "GET",
+    "status": 200,
+    "final_path": "/inventory/",
+    "response_sha256": "f16274bbf76f2683f7a08d79ac9b24b83024ef710288371b5482955bca27471e",
+    "html": "before2_http_001.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ],
+      "site_id": [
+        {
+          "value": "",
+          "label": "بدون کارگاه"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-009",
+    "actor": "uiux.audit.project",
+    "path": "/inventory/custody/",
+    "case": "quantity/custody/value read",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/inventory/custody/",
+    "response_sha256": "ef67400ce1c4c1c5d6b7c381f4d584b87b4ced9ed965b4c9698e013b4ea69208",
+    "html": "before2_http_002.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ],
+      "site_id": [
+        {
+          "value": "",
+          "label": "بدون کارگاه"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-009",
+    "actor": "uiux.audit.project",
+    "path": "/inventory/valuation/",
+    "case": "quantity/custody/value read",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/inventory/valuation/",
+    "response_sha256": "bea4102275e504d1896fd9fc2312620ee36ca754131e0075cf56f7d5fe8f2e43",
+    "html": "before2_http_003.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ],
+      "site_id": [
+        {
+          "value": "",
+          "label": "بدون کارگاه"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-009",
+    "actor": "uiux.audit.project",
+    "path": "/inventory/d5c8d76d-dd56-429b-a686-ea2f4c173ee2/",
+    "case": "warehouse scope A",
+    "method": "GET",
+    "status": 200,
+    "final_path": "/inventory/d5c8d76d-dd56-429b-a686-ea2f4c173ee2/",
+    "response_sha256": "6dd31251c5bbe5bdb126368aaef498034dcb9704b0c221e9909cbd1ba481a99d",
+    "html": "before2_http_004.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ],
+      "site_id": [
+        {
+          "value": "",
+          "label": "بدون کارگاه"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-009",
+    "actor": "uiux.audit.project",
+    "path": "/inventory/f7ea2436-8e34-4c06-8d5e-e95a28988b29/",
+    "case": "warehouse scope C",
+    "method": "GET",
+    "status": 404,
+    "final_path": "/inventory/f7ea2436-8e34-4c06-8d5e-e95a28988b29/",
+    "response_sha256": "7d897d53f44b06d867846fe5f7614a724581dbcb0a6a7289cedd8656839baae5",
+    "html": "before2_http_005.html",
+    "errors": [],
+    "selects": {}
+  },
+  {
+    "scenario": "RV-009",
+    "actor": "uiux.audit.project",
+    "path": "/inventory/ec3455bd-b774-4711-a7c6-607e7ca97125/",
+    "case": "warehouse scope X",
+    "method": "GET",
+    "status": 404,
+    "final_path": "/inventory/ec3455bd-b774-4711-a7c6-607e7ca97125/",
+    "response_sha256": "7d897d53f44b06d867846fe5f7614a724581dbcb0a6a7289cedd8656839baae5",
+    "html": "before2_http_006.html",
+    "errors": [],
+    "selects": {}
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/accounting/statements/",
+    "case": "statement authority and tenant",
+    "method": "GET",
+    "status": 200,
+    "final_path": "/accounting/statements/",
+    "response_sha256": "9e4c337ef47ef4f2e85086db1b173b6b3ad683c6ec7af3b4bcb0d5489611f1c2",
+    "html": "before2_http_007.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+          "label": "PRJ-01-03 — بازسازی کارخانه نوآوران"
+        },
+        {
+          "value": "623b4e02-b751-495f-b0e7-7e1601b9ccdf",
+          "label": "PRJ-01-04 — ساختمان اداری آفتاب"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        },
+        {
+          "value": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+          "label": "PRJ-01-02 — مرکز درمانی مهر"
+        }
+      ],
+      "kind": [
+        {
+          "value": "trial_balance",
+          "label": "تراز آزمایشی"
+        },
+        {
+          "value": "balance_sheet",
+          "label": "ترازنامه"
+        },
+        {
+          "value": "profit_loss",
+          "label": "صورت سود و زیان"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/accounting/statements/?kind=trial_balance&ends_on=1405%2F07%2F30",
+    "case": "statement authority and tenant",
+    "method": "GET",
+    "status": 200,
+    "final_path": "/accounting/statements/?kind=trial_balance&ends_on=1405%2F07%2F30",
+    "response_sha256": "be40175504bd033965a02d9482652e9179257fab62e9917ed512f86840fbbd65",
+    "html": "before2_http_008.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+          "label": "PRJ-01-03 — بازسازی کارخانه نوآوران"
+        },
+        {
+          "value": "623b4e02-b751-495f-b0e7-7e1601b9ccdf",
+          "label": "PRJ-01-04 — ساختمان اداری آفتاب"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        },
+        {
+          "value": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+          "label": "PRJ-01-02 — مرکز درمانی مهر"
+        }
+      ],
+      "kind": [
+        {
+          "value": "trial_balance",
+          "label": "تراز آزمایشی"
+        },
+        {
+          "value": "balance_sheet",
+          "label": "ترازنامه"
+        },
+        {
+          "value": "profit_loss",
+          "label": "صورت سود و زیان"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/accounting/statements/76e93194-0887-4096-9ac3-9a287c8ad9cb/",
+    "case": "statement authority and tenant",
+    "method": "GET",
+    "status": 200,
+    "final_path": "/accounting/statements/76e93194-0887-4096-9ac3-9a287c8ad9cb/",
+    "response_sha256": "d21f243c778c7ee65eb472532fdcd0e1a28f57b7c97c7c06db76032c841a4a52",
+    "html": "before2_http_009.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+          "label": "PRJ-01-03 — بازسازی کارخانه نوآوران"
+        },
+        {
+          "value": "623b4e02-b751-495f-b0e7-7e1601b9ccdf",
+          "label": "PRJ-01-04 — ساختمان اداری آفتاب"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        },
+        {
+          "value": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+          "label": "PRJ-01-02 — مرکز درمانی مهر"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/accounting/statements/bb0c706d-0da8-4829-aa58-3009fca097e4/",
+    "case": "statement authority and tenant",
+    "method": "GET",
+    "status": 404,
+    "final_path": "/accounting/statements/bb0c706d-0da8-4829-aa58-3009fca097e4/",
+    "response_sha256": "9c8c11c89d736361d5ed24a4f08a930d35f08602a12cf25a3643f6402ad52b36",
+    "html": "before2_http_010.html",
+    "errors": [],
+    "selects": {}
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/accounting/statements/?kind=invalid&ends_on=invalid",
+    "case": "invalid redisplay",
+    "method": "GET",
+    "status": 200,
+    "final_path": "/accounting/statements/?kind=invalid&ends_on=invalid",
+    "response_sha256": "ec6d1f5ffa5a0f9d6a46f3036b806e953c578b858f895b1c4e201e7930d02afa",
+    "html": "before2_http_011.html",
+    "errors": [
+      "یک گزینهٔ معتبر انتخاب کنید. invalid از گزینه‌های موجود نیست.",
+      "یک تاریخ معتبر وارد کنید."
+    ],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+          "label": "PRJ-01-03 — بازسازی کارخانه نوآوران"
+        },
+        {
+          "value": "623b4e02-b751-495f-b0e7-7e1601b9ccdf",
+          "label": "PRJ-01-04 — ساختمان اداری آفتاب"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        },
+        {
+          "value": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+          "label": "PRJ-01-02 — مرکز درمانی مهر"
+        }
+      ],
+      "kind": [
+        {
+          "value": "trial_balance",
+          "label": "تراز آزمایشی"
+        },
+        {
+          "value": "balance_sheet",
+          "label": "ترازنامه"
+        },
+        {
+          "value": "profit_loss",
+          "label": "صورت سود و زیان"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/accounting/statements/run/",
+    "case": "manipulated invalid run",
+    "method": "POST",
+    "status": 200,
+    "final_path": "/accounting/statements/",
+    "response_sha256": "504fc9f1f9b8d99e66c42dae2a135d01eec12a45d15f1a684dc06aef090366c3",
+    "html": "before2_http_012.html",
+    "errors": [
+      "!  پارامترهای گزارش مالی معتبر نیست."
+    ],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+          "label": "PRJ-01-03 — بازسازی کارخانه نوآوران"
+        },
+        {
+          "value": "623b4e02-b751-495f-b0e7-7e1601b9ccdf",
+          "label": "PRJ-01-04 — ساختمان اداری آفتاب"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        },
+        {
+          "value": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+          "label": "PRJ-01-02 — مرکز درمانی مهر"
+        }
+      ],
+      "kind": [
+        {
+          "value": "trial_balance",
+          "label": "تراز آزمایشی"
+        },
+        {
+          "value": "balance_sheet",
+          "label": "ترازنامه"
+        },
+        {
+          "value": "profit_loss",
+          "label": "صورت سود و زیان"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "uiux.audit.project",
+    "path": "/accounting/statements/",
+    "case": "statement authority and tenant",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/accounting/statements/",
+    "response_sha256": "58880865e503dcf1f07f4cba4ab8ba91524d1eea6871e39612a7fc94c76a4aed",
+    "html": "before2_http_013.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "uiux.audit.project",
+    "path": "/accounting/statements/?kind=trial_balance&ends_on=1405%2F07%2F30",
+    "case": "statement authority and tenant",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/accounting/statements/?kind=trial_balance&ends_on=1405%2F07%2F30",
+    "response_sha256": "3353798ab0d6ae03c293438814e302318f4fab48f4aec4c6a86eb6bafcae99e3",
+    "html": "before2_http_014.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "uiux.audit.project",
+    "path": "/accounting/statements/76e93194-0887-4096-9ac3-9a287c8ad9cb/",
+    "case": "statement authority and tenant",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/accounting/statements/76e93194-0887-4096-9ac3-9a287c8ad9cb/",
+    "response_sha256": "1b879d11da12618bfd3b4a083ca5f0c20bb80850e71d69b754be11a6ad8e6dc6",
+    "html": "before2_http_015.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "uiux.audit.project",
+    "path": "/accounting/statements/bb0c706d-0da8-4829-aa58-3009fca097e4/",
+    "case": "statement authority and tenant",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/accounting/statements/bb0c706d-0da8-4829-aa58-3009fca097e4/",
+    "response_sha256": "6ffc58f00a78cbb544663af3b8e5d0ec1b011f98bf68cbc5de5bde2d15342c3e",
+    "html": "before2_http_016.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "uiux.audit.project",
+    "path": "/accounting/statements/?kind=invalid&ends_on=invalid",
+    "case": "invalid redisplay",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/accounting/statements/?kind=invalid&ends_on=invalid",
+    "response_sha256": "66411104d4bb5e6a2bf15019bc230839f0add7a45019136ec06e2eaa05359615",
+    "html": "before2_http_017.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "uiux.audit.project",
+    "path": "/accounting/statements/run/",
+    "case": "manipulated invalid run",
+    "method": "POST",
+    "status": 403,
+    "final_path": "/accounting/statements/run/",
+    "response_sha256": "f194eeb78f9dc37f9dbfec427d8bb9dd42bb9a33548fc6d7fd9241e62d272cb3",
+    "html": "before2_http_018.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "uiux.persona.project-manager",
+    "path": "/accounting/statements/",
+    "case": "statement authority and tenant",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/accounting/statements/",
+    "response_sha256": "92da1d1cba2fc9959ffacb24f531e38dbdb5b79e4d88c96c5577a47fb96e25c5",
+    "html": "before2_http_019.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        },
+        {
+          "value": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+          "label": "PRJ-01-02 — مرکز درمانی مهر"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "uiux.persona.project-manager",
+    "path": "/accounting/statements/?kind=trial_balance&ends_on=1405%2F07%2F30",
+    "case": "statement authority and tenant",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/accounting/statements/?kind=trial_balance&ends_on=1405%2F07%2F30",
+    "response_sha256": "3ddd1961e08ba960fa9c468215b759915068984e8387af52e17f17a5530c83f3",
+    "html": "before2_http_020.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        },
+        {
+          "value": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+          "label": "PRJ-01-02 — مرکز درمانی مهر"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "uiux.persona.project-manager",
+    "path": "/accounting/statements/76e93194-0887-4096-9ac3-9a287c8ad9cb/",
+    "case": "statement authority and tenant",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/accounting/statements/76e93194-0887-4096-9ac3-9a287c8ad9cb/",
+    "response_sha256": "eb2427394bd2c2fbceb7c6e08e933def1c3558e155b60e5c0ff4c7e92f4e7dbd",
+    "html": "before2_http_021.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        },
+        {
+          "value": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+          "label": "PRJ-01-02 — مرکز درمانی مهر"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "uiux.persona.project-manager",
+    "path": "/accounting/statements/bb0c706d-0da8-4829-aa58-3009fca097e4/",
+    "case": "statement authority and tenant",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/accounting/statements/bb0c706d-0da8-4829-aa58-3009fca097e4/",
+    "response_sha256": "610dcfe00624a70a0b3373b737da5cc4c8a600e3a7865a8d8585af94b0c6bfee",
+    "html": "before2_http_022.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        },
+        {
+          "value": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+          "label": "PRJ-01-02 — مرکز درمانی مهر"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "uiux.persona.project-manager",
+    "path": "/accounting/statements/?kind=invalid&ends_on=invalid",
+    "case": "invalid redisplay",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/accounting/statements/?kind=invalid&ends_on=invalid",
+    "response_sha256": "24f91ac64757602babacaa376e05124d680c50049a8206308ee254a34500f2fc",
+    "html": "before2_http_023.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        },
+        {
+          "value": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+          "label": "PRJ-01-02 — مرکز درمانی مهر"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-011",
+    "actor": "uiux.persona.project-manager",
+    "path": "/accounting/statements/run/",
+    "case": "manipulated invalid run",
+    "method": "POST",
+    "status": 403,
+    "final_path": "/accounting/statements/run/",
+    "response_sha256": "f2bc178e41ee6d03fd631f6d2bbc55e11a709c80453fd8e1a680207d317f406e",
+    "html": "before2_http_024.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        },
+        {
+          "value": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+          "label": "PRJ-01-02 — مرکز درمانی مهر"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-013",
+    "actor": "uiux.audit.project",
+    "path": "/subledgers/",
+    "case": "settlement workbench; empty obligation baseline",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/subledgers/",
+    "response_sha256": "12118e2ce1526965d2fc1d3bd1d8490527137c1e1b52e5c50614e5192af68684",
+    "html": "before2_http_025.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-013",
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/subledgers/",
+    "case": "settlement workbench; empty obligation baseline",
+    "method": "GET",
+    "status": 200,
+    "final_path": "/subledgers/",
+    "response_sha256": "9e8602a4c46a5fc7b13ec86494a2100835424efa98eaa11675ce5d592b2e0718",
+    "html": "before2_http_026.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+          "label": "PRJ-01-03 — بازسازی کارخانه نوآوران"
+        },
+        {
+          "value": "623b4e02-b751-495f-b0e7-7e1601b9ccdf",
+          "label": "PRJ-01-04 — ساختمان اداری آفتاب"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        },
+        {
+          "value": "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+          "label": "PRJ-01-02 — مرکز درمانی مهر"
+        }
+      ],
+      "direction": [
+        {
+          "value": "receivable",
+          "label": "دریافتنی"
+        },
+        {
+          "value": "payable",
+          "label": "پرداختنی"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.audit.project",
+    "path": "/workforce/departments/",
+    "case": "retained read subset / unauthorized administration",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/workforce/departments/",
+    "response_sha256": "4731303d81a358602359bed66ed472ffce3ad5b13f6b2a81767a1b2dd930468b",
+    "html": "before2_http_027.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ],
+      "site_id": [
+        {
+          "value": "",
+          "label": "بدون کارگاه"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.audit.project",
+    "path": "/workforce/positions/",
+    "case": "retained read subset / unauthorized administration",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/workforce/positions/",
+    "response_sha256": "92cd17c4fc8e45867918a1386822868c86dbf103c533b1b19342406dd85c56d4",
+    "html": "before2_http_028.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ],
+      "site_id": [
+        {
+          "value": "",
+          "label": "بدون کارگاه"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.audit.project",
+    "path": "/workforce/teams/",
+    "case": "retained read subset / unauthorized administration",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/workforce/teams/",
+    "response_sha256": "cda403d54a3690c7211971c487bfae52632c9e4bbe827e8d7548c6ad087475b5",
+    "html": "before2_http_029.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ],
+      "site_id": [
+        {
+          "value": "",
+          "label": "بدون کارگاه"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.audit.project",
+    "path": "/workforce/employees/create/",
+    "case": "retained read subset / unauthorized administration",
+    "method": "GET",
+    "status": 403,
+    "final_path": "/workforce/employees/create/",
+    "response_sha256": "009e4892755004553f19d83a2f1cdc5dbd8bc5739d5bc749419ffe0a94f87db3",
+    "html": "before2_http_030.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ],
+      "site_id": [
+        {
+          "value": "",
+          "label": "بدون کارگاه"
+        }
+      ]
+    }
+  },
+  {
+    "scenario": "RV-015",
+    "actor": "uiux.audit.project",
+    "path": "/workforce/employees/create/",
+    "case": "manipulated employee POST",
+    "method": "POST",
+    "status": 403,
+    "final_path": "/workforce/employees/create/",
+    "response_sha256": "6885983a1d683b3c43f18eef0c713e0a33d0b987fa37724ee77a610c39a33a74",
+    "html": "before2_http_031.html",
+    "errors": [],
+    "selects": {
+      "project_id": [
+        {
+          "value": "",
+          "label": "بدون پروژه / همه دامنه مجاز"
+        },
+        {
+          "value": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "label": "PRJ-01-01 — مجتمع مسکونی باغستان"
+        }
+      ],
+      "site_id": [
+        {
+          "value": "",
+          "label": "بدون کارگاه"
+        }
+      ]
+    }
+  }
+]

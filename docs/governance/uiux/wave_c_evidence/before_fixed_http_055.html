@@ -1,0 +1,519 @@
+<main id="info">
+    
+      <p>
+      Using the URLconf defined in <code>config.urls</code>,
+      Django tried these URL patterns, in this order:
+      </p>
+      <ol>
+        
+          <li>
+            
+              <code>
+                
+                [name='home']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                search/
+                [name='global_search']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                admin/
+                
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounts/
+                
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                organizations/
+                
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                audit/
+                
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                
+                [name='dashboard']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                accounts/
+                [name='account_list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                accounts/create/
+                [name='account_create']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                periods/
+                [name='period_list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                periods/year/create/
+                [name='fiscal_year_create']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                periods/create/
+                [name='fiscal_period_create']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                periods/&lt;uuid:period_id&gt;/close/
+                [name='period_close']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                periods/&lt;uuid:period_id&gt;/reopen/
+                [name='period_reopen']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                journals/
+                [name='journal_list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                journals/create/
+                [name='journal_create']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                journals/adjustment/create/
+                [name='controlled_adjustment_create']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                journals/&lt;uuid:journal_id&gt;/
+                [name='journal_detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                journals/&lt;uuid:journal_id&gt;/line/
+                [name='journal_line_add']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                journals/&lt;uuid:journal_id&gt;/submit/
+                [name='journal_submit']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                journals/&lt;uuid:journal_id&gt;/post/
+                [name='journal_post']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                journals/&lt;uuid:journal_id&gt;/reverse/
+                [name='journal_reverse']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                journals/&lt;uuid:journal_id&gt;/replacement/
+                [name='journal_replacement']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                journals/&lt;uuid:journal_id&gt;/source/
+                [name='journal_source']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                openings/
+                [name='opening_list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                openings/create/
+                [name='opening_create']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                openings/&lt;uuid:opening_id&gt;/
+                [name='opening_detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                openings/&lt;uuid:opening_id&gt;/line/
+                [name='opening_line_add']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                openings/&lt;uuid:opening_id&gt;/submit/
+                [name='opening_submit']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                openings/&lt;uuid:opening_id&gt;/accept/
+                [name='opening_accept']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                reconciliations/
+                [name='reconciliation_list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                reconciliations/run/
+                [name='reconciliation_run']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                reconciliations/&lt;uuid:run_id&gt;/
+                [name='reconciliation_detail']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                reconciliations/exceptions/&lt;uuid:exception_id&gt;/dispose/
+                [name='reconciliation_dispose']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                reconciliations/&lt;uuid:run_id&gt;/sign-off/
+                [name='reconciliation_sign_off']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                statements/
+                [name='statement_list']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                statements/run/
+                [name='statement_run']
+              </code>
+            
+          </li>
+        
+          <li>
+            
+              <code>
+                accounting/
+                
+              </code>
+            
+              <code>
+                statements/&lt;uuid:run_id&gt;/
+                [name='statement_detail']
+              </code>
+            
+          </li>
+        
+      </ol>
+      <p>
+        
+          The current path, <code>accounting/statements/bb0c706d-0da8-4829-aa58-3009fca097e4/</code>,
+        
+        matched the last one.
+      </p>
+    
+  </main>

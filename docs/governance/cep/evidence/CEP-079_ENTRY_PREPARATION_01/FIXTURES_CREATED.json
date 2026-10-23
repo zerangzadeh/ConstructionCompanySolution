@@ -1,0 +1,227 @@
+{
+  "result": "CREATED_CANONICAL_DEVELOPMENT_STARTING_STATES",
+  "created": [
+    {
+      "model": "procurement.PurchaseRequest",
+      "id": "3ffcb950-90f8-4e9c-b65c-71d18b9e82d8",
+      "purpose": "New disposable PR; source for workbench and independent approval preparation"
+    },
+    {
+      "model": "procurement.PurchaseRequestItem",
+      "id": "55d8c29e-df69-413a-9933-6a7077f72d1b",
+      "purpose": "Synthetic PR line; explicit unit; no accepted source changed"
+    },
+    {
+      "model": "inventory.Warehouse",
+      "id": "d7898ae4-7d74-4d4a-ba25-0f837a9491a3",
+      "purpose": "Dedicated disposable stock namespace; no existing warehouse balance changed"
+    },
+    {
+      "model": "procurement.PurchaseOrder",
+      "id": "f8bac9a6-b593-47e6-8162-552041983d5c",
+      "purpose": "Isolated issued PO starting state for receipt actions"
+    },
+    {
+      "model": "procurement.PurchaseOrderItem",
+      "id": "1166fb7c-a044-48a5-94a8-54c42a831b87",
+      "purpose": "Synthetic quantity; existing source unit price copied as test fact, no rate/policy invention"
+    },
+    {
+      "model": "procurement.PurchaseOrder",
+      "id": "569e7672-3a10-4ad8-a63c-b932ed90970e",
+      "purpose": "Isolated issued PO starting state for receipt actions"
+    },
+    {
+      "model": "procurement.PurchaseOrderItem",
+      "id": "6b2b436c-80e7-44ab-9ecd-d57c5914def4",
+      "purpose": "Synthetic quantity; existing source unit price copied as test fact, no rate/policy invention"
+    },
+    {
+      "model": "procurement.GoodsReceipt",
+      "id": "4cc7c234-d051-4d88-9d7b-b468159272ba",
+      "purpose": "New posted GR for isolated handoff/stock starting state"
+    },
+    {
+      "model": "procurement.GoodsReceiptItem",
+      "id": "d28c791e-43bd-48d0-aa2a-806ad5376480",
+      "purpose": "New receipt line; existing accepted PO/GR not mutated"
+    },
+    {
+      "model": "procurement.GoodsReceipt",
+      "id": "526efc13-8f78-46cf-bad0-d8c62c4f19b3",
+      "purpose": "New posted GR for isolated handoff/stock starting state"
+    },
+    {
+      "model": "procurement.GoodsReceiptItem",
+      "id": "ebb254fa-8633-47e4-88f2-796a981b2a35",
+      "purpose": "New receipt line; existing accepted PO/GR not mutated"
+    },
+    {
+      "model": "inventory.StockTransaction",
+      "id": "1ba409b6-7730-413f-bc1a-fce7fcb10e0d",
+      "purpose": "Dedicated posted stock starting state; no accepted stock reversed"
+    },
+    {
+      "model": "accounting.JournalEntry",
+      "id": "e6e69433-d65d-40f7-8cd0-c090065b081b",
+      "purpose": "New independent-maker/checker posted journal; reversal starting state only"
+    },
+    {
+      "model": "accounting.JournalLine",
+      "id": "1c4cfabb-571f-4402-93ac-8ac3557ee1be",
+      "purpose": "Exact existing manual example amounts copied as synthetic test facts"
+    },
+    {
+      "model": "accounting.JournalLine",
+      "id": "a61bf86e-1cde-48e3-9e7e-e3a87f705cdf",
+      "purpose": "Exact existing manual example amounts copied as synthetic test facts"
+    }
+  ],
+  "no_uat_scenarios_executed": true,
+  "roles_permissions_scopes_unchanged": true,
+  "no_billing_or_statutory_inputs_created": true,
+  "retention": "Retain. Future mutation limited to these identified disposable new records; canonical reversal/archive only, no raw deletion.",
+  "data_changes": {
+    "audit.AuditEvent": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "04a839b9-b772-4dc7-842c-481a8bc11547",
+        "73582392-85f6-49ea-9a0f-ca44fed5ede7",
+        "eca2c6b5-254d-450f-adea-bb0d81b2fa4a",
+        "16bc6b9a-8047-47ac-8fde-a2eb388e0596",
+        "2decc7fb-cbc5-4620-b685-399cb32b9923",
+        "6400d5b2-3cee-43da-ae12-cadc65a53db7",
+        "0f66e8ce-8002-401a-b9aa-ed9b9a4c4a2d",
+        "f8190a05-2a42-455b-9ada-93ed91a3b2ba",
+        "4f10bb9d-a6da-4602-a68d-eeff7d232ded",
+        "5f3cb8ae-e059-4c19-84a5-58b02f6cfee5",
+        "0f3a3151-1fb3-4b22-841c-7a6f9d52e1ce",
+        "058a5b20-3f21-4071-a0a0-3de213adbbd1",
+        "66ba6549-7db9-4b42-b910-07330e3c8e61",
+        "01c9847d-7409-486b-96ff-901bcb75fba2",
+        "5a41b6d7-d155-4e50-9389-a689c28fd848",
+        "67a70a9b-bda7-4d21-aff0-c9dc313b73bb",
+        "12a46414-0da2-4ad6-8f55-938da4869e89",
+        "d79a856f-8f60-465f-9103-373ee0d12e38",
+        "b208e890-c990-44c0-85fc-c4abe0171a15",
+        "ef524e36-e5a8-45c7-91cc-5dcbdd4daf0a",
+        "0f58a0dc-1a5c-40d3-b9f7-fad9238b590e",
+        "60caa8d0-455e-4be8-9b3a-68f20270ff70",
+        "c0633eee-aeaf-4993-ae87-8577c153e086",
+        "23c65355-075c-4842-8a5a-69953bcbca8d",
+        "06c647a0-5671-4175-b289-b45d8bc339ad",
+        "a7cfcee7-00b4-4252-9c8e-8119dc2f97ff",
+        "12f064a5-5de3-4b45-b837-21400c15cf14",
+        "f1d8c92f-4dce-471f-9ebb-1e7c513f7c6f"
+      ]
+    },
+    "accounting.JournalEntry": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "e6e69433-d65d-40f7-8cd0-c090065b081b"
+      ]
+    },
+    "accounting.JournalLine": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "1c4cfabb-571f-4402-93ac-8ac3557ee1be",
+        "a61bf86e-1cde-48e3-9e7e-e3a87f705cdf"
+      ]
+    },
+    "procurement.PurchaseRequest": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "3ffcb950-90f8-4e9c-b65c-71d18b9e82d8"
+      ]
+    },
+    "procurement.PurchaseRequestItem": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "55d8c29e-df69-413a-9933-6a7077f72d1b"
+      ]
+    },
+    "procurement.PurchaseOrder": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "569e7672-3a10-4ad8-a63c-b932ed90970e",
+        "f8bac9a6-b593-47e6-8162-552041983d5c"
+      ]
+    },
+    "procurement.PurchaseOrderItem": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "1166fb7c-a044-48a5-94a8-54c42a831b87",
+        "6b2b436c-80e7-44ab-9ecd-d57c5914def4"
+      ]
+    },
+    "procurement.GoodsReceipt": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "526efc13-8f78-46cf-bad0-d8c62c4f19b3",
+        "4cc7c234-d051-4d88-9d7b-b468159272ba"
+      ]
+    },
+    "procurement.GoodsReceiptItem": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "d28c791e-43bd-48d0-aa2a-806ad5376480",
+        "ebb254fa-8633-47e4-88f2-796a981b2a35"
+      ]
+    },
+    "procurement.PurchaseOrderVersion": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "eab0381e-bb0d-4dfd-8fc6-36010b8e0d53",
+        "16bc1a80-814a-4256-8c46-6584a6823812"
+      ]
+    },
+    "procurement.PurchaseOrderVersionLine": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "45f52af5-722e-4091-8552-d7a12f9f55c5",
+        "a5a24803-c085-4beb-913a-756776602594"
+      ]
+    },
+    "inventory.Warehouse": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "d7898ae4-7d74-4d4a-ba25-0f837a9491a3"
+      ]
+    },
+    "inventory.StockTransaction": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "1ba409b6-7730-413f-bc1a-fce7fcb10e0d"
+      ]
+    },
+    "workflows.WorkflowInstance": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "9ac81745-1b87-4e97-8d64-5d0766c36078"
+      ]
+    },
+    "workflows.WorkflowStepInstance": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "45fb17f7-b279-4b9f-b03d-301c9ddf56d3",
+        "8b9a0ba6-82e9-4058-bdda-e4ed8183fc6b"
+      ]
+    },
+    "workflows.WorkItem": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "01ea6cf1-df6f-4778-af89-4be0e8bed5a7"
+      ]
+    },
+    "workflows.WorkItemCandidate": {
+      "changed_or_missing_existing": [],
+      "new": [
+        "2acffc2d-2c06-4834-b07f-edbbb4f275e7",
+        "337132a6-242c-4876-bac4-84cca801fe24",
+        "63f31d3c-16df-4c26-89dc-aad974febcaf",
+        "fe03f8ab-2619-4b8c-b732-b919f34cb536",
+        "73712643-3d63-433c-aa14-4bd07260238f"
+      ]
+    }
+  }
+}

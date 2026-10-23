@@ -272,12 +272,18 @@ class SealedCustodyTests(SealedCustodyFixtureMixin, TestCase):
         other_project = Project.objects.create(
             organization=self.organization, code="OTHER-CUSTODY", name="Other"
         )
-        MembershipRoleAssignment.objects.create(
+        MembershipRoleAssignment.objects.get_or_create(
             organization=self.organization,
             membership=membership,
             role=membership.role_definition,
-            reason="P5-S08 scope test",
+            revoked_at__isnull=True,
+            defaults={"reason": "P5-S08 scope test"},
         )
+        # The shared fixture now establishes explicit organization authority.
+        # Remove that scope so this remains an actual unrelated-project denial.
+        MembershipScopeGrant.objects.filter(
+            membership=membership, revoked_at__isnull=True
+        ).update(revoked_at=timezone.now())
         MembershipScopeGrant.objects.create(
             organization=self.organization,
             membership=membership,

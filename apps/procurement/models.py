@@ -109,6 +109,7 @@ class QuoteEvidenceType(models.TextChoices):
 
 class QuoteEvidenceSourceChannel(models.TextChoices):
     INTERNAL_CUSTODY_CAPTURE = "internal_custody_capture", "ثبت داخلی نگهداری"
+    EXTERNAL_PORTAL_UPLOAD = "external_portal_upload", "دریافت اصل پیشنهاد از درگاه"
 
 
 class RFQCloseEntryDisposition(models.TextChoices):
@@ -1295,9 +1296,9 @@ class QuoteRevisionEvidence(UUIDModel, CreatedAtModel):
             ),
             models.CheckConstraint(
                 condition=models.Q(
-                    source_channel=QuoteEvidenceSourceChannel.INTERNAL_CUSTODY_CAPTURE
+                    source_channel__in=QuoteEvidenceSourceChannel.values
                 ),
-                name="quote_evidence_internal_channel",
+                name="quote_evidence_supported_channel",
             ),
         ]
         indexes = [  # noqa: RUF012
@@ -1358,8 +1359,15 @@ class QuoteRevisionEvidence(UUIDModel, CreatedAtModel):
                 raise ValidationError("قلم اصلی باید شناسه فنی primary داشته باشد.")
         elif self.evidence_type != QuoteEvidenceType.SUPPLIER_ATTACHMENT:
             raise ValidationError("نوع شاهد پیشنهاد معتبر نیست.")
-        if self.source_channel != QuoteEvidenceSourceChannel.INTERNAL_CUSTODY_CAPTURE:
+        if self.source_channel not in QuoteEvidenceSourceChannel.values:
             raise ValidationError("کانال منبع شاهد پیشنهاد معتبر نیست.")
+        if self.source_channel == QuoteEvidenceSourceChannel.EXTERNAL_PORTAL_UPLOAD and (
+            self.evidence_type != QuoteEvidenceType.SUPPLIER_ORIGINAL
+            or self.canonical_sha256 != self.revision_fingerprint
+            or self.quote_revision.source_channel != QuoteSourceChannel.EXTERNAL_PORTAL
+            or self.quote_revision.captured_by_id != self.captured_by_id
+        ):
+            raise ValidationError("شاهد درگاه باید همان اصل و بایت‌های پیشنهاد خارجی باشد.")
         if self.received_at > self.custodied_at:
             raise ValidationError("زمان نگهداری نمی‌تواند پیش از دریافت باشد.")
 

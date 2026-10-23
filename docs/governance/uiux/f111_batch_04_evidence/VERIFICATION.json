@@ -1,0 +1,71 @@
+{
+  "decision": "BATCH_04_RUNTIME_VERIFIED_RESOLVED",
+  "finding": "UIUX-F-114",
+  "status": "RUNTIME_VERIFIED_RESOLVED",
+  "baseline_files_compared": 5090,
+  "changed_existing_files": [
+    "apps/procurement/forms.py",
+    "apps/procurement/views.py",
+    "docs/governance/uiux/UIUX_FINDINGS_REGISTER.yaml"
+  ],
+  "two_product_ast_boundaries_only": true,
+  "all_other_findings_and_prior_evidence_preserved": true,
+  "focused": {
+    "cases": 10,
+    "passed": 10
+  },
+  "regression": {
+    "cases": 109,
+    "passed": 94
+  },
+  "attribution": {
+    "attributable_regressions": 0,
+    "classification": "BASELINE TEST DEBT",
+    "identical_failures": 15,
+    "failures": [
+      "apps.procurement.tests.ProcurementModelTests.test_issued_order_and_posted_receipt_details_are_immutable",
+      "apps.procurement.tests.ProcurementServiceTests.test_order_amount_is_decimal_and_request_cannot_be_over_ordered",
+      "apps.procurement.tests.ProcurementServiceTests.test_purchase_order_requires_approved_request_and_supplier_role",
+      "apps.procurement.tests.ProcurementServiceTests.test_reads_and_mutations_are_tenant_scoped",
+      "apps.procurement.tests.ProcurementServiceTests.test_receipt_cannot_exceed_order_and_void_reopens_order",
+      "apps.procurement.tests.ProcurementServiceTests.test_receipts_complete_order_without_creating_inventory",
+      "apps.procurement.tests.ProcurementServiceTests.test_rejection_requires_reason_and_is_terminal",
+      "apps.procurement.tests.ProcurementServiceTests.test_request_workflow_is_role_controlled_and_audited",
+      "apps.procurement.tests.ProcurementPanelTests.test_owner_can_open_scoped_procurement_pages",
+      "apps.procurement.test_p5_s12_s17_source_to_pay.P5S12S17SourceToPayTests.test_invoice_approval_and_exact_three_way_match_are_independent",
+      "apps.procurement.test_p5_s12_s17_source_to_pay.P5S12S17SourceToPayTests.test_issue_versions_order_and_independent_change_supersedes",
+      "apps.procurement.test_p5_s12_s17_source_to_pay.P5S12S17SourceToPayTests.test_missing_policy_and_cross_tenant_invoice_fail_closed",
+      "apps.procurement.test_p5_s12_s17_source_to_pay.P5S12S17SourceToPayTests.test_service_acceptance_is_version_pinned_and_conserved",
+      "apps.procurement.test_p5_s12_s17_source_to_pay.P5S12S17SourceToPayTests.test_tolerance_classifies_but_charges_and_overbilling_block",
+      "apps.procurement.test_p5_s12_s17_source_to_pay.P5S12AwardConsumptionTests.test_final_award_requires_explicit_conserved_po_consumption"
+    ],
+    "boundary": "Legacy Purchase Request authorization/setup or panel entry before changed GoodsReceiptForm/view; exact entry forms+views replay"
+  },
+  "runtime_http": 13,
+  "runtime_browser": 4,
+  "integrity": {
+    "model_tables": 519,
+    "runtime_deltas": [
+      "sessions.Session"
+    ],
+    "preexisting_rows_changed": [],
+    "preparation_additions": {
+      "sessions.Session": 8,
+      "audit.AuditEvent": 15,
+      "procurement.PurchaseOrder": 5,
+      "procurement.PurchaseOrderItem": 5,
+      "procurement.PurchaseOrderVersion": 5,
+      "procurement.PurchaseOrderVersionLine": 5
+    },
+    "authority_unchanged": true,
+    "authority_fingerprint_before": "bc8efa55bf5e89a47af55e03b6c654cae8d8f555d541354c37737b50d706529d",
+    "authority_fingerprint_after": "bc8efa55bf5e89a47af55e03b6c654cae8d8f555d541354c37737b50d706529d",
+    "temporary_authority": "NONE; cleanup not required",
+    "user_last_login_excluded": true,
+    "receipts_created": 0
+  },
+  "migration": "NO",
+  "batch05_to09": "NOT_EXECUTED",
+  "wave_c": "NOT_STARTED",
+  "production_cep078_079_git_writes": "NOT_EXECUTED"
+}

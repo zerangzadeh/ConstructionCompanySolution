@@ -1,0 +1,25 @@
+{
+  "domain_decisions": "ALL_APPROVED_OR_ALREADY_DETERMINED",
+  "domain_decision_pack_status": "DOMAIN_DECISION_PACK_READY",
+  "wave_c_status": "WAVE_C_BLOCKED",
+  "remaining_in_this_package": [
+    {
+      "scenario": "RV-030",
+      "gate": "Final browser confirmation of corrected Tender forms and full transition journey",
+      "evidence": "Real HTTP 6/6 and post-correction Commercial tests 6/6 pass. Earlier desktop/mobile captures cover project selection and creation. Final browser call returned: Local browser use is disabled in Work settings.",
+      "required_action": "Restore local browser access in Work settings and finish desktop/mobile confirmation. No Product Decision or additional policy is needed."
+    }
+  ],
+  "prior_wave_c_boundaries_not_revalidated_here": [
+    "RV-007: first-grant authorization resolved; canonical RFQ close/opening lifecycle retest remains, with scheduled close 2026-10-24 and source/scan/duty controls preserved.",
+    "RV-029: authorization resolved; full populated own-employment-history runtime journey was not rerun by this five-scenario package.",
+    "The complete required Wave C matrix has not been re-executed or certified by this package."
+  ],
+  "regression_debt": "BASELINE_DEBT.json: 10 failures across earlier focused/broad runs; broad suite is not green. No authorization work reopened.",
+  "not_wave_c_blockers": [
+    "Successful populated official statutory calculation or export (PD-WC-D03).",
+    "Production financial policies/chart accounts, live payments and statutory/Production certification.",
+    "Tender legal/scoring/award policy and multi-file bid-package digest semantics.",
+    "Payroll Accounting handoff posting without its separately governed mapping; this scope validates preparation and prerequisite visibility."
+  ]
+}

@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="27" skipped="0" tests="56" time="158.755" timestamp="2026-10-23T01:59:36.855936+03:30" hostname="Zerangzadeh"><testcase classname="apps.procurement.test_rfq.RequestForQuotationServiceTests" name="test_addendum_cannot_move_opening_boundary_earlier" time="12.395" /><testcase classname="apps.procurement.test_rfq.RequestForQuotationServiceTests" name="test_issue_is_idempotent_and_snapshots_are_immutable" time="1.321" /><testcase classname="apps.procurement.test_rfq.RequestForQuotationServiceTests" name="test_read_scope_and_cross_tenant_project_are_denied" time="1.089" /><testcase classname="apps.procurement.test_rfq_close.RFQCloseManifestTests" name="test_audit_failure_rolls_back_manifest_entries_and_rfq_state" time="1.631" /><testcase classname="apps.procurement.test_rfq_close.RFQCloseManifestTests" name="test_close_freezes_effective_revision_and_excluded_metadata" time="2.097" /><testcase classname="apps.procurement.test_rfq_close.RFQCloseManifestTests" name="test_close_permission_is_intersected_with_project_scope" time="1.508"><failure message="django.db.utils.IntegrityError: duplicate key value violates unique constraint &quot;membership_one_unrevoked_role&quot;&#10;DETAIL:  Key (membership_id, role_id)=(1ad9caba-6e7e-4632-bebb-d8b12bdf1149, 362add8a-8795-409d-bcd4-f9c647788851) already exists.">.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UniqueViolation: duplicate key value violates unique constraint "membership_one_unrevoked_role"
+E   DETAIL:  Key (membership_id, role_id)=(1ad9caba-6e7e-4632-bebb-d8b12bdf1149, 362add8a-8795-409d-bcd4-f9c647788851) already exists.
+
+The above exception was the direct cause of the following exception:
+apps\procurement\test_rfq_close.py:166: in test_close_permission_is_intersected_with_project_scope
+    MembershipRoleAssignment.objects.create(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+.venv\Lib\site-packages\django\db\models\base.py:902: in save
+    self.save_base(
+.venv\Lib\site-packages\django\db\models\base.py:1008: in save_base
+    updated = self._save_table(
+.venv\Lib\site-packages\django\db\models\base.py:1169: in _save_table
+    results = self._do_insert(
+.venv\Lib\site-packages\django\db\models\base.py:1210: in _do_insert
+    return manager._insert(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:1873: in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1882: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.IntegrityError: duplicate key value violates unique constraint "membership_one_unrevoked_role"
+E   DETAIL:  Key (membership_id, role_id)=(1ad9caba-6e7e-4632-bebb-d8b12bdf1149, 362add8a-8795-409d-bcd4-f9c647788851) already exists.</failure></testcase><testcase classname="apps.procurement.test_rfq_close.RFQCloseManifestTests" name="test_cross_tenant_and_non_effective_late_submission_are_excluded" time="1.626" /><testcase classname="apps.procurement.test_rfq_close.RFQCloseManifestTests" name="test_database_allows_at_most_one_active_submitted_revision" time="1.510" /><testcase classname="apps.procurement.test_rfq_close.RFQCloseManifestTests" name="test_idempotency_immutability_and_post_close_evidence_never_supplement_manifest" time="1.368" /><testcase classname="apps.procurement.test_rfq_close.RFQCloseManifestTests" name="test_permission_has_no_default_owner_or_platform_bypass_and_deadline_holds" time="1.606" /><testcase classname="apps.procurement.test_quotes.SealedQuoteRevisionTests" name="test_duplicate_capture_is_idempotent_and_conflict_is_rejected" time="1.741" /><testcase classname="apps.procurement.test_quotes.SealedQuoteRevisionTests" name="test_metadata_scope_and_withdrawal_are_guarded" time="1.738" /><testcase classname="apps.procurement.test_quotes.SealedQuoteRevisionTests" name="test_submitted_revision_is_immutable_and_superseded_by_later_revision" time="1.418" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_accepts_one_immutable_original_without_mutating_close_manifest" time="2.194" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_audit_failure_rolls_back_database_and_protected_bytes" time="1.578" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_code_owned_item_count_and_package_limits_fail_closed" time="2.129" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_cross_tenant_target_is_denied_without_business_evidence" time="1.531" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_file_policy_fails_closed_with_redacted_audit" time="1.706" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_idempotency_hash_validation_ooxml_and_attachment_identity" time="1.996" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_permission_has_no_owner_admin_platform_or_uploader_bypass" time="1.725" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_permission_is_intersected_with_project_scope" time="1.661" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyTests" name="test_sealed_content_is_denied_from_generic_document_paths_and_admin" time="2.394" /><testcase classname="apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests" name="test_approve_requires_policy_independent_permission_and_keeps_approved_immutable" time="1.409"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests" name="test_correction_supersedes_without_mutating_decision" time="1.516"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests" name="test_cross_tenant_and_missing_prerequisite_fail_closed" time="1.346"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests" name="test_policy_can_explicitly_allow_self_approval" time="1.725"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests" name="test_policy_controls_self_approval_and_withdrawal_blocks_approval" time="1.718"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests" name="test_prepare_requires_open_confidential_scope_and_retains_exact_evidence" time="1.591"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests" name="test_reason_catalog_and_access_fail_closed" time="1.354"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityTests" name="test_revoked_confidential_access_blocks_preparation" time="1.362"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11ComparisonAwardTests" name="test_no_award_is_explicit_has_no_allocations_and_does_not_mutate_downstream" time="1.442"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11SelfFinalizationPolicyTests" name="test_tenant_policy_explicitly_allows_s11_comparison_and_award_self_finalization" time="1.812"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests" name="test_award_is_sourcing_only_conserves_quantity_and_self_finalization_is_policy_gated" time="1.872"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:386: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests" name="test_conflict_cannot_self_clear_and_blocks_evaluation_until_disposed" time="1.913"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:386: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests" name="test_exception_closed_catalogue_and_independent_lifecycle" time="1.545"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:386: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests" name="test_reproducible_asserted_input_lineage_and_immutable_finalization" time="1.609"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:386: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests" name="test_split_award_is_explicit_and_allocation_inputs_are_governing" time="1.549"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:386: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests" name="test_tie_requires_explicit_resolution_and_split_award_retains_exact_revisions" time="2.086"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:386: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_cep032_buyer_actions.BuyerActionTests" name="test_authorized_action_forms_render_without_mutating_sources" time="0.944"><failure message="django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:56: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:172: in _closed_revision
+    manifest = close_rfq(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\rfq_services.py:644: in close_rfq
+    _permission(
+apps\procurement\rfq_services.py:56: in _permission
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.</failure></testcase><testcase classname="apps.procurement.test_cep032_buyer_actions.BuyerActionTests" name="test_comparison_award_flow_preserves_separation_history_and_no_downstream" time="0.446"><failure message="django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:56: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:172: in _closed_revision
+    manifest = close_rfq(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\rfq_services.py:644: in close_rfq
+    _permission(
+apps\procurement\rfq_services.py:56: in _permission
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.</failure></testcase><testcase classname="apps.procurement.test_cep032_buyer_actions.BuyerActionTests" name="test_conflict_blocks_evaluation_and_requires_independent_disposition" time="0.475"><failure message="django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:56: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:172: in _closed_revision
+    manifest = close_rfq(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\rfq_services.py:644: in close_rfq
+    _permission(
+apps\procurement\rfq_services.py:56: in _permission
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.</failure></testcase><testcase classname="apps.procurement.test_cep032_buyer_actions.BuyerActionTests" name="test_explicit_no_award_and_cross_comparison_allocation_rejection" time="0.413"><failure message="django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:56: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:172: in _closed_revision
+    manifest = close_rfq(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\rfq_services.py:644: in close_rfq
+    _permission(
+apps\procurement\rfq_services.py:56: in _permission
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.</failure></testcase><testcase classname="apps.procurement.test_cep032_buyer_actions.BuyerActionTests" name="test_opening_and_admissibility_actions_retain_independent_decisions" time="0.637"><failure message="django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:56: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:172: in _closed_revision
+    manifest = close_rfq(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\rfq_services.py:644: in close_rfq
+    _permission(
+apps\procurement\rfq_services.py:56: in _permission
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.</failure></testcase><testcase classname="apps.procurement.test_cep032_buyer_actions.BuyerActionTests" name="test_permission_tenant_csrf_and_get_do_not_mutate" time="0.464"><failure message="django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:56: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:172: in _closed_revision
+    manifest = close_rfq(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\rfq_services.py:644: in close_rfq
+    _permission(
+apps\procurement\rfq_services.py:56: in _permission
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.</failure></testcase><testcase classname="apps.procurement.test_cep032_buyer_actions.BuyerActionTests" name="test_quote_capture_submit_withdraw_retry_and_foreign_rfq_rejected" time="0.484"><failure message="django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:56: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:172: in _closed_revision
+    manifest = close_rfq(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\rfq_services.py:644: in close_rfq
+    _permission(
+apps\procurement\rfq_services.py:56: in _permission
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.</failure></testcase><testcase classname="apps.procurement.test_cep032_buyer_actions.BuyerActionTests" name="test_revoked_confidential_grant_hides_values_and_rejects_assertions" time="0.429"><failure message="django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:56: in setUp
+    self.revision, self.manifest = self._closed_revision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\test_p5_s08_sealed_custody.py:172: in _closed_revision
+    manifest = close_rfq(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\rfq_services.py:644: in close_rfq
+    _permission(
+apps\procurement\rfq_services.py:56: in _permission
+    return require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه بستن ثبتی استعلام را ندارید.</failure></testcase><testcase classname="apps.procurement.test_rfq.RequestForQuotationConcurrencyTests" name="test_concurrent_identical_issue_creates_one_version" time="10.210" /><testcase classname="apps.procurement.test_rfq_close.RFQCloseConcurrencyTests" name="test_concurrent_identical_close_creates_one_manifest" time="11.992" /><testcase classname="apps.procurement.test_quotes.SealedQuoteConcurrencyTests" name="test_concurrent_identical_capture_creates_one_revision" time="10.295" /><testcase classname="apps.procurement.test_p5_s08_sealed_custody.SealedCustodyConcurrencyTests" name="test_equivalent_retries_converge_and_distinct_attachments_do_not_collapse" time="16.420" /><testcase classname="apps.procurement.test_p5_s10_admissibility.QuoteAdmissibilityConcurrencyTests" name="test_concurrent_approval_creates_one_decision" time="16.105"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11ConcurrencyTests" name="test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity" time="12.834"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:65: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:436: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase></testsuite></testsuites>

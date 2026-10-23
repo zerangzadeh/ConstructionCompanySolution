@@ -1,0 +1,47 @@
+{
+  "focused": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/f111_batch_06_evidence/run_validation.py tests/test_uiux_f111_pattern_allocation_scope.py --reuse-db -q --junitxml=docs/governance/uiux/f111_batch_06_evidence/focused.xml",
+    "exit_code": 0
+  },
+  "regression": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/f111_batch_06_evidence/run_validation.py apps/expenses/tests.py apps/expenses/test_p4_s26_s30.py tests/test_uiux_f111_scope.py --reuse-db -q --junitxml=docs/governance/uiux/f111_batch_06_evidence/regression.xml",
+    "exit_code": 1,
+    "attribution": "15 exact-baseline setup failures;47 passing tests;64 passing subtests"
+  },
+  "baseline_regression": {
+    "same_as_regression_with": "--entry-forms; captured exact entry forms/views via import loader; no working-tree replacement",
+    "exit_code": 1
+  },
+  "django": {
+    "command": ".venv/Scripts/python.exe manage.py check",
+    "exit_code": 0
+  },
+  "migration": {
+    "command": ".venv/Scripts/python.exe manage.py makemigrations --check --dry-run",
+    "exit_code": 0
+  },
+  "ruff": {
+    "command": ".venv/Scripts/python.exe -m ruff check apps/expenses/forms.py apps/expenses/views.py tests/test_uiux_f111_pattern_allocation_scope.py",
+    "exit_code": 0
+  },
+  "format": {
+    "command": ".venv/Scripts/python.exe -m ruff format --check apps/expenses/forms.py apps/expenses/views.py tests/test_uiux_f111_pattern_allocation_scope.py",
+    "exit_code": 0
+  },
+  "test_isolation": "Final suites run serially against disposable PostgreSQL test_bonira_uiux_batch01, temporary document root, MD5 test-only password hasher; no production or Development business DB testing",
+  "runtime": "Development PostgreSQL construction_erp, fresh 8009 process, canonical fixture services, real login/CSRF; no passwords/cookies/tokens saved",
+  "runtime_steps": [
+    "runtime.py prepare",
+    "runtime.py http",
+    "runtime.py direct",
+    "Chrome browser observations",
+    "runtime.py positive",
+    "runtime.py http (strengthened complete unauthorized Project payloads)",
+    "runtime.py after"
+  ],
+  "boundary": {
+    "command": "C:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\python.exe docs/governance/uiux/f111_batch_06_evidence/verify.py",
+    "exit_code": 0,
+    "yaml_parser": "Existing host PyYAML; no dependency added"
+  }
+}

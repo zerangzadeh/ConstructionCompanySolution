@@ -1,0 +1,203 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+ 
+<div class="mx-auto max-w-4xl"><p class="text-xs font-semibold text-blue-600">اسناد</p><h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">ایجاد سند</h1><p class="mt-1 text-sm text-slate-500">فایل خصوصی PDF، JPEG یا PNG تا ۱۰ مگابایت به‌عنوان نسخه اول ذخیره می‌شود.</p>
+<form class="erp-surface mt-6 space-y-6 rounded-xl p-5 sm:p-6" method="post" enctype="multipart/form-data"><!-- CSRF omitted -->
+    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+        <p class="mb-1 text-xs font-semibold">لطفاً موارد زیر را بررسی کنید:</p>
+        <ul class="errorlist nonfield"><li>دقیقاً یک موجودیت مرتبط برای سند انتخاب کنید.</li></ul>
+    </div>
+
+
+  <section><h2 class="text-sm font-bold">مشخصات سند</h2><div class="mt-4 grid gap-4 md:grid-cols-2">
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_document_type">
+        نوع سند<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="document_type" aria-describedby="id_document_type-errors" aria-invalid="true" id="id_document_type">
+  <option value="general">عمومی</option>
+
+  <option value="contract">قرارداد</option>
+
+  <option value="drawing">نقشه</option>
+
+  <option value="receipt">رسید</option>
+
+  <option value="photo">تصویر</option>
+
+  <option value="report">گزارش</option>
+
+  <option value="other">سایر</option>
+
+</select>
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_document_type-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_title">
+        عنوان
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="title" maxlength="255" aria-describedby="id_title-errors" aria-invalid="true" required id="id_title">
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_title-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_category">
+        دسته‌بندی
+        
+    </label>
+    <select name="category" id="id_category">
+  <option value="" selected>---------</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_confidentiality">
+        سطح محرمانگی
+    </label>
+    <select name="confidentiality" id="id_confidentiality">
+  <option value="internal">داخلی</option>
+
+  <option value="confidential">محرمانه</option>
+
+  <option value="restricted">بسیار محدود</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_access_expires_at">
+        پایان دسترسی
+    </label>
+    <input type="datetime-local" name="access_expires_at" id="id_access_expires_at">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_reference">
+        مرجع
+        
+    </label>
+    <input type="text" name="reference" maxlength="120" id="id_reference">
+    
+    
+</div>
+</div><div class="mt-4">
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_description">
+        توضیحات
+        
+    </label>
+    <textarea name="description" cols="40" rows="10" id="id_description">
+</textarea>
+    
+    
+</div>
+</div></section>
+  <section class="border-t border-slate-100 pt-5"><h2 class="text-sm font-bold">موجودیت مرتبط</h2><p class="mt-1 text-xs text-slate-500">دقیقاً یکی را انتخاب کنید؛ پس از ایجاد می‌توان ارتباط‌های بیشتری افزود.</p><div class="mt-4 grid gap-4 md:grid-cols-2">
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_project">
+        پروژه
+        
+    </label>
+    <select name="project" aria-describedby="id_project-errors" aria-invalid="true" id="id_project">
+  <option value="">---------</option>
+
+</select>
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_project-errors" role="alert">یک گزینهٔ معتبر انتخاب کنید. آن گزینه از گزینه‌های موجود نیست.</p>
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_contract">
+        قرارداد
+        
+    </label>
+    <select name="contract" id="id_contract">
+  <option value="" selected>---------</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_estimate">
+        برآورد
+        
+    </label>
+    <select name="estimate" id="id_estimate">
+  <option value="" selected>---------</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_expense">
+        هزینه
+    </label>
+    <select name="expense" id="id_expense">
+  <option value="" selected>---------</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_treasury_movement">
+        حرکت خزانه‌داری
+    </label>
+    <select name="treasury_movement" id="id_treasury_movement">
+  <option value="" selected>---------</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_daily_report">
+        گزارش روزانه
+    </label>
+    <select name="daily_report" id="id_daily_report">
+  <option value="" selected>---------</option>
+
+</select>
+    
+    
+</div>
+</div></section>
+  <section class="border-t border-slate-100 pt-5"><h2 class="text-sm font-bold">نسخه اول</h2><div class="mt-4">
+<div class="erp-form-field erp-form-field--invalid">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_file">
+        فایل نسخه اول<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="file" name="file" aria-describedby="id_file-errors" aria-invalid="true" required id="id_file">
+    
+    
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="id_file-errors" role="alert">این فیلد لازم است.</p>
+    
+</div>
+</div></section>
+  <div class="flex flex-col-reverse gap-2 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end"><a class="h-10 px-4 text-center text-sm font-semibold leading-10 text-slate-600" href="/documents/">انصراف</a><button class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white" type="submit">ایجاد سند</button></div>
+</form></div>
+
+        </main>

@@ -14,6 +14,42 @@ _DATETIME_RE = re.compile(r"^(\d{4})/(\d{2})/(\d{2})\s+(\d{1,2}):(\d{2})$")
 _PERSIAN_DIGITS = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")
 
 
+class ParentChoiceSelect(forms.Select):
+    """Expose parent metadata for presentation of already authorized choices."""
+
+    def __init__(self, *, parent_attribute: str, **kwargs: Any) -> None:
+        self.parent_attribute = parent_attribute
+        super().__init__(**kwargs)
+
+    def create_option(
+        self,
+        name: str,
+        value: Any,
+        label: Any,
+        selected: bool,
+        index: int,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        option = super().create_option(name, value, label, selected, index, **kwargs)
+        if value and hasattr(value, "instance"):
+            option["attrs"]["data-parent-value"] = str(
+                getattr(value.instance, self.parent_attribute)
+            )
+        return option
+
+
+def attach_parent_choice_ui(
+    form: forms.BaseForm, child: str, parent: str, parent_attribute: str
+) -> None:
+    """Filter rendered choices in the browser without changing field validation."""
+    field = form.fields[child]
+    field.widget = ParentChoiceSelect(
+        parent_attribute=parent_attribute,
+        attrs={**field.widget.attrs, "data-local-parent": form[parent].id_for_label},
+        choices=field.choices,
+    )
+
+
 def normalize_jalali_digits(value: str) -> str:
     return value.translate(_PERSIAN_DIGITS)
 

@@ -1,0 +1,17 @@
+{
+  "authority": "PD-WC-01..08; targeted Development Wave C re-entry only",
+  "product": [
+    "apps/procurement/rfq_actions.py", "templates/procurement/rfq_buyer_workspace.html",
+    "templates/timekeeping/workbench.html", "apps/payroll/forms.py", "apps/payroll/views.py",
+    "templates/payroll/workbench.html", "templates/payroll/run_detail.html",
+    "templates/payroll/statutory_workbench.html", "templates/payroll/financial_handoff_workbench.html",
+    "apps/workforce/employment_forms.py", "apps/workforce/employment_views.py",
+    "apps/workforce/employment_services.py", "apps/workforce/urls.py",
+    "templates/workforce/employment_manage.html", "templates/workforce/employee_detail.html"
+  ],
+  "conditional_only": ["apps/procurement/forms.py", "apps/procurement/views.py"],
+  "evidence": ["docs/governance/uiux/wave_c_reentry/", "tests/test_uiux_wave_c_reentry.py", "docs/governance/uiux/UIUX_RUNTIME_VALIDATION_WAVE_C_REPORT.md", "docs/governance/uiux/UIUX_RUNTIME_VALIDATION_RESULTS.yaml", "docs/governance/uiux/UIUX_FINDINGS_REGISTER.yaml"],
+  "development_data": "Minimum custom roles, accounts, explicit assignments/scopes via canonical services; independently approved; canonical domain fixtures and fully determined policy selections only",
+  "migration": "NO",
+  "prohibited": "Permission definitions/defaults, models, new identity, invented policy/source/scanner verdict, CEP-078/079, Production, Git writes"
+}

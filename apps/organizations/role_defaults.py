@@ -4,9 +4,25 @@ from apps.organizations.permission_catalog import (
     permission_codes_with_suffix,
 )
 from apps.organizations.permission_registry import registered_permission_codes
+from apps.organizations.role_reconciliation import (
+    ROLE_PERMISSION_ADDITIONS,
+    SPECIALIST_ROLE_DESCRIPTIONS,
+    UNASSIGNED_PERMISSION_REASONS,
+)
 
 # CEP035 source activation/mapping require explicit grants; no implicit role expansion.
-ALL_PERMISSIONS = registered_permission_codes() - permission_codes(
+# Support's enum/catalog entries predated its missing registry resource. Keep
+# their newly registered codes explicitly assigned only to the reviewed duties.
+_support_explicit_permissions = set().union(
+    *(ROLE_PERMISSION_ADDITIONS[code] for code in (
+        "support_operator", "support_access_confirmer", "support_access_approver"
+    ))
+)
+ALL_PERMISSIONS = (
+    registered_permission_codes()
+    - _support_explicit_permissions
+    - set(UNASSIGNED_PERMISSION_REASONS)
+) - permission_codes(
     BusinessPermissionCode.LEAVE_POLICIES_MANAGE,
     BusinessPermissionCode.LEAVE_BALANCES_MANAGE,
     BusinessPermissionCode.LEAVE_BALANCES_VIEW,
@@ -921,3 +937,15 @@ DEFAULT_ROLE_METADATA: dict[str, dict[str, object]] = {
         "is_owner": False,
     },
 }
+
+# Product Decision 2026-10-22 supersedes the historical unassigned-permission
+# catalogue exclusions above. It does not assign these roles to any membership.
+for _code, _grants in ROLE_PERMISSION_ADDITIONS.items():
+    DEFAULT_ROLE_PERMISSIONS.setdefault(_code, set()).update(_grants)
+for _code, _description in SPECIALIST_ROLE_DESCRIPTIONS.items():
+    DEFAULT_ROLE_METADATA[_code] = {
+        "name": _code.replace("_", " ").title(),
+        "description": _description,
+        "is_system": True,
+        "is_owner": False,
+    }

@@ -1,0 +1,98 @@
+{
+  "at": "2026-10-23T15:10:02.194448+03:30",
+  "environment": "Development / Non-Production; browser readiness only, no application navigation or authentication",
+  "supported_browsers": [
+    "Google Chrome",
+    "Microsoft Edge"
+  ],
+  "safari_requirement": "EXCLUDED_BY_EXPLICIT_HUMAN_DECISION_FOR_V1_CEP078; not a blocker, no compatibility claim",
+  "human_decision": {
+    "path": "docs/governance/cep/supporting/CEP-078_V1_BROWSER_SCOPE_HUMAN_DECISION_20261023.md",
+    "sha256": "0d146d7e5e2c0e0ea3099658d0dab5bb6cebee66ee50f82061de13db3969e64c"
+  },
+  "attempts": [
+    {
+      "operation": "CUA browser-provider inventory",
+      "observed": [
+        "Chrome extension provider 3",
+        "ChatGPT in-app browser 2",
+        "Codex MCP Apps 1"
+      ],
+      "edge_provider_available": false
+    },
+    {
+      "operation": "cua.createBrowserTab edge about:blank with task session",
+      "result": "Browser is not available: edge",
+      "tab_created": false
+    },
+    {
+      "operation": "Dedicated computer-use skill / sky.list_apps Edge selection",
+      "result": "No Edge app/window returned"
+    },
+    {
+      "operation": "sky.launch_app with existing installed Edge executable",
+      "result": "accessibility window-opened handler did not become ready",
+      "launch_outcome": "UNKNOWN; no window handle acquired; no process-kill or unsafe cleanup"
+    },
+    {
+      "operation": "sky.list_windows recovery after launch error",
+      "result": "No Edge targetable window returned; no native input performed"
+    },
+    {
+      "operation": "CUA Chrome about:blank task tab",
+      "result": "Created temporary tab 1823780335, blank page observed"
+    },
+    {
+      "operation": "Read-only Chrome runtime metadata query on blank page",
+      "result": "TypeError: navigator unavailable in read-only evaluation scope; no exact runtime version obtained",
+      "classification": "TOOL_CAPABILITY_LIMITATION_NOT_PRODUCT_FAILURE"
+    },
+    {
+      "operation": "Navigate temporary Chrome tab to chrome://version/ for built-in identity",
+      "result": "REJECTED_BY_BROWSER_SECURITY_POLICY",
+      "reason": "Requested URL protocol not allowed; allowed protocols http: and https:. Browser use did not acquire authority for this action.",
+      "workaround": "NOT_ATTEMPTED; no indirect execution, alternate version surface, raw CDP or browser-command circumvention"
+    },
+    {
+      "operation": "Close temporary Chrome readiness tab",
+      "result": "PASS; close returned successfully"
+    }
+  ],
+  "observed_runtime_identities": {
+    "Chrome": {
+      "provider": "Chrome extension 3",
+      "full_version": null,
+      "status": "UTV_EXACT_IDENTITY_NOT_OBTAINED"
+    },
+    "Edge": {
+      "provider": null,
+      "full_version": null,
+      "status": "UTV_CONTROL_AND_IDENTITY_UNAVAILABLE"
+    }
+  },
+  "installed_binary_metadata_reference": "../CEP-078_REENTRY_01/BROWSER_INSTALLATIONS.json; prior installed Chrome155.0.8059.82 and Edge155.0.4283.62 are not claimed as observed current execution identities",
+  "findings": [
+    {
+      "id": "CEP-078-FINDING-004",
+      "class": "BLOCKER-ENVIRONMENT",
+      "status": "OPEN",
+      "result": "UTV",
+      "description": "No controllable Edge provider; dedicated native helper failed to acquire an Edge window after bounded recovery",
+      "resolution": "An approved controllable Microsoft Edge verification session"
+    },
+    {
+      "id": "CEP-078-FINDING-005",
+      "class": "BLOCKER-ENVIRONMENT",
+      "status": "OPEN",
+      "result": "UTV",
+      "description": "Exact observed runtime identities not established; read-only evaluation lacks navigator and internal Chrome version page rejected by browser protocol policy",
+      "resolution": "Exact observed runtime identity evidence through an allowed supported verification capability; no security-policy circumvention"
+    }
+  ],
+  "entry_result": "BLOCKED_EXT0024_CURRENT_CHROME_EDGE_RUNTIME_READINESS",
+  "product_findings": [],
+  "application_scenarios_executed": 0,
+  "schema_business_permission_changes": 0,
+  "gates": "GATE07 scoped proof retained, not rerun; GATE08 unchanged",
+  "prior_blocker_safari_component": "RESOLVED_BY_HUMAN_DECISION; do not reintroduce"
+}

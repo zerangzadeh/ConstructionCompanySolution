@@ -1,0 +1,75 @@
+[
+  {
+    "evidence_id": "RV-EV-065",
+    "scenario_id": "RV-025",
+    "finding_ids": [
+      "UIUX-F-135"
+    ],
+    "result": "PASS",
+    "executed_at": "2026-10-23T13:35:52.187443+03:30",
+    "runtime": {
+      "environment": "Development / Non-Production",
+      "base_url": "http://127.0.0.1:8000",
+      "branch": "main",
+      "head": "43ac319c6e73e48ca9626461b73987922c498ec3",
+      "dirty_source": "ENTRY.json + SOURCE_INTEGRITY.json",
+      "browser": "BROWSER_METADATA.json",
+      "viewports": [
+        [
+          1440,
+          900
+        ],
+        [
+          390,
+          844
+        ]
+      ]
+    },
+    "personas": [
+      "P-01 / uiux.persona.project-operations: existing member and scoped Projects",
+      "P-25 reader / uiux.audit.project: existing project-scoped quality_issues.view authority"
+    ],
+    "preconditions": [
+      "F-135 is RV-025's sole remaining supported failure",
+      "Previous F-110/F-134/positive external portal results accepted and retained",
+      "Existing accounts/permissions/scopes; ordinary login using existing DPAPI secrets in memory",
+      "Development migration guard PASS; no business fixture changes"
+    ],
+    "steps": [
+      "Focus date input with keyboard",
+      "Press Escape from input, associated trigger, month and day controls",
+      "Verify picker hidden and appropriate focus remains/returns without reopening",
+      "Reopen using existing trigger Enter behavior",
+      "Verify Escape outside the picker preserves focus and closed-picker Escape is a no-op",
+      "Verify non-Escape caret key keeps picker open",
+      "Tab to next date boundary and dismiss that picker",
+      "Repeat affected desktop/mobile empty/populated states; compare date values and query URL before/after",
+      "Inspect RTL page/LTR date fields, focus visibility, viewport bounds and runtime logs"
+    ],
+    "expected": "Open picker dismisses on Escape; focus never remains in hidden picker; no value/date/query/authorization/business change",
+    "actual": "22/22 keyboard assertions PASS; all Escape origins close picker; input/trigger focus retained, popup-button focus returned to its associated trigger; Tab reaches next date boundary; populated date values and URLs unchanged; Persian RTL/LTR intact; zero runtime errors",
+    "screenshots": [
+      "projects_open_desktop.jpg",
+      "projects_escape_input_desktop.jpg",
+      "projects_escape_calendar_desktop.jpg",
+      "projects_open_mobile_populated.jpg",
+      "projects_escape_mobile_populated.jpg",
+      "quality_open_1440.jpg",
+      "quality_escape_1440.jpg",
+      "quality_open_390.jpg",
+      "quality_escape_390.jpg",
+      "quality_escape_next_boundary_mobile.jpg"
+    ],
+    "keyboard_focus": "KEYBOARD_TESTS.json",
+    "source_delta": "SOURCE_DELTA.diff",
+    "tests": "18/18 PASS; 3 subtests PASS",
+    "authorization_integrity": "DATA_INTEGRITY.json; no business/auth changes; previous server-isolation evidence retained",
+    "limitations": [
+      "F-135 revalidation only; not full WCAG/screen-reader certification or all calendar forms",
+      "Tablet layout and other completed Wave E evidence retained without repetition",
+      "Native JPEG bitmap sizes may differ from directly measured CSS viewport; unmodified provider captures retained",
+      "Full browser build unavailable; same-provider metadata limitation retained"
+    ],
+    "credentials_tokens_csrf_saved": false
+  }
+]

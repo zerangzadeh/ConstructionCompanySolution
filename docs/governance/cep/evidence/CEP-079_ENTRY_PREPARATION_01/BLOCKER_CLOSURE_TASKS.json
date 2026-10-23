@@ -1,0 +1,91 @@
+{
+  "task1": {
+    "result": "BLOCKED",
+    "blocker": "CEP079-PREP-B01",
+    "case": "UAT-CASE-012",
+    "retained_evidence": "CEP040_RECOVERY.json; unchanged HEAD 43ac319c6e73e48ca9626461b73987922c498ec3",
+    "delta_check": "Direct project tests contain P4 and CEP005/047/059 scoped evidence; no original CEP040 report/acceptance retained. git log --all --grep CEP-040/IMB-0039 and exact CEP040 report/evidence paths return no records.",
+    "recovery_limit": "Prior approved consolidated recovery exhausted; no repeat broad search or downstream substitution.",
+    "missing_proof": [
+      "Outcome detects missing/duplicate source occurrences and superseded versions",
+      "Authoritative source-only read/projection; no financial writer",
+      "As-of/freshness/version traceability",
+      "Tenant/project filtering before aggregation and drill-down",
+      "No repeated/superseded double count under approved current-evidence policy",
+      "Source-to-result reconciliation and required UNIT/MODEL/SERVICE/REGRESSION outputs with exact source/version, transaction/no-write trace, and scoped AC/DoD evidence"
+    ],
+    "minimum_action": "Recover original authoritative CEP040/IMB0039 source/version, duplicate/supersession, scope, no-financial-write and AC/DoD acceptance/test outputs; no reimplementation."
+  },
+  "task2": {
+    "result": "PASS",
+    "resolved_blocker": "CEP079-PREP-B02",
+    "evidence": "WORKFORCE_CLOSURE.json",
+    "validation": "6/6 distinct keyboard prerequisite cells PASS; focused v4 FAIL -> v5 PASS; Django check PASS; mobile pointer probes retained as limitation",
+    "case034": "UNAFFECTED"
+  },
+  "task3": {
+    "result": "BLOCKED",
+    "cases": {
+      "UAT-CASE-018": {
+        "blocker": "CEP079-PREP-B04",
+        "result": "ROLLED_BACK_CANONICAL_RECONCILIATION_INTEGRITY_FAILURE",
+        "minimum_action": "Separately authorize bounded Accounting reconciliation result-hash defect attribution/correction, then prepare signed native period-end evidence and retained statements; independent existing close/reopen actors are identified. No close/reopen executed.",
+        "error": "['نتیجه نگهداری\\u200cشده اجرای تطبیق دستکاری شده است.']"
+      },
+      "UAT-CASE-019/020/022": {
+        "blocker": "CEP079-PREP-B05",
+        "minimum_action": "Treasury/Accounting owner supplies approved effective BANK cash/clearing GL mapping and account facts; activate only isolated Development account and create statement/cleared-cheque through canonical lifecycle",
+        "source_conclusion": "Target has 0 BANK accounts/0 BANK mappings; sole CASH mapping marked UIUX_TEST_ONLY_NON_AUTHORITATIVE cannot authorize a BANK mapping. Prior Treasury recovery retained; existing supporting decision defines tenant-owned mapping semantics, no approved bank values."
+      }
+    },
+    "evidence": [
+      "TASK3_DISCOVERY.json",
+      "TASK3_RECONCILIATION_FIXTURE.json",
+      "TASK3_RECONCILIATION_RETRY_PREIMAGE.json"
+    ],
+    "protected_financial_rows": "UNCHANGED_ALL_ATTEMPTS_ROLLED_BACK"
+  },
+  "task4": {
+    "result": "BLOCKED",
+    "evidence": "TASK4_GOVERNED_INPUT_DISCOVERY.json",
+    "minimum_actions": {
+      "CEP079-PREP-B06": {
+        "cases": [
+          "UAT-CASE-029",
+          "UAT-CASE-044"
+        ],
+        "owner": "Partner Qualification domain owner",
+        "required": "Approved versioned qualification/category applicability requirement, source_reference/source_version and partner evidence/facts for the applicable BusinessParty; then canonical isolated profile/qualification fixture."
+      },
+      "CEP079-PREP-B07": {
+        "cases": [
+          "UAT-CASE-043"
+        ],
+        "owner": "Fixed Assets/Accounting policy owner",
+        "required": "Approved effective asset class, book/monetary policy, capitalization source/reference and required candidate facts; non-posting candidate only. No invented threshold, useful life, treatment or recognition."
+      },
+      "CEP079-PREP-B08": {
+        "cases": [
+          "UAT-CASE-044"
+        ],
+        "owner": "Compliance HSE/QA domain owner",
+        "required": "Approved applicable inspection template/checklist, outcome rules, required evidence and source/version references; then isolated native inspection inputs."
+      }
+    },
+    "fixtures_created": 0
+  },
+  "task5": {
+    "result": "BLOCKED",
+    "blocker": "CEP079-PREP-B03",
+    "cases": [
+      "UAT-CASE-009",
+      "UAT-CASE-016 (AR branch)",
+      "UAT-CASE-023"
+    ],
+    "evidence": [
+      "TASK5_AUTHORITY_DELTA.json",
+      "BILLING_AUTHORITY_DECISION_REQUIREMENT.json"
+    ],
+    "minimum_action": "Human/Product-Regulatory authority supplies approved effective four parameters/bases with external provenance and accepted professional review, applicable approved contract terms and Billing configuration; canonical disposable claim/AR/settlement fixture preparation follows."
+  }
+}

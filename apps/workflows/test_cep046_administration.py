@@ -390,6 +390,71 @@ class AdministrationTests(AdministrationFixture, TestCase):
         self.assertContains(response, "&lt;script&gt;")
         self.assertNotContains(response, "<script>alert('test')</script>")
 
+    def test_business_review_preserves_configuration_and_uses_stored_names(self):
+        version = self.draft()
+        config = valid_configuration()
+        names = {
+            "start": "شروع درخواست",
+            "decision": "بررسی درخواست خرید",
+            "approved": "درخواست تأییدشده",
+            "rejected": "درخواست ردشده",
+        }
+        for step in config["steps"]:
+            step["name"] = names[step["key"]]
+        edit_workflow_draft(
+            actor=self.owner,
+            organization=self.organization,
+            version_id=version.pk,
+            configuration=config,
+        )
+        before = configuration_payload(version)
+        response = self.client.get(
+            reverse("workflows:version_detail", args=[version.pk])
+        )
+        self.assertEqual(response.status_code, 200)
+        markup = response.content.decode()
+        primary = markup.split('aria-labelledby="workflow-review-title">', 1)[1].split(
+            "</section>", 1
+        )[0]
+        advanced = markup.split("پیکربندی پیشرفته و شناسه‌های فنی", 1)[1]
+        self.assertIn("نمای فرایند", primary)
+        for name in names.values():
+            self.assertIn(name, primary)
+        self.assertIn("ارسال‌شده", primary)
+        self.assertIn('scope="col"', primary)
+        self.assertNotIn("ordinary-admin", primary)
+        self.assertNotIn("procurement.purchase_request_approval", primary)
+        self.assertNotIn('"domain_command"', primary)
+        self.assertIn("ordinary-admin", advanced)
+        self.assertIn("procurement.purchase_request.approve", advanced)
+        self.assertEqual(configuration_payload(version), before)
+
+    def test_unknown_review_labels_do_not_guess_semantics_or_expose_keys(self):
+        version = self.draft()
+        config = valid_configuration()
+        config["steps"][1]["name"] = "<script>alert('review')</script>"
+        config["transitions"][0]["outcome"] = "unlabelled_test_outcome"
+        edit_workflow_draft(
+            actor=self.owner,
+            organization=self.organization,
+            version_id=version.pk,
+            configuration=config,
+        )
+        response = self.client.get(
+            reverse("workflows:version_detail", args=[version.pk])
+        )
+        markup = response.content.decode()
+        primary = markup.split('aria-labelledby="workflow-review-title">', 1)[1].split(
+            "</section>", 1
+        )[0]
+        advanced = markup.split("پیکربندی پیشرفته و شناسه‌های فنی", 1)[1]
+        self.assertIn("گام بدون عنوان کسب‌وکار", primary)
+        self.assertIn("نتیجهٔ تعریف‌شده در پیکربندی پیشرفته", primary)
+        self.assertNotIn("unlabelled_test_outcome", primary)
+        self.assertIn("unlabelled_test_outcome", advanced)
+        self.assertIn("&lt;script&gt;", primary)
+        self.assertNotIn("<script>alert('review')</script>", primary)
+
     def test_creation_validates_tenant_scope_and_neutral_duplicate_error(self):
         project = Project.objects.create(
             organization=self.other_organization, code="FOREIGN", name="Secret"

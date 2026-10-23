@@ -1,0 +1,48 @@
+{
+  "result": "PARTIAL",
+  "required_scenario": "CEP-078-SC-001 / original RV001 planning input only",
+  "Edge": {
+    "result": "FAIL",
+    "viewports": [
+      [
+        1440,
+        900
+      ],
+      [
+        1024,
+        768
+      ],
+      [
+        390,
+        844
+      ]
+    ],
+    "corrected_assertions": {
+      "PASS": 24,
+      "FAIL": 3
+    },
+    "failed_assertion": "Exactly one document main landmark; observed two with inner main nested inside outer main at each viewport",
+    "supporting_passes": "Exact CSS viewport, no page overflow, Persian/RTL, one H1, associated required labels, skip-link Tab, visible focus, actual username → forgot-password link → password keyboard order"
+  },
+  "Chrome": {
+    "result": "UTV",
+    "observations": 3,
+    "reason": "Existing authenticated session redirected login URL to Home; anonymous precondition not met. No logout/persona or credential changes after required Edge failure. No Chrome anonymous-login PASS inferred."
+  },
+  "finding": {
+    "id": "CEP-078-FINDING-006",
+    "existing_uiux": "UIUX-F-107",
+    "classification": "PRE_EXISTING_UI_ACCESSIBILITY_DEFECT_NOT_CEP_REGRESSION",
+    "current_source": "templates/accounts/login.html:422 nested under templates/base.html:715",
+    "prior_evidence": "UIUX_FINDINGS_REGISTER.yaml UIUX-F-107 / RV-EV-001 runtime confirmation 2026-10-21",
+    "scope": "Shared login semantic landmarks; source unchanged and actual Edge failure retained",
+    "remediation": "Not authorized inside verification package; separate bounded implementation action required"
+  },
+  "harness_correction": "Original three tabToPassword failures expected immediate password while DOM has visible forgot-password link. Original results retained; corrected actual two-step order passes at all viewports; no product change.",
+  "remaining_coverage": "Chrome anonymous login and all other 32 planned journey inputs for both browsers remain UTV after required failed accessibility test stop. No all-role/all-route/WCAG or cross-browser PASS.",
+  "console_errors_observed": 0,
+  "business_submissions": 0,
+  "capture_privacy": "Retained native images show empty credential controls; preliminary autofill captures replaced; values never inspected or serialized.",
+  "visual_qa": "Desktop/tablet/mobile retained native images inspected; responsive containment and visible focus supported for this page, not full accessibility conformance",
+  "canonical_stop": "Required test failure cannot close COMPLETE; preserve partial work and block affected verification without unauthorized remediation."
+}

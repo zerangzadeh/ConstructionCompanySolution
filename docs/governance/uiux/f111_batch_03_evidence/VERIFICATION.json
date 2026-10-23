@@ -1,0 +1,38 @@
+{
+  "changed_existing_files": [
+    "docs/governance/uiux/UIUX_FINDINGS_REGISTER.yaml",
+    "apps/billing/forms.py",
+    "apps/billing/views.py"
+  ],
+  "new_files_outside_evidence": [
+    "docs/governance/uiux/UIUX_F111_BATCH_03_REMEDIATION_REPORT.md",
+    "tests/test_uiux_f111_pattern_payable_scope.py"
+  ],
+  "prior_files_byte_preserved": 8899,
+  "allowed_product_declarations": {
+    "forms": [
+      "PayableCertificateForm",
+      "PayableMeasurementForm"
+    ],
+    "views": [
+      "payable_certificate_create",
+      "payable_measurement_create"
+    ]
+  },
+  "all_other_product_source_bytes_preserved": true,
+  "all_other_finding_entries_byte_preserved": true,
+  "batch01_and_batch02_code_and_evidence_preserved": true,
+  "plan_registry_roadmap_services_models_settings_templates_preserved": true,
+  "entry_capture_correction": "ENTRY.json intended report path retained copied BATCH_02 filename; actual new report is BATCH_03 only. No BATCH_02 report was modified.",
+  "independent_runtime_available_controls": {
+    "UIUX-F-123": "PASS_6_HTTP_AND_MEASUREMENT_BROWSER",
+    "UIUX-F-124": "PASS_6_HTTP_AND_CERTIFICATE_BROWSER"
+  },
+  "both_findings_required_site_only_runtime": "PENDING_NO_EXISTING_QUALIFYING_ACTOR",
+  "finding_closure": "NONE_BOTH_REMAIN_OPEN",
+  "batch04_through09": "NOT_EXECUTED",
+  "wave_c": "NOT_STARTED",
+  "production_cep078_cep079_git_writes": "NOT_EXECUTED",
+  "boundary_evidence_checks": "PASS",
+  "decision": "BATCH_03_IMPLEMENTED_RUNTIME_RETEST_PENDING"
+}

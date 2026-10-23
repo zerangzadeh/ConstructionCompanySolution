@@ -1,0 +1,243 @@
+[
+  {
+    "actor": "uiux.audit.project",
+    "path": "/safety/05ae790e-993c-4cc0-9036-521d65283f02/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "safety own project reader",
+    "passed": true,
+    "final_path": "/safety/05ae790e-993c-4cc0-9036-521d65283f02/",
+    "body_sha256": "45a5aba56d19ae975e6ef7617ad8518e7a53f44c4387828f72db3c5b3a4fb46d"
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/safety/49ad2950-c4d2-48d2-97f5-9aa5e6daf847/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "safety reader cannot read unauthorized sibling project",
+    "passed": true,
+    "final_path": "/safety/49ad2950-c4d2-48d2-97f5-9aa5e6daf847/",
+    "body_sha256": "c0a468070425aa8d753f4c3a43dae6b7c55eb29e3a6de3110b2f12688337192f"
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "path": "/safety/49ad2950-c4d2-48d2-97f5-9aa5e6daf847/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "safety manager own authorized lifecycle form",
+    "passed": true,
+    "final_path": "/safety/49ad2950-c4d2-48d2-97f5-9aa5e6daf847/",
+    "body_sha256": "5f5df51060cc4f178c81b885401df4f50a01f4ec587706aa7c359065812840be"
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "path": "/safety/a6f9606d-7e44-4593-bc05-b163f6108b74/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "safety manager cannot read project C",
+    "passed": true,
+    "final_path": "/safety/a6f9606d-7e44-4593-bc05-b163f6108b74/",
+    "body_sha256": "964a5cf43a22e423cd636a85d6482fa30459b9f8494484fb5cce5c6cdd3ddbfd"
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "path": "/safety/b4fbe460-ae2e-4e9c-86c4-2197462fabb3/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "safety cross-tenant denial",
+    "passed": true,
+    "final_path": "/safety/b4fbe460-ae2e-4e9c-86c4-2197462fabb3/",
+    "body_sha256": "cd73cfd9d1cf2335e6001dc4408ce5eb6e2c69b83f25f83788c4bd5d87ab2b6a"
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/quality/0715f881-12b0-4171-b784-264252597b24/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "quality own project reader",
+    "passed": true,
+    "final_path": "/quality/0715f881-12b0-4171-b784-264252597b24/",
+    "body_sha256": "a176ebad0d45ec9abf1cd959fe0dcf16dafd499c166d24d53da5f4cbbec6e108"
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/quality/cbf6257e-907a-423f-9aa9-d194fdcf62f4/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "quality reader cannot read unauthorized sibling project",
+    "passed": true,
+    "final_path": "/quality/cbf6257e-907a-423f-9aa9-d194fdcf62f4/",
+    "body_sha256": "db45ac003d6855232b6278eab2fb21a7654041087dada308f81bbfddbfec6678"
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "path": "/quality/cbf6257e-907a-423f-9aa9-d194fdcf62f4/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "quality manager own authorized lifecycle form",
+    "passed": true,
+    "final_path": "/quality/cbf6257e-907a-423f-9aa9-d194fdcf62f4/",
+    "body_sha256": "c67ad2f2306968ecd4a70cf598664dd2f12221b74c0d37cc3bd665b838376dd2"
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "path": "/quality/5244663b-3b5b-410a-8eac-c8bdeeaacf51/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "quality manager cannot read project C",
+    "passed": true,
+    "final_path": "/quality/5244663b-3b5b-410a-8eac-c8bdeeaacf51/",
+    "body_sha256": "d840a2b308917394ec0210c45d085eb8c085cf30652d66b1ba7c0bff85ccb9b2"
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "path": "/quality/aac1463b-d407-4315-8d3d-0d4eb65f782f/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "quality cross-tenant denial",
+    "passed": true,
+    "final_path": "/quality/aac1463b-d407-4315-8d3d-0d4eb65f782f/",
+    "body_sha256": "151105e835bfda27ca7a041ecc3f50e70ee8f4395fc2d0319d13afd73e092de0"
+  },
+  {
+    "actor": "uiux.wavec.time",
+    "path": "/workforce/ess/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "Explicit linked own ESS dashboard",
+    "passed": true,
+    "final_path": "/workforce/ess/",
+    "body_sha256": "b96acb0fa5f0c60c39b540ffafc6ba36fc87c3353c12ff532621a967557efab4"
+  },
+  {
+    "actor": "uiux.wavec.time",
+    "path": "/workforce/ess/profile/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "Own linked profile",
+    "passed": true,
+    "final_path": "/workforce/ess/profile/",
+    "body_sha256": "ba4639b61ca46a08b93b7d14b55cc9d96c9886f4c3840906671bee2c48097a5b"
+  },
+  {
+    "actor": "uiux.wavec.time",
+    "path": "/workforce/ess/profile/b17e6726-c27e-4525-8d88-6db97dac8880/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "case": "ESS rejects another worker relationship identifier",
+    "passed": true,
+    "final_path": "/workforce/ess/profile/b17e6726-c27e-4525-8d88-6db97dac8880/",
+    "body_sha256": "96c011f3d1e5aa1ac23d2cd12a377eb053982fa1977457c61e951dc20373f146"
+  },
+  {
+    "actor": "uiux.wavec.time",
+    "path": "/payroll/ess/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "case": "Retained linked identity lacks payroll own-history grant; not positive evidence",
+    "passed": true,
+    "final_path": "/payroll/ess/",
+    "body_sha256": "96c011f3d1e5aa1ac23d2cd12a377eb053982fa1977457c61e951dc20373f146"
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/workforce/ess/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "case": "No explicit person link fails closed",
+    "passed": true,
+    "final_path": "/workforce/ess/",
+    "body_sha256": "96c011f3d1e5aa1ac23d2cd12a377eb053982fa1977457c61e951dc20373f146"
+  },
+  {
+    "actor": "uiux.persona.tenant-admin",
+    "path": "/workflows/administration/versions/521eb6af-b641-4c39-9024-c60c1ed2fda0/",
+    "method": "GET",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "case": "Existing tenant-admin workflow view authority",
+    "passed": true,
+    "final_path": "/workflows/administration/versions/521eb6af-b641-4c39-9024-c60c1ed2fda0/",
+    "body_sha256": "a9d22455238afa960a79df45385dffb4ee84fbbb141e3b9cd3702a1fcd224104"
+  },
+  {
+    "actor": "uiux.persona.tenant-admin",
+    "path": "/workflows/administration/versions/02edc32e-e13a-450f-b18d-b924eaa2a4f6/",
+    "method": "GET",
+    "status": 404,
+    "expected": [
+      404
+    ],
+    "case": "Workflow cross-tenant identifier unavailable",
+    "passed": true,
+    "final_path": "/workflows/administration/versions/02edc32e-e13a-450f-b18d-b924eaa2a4f6/",
+    "body_sha256": "01ea84887f3d6ac9b7e8e79fc98a1c67c0332aaef2f2c8cb6d78f005f86f6468"
+  },
+  {
+    "actor": "uiux.persona.tenant-admin",
+    "path": "/knowledge/platform/promotions/",
+    "method": "GET",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "case": "Tenant Admin cannot access Platform Admin queue",
+    "passed": true,
+    "final_path": "/knowledge/platform/promotions/",
+    "body_sha256": "4b70c5aa3047ad1dd320d6489c9267b73f4a808f76b10b2c79358070cc97b40c"
+  }
+]

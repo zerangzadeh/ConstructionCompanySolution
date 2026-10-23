@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="15" time="30.242" timestamp="2026-10-23T12:58:34.953206+03:30" hostname="Zerangzadeh"><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_acceptance_creates_no_membership_and_context_is_exact_scope" time="9.845" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_accepted_identity_is_denied_after_email_rebind" time="1.267" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_ambiguous_email_and_internal_membership_fail_closed" time="1.266" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_authorized_invitation_management_view_rechecks_object_scope" time="2.437" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_email_impersonation_and_cross_tenant_invitation_are_denied" time="1.272" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_invitation_management_is_default_ungranted_and_token_hash_only" time="1.455" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_new_submission_supersedes_without_mutating_history" time="1.585" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_revocation_is_append_only_and_immediately_denies_access" time="1.465" /><testcase classname="apps.procurement.test_p5_s18_s22_supplier_portal.SupplierPortalFoundationTests" name="test_submission_reuses_quote_revision_and_is_idempotent" time="1.566" /><testcase classname="apps.organizations.test_p1_1_authorization.P11RoleCatalogCloseoutTests" name="test_role_catalog_routes_enforce_platform_and_tenant_boundaries" time="3.429" /><testcase classname="apps.projects.tests.ProjectServiceTests" name="test_project_list_requires_active_organization" time="1.467" /><testcase classname="apps.projects.tests.ProjectServiceTests" name="test_project_list_is_tenant_scoped" time="1.223"><failure message="AssertionError: False is not true : Couldn't find '/projects/sites/'  [response HTML redacted]">self = &lt;apps.projects.tests.ProjectServiceTests testMethod=test_project_list_is_tenant_scoped&gt;
+
+    def test_project_list_is_tenant_scoped(self) -&gt; None:
+        project = self.organization.projects.create(
+            code="P-006",
+            name="Visible project",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization.projects.create(
+            code="P-006",
+            name="Hidden project",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.client.force_login(self.owner)
+        session = self.client.session
+        session[ACTIVE_ORGANIZATION_SESSION_KEY] = str(self.organization.pk)
+        session.save()
+    
+        response = self.client.get(reverse("projects:list"))
+    
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Visible project")
+        self.assertNotContains(response, "Hidden project")
+        self.assertContains(
+            response,
+            reverse("projects:detail", kwargs={"project_id": project.pk}),
+        )
+        self.assertContains(response, "پروژه جدید")
+&gt;       self.assertContains(response, reverse("projects:all_site_list"))
+E       AssertionError: False is not true : Couldn't find '/projects/sites/'  [response HTML redacted]</failure></testcase><testcase classname="apps.quality.tests.QualityIssueViewAndAdminTests" name="test_admin_is_read_only" time="0.209" /><testcase classname="apps.quality.tests.QualityIssueViewAndAdminTests" name="test_create_view_relations_are_tenant_scoped" time="0.355" /><testcase classname="apps.quality.tests.QualityIssueServiceTests" name="test_create_read_rbac_tenant_scope_and_audit" time="0.887" /></testsuite></testsuites>

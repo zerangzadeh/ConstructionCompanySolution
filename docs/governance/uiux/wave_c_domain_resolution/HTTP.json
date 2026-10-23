@@ -1,0 +1,366 @@
+[
+  {
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/accounting/statements/096c3e8b-1322-44a5-9bc5-2a953f64c82b/",
+    "method": "GET",
+    "case": "Populated statement and progressive audit metadata",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "passed": true,
+    "final_path": "/accounting/statements/096c3e8b-1322-44a5-9bc5-2a953f64c82b/",
+    "response_sha256": "9ffb455024c1cc1008bd10c3f27e876b769b3e243806f502f4671eb510b36e40"
+  },
+  {
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/accounting/statements/bb0c706d-0da8-4829-aa58-3009fca097e4/",
+    "method": "GET",
+    "case": "Cross-tenant statement identifier denied",
+    "status": 404,
+    "expected": [
+      404
+    ],
+    "passed": true,
+    "final_path": "/accounting/statements/bb0c706d-0da8-4829-aa58-3009fca097e4/",
+    "response_sha256": "b6812617a159da683cadc72ca00ba9693d308e808a43f52bedd66c08798416f1"
+  },
+  {
+    "actor": "uiux.wavec.hr",
+    "path": "/accounting/statements/096c3e8b-1322-44a5-9bc5-2a953f64c82b/",
+    "method": "GET",
+    "case": "Same-tenant HR cannot read financial statement",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "passed": true,
+    "final_path": "/accounting/statements/096c3e8b-1322-44a5-9bc5-2a953f64c82b/",
+    "response_sha256": "fd35558aa28bbb7efcaec0d394a25156bd0bb97242e61a52654bf9c1f2937fd4"
+  },
+  {
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/subledgers/",
+    "method": "GET",
+    "case": "Settlement uses source selector rather than pasted UUID",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "passed": true,
+    "final_path": "/subledgers/",
+    "response_sha256": "5d13d491f0ef72ed2a4bf5514d5331c0a792e02437b45bdab202e32052610ed9"
+  },
+  {
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/subledgers/obligations/3065b6bc-e2e5-4041-821b-cac1cf8d4980/allocate/",
+    "method": "POST",
+    "case": "Allocation POST requires CSRF",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "passed": true,
+    "final_path": "/subledgers/obligations/3065b6bc-e2e5-4041-821b-cac1cf8d4980/allocate/",
+    "response_sha256": "a8c1c826df1bde8bf5b1c745b1529d708cdfc9d6d56b242b95185e513abaea27"
+  },
+  {
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/subledgers/obligations/3065b6bc-e2e5-4041-821b-cac1cf8d4980/allocate/",
+    "method": "POST",
+    "case": "Malformed movement identifier is bounded, not HTTP 500",
+    "status": 404,
+    "expected": [
+      404
+    ],
+    "passed": true,
+    "final_path": "/subledgers/obligations/3065b6bc-e2e5-4041-821b-cac1cf8d4980/allocate/",
+    "response_sha256": "f0bd625cb7573a016285c8249a8338e96cd8cbd236f6784fd8866d2c96931660"
+  },
+  {
+    "actor": "uiux.wavec.hr",
+    "path": "/subledgers/obligations/3065b6bc-e2e5-4041-821b-cac1cf8d4980/allocate/",
+    "method": "POST",
+    "case": "Unauthorized allocation denied",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "passed": true,
+    "final_path": "/subledgers/obligations/3065b6bc-e2e5-4041-821b-cac1cf8d4980/allocate/",
+    "response_sha256": "b73ae4b6fdd372eba34445b913981abf8993c368f67935ccb19d0c646158bfe2"
+  },
+  {
+    "actor": "account.demo-construction-01.accountant",
+    "path": "/subledgers/obligations/3065b6bc-e2e5-4041-821b-cac1cf8d4980/allocate/",
+    "method": "POST",
+    "case": "Over-allocation preserves fully consumed source",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "passed": true,
+    "final_path": "/subledgers/",
+    "response_sha256": "1d312a3b3164b04b9d26857a58a0695d2a9cbe0a3e7f9955b326cb88b9ae26bf"
+  },
+  {
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/runs/78ec311e-3d9c-4702-bfd8-37db6da18f78/",
+    "method": "GET",
+    "case": "Finalized ordinary Payroll",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "passed": true,
+    "final_path": "/payroll/runs/78ec311e-3d9c-4702-bfd8-37db6da18f78/",
+    "response_sha256": "61002a4e6fbcb686f55e1c87e6ae430a1884f4e2671dfa2e48aa436fe95056db"
+  },
+  {
+    "actor": "uiux.wavec.hr",
+    "path": "/payroll/runs/78ec311e-3d9c-4702-bfd8-37db6da18f78/",
+    "method": "GET",
+    "case": "Payroll-only data denied to HR persona",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "passed": true,
+    "final_path": "/payroll/runs/78ec311e-3d9c-4702-bfd8-37db6da18f78/",
+    "response_sha256": "d17dca583ab719c0bae33f0f251a202fbe2cba8f8c5149023bb5e396e9eee341"
+  },
+  {
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/runs/e8cb4c8c-4dd0-44a6-8fc0-d55fb065ee3e/inputs/new/",
+    "method": "GET",
+    "case": "Approved source and rule controls only",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "passed": true,
+    "final_path": "/payroll/runs/e8cb4c8c-4dd0-44a6-8fc0-d55fb065ee3e/inputs/new/",
+    "response_sha256": "e9ecdb947422f5cf52dced89aca20139c9bd74e2eb7f02f03515e0b276b2c3e4"
+  },
+  {
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/runs/e8cb4c8c-4dd0-44a6-8fc0-d55fb065ee3e/inputs/new/",
+    "method": "POST",
+    "case": "Payroll source POST requires CSRF",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "passed": true,
+    "final_path": "/payroll/runs/e8cb4c8c-4dd0-44a6-8fc0-d55fb065ee3e/inputs/new/",
+    "response_sha256": "a8c1c826df1bde8bf5b1c745b1529d708cdfc9d6d56b242b95185e513abaea27"
+  },
+  {
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/runs/e8cb4c8c-4dd0-44a6-8fc0-d55fb065ee3e/inputs/new/",
+    "method": "POST",
+    "case": "Forged source invalid redisplay",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "passed": true,
+    "final_path": "/payroll/runs/e8cb4c8c-4dd0-44a6-8fc0-d55fb065ee3e/inputs/new/",
+    "response_sha256": "fbc83240fb810fbe18efab6ae38f67d94c675dd44370093a7babc34eef3376dc"
+  },
+  {
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/statutory/",
+    "method": "GET",
+    "case": "Four canonical prerequisite states visible",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "passed": true,
+    "final_path": "/payroll/statutory/",
+    "response_sha256": "504529276dfd7bd79619db629a00c806ad98e6ec4c9a5304d568b49b56e7455c"
+  },
+  {
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/statutory/calculations/new/",
+    "method": "POST",
+    "case": "Absent statutory authority fails closed",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "passed": true,
+    "final_path": "/payroll/statutory/calculations/new/",
+    "response_sha256": "642337e68b65b096f89f2791cf066aeb264b9209558cbffe85ea1bcabda5c978"
+  },
+  {
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/financial-handoffs/",
+    "method": "GET",
+    "case": "Prepared proposals and explicit exceptions",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "passed": true,
+    "final_path": "/payroll/financial-handoffs/",
+    "response_sha256": "3bd9da1398fd1cdf2b2c234e6893c66402dc260056cf848501f640c671194d8a"
+  },
+  {
+    "actor": "uiux.wavec.commercial",
+    "path": "/commercial/b05bf9f6-4769-4160-ae93-1eea8d4aea18/",
+    "method": "GET",
+    "case": "Tender immutable lifecycle history",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "passed": true,
+    "final_path": "/commercial/b05bf9f6-4769-4160-ae93-1eea8d4aea18/",
+    "response_sha256": "459953e247c25706401df5064259a4df532796d73540537c83c15da19490e610"
+  },
+  {
+    "actor": "uiux.wavec.commercial",
+    "path": "/commercial/create/",
+    "method": "POST",
+    "case": "Project-scoped actor cannot omit project",
+    "status": 400,
+    "expected": [
+      400
+    ],
+    "passed": true,
+    "final_path": "/commercial/create/",
+    "response_sha256": "e74ded53a1940e4eb2753ff1cf7f6b9cbef244ac3190cc06420696ff5f0e4e0d"
+  },
+  {
+    "actor": "uiux.wavec.commercial",
+    "path": "/commercial/create/",
+    "method": "POST",
+    "case": "Cross-tenant project rejected by authorized selector",
+    "status": 400,
+    "expected": [
+      400
+    ],
+    "passed": true,
+    "final_path": "/commercial/create/",
+    "response_sha256": "f0ac3da89afec259546d1a52f744a897e85138cf101a7e27c44ff9e674fd8f24"
+  },
+  {
+    "actor": "uiux.wavec.hr",
+    "path": "/commercial/b05bf9f6-4769-4160-ae93-1eea8d4aea18/",
+    "method": "GET",
+    "case": "Unauthorized Tender access denied",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "passed": true,
+    "final_path": "/commercial/b05bf9f6-4769-4160-ae93-1eea8d4aea18/",
+    "response_sha256": "af066e136a53338c63706dd139c32d76b05e8c905b7c98c1f7a54c52f0103d9b"
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/",
+    "method": "GET",
+    "case": "External context without membership",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "passed": true,
+    "final_path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/",
+    "response_sha256": "24bdb384593895d6e82e3da6c453e9b0217357a747407bf8a98d8711357d876b"
+  },
+  {
+    "actor": "uiux.wavec.hr",
+    "path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/",
+    "method": "GET",
+    "case": "Internal identity cannot impersonate external principal",
+    "status": 404,
+    "expected": [
+      404
+    ],
+    "passed": true,
+    "final_path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/",
+    "response_sha256": "20ae0e78de3e5cbf8523e9a601fb2d25b9eac7290139e626ed805754e9d6087e"
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/submit/",
+    "method": "POST",
+    "case": "External submission requires CSRF",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "passed": true,
+    "final_path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/submit/",
+    "response_sha256": "a8c1c826df1bde8bf5b1c745b1529d708cdfc9d6d56b242b95185e513abaea27"
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/submit/",
+    "method": "POST",
+    "case": "Actual primary file is mandatory",
+    "status": 400,
+    "expected": [
+      400
+    ],
+    "passed": true,
+    "final_path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/submit/",
+    "response_sha256": "8e2f864f9305a096cdb338a7abfa2b217f131f89a24a02f64a8352a88f2f4026"
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/submit/",
+    "method": "POST",
+    "case": "Actual multipart payload retained with server authority",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "passed": true,
+    "final_path": "/procurement/portal/receipts/573f0d49-2b4b-4f13-af72-43dda5b18151/",
+    "response_sha256": "64d8fc836f50d908b6d297035c83e652b1bae408219602f37268b3d6d963fa54"
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/submit/",
+    "method": "POST",
+    "case": "Identical payload replay returns same receipt",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "passed": true,
+    "final_path": "/procurement/portal/receipts/573f0d49-2b4b-4f13-af72-43dda5b18151/",
+    "response_sha256": "587c99e3d6d93f8d4153ac5a5e1d55d4f5a66c5cae117225c1605cad1238781e"
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/submit/",
+    "method": "POST",
+    "case": "Changed bytes cannot reuse idempotency key",
+    "status": 400,
+    "expected": [
+      400
+    ],
+    "passed": true,
+    "final_path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/submit/",
+    "response_sha256": "c7d6b215dae2d928af5770edde818bb9d0d2838243025a864686ddd4ca73ad8f"
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/submit/",
+    "method": "POST",
+    "case": "Client digest mismatch is rejected",
+    "status": 400,
+    "expected": [
+      400
+    ],
+    "passed": true,
+    "final_path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/submit/",
+    "response_sha256": "a359fc1a7386721de3c43ae4c2100e15744017e4a9a18f5b7680cfbc16dacdea"
+  }
+]

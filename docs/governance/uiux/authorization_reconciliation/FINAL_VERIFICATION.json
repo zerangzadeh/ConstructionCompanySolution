@@ -1,0 +1,43 @@
+{
+  "initial_grant_and_matrix": "18/18 PASS on final service source",
+  "protected_opening_retest": "9/9 PASS, including concurrency",
+  "affected_selection": "114 tests: 105 initially PASS, 5 fixture failures corrected/retested PASS, 4 baseline registry failures; 68 subtests PASS",
+  "remaining_failures": [
+    "apps.payroll.test_p7_s13_s22_core_payroll.CorePayrollTests::test_payroll_registry_is_complete_and_owner_admin_are_denied",
+    "apps.organizations.test_permission_registry.PermissionRegistryArchitectureTests::test_every_managed_business_model_is_registered_exactly_once",
+    "apps.organizations.test_permission_registry.PermissionRegistryArchitectureTests::test_every_registered_permission_is_referenced_by_its_enforcement_module",
+    "apps.organizations.test_permission_registry.PermissionRegistryArchitectureTests::test_resource_keys_are_unique_and_match_permission_namespaces"
+  ],
+  "baseline_attribution": "REGISTRY_BASELINE_DEBT.json",
+  "http": {
+    "observations": 18,
+    "post_count": 6,
+    "all_expected": true,
+    "browser_visual_validation": "NOT_RERUN_NO_UI_CHANGE",
+    "full_wave_c_completion": false
+  },
+  "concurrency": {
+    "outcomes": [
+      "DUPLICATE_DENIED",
+      "GRANTED"
+    ],
+    "role_assignments": 1,
+    "scope_grants": 1,
+    "target": "ffa7f100-379f-4d11-84d6-6b86b90f7df0",
+    "lost_update_or_duplicate": false
+  },
+  "integrity": {
+    "model_count": 518,
+    "no_existing_rows_deleted": true,
+    "financial_payroll_inventory_models_unchanged": true,
+    "last_login_and_sessions_excluded": true,
+    "delta": "DATA_DELTA.json"
+  },
+  "django_check": "PASS",
+  "migration_drift": "PASS_NO_CHANGES",
+  "ruff_lint": "PASS",
+  "new_module_format": "PASS",
+  "full_repository_regression": "NOT_RUN",
+  "unrelated_entry_files_byte_preserved": true,
+  "git_index_and_head_unchanged": true
+}

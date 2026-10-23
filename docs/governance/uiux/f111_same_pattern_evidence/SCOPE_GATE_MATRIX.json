@@ -1,0 +1,486 @@
+{
+  "object_scoped_namespaces": [
+    "activities",
+    "attendance",
+    "baselines",
+    "claim_settlements",
+    "claims",
+    "compliance_evidence",
+    "contract_amendments",
+    "contract_items",
+    "contracts",
+    "daily_reports",
+    "documents",
+    "equipment_assignments",
+    "estimate_items",
+    "estimates",
+    "expenses",
+    "goods_receipt_items",
+    "goods_receipts",
+    "guarantees",
+    "invoice_matches",
+    "leave_mission",
+    "maintenance_records",
+    "overtime",
+    "payable_certificates",
+    "payable_measurements",
+    "payroll_ess",
+    "payroll_inquiries",
+    "payroll_results",
+    "payslips",
+    "progress",
+    "project_assignments",
+    "project_controls",
+    "project_cost",
+    "project_phases",
+    "project_sites",
+    "projects",
+    "purchase_order_items",
+    "purchase_orders",
+    "purchase_request_items",
+    "purchase_requests",
+    "quality_issues",
+    "reporting",
+    "retention_releases",
+    "rfqs",
+    "safety_incidents",
+    "stock_balances",
+    "stock_transactions",
+    "supplier_invoices",
+    "supplier_portal",
+    "tender_bids",
+    "timesheets",
+    "warehouses",
+    "wbs_nodes",
+    "work_items",
+    "workforce_labor_rates",
+    "workforce_performance",
+    "workforce_qualifications",
+    "workforce_skills"
+  ],
+  "candidate_view_gates": {
+    "apps/procurement/views.py:purchase_request_create": [
+      {
+        "symbol": "PURCHASE_REQUESTS_CREATE",
+        "permission": "purchase_requests.create",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/procurement/views.py:goods_receipt_create": [
+      {
+        "symbol": "GOODS_RECEIPTS_CREATE",
+        "permission": "goods_receipts.create",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/equipment/views.py:maintenance_create": [
+      {
+        "symbol": "MAINTENANCE_RECORDS_CREATE",
+        "permission": "maintenance_records.create",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/equipment/views.py:meter_reading_create": [
+      {
+        "symbol": "EQUIPMENT_METERS_RECORD",
+        "permission": "equipment_meters.record",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/equipment/views.py:usage_create": [
+      {
+        "symbol": "EQUIPMENT_USAGE_RECORD",
+        "permission": "equipment_usage.record",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/equipment/views.py:fuel_create": [
+      {
+        "symbol": "EQUIPMENT_FUEL_RECORD",
+        "permission": "equipment_fuel.record",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/equipment/views.py:downtime_create": [
+      {
+        "symbol": "EQUIPMENT_DOWNTIME_MANAGE",
+        "permission": "equipment_downtime.manage",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/equipment/views.py:maintenance_plan_create": [
+      {
+        "symbol": "EQUIPMENT_MAINTENANCE_PLANS_MANAGE",
+        "permission": "equipment_maintenance_plans.manage",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/equipment/views.py:work_order_create": [
+      {
+        "symbol": "EQUIPMENT_WORK_ORDERS_MANAGE",
+        "permission": "equipment_work_orders.manage",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/equipment/views.py:_operation_form": [],
+    "apps/equipment/views.py:spare_link_create": [
+      {
+        "symbol": "EQUIPMENT_SPARE_LINKS_MANAGE",
+        "permission": "equipment_spare_links.manage",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/equipment/views.py:operator_qualification_create": [
+      {
+        "symbol": "EQUIPMENT_QUALIFICATIONS_MANAGE",
+        "permission": "equipment_qualifications.manage",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/contracts/views.py:contract_create": [
+      {
+        "symbol": "CONTRACTS_CREATE",
+        "permission": "contracts.create",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/contracts/views.py:contractual_record_create": [
+      {
+        "symbol": "CONTRACTUAL_RECORDS_PREPARE",
+        "permission": "contractual_records.prepare",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/inventory/views.py:warehouse_create": [
+      {
+        "symbol": "WAREHOUSES_CREATE",
+        "permission": "warehouses.create",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/inventory/views.py:transaction_create": [
+      {
+        "symbol": "STOCK_TRANSACTIONS_CREATE",
+        "permission": "stock_transactions.create",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/expenses/views.py:expense_detail": [
+      {
+        "symbol": "EXPENSES_VIEW",
+        "permission": "expenses.view",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/expenses/views.py:expense_allocate": [
+      {
+        "symbol": "EXPENSES_ALLOCATE",
+        "permission": "expenses.allocate",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/expenses/views.py:recurrence_list": [
+      {
+        "symbol": "EXPENSE_RECURRENCES_MANAGE",
+        "permission": "expenses.recurrences_manage",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/fixed_assets/views.py:asset_create": [
+      {
+        "symbol": "FIXED_ASSET_CANDIDATE_PREPARE",
+        "permission": "fixed_assets.candidate_prepare",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/fixed_assets/views.py:transaction_create": [
+      {
+        "symbol": "FIXED_ASSETS_VIEW",
+        "permission": "fixed_assets.view",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/accounting/views.py:journal_detail": [
+      {
+        "symbol": "ACCOUNTING_VIEW",
+        "permission": "accounting.view",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/accounting/views.py:journal_line_add": [
+      {
+        "symbol": "ACCOUNTING_JOURNALS_PREPARE",
+        "permission": "accounting.journals_prepare",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/accounting/views.py:opening_detail": [
+      {
+        "symbol": "ACCOUNTING_VIEW",
+        "permission": "accounting.view",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/accounting/views.py:opening_line_add": [
+      {
+        "symbol": "ACCOUNTING_JOURNALS_PREPARE",
+        "permission": "accounting.journals_prepare",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/billing/views.py:guarantee_create": [
+      {
+        "symbol": "GUARANTEES_MANAGE",
+        "permission": "guarantees.manage",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/billing/views.py:compliance_evidence_create": [
+      {
+        "symbol": "COMPLIANCE_EVIDENCE_MANAGE",
+        "permission": "compliance_evidence.manage",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/billing/views.py:retention_release_create": [
+      {
+        "symbol": "RETENTION_RELEASES_CREATE",
+        "permission": "retention_releases.create",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/billing/views.py:retention_release_detail": [
+      {
+        "symbol": "RETENTION_RELEASES_VIEW",
+        "permission": "retention_releases.view",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/billing/views.py:retention_release_correct": [
+      {
+        "symbol": "RETENTION_RELEASES_CREATE",
+        "permission": "retention_releases.create",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/billing/views.py:payable_measurement_create": [
+      {
+        "symbol": "PAYABLE_MEASUREMENTS_RECORD",
+        "permission": "payable_measurements.record",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/billing/views.py:payable_certificate_create": [
+      {
+        "symbol": "PAYABLE_CERTIFICATES_CREATE",
+        "permission": "payable_certificates.create",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/billing/views.py:taxpayer_invoice_create": [
+      {
+        "symbol": "TAXPAYER_INVOICES_PREPARE",
+        "permission": "taxpayer_invoices.prepare",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/billing/views.py:contractor_compliance_create": [
+      {
+        "symbol": "CONTRACTOR_COMPLIANCE_PREPARE",
+        "permission": "contractor_compliance.prepare",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/billing/views.py:_claim": [],
+    "apps/billing/views.py:claim_detail": [
+      {
+        "symbol": "CLAIMS_VIEW",
+        "permission": "claims.view",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/billing/views.py:claim_settlement_allocate": [
+      {
+        "symbol": "CLAIM_SETTLEMENTS_ALLOCATE",
+        "permission": "claim_settlements.allocate",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/documents/views.py:document_upload": [
+      {
+        "symbol": "DOCUMENTS_UPLOAD",
+        "permission": "documents.upload",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/documents/views.py:_detail_context": [],
+    "apps/documents/views.py:document_link_add": [
+      {
+        "symbol": "DOCUMENTS_UPLOAD",
+        "permission": "documents.upload",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/workforce/views.py:employee_create": [
+      {
+        "symbol": "EMPLOYEES_CREATE",
+        "permission": "employees.create",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/workforce/views.py:employee_positions": [
+      {
+        "symbol": "EMPLOYEES_CREATE",
+        "permission": "employees.create",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/workforce/views.py:workforce_training_requirement_create": [
+      {
+        "symbol": "WORKFORCE_QUALIFICATIONS_MANAGE",
+        "permission": "workforce_qualifications.manage",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/workforce/views.py:_foundation_form": [],
+    "apps/workforce/views.py:workforce_training_record_create": [
+      {
+        "symbol": "WORKFORCE_QUALIFICATIONS_MANAGE",
+        "permission": "workforce_qualifications.manage",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/payroll/views.py:employment_configuration_create": [
+      {
+        "symbol": "PAYROLL_CONFIGURATION_MANAGE",
+        "permission": "payroll_configuration.manage",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/payroll/views.py:rule_create": [
+      {
+        "symbol": "PAYROLL_CONFIGURATION_MANAGE",
+        "permission": "payroll_configuration.manage",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/payroll/views.py:input_create": [
+      {
+        "symbol": "PAYROLL_PREPARE",
+        "permission": "payroll.prepare",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/quality/views.py:issue_create": [
+      {
+        "symbol": "QUALITY_ISSUES_CREATE",
+        "permission": "quality_issues.create",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/safety/views.py:incident_create": [
+      {
+        "symbol": "SAFETY_INCIDENTS_CREATE",
+        "permission": "safety_incidents.create",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/compliance/views.py:create_record": [
+      {
+        "symbol": "COMPLIANCE_VIEW",
+        "permission": "compliance.view",
+        "allow_any_scope": false,
+        "requires_organization_grant": true
+      }
+    ],
+    "apps/billing/views.py:_commercial_record": [],
+    "apps/billing/views.py:guarantee_detail": [
+      {
+        "symbol": "GUARANTEES_VIEW",
+        "permission": "guarantees.view",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/billing/views.py:guarantee_revise": [
+      {
+        "symbol": "GUARANTEES_MANAGE",
+        "permission": "guarantees.manage",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/billing/views.py:compliance_evidence_detail": [
+      {
+        "symbol": "COMPLIANCE_EVIDENCE_VIEW",
+        "permission": "compliance_evidence.view",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ],
+    "apps/billing/views.py:compliance_evidence_revise": [
+      {
+        "symbol": "COMPLIANCE_EVIDENCE_MANAGE",
+        "permission": "compliance_evidence.manage",
+        "allow_any_scope": true,
+        "requires_organization_grant": false
+      }
+    ]
+  },
+  "nested_commercial_reader_gate": {
+    "source": "apps/billing/commercial_services.py:_require",
+    "project_passed": null,
+    "allow_any_scope": "omitted/default False",
+    "requires_organization_grant": true,
+    "covered_candidates": [
+      "SP-021",
+      "SP-042"
+    ]
+  }
+}

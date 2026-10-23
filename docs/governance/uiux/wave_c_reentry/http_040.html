@@ -1,0 +1,281 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+ 
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">قاعده جدید حقوق</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">حقوق و دستمزد محرمانه</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">قاعده جدید حقوق</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">فقط روش‌های محدود، نسخه‌دار و قابل بازتولید پذیرفته می‌شوند؛ کد آزاد اجرایی وجود ندارد.</p>
+        
+    </div>
+    
+</header>
+
+<section class="erp-surface mx-auto mt-5 max-w-3xl rounded-2xl p-5 sm:p-7">
+  <form method="post" class="space-y-4" novalidate>
+    <!-- CSRF omitted -->
+    
+    
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_component">
+        جزء حقوق<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="component" required id="id_component">
+  <option value="" selected>---------</option>
+
+  <option value="ed68069b-e69c-4f0f-8934-61cfd9aa9a45">PayrollComponent object (ed68069b-e69c-4f0f-8934-61cfd9aa9a45)</option>
+
+  <option value="07094437-8ed4-4499-8508-99ecf49dc1f8">PayrollComponent object (07094437-8ed4-4499-8508-99ecf49dc1f8)</option>
+
+  <option value="4aff2d30-dc2e-4fc6-b2d0-f7aa5d08881f">PayrollComponent object (4aff2d30-dc2e-4fc6-b2d0-f7aa5d08881f)</option>
+
+  <option value="d55a134d-f8bf-483b-9f81-4f7ff7c84a39">PayrollComponent object (d55a134d-f8bf-483b-9f81-4f7ff7c84a39)</option>
+
+  <option value="fa201dea-4dab-43f0-a3b4-849a094920a1">PayrollComponent object (fa201dea-4dab-43f0-a3b4-849a094920a1)</option>
+
+  <option value="2b9bfdb8-f594-4c57-bef0-c5dc32aec174">PayrollComponent object (2b9bfdb8-f594-4c57-bef0-c5dc32aec174)</option>
+
+  <option value="c70e1a94-97de-4879-97a5-9ca4628d85bb">PayrollComponent object (c70e1a94-97de-4879-97a5-9ca4628d85bb)</option>
+
+  <option value="f27396d9-e8d3-4e46-8da1-c5146e595170">PayrollComponent object (f27396d9-e8d3-4e46-8da1-c5146e595170)</option>
+
+  <option value="e727b6b0-d7c5-4ef0-ada9-9db33db089e2">PayrollComponent object (e727b6b0-d7c5-4ef0-ada9-9db33db089e2)</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_code">
+        کد
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="code" maxlength="50" required id="id_code">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_name">
+        نام
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="name" maxlength="255" required id="id_name">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_sequence">
+        ترتیب<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="number" name="sequence" value="100" min="1" required id="id_sequence">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_method">
+        روش دریافت/ پرداخت
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="method" id="id_method">
+  <option value="fixed_amount">مبلغ ثابت</option>
+
+  <option value="quantity_times_rate">مقدار × نرخ</option>
+
+  <option value="percent_of_component">درصد از جزء مبنا</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_fixed_amount">
+        مبلغ ثابت
+    </label>
+    <input type="number" name="fixed_amount" min="0" step="1e-8" id="id_fixed_amount">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_rate_source">
+        منبع نرخ<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="rate_source" id="id_rate_source">
+  <option value="rule">نرخ نسخه قاعده</option>
+
+  <option value="employment">نرخ نسخه پیکربندی پرداخت</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_rate">
+        نرخ قاعده
+    </label>
+    <input type="number" name="rate" min="0" step="1e-8" id="id_rate">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_percentage">
+        درصد
+    </label>
+    <input type="number" name="percentage" min="0" step="1e-8" id="id_percentage">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_basis_component">
+        جزء مبنا
+    </label>
+    <select name="basis_component" id="id_basis_component">
+  <option value="" selected>---------</option>
+
+  <option value="ed68069b-e69c-4f0f-8934-61cfd9aa9a45">PayrollComponent object (ed68069b-e69c-4f0f-8934-61cfd9aa9a45)</option>
+
+  <option value="07094437-8ed4-4499-8508-99ecf49dc1f8">PayrollComponent object (07094437-8ed4-4499-8508-99ecf49dc1f8)</option>
+
+  <option value="4aff2d30-dc2e-4fc6-b2d0-f7aa5d08881f">PayrollComponent object (4aff2d30-dc2e-4fc6-b2d0-f7aa5d08881f)</option>
+
+  <option value="d55a134d-f8bf-483b-9f81-4f7ff7c84a39">PayrollComponent object (d55a134d-f8bf-483b-9f81-4f7ff7c84a39)</option>
+
+  <option value="fa201dea-4dab-43f0-a3b4-849a094920a1">PayrollComponent object (fa201dea-4dab-43f0-a3b4-849a094920a1)</option>
+
+  <option value="2b9bfdb8-f594-4c57-bef0-c5dc32aec174">PayrollComponent object (2b9bfdb8-f594-4c57-bef0-c5dc32aec174)</option>
+
+  <option value="c70e1a94-97de-4879-97a5-9ca4628d85bb">PayrollComponent object (c70e1a94-97de-4879-97a5-9ca4628d85bb)</option>
+
+  <option value="f27396d9-e8d3-4e46-8da1-c5146e595170">PayrollComponent object (f27396d9-e8d3-4e46-8da1-c5146e595170)</option>
+
+  <option value="e727b6b0-d7c5-4ef0-ada9-9db33db089e2">PayrollComponent object (e727b6b0-d7c5-4ef0-ada9-9db33db089e2)</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_applicable_pay_models">
+        مدل‌های پرداخت مشمول
+    </label>
+    <select name="applicable_pay_models" id="id_applicable_pay_models" multiple>
+  <option value="salaried">حقوق ثابت</option>
+
+  <option value="hourly">ساعتی</option>
+
+  <option value="daily">روزانه</option>
+
+  <option value="project_linked">وابسته به پروژه</option>
+
+  <option value="other">سایر تنظیم صریح</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_project">
+        پروژه
+        
+    </label>
+    <select name="project" id="id_project">
+  <option value="" selected>---------</option>
+
+  <option value="f61f52ed-3c85-4570-af2b-5e89c025ab4e">PRJ-01-03 - بازسازی کارخانه نوآوران</option>
+
+  <option value="623b4e02-b751-495f-b0e7-7e1601b9ccdf">PRJ-01-04 - ساختمان اداری آفتاب</option>
+
+  <option value="58f517da-2139-45ac-8b7b-4f3d3a3d26e8">PRJ-01-01 - مجتمع مسکونی باغستان</option>
+
+  <option value="de3b5756-9d3e-4e67-a08b-97dbd2824c2f">PRJ-01-02 - مرکز درمانی مهر</option>
+
+</select>
+    
+    
+</div>
+<button type="submit" name="_refresh_context" value="1" formnovalidate class="erp-btn erp-btn--secondary">نمایش کارگاه‌های پروژه</button>
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_site">
+        کارگاه
+        
+    </label>
+    <select name="site" aria-describedby="id_site-help" id="id_site">
+  <option value="" selected>---------</option>
+
+</select>
+    
+        <p class="erp-field-help mt-1 text-sm text-slate-500" id="id_site-help">پس از انتخاب پروژه، کارگاه‌های همان پروژه را نمایش دهید.</p>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_effective_from">
+        شروع اثر<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="date" name="effective_from" required id="id_effective_from">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_effective_to">
+        پایان اثر
+    </label>
+    <input type="date" name="effective_to" id="id_effective_to">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_source_reference">
+        مرجع منبع<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="source_reference" maxlength="255" required id="id_source_reference">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_evidence_json">
+        شواهد JSON
+    </label>
+    <textarea name="evidence_json" cols="40" rows="3" dir="ltr" id="id_evidence_json">
+</textarea>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_requires_statutory_authority">
+        نیازمند مرجع قانونی (فعال‌سازی در این tranche مسدود است)
+    </label>
+    <input type="checkbox" name="requires_statutory_authority" id="id_requires_statutory_authority">
+    
+    
+</div>
+
+    <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-5"><button class="erp-btn erp-btn--primary" type="submit">ثبت کنترل‌شده</button><a class="erp-btn erp-btn--secondary" href="/payroll/">بازگشت</a></div>
+  </form>
+</section>
+
+        </main>

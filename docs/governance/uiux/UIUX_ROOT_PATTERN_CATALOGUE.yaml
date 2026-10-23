@@ -1,0 +1,296 @@
+schema_version: '1.0'
+document:
+  id: BONIRA-UIUX-ROOT-PATTERN-CATALOGUE
+  title: BONIRA UI/UX Root Pattern Catalogue
+  status: STATIC_TAXONOMY_STABLE
+  repository: zerangzadeh/ConstructionCompanySolution
+  branch: main
+  audit_baseline_commit: 43ac319c6e73e48ca9626461b73987922c498ec3
+  canonical_path: docs/governance/uiux/UIUX_ROOT_PATTERN_CATALOGUE.md
+  machine_readable_companion: docs/governance/uiux/UIUX_ROOT_PATTERN_CATALOGUE.yaml
+  catalogue_note: Markdown is the canonical human-readable catalogue. This YAML is the machine-readable companion used for
+    impact mapping and remediation planning.
+promotion_rule: A pattern is promoted from candidate when evidence exists across multiple material surfaces or a shared component
+  makes the issue systemic. Promotion describes UI/UX root behavior only and does not authorize business/domain changes.
+patterns:
+- pattern_id: RP-C01-TECHNICAL-LANGUAGE-LEAK
+  status: CONFIRMED_SYSTEMIC
+  name_fa: نشت زبان فنی و حاکمیتی به رابط کاربر
+  description: Internal governance, authorization, implementation, evidence, source, boundary or architecture vocabulary is
+    shown as primary operational language.
+  sample_modules:
+  - Shared Shell
+  - Payroll
+  - Procurement
+  - Projects
+  - Parties
+  - Documents
+  - Inventory
+  - Equipment
+  - Fixed Assets
+  - ESS
+  remediation_class: SHARED_TERMINOLOGY_AND_COPY_STANDARD
+  domain_change_expected: false
+- pattern_id: RP-C02-MODEL-REPRESENTATION-EXPOSED
+  status: CONFIRMED_SYSTEMIC
+  name_fa: نمایش نمایشگرهای فنی مدل به کاربر
+  description: Encoded values, raw status/source values, UUID-like identifiers or internal event references are presented
+    to users instead of business-identifying representations.
+  sample_modules:
+  - Timekeeping
+  - Subledgers
+  - Inventory Valuation
+  - ESS
+  remediation_class: PRESENTATION_ADAPTER_AND_SELECTORS
+  domain_change_expected: false
+- pattern_id: RP-C03-EXCESSIVE-TECHNICAL-INPUT
+  status: CONFIRMED_CROSS_MODULE
+  name_fa: ورودی فنی قابل اجتناب
+  description: Users are asked to manually enter values the UI could derive, select, or encode.
+  sample_modules:
+  - Timekeeping
+  - Subledgers
+  remediation_class: FORM_SIMPLIFICATION_AND_DERIVATION
+  domain_change_expected: false
+- pattern_id: RP-C04-WEAK-ACTION-HIERARCHY
+  status: CONFIRMED_SYSTEMIC
+  name_fa: سلسله‌مراتب ضعیف اقدامات
+  description: Many legitimate actions are rendered with equal weight instead of identifying the primary task or current next
+    action.
+  sample_modules:
+  - Payroll
+  - Procurement
+  - Subledgers
+  - ESS
+  - Equipment
+  - Fixed Assets
+  remediation_class: TASK_FIRST_ACTION_HIERARCHY
+  domain_change_expected: false
+- pattern_id: RP-C05-TASK-GUIDANCE-DEFICIT
+  status: CONFIRMED_SYSTEMIC
+  name_fa: کمبود راهنمای وظیفه‌محور
+  description: Pages explain controls, boundaries or implementation status more readily than the user's objective, prerequisites,
+    and next step.
+  sample_modules:
+  - Timekeeping
+  - Payroll
+  - Procurement
+  - Subledgers
+  - Projects
+  - Organizations
+  - Inventory
+  remediation_class: TASK_COPY_AND_CONTEXTUAL_HELP
+  domain_change_expected: false
+- pattern_id: RP-C06-GENERIC-FORM-ACTION
+  status: CONFIRMED_SYSTEMIC
+  name_fa: اقدام عمومی در فرم‌های متفاوت
+  description: A shared form template uses a generic governance-oriented primary button instead of a task-specific action
+    label.
+  sample_modules:
+  - Accounting
+  - Payroll
+  - Procurement
+  - Timekeeping
+  remediation_class: TASK_SPECIFIC_CTA_LABELS
+  domain_change_expected: false
+- pattern_id: RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
+  status: CONFIRMED_SYSTEMIC
+  name_fa: نمایش گردش‌کار به شکل فرمان‌ها به جای سفر کاربر
+  description: Domain commands/states are surfaced directly without a user-facing progression, stage model, or recommended
+    next step.
+  sample_modules:
+  - Payroll
+  - Procurement
+  - Subledgers
+  - Equipment
+  - Fixed Assets
+  remediation_class: STATE_AWARE_JOURNEY_PRESENTATION
+  domain_change_expected: false
+- pattern_id: RP-C08-WEAK-EMPTY-STATE
+  status: CONFIRMED_CROSS_MODULE
+  name_fa: وضعیت خالی کم‌راهنما
+  description: Empty states emphasize access/source state or absence without clearly distinguishing why nothing is shown and
+    what the user can do next.
+  sample_modules:
+  - Payroll
+  - Core Search
+  - ESS
+  remediation_class: STATE_AWARE_EMPTY_STATES
+  domain_change_expected: false
+- pattern_id: RP-C09-INCONSISTENT-DETAIL-AFFORDANCE
+  status: CONFIRMED_SYSTEMIC
+  name_fa: ناهماهنگی روش ورود به جزئیات
+  description: 'Lists use inconsistent record-opening patterns: whole row, name link, multiple linked cells, explicit button,
+    or icon-only action.'
+  sample_modules:
+  - Projects
+  - Equipment
+  - Inventory
+  remediation_class: CANONICAL_LIST_DETAIL_PATTERN
+  domain_change_expected: false
+- pattern_id: RP-C10-NAVIGATION-STATE-INCONSISTENCY
+  status: CONFIRMED_SHARED_COMPONENT
+  name_fa: ناهماهنگی وضعیت در ناوبری
+  description: The shared navigation can duplicate the same destination in enabled and disabled states or use duplicated navigation
+    identifiers.
+  sample_modules:
+  - Shared Navigation
+  remediation_class: NAVIGATION_STATE_NORMALIZATION
+  domain_change_expected: false
+- pattern_id: RP-C11-INFORMATION-ARCHITECTURE-MISMATCH
+  status: CONFIRMED_CROSS_SURFACE
+  name_fa: عدم انطباق معماری اطلاعات با قابلیت واقعی
+  description: Navigation/grouping does not consistently match reachable capabilities or user intents.
+  sample_modules:
+  - Shared Navigation
+  - ESS
+  remediation_class: INFORMATION_ARCHITECTURE_HARMONIZATION
+  domain_change_expected: false
+- pattern_id: RP-C12-POST_RENDER_LOCALIZATION
+  status: CONFIRMED_SHARED_IMPLEMENTATION_PATTERN
+  name_fa: بومی‌سازی پس از رندر
+  description: Shared JavaScript rewrites exact English text nodes after render instead of relying solely on canonical localized
+    presentation labels.
+  sample_modules:
+  - Shared Shell
+  remediation_class: AUTHORITATIVE_SERVER_SIDE_LOCALIZATION
+  domain_change_expected: false
+- pattern_id: RP-C13-OPERATIONAL-AUDIT-CONFLATION
+  status: CONFIRMED_SYSTEMIC
+  name_fa: ادغام نمای عملیاتی و نمای ممیزی/ردیابی
+  description: Operational pages place lineage, evidence hashes, source versions, control guarantees or audit metadata beside
+    normal task data instead of progressively disclosing them.
+  sample_modules:
+  - Accounting
+  - Treasury
+  - Inventory Valuation
+  - Reporting
+  - Fixed Assets
+  remediation_class: PROGRESSIVE_DISCLOSURE_AUDIT_LAYER
+  domain_change_expected: false
+- pattern_id: RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
+  status: CONFIRMED_LOCAL_PATTERN
+  name_fa: ناهماهنگی Landmark معنایی
+  description: A page template introduces a main landmark inside the global main landmark.
+  sample_modules:
+  - Reporting
+  remediation_class: SEMANTIC_HTML_NORMALIZATION
+  domain_change_expected: false
+- pattern_id: RP-C15-SHARED-FORM-PATTERN-BYPASS
+  status: CONFIRMED_CROSS_SURFACE
+  name_fa: دور زدن الگوی مشترک فرم
+  description: Some forms use raw HTML inputs/buttons instead of the shared accessible form components, causing labeling,
+    validation and interaction inconsistency.
+  sample_modules:
+  - Support
+  - Treasury
+  remediation_class: SHARED_FORM_COMPONENT_ADOPTION
+  domain_change_expected: false
+- pattern_id: RP-C16-DEVELOPMENT-ARTEFACT-LEAK
+  status: CONFIRMED_SYSTEMIC
+  name_fa: نشت شناسه‌های توسعه و Roadmap به محصول
+  description: Delivery-stage, CEP, phase or roadmap identifiers appear visibly on operational/product pages.
+  sample_modules:
+  - Contracts
+  - Compliance
+  - Reporting
+  - Procurement
+  remediation_class: REMOVE_DELIVERY_METADATA_FROM_RUNTIME_UI
+  domain_change_expected: false
+- pattern_id: RP-C17-CONFIGURATION-NOT-VISUALIZED
+  status: CONFIRMED_LOCAL_PATTERN
+  name_fa: نمایش تنظیمات پیچیده به شکل داده فنی به جای مدل بصری
+  description: Complex configurable process structures are presented mainly as raw keys, types, transitions or configuration
+    text rather than a visual/business representation.
+  sample_modules:
+  - Workflow Administration
+  remediation_class: VISUAL_CONFIGURATION_PRESENTATION
+  domain_change_expected: false
+- pattern_id: RP-C18-CASCADE-FILTERING-INCONSISTENT
+  status: CONFIRMED_SYSTEMIC
+  name_fa: عدم یکنواختی فیلتر آبشاری انتخاب‌ها
+  description: Dependent selections such as Project→Site→Phase or Project→Request are sometimes narrowed only after submit,
+    or not narrowed at all, even though the system already knows the relationship.
+  sample_modules:
+  - Daily Reports
+  - Procurement
+  - Equipment
+  - Payroll
+  remediation_class: CONTEXT_AWARE_CASCADE_FILTERING
+  domain_change_expected: false
+- pattern_id: RP-C19-DERIVABLE-DATA-REENTRY
+  status: CONFIRMED_SYSTEMIC
+  name_fa: ورود مجدد داده قابل استخراج
+  description: Users are asked to enter values, metadata, identifiers or companion fields that can be derived from an existing
+    selection, current context, uploaded content or system-generated identity.
+  sample_modules:
+  - Daily Reports
+  - Payroll
+  - Procurement Supplier Portal
+  - Equipment
+  - Subledgers
+  remediation_class: FORM_INTELLIGENCE_AND_DATA_REUSE
+  domain_change_expected: false
+- pattern_id: RP-C20-HOME-LINK-DIRECTORY
+  status: CONFIRMED_PRODUCT_LEVEL
+  name_fa: صفحه اصلی به‌عنوان فهرست لینک به جای داشبورد وظیفه‌محور
+  description: The canonical Home prioritizes permission-safe destination links but does not summarize role-specific work,
+    exceptions, activity or business attention signals.
+  sample_modules:
+  - Core / Home
+  remediation_class: ROLE_AWARE_HOME_DASHBOARD
+  domain_change_expected: false
+  product_decision_required: true
+- pattern_id: RP-C21-SHARED-LABEL-OVERRIDE
+  status: CONFIRMED_SHARED_COMPONENT
+  name_fa: بازنویسی برچسب دامنه توسط Component مشترک
+  description: The shared form-field renderer substitutes labels by generic field name, overriding business-specific labels
+    defined by individual forms.
+  sample_modules:
+  - Shared Forms
+  - Accounting
+  - Procurement
+  - Projects
+  - Workforce
+  remediation_class: FIELD_LABEL_AUTHORITY_NORMALIZATION
+  domain_change_expected: false
+- pattern_id: RP-C23-JALALI-INPUT-INCONSISTENCY
+  status: CONFIRMED_MODULE_PATTERN
+  name_fa: ناهماهنگی ورود تاریخ شمسی بین ماژول‌ها
+  description: Some user-facing forms bypass the canonical Jalali input/parser pattern and expose native browser date controls.
+  sample_modules:
+  - Billing
+  remediation_class: CANONICAL_JALALI_DATE_COMPONENT
+  domain_change_expected: false
+- pattern_id: RP-C24-PAGINATION-QUERY-STATE-LOSS
+  status: CONFIRMED_SHARED_COMPONENT
+  name_fa: از دست رفتن وضعیت فیلتر و مرتب‌سازی هنگام صفحه‌بندی
+  description: The shared pagination component replaces the query string with only the page parameter rather than preserving
+    active filters/sort state.
+  sample_modules:
+  - Shared Tables
+  remediation_class: QUERY_STATE_PRESERVING_PAGINATION
+  domain_change_expected: false
+- pattern_id: RP-C25-STATUS-SEMANTICS-INCOMPLETE
+  status: CONFIRMED_SHARED_COMPONENT
+  name_fa: پوشش ناقص معنای وضعیت در Badge مشترک
+  description: The shared status badge falls back to neutral for common domain lifecycle states because semantic mapping coverage
+    is incomplete.
+  sample_modules:
+  - Shared Status
+  - Safety
+  - Quality
+  remediation_class: CENTRAL_STATUS_SEMANTIC_MAP
+  domain_change_expected: false
+- pattern_id: RP-C26-JALALI-DISPLAY-INCONSISTENCY
+  status: CONFIRMED_SYSTEMIC
+  name_fa: ناهماهنگی نمایش تاریخ شمسی
+  description: User-facing dates are sometimes rendered through canonical Jalali filters and sometimes directly from raw Date/DateTime
+    values.
+  sample_modules:
+  - Accounting
+  - Billing
+  - Safety
+  - Quality
+  remediation_class: CANONICAL_JALALI_DISPLAY
+  domain_change_expected: false

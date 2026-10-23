@@ -9,6 +9,9 @@ from apps.daily_reports.models import (
     DelayEvent,
 )
 from apps.materials.models import Material, UnitOfMeasure
+from apps.organizations.authorization import scope_queryset
+from apps.organizations.form_scoping import scoped_projects_for_form
+from apps.organizations.models import OrganizationMembership
 from apps.projects.models import (
     Activity,
     Project,
@@ -16,7 +19,7 @@ from apps.projects.models import (
     ProjectPhaseStatus,
     ProjectSite,
 )
-from core.forms import JalaliDateMixin
+from core.forms import JalaliDateMixin, attach_parent_choice_ui
 
 
 class DailyReportForm(JalaliDateMixin, forms.ModelForm):
@@ -61,27 +64,46 @@ class DailyReportForm(JalaliDateMixin, forms.ModelForm):
             "quality_notes": forms.Textarea(attrs={"rows": 3}),
         }
 
-    def __init__(self, *args, organization=None, **kwargs):
+    def __init__(
+        self,
+        *args,
+        organization=None,
+        membership: OrganizationMembership | None = None,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization,
-            deleted_at__isnull=True,
-        ).order_by("name")
+        if not isinstance(membership, OrganizationMembership) or (
+            membership.organization_id != getattr(organization, "pk", None)
+        ):
+            return
+        self.fields["project"].queryset = scoped_projects_for_form(
+            organization=organization, membership=membership
+        )
         self.fields["site"].queryset = (
-            ProjectSite.objects.filter(
-                organization=organization,
-                project__deleted_at__isnull=True,
-                is_active=True,
+            scope_queryset(
+                ProjectSite.objects.filter(
+                    organization=organization,
+                    project__deleted_at__isnull=True,
+                    is_active=True,
+                ),
+                membership=membership,
+                project_lookup="project_id",
+                site_lookup="pk",
             )
             .select_related("project")
             .order_by("project__name", "name")
         )
         self.fields["phase"].queryset = (
-            ProjectPhase.objects.filter(
-                organization=organization,
-                site__project__deleted_at__isnull=True,
-                site__is_active=True,
-                status=ProjectPhaseStatus.ACTIVE,
+            scope_queryset(
+                ProjectPhase.objects.filter(
+                    organization=organization,
+                    site__project__deleted_at__isnull=True,
+                    site__is_active=True,
+                    status=ProjectPhaseStatus.ACTIVE,
+                ),
+                membership=membership,
+                project_lookup="site__project_id",
+                site_lookup="site_id",
             )
             .select_related("site", "site__project")
             .order_by("site__project__name", "site__name", "name")
@@ -93,6 +115,8 @@ class DailyReportForm(JalaliDateMixin, forms.ModelForm):
         )
         for field in self.fields.values():
             field.widget.attrs["class"] = field_class
+        attach_parent_choice_ui(self, "site", "project", "project_id")
+        attach_parent_choice_ui(self, "phase", "site", "site_id")
 
     def clean(self):
         cleaned_data = super().clean()

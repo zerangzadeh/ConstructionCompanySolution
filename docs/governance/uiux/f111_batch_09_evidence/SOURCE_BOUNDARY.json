@@ -1,0 +1,87 @@
+{
+  "baseline_hashes_compared": 5566,
+  "changed_existing_files": [
+    "apps/equipment/forms.py",
+    "apps/equipment/views.py",
+    "apps/quality/forms.py",
+    "apps/quality/views.py",
+    "apps/safety/forms.py",
+    "apps/safety/views.py"
+  ],
+  "non_target_source_AST_preserved": true,
+  "import_changes": {
+    "equipment.forms": {
+      "added": [],
+      "removed": []
+    },
+    "equipment.views": {
+      "added": [],
+      "removed": []
+    },
+    "quality.forms": {
+      "added": [
+        [
+          "apps.organizations.authorization",
+          "scope_queryset"
+        ],
+        [
+          "apps.organizations.form_scoping",
+          "scoped_projects_for_form"
+        ],
+        [
+          "apps.organizations.models",
+          "OrganizationMembership"
+        ]
+      ],
+      "removed": [
+        [
+          "apps.projects.models",
+          "Project"
+        ]
+      ]
+    },
+    "quality.views": {
+      "added": [
+        [
+          "apps.organizations.authorization",
+          "get_active_membership"
+        ]
+      ],
+      "removed": []
+    },
+    "safety.forms": {
+      "added": [
+        [
+          "apps.organizations.authorization",
+          "scope_queryset"
+        ],
+        [
+          "apps.organizations.form_scoping",
+          "scoped_projects_for_form"
+        ],
+        [
+          "apps.organizations.models",
+          "OrganizationMembership"
+        ]
+      ],
+      "removed": [
+        [
+          "apps.projects.models",
+          "Project"
+        ]
+      ]
+    },
+    "safety.views": {
+      "added": [
+        [
+          "apps.organizations.authorization",
+          "get_active_membership"
+        ]
+      ],
+      "removed": []
+    }
+  },
+  "all_other_finding_blocks_byte_preserved": true,
+  "prior_batches_01_through_08_preserved": true,
+  "graph_registry_roadmap_protected_documents_unchanged": true
+}

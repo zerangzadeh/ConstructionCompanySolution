@@ -1,0 +1,103 @@
+<main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+ 
+<div dir="rtl"><div class="mx-auto max-w-2xl">
+<nav class="mb-3 flex items-center gap-2 text-[11px] text-slate-400" aria-label="مسیر صفحه">
+    <a class="transition hover:text-blue-700" href="/">خانه</a>
+    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    
+    <span class="truncate text-slate-600">ثبت برآورد جدید</span>
+</nav>
+<header class="erp-page-header" aria-labelledby="erp-page-title">
+    <div class="erp-page-header__copy">
+        
+            <p class="text-xs font-semibold text-blue-600">مدیریت برآوردها</p>
+        
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">ثبت برآورد جدید</h1>
+        
+            <p class="mt-1 text-sm text-slate-500">شرکت سازه‌پردازان پارس</p>
+        
+    </div>
+    
+</header>
+
+<section class="mt-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-xs text-blue-900" aria-label="دامنه ثبت"><p class="font-semibold" data-mutation-context>پروژه مؤثر این ثبت هنوز انتخاب نشده است.</p><p class="mt-1 text-blue-700">انتخاب دامنه فقط گزینه‌ها را محدود می‌کند و مجوز تازه‌ای ایجاد نمی‌کند.</p></section>
+<form class="erp-surface mt-6 space-y-5 rounded-xl p-5 sm:p-6" method="post">
+<!-- CSRF omitted -->
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_project">
+        پروژه
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="project" data-cascade-project="" required id="id_project">
+  <option value="" selected>---------</option>
+
+  <option value="58f517da-2139-45ac-8b7b-4f3d3a3d26e8">PRJ-01-01 - مجتمع مسکونی باغستان</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_contract">
+        قرارداد
+        
+    </label>
+    <select name="contract" data-cascade-field="contract" data-cascade-source="estimates" data-options-url="/organizations/context/form-options/" data-empty-label="بدون قرارداد" id="id_contract">
+  <option value="" selected>بدون قرارداد</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_phase">
+        فاز
+        
+    </label>
+    <select name="phase" data-cascade-field="phase" data-cascade-source="estimates" data-options-url="/organizations/context/form-options/" data-empty-label="بدون فاز" id="id_phase">
+  <option value="" selected>بدون فاز</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_estimate_number">
+        شماره برآورد
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="estimate_number" maxlength="80" required id="id_estimate_number">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_title">
+        عنوان
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="title" maxlength="255" required id="id_title">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_notes">
+        یادداشت‌ها
+        
+    </label>
+    <textarea name="notes" cols="40" rows="10" id="id_notes">
+</textarea>
+    
+    
+</div>
+
+<div class="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-end"><a class="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50" href="/estimates/">انصراف</a><button class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white" type="submit">ثبت برآورد</button></div>
+</form></div></div>
+
+        </main>

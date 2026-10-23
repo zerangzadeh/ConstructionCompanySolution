@@ -1,0 +1,204 @@
+[
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/",
+    "case": "expired external grant fails closed",
+    "status": 404,
+    "expected": [
+      404
+    ],
+    "final": "/procurement/portal/grants/f83ba13d-b9cf-45a3-ac94-8e0cfb80eef0/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/payroll/",
+    "case": "external identity has no implicit tenant payroll access",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final": "/organizations/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wcd.external",
+    "path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/",
+    "case": "external cannot enter buyer workspace",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final": "/organizations/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/projects/f61f52ed-3c85-4570-af2b-5e89c025ab4e/",
+    "case": "project A reader cannot read project C",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "final": "/projects/f61f52ed-3c85-4570-af2b-5e89c025ab4e/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.audit.project",
+    "path": "/projects/7806a619-7ca4-42ac-90f7-fb585c39f112/",
+    "case": "foreign tenant identifier denied",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "final": "/projects/7806a619-7ca4-42ac-90f7-fb585c39f112/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.commercial",
+    "path": "/commercial/create/",
+    "case": "existing Commercial create form permission",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final": "/commercial/create/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.documents",
+    "path": "/documents/",
+    "case": "Document Control permitted list",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final": "/documents/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.payroll",
+    "path": "/payroll/",
+    "case": "Payroll specialist permitted workbench",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final": "/payroll/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.persona.inventory",
+    "path": "/inventory/",
+    "case": "Inventory reader permitted list, no mutation claim",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final": "/inventory/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.controls",
+    "path": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/",
+    "case": "Project Controls explicit assigned project",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.controls",
+    "path": "/projects/f61f52ed-3c85-4570-af2b-5e89c025ab4e/controls/",
+    "case": "Project Controls unassigned project denied",
+    "status": 403,
+    "expected": [
+      403,
+      404
+    ],
+    "final": "/projects/f61f52ed-3c85-4570-af2b-5e89c025ab4e/controls/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/",
+    "case": "protected Buyer representative",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final": "/procurement/rfqs/5bdf8343-48e3-4618-a13b-20afb06265e2/buyer/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.wavec.buyer",
+    "path": "/procurement/rfqs/fe5c60ff-9298-4fd9-942b-8e635a315098/buyer/",
+    "case": "Buyer foreign tenant denied",
+    "status": 404,
+    "expected": [
+      403,
+      404
+    ],
+    "final": "/procurement/rfqs/fe5c60ff-9298-4fd9-942b-8e635a315098/buyer/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.persona.project-manager",
+    "path": "/equipment/operations/",
+    "case": "project scopes do not become organization workbench authority",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "final": "/equipment/operations/",
+    "passed": true
+  },
+  {
+    "actor": "account.demo-construction-01.owner",
+    "path": "/equipment/operations/",
+    "case": "existing organization scope permits Equipment workbench",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final": "/equipment/operations/",
+    "passed": true
+  },
+  {
+    "actor": "account.demo-construction-01.owner",
+    "path": "/accounting/statements/",
+    "case": "existing organization authority permits statement filter",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final": "/accounting/statements/",
+    "passed": true
+  },
+  {
+    "actor": "uiux.persona.tenant-admin",
+    "path": "/organizations/platform/roles/",
+    "case": "Tenant Admin remains separate from Platform Admin",
+    "status": 403,
+    "expected": [
+      403
+    ],
+    "final": "/organizations/platform/roles/",
+    "passed": true
+  },
+  {
+    "actor": "admin",
+    "path": "/organizations/platform/roles/",
+    "case": "separate Platform Admin role catalog",
+    "status": 200,
+    "expected": [
+      200
+    ],
+    "final": "/organizations/platform/roles/",
+    "passed": true
+  }
+]

@@ -16,10 +16,13 @@ from apps.equipment.p8_models import (
     MeterReading,
 )
 from apps.inventory.models import StockTransaction
+from apps.organizations.authorization import scope_queryset
+from apps.organizations.form_scoping import scoped_projects_for_form
+from apps.organizations.models import OrganizationMembership
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project, ProjectSite
 from apps.workforce.models import Employee, EmployeeQualification
-from core.forms import JalaliDateMixin
+from core.forms import JalaliDateMixin, attach_parent_choice_ui
 
 
 class _StyledForm(JalaliDateMixin, forms.Form):
@@ -79,23 +82,40 @@ class EquipmentAssignmentForm(_StyledForm):
         label="یادداشت‌ها", required=False, widget=forms.Textarea(attrs={"rows": 3})
     )
 
-    def __init__(self, *args: object, organization, **kwargs: object) -> None:
+    def __init__(
+        self,
+        *args: object,
+        organization,
+        membership: OrganizationMembership | None = None,
+        **kwargs: object,
+    ) -> None:
         super().__init__(*args, **kwargs)
+        if not isinstance(membership, OrganizationMembership) or (
+            membership.organization_id != organization.pk
+        ):
+            return
         self.fields["equipment"].queryset = Equipment.objects.filter(
             organization=organization, archived_at__isnull=True
         ).order_by("name")
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization, deleted_at__isnull=True
-        ).order_by("name")
+        self.fields["project"].queryset = scoped_projects_for_form(
+            organization=organization, membership=membership
+        )
         self.fields["site"].queryset = (
-            ProjectSite.objects.filter(
-                organization=organization,
-                is_active=True,
-                project__deleted_at__isnull=True,
+            scope_queryset(
+                ProjectSite.objects.filter(
+                    organization=organization,
+                    is_active=True,
+                    project__deleted_at__isnull=True,
+                ),
+                membership=membership,
+                project_lookup="project_id",
+                site_lookup="pk",
             )
             .select_related("project")
             .order_by("project__name", "name")
         )
+
+        attach_parent_choice_ui(self, "site", "project", "project_id")
 
     def clean(self):
         cleaned = super().clean()
@@ -143,19 +163,34 @@ class MaintenanceRecordForm(_StyledForm):
         label="یادداشت‌ها", required=False, widget=forms.Textarea(attrs={"rows": 2})
     )
 
-    def __init__(self, *args: object, organization, **kwargs: object) -> None:
+    def __init__(
+        self,
+        *args: object,
+        organization,
+        membership: OrganizationMembership | None = None,
+        **kwargs: object,
+    ) -> None:
         super().__init__(*args, **kwargs)
+        if not isinstance(membership, OrganizationMembership) or (
+            membership.organization_id != organization.pk
+        ):
+            return
         self.fields["equipment"].queryset = Equipment.objects.filter(
             organization=organization, archived_at__isnull=True
         ).order_by("name")
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization, deleted_at__isnull=True
-        ).order_by("name")
+        self.fields["project"].queryset = scoped_projects_for_form(
+            organization=organization, membership=membership
+        )
         self.fields["site"].queryset = (
-            ProjectSite.objects.filter(
-                organization=organization,
-                is_active=True,
-                project__deleted_at__isnull=True,
+            scope_queryset(
+                ProjectSite.objects.filter(
+                    organization=organization,
+                    is_active=True,
+                    project__deleted_at__isnull=True,
+                ),
+                membership=membership,
+                project_lookup="project_id",
+                site_lookup="pk",
             )
             .select_related("project")
             .order_by("project__name", "name")
@@ -232,6 +267,14 @@ class OperatorQualificationForm(_StyledForm):
         ].queryset = EmployeeQualification.objects.filter(
             organization=organization
         ).select_related("employee")
+        self.fields["workforce_qualification"].label_from_instance = (
+            lambda qualification: (
+                f"{qualification.employee.employee_number} — {qualification.title}"
+            )
+        )
+        attach_parent_choice_ui(
+            self, "workforce_qualification", "employee", "employee_id"
+        )
 
 
 class DowntimeForm(_StyledForm):
@@ -369,7 +412,11 @@ class WorkOrderForm(_StyledForm):
         )
         self.fields["plan"].queryset = MaintenancePlan.objects.filter(
             organization=organization, active=True
+        ).select_related("equipment")
+        self.fields["plan"].label_from_instance = lambda plan: (
+            f"{plan.equipment.code} — {plan.name}"
         )
+        attach_parent_choice_ui(self, "plan", "equipment", "equipment_id")
 
 
 class WorkOrderTransitionForm(_StyledForm):

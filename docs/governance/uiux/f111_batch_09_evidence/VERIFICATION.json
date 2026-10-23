@@ -1,0 +1,277 @@
+{
+  "baseline_hashes_compared": 5566,
+  "changed_existing_files": [
+    "apps/equipment/forms.py",
+    "apps/equipment/views.py",
+    "apps/quality/forms.py",
+    "apps/quality/views.py",
+    "apps/safety/forms.py",
+    "apps/safety/views.py",
+    "docs/governance/uiux/UIUX_FINDINGS_REGISTER.yaml"
+  ],
+  "non_target_source_AST_preserved": true,
+  "import_changes": {
+    "equipment.forms": {
+      "added": [],
+      "removed": []
+    },
+    "equipment.views": {
+      "added": [],
+      "removed": []
+    },
+    "quality.forms": {
+      "added": [
+        [
+          "apps.organizations.authorization",
+          "scope_queryset"
+        ],
+        [
+          "apps.organizations.form_scoping",
+          "scoped_projects_for_form"
+        ],
+        [
+          "apps.organizations.models",
+          "OrganizationMembership"
+        ]
+      ],
+      "removed": [
+        [
+          "apps.projects.models",
+          "Project"
+        ]
+      ]
+    },
+    "quality.views": {
+      "added": [
+        [
+          "apps.organizations.authorization",
+          "get_active_membership"
+        ]
+      ],
+      "removed": []
+    },
+    "safety.forms": {
+      "added": [
+        [
+          "apps.organizations.authorization",
+          "scope_queryset"
+        ],
+        [
+          "apps.organizations.form_scoping",
+          "scoped_projects_for_form"
+        ],
+        [
+          "apps.organizations.models",
+          "OrganizationMembership"
+        ]
+      ],
+      "removed": [
+        [
+          "apps.projects.models",
+          "Project"
+        ]
+      ]
+    },
+    "safety.views": {
+      "added": [
+        [
+          "apps.organizations.authorization",
+          "get_active_membership"
+        ]
+      ],
+      "removed": []
+    }
+  },
+  "all_other_finding_blocks_byte_preserved": true,
+  "prior_batches_01_through_08_preserved": true,
+  "graph_registry_roadmap_protected_documents_unchanged": true,
+  "focused_tests": 48,
+  "regression": {
+    "baseline_identical_to_current": true,
+    "tests_compared": 91,
+    "passed": 69,
+    "failures": [
+      {
+        "test": "apps.equipment.tests.EquipmentServiceTests.test_assignment_lifecycle_preserves_history_and_derived_status",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\equipment\\tests.py:207: in test_assignment_lifecycle_preserves_history_and_derived_status\n    assignment = assign_equipment(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\equipment\\services.py:279: in assign_equipment\n    _require_permission(\napps\\equipment\\services.py:74: in _require_permission\n    require_business_permission(\napps\\organizations\\authorization.py:436: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید."
+      },
+      {
+        "test": "apps.equipment.tests.EquipmentServiceTests.test_assignment_service_rejects_cross_tenant_and_overlap",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\equipment\\tests.py:246: in test_assignment_service_rejects_cross_tenant_and_overlap\n    assign_equipment(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\equipment\\services.py:279: in assign_equipment\n    _require_permission(\napps\\equipment\\services.py:74: in _require_permission\n    require_business_permission(\napps\\organizations\\authorization.py:436: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید."
+      },
+      {
+        "test": "apps.equipment.tests.EquipmentServiceTests.test_create_and_scoped_read_enforce_rbac_and_audit",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\equipment\\tests.py:173: in test_create_and_scoped_read_enforce_rbac_and_audit\n    equipment = create_equipment(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\equipment\\services.py:149: in create_equipment\n    _require_permission(\napps\\equipment\\services.py:74: in _require_permission\n    require_business_permission(\napps\\organizations\\authorization.py:436: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید."
+      },
+      {
+        "test": "apps.equipment.tests.EquipmentServiceTests.test_maintenance_lifecycle_updates_equipment_and_audits",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\equipment\\tests.py:275: in test_maintenance_lifecycle_updates_equipment_and_audits\n    record = create_maintenance_record(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\equipment\\services.py:453: in create_maintenance_record\n    _require_permission(\napps\\equipment\\services.py:74: in _require_permission\n    require_business_permission(\napps\\organizations\\authorization.py:436: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید."
+      },
+      {
+        "test": "apps.equipment.tests.EquipmentPanelTests.test_owner_can_open_scoped_equipment_pages",
+        "classification": "BASELINE TEST DEBT",
+        "message": "AssertionError: 403 != 200",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\equipment\\tests.py:343: in test_owner_can_open_scoped_equipment_pages\n    self.assertEqual(self.client.get(reverse(\"equipment:list\")).status_code, 200)\nE   AssertionError: 403 != 200"
+      },
+      {
+        "test": "apps.daily_reports.tests.DailyReportServiceTests.test_create_report_is_tenant_scoped_and_audited",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\daily_reports\\tests.py:72: in setUp\n    self.project = create_project(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\projects\\services.py:169: in create_project\n    raise PermissionDenied(\"اجازه ایجاد پروژه در این سازمان را ندارید.\")\nE   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید."
+      },
+      {
+        "test": "apps.daily_reports.tests.DailyReportServiceTests.test_draft_report_accepts_operational_entries_and_locks_on_submit",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\daily_reports\\tests.py:72: in setUp\n    self.project = create_project(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\projects\\services.py:169: in create_project\n    raise PermissionDenied(\"اجازه ایجاد پروژه در این سازمان را ندارید.\")\nE   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید."
+      },
+      {
+        "test": "apps.daily_reports.tests.DailyReportServiceTests.test_list_and_create_views_are_tenant_scoped",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\daily_reports\\tests.py:72: in setUp\n    self.project = create_project(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\projects\\services.py:169: in create_project\n    raise PermissionDenied(\"اجازه ایجاد پروژه در این سازمان را ندارید.\")\nE   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید."
+      },
+      {
+        "test": "apps.daily_reports.tests.DailyReportServiceTests.test_report_list_and_detail_exclude_other_tenant",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\daily_reports\\tests.py:72: in setUp\n    self.project = create_project(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\projects\\services.py:169: in create_project\n    raise PermissionDenied(\"اجازه ایجاد پروژه در این سازمان را ندارید.\")\nE   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید."
+      },
+      {
+        "test": "apps.daily_reports.tests.DailyReportServiceTests.test_report_optionally_scopes_to_an_active_worksite_phase",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\daily_reports\\tests.py:72: in setUp\n    self.project = create_project(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\projects\\services.py:169: in create_project\n    raise PermissionDenied(\"اجازه ایجاد پروژه در این سازمان را ندارید.\")\nE   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید."
+      },
+      {
+        "test": "apps.daily_reports.tests.DailyReportServiceTests.test_report_rejects_cross_tenant_project",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\daily_reports\\tests.py:72: in setUp\n    self.project = create_project(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\projects\\services.py:169: in create_project\n    raise PermissionDenied(\"اجازه ایجاد پروژه در این سازمان را ندارید.\")\nE   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید."
+      },
+      {
+        "test": "apps.daily_reports.tests.DailyReportServiceTests.test_report_rejects_phase_from_another_worksite",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\daily_reports\\tests.py:72: in setUp\n    self.project = create_project(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\projects\\services.py:169: in create_project\n    raise PermissionDenied(\"اجازه ایجاد پروژه در این سازمان را ندارید.\")\nE   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید."
+      },
+      {
+        "test": "apps.daily_reports.tests.DailyReportServiceTests.test_report_rejects_site_from_another_project",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\daily_reports\\tests.py:72: in setUp\n    self.project = create_project(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\projects\\services.py:169: in create_project\n    raise PermissionDenied(\"اجازه ایجاد پروژه در این سازمان را ندارید.\")\nE   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید."
+      },
+      {
+        "test": "apps.daily_reports.tests.DailyReportServiceTests.test_structured_entries_are_locked_after_submission_and_reject_cross_project_activity",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\daily_reports\\tests.py:72: in setUp\n    self.project = create_project(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\projects\\services.py:169: in create_project\n    raise PermissionDenied(\"اجازه ایجاد پروژه در این سازمان را ندارید.\")\nE   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید."
+      },
+      {
+        "test": "apps.daily_reports.tests.DailyReportServiceTests.test_structured_entries_validate_master_scope_and_preserve_material_snapshots",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\daily_reports\\tests.py:72: in setUp\n    self.project = create_project(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\projects\\services.py:169: in create_project\n    raise PermissionDenied(\"اجازه ایجاد پروژه در این سازمان را ندارید.\")\nE   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید."
+      },
+      {
+        "test": "apps.daily_reports.tests.DailyReportServiceTests.test_submitted_report_can_be_approved_once",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\daily_reports\\tests.py:72: in setUp\n    self.project = create_project(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\projects\\services.py:169: in create_project\n    raise PermissionDenied(\"اجازه ایجاد پروژه در این سازمان را ندارید.\")\nE   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید."
+      },
+      {
+        "test": "apps.daily_reports.tests.DailyReportServiceTests.test_viewer_cannot_create_report",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\daily_reports\\tests.py:72: in setUp\n    self.project = create_project(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\projects\\services.py:169: in create_project\n    raise PermissionDenied(\"اجازه ایجاد پروژه در این سازمان را ندارید.\")\nE   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید."
+      },
+      {
+        "test": "apps.equipment.test_workflow.MaintenanceWorkflowTests.test_cancellation_is_a_terminal_workbench_outcome",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\equipment\\test_workflow.py:174: in test_cancellation_is_a_terminal_workbench_outcome\n    record = self._scheduled(\"W57-CANCEL\")\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\napps\\equipment\\test_workflow.py:52: in _scheduled\n    return create_maintenance_record(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\equipment\\services.py:453: in create_maintenance_record\n    _require_permission(\napps\\equipment\\services.py:74: in _require_permission\n    require_business_permission(\napps\\organizations\\authorization.py:436: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید."
+      },
+      {
+        "test": "apps.equipment.test_workflow.MaintenanceWorkflowTests.test_create_restores_missing_platform_catalog",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\equipment\\test_workflow.py:219: in test_create_restores_missing_platform_catalog\n    record = self._scheduled(\"W57-CATALOG-RECOVERY\")\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\napps\\equipment\\test_workflow.py:52: in _scheduled\n    return create_maintenance_record(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\equipment\\services.py:453: in create_maintenance_record\n    _require_permission(\napps\\equipment\\services.py:74: in _require_permission\n    require_business_permission(\napps\\organizations\\authorization.py:436: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید."
+      },
+      {
+        "test": "apps.equipment.test_workflow.MaintenanceWorkflowTests.test_cycle_uses_workbench_domain_service_due_date_and_terminal_history",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\equipment\\test_workflow.py:65: in test_cycle_uses_workbench_domain_service_due_date_and_terminal_history\n    record = self._scheduled()\n             ^^^^^^^^^^^^^^^^^\napps\\equipment\\test_workflow.py:52: in _scheduled\n    return create_maintenance_record(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\equipment\\services.py:453: in create_maintenance_record\n    _require_permission(\napps\\equipment\\services.py:74: in _require_permission\n    require_business_permission(\napps\\organizations\\authorization.py:436: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید."
+      },
+      {
+        "test": "apps.equipment.test_workflow.MaintenanceWorkflowTests.test_open_only_backfill_shadow_and_legacy_compatibility_path",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\equipment\\test_workflow.py:154: in test_open_only_backfill_shadow_and_legacy_compatibility_path\n    _transition_maintenance_status_domain(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\equipment\\services.py:556: in _transition_maintenance_status_domain\n    _require_permission(\napps\\equipment\\services.py:74: in _require_permission\n    require_business_permission(\napps\\organizations\\authorization.py:436: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید."
+      },
+      {
+        "test": "apps.equipment.test_workflow.MaintenanceWorkflowTests.test_tenant_scope_and_candidacy_are_rechecked",
+        "classification": "BASELINE TEST DEBT",
+        "message": "django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید.",
+        "exact_dirty_entry_message_match": true,
+        "trace": "apps\\equipment\\test_workflow.py:195: in test_tenant_scope_and_candidacy_are_rechecked\n    record = self._scheduled(\"W57-AUTH\")\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\napps\\equipment\\test_workflow.py:52: in _scheduled\n    return create_maintenance_record(\nC:\\Users\\azera\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\contextlib.py:81: in inner\n    return func(*args, **kwds)\n           ^^^^^^^^^^^^^^^^^^^\napps\\equipment\\services.py:453: in create_maintenance_record\n    _require_permission(\napps\\equipment\\services.py:74: in _require_permission\n    require_business_permission(\napps\\organizations\\authorization.py:436: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید."
+      }
+    ],
+    "new_failures": [],
+    "replay": "Import loader executes all six captured dirty-entry form/view files; no working source replacement; same disposable PostgreSQL database and regression set"
+  },
+  "http_observations": 146,
+  "http_by_finding": {
+    "UIUX-F-115": 30,
+    "UIUX-F-126": 58,
+    "UIUX-F-127": 58
+  },
+  "direct_denials": 24,
+  "browser_observations": 9,
+  "browser_real_server_POSTs": 2,
+  "browser_date_normalization_only": 1,
+  "integrity_tables": 519,
+  "fixture_preparation": "Four canonical synthetic sibling objects; audit retained",
+  "temporary_authority": "NONE",
+  "decision": "BATCH_09_RUNTIME_VERIFIED_RESOLVED",
+  "findings": {
+    "UIUX-F-115": "RUNTIME_VERIFIED_RESOLVED",
+    "UIUX-F-126": "RUNTIME_VERIFIED_RESOLVED",
+    "UIUX-F-127": "RUNTIME_VERIFIED_RESOLVED"
+  },
+  "migration": "NO",
+  "wave_c": "NOT_STARTED",
+  "SP031": "NOT_EXECUTED_UNCHANGED",
+  "production": "NO ACTION",
+  "cep_078_079": "NOT_EXECUTED",
+  "git_add_commit_push": "NOT_EXECUTED"
+}

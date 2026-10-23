@@ -661,7 +661,9 @@ class RecognitionSourceTests(RecognitionFixture, TestCase):
                 obj.save()
             with self.assertRaises(ValidationError):
                 type(obj).objects.filter(pk=obj.pk).delete()
-        for permissions in DEFAULT_ROLE_PERMISSIONS.values():
+        for permissions in (
+            DEFAULT_ROLE_PERMISSIONS[role] for role in ("tenant_owner", "tenant_admin")
+        ):
             self.assertNotIn(P.ACCOUNTING_RECOGNITION_VIEW, permissions)
             self.assertNotIn(P.ACCOUNTING_RECOGNITION_PREPARE, permissions)
 

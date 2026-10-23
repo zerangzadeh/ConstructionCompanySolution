@@ -1,0 +1,184 @@
+{
+  "cases": [
+    {
+      "case": "HR exact employee read",
+      "result": "SUCCESS",
+      "expected": "SUCCESS",
+      "passed": true,
+      "data_shape": {
+        "is_none": false
+      }
+    },
+    {
+      "case": "HR foundation read",
+      "result": "SUCCESS",
+      "expected": "SUCCESS",
+      "passed": true,
+      "data_shape": {
+        "is_none": false
+      }
+    },
+    {
+      "case": "HR foreign tenant read",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "به این شرکت دسترسی ندارید."
+    },
+    {
+      "case": "HR foreign related department write",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "رکورد مرتبط نیروی انسانی متعلق به سازمان دیگری است."
+    },
+    {
+      "case": "Unauthorized timekeeping write",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "مجوز یا دامنه لازم برای این عملیات را ندارید."
+    },
+    {
+      "case": "Payroll excludes workforce_performance.view",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "Denied by exact specialist boundary"
+    },
+    {
+      "case": "Payroll excludes workforce_labor_rates.view",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "Denied by exact specialist boundary"
+    },
+    {
+      "case": "Payroll excludes employees.view",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "Denied by exact specialist boundary"
+    },
+    {
+      "case": "Controls comparison A",
+      "result": "SUCCESS",
+      "expected": "SUCCESS",
+      "passed": true,
+      "data_shape": {
+        "is_none": false,
+        "budget_id": "bb71007d-7b06-4fcd-abad-a748d7f52062",
+        "line_count": 1
+      }
+    },
+    {
+      "case": "Controls exceptions A",
+      "result": "SUCCESS",
+      "expected": "SUCCESS",
+      "passed": true,
+      "data_shape": {
+        "is_none": false
+      }
+    },
+    {
+      "case": "Controls reconciliation A",
+      "result": "SUCCESS",
+      "expected": "SUCCESS",
+      "passed": true,
+      "data_shape": {
+        "is_none": false,
+        "budget_id": "bb71007d-7b06-4fcd-abad-a748d7f52062",
+        "line_count": 1
+      }
+    },
+    {
+      "case": "Controls comparison C",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "اجازه مدیریت کنترل پروژه در این سازمان را ندارید."
+    },
+    {
+      "case": "Controls exceptions C",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "اجازه مدیریت کنترل پروژه در این سازمان را ندارید."
+    },
+    {
+      "case": "Controls reconciliation C",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "اجازه مدیریت کنترل پروژه در این سازمان را ندارید."
+    },
+    {
+      "case": "Controls comparison X",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "اجازه مدیریت کنترل پروژه در این سازمان را ندارید."
+    },
+    {
+      "case": "Controls exceptions X",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "اجازه مدیریت کنترل پروژه در این سازمان را ندارید."
+    },
+    {
+      "case": "Controls reconciliation X",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "اجازه مدیریت کنترل پروژه در این سازمان را ندارید."
+    },
+    {
+      "case": "Document scanned version download",
+      "result": "SUCCESS",
+      "expected": "SUCCESS",
+      "passed": true,
+      "data_shape": {
+        "is_none": false
+      }
+    },
+    {
+      "case": "Document scanned version download",
+      "result": "SUCCESS",
+      "expected": "SUCCESS",
+      "passed": true,
+      "data_shape": {
+        "is_none": false
+      }
+    },
+    {
+      "case": "Document unauthorized download",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "اجازه انجام این عملیات روی اسناد را ندارید."
+    },
+    {
+      "case": "Procurement protected opening denied",
+      "result": "DENIED",
+      "expected": "DENIED",
+      "passed": true,
+      "reason": "هدف گشایش در این سازمان معتبر نیست."
+    }
+  ],
+  "all_expected": true,
+  "snapshot_unchanged": false,
+  "delta": {
+    "audit.AuditEvent": {
+      "added": [
+        "dee041bc-a57e-405a-a1aa-d9b5b948e940"
+      ],
+      "changed": []
+    }
+  },
+  "audit_actions": [
+    "project_cost.reconciliation_viewed"
+  ],
+  "before_sha256": "7db39a77a3f783e62c80bacae64f97c52823f0c9f8b047bfdba4b58070108855",
+  "after_sha256": "5057155fde8e37beb55fdac8c7bec1750f1855c073b3eab83bb8306ec53acc8b"
+}

@@ -377,7 +377,7 @@ class IndexationTests(TestCase):
         with self.assertRaises(PermissionDenied):
             self.calculate(actor=outsider)
 
-    def test_new_capabilities_are_explicit_and_never_default_granted(self):
+    def test_reconciled_capabilities_do_not_expand_owner_admin_authority(self):
         from apps.organizations.role_defaults import DEFAULT_ROLE_PERMISSIONS
 
         codes = {
@@ -385,7 +385,9 @@ class IndexationTests(TestCase):
             P.INDEXATION_CALCULATE,
             P.INDEXATION_CORRECT,
         }
-        for permissions in DEFAULT_ROLE_PERMISSIONS.values():
+        for permissions in (
+            DEFAULT_ROLE_PERMISSIONS[role] for role in ("tenant_owner", "tenant_admin")
+        ):
             self.assertFalse(codes & set(permissions))
         first = self.calculate()
         for code, action in (

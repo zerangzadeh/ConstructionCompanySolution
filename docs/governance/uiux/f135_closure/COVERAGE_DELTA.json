@@ -1,0 +1,63 @@
+{
+  "axes": "UI dimension x Persona x Module x State",
+  "retained_authority": "../wave_e_targeted_closure/COVERAGE_RECONCILIATION.json",
+  "accepted_wave_d": "UNCHANGED; not repeated",
+  "accepted_wave_e": "UNCHANGED except the F-135 keyboard interaction delta; no responsive or portal journey replay",
+  "delta_cells": [
+    {
+      "module": "Projects",
+      "persona": "P-01 / uiux.persona.project-operations",
+      "state": "Empty date desktop; populated from-bound mobile",
+      "dimensions": [
+        "Escape dismissal",
+        "focus retention/return",
+        "visible focus",
+        "normal Tab continuation",
+        "unchanged date/URL",
+        "RTL/LTR"
+      ],
+      "viewports": [
+        [
+          1440,
+          900
+        ],
+        [
+          390,
+          844
+        ]
+      ],
+      "classification": "DIRECT_RUNTIME_EVIDENCE",
+      "result": "PASS"
+    },
+    {
+      "module": "Quality",
+      "persona": "P-25 reader / uiux.audit.project",
+      "state": "Empty date desktop; populated from-bound mobile; next date boundary",
+      "dimensions": [
+        "Escape dismissal",
+        "focus retention/return",
+        "visible focus",
+        "normal Tab continuation",
+        "unchanged date/URL",
+        "non-Escape key",
+        "RTL/LTR"
+      ],
+      "viewports": [
+        [
+          1440,
+          900
+        ],
+        [
+          390,
+          844
+        ]
+      ],
+      "classification": "DIRECT_RUNTIME_EVIDENCE",
+      "result": "PASS"
+    }
+  ],
+  "tablet": "RETAINED_ACCEPTED_LAYOUT; keyboard behavior is representative equivalence from identical shared handler; no CSS/breakpoint change",
+  "other_representative_cells": "RETAINED_ACCEPTED; hashes preserved",
+  "blocked_or_unrepresented_material_cell": null,
+  "evidence": "KEYBOARD_TESTS.json + CAPTURES.json"
+}

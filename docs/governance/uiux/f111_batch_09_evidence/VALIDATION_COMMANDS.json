@@ -1,0 +1,61 @@
+{
+  "focused": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/f111_batch_09_evidence/run_validation.py tests/test_uiux_f111_pattern_operational_scope.py -q --reuse-db --tb=short --junitxml=docs/governance/uiux/f111_batch_09_evidence/focused.xml",
+    "exit_code": 0,
+    "result": "48 tests +221 subtests PASS;16 concrete test methods per finding"
+  },
+  "fresh_test_database": {
+    "name": "test_bonira_uiux_batch09",
+    "migration_count": 434,
+    "preparation": "Same focused command with --create-db --reuse-db; full canonical migration replay; initial resulting stricter service gate observations retained and test expectations corrected without product semantic changes"
+  },
+  "regression": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/f111_batch_09_evidence/run_validation.py apps/equipment/tests.py apps/quality/tests.py apps/safety/tests.py apps/daily_reports/tests.py apps/equipment/test_workflow.py::MaintenanceWorkflowTests apps/quality/test_workflow.py::QualityWorkflowTests apps/safety/test_workflow.py::SafetyWorkflowTests tests/test_uiux_f111_scope.py -q --reuse-db --tb=short --junitxml=docs/governance/uiux/f111_batch_09_evidence/regression.xml",
+    "exit_code": 1,
+    "result": "69 tests +73 subtests PASS;22 exactly reproduced dirty-entry baseline failures;zero new regressions",
+    "attribution": "attribute_regression.py PASS;10 Equipment and12 Daily Report legacy authorization failures;new_failures empty"
+  },
+  "baseline_regression": {
+    "command": ".venv/Scripts/python.exe docs/governance/uiux/f111_batch_09_evidence/run_validation.py --entry-forms apps/equipment/tests.py apps/quality/tests.py apps/safety/tests.py apps/daily_reports/tests.py apps/equipment/test_workflow.py::MaintenanceWorkflowTests apps/quality/test_workflow.py::QualityWorkflowTests apps/safety/test_workflow.py::SafetyWorkflowTests tests/test_uiux_f111_scope.py -q --reuse-db --tb=short --junitxml=docs/governance/uiux/f111_batch_09_evidence/baseline_regression.xml",
+    "state": "COMPLETE",
+    "exit_code": 1,
+    "result": "69 tests +73 subtests PASS;22 failures;all per-test outcomes and messages exactly identical to current run"
+  },
+  "checks": {
+    "django": ".venv/Scripts/python.exe manage.py check",
+    "migration": ".venv/Scripts/python.exe manage.py makemigrations --check --dry-run",
+    "ruff": ".venv/Scripts/python.exe -m ruff check [six product files and new focused test]",
+    "format": ".venv/Scripts/python.exe -m ruff format --check tests/test_uiux_f111_pattern_operational_scope.py",
+    "whitespace": "git diff --check; verify.py source/report/evidence whitespace",
+    "yaml": "Existing system Python311 PyYAML 6.0.3; no dependency installed",
+    "results": "Django check,Ruff lint,new-test formatting,migration drift,currency,YAML,whitespace and source boundary PASS"
+  },
+  "runtime": {
+    "commands": [
+      "runtime.py prepare",
+      "Fresh manage.py runserver 127.0.0.1:8012 --noreload",
+      "runtime.py http",
+      "runtime.py direct",
+      "cua_repl browser form controls",
+      "runtime.py after",
+      "runtime.py authorized_denials on second fresh process with identical product hashes",
+      "runtime.py after",
+      "Verified own server cleanup"
+    ],
+    "http": "146 PASS: F115=30,F126=58,F127=58;actual authentication and form CSRF",
+    "direct": "24 source/tenant/site denials PASS;eight per finding",
+    "browser": "9 observations;two actual server POST rejections;one initial date-normalization click not counted as a POST",
+    "integrity": "519 tables;runtime sessions-only changes;last_login excluded;all pre-existing business rows preserved;full authority unchanged",
+    "fixture_mutations": "Four canonical synthetic sibling records and four audit events;no authority mutations",
+    "browser_label_validation": "All nine records match own actor HTTP values/order/full labels after existing Jalali/digit localization; three actor logging metadata corrections supported by screenshot headers and login actions;raw ledger preserved"
+  },
+  "scope": "Six local constructors/view form assignments and necessary imports only;new focused test;three finding blocks, report and bounded evidence",
+  "source_boundary": "verify.py --source-only PASS;5,566 entry hashes compared",
+  "safety": "No shared helpers/services/models/templates/settings/schema/migrations;no Wave C/SP031/CEP078/079/production;no Git writes",
+  "closure": {
+    "finding_entries": "UIUX-F-115/F-126/F-127 only",
+    "YAML": "PyYAML6.0.3 PASS",
+    "final_verifier": "verify.py; all evidence gates enforced before three findings closed",
+    "correction": "Verifier report-link gate permits its own VERIFICATION.json output before writing it; all other links must already exist"
+  }
+}

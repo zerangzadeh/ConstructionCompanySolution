@@ -1,0 +1,26 @@
+{
+  "classification": "TEST INFRASTRUCTURE DEBT",
+  "eligible_as_final_validation": false,
+  "attempts": [
+    {
+      "name": "initial full-app run",
+      "collected_methods": 485,
+      "outcome": "Interrupted during historical migration-state replay; no completed-suite claim."
+    },
+    {
+      "name": "reused database after interruption",
+      "collected_methods": 480,
+      "failed": 246,
+      "passed": 234,
+      "passing_subtests": 118,
+      "duplicate_fixture_username_failures": 32,
+      "outcome": "Invalid comparison baseline: retained interrupted synthetic fixtures and settings-wrapper identity loss."
+    },
+    {
+      "name": "first clean bootstrap with settings wrapper",
+      "collected_methods": 515,
+      "setup_errors": 515,
+      "outcome": "Development-only migration guard rejected UserSettingsHolder.SETTINGS_MODULE=None. No test body executed. Runner corrected; product guard unchanged; atomic failed migration resumed."
+    }
+  ]
+}
