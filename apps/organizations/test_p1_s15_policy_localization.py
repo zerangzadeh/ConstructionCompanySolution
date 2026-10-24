@@ -14,6 +14,7 @@ from apps.organizations.models import (
     AuthorizationScopeType,
     BusinessPermission,
     BusinessPermissionCode,
+    InsuranceClassification,
     MembershipRole,
     MembershipRoleAssignment,
     MembershipScopeGrant,
@@ -143,9 +144,14 @@ class AccountingPolicyFoundationTests(TestCase):
             code=RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
             reason="Create national regulatory policy definition.",
         )
+        classification, _ = InsuranceClassification.objects.get_or_create(
+            code="test-national",
+            defaults={"name": "طبقه‌بندی آزمون", "created_by": self.platform_admin},
+        )
         draft = create_platform_policy_version(
             actor=self.platform_admin,
             policy=policy,
+            insurance_classification=classification,
             version=version,
             parameters={
                 "tax_rate": "10",
@@ -474,6 +480,7 @@ class AccountingPolicyFoundationTests(TestCase):
             resolve_effective_platform_regulatory_policy(
                 code=RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
                 consumer="billing.progress_claim.calculate",
+                insurance_classification=current.insurance_classification,
                 on_date=timezone.localdate(),
             ).pk,
             current.pk,
@@ -482,6 +489,7 @@ class AccountingPolicyFoundationTests(TestCase):
             resolve_effective_platform_regulatory_policy(
                 code=RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
                 consumer="billing.progress_claim.calculate",
+                insurance_classification=current.insurance_classification,
                 on_date=timezone.localdate() + timedelta(days=1),
             ).pk,
             future.pk,

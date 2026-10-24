@@ -2938,6 +2938,39 @@ class PolicySource(UUIDModel, TimeStampedModel):
         return f"{self.issuer} · {self.source_identifier} · {self.version}"
 
 
+class InsuranceClassification(UUIDModel, TimeStampedModel):
+    """Platform catalog identity; reviewed policy versions approve its applicability."""
+
+    code = models.SlugField("کد طبقه‌بندی بیمه", max_length=100, unique=True)
+    name = models.CharField("عنوان طبقه‌بندی بیمه", max_length=255)
+    is_active = models.BooleanField("فعال", default=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="insurance_classifications_created",
+    )
+
+    class Meta:
+        ordering = ["code"]  # noqa: RUF012
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self.code = canonicalize_lower_identifier(self.code)
+        if not self._state.adding:
+            original = type(self).objects.get(pk=self.pk)
+            if any(
+                getattr(original, f) != getattr(self, f)
+                for f in ("code", "name", "created_by_id")
+            ):
+                raise ValidationError(
+                    "هویت طبقه‌بندی بیمه تغییرناپذیر است؛ طبقه‌بندی جدید ثبت کنید."
+                )
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.code})"
+
+
 class PlatformPolicy(UUIDModel, TimeStampedModel):
     """Platform-owned definition of a bounded policy/localization option."""
 
@@ -3041,6 +3074,14 @@ class PlatformPolicyVersion(UUIDModel, TimeStampedModel):
     policy = models.ForeignKey(
         PlatformPolicy, on_delete=models.PROTECT, related_name="versions"
     )
+    insurance_classification = models.ForeignKey(
+        InsuranceClassification,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="policy_versions",
+        verbose_name="طبقه‌بندی بیمه",
+    )
     version = models.PositiveIntegerField("شماره نسخه")
     parameters = models.JSONField(
         "پارامترهای کنترل‌شده",
@@ -3138,6 +3179,26 @@ class PlatformPolicyVersion(UUIDModel, TimeStampedModel):
     def clean(self) -> None:
         super().clean()
         validate_policy_parameters(self.parameters)
+        if self.insurance_classification_id:
+            from apps.organizations.policy_specs import (
+                RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
+            )
+
+            if self.policy.code != RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE:
+                raise ValidationError(
+                    "طبقه‌بندی بیمه فقط به قواعد صورت‌وضعیت دریافتنی متصل می‌شود."
+                )
+            if (
+                self.status == PolicyVersionStatus.DRAFT
+                and not self.insurance_classification.is_active
+            ):
+                raise ValidationError("طبقه‌بندی بیمه غیرفعال است.")
+        if (
+            self.supersedes_id
+            and self.supersedes.insurance_classification_id
+            != self.insurance_classification_id
+        ):
+            raise ValidationError("نسخه جایگزین باید متعلق به همان طبقه‌بندی بیمه باشد.")
         if self.supersedes_id:
             if self.supersedes_id == self.pk:
                 raise ValidationError({"supersedes": "نسخه نمی‌تواند جایگزین خود باشد."})
@@ -3172,9 +3233,17 @@ class PlatformPolicyVersion(UUIDModel, TimeStampedModel):
     def save(self, *args: object, **kwargs: object) -> None:
         if not self._state.adding:
             original = PlatformPolicyVersion.objects.get(pk=self.pk)
+            if (
+                original.insurance_classification_id != self.insurance_classification_id
+                and self.review_evidence.exists()
+            ):
+                raise ValidationError(
+                    "طبقه‌بندی نسخه بررسی‌شده تغییرناپذیر است؛ نسخه جدید ایجاد کنید."
+                )
             if original.status != PolicyVersionStatus.DRAFT:
                 immutable_fields = (
                     "policy_id",
+                    "insurance_classification_id",
                     "version",
                     "parameters",
                     "effective_from",

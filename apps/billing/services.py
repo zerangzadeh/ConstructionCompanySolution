@@ -1140,13 +1140,35 @@ def _resolve_contract_term_version(
 
 
 def _resolve_regulatory_rule_version(
-    *, organization: Organization, on_date: date
+    *,
+    organization: Organization,
+    on_date: date,
+    term_version: ContractTermVersion | None = None,
 ) -> PlatformPolicyVersion:
-    del organization
+    if term_version is None:
+        raise ValidationError("نسخه شرایط قرارداد برای تعیین طبقه‌بندی بیمه الزامی است.")
+    try:
+        term_version = ContractTermVersion.objects.select_related(
+            "insurance_classification"
+        ).get(
+            pk=term_version.pk,
+            organization=organization,
+            contract__organization=organization,
+            status__in=[
+                ContractTermVersionStatus.APPROVED,
+                ContractTermVersionStatus.SUPERSEDED,
+            ],
+            effective_from__lte=on_date,
+        )
+    except ContractTermVersion.DoesNotExist as exc:
+        raise PermissionDenied("نسخه شرایط قرارداد معتبر یا در دسترس نیست.") from exc
+    if not organization.is_active:
+        raise PermissionDenied("سازمان فعال نیست.")
     return resolve_effective_platform_regulatory_policy(
         code=RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
         consumer="billing.progress_claim.calculate",
         on_date=on_date,
+        insurance_classification=term_version.insurance_classification,
     )
 
 
@@ -1220,6 +1242,7 @@ def create_progress_claim(
         on_date=measurement_cutoff,
     )
     regulatory_version = _resolve_regulatory_rule_version(
+        term_version=term_version,
         organization=organization,
         on_date=measurement_cutoff,
     )
@@ -1278,7 +1301,9 @@ def recalculate_progress_claim(
     term = locked.contract_term_version
     regulatory = locked.regulatory_rule_version
     if (
-        term.status
+        term.organization_id != organization.pk
+        or term.contract_id != locked.contract_id
+        or term.status
         not in {
             ContractTermVersionStatus.APPROVED,
             ContractTermVersionStatus.SUPERSEDED,
@@ -1296,6 +1321,15 @@ def recalculate_progress_claim(
         )
     ):
         raise ValidationError("نسخه مقرراتی پین‌شده برای این صورت‌وضعیت معتبر نیست.")
+    if (
+        not term.insurance_classification_id
+        or regulatory.insurance_classification_id != term.insurance_classification_id
+    ):
+        raise ValidationError(
+            "قاعده مقرراتی با طبقه‌بندی بیمه شرایط قرارداد هم‌خوان نیست."
+        )
+    if not term.insurance_classification.is_active or not regulatory.policy.is_active:
+        raise ValidationError("طبقه‌بندی بیمه یا سیاست غیرفعال است.")
     validate_policy_for_consumer(
         policy_version=regulatory,
         consumer="billing.progress_claim.calculate",

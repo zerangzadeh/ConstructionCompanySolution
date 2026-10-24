@@ -8,7 +8,8 @@ from apps.contracts.models import (
     ContractualRevisionAction,
 )
 from apps.organizations.authorization import scope_queryset
-from apps.organizations.models import OrganizationMembership
+from apps.organizations.models import InsuranceClassification, OrganizationMembership
+from apps.organizations.policy_services import available_insurance_classifications
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project
 from core.forms import JalaliDateMixin
@@ -167,3 +168,18 @@ class ContractualRevisionForm(forms.Form):
 
 class ContractualWithdrawalForm(forms.Form):
     reason = forms.CharField(label="دلیل استرداد", widget=forms.Textarea)
+
+
+class ContractInsuranceClassificationForm(forms.Form):
+    insurance_classification = forms.ModelChoiceField(
+        label="طبقه‌بندی بیمه", queryset=InsuranceClassification.objects.none()
+    )
+    reason = forms.CharField(
+        label="دلیل انتخاب", widget=forms.Textarea(attrs={"rows": 2})
+    )
+
+    def __init__(self, *args, on_date, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields[
+            "insurance_classification"
+        ].queryset = available_insurance_classifications(on_date=on_date)

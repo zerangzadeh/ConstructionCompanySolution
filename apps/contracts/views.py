@@ -3,6 +3,7 @@ import uuid
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from apps.contracts.commercial_review import get_commercial_review
 from apps.contracts.contractual_services import (
@@ -15,16 +16,18 @@ from apps.contracts.contractual_services import (
 )
 from apps.contracts.forms import (
     ContractForm,
+    ContractInsuranceClassificationForm,
     ContractualDecisionForm,
     ContractualRecordForm,
     ContractualRevisionForm,
     ContractualWithdrawalForm,
 )
-from apps.contracts.models import ContractStatus
+from apps.contracts.models import ContractStatus, ContractTermVersionStatus
 from apps.contracts.services import (
     can_manage_contracts,
     create_contract,
     get_organization_contracts,
+    select_contract_insurance_classification,
 )
 from apps.organizations.authorization import (
     get_active_membership,
@@ -152,7 +155,25 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
         ).prefetch_related("items__unit_of_measure", "amendments"),
         pk=contract_id,
     )
-    return render(request, "contracts/detail.html", {"contract": contract})
+    terms = list(
+        contract.term_versions.filter(organization=request.organization).select_related(
+            "insurance_classification"
+        )
+    )
+    can_select = has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.CONTRACT_TERMS_MANAGE,
+        project=contract.project,
+    )
+    for term in terms:
+        if can_select and term.status == ContractTermVersionStatus.DRAFT:
+            term.insurance_form = ContractInsuranceClassificationForm(
+                on_date=term.effective_from, prefix=str(term.pk)
+            )
+    return render(
+        request, "contracts/detail.html", {"contract": contract, "term_versions": terms}
+    )
 
 
 @active_organization_required
@@ -346,3 +367,41 @@ def contractual_record_withdraw(request: HttpRequest, record_id: str) -> HttpRes
             reason=form.cleaned_data["reason"],
         )
     return redirect("contracts:contractual_detail", record_id=record.pk)
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.CONTRACT_TERMS_MANAGE)
+@require_POST
+def contract_term_insurance_select(
+    request: HttpRequest, contract_id: str, term_id: str
+) -> HttpResponse:
+    contract = get_object_or_404(
+        get_organization_contracts(
+            user=request.user, organization=request.organization
+        ),
+        pk=contract_id,
+    )
+    term = get_object_or_404(
+        contract.term_versions.filter(organization=request.organization), pk=term_id
+    )
+    form = ContractInsuranceClassificationForm(
+        request.POST, on_date=term.effective_from, prefix=str(term.pk)
+    )
+    if form.is_valid():
+        try:
+            select_contract_insurance_classification(
+                organization=request.organization,
+                actor=request.user,
+                term_version=term,
+                **form.cleaned_data,
+            )
+        except ValidationError as exc:
+            form.add_error(None, exc)
+        else:
+            return redirect("contracts:detail", contract_id=contract.pk)
+    return render(
+        request,
+        "contracts/insurance_classification_form.html",
+        {"form": form, "contract": contract},
+        status=400,
+    )

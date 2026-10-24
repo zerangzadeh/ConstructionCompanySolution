@@ -5,7 +5,7 @@ from typing import Any
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.utils import timezone
 
 from apps.accounts.models import User
@@ -18,6 +18,7 @@ from apps.organizations.authorization import (
 )
 from apps.organizations.models import (
     BusinessPermissionCode,
+    InsuranceClassification,
     MembershipRole,
     Organization,
     PlatformPolicy,
@@ -34,6 +35,7 @@ from apps.organizations.models import (
 from apps.organizations.policy_specs import (
     ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
     ACCOUNTING_ROUNDING_POLICY_CODE,
+    RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
     get_platform_policy_spec,
     initial_accounting_policy_parameters,
     validate_policy_for_consumer,
@@ -49,6 +51,9 @@ def _require_platform_admin(actor: User) -> None:
 def _snapshot_version(version: PlatformPolicyVersion) -> dict[str, Any]:
     return {
         "policy_code": version.policy.code,
+        "insurance_classification_id": str(version.insurance_classification_id)
+        if version.insurance_classification_id
+        else None,
         "version": version.version,
         "status": version.status,
         "effective_from": version.effective_from.isoformat(),
@@ -181,6 +186,7 @@ def create_platform_policy_version(
     source_basis: str,
     effective_to: date | None = None,
     supersedes: PlatformPolicyVersion | None = None,
+    insurance_classification: InsuranceClassification | None = None,
 ) -> PlatformPolicyVersion:
     _require_platform_admin(actor)
     locked_policy = PlatformPolicy.objects.select_for_update().get(pk=policy.pk)
@@ -199,13 +205,16 @@ def create_platform_policy_version(
     if source_basis not in PolicySourceBasis.values:
         raise ValidationError("مبنای منبع سیاست معتبر نیست.")
     validate_policy_parameters(spec=spec, parameters=parameters)
-    existing_versions = locked_policy.versions.exclude(status=PolicyVersionStatus.DRAFT)
+    existing_versions = locked_policy.versions.filter(
+        insurance_classification=insurance_classification
+    ).exclude(status=PolicyVersionStatus.DRAFT)
     if existing_versions.exists() and supersedes is None:
         raise ValidationError("نسخه جایگزین باید صریحاً نسخه قبلی را supersede کند.")
     if supersedes and supersedes.policy_id != locked_policy.pk:
         raise ValidationError("نسخه supersede‌شده متعلق به همین سیاست نیست.")
     policy_version = PlatformPolicyVersion(
         policy=locked_policy,
+        insurance_classification=insurance_classification,
         version=version,
         parameters=parameters,
         effective_from=effective_from,
@@ -243,6 +252,7 @@ def update_platform_policy_version(
     source_basis: str,
     effective_to: date | None = None,
     supersedes: PlatformPolicyVersion | None = None,
+    insurance_classification: InsuranceClassification | None = None,
 ) -> PlatformPolicyVersion:
     """Edit only a Platform-managed draft; published history is never rewritten."""
     _require_platform_admin(actor)
@@ -263,6 +273,7 @@ def update_platform_policy_version(
         spec=get_platform_policy_spec(locked.policy.code), parameters=parameters
     )
     before = _snapshot_version(locked)
+    locked.insurance_classification = insurance_classification
     locked.parameters = parameters
     locked.effective_from = effective_from
     locked.effective_to = effective_to
@@ -336,8 +347,17 @@ def publish_platform_policy_version(
     )
     if locked.status != PolicyVersionStatus.DRAFT:
         raise ValidationError("فقط نسخه پیش‌نویس قابل انتشار است.")
+    PlatformPolicy.objects.select_for_update().get(pk=locked.policy_id)
     spec = get_platform_policy_spec(locked.policy.code)
     validate_policy_parameters(spec=spec, parameters=locked.parameters)
+    if locked.policy.code == RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE:
+        if not locked.insurance_classification_id:
+            raise ValidationError("انتشار قواعد صورت‌وضعیت به طبقه‌بندی بیمه نیاز دارد.")
+        classification = InsuranceClassification.objects.select_for_update().get(
+            pk=locked.insurance_classification_id
+        )
+        if not classification.is_active:
+            raise ValidationError("طبقه‌بندی بیمه غیرفعال است.")
     if locked.policy.sensitivity == "regulatory":
         if locked.source_basis != PolicySourceBasis.EXTERNAL_AUTHORITY:
             raise ValidationError("قاعده مقرراتی باید به مرجع بیرونی متکی باشد.")
@@ -356,6 +376,7 @@ def publish_platform_policy_version(
         raise ValidationError("مبنای منبع سیاست باید مشخص باشد.")
     overlap = PlatformPolicyVersion.objects.filter(
         policy=locked.policy,
+        insurance_classification_id=locked.insurance_classification_id,
         status=PolicyVersionStatus.PUBLISHED,
         effective_from__lt=locked.effective_to or date.max,
     ).filter(Q(effective_to__isnull=True) | Q(effective_to__gt=locked.effective_from))
@@ -813,9 +834,25 @@ def resolve_active_tenant_policy(
 
 
 def resolve_effective_platform_regulatory_policy(
-    *, code: str, consumer: str, on_date: date
+    *,
+    code: str,
+    consumer: str,
+    on_date: date,
+    insurance_classification: InsuranceClassification | None = None,
 ) -> PlatformPolicyVersion:
     """Resolve national rules directly from Platform history, never Tenant choice."""
+    if code == RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE:
+        if (
+            insurance_classification is None
+            or not InsuranceClassification.objects.filter(
+                pk=insurance_classification.pk, is_active=True
+            ).exists()
+        ):
+            raise ValidationError(
+                "طبقه‌بندی بیمه فعال برای شرایط قرارداد انتخاب نشده است."
+            )
+    elif insurance_classification is not None:
+        raise ValidationError("طبقه‌بندی بیمه برای این سیاست معتبر نیست.")
     statuses = [PolicyVersionStatus.PUBLISHED]
     if on_date < timezone.localdate():
         statuses.append(PolicyVersionStatus.RETIRED)
@@ -823,6 +860,7 @@ def resolve_effective_platform_regulatory_policy(
         PlatformPolicyVersion.objects.select_related("policy")
         .filter(
             policy__code=code,
+            insurance_classification=insurance_classification,
             policy__is_active=True,
             policy__tenant_selectable=False,
             policy__sensitivity="regulatory",
@@ -847,3 +885,83 @@ def resolve_effective_platform_regulatory_policy(
         policy_version=version, consumer=consumer, expected_policy_code=code
     )
     return version
+
+
+@transaction.atomic
+def create_insurance_classification(
+    *, actor: User, code: str, name: str, reason: str
+) -> InsuranceClassification:
+    _require_platform_admin(actor)
+    if not reason.strip():
+        raise ValidationError("دلیل ثبت طبقه‌بندی الزامی است.")
+    classification = InsuranceClassification(
+        code=code, name=name.strip(), created_by=actor
+    )
+    classification.save()
+    record_audit_event(
+        action=AuditAction.PLATFORM_POLICY_CREATED,
+        entity_type="organizations.InsuranceClassification",
+        entity_id=classification.pk,
+        actor=actor,
+        allow_platform_actor=True,
+        metadata={
+            "after": {"code": classification.code, "name": classification.name},
+            "reason": reason.strip(),
+        },
+    )
+    return classification
+
+
+@transaction.atomic
+def set_insurance_classification_active(
+    *,
+    actor: User,
+    classification: InsuranceClassification,
+    is_active: bool,
+    reason: str,
+) -> InsuranceClassification:
+    _require_platform_admin(actor)
+    if not reason.strip() or type(is_active) is not bool:
+        raise ValidationError("وضعیت و دلیل معتبر الزامی است.")
+    locked = InsuranceClassification.objects.select_for_update().get(
+        pk=classification.pk
+    )
+    before = locked.is_active
+    locked.is_active = is_active
+    locked.save(update_fields=["is_active", "updated_at"])
+    record_audit_event(
+        action=AuditAction.PLATFORM_POLICY_VERSION_UPDATED,
+        entity_type="organizations.InsuranceClassification",
+        entity_id=locked.pk,
+        actor=actor,
+        allow_platform_actor=True,
+        metadata={
+            "before": {"is_active": before},
+            "after": {"is_active": is_active},
+            "reason": reason.strip(),
+        },
+    )
+    return locked
+
+
+def available_insurance_classifications(
+    *, on_date: date
+) -> QuerySet[InsuranceClassification]:
+    """Only classifications covered by approved effective national rules are selectable."""
+    statuses = [PolicyVersionStatus.PUBLISHED]
+    if on_date < timezone.localdate():
+        statuses.append(PolicyVersionStatus.RETIRED)
+    versions = PlatformPolicyVersion.objects.filter(
+        policy__code=RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
+        policy__is_active=True,
+        policy__tenant_selectable=False,
+        policy__sensitivity="regulatory",
+        status__in=statuses,
+        effective_from__lte=on_date,
+        source_basis=PolicySourceBasis.EXTERNAL_AUTHORITY,
+        source_links__isnull=False,
+        review_evidence__disposition=PolicyReviewDisposition.ACCEPTED,
+    ).filter(Q(effective_to__isnull=True) | Q(effective_to__gt=on_date))
+    return InsuranceClassification.objects.filter(
+        is_active=True, pk__in=versions.values("insurance_classification_id")
+    )

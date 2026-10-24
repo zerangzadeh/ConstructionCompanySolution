@@ -125,6 +125,106 @@ class DocumentServiceTests(TestCase):
         defaults.update(kwargs)
         return create_document(**defaults)
 
+    def _partner_evidence_document(self):
+        from apps.parties.models import BusinessParty, PartyKind
+        from apps.partner_qualification.services import (
+            create_profile,
+            create_qualification,
+            publish_requirement,
+        )
+
+        party = BusinessParty.objects.create(
+            organization=self.organization,
+            party_kind=PartyKind.COMPANY,
+            display_name="DMS partner evidence fixture",
+        )
+        profile = create_profile(
+            organization=self.organization, actor=self.owner, party=party
+        )
+        requirement = publish_requirement(
+            organization=self.organization,
+            actor=self.owner,
+            code="DMS-PARTNER",
+            title="Source-backed test requirement",
+            category_code="test",
+            source_reference="test://dms-partner",
+            source_version="1",
+        )
+        qualification = create_qualification(
+            organization=self.organization,
+            actor=self.owner,
+            profile=profile,
+            requirement=requirement,
+            reference_number="DMS-PARTNER-1",
+        )
+        return self._create_document(target=qualification)
+
+    def test_partner_evidence_document_resolves_registered_link_model(self) -> None:
+        document = self._partner_evidence_document()
+        self.assertFalse(document.links.exists())
+        self.assertEqual(
+            get_organization_document(
+                user=self.owner,
+                organization=self.organization,
+                document_id=str(document.pk),
+            ).pk,
+            document.pk,
+        )
+
+    def test_partner_evidence_document_keeps_tenant_and_domain_permission(self) -> None:
+        document = self._partner_evidence_document()
+        with self.assertRaises(PermissionDenied):
+            get_organization_document(
+                user=self.other_user,
+                organization=self.other_organization,
+                document_id=str(document.pk),
+            )
+        viewer = User.objects.create_user(username="partner-document-only")
+        role = OrganizationRole.objects.create(
+            organization=self.organization,
+            code="partner_document_only",
+            name="Document view without partner evidence permission",
+        )
+        role.permissions.add(
+            BusinessPermission.objects.get(code=BusinessPermissionCode.DOCUMENTS_VIEW)
+        )
+        membership = OrganizationMembership.objects.create(
+            organization=self.organization,
+            user=viewer,
+            role_definition=role,
+            status=MembershipStatus.ACTIVE,
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Partner DMS regression scope",
+        )
+        from apps.organizations.authorization import has_business_permission
+        from tests.retirement_fixtures import explicit_fixture_roles
+
+        explicit_fixture_roles(self.organization)
+        self.assertTrue(
+            has_business_permission(
+                user=viewer,
+                organization=self.organization,
+                permission=BusinessPermissionCode.DOCUMENTS_VIEW,
+            )
+        )
+        self.assertFalse(
+            has_business_permission(
+                user=viewer,
+                organization=self.organization,
+                permission=BusinessPermissionCode.PARTNER_SENSITIVE_EVIDENCE_VIEW,
+            )
+        )
+        with self.assertRaises(PermissionDenied):
+            get_organization_document(
+                user=viewer,
+                organization=self.organization,
+                document_id=str(document.pk),
+            )
+
     def test_create_document_records_first_version_link_metadata_and_audit(
         self,
     ) -> None:

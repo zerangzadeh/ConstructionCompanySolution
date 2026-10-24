@@ -42,6 +42,9 @@ class PartnerQualificationP9S12S15Tests(TestCase):
             self.organization.memberships.create(
                 user=user, role=role, status=MembershipStatus.ACTIVE
             )
+        from tests.retirement_fixtures import explicit_fixture_roles
+
+        explicit_fixture_roles(self.organization)
         self.party = BusinessParty.objects.create(
             organization=self.organization,
             party_kind=PartyKind.COMPANY,

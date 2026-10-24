@@ -249,6 +249,21 @@ class ContractTermVersion(UUIDModel, TimeStampedModel):
     )
     version = models.PositiveIntegerField()
     effective_from = models.DateField()
+    insurance_classification = models.ForeignKey(
+        "organizations.InsuranceClassification",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="contract_term_versions",
+        verbose_name="طبقه‌بندی بیمه",
+    )
+    insurance_classification_selected_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="contract_insurance_selections",
+    )
     payment_due_days = models.PositiveIntegerField(default=0)
     status = models.CharField(
         max_length=20,
@@ -389,6 +404,13 @@ class ContractTermVersion(UUIDModel, TimeStampedModel):
                 )
         if not self.reason.strip():
             raise ValidationError({"reason": "دلیل نسخه شرایط قرارداد الزامی است."})
+        if (
+            self.approved_by_id
+            and self.approved_by_id == self.insurance_classification_selected_by_id
+        ):
+            raise ValidationError(
+                "انتخاب‌کننده طبقه‌بندی نمی‌تواند همان نسخه را تأیید کند."
+            )
         if self.approved_by_id == self.created_by_id and self.approved_by_id:
             raise ValidationError("تهیه‌کننده نمی‌تواند همان نسخه شرایط را تأیید کند.")
         if self.superseded_by_id:
@@ -426,6 +448,8 @@ class ContractTermVersion(UUIDModel, TimeStampedModel):
                     "version",
                     "effective_from",
                     "payment_due_days",
+                    "insurance_classification_id",
+                    "insurance_classification_selected_by_id",
                     "retention_rate",
                     "retention_cap",
                     "retention_basis",

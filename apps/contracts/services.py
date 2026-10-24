@@ -29,6 +29,7 @@ from apps.organizations.authorization import (
 )
 from apps.organizations.models import (
     BusinessPermissionCode,
+    InsuranceClassification,
     Organization,
     OrganizationStatus,
 )
@@ -74,6 +75,7 @@ def create_contract_term_version(
     contractual_insurance_cap: Decimal = Decimal(0),
     retention_release_requirement: str = RetentionReleaseRequirement.UNCONFIGURED,
     retention_release_cap: Decimal = Decimal(0),
+    insurance_classification: InsuranceClassification | None = None,
 ) -> ContractTermVersion:
     try:
         locked_contract = (
@@ -112,6 +114,10 @@ def create_contract_term_version(
         version=version,
         effective_from=effective_from,
         payment_due_days=payment_due_days,
+        insurance_classification=insurance_classification,
+        insurance_classification_selected_by=actor
+        if insurance_classification
+        else None,
         retention_rate=retention_rate,
         retention_cap=retention_cap,
         advance_recovery_rate=advance_recovery_rate,
@@ -123,6 +129,8 @@ def create_contract_term_version(
         reason=reason.strip(),
         created_by=actor,
     )
+    if insurance_classification is not None:
+        _validate_term_insurance_classification(term)
     term.save()
     record_audit_event(
         action=AuditAction.CONTRACT_TERM_VERSION_CREATED,
@@ -130,7 +138,13 @@ def create_contract_term_version(
         entity_id=term.pk,
         organization=organization,
         actor=actor,
-        metadata={"contract_id": str(locked_contract.pk), "version": version},
+        metadata={
+            "contract_id": str(locked_contract.pk),
+            "version": version,
+            "insurance_classification_id": str(term.insurance_classification_id)
+            if term.insurance_classification_id
+            else None,
+        },
     )
     return term
 
@@ -164,7 +178,10 @@ def approve_contract_term_version(
     )
     if locked.status != ContractTermVersionStatus.DRAFT:
         raise ValidationError("فقط نسخه پیش‌نویس شرایط قابل تأیید است.")
-    if locked.created_by_id == actor.pk:
+    if actor.pk in {
+        locked.created_by_id,
+        locked.insurance_classification_selected_by_id,
+    }:
         raise PermissionDenied("تهیه‌کننده نمی‌تواند همان نسخه شرایط را تأیید کند.")
     if not reason.strip():
         raise ValidationError("دلیل تأیید نسخه شرایط الزامی است.")
@@ -181,6 +198,8 @@ def approve_contract_term_version(
         .exists()
     ):
         raise ValidationError("برای این تاریخ اثر قبلاً نسخه شرایط تأیید شده است.")
+    if locked.insurance_classification_id:
+        _validate_term_insurance_classification(locked)
     previous = list(
         ContractTermVersion.objects.select_for_update().filter(
             contract=locked.contract,
@@ -571,3 +590,77 @@ def approve_contract_amendment(
     return approve_contract_amendment_with_workflow(
         organization=organization, actor=actor, amendment=amendment
     )
+
+
+def _validate_term_insurance_classification(term: ContractTermVersion) -> None:
+    from apps.organizations.policy_services import (
+        resolve_effective_platform_regulatory_policy,
+    )
+    from apps.organizations.policy_specs import RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE
+
+    resolve_effective_platform_regulatory_policy(
+        code=RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
+        consumer="billing.progress_claim.calculate",
+        on_date=term.effective_from,
+        insurance_classification=term.insurance_classification,
+    )
+
+
+@transaction.atomic
+def select_contract_insurance_classification(
+    *,
+    organization: Organization,
+    actor: User,
+    term_version: ContractTermVersion,
+    insurance_classification: InsuranceClassification,
+    reason: str,
+) -> ContractTermVersion:
+    try:
+        locked = (
+            ContractTermVersion.objects.select_for_update()
+            .select_related("contract__project")
+            .get(
+                pk=term_version.pk,
+                organization=organization,
+                contract__organization=organization,
+            )
+        )
+    except ContractTermVersion.DoesNotExist as exc:
+        raise PermissionDenied("نسخه شرایط متعلق به این سازمان نیست.") from exc
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.CONTRACT_TERMS_MANAGE,
+        project=locked.contract.project,
+        message="اجازه انتخاب طبقه‌بندی بیمه را ندارید.",
+    )
+    if locked.status != ContractTermVersionStatus.DRAFT or not reason.strip():
+        raise ValidationError(
+            "انتخاب طبقه‌بندی فقط برای نسخه پیش‌نویس و با دلیل مجاز است."
+        )
+    before = locked.insurance_classification_id
+    locked.insurance_classification = insurance_classification
+    locked.insurance_classification_selected_by = actor
+    _validate_term_insurance_classification(locked)
+    locked.save(
+        update_fields=[
+            "insurance_classification",
+            "insurance_classification_selected_by",
+            "updated_at",
+        ]
+    )
+    record_audit_event(
+        action=AuditAction.CONTRACT_UPDATED,
+        entity_type="contracts.ContractTermVersion",
+        entity_id=locked.pk,
+        organization=organization,
+        actor=actor,
+        metadata={
+            "before": {"insurance_classification_id": str(before) if before else None},
+            "after": {
+                "insurance_classification_id": str(locked.insurance_classification_id)
+            },
+            "reason": reason.strip(),
+        },
+    )
+    return locked

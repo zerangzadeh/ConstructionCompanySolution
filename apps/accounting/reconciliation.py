@@ -135,9 +135,10 @@ def _line_evidence(line: object) -> dict[str, object]:
 
 
 def _line_totals(lines: list[object]) -> tuple[Decimal, Decimal]:
+    # Match retained DecimalField scale even when there are no lines to sum.
     return (
-        sum((line.debit for line in lines), Decimal(0)),
-        sum((line.credit for line in lines), Decimal(0)),
+        sum((line.debit for line in lines), Decimal("0.000000")),
+        sum((line.credit for line in lines), Decimal("0.000000")),
     )
 
 
@@ -412,8 +413,8 @@ def inspect_manual_opening_reconciliation(
     exceptions: list[ReconciliationException] = []
     posted_count = 0
     pending_count = 0
-    debit_total = Decimal(0)
-    credit_total = Decimal(0)
+    debit_total = Decimal("0.000000")
+    credit_total = Decimal("0.000000")
 
     for journal in journals:
         get_posting_contract(

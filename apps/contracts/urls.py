@@ -15,5 +15,10 @@ urlpatterns = [
     path("contractual-records/<uuid:record_id>/decide/", views.contractual_record_decide, name="contractual_decide"),
     path("contractual-records/<uuid:record_id>/revision/", views.contractual_record_revision, name="contractual_revision"),
     path("contractual-records/<uuid:record_id>/withdraw/", views.contractual_record_withdraw, name="contractual_withdraw"),
+    path(
+        "<uuid:contract_id>/terms/<uuid:term_id>/insurance/",
+        views.contract_term_insurance_select,
+        name="term_insurance_select",
+    ),
     path("<uuid:contract_id>/", views.contract_detail, name="detail"),
 ]

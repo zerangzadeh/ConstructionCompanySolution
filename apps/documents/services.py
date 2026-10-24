@@ -304,7 +304,7 @@ def _validate_document_context_access(
         if next(
             item
             for item in DOCUMENT_LINK_TYPES
-            if item.target_field == link.target_type
+            if isinstance(link, item.model)
         ).legacy_compatible
     }
     if legacy_link_ids != typed_link_ids:

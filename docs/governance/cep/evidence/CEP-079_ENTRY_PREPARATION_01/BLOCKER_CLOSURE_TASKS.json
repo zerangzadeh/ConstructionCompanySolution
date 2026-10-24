@@ -28,9 +28,9 @@
     "cases": {
       "UAT-CASE-018": {
         "blocker": "CEP079-PREP-B04",
-        "result": "ROLLED_BACK_CANONICAL_RECONCILIATION_INTEGRITY_FAILURE",
-        "minimum_action": "Separately authorize bounded Accounting reconciliation result-hash defect attribution/correction, then prepare signed native period-end evidence and retained statements; independent existing close/reopen actors are identified. No close/reopen executed.",
-        "error": "['نتیجه نگهداری\\u200cشده اجرای تطبیق دستکاری شده است.']"
+        "result": "RESOLVED",
+        "minimum_action": "None for B04; remaining blockers still prevent Entry Reassessment/UAT.",
+        "current_evidence": "stage3b.B04 in this control artifact; prior failed attempts remain unchanged."
       },
       "UAT-CASE-019/020/022": {
         "blocker": "CEP079-PREP-B05",
@@ -87,5 +87,627 @@
       "BILLING_AUTHORITY_DECISION_REQUIREMENT.json"
     ],
     "minimum_action": "Human/Product-Regulatory authority supplies approved effective four parameters/bases with external provenance and accepted professional review, applicable approved contract terms and Billing configuration; canonical disposable claim/AR/settlement fixture preparation follows."
+  },
+  "stage3b": {
+    "at": "2026-10-24T16:46:00.044014+00:00",
+    "head": "0dd307ab40ae909a659fbf1c216e45010b41765a",
+    "authority": "Direct Human Stage 3B bounded Development B04 technical correction and prerequisite verification; no UAT, Entry Reassessment, migration, production or Git writes.",
+    "B04": {
+      "status": "RESOLVED",
+      "prior_state": {
+        "blocker": "CEP079-PREP-B04",
+        "result": "ROLLED_BACK_CANONICAL_RECONCILIATION_INTEGRITY_FAILURE",
+        "minimum_action": "Separately authorize bounded Accounting reconciliation result-hash defect attribution/correction, then prepare signed native period-end evidence and retained statements; independent existing close/reopen actors are identified. No close/reopen executed.",
+        "error": "['نتیجه نگهداری\\u200cشده اجرای تطبیق دستکاری شده است.']"
+      },
+      "cause": "Empty Decimal sums hashed as 0 before persistence but retained six-decimal fields reload as 0.000000; pending empty sources broke even nonempty reconciliation hashes.",
+      "correction": "Initialize reconciliation and line totals at existing six-decimal storage scale; no verifier relaxation, retained-history rewrite, financial semantics or schema change.",
+      "source_sha256": {
+        "apps/accounting/reconciliation.py": "55e07a4a4ec8976f6388f87587dd68c3e6c8dbd926f3fb4ac1df0749db7ea57f",
+        "apps/accounting/tests.py": "25c9b310d1b3bce71296fe3970efe5e8e5108e4e4f967553a07ae7c683e85332"
+      },
+      "validation": {
+        "baseline": "Existing signed-run test PASS; both added regression tests failed retained result-hash verification before correction.",
+        "focused_command": ".venv/Scripts/python.exe -m pytest apps/accounting/tests.py -k \"reconciliation or tie_out\" --no-header -q --reuse-db",
+        "focused_result": "15 passed, 24 deselected; reload, empty and mixed nonempty/pending sources, tamper rejection and existing reconciliation checks.",
+        "ruff": "PASS for both changed Python files",
+        "django_check": "PASS: 0 issues",
+        "runtime": "Canonical existing preparation helper reused with file writes captured in memory; signed nonempty cutoff and three retained statements independently verified after commit in a read-only transaction. Second preparation reused same run idempotently.",
+        "validation_correction": "Initial extra post-commit assertion incorrectly required nonzero source lines for every statement kind. Canonical zero profit/loss remains valid; final check requires nonempty trial balance and verifies all statement hashes. Initial new tamper test message assertion also corrected for ValidationError string escaping."
+      },
+      "fixture": {
+        "scope": "ENTRY_PREPARATION_ONLY_NO_PERIOD_CLOSE_REOPEN_NO_UAT",
+        "protected_source_fingerprints_before": {
+          "accounting.FiscalPeriod": "a987a52c4ad23dcffb53863051cd19cdc3e2253b32b1a7f403d93e47d246114b",
+          "accounting.JournalEntry": "66cd87c4c2aed0a690091f36f6f58dcb6ecb8bad7d7e0f6a66faee7125f3e447",
+          "accounting.JournalLine": "f6b95e25ca4e2a935ff7f6dc50e6ddcb3a2a2495d20d9d7d3e81c34b195c9ced",
+          "accounting.OpeningBalanceImport": "ef98119204e5683157d027678ee64d9e5496d9b09d44787c3fe16e55724b327f",
+          "accounting.FiscalPeriodControlEvent": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "accounting.JournalNumberSequence": "42717c31136adfa5f528b32bb0667d58a3adbdb8d631293785bc99670f2be1a3",
+          "treasury.TreasuryAccount": "b34a7194217af3735267de02a90bd16f100e5bc9a711c65b05637e906a33faa1",
+          "treasury.TreasuryAccountMappingVersion": "7e98f9576c75e7a79f2d754074520cf2b7f540ad6135b12dfd902b409dbd0bba",
+          "treasury.TreasuryMovement": "98b5a93d05bc5d812b9ab69532de3836d1370eb632d6a82d377096b2cba2d43f"
+        },
+        "result": "PREPARED_AND_QUALIFIED",
+        "period_id": "5b592098-cd9d-4e41-bfd5-e2f0abd12ed8",
+        "period_status": "open",
+        "period_control_events": 0,
+        "run": {
+          "id": "90f6ee72-92b6-4502-91db-e7e231927b04",
+          "scope": "manual_opening_correction",
+          "cutoff": "2027-06-21",
+          "source_count": 4,
+          "journal_count": 3,
+          "posted_count": 1,
+          "pending_count": 3,
+          "exception_count": 0,
+          "debit_total": "1.000000",
+          "credit_total": "1.000000",
+          "input_hash": "0dcc35fd2f1404760d200146660c2fdaa171a1024a53a57943f35c52d0b4338b",
+          "result_hash": "d24744ab41ceb3bb8d8f7682ae7a8e229a6c9df971faf02fd3ee950ea53b2870"
+        },
+        "review": {
+          "id": "19b01b25-054c-48e4-81c6-a09082ef11ed",
+          "signed_evidence_hash": "5033d2ff4e8eed96645c6500c83d1b71a72d1dd86103f17fa2c273e3a0a578f3",
+          "reviewer_membership": "dd40accc-ac0d-4ff4-8df2-a5372933ce49",
+          "creator_membership": "381e4525-6f98-4b4d-ad6f-44008dbb9643"
+        },
+        "statements": [
+          {
+            "id": "8b5288e7-a065-43d5-8981-1208cf64cc12",
+            "kind": "trial_balance",
+            "source_line_count": 12,
+            "debit_total": "0.000000",
+            "credit_total": "0.000000",
+            "input_hash": "a3cef7e70914e892ee36d30c9a74e684705832a58d0cc9796a48ee9ee9ed3aca",
+            "result_hash": "2815a5a3fe0e5a9c4f1d9a5b22f54b4066bbda77b6ab733f6dbe1512d3b3a8b7"
+          },
+          {
+            "id": "f7bc04c8-58f5-4bc3-9583-273c8d1d4e11",
+            "kind": "balance_sheet",
+            "source_line_count": 12,
+            "debit_total": "7.000000",
+            "credit_total": "7.000000",
+            "input_hash": "a3cef7e70914e892ee36d30c9a74e684705832a58d0cc9796a48ee9ee9ed3aca",
+            "result_hash": "ac1bff13ae46de122da8020b5d3558be5114a6ee0cc572eb145ec2a967efd63a"
+          },
+          {
+            "id": "135fad72-a3d3-4482-9ae9-7f627f674c2e",
+            "kind": "profit_loss",
+            "source_line_count": 0,
+            "debit_total": "0.000000",
+            "credit_total": "0.000000",
+            "input_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "result_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          }
+        ],
+        "independent_close_reopen_bindings": {
+          "close": {
+            "requester": {
+              "accounting.periods_close": "381e4525-6f98-4b4d-ad6f-44008dbb9643"
+            },
+            "approver": {
+              "accounting.periods_close": "dd40accc-ac0d-4ff4-8df2-a5372933ce49",
+              "accounting.periods_reopen": "dd40accc-ac0d-4ff4-8df2-a5372933ce49"
+            }
+          },
+          "reopen": {
+            "requester": {
+              "accounting.periods_close": "dd40accc-ac0d-4ff4-8df2-a5372933ce49",
+              "accounting.periods_reopen": "dd40accc-ac0d-4ff4-8df2-a5372933ce49"
+            },
+            "approver": {
+              "accounting.periods_reopen": "3e1a1e18-9319-4408-9389-c2b7b982f6be"
+            }
+          }
+        },
+        "coverage_limit": "Existing canonical Accounting manual/opening/correction scope and statement source snapshots; no new cross-domain coverage inferred. Nonzero opening balances at cutoff; target future period has no movements. Three pending pre-existing sources outside target period remain unchanged; no unknown-as-zero substitution.",
+        "protected_sources_unchanged": true,
+        "protected_source_fingerprints_after": {
+          "accounting.FiscalPeriod": "a987a52c4ad23dcffb53863051cd19cdc3e2253b32b1a7f403d93e47d246114b",
+          "accounting.JournalEntry": "66cd87c4c2aed0a690091f36f6f58dcb6ecb8bad7d7e0f6a66faee7125f3e447",
+          "accounting.JournalLine": "f6b95e25ca4e2a935ff7f6dc50e6ddcb3a2a2495d20d9d7d3e81c34b195c9ced",
+          "accounting.OpeningBalanceImport": "ef98119204e5683157d027678ee64d9e5496d9b09d44787c3fe16e55724b327f",
+          "accounting.FiscalPeriodControlEvent": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "accounting.JournalNumberSequence": "42717c31136adfa5f528b32bb0667d58a3adbdb8d631293785bc99670f2be1a3",
+          "treasury.TreasuryAccount": "b34a7194217af3735267de02a90bd16f100e5bc9a711c65b05637e906a33faa1",
+          "treasury.TreasuryAccountMappingVersion": "7e98f9576c75e7a79f2d754074520cf2b7f540ad6135b12dfd902b409dbd0bba",
+          "treasury.TreasuryMovement": "98b5a93d05bc5d812b9ab69532de3836d1370eb632d6a82d377096b2cba2d43f"
+        },
+        "independent_post_commit_read_only_verification": "PASS"
+      }
+    },
+    "B01": {
+      "status": "HUMAN_DECISION_REQUIRED",
+      "basis": "Previously exhausted recovery reused without repository/history/evidence recovery searches.",
+      "decision": "Authorize bounded independent re-verification of the missing CEP-040/IMB-0039 Project Cost acceptance contract as a substitute for unrecoverable historical evidence: YES/NO.",
+      "reverification_executed": false
+    },
+    "other_blockers": "B03/B05/B06/B07/B08 remain blocked on the previously identified approved Human/domain inputs. No policy values, mappings, qualification, capitalization or checklist content invented.",
+    "gate09": "NOT_PASSED",
+    "ext0025": "NOT_READY",
+    "cep079": "NOT_STARTED",
+    "entry_reassessment": "NOT_PERFORMED",
+    "uat_scenarios_executed": 0,
+    "registry_and_prior_assessment": "UNCHANGED; conservative blocked state retained. This control artifact records only the material blocker delta; no Entry Reassessment performed.",
+    "historical_evidence": "UNCHANGED; only this existing control artifact updated. Prior failed fixture evidence retained."
+  },
+  "stage3b_approved_configuration_20261024": {
+    "at": "2026-10-24T17:51:17.774868+00:00",
+    "head": "0dd307ab40ae909a659fbf1c216e45010b41765a",
+    "authority": "Direct Human approval attachment 76faa8cf-2f4e-4fea-bd8a-917252f4e83e; synthetic Development only; final supplied inputs; no further requests.",
+    "tenant": "demo-construction-01",
+    "results": {
+      "B03": {
+        "result": "EXTERNAL_REGULATORY_AUTHORITY_NOT_SATISFIED / NATIVE_TECHNICAL_CONFIGURATION_BLOCKED",
+        "requested_fallback": "TECHNICAL_UAT_CONFIGURATION_READY / EXTERNAL_REGULATORY_AUTHORITY_NOT_SATISFIED",
+        "truthfulness_limit": "Cannot claim native technical readiness: supplied approved_claim_amount is not a supported regulatory basis; no silent substitution with gross/after_contractual. Current Platform lifecycle also rejects effective_from 2026-10-01 as past-dated.",
+        "source": "DEV-REGULATORY-UAT-001",
+        "source_version": "1.0",
+        "parameters": {
+          "tax_rate": "10",
+          "tax_basis": "approved_claim_amount",
+          "insurance_rate": "5",
+          "insurance_basis": "approved_claim_amount"
+        },
+        "external_authority": "Human explicitly declares synthetic source, not statutory law. Native publication requires EXTERNAL_AUTHORITY provenance and accepted professional review; neither fabricated.",
+        "schema_validation": [
+          "مقدار «tax_basis» در قرارداد سیاست مجاز نیست."
+        ],
+        "billing_configuration_id": "759ff07f-4e66-407f-a040-194d15bab468",
+        "billing_configuration": "Existing Human-approved defaults retained",
+        "contract": "CTR-01-01-01",
+        "mutation": "NONE; stopped B03 per supplied external-authority boundary; no further input requested"
+      },
+      "B05": {
+        "result": "READY_ENTRY_PREREQUISITES_ONLY",
+        "account": "DEV-BANK-01",
+        "mapping": {
+          "id": "0f541854-6e72-45bf-a2c6-5af24d406629",
+          "cash": "WCD-CASH",
+          "clearing": "WCD-CLEARING",
+          "effective_from": "2026-10-24"
+        },
+        "cheque": {
+          "id": "407ed53f-bb9f-4b0d-a2ab-4c8cd3f7c2a0",
+          "status": "cleared"
+        },
+        "statement": {
+          "id": "33f50bfe-aa3f-45b6-a7d7-e226b54b9aa3",
+          "status": "accepted",
+          "rows": 1
+        },
+        "amount_source": "Existing approved CEP079-PREP-01-JOURNAL synthetic amount reused, not a new business rule",
+        "amount": "1.000000",
+        "financial_effect": "One new canonical synthetic cheque-clearing Treasury movement and balanced Accounting journal; native sequence/audit only; no pre-existing account/journal/line/movement/cheque modified",
+        "validation": "Active mapped BANK, independent maker/checker, cleared cheque, accepted statement and preserved pre-existing source fingerprints verified; no match/reconciliation/bounce UAT executed"
+      },
+      "B06": {
+        "result": "PARTIAL_CONFIGURATION_READY_EVIDENCE_PATH_DEFECT",
+        "partner": "بازرگانی فولاد ایرانیان",
+        "category": "SUPPLIER-MATERIALS-DEV",
+        "canonical_party_category": "supplier-materials-dev",
+        "profile_id": "ad6853cf-d1d0-4adc-a83c-55d450d09fc6",
+        "requirement": {
+          "code": "DEV-PARTNER-QUAL-001",
+          "version": 1,
+          "source_version": "1.0",
+          "evidence_required": true
+        },
+        "qualification": {
+          "reference": "DEV-PARTNER-QUAL-001-UAT",
+          "status": "draft"
+        },
+        "remaining": "Native DMS context access raises StopIteration for PartnerEvidence: services._validate_document_context_access matches registry target_field against link.target_type=partner_qualification, while the registered target_field is qualification. No source fix or authorization bypass permitted in this configuration-only stage.",
+        "failed_attempts": "Two atomic upload/qualification attempts rolled back completely; newly uploaded blobs deleted through document storage. No inaccessible evidence or false QUALIFIED_FOR_UAT/eligible decision retained.",
+        "validation": "Active exact partner; canonical classification assignment; source/version-pinned requirement; profile and draft qualification model/service validation PASS. Supporting-document visibility check FAIL attributable to existing DMS registry mismatch."
+      },
+      "B07": {
+        "result": "PARTIAL_CLASS_READY_BOOK_AND_CANDIDATE_BLOCKED",
+        "asset_class": {
+          "code": "DEV-HEAVY-EQUIPMENT",
+          "version": 1,
+          "status": "published",
+          "effective_from": "2026-10-01",
+          "asset_gl": "1500",
+          "capitalization_source": "DEV-FA-SRC-001"
+        },
+        "existing_monetary_policy": {
+          "code": "accounting-money-precision",
+          "version": 2
+        },
+        "approved_candidate_inputs": {
+          "equipment": "EQ-01-EXC",
+          "book": "DEV-FA-BOOK",
+          "method": "Straight-line",
+          "useful_life_months": 60,
+          "residual_value": "1000000000",
+          "acquisition_amount": "10000000000",
+          "ready_for_use": "2026-10-01",
+          "precision": 0
+        },
+        "remaining": "Existing create_book_policy requires an explicit depreciation start convention (daily_prorata/full_month/next_month), with no approved default. Straight-line specifies method, not timing. No timing policy invented and no further input requested. No book/candidate/depreciation/posting created.",
+        "validation": "Independent class review/publication, exact supplied GL/source/effective date and native model validation verified"
+      },
+      "B08": {
+        "result": "PARTIAL_TEMPLATE_AND_DRAFT_READY_SAFE_EVIDENCE_NOT_AVAILABLE",
+        "template": "DEV-QA-INSPECTION-001",
+        "version": 1,
+        "source_version": "1.0",
+        "profile": "qa_qc",
+        "checklist_count": 4,
+        "inspection": {
+          "number": "CEP079-STAGE3B-DEV-QA-01",
+          "status": "draft"
+        },
+        "evidence": {
+          "document_number": "DOC-000002",
+          "version": 1,
+          "metadata_visibility": "PASS",
+          "safe_availability": false,
+          "linked": false
+        },
+        "remaining": "DOC-000002 v1 has no current CLEAN availability; canonical download/use path denies access. No scan result fabricated or safety gate bypassed. Critical/evidence rules are retained JSON content; lifecycle services have no automatic evaluator for them.",
+        "critical_designations": "No item was newly designated Critical; Human supplied conditional rule retained verbatim.",
+        "validation": "Exact Human-approved JSON read back; immutable template hash pinned to draft; document metadata visibility checked; unsafe version not linked or consumed; no inspection submit/review/outcome transition executed"
+      }
+    },
+    "B01_B04": "UNTOUCHED",
+    "registry_gate09_ext0025": "UNCHANGED",
+    "uat_scenarios_executed": 0,
+    "entry_reassessment": "NOT_PERFORMED",
+    "application_source_migrations_git_writes_production": "NONE",
+    "post_commit_read_only_verification": {
+      "B05": "PASS: committed BANK/mapping, cleared cheque, balanced native journal, accepted one-row statement, independent actors",
+      "B06": "PARTIAL verified: approved requirement/profile/draft committed; failed evidence uploads fully rolled back; no false qualified outcome",
+      "B07": "PARTIAL verified: published class; native full_clean rejects missing convention; no book/candidate or financial effect",
+      "B08": "PARTIAL verified: published exact supplied template/hash and draft; permitted document metadata visible, safe-use status unavailable; no evidence bypass or inspection outcome"
+    }
+  },
+  "stage3b_final_closure_20261024": {
+    "authority": "Human attachment 1feae84a-099f-4108-af79-e331333799cd; bounded B01 independent acceptance verification, B06 technical correction and B03/B06/B07/B08 Development configuration.",
+    "at": "2026-10-24T18:22:28.028312+00:00",
+    "head": "0dd307ab40ae909a659fbf1c216e45010b41765a",
+    "results": {
+      "B01": {
+        "status": "RESOLVED",
+        "scope": "CEP-079 entry only; bounded CEP-040/IMB-0039 acceptance correction; no CEP040 rerun or UAT execution.",
+        "updated_at": "2026-10-24T18:32:22.513873+00:00",
+        "authority": "Direct Human B01-only remediation request, 2026-10-24; preserve B03-B08 and existing behavior/history.",
+        "canonical_basis": {
+          "AC1": "Coverage detects missing source occurrences.",
+          "AC3": "Retain source as-of/freshness/version semantics.",
+          "AC2_AC4_AC5_AC6": "Source-derived read model only; tenant/project scoping; retry deduplication preserved; no new financial metrics/policies."
+        },
+        "root_cause": "Source provenance rows were derived only from existing compatible actual facts; expected project coverage was further restricted to those fact-bearing contracts. Source cutoff_at was not copied into results or export.",
+        "change": "Union observed fact-bearing sources with existing explicitly project-scoped approved ACTUAL coverage contracts. No tenant-wide applicability inferred. Missing compatible facts have count 0, net_amount null and missing_facts true. Copy existing coverage cutoff_at exactly, retaining null when unknown; include cutoff and absence in CSV evidence. Existing financial aggregates, completeness/equivalence flags and historical records unchanged.",
+        "files": [
+          "apps/projects/services.py",
+          "apps/projects/test_cep040_reconciliation.py"
+        ],
+        "source_sha256": {
+          "apps/projects/services.py": "db392ce9b5c85fc88342564d8115cd25b5cf73d22f182dee664f9064d0283a36",
+          "apps/projects/test_cep040_reconciliation.py": "a2bcb2a1a6cd926c9ec6720ae6acaedc6a1482412b9dd7b2bd175581b4b86721"
+        },
+        "validation": {
+          "before_correction": "Both targeted missing-source/export checks reproduced failure: expected source count 0 instead of 1.",
+          "command": ".venv/Scripts/python.exe -m pytest apps/projects/test_cep040_reconciliation.py --reuse-db --no-header -q --tb=short",
+          "result": "6 passed in 13.97s",
+          "covered": [
+            "Explicit expected source retained without facts; unknown amount/cutoff and incomplete coverage preserved",
+            "Only append-only audit INSERTs during read-model inspection; no financial/source writes",
+            "Exact existing cutoff/watermark retained in structured result and export",
+            "Native fact retry returns same record; no amount/count double counting",
+            "Project-specific expectations; no tenant-wide source applicability inferred; cross-tenant denial",
+            "Active explicit project-scoped actor denied another project; observed sources without coverage preserved with unknown cutoff"
+          ],
+          "ruff": "PASS: apps/projects/services.py apps/projects/test_cep040_reconciliation.py",
+          "django_check": "PASS: 0 issues",
+          "legacy_expense_fixture_failures": "Previously attributed; unchanged and not repaired or rerun in this B01-only stage.",
+          "fixture_scope": "New bounded tests use explicit current role/scope assignments through existing test helper; no production authorization changes."
+        },
+        "historical_recovery": "NOT_REPEATED",
+        "development_business_data_mutation": "NONE; new source/coverage/fact fixtures exist only in isolated test transactions.",
+        "migrations": "NONE",
+        "remaining_blocker": "NONE_FOR_B01",
+        "previous_verification": {
+          "status": "BLOCKED_INDEPENDENT_ACCEPTANCE_VERIFICATION_FAILED",
+          "historical_recovery": "NOT_REPEATED",
+          "authorization": "Explicit YES to bounded substitute verification; no CEP040 implementation rerun.",
+          "canonical_contract": "CEP-040/IMB-0039 AC1..6 and DoD; current source inspected without historical-evidence searches.",
+          "focused_verification": "Six exact temporary test node IDs. 2 PASS (retry deduplication, cross-tenant denial); 2 genuine AC failures; 2 pre-existing legacy expense-fixture failures. Initial legacy-role bootstrap failures separately corrected only in temporary verifier fixture.",
+          "failures": [
+            {
+              "acceptance": "AC1",
+              "observed": "Approved expected source with NOT_STARTED coverage and no facts is absent from reconciliation.sources; output cannot identify that missing source."
+            },
+            {
+              "acceptance": "AC3",
+              "observed": "Coverage cutoff_at exists in source model but is absent from returned reconciliation data; required as-of/freshness not retained."
+            }
+          ],
+          "source": "apps/projects/services.py:get_project_cost_reconciliation; source rows are derived only from compatible_actual_facts and snapshot has no cutoff/as-of field.",
+          "product_mutation": "NONE; no remediation or new source/cutoff policy inferred; existing behavior preserved."
+        }
+      },
+      "B03": {
+        "status": "RESOLVED",
+        "updated_at": "2026-10-24T20:24:50.166285+00:00",
+        "authority": "Direct Human B03 final source dataset and Product Owner qualified-review acceptance; attachment af551ef1-b114-4120-ade9-5782ae7c8a43/Pasted text.txt.",
+        "environment": "Development / Non-Production",
+        "policy_code": "receivable-claim-regulatory",
+        "native_policy_version": 2,
+        "policy_version_id": "c8e9de14-242d-4866-aa67-463f85a892f8",
+        "policy_status": "published",
+        "source_basis": "external_authority",
+        "requested_policy_reference": "IR-REG-1405-CONSTRUCTION-EXEC",
+        "identity_mapping": "Existing closed policy code retained; new v2 preserves synthetic draft v1. Suggested identity retained in native reason.",
+        "parameters": {
+          "tax_rate": "10",
+          "tax_basis": "gross",
+          "insurance_rate": "6.6",
+          "insurance_basis": "gross"
+        },
+        "effective_from": "2026-10-24",
+        "sources": [
+          {
+            "source_identifier": "IR-BUDGET-1405-VAT",
+            "version": "1405",
+            "id": "49b94d8c-ccf9-4062-88c2-5ab708d5d92b"
+          },
+          {
+            "source_identifier": "IR-SSO-1000-99-12101",
+            "version": "1405-UAT-1",
+            "id": "72baf0c9-f589-4355-b3d5-31ab9b8343c4"
+          }
+        ],
+        "review": {
+          "reviewer_identity": "اعظم زرنگ زاده",
+          "qualification": "Product Owner; explicitly accepted as qualified by Human Decision Authority for Development / Representative-UAT B03.",
+          "reviewed_on": "2026-09-24",
+          "disposition": "accepted",
+          "id": "9aacd9e4-2c23-4e8e-a4f4-116f55c8a968",
+          "recorded_by": "Existing authorized Platform Admin; no additional reviewer or credential invented."
+        },
+        "classification": {
+          "supplied_code": "IR-CONSTRUCTION-EXECUTION",
+          "code": "ir-construction-execution",
+          "name": "پیمان عمرانی اجرایی",
+          "id": "a33278a4-712b-40b0-b218-b9772a7e5c39",
+          "meaning": "contractor contract subject to Iranian public construction-project insurance rules",
+          "applicability": "CTR-01-01-01"
+        },
+        "contract": "CTR-01-01-01",
+        "term_version": 2,
+        "term_id": "a84f9c44-a6d8-428f-a84f-469a9893d06e",
+        "term_status": "approved",
+        "payment_days": 30,
+        "retention_percent": "10.000000",
+        "retention_cap": "60850000000.0000",
+        "advance_percent": "20",
+        "advance_recovery_percent": "20.000000",
+        "advance_recovery_cap": "121700000000.0000",
+        "cap_basis_contract_value": "608500000000.00",
+        "independent_approval": {
+          "result": "PASS",
+          "service": "apps.contracts.services.approve_contract_term_version",
+          "authorized_distinct_creator_and_approver": true,
+          "approved_at": "2026-10-24T20:23:03.455825+00:00",
+          "approval_audit_verified": true
+        },
+        "historical_terms": {
+          "version": 1,
+          "id": "dd0f0d8b-78f2-44eb-9673-3ba4df38b26d",
+          "effective_from": "2026-10-24",
+          "status": "superseded",
+          "superseded_by_version": 2,
+          "immutable_terms_and_original_approval_evidence_preserved": true,
+          "native_lifecycle_changes_only": [
+            "status",
+            "superseded_by_id",
+            "updated_at"
+          ]
+        },
+        "billing_resolution": "PASS as-of 2026-10-25: CTR-01-01-01 -> approved ContractTermVersion v2 -> ir-construction-execution -> published receivable-claim-regulatory v2 -> tax10/gross and insurance6.6/gross. Rates/bases resolved from published policy; no Contract hard-coding.",
+        "focused_validation": {
+          "source_review_publication": "PASS: exactly two supplied real-source references, Human-accepted qualified Product Owner review, native Platform publication service.",
+          "classification_and_policy_resolution": "PASS: native term creation selects ir-construction-execution; Platform resolver returns published receivable-claim-regulatory v2 with exact supplied rates/bases.",
+          "effective_date": "PASS: v2 resolves at 2026-10-25; prior as-of 2026-10-24 still selects historical v1. Regulatory Policy effective_from remains 2026-10-24.",
+          "negative_controls": "PASS: unpublished policy, unreviewed publication, unauthorized Tenant publication, creator self-approval, draft-term Billing and unclassified approved-term Billing denied.",
+          "tenant_isolation": "PASS: actual v2 denied under another existing organization by selection, approval and Billing services.",
+          "historical_terms": "PASS: immutable v1 commercial content, effective date and original approval history preserved; native workflow alone records supersession to v2.",
+          "independent_term_approval_and_full_billing_chain": "PASS: authorized independent native approval and full as-of 2026-10-25 resolution.",
+          "focused_tests": "2/2 PASS; targeted unpublished/inactive classification, permissions, tenant isolation and approval separation tests; 8.122s; Django system checks PASS.",
+          "test_command": ".venv/Scripts/python.exe manage.py test apps.billing.test_insurance_classification.InsuranceClassificationTests.test_missing_draft_expired_and_inactive_classifications_fail_closed apps.billing.test_insurance_classification.InsuranceClassificationTests.test_tenant_permissions_scope_and_approval_separation --keepdb --noinput --verbosity 1"
+        },
+        "technical_prerequisite": "READY_AS_OF_2026_10_25",
+        "external_authority": "SATISFIED_BY_EXPLICIT_HUMAN_SOURCE_AND_QUALIFIED_REVIEW_ACCEPTANCE",
+        "remaining": "NONE within authorized B03 entry-preparation scope as-of 2026-10-25.",
+        "actionable_technical_blockers_remaining": 0,
+        "external_human_authority_blockers_remaining": 0,
+        "entry_reassessment_technically_eligible": true,
+        "product_code_schema_migrations": "NONE_THIS_REQUEST",
+        "uat_scenarios_executed": 0,
+        "entry_reassessment": "NOT_PERFORMED",
+        "registry_gate09_ext0025": "UNCHANGED",
+        "production_git_writes": "NONE",
+        "previous_configuration": {
+          "status": "MAXIMUM_NATIVE_CONFIGURATION_COMPLETE / EXTERNAL_REGULATORY_AUTHORITY_REMAINS",
+          "technical_readiness_scope": "Valid synthetic native draft plus independently approved Tenant contract terms and Billing. Actual Billing prerequisite is NOT_READY: the canonical consumer requires a published effective external-authority version with accepted professional review; no simulation publication path exists.",
+          "source": "UAT-MOCK-REG-SOURCE-001",
+          "source_version": "1.0",
+          "native_policy_version": 1,
+          "policy_status": "draft",
+          "source_basis": "product_defined",
+          "parameters": {
+            "tax_rate": "10",
+            "tax_basis": "gross",
+            "insurance_rate": "5",
+            "insurance_basis": "gross"
+          },
+          "effective_from": "2026-10-24",
+          "contract": "CTR-01-01-01",
+          "term_version": 1,
+          "payment_days": 30,
+          "retention_percent": "10",
+          "retention_cap": "60850000000.0000",
+          "advance_percent": "20",
+          "advance_recovery_percent": "20",
+          "advance_recovery_cap": "121700000000.0000",
+          "cap_basis_contract_value": "608500000000.00",
+          "billing_configuration_id": "759ff07f-4e66-407f-a040-194d15bab468",
+          "publication_expected_denial": [
+            "قاعده مقرراتی باید به مرجع بیرونی متکی باشد."
+          ],
+          "consumer_expected_denial": [
+            "نسخه مقرراتی پلتفرمِ منتشرشده و مؤثر وجود ندارد."
+          ],
+          "remaining": "Genuine external regulatory source and qualified ACCEPTED professional review required by canonical publication and Billing consumption. Synthetic approval cannot satisfy either; maximum supported native configuration completed without weakening controls.",
+          "updated_at": "2026-10-24T18:49:05.113510+00:00",
+          "authority": "Direct Human B03-only synthetic Development / Representative UAT configuration authorization, 2026-10-24.",
+          "previous_source_retained": "DEV-REGULATORY-UAT-001",
+          "source_id": "c67f0d42-cd9f-4b1a-bec8-3124b2336f0e",
+          "source_type_metadata": "synthetic_uat_reference",
+          "human_simulation_review_metadata": "APPROVED_FOR_UAT_SIMULATION",
+          "human_approval_authority": "Project/Product Decision Authority",
+          "metadata_semantics": "Simulation source type and review labels retained in native immutable source metadata; no unsupported enum, external source basis, professional reviewer or accepted review evidence created.",
+          "configuration_action": "Platform Admin native record_policy_source and link_policy_version_source; matching existing draft version reused; prior source/history retained. Existing approved ContractTermVersion v1 and TenantBillingConfiguration reused unchanged.",
+          "focused_validation": {
+            "regulatory_source_and_version": "PASS: native full_clean, canonical parameter schema, exact tax10/insurance5 gross bases and 2026-10-24 effective date; post-commit readback.",
+            "contract_and_billing": "PASS: effective approved v1 resolved by native Billing selector; independent maker/approver; 30 days, retention10% cap60850000000, advance recovery20% cap121700000000 (approved 20% advance); precision0, partial periods true, late measurements false; records unchanged.",
+            "authorization": "PASS: authorized Platform Admin source/link and Tenant settings authority; non-Platform Tenant actor denied Platform management; existing tenant role lacking company.settings_change denied Billing update. Platform actor also has separate Tenant membership, so no role-only denial claimed.",
+            "publication": "EXPECTED_DENIAL: product_defined synthetic source is not external regulatory authority.",
+            "cep079_billing_prerequisite_consumer": "NOT_READY: native _resolve_regulatory_rule_version rejects absence of published effective regulatory policy, before and after committed source/link. No claims or UAT scenarios created.",
+            "review": "No professional review evidence exists; synthetic Human approval retained only as metadata."
+          },
+          "technical_prerequisite": "NOT_READY",
+          "external_authority": "REMAINS",
+          "entry_reassessment_technically_eligible": false
+        },
+        "resolution_scope": "B03 only; Development / Representative-UAT entry preparation qualified as-of 2026-10-25. No UAT or Entry Reassessment executed.",
+        "term_effective_from": "2026-10-25",
+        "entry_reassessment_as_of": "2026-10-25",
+        "date_correction_closeout": {
+          "authority": "Direct Human approval in current chat: only draft v2 effective date changes to 1405/08/03 (2026-10-25), with native independent approval and unchanged approved inputs.",
+          "previous_blocker": "Same effective date 2026-10-24 as approved predecessor v1.",
+          "draft_date_edit": {
+            "before": "2026-10-24",
+            "after": "2026-10-25",
+            "all_other_draft_fields_preserved": true,
+            "audit_recorded": true
+          },
+          "native_approval_status": "approved",
+          "qualified_as_of": "2026-10-25",
+          "live_checks": {
+            "draft_terms_not_billable": "PASS: PermissionDenied",
+            "creator_cannot_approve": "PASS: PermissionDenied",
+            "tenant_cannot_publish_platform_policy": "PASS: PermissionDenied",
+            "cross_tenant_approval": "PASS: PermissionDenied",
+            "cross_tenant_billing": "PASS: PermissionDenied",
+            "v2_not_effective_on_2026_10_24": "PASS: PermissionDenied",
+            "unpublished_policy_not_effective_or_consumed": "PASS",
+            "full_contract_terms_classification_published_policy_chain": "PASS",
+            "as_of_dates_2026_10_24_and_2026_10_25": "PASS",
+            "policy_rates_and_bases": "PASS: tax10/gross; insurance6.6/gross; sourced from published policy",
+            "independent_approval": "PASS",
+            "v1_historical_content_and_approval_evidence_preserved": "PASS: only native lifecycle status/successor/timestamp changed",
+            "policy_sources_review_classification_unchanged": "PASS",
+            "no_claim_or_uat_created": "PASS",
+            "native_approval_audit": "PASS"
+          },
+          "live_checks_passed": 15,
+          "protected_policy_sources_review_classification_sha256": "8905033f5056b4857e3144076da27fa98d346f4b0ec068619ae7e4b66ab494a1",
+          "post_commit_readback": "PASS",
+          "schema_migrations_source_changes": "NONE",
+          "entry_reassessment": "NOT_EXECUTED",
+          "uat": "NOT_EXECUTED",
+          "other_blockers": "UNCHANGED",
+          "registry_gate09_ext0025": "UNCHANGED",
+          "production_git_writes": "NONE"
+        }
+      },
+      "B06": {
+        "status": "RESOLVED_ENTRY_ONLY",
+        "correction": "One-line registry resolution by actual registered link model, replacing ambiguous target_field/target_type string comparison; all context authorization remains enforced.",
+        "reproduction": "Both added regression tests failed with StopIteration before correction.",
+        "focused_tests": "20/20 PASS: affected DMS, employee DMS authorization and Partner Qualification; legacy Partner test fixture updated to explicit assignments/scope only.",
+        "django_ruff": "PASS",
+        "qualification": "DEV-PARTNER-QUAL-001-UAT",
+        "native_status": "approved",
+        "approved_label": "QUALIFIED_FOR_UAT",
+        "category": "SUPPLIER-MATERIALS-DEV",
+        "category_status": "eligible",
+        "requirement_source": "DEV-PARTNER-QUAL-001",
+        "source_version": "1.0",
+        "evidence": {
+          "document": "DOC-000011",
+          "version": 2,
+          "sha256": "001d98cf2c5ce5c1553b5744ca26278996271b3a01d1180216dde6d2fed6461f",
+          "existing_scanner": "microsoft-defender-mpcmdrun"
+        },
+        "validation": "Four approved synthetic requirements met; corrected DMS metadata and safe-download authorization for maker/reviewer PASS; independent qualification approval and eligible category; no new status or real certification."
+      },
+      "B07": {
+        "status": "RESOLVED_ENTRY_ONLY",
+        "class": "DEV-HEAVY-EQUIPMENT",
+        "book": "DEV-FA-BOOK",
+        "version": 1,
+        "convention": "daily_prorata",
+        "semantics": "Existing daily convention starts at ready-for-use date, includes eligible days only; no full-month-before-service or next-month delay.",
+        "candidate": "DEV-FA-CANDIDATE-EQ-01-EXC",
+        "candidate_status": "candidate",
+        "equipment": "EQ-01-EXC",
+        "source": "DEV-FA-SRC-001",
+        "source_reviewed": true,
+        "validation": "Independent native book/source review; exact approved basis/residual/life/date/precision read back; pure date-boundary fraction checks PASS; candidate remains non-posting; no depreciation run, capitalization transaction or journal created."
+      },
+      "B08": {
+        "status": "RESOLVED_ENTRY_ONLY",
+        "template": "DEV-QA-INSPECTION-001",
+        "version": 1,
+        "inspection": "CEP079-STAGE3B-DEV-QA-01",
+        "inspection_status": "draft",
+        "evidence": {
+          "document": "DOC-000011",
+          "version": 2,
+          "existing_clean_assessment": "6fce88a5-8e0b-4799-9f89-70dbad25da07",
+          "scanner": "microsoft-defender-mpcmdrun"
+        },
+        "validation": "Existing authorized CLEAN synthetic Development version/hash verified and linked; template/checklist/conditional evidence configuration retained; executable draft inspection input available; no submit/review/outcome execution.",
+        "automatic_critical_evaluation": "Not asserted and not a separate entry blocker: canonical CEP079 preparation requires applicable published template/checklist/source/evidence and inspection inputs; no automatic evaluator prerequisite identified.",
+        "security": "No new CLEAN assessment, malware bypass, security-status update or source-template change."
+      }
+    },
+    "B04_B05": "PRESERVED_NOT_REOPENED",
+    "registry_gate09_ext0025": "UNCHANGED",
+    "uat_scenarios_executed": 0,
+    "entry_reassessment": "NOT_PERFORMED",
+    "production_git_writes_migrations": "NONE",
+    "post_commit_read_only_verification": {
+      "B03": "PASS: approved classified v2 effective 2026-10-25 resolves published policy v2 effective 2026-10-24, tax10/gross and insurance6.6/gross; native v1 supersession preserves commercial and original approval history; protected policy/source/review/classification rows unchanged.",
+      "B06": "PASS: committed independent qualification/category and corrected authorized CLEAN evidence",
+      "B07": "PASS: exact supplied non-posting candidate; no asset transactions/depreciation lines",
+      "B08": "PASS: unchanged pinned template, CLEAN evidence and executable draft; no outcome executed"
+    },
+    "code_sha256": {
+      "apps/documents/services.py": "f1f0d423115732211d234f6fa1c61873b91ef9347fb5a08a4da9100ace940d29",
+      "apps/documents/tests.py": "1ba3977148952680ba7d8a7755c8bc8544b73bc539fcc66cca7defd6882de40c",
+      "apps/partner_qualification/test_p9_s12_s15.py": "203a8422b5e88df6a3e188ab350a41c95416cc00787bdf4f0262c70a6f553f31",
+      "apps/projects/services.py": "db392ce9b5c85fc88342564d8115cd25b5cf73d22f182dee664f9064d0283a36",
+      "apps/projects/test_cep040_reconciliation.py": "a2bcb2a1a6cd926c9ec6720ae6acaedc6a1482412b9dd7b2bd175581b4b86721"
+    },
+    "focused_checks": {
+      "B06_modules": "20 passed; affected DMS/employee authorization/Partner tests",
+      "B01_exact_nodes": "6/6 bounded reconciliation regression tests PASS; prior independent failures retained in results.B01.previous_verification; unrelated legacy expense fixtures unchanged.",
+      "ruff": "PASS for three changed DMS/Partner files",
+      "django_check": "0 issues",
+      "diff_check": "PASS",
+      "B06_strengthened_domain_denial": "2/2 regression tests PASS after explicit assertion that document-view is granted while partner-sensitive-evidence permission is denied",
+      "B03_real_regulatory_configuration": "PASS: 15 targeted live checks, 2/2 focused tests, committed data readback; full Billing chain qualified as-of 2026-10-25."
+    },
+    "actionable_technical_blockers_remaining": 0,
+    "external_human_authority_blockers_remaining": 0,
+    "entry_reassessment_eligible": true,
+    "entry_reassessment_as_of": "2026-10-25"
   }
 }

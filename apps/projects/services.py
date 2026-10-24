@@ -2,7 +2,7 @@ import csv
 import hashlib
 import json
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from io import StringIO
 
@@ -1079,7 +1079,9 @@ class ProjectCostReconciliationSource:
     coverage_status: str
     watermark: str
     fact_count: int
-    net_amount: Decimal
+    net_amount: Decimal | None
+    cutoff_at: datetime | None = None
+    missing_facts: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -2449,15 +2451,35 @@ def get_project_cost_reconciliation(
         .annotate(fact_count=Count("pk"), net_amount=Sum("amount"))
         .order_by("contract__producer_key", "contract__version", "contract_id")
     )
-    contract_ids = [row["contract_id"] for row in source_rows]
+    source_rows_by_contract = {row["contract_id"]: row for row in source_rows}
     coverage_by_contract = {
         coverage.contract_id: coverage
         for coverage in ProjectCostCoverage.objects.filter(
             organization=organization,
             project=project,
-            contract_id__in=contract_ids,
-        )
+            contract__organization=organization,
+            contract__measure=ProjectCostMeasure.ACTUAL,
+            contract__status=ProjectCostSourceContractStatus.APPROVED,
+        ).select_related("contract")
     }
+    # Explicit project coverage establishes an expected source; a tenant-wide
+    # producer contract alone does not. Missing facts never imply a zero amount.
+    for contract_id, coverage in coverage_by_contract.items():
+        contract = coverage.contract
+        source_rows_by_contract.setdefault(
+            contract_id,
+            {
+                "contract_id": contract_id,
+                "contract__producer_key": contract.producer_key,
+                "contract__version": contract.version,
+                "contract__source_model": contract.source_model,
+                "contract__reconciliation_policy_reference": (
+                    contract.reconciliation_policy_reference
+                ),
+                "fact_count": 0,
+                "net_amount": None,
+            },
+        )
     sources = tuple(
         ProjectCostReconciliationSource(
             contract_id=str(row["contract_id"]),
@@ -2479,8 +2501,21 @@ def get_project_cost_reconciliation(
             ),
             fact_count=int(row["fact_count"]),
             net_amount=row["net_amount"],
+            cutoff_at=(
+                coverage_by_contract[row["contract_id"]].cutoff_at
+                if row["contract_id"] in coverage_by_contract
+                else None
+            ),
+            missing_facts=row["fact_count"] == 0,
         )
-        for row in source_rows
+        for row in sorted(
+            source_rows_by_contract.values(),
+            key=lambda row: (
+                row["contract__producer_key"],
+                row["contract__version"],
+                str(row["contract_id"]),
+            ),
+        )
     )
 
     exclusions = (
@@ -2642,13 +2677,15 @@ def export_project_cost_reconciliation(
                     "",
                     "",
                     "",
-                    source.net_amount,
+                    "" if source.net_amount is None else source.net_amount,
                     "",
                     (
                         f"{source.producer_key}:v{source.version};"
                         f"model={source.source_model};coverage={source.coverage_status};"
                         f"policy={source.reconciliation_policy_reference};"
-                        f"watermark={source.watermark or 'none'}"
+                        f"watermark={source.watermark or 'none'};"
+                        f"cutoff_at={source.cutoff_at.isoformat() if source.cutoff_at else 'none'};"
+                        f"facts={'missing' if source.missing_facts else 'present'}"
                     ),
                 )
             )

@@ -72,6 +72,7 @@ from apps.organizations.forms import (
 from apps.organizations.models import (
     AccountConnectionRequestStatus,
     BusinessPermissionCode,
+    InsuranceClassification,
     MembershipRole,
     MembershipRoleAssignment,
     MembershipScopeGrant,
@@ -86,6 +87,7 @@ from apps.organizations.models import (
 )
 from apps.organizations.policy_services import (
     apply_tenant_policy_selection,
+    create_insurance_classification,
     create_platform_policy,
     create_platform_policy_version,
     link_policy_version_source,
@@ -95,6 +97,7 @@ from apps.organizations.policy_services import (
     record_policy_source,
     retire_platform_policy_version,
     select_tenant_policy_version,
+    set_insurance_classification_active,
     update_platform_policy_version,
 )
 from apps.organizations.policy_specs import (
@@ -980,7 +983,23 @@ def platform_policy_catalog(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         try:
             action = request.POST.get("action", "create_definition")
-            if action == "create_definition":
+            if action == "create_insurance_classification":
+                create_insurance_classification(
+                    actor=request.user,
+                    code=request.POST["code"],
+                    name=request.POST["name"],
+                    reason=request.POST["reason"],
+                )
+            elif action == "set_insurance_classification_active":
+                set_insurance_classification_active(
+                    actor=request.user,
+                    classification=InsuranceClassification.objects.get(
+                        pk=request.POST["classification_id"]
+                    ),
+                    is_active=request.POST.get("is_active") == "true",
+                    reason=request.POST["reason"],
+                )
+            elif action == "create_definition":
                 create_platform_policy(
                     actor=request.user,
                     code=request.POST.get("code", ""),
@@ -1009,6 +1028,11 @@ def platform_policy_catalog(request: HttpRequest) -> HttpResponse:
                 )
                 kwargs = {
                     "actor": request.user,
+                    "insurance_classification": InsuranceClassification.objects.get(
+                        pk=request.POST["insurance_classification_id"]
+                    )
+                    if request.POST.get("insurance_classification_id")
+                    else None,
                     "parameters": json.loads(request.POST["parameters"]),
                     "effective_from": date.fromisoformat(
                         request.POST["effective_from"]
@@ -1083,7 +1107,15 @@ def platform_policy_catalog(request: HttpRequest) -> HttpResponse:
                 )
             else:
                 raise ValidationError("عملیات سیاست معتبر نیست.")
-        except (PermissionDenied, ValidationError, ValueError) as exc:
+        except (
+            PermissionDenied,
+            ValidationError,
+            ValueError,
+            KeyError,
+            InsuranceClassification.DoesNotExist,
+            PlatformPolicy.DoesNotExist,
+            PlatformPolicyVersion.DoesNotExist,
+        ) as exc:
             messages.error(request, str(exc))
         else:
             messages.success(request, "عملیات چرخهٔ سیاست پلتفرم ثبت شد.")
@@ -1117,6 +1149,7 @@ def platform_policy_catalog(request: HttpRequest) -> HttpResponse:
                 for code, spec in PLATFORM_POLICY_SPECS.items()
             ],
             "policy_sources": PolicySource.objects.all(),
+            "insurance_classifications": InsuranceClassification.objects.all(),
         },
     )
 

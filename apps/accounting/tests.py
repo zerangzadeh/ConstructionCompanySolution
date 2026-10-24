@@ -41,6 +41,7 @@ from apps.accounting.reconciliation import (
     dispose_reconciliation_exception,
     inspect_manual_opening_reconciliation,
     sign_off_reconciliation_run,
+    verify_signed_reconciliation_run,
 )
 from apps.accounting.services import (
     ACCOUNTING_PRECISION_POLICY_CODE,
@@ -1162,6 +1163,88 @@ class AccountingFoundationTests(TestCase):
             review.save()
         with self.assertRaises(ValidationError):
             review.delete()
+
+    def test_reconciliation_empty_totals_survive_database_round_trip(self) -> None:
+        run = create_manual_opening_reconciliation_run(
+            organization=self.organization,
+            actor=self.owner,
+            cutoff_date=self.period.ends_on,
+        )
+        original_hash = run.result_hash
+        run.refresh_from_db()
+        review = sign_off_reconciliation_run(
+            organization=self.organization,
+            actor=self.approver,
+            run=run,
+            reason="Verify retained zero totals after database reload.",
+        )
+        self.assertEqual(run.source_count, 0)
+        self.assertEqual(run.result_hash, original_hash)
+        self.assertEqual(
+            verify_signed_reconciliation_run(
+                organization=self.organization, run=run
+            ).pk,
+            review.pk,
+        )
+
+    def test_reconciliation_nonempty_result_with_pending_empty_sources(self) -> None:
+        posted = self._posted_journal()
+        create_journal(
+            organization=self.organization,
+            actor=self.owner,
+            period=self.period,
+            kind=JournalKind.MANUAL,
+            document_date=self.period.starts_on,
+            accounting_date=self.period.starts_on,
+            description="Pending empty source alongside posted balances",
+            source_key="PENDING-EMPTY-RECONCILIATION",
+        )
+        create_opening_import(
+            organization=self.organization,
+            actor=self.owner,
+            fiscal_year=self.year,
+            period=self.period,
+            source_reference="PENDING-EMPTY-OPENING",
+            cutoff_date=date(2025, 12, 31),
+            evidence_reference="evidence://pending-opening",
+            reconciliation_reference="reconciliation://pending-opening",
+        )
+        original_lines = list(posted.lines.values_list("debit", "credit"))
+        run = create_manual_opening_reconciliation_run(
+            organization=self.organization,
+            actor=self.owner,
+            cutoff_date=self.period.ends_on,
+        )
+        original_hash = run.result_hash
+        run.refresh_from_db()
+        review = sign_off_reconciliation_run(
+            organization=self.organization,
+            actor=self.approver,
+            run=run,
+            reason="Verify nonempty cutoff with pending empty sources.",
+        )
+        self.assertEqual(
+            (run.source_count, run.posted_count, run.pending_count), (3, 1, 2)
+        )
+        self.assertEqual(run.exception_count, 0)
+        self.assertEqual(run.debit_total, Decimal(100))
+        self.assertEqual(run.credit_total, Decimal(100))
+        self.assertEqual(run.result_hash, original_hash)
+        self.assertEqual(
+            verify_signed_reconciliation_run(
+                organization=self.organization, run=run
+            ).pk,
+            review.pk,
+        )
+        self.assertEqual(
+            list(posted.lines.values_list("debit", "credit")), original_lines
+        )
+        empty_tie_out = run.tie_outs.get(tie_out_type=ReconciliationTieOutType.MANUAL)
+        ReconciliationTieOutSnapshot.objects.filter(pk=empty_tie_out.pk).update(
+            journal_debit_total=Decimal(1)
+        )
+        with self.assertRaisesMessage(ValidationError, "دستکاری شده است"):
+            verify_signed_reconciliation_run(organization=self.organization, run=run)
 
     def test_reconciliation_sign_off_requires_permission_reason_dispositions_and_sod(
         self,

@@ -55,6 +55,7 @@ from apps.contracts.services import (
 )
 from apps.organizations.access_services import assign_platform_admin
 from apps.organizations.models import (
+    InsuranceClassification,
     MembershipRole,
     MembershipStatus,
     Organization,
@@ -172,10 +173,21 @@ class ProjectBaselineWorkflowTests(TestCase):
             status=ContractAmendmentStatus.APPROVED,
             created_by=self.owner,
         )
+        self.insurance_classification = InsuranceClassification.objects.create(
+            code="test-execution",
+            name="طبقه‌بندی آزمون",
+            created_by=self.policy_author,
+        )
+        self.regulatory_rules = self._publish_regulatory_rules(
+            effective_from=date(2026, 1, 1),
+            tax_rate="0",
+            insurance_rate="0",
+        )
         self.contract_terms = create_contract_term_version(
             organization=self.organization,
             actor=self.owner,
             contract=self.contract,
+            insurance_classification=self.insurance_classification,
             effective_from=date(2026, 1, 1),
             reason="Initial receivable claim terms",
         )
@@ -185,11 +197,6 @@ class ProjectBaselineWorkflowTests(TestCase):
             term_version=self.contract_terms,
             reason="Independent commercial approval",
         )
-        self.regulatory_rules = self._publish_regulatory_rules(
-            effective_from=date(2026, 1, 1),
-            tax_rate="0",
-            insurance_rate="0",
-        )
 
     def _publish_regulatory_rules(
         self,
@@ -197,6 +204,7 @@ class ProjectBaselineWorkflowTests(TestCase):
         effective_from: date,
         tax_rate: str,
         insurance_rate: str,
+        insurance_basis: str = "gross",
     ) -> PlatformPolicyVersion:
         policy = create_platform_policy(
             actor=self.policy_author,
@@ -213,12 +221,13 @@ class ProjectBaselineWorkflowTests(TestCase):
         version_number = policy.versions.count() + 1
         draft = PlatformPolicyVersion.objects.create(
             policy=policy,
+            insurance_classification=self.insurance_classification,
             version=version_number,
             parameters={
                 "tax_rate": tax_rate,
                 "tax_basis": "gross",
                 "insurance_rate": insurance_rate,
-                "insurance_basis": "gross",
+                "insurance_basis": insurance_basis,
             },
             effective_from=effective_from,
             source_basis=PolicySourceBasis.EXTERNAL_AUTHORITY,
@@ -678,6 +687,7 @@ class ProgressClaimCalculationTests(ProgressRecordWorkflowTests):
             organization=self.organization,
             actor=self.owner,
             contract=self.contract,
+            insurance_classification=self.insurance_classification,
             effective_from=date(2026, 9, 1),
             reason="September commercial terms",
             retention_rate=Decimal(10),
@@ -724,6 +734,7 @@ class ProgressClaimCalculationTests(ProgressRecordWorkflowTests):
             organization=self.organization,
             actor=self.owner,
             contract=self.contract,
+            insurance_classification=self.insurance_classification,
             effective_from=date(2027, 1, 1),
             reason="Future commercial version",
         )
@@ -753,6 +764,7 @@ class ProgressClaimCalculationTests(ProgressRecordWorkflowTests):
         policy = self.regulatory_rules.policy
         rule = PlatformPolicyVersion.objects.create(
             policy=policy,
+            insurance_classification=self.insurance_classification,
             version=2,
             parameters={
                 "tax_rate": "0",
@@ -819,6 +831,7 @@ class ProgressClaimCalculationTests(ProgressRecordWorkflowTests):
         policy.save(update_fields=["is_active", "updated_at"])
         with self.assertRaises(ValidationError):
             _resolve_regulatory_rule_version(
+                term_version=self.contract_terms,
                 organization=self.organization,
                 on_date=date(2026, 9, 30),
             )
@@ -856,6 +869,7 @@ class ProgressClaimCalculationTests(ProgressRecordWorkflowTests):
             organization=self.organization,
             actor=self.owner,
             contract=self.contract,
+            insurance_classification=self.insurance_classification,
             effective_from=date(2026, 9, 1),
             reason="Negative-net rejection fixture",
             retention_rate=Decimal(100),
@@ -882,6 +896,7 @@ class ProgressClaimCalculationTests(ProgressRecordWorkflowTests):
             organization=self.organization,
             actor=self.owner,
             contract=self.contract,
+            insurance_classification=self.insurance_classification,
             effective_from=date(2026, 10, 1),
             reason="Safe October terms",
         )
