@@ -15,7 +15,11 @@ from apps.equipment.p8_models import (
     MaintenancePlan,
     MeterReading,
 )
-from apps.inventory.models import StockTransaction
+from apps.inventory.models import (
+    StockTransaction,
+    StockTransactionStatus,
+    StockTransactionType,
+)
 from apps.organizations.authorization import scope_queryset
 from apps.organizations.form_scoping import scoped_projects_for_form
 from apps.organizations.models import OrganizationMembership
@@ -195,6 +199,7 @@ class MaintenanceRecordForm(_StyledForm):
             .select_related("project")
             .order_by("project__name", "name")
         )
+        attach_parent_choice_ui(self, "site", "project", "project_id")
         self.fields["provider"].queryset = BusinessParty.objects.filter(
             organization=organization, archived_at__isnull=True
         ).order_by("display_name")
@@ -442,7 +447,16 @@ class SpareLinkForm(_StyledForm):
     def __init__(self, *args, organization, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["inventory_transaction"].queryset = StockTransaction.objects.filter(
-            organization=organization
+            organization=organization,
+            status=StockTransactionStatus.POSTED,
+            transaction_type__in=[
+                StockTransactionType.ISSUE,
+                StockTransactionType.REVERSAL,
+            ],
+        ).select_related("material", "unit_of_measure")
+        self.fields["inventory_transaction"].label_from_instance = lambda item: (
+            f"{item.transaction_number} — {item.material.name} — "
+            f"{item.quantity} {item.unit_of_measure.symbol} — {item.reference}"
         )
 
 

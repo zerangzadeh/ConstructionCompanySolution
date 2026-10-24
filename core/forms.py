@@ -39,7 +39,12 @@ class ParentChoiceSelect(forms.Select):
 
 
 def attach_parent_choice_ui(
-    form: forms.BaseForm, child: str, parent: str, parent_attribute: str
+    form: forms.BaseForm,
+    child: str,
+    parent: str,
+    parent_attribute: str,
+    *,
+    parent_value_attribute: str | None = None,
 ) -> None:
     """Filter rendered choices in the browser without changing field validation."""
     field = form.fields[child]
@@ -48,6 +53,14 @@ def attach_parent_choice_ui(
         attrs={**field.widget.attrs, "data-local-parent": form[parent].id_for_label},
         choices=field.choices,
     )
+    if parent_value_attribute:
+        parent_field = form.fields[parent]
+        parent_field.widget = ParentChoiceSelect(
+            parent_attribute=parent_value_attribute,
+            attrs=parent_field.widget.attrs,
+            choices=parent_field.choices,
+        )
+        field.widget.attrs["data-local-parent-key"] = "parentValue"
 
 
 def normalize_jalali_digits(value: str) -> str:

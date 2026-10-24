@@ -15,7 +15,9 @@ from apps.organizations.decorators import (
 )
 from apps.organizations.models import BusinessPermissionCode
 from apps.support.forms import (
+    AccessRequestForm,
     CaseAssignmentForm,
+    CaseCreateForm,
     CaseTransitionForm,
     SupportEvidenceForm,
 )
@@ -37,6 +39,21 @@ from apps.support.services import (
     transition_case,
 )
 
+CASE_STATUS_LABELS = {
+    "open": "باز",
+    "triaged": "بررسی اولیه",
+    "in_progress": "در حال رسیدگی",
+    "awaiting_requester": "در انتظار درخواست‌کننده",
+    "resolved": "حل‌شده",
+    "closed": "بسته‌شده",
+}
+ACCESS_STATUS_LABELS = {
+    "requested": "در انتظار تأیید شرکت",
+    "tenant_confirmed": "تأییدشده توسط شرکت",
+    "active": "فعال",
+    "revoked": "لغوشده",
+}
+
 
 @never_cache
 @require_GET
@@ -52,31 +69,44 @@ def workbench(request):
         "access": BusinessPermissionCode.SUPPORT_ACCESS_REQUEST,
     }
     require_organization_permission(request, required_permissions[surface])
+    cases = (
+        SupportCase.objects.filter(organization=organization, requester=request.user)
+        if surface in {"workbench", "cases"}
+        else SupportCase.objects.none()
+    )
+    for case in cases:
+        case.display_status = CASE_STATUS_LABELS.get(case.status, "نامشخص")
+    calendar = (
+        calendar_projection(organization=organization, actor=request.user)
+        if surface == "calendar"
+        else []
+    )
+    for item in calendar:
+        item["display_status"] = CASE_STATUS_LABELS.get(item["status"], "نامشخص")
+    access_requests = (
+        SupportAccessRequest.objects.filter(
+            organization=organization, requested_by=request.user
+        )
+        if surface == "access"
+        else SupportAccessRequest.objects.none()
+    )
+    for item in access_requests:
+        item.display_status = ACCESS_STATUS_LABELS.get(item.status, "نامشخص")
     return render(
         request,
         "support/workbench.html",
         {
             "surface": surface,
+            "case_form": CaseCreateForm(),
+            "access_form": AccessRequestForm(),
             "notifications": list_notifications(
                 organization=organization, actor=request.user
             )
             if surface in {"workbench", "notifications"}
             else [],
-            "cases": SupportCase.objects.filter(
-                organization=organization, requester=request.user
-            )
-            if surface in {"workbench", "cases"}
-            else SupportCase.objects.none(),
-            "calendar": calendar_projection(
-                organization=organization, actor=request.user
-            )
-            if surface == "calendar"
-            else [],
-            "access_requests": SupportAccessRequest.objects.filter(
-                organization=organization, requested_by=request.user
-            )
-            if surface == "access"
-            else SupportAccessRequest.objects.none(),
+            "cases": cases,
+            "calendar": calendar,
+            "access_requests": access_requests,
         },
     )
 
@@ -106,20 +136,12 @@ def case_detail(request, case_id):
     )
     if case is None:
         raise Http404
-    status_labels = {
-        "open": "باز",
-        "triaged": "بررسی اولیه",
-        "in_progress": "در حال رسیدگی",
-        "awaiting_requester": "در انتظار درخواست‌کننده",
-        "resolved": "حل‌شده",
-        "closed": "بسته‌شده",
-    }
     return render(
         request,
         "support/case_detail.html",
         {
             "case": case,
-            "status_label": status_labels.get(case.status, "نامشخص"),
+            "status_label": CASE_STATUS_LABELS.get(case.status, "نامشخص"),
             "assignment_form": CaseAssignmentForm(
                 organization=request.organization, current_status=case.status
             ),

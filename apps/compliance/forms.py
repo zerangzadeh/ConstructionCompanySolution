@@ -20,7 +20,7 @@ from apps.compliance.models import (
 from apps.documents.models import DocumentVersion
 from apps.organizations.models import MembershipStatus, Organization
 from apps.projects.models import Project, ProjectSite
-from core.forms import JalaliDateMixin
+from core.forms import JalaliDateMixin, attach_parent_choice_ui
 
 
 class StyledForm(JalaliDateMixin):
@@ -44,6 +44,8 @@ class ScopedModelForm(StyledForm, forms.ModelForm):
                 organization=organization, is_active=True
             )
             self.fields["site"].required = False
+        if "project" in self.fields and "site" in self.fields:
+            attach_parent_choice_ui(self, "site", "project", "project_id")
         self.style()
 
 

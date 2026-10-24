@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from uuid import uuid4
+
 from django import forms
 
 from apps.accounting.models import (
@@ -90,7 +92,9 @@ class JournalForm(AccountingFormMixin, JalaliDateMixin, forms.Form):
     document_date = forms.DateField(label="تاریخ سند")
     accounting_date = forms.DateField(label="تاریخ حسابداری")
     description = forms.CharField(widget=forms.Textarea, label="شرح سند")
-    source_key = forms.CharField(max_length=120, label="کلید منبع")
+    source_key = forms.CharField(
+        max_length=120, label="کلید منبع", widget=forms.HiddenInput, initial=uuid4
+    )
     evidence_reference = forms.CharField(
         max_length=500, required=False, label="مرجع مدرک"
     )
@@ -211,6 +215,7 @@ class OpeningImportForm(AccountingFormMixin, JalaliDateMixin, forms.Form):
         self.fields["period"].queryset = FiscalPeriod.objects.filter(
             organization=organization
         )
+        attach_parent_choice_ui(self, "period", "fiscal_year", "fiscal_year_id")
         self._style_fields()
 
 

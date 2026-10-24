@@ -1,4 +1,4 @@
-<section class="border-b border-slate-200 bg-slate-50/95" aria-label="دامنه کاری مؤثر">
+<section class="border-b border-slate-200 bg-slate-50/95" aria-label="انتخاب پروژه و کارگاه">
     <form class="mx-auto flex max-w-[1600px] flex-wrap items-end gap-2 px-4 py-2 sm:px-6 lg:px-8" method="post" action="{% url 'organizations:update_context' %}">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
@@ -9,7 +9,7 @@
         <label class="min-w-48 flex-1 sm:flex-none">
             <span class="mb-1 block text-[10px] font-semibold text-slate-500">پروژه{% if context_requires_project %} <span class="text-rose-600">(برای این عملیات الزامی)</span>{% endif %}</span>
             <select class="min-h-9 min-w-0 max-w-full rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-800" name="project_id" data-context-project>
-                <option value="">بدون پروژه / همه دامنه مجاز</option>
+                <option value="">همه پروژه‌های در دسترس</option>
                 {% for project in context_projects %}<option value="{{ project.pk }}"{% if active_project.pk == project.pk %} selected{% endif %}>{{ project.code }} — {{ project.name }}</option>{% endfor %}
             </select>
         </label>
@@ -22,9 +22,9 @@
                 </select>
             </label>
         {% endif %}
-        <button class="erp-btn erp-btn--secondary erp-btn--compact min-h-9" type="submit">اعمال دامنه</button>
+        <button class="erp-btn erp-btn--secondary erp-btn--compact min-h-9" type="submit">انتخاب پروژه و کارگاه</button>
         {% if context_requires_project and not active_project %}
-            <p class="w-full text-[11px] text-amber-700" role="status">پروژه‌ای انتخاب نشده است؛ برای ثبت، یک پروژه مجاز را در دامنه یا فرم انتخاب کنید.</p>
+            <p class="w-full text-[11px] text-amber-700" role="status">پروژه‌ای انتخاب نشده است؛ برای ثبت اطلاعات، پروژه را از این بخش یا در فرم انتخاب کنید.</p>
         {% endif %}
     </form>
 </section>

@@ -4,9 +4,9 @@
 {% include "components/page_header.html" with page_breadcrumb_label="کنترل ضمانت و انطباق" page_breadcrumb_url="/billing/commercial-controls/" page_eyebrow="کنترل تجاری و شواهد" page_title=title page_description="فقط واقعیت قراردادی یا شاهد بازبینی‌شده ثبت می‌شود؛ نبود اختیار صریح، عملیات را متوقف می‌کند." only %}
 <section class="erp-surface mt-6 rounded-xl p-5">
   <form method="post" class="grid gap-4 md:grid-cols-2">{% csrf_token %}
-    {% for field in form %}<div{% if field.name == "reason" %} class="md:col-span-2"{% endif %}><label class="mb-1 block text-sm font-medium" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<p class="mt-1 text-xs text-slate-500">{{ field.help_text }}</p>{% endif %}{% if field.errors %}<p class="mt-1 text-xs text-red-700">{{ field.errors|join:", " }}</p>{% endif %}</div>{% endfor %}
-    {% if form.non_field_errors %}<div class="text-sm text-red-700 md:col-span-2">{{ form.non_field_errors }}</div>{% endif %}
-    <button class="erp-button-primary md:col-span-2" type="submit">ثبت پیش‌نویس</button>
+    {% include "components/form_errors.html" with form=form only %}
+    {% for field in form %}{% if field.is_hidden %}{{ field }}{% else %}<div{% if field.name == "reason" %} class="md:col-span-2"{% endif %}>{% include "components/form_field.html" with field=field only %}</div>{% endif %}{% endfor %}
+    <button class="erp-btn erp-btn--primary md:col-span-2" type="submit">ثبت پیش‌نویس</button>
   </form>
 </section>
 {% endblock %}

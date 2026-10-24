@@ -27,17 +27,18 @@
 <section class="erp-surface mt-6 rounded-xl p-5">
   <h2 class="font-semibold">مبنای محاسبه</h2>
   <dl class="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
-    <div><dt class="text-slate-500">نسخه مبنا</dt><dd class="mt-1" dir="ltr">{{ claim.calculation_snapshot.baseline_version|default:"—" }}</dd></div>
     <div><dt class="text-slate-500">ناخالص تأییدشده قبلی</dt><dd class="mt-1" dir="ltr">{{ claim.calculation_snapshot.prior_approved_gross|default:"—" }}</dd></div>
     <div><dt class="text-slate-500">سقف مؤثر قرارداد</dt><dd class="mt-1" dir="ltr">{{ claim.calculation_snapshot.effective_ceiling|default:"—" }}</dd></div>
-    <div><dt class="text-slate-500">دقت نهایی ارز</dt><dd class="mt-1" dir="ltr">{{ claim.calculation_snapshot.currency_decimal_places|default:"—" }}</dd></div>
-    <div><dt class="text-slate-500">نسخه شرایط قرارداد</dt><dd class="mt-1" dir="ltr">{{ claim.calculation_snapshot.contract_term_version|default:"—" }}</dd></div>
-    <div><dt class="text-slate-500">نسخه مقررات</dt><dd class="mt-1" dir="ltr">{{ claim.calculation_snapshot.regulatory_rule_version|default:"—" }}</dd></div>
     <div><dt class="text-slate-500">مهلت پرداخت (روز)</dt><dd class="mt-1" dir="ltr">{{ claim.calculation_snapshot.payment_due_days|default:"0" }}</dd></div>
     <div><dt class="text-slate-500">سررسید</dt><dd class="mt-1" dir="ltr">{{ claim.due_date|default:"—" }}</dd></div>
     <div><dt class="text-slate-500">شروع دوره</dt><dd class="mt-1" dir="ltr">{{ claim.period_start }}</dd></div>
     <div><dt class="text-slate-500">حد برش اندازه‌گیری</dt><dd class="mt-1" dir="ltr">{{ claim.measurement_cutoff }}</dd></div>
   </dl>
+  <details class="mt-4 rounded-lg border border-slate-200 p-3"><summary class="cursor-pointer text-sm font-medium">ردیابی و ممیزی محاسبه</summary><dl class="mt-3 grid gap-3 text-sm md:grid-cols-2">    <div><dt class="text-slate-500">نسخه مبنا</dt><dd class="mt-1" dir="ltr">{{ claim.calculation_snapshot.baseline_version|default:"—" }}</dd></div>
+    <div><dt class="text-slate-500">دقت نهایی ارز</dt><dd class="mt-1" dir="ltr">{{ claim.calculation_snapshot.currency_decimal_places|default:"—" }}</dd></div>
+    <div><dt class="text-slate-500">نسخه شرایط قرارداد</dt><dd class="mt-1" dir="ltr">{{ claim.calculation_snapshot.contract_term_version|default:"—" }}</dd></div>
+    <div><dt class="text-slate-500">نسخه مقررات</dt><dd class="mt-1" dir="ltr">{{ claim.calculation_snapshot.regulatory_rule_version|default:"—" }}</dd></div>
+</dl></details>
 </section>
 
 <div class="mt-6 grid gap-6 xl:grid-cols-3">
@@ -54,5 +55,5 @@
   {% if settlement_form %}<section class="erp-surface rounded-xl p-5"><h2 class="font-semibold">تسویهٔ دستی</h2><p class="mt-2 text-sm text-slate-600">ابتدا تعهد دریافتنی را در AR شناسایی کنید؛ سپس دریافت قطعی خزانه‌داری را انتخاب کنید. تخصیص و برگشت در زیر‌دفتر انجام می‌شود.</p><form method="post" action="{% url 'billing:claim_settlement_allocate' claim.pk %}" class="mt-4 space-y-4">{% csrf_token %}{% for field in settlement_form %}<div><label class="mb-1 block text-sm font-medium" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}<p class="mt-1 text-xs text-red-700">{{ field.errors|join:", " }}</p>{% endif %}</div>{% endfor %}<button class="erp-button-primary w-full" type="submit">ثبت تسویه</button></form></section>{% endif %}
 </div>
 
-{% if settlement_summary %}<section class="erp-surface mt-6 overflow-hidden rounded-xl"><div class="border-b border-slate-100 px-5 py-4"><h2 class="font-semibold">ردیابی تسویه‌ها</h2></div><div class="overflow-x-auto"><table class="w-full min-w-[720px] text-right text-sm"><thead class="bg-slate-50 text-xs text-slate-500"><tr><th class="px-4 py-3">دریافت</th><th class="px-4 py-3">مبلغ</th><th class="px-4 py-3">دلیل</th><th class="px-4 py-3">وضعیت</th><th class="px-4 py-3">ثبت‌کننده</th></tr></thead><tbody class="divide-y divide-slate-100">{% for settlement in settlements %}<tr><td class="px-4 py-3" dir="ltr">{{ settlement.treasury_movement.id }}</td><td class="px-4 py-3" dir="ltr">{{ settlement.amount }}</td><td class="px-4 py-3">{{ settlement.reason }}</td><td class="px-4 py-3">{% if settlement.reversal %}برگشت‌شده{% else %}فعال{% endif %}</td><td class="px-4 py-3">{{ settlement.created_by.user|default:"—" }}</td></tr>{% empty %}<tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">تسویه‌ای ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div></section>{% endif %}
+{% if settlement_summary %}<section class="erp-surface mt-6 overflow-hidden rounded-xl"><div class="border-b border-slate-100 px-5 py-4"><h2 class="font-semibold">ردیابی تسویه‌ها</h2></div><div class="overflow-x-auto"><table class="w-full min-w-[720px] text-right text-sm"><thead class="bg-slate-50 text-xs text-slate-500"><tr><th class="px-4 py-3">دریافت</th><th class="px-4 py-3">مبلغ</th><th class="px-4 py-3">دلیل</th><th class="px-4 py-3">وضعیت</th><th class="px-4 py-3">ثبت‌کننده</th></tr></thead><tbody class="divide-y divide-slate-100">{% for settlement in settlements %}<tr><td class="px-4 py-3" dir="ltr">{{ settlement.treasury_movement.get_kind_display }} · {{ settlement.treasury_movement.movement_date|jalali_date }} · {{ settlement.treasury_movement.description }}<details class="mt-2 text-xs text-slate-500"><summary class="cursor-pointer">شناسه تراکنش</summary><bdi dir="ltr">{{ settlement.treasury_movement.id }}</bdi></details></td><td class="px-4 py-3" dir="ltr">{{ settlement.amount }}</td><td class="px-4 py-3">{{ settlement.reason }}</td><td class="px-4 py-3">{% if settlement.reversal %}برگشت‌شده{% else %}فعال{% endif %}</td><td class="px-4 py-3">{{ settlement.created_by.user|default:"—" }}</td></tr>{% empty %}<tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">تسویه‌ای ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div></section>{% endif %}
 {% endblock %}

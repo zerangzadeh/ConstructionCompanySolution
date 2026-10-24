@@ -5,6 +5,21 @@ from django import forms
 from apps.accounts.models import User
 from apps.documents.models import Document, DocumentVersion
 from apps.organizations.models import MembershipStatus, Organization
+from core.forms import attach_parent_choice_ui
+
+
+class CaseCreateForm(forms.Form):
+    category = forms.CharField(label="دسته درخواست")
+    summary = forms.CharField(label="شرح درخواست")
+
+
+class AccessRequestForm(forms.Form):
+    purpose = forms.CharField(label="هدف دسترسی")
+    scope = forms.CharField(label="محدوده دسترسی")
+    expires_at = forms.DateTimeField(
+        label="پایان اعتبار دسترسی",
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+    )
 
 
 class CaseAssignmentForm(forms.Form):
@@ -77,6 +92,8 @@ class SupportEvidenceForm(forms.Form):
         self.fields["document_version"].queryset = versions.select_related(
             "document"
         ).order_by("document__title", "-version_number")
+
+        attach_parent_choice_ui(self, "document_version", "document", "document_id")
 
     def clean(self):
         cleaned = super().clean()

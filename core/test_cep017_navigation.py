@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from django.conf import settings
+from django.template import Context, Template
 from django.test import SimpleTestCase
 
 
@@ -41,7 +42,6 @@ class Cep017NavigationTemplateTests(SimpleTestCase):
             "NAV-009",
             "NAV-013",
             "NAV-015",
-            "NAV-019",
         ):
             marker = f'data-nav-id="{node_id}"'
             fragment = navigation[
@@ -49,6 +49,23 @@ class Cep017NavigationTemplateTests(SimpleTestCase):
             ]
             self.assertIn('aria-disabled="true"', fragment)
             self.assertNotIn("href=", fragment)
+
+    def test_rfq_navigation_renders_one_state_for_each_permission_variant(self) -> None:
+        template = Template('{% include "components/navigation_links.html" %}')
+        for permissions in ([], ["rfqs.view"]):
+            with self.subTest(permissions=permissions):
+                rendered = template.render(
+                    Context(
+                        {
+                            "navigation_is_authenticated": True,
+                            "business_permission_codes": permissions,
+                        }
+                    )
+                )
+                self.assertEqual(rendered.count('data-nav-id="NAV-019"'), 1)
+                self.assertEqual(
+                    'href="/procurement/rfqs/"' in rendered, bool(permissions)
+                )
 
     def test_shared_breadcrumb_and_mobile_close_contract_are_present(self) -> None:
         template_root = Path(settings.BASE_DIR) / "templates"

@@ -21,6 +21,17 @@ class StyledForm(forms.Form):
             )
 
 
+class WorkingWeekdaysField(forms.TypedMultipleChoiceField):
+    """Named choices with compatibility for the original comma-separated input."""
+
+    def to_python(self, value):
+        if isinstance(value, (list, tuple)) and len(value) == 1:
+            value = value[0]
+        if isinstance(value, str):
+            value = [item.strip() for item in value.split(",") if item.strip()]
+        return super().to_python(value)
+
+
 class CalendarForm(StyledForm):
     code = forms.CharField(label="کد")
     name = forms.CharField(label="نام")
@@ -32,21 +43,22 @@ class CalendarForm(StyledForm):
         required=False,
         widget=forms.DateInput(attrs={"type": "date"}),
     )
-    working_weekdays = forms.CharField(
-        label="روزهای کاری ISO", help_text="نمونه: 1,2,3,4,5"
+    working_weekdays = WorkingWeekdaysField(
+        label="روزهای کاری",
+        choices=(
+            (6, "شنبه"),
+            (7, "یکشنبه"),
+            (1, "دوشنبه"),
+            (2, "سه‌شنبه"),
+            (3, "چهارشنبه"),
+            (4, "پنجشنبه"),
+            (5, "جمعه"),
+        ),
+        coerce=int,
+        widget=forms.CheckboxSelectMultiple(
+            attrs={"class": "grid grid-cols-2 gap-2 sm:grid-cols-4"}
+        ),
     )
-
-    def clean_working_weekdays(self):
-        try:
-            return [
-                int(value.strip())
-                for value in self.cleaned_data["working_weekdays"].split(",")
-                if value.strip()
-            ]
-        except ValueError as exc:
-            raise ValidationError(
-                "روزها را به‌شکل اعداد جداشده با ویرگول وارد کنید."
-            ) from exc
 
 
 class ShiftForm(StyledForm):

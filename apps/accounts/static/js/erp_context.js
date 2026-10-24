@@ -1,4 +1,31 @@
 (() => {
+    document.querySelectorAll("select[data-material-derived]").forEach((select) => {
+        const name = document.getElementById(select.dataset.materialNameField);
+        const unit = document.getElementById(select.dataset.materialUnitField);
+        const unitChoice = document.getElementById(select.dataset.materialUnitChoice);
+        if (!name || !unit || !unitChoice || [name, unit, unitChoice].some((field) => field.form !== select.form)) return;
+        let wasDerived = false;
+        const render = () => {
+            const option = select.selectedOptions[0];
+            const derived = Boolean(select.value && option?.dataset.materialName);
+            name.readOnly = derived;
+            unit.readOnly = derived;
+            unitChoice.disabled = derived;
+            if (derived) {
+                name.value = option.dataset.materialName;
+                unit.value = option.dataset.materialUnit;
+                unitChoice.value = option.dataset.materialUnitId;
+            } else if (wasDerived) {
+                name.value = "";
+                unit.value = "";
+                unitChoice.value = "";
+            }
+            wasDerived = derived;
+        };
+        select.addEventListener("change", render);
+        render();
+    });
+
     // Metadata is emitted only for choices already scoped by the server form.
     document.querySelectorAll("select[data-local-parent]").forEach((select) => {
         const parent = document.getElementById(select.dataset.localParent);
@@ -6,8 +33,11 @@
         const choices = [...select.options].map((option) => option.cloneNode(true));
         const render = () => {
             const previous = select.value;
+            const parentValue = select.dataset.localParentKey
+                ? parent.selectedOptions[0]?.dataset[select.dataset.localParentKey]
+                : parent.value;
             select.replaceChildren(...choices.filter((option) =>
-                !option.value || (parent.value && option.dataset.parentValue === parent.value)
+                !option.value || (parent.value && parentValue && option.dataset.parentValue === parentValue)
             ).map((option) => option.cloneNode(true)));
             select.value = [...select.options].some((option) => option.value === previous) ? previous : "";
             select.disabled = !parent.value;

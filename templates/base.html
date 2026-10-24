@@ -12,7 +12,7 @@
     <script src="{% static 'js/erp_jalali.js' %}?v=20261023-cep078-month-focus" defer></script>
     <script src="{% static 'js/erp_money.js' %}" defer></script>
     <script src="{% static 'js/erp_table.js' %}?v=20261023-cep078-associated-filters" defer></script>
-    <script src="{% static 'js/erp_context.js' %}?v=20261023-cep078-local-cascade" defer></script>
+    <script src="{% static 'js/erp_context.js' %}?v=20261024-uiux-derived-choices" defer></script>
     <style>
          :root {
             --erp-canvas: #f8fafc;
@@ -703,7 +703,7 @@
                     </div>
                 </details>
                 <a class="flex min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700" href="{% url 'organizations:select' %}"><svg class="h-4 w-4 shrink-0 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18M5 21V7h8v14m0-10h6v10M8 10h2m-2 4h2m-2 4h2m8-4h-2m2 4h-2"/></svg><span class="hidden text-slate-400 sm:inline">شرکت فعال:</span><span class="max-w-28 truncate sm:max-w-56">{{ request.organization.name|default:"انتخاب شرکت" }}</span></a>
-                {% if request.organization %}<form class="hidden min-w-0 flex-1 md:flex" method="get" action="{% url 'global_search' %}"><label class="sr-only" for="header-global-search">جستجوی مجاز</label><input id="header-global-search" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs" name="q" minlength="2" maxlength="100" autocomplete="off" placeholder="جستجوی پروژه و مصالح"></form>{% endif %}
+                {% if request.organization %}<form class="hidden min-w-0 flex-1 md:flex" method="get" action="{% url 'global_search' %}"><label class="sr-only" for="header-global-search">جستجوی پروژه و مصالح</label><input id="header-global-search" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs" name="q" minlength="2" maxlength="100" autocomplete="off" placeholder="جستجوی پروژه و مصالح"></form>{% endif %}
                 <div class="hidden h-5 w-px bg-slate-200 md:block"></div>
                 <span class="hidden text-[11px] text-slate-500 md:inline">سامانه جامع و یکپارچه مدیریت شرکت</span>
                 <a class="mr-auto flex items-center gap-2 rounded-lg border-r border-slate-200 py-1 pr-3 transition hover:bg-slate-50" href="{% url 'accounts:settings' %}" aria-label="تنظیمات شخصی">

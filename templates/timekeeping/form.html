@@ -7,7 +7,7 @@
     {% csrf_token %}
     {% if form.non_field_errors %}<div class="rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ form.non_field_errors }}</div>{% endif %}
     {% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
-    <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-5"><button class="erp-btn erp-btn--primary" type="submit">ثبت کنترل‌شده</button><a class="erp-btn erp-btn--secondary" href="{% url 'timekeeping:workbench' %}">بازگشت</a></div>
+    <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-5"><button class="erp-btn erp-btn--primary" type="submit">ذخیره {{ title }}</button><a class="erp-btn erp-btn--secondary" href="{% url 'timekeeping:workbench' %}">بازگشت</a></div>
   </form>
 </section>
 {% endblock %}

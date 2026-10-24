@@ -21,8 +21,7 @@
     </div></details>
     <details data-nav-id="NAV-017" class="erp-nav-group" open><summary><span>تأمین و تدارکات</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
         {% if "purchase_requests.view" in business_permission_codes %}<a data-nav-id="NAV-018" class="erp-nav-link{% if current_namespace == 'procurement' %} is-active{% endif %}" href="{% url 'procurement:request_list' %}">درخواست‌های خرید</a>{% endif %}
-        {% if "rfqs.view" in business_permission_codes %}<a data-nav-id="NAV-019" class="erp-nav-link{% if current_namespace == 'procurement' %} is-active{% endif %}" href="{% url 'procurement:rfq_list' %}">استعلام و انتخاب تأمین‌کننده</a>{% endif %}
-        <span data-nav-id="NAV-019" class="erp-nav-link is-unavailable" aria-disabled="true">استعلام و انتخاب تأمین‌کننده</span>
+        {% if "rfqs.view" in business_permission_codes %}<a data-nav-id="NAV-019" class="erp-nav-link{% if current_namespace == 'procurement' %} is-active{% endif %}" href="{% url 'procurement:rfq_list' %}">استعلام و انتخاب تأمین‌کننده</a>{% else %}<span data-nav-id="NAV-019" class="erp-nav-link is-unavailable" aria-disabled="true">استعلام و انتخاب تأمین‌کننده</span>{% endif %}
         {% if "purchase_orders.view" in business_permission_codes %}<a data-nav-id="NAV-020" class="erp-nav-link{% if current_namespace == 'procurement' %} is-active{% endif %}" href="{% url 'procurement:order_list' %}">سفارش‌های خرید</a>{% endif %}
         {% if "goods_receipts.view" in business_permission_codes %}<a data-nav-id="NAV-021" class="erp-nav-link{% if current_namespace == 'procurement' %} is-active{% endif %}" href="{% url 'procurement:receipt_list' %}">رسید کالا</a>{% endif %}
         {% if "materials.view" in business_permission_codes %}<a data-nav-id="NAV-022" class="erp-nav-link{% if current_namespace == 'materials' %} is-active{% endif %}" href="{% url 'materials:material_list' %}">مصالح و کالا</a>{% endif %}

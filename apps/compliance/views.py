@@ -307,14 +307,18 @@ def record_detail(request: HttpRequest, kind: str, record_id: str) -> HttpRespon
         message="اجازه مشاهده این رکورد HSE/QA را ندارید.",
     )
     transitions = list(TRANSITION_MAP[kind].get(record.status, set()))
+    status_labels = dict(record._meta.get_field("status").flatchoices)
     events = ComplianceLifecycleEvent.objects.filter(
         organization=request.organization,
         entity_type=model._meta.label_lower,
         entity_id=record.pk,
     ).select_related("actor")
+    for event in events:
+        event.from_label = status_labels.get(event.from_status, "—")
+        event.to_label = status_labels.get(event.to_status, "وضعیت ثبت‌شده")
     transition_forms = [
         (
-            status,
+            status_labels.get(status, "وضعیت ثبت‌شده"),
             TransitionForm(
                 initial={"expected_status": record.status, "to_status": status}
             ),

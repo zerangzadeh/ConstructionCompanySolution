@@ -1,7 +1,8 @@
 {% load form_accessibility %}
 <div class="erp-form-field{% if field.errors %} erp-form-field--invalid{% endif %}">
     <label class="mb-1.5 block text-sm font-medium text-slate-700" for="{{ field.id_for_label }}">
-        {% if field.name == "project" %}پروژه
+        {% if field|has_specific_label %}{{ field.label }}
+        {% elif field.name == "project" %}پروژه
         {% elif field.name == "site" %}کارگاه
         {% elif field.name == "phase" %}فاز
         {% elif field.name == "contract" %}قرارداد

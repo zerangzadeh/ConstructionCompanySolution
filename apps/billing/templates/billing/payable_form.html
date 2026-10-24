@@ -2,5 +2,5 @@
 {% block title %}{{ title }} | بنیرا{% endblock %}
 {% block content %}
 {% include "components/page_header.html" with page_eyebrow="کنترل تجاری پرداختنی" page_title=title page_description="اطلاعات فقط در دامنه سازمان و پروژه فعال ثبت می‌شود." only %}
-<section class="erp-surface mt-6 rounded-xl p-5"><form method="post" class="grid gap-4 md:grid-cols-2">{% csrf_token %}{% for field in form %}<div><label class="mb-1 block text-sm font-medium" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}<p class="mt-1 text-xs text-red-700">{{ field.errors|join:", " }}</p>{% endif %}</div>{% endfor %}{% if form.non_field_errors %}<div class="text-sm text-red-700 md:col-span-2">{{ form.non_field_errors }}</div>{% endif %}<button class="erp-button-primary md:col-span-2" type="submit">ثبت</button></form></section>
+<section class="erp-surface mt-6 rounded-xl p-5"><form method="post" class="grid gap-4 md:grid-cols-2">{% csrf_token %}{% include "components/form_errors.html" with form=form only %}{% for field in form %}{% if field.is_hidden %}{{ field }}{% else %}{% include "components/form_field.html" with field=field only %}{% endif %}{% endfor %}<button class="erp-btn erp-btn--primary md:col-span-2" type="submit">{{ title }}</button></form></section>
 {% endblock %}

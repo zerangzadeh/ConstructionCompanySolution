@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django import forms
 from django.core.exceptions import PermissionDenied
 
@@ -21,7 +23,7 @@ from apps.treasury.models import (
     TreasuryMovementKind,
     TreasuryMovementStatus,
 )
-from core.forms import JalaliDateMixin
+from core.forms import JalaliDateMixin, attach_parent_choice_ui
 
 from .commercial_services import get_compliance_evidence
 from .models import (
@@ -40,7 +42,7 @@ from .models import (
 )
 
 
-class _CommercialEvidenceForm(forms.Form):
+class _CommercialEvidenceForm(JalaliDateMixin, forms.Form):
     def _configure_create(
         self,
         *,
@@ -277,6 +279,8 @@ class RetentionReleaseForm(_CommercialEvidenceForm):
         except PermissionDenied:
             pass
 
+        attach_parent_choice_ui(self, "clearance_evidence", "contract", "contract_id")
+
 
 class RetentionReleaseCorrectionForm(_CommercialEvidenceForm):
     correction_kind = forms.ChoiceField(
@@ -360,10 +364,25 @@ class ContractorComplianceAssessmentForm(forms.Form):
             status="approved",
         ).select_related("contract")
 
+        attach_parent_choice_ui(
+            self,
+            "clearance_evidence",
+            "source_certificate",
+            "contract_id",
+            parent_value_attribute="contract_id",
+        )
+
 
 class StatutorySubmissionForm(forms.Form):
-    idempotency_key = forms.CharField(label="کلید تکرارناپذیری", max_length=255)
-    correlation_id = forms.UUIDField(label="شناسه همبستگی")
+    idempotency_key = forms.CharField(
+        label="کلید تکرارناپذیری",
+        max_length=255,
+        widget=forms.HiddenInput,
+        initial=uuid4,
+    )
+    correlation_id = forms.UUIDField(
+        label="شناسه همبستگی", widget=forms.HiddenInput, initial=uuid4
+    )
 
 
 class SubmissionResolutionForm(forms.Form):
@@ -413,7 +432,7 @@ class ClaimSettlementAllocationForm(JalaliDateMixin, forms.Form):
         return self.cleaned_data["reason"].strip()
 
 
-class PayableMeasurementForm(forms.Form):
+class PayableMeasurementForm(JalaliDateMixin, forms.Form):
     contract_item = forms.ModelChoiceField(
         label="ردیف پیمان جزء", queryset=ContractItem.objects.none()
     )
@@ -451,7 +470,7 @@ class PayableMeasurementForm(forms.Form):
         )
 
 
-class PayableCertificateForm(forms.Form):
+class PayableCertificateForm(JalaliDateMixin, forms.Form):
     contract = forms.ModelChoiceField(
         label="پیمان جزء", queryset=Contract.objects.none()
     )

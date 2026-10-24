@@ -17,7 +17,7 @@ from apps.organizations.models import (
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project
 from apps.treasury.models import PaymentRequest, TreasuryAccount, TreasuryAccountStatus
-from core.forms import JalaliDateMixin
+from core.forms import JalaliDateMixin, attach_parent_choice_ui
 
 
 class MovementForm(JalaliDateMixin, forms.Form):
@@ -81,6 +81,7 @@ class MovementForm(JalaliDateMixin, forms.Form):
         self.fields["origin_request"].label_from_instance = lambda item: (
             f"{item.purpose[:60]} · {item.amount} ریال"
         )
+        attach_parent_choice_ui(self, "origin_request", "project", "project_id")
 
 
 class MovementPostForm(forms.Form):

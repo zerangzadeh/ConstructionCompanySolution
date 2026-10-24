@@ -1,8 +1,15 @@
 from __future__ import annotations
 
 from django import template
+from django.forms.utils import pretty_name
 
 register = template.Library()
+
+
+@register.filter
+def has_specific_label(field):
+    """Preserve domain labels; translate only Django's generated field names."""
+    return field.label != pretty_name(field.name)
 
 
 @register.simple_tag

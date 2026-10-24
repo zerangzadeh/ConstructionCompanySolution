@@ -167,6 +167,23 @@ class DailyReportEquipmentEntryForm(_DailyReportEntryForm):
         }
 
 
+class MaterialEntrySelect(forms.Select):
+    """Expose the selected authorized material's existing name and unit."""
+
+    def create_option(self, name, value, label, selected, index, **kwargs):
+        option = super().create_option(name, value, label, selected, index, **kwargs)
+        if value and hasattr(value, "instance"):
+            material = value.instance
+            option["attrs"].update(
+                {
+                    "data-material-name": material.name,
+                    "data-material-unit": material.unit_of_measure.symbol,
+                    "data-material-unit-id": str(material.unit_of_measure_id),
+                }
+            )
+        return option
+
+
 class DailyReportMaterialEntryForm(_DailyReportEntryForm):
     class Meta:
         model = DailyReportMaterialEntry
@@ -194,7 +211,7 @@ class DailyReportMaterialEntryForm(_DailyReportEntryForm):
                 organization_id=organization_id,
                 archived_at__isnull=True,
                 is_active=True,
-            )
+            ).select_related("unit_of_measure")
             self.fields["unit_of_measure"].queryset = UnitOfMeasure.objects.filter(
                 organization_id=organization_id,
                 archived_at__isnull=True,
@@ -202,6 +219,17 @@ class DailyReportMaterialEntryForm(_DailyReportEntryForm):
             )
         self.fields["material"].required = False
         self.fields["unit_of_measure"].required = False
+        field = self.fields["material"]
+        field.widget = MaterialEntrySelect(
+            attrs={
+                **field.widget.attrs,
+                "data-material-derived": "true",
+                "data-material-name-field": self["material_name"].id_for_label,
+                "data-material-unit-field": self["unit"].id_for_label,
+                "data-material-unit-choice": self["unit_of_measure"].id_for_label,
+            },
+            choices=field.choices,
+        )
 
     def clean(self) -> dict[str, object]:
         cleaned_data = super().clean()

@@ -57,6 +57,8 @@ from .models import (
     ContractComplianceEvidence,
     ContractGuarantee,
     ContractorComplianceAssessment,
+    GuaranteeExposureSide,
+    GuaranteeType,
     PayableCertificate,
     PayableMeasurement,
     ProgressClaim,
@@ -731,6 +733,8 @@ def commercial_control_dashboard(request: HttpRequest) -> HttpResponse:
         request,
         "billing/commercial_control_dashboard.html",
         {
+            "exposure_side_choices": GuaranteeExposureSide.choices,
+            "guarantee_type_choices": GuaranteeType.choices,
             "exposure": commercial_exposure(
                 actor=request.user, organization=request.organization
             ),
