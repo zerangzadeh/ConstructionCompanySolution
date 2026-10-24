@@ -8,12 +8,12 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
-from apps.documents.models import DocumentVersion
 from apps.organizations.authorization import require_business_permission, scope_queryset
 from apps.organizations.decorators import active_organization_required
 from apps.organizations.models import BusinessPermissionCode
 from apps.projects.models import Project
 from apps.reporting.catalog import METRIC_SPECS
+from apps.reporting.closeout_ui import CloseoutEvidenceForm, closeout_presentation
 from apps.reporting.models import (
     MetricDefinition,
     ProjectCloseoutCase,
@@ -274,7 +274,11 @@ def project_closeout_detail(request: HttpRequest, case_id: str) -> HttpResponse:
         organization=request.organization, actor=request.user, case_id=case_id
     )
     return _private(
-        render(request, "reporting/project_closeout_detail.html", {"case": case})
+        render(
+            request,
+            "reporting/project_closeout_detail.html",
+            {"case": case, **closeout_presentation(case=case, actor=request.user)},
+        )
     )
 
 
@@ -355,11 +359,16 @@ def project_closeout_reopen(request: HttpRequest, case_id: str) -> HttpResponse:
 @active_organization_required
 def project_closeout_evidence(request: HttpRequest, case_id: str) -> HttpResponse:
     case = _closeout_case_from_request(request, case_id)
-    document_version = DocumentVersion.objects.filter(
-        organization=request.organization, pk=request.POST.get("document_version_id")
-    ).first()
-    if document_version is None:
-        raise PermissionDenied("نسخه سند در شرکت فعال یافت نشد.")
+    form = CloseoutEvidenceForm(
+        request.POST, organization=request.organization, actor=request.user
+    )
+    if not form.is_valid():
+        messages.error(
+            request,
+            "سند/نسخه یا هدف شاهد معتبر نیست؛ نسخه مجاز و هدف شاهد را انتخاب کنید.",
+        )
+        return redirect("reporting:project_closeout_detail", case_id=case.pk)
+    document_version = form.cleaned_data["document_version_id"]
     item = None
     if request.POST.get("item_id"):
         item = ProjectCloseoutItemSnapshot.objects.filter(
@@ -373,7 +382,7 @@ def project_closeout_evidence(request: HttpRequest, case_id: str) -> HttpRespons
         case=case,
         actor=request.user,
         document_version=document_version,
-        evidence_role=request.POST.get("evidence_role", "closeout_support"),
+        evidence_role=form.cleaned_data["evidence_role"],
         item=item,
     )
     messages.success(request, "پین دقیق نسخه سند ثبت شد؛ بایت سند در DMS باقی ماند.")

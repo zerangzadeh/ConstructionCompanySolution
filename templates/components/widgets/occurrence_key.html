@@ -1,0 +1,7 @@
+<input type="hidden" name="{{ widget.name }}" value="{{ widget.value|default_if_none:'' }}" id="{{ widget.attrs.id }}">
+<details class="rounded-lg border border-slate-200 p-3">
+  <summary class="cursor-pointer text-sm font-medium">ثبت از منبع موجود / حفظ مرجع قبلی (اختیاری)</summary>
+  <label class="mt-2 block text-sm" for="{{ widget.attrs.id }}_existing">مرجع منبع موجود</label>
+  <input type="text" name="{{ widget.name }}_existing" id="{{ widget.attrs.id }}_existing" class="mt-1 w-full rounded-lg border border-slate-300 p-2" dir="ltr" maxlength="{{ widget.attrs.maxlength|default:'120' }}">
+  <p class="mt-2 text-sm text-slate-600">{{ occurrence_help }}</p>
+</details>

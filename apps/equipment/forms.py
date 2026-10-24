@@ -10,6 +10,7 @@ from apps.equipment.p8_models import (
     CostPolicyStatus,
     EquipmentCostAllocation,
     EquipmentCostPolicyVersion,
+    EquipmentCostSourceEnvelope,
     EquipmentMeter,
     EquipmentUsageLog,
     MaintenancePlan,
@@ -27,6 +28,7 @@ from apps.parties.models import BusinessParty
 from apps.projects.models import Project, ProjectSite
 from apps.workforce.models import Employee, EmployeeQualification
 from core.forms import JalaliDateMixin, attach_parent_choice_ui
+from core.ui_forms import initialize_occurrence_key
 
 
 class _StyledForm(JalaliDateMixin, forms.Form):
@@ -331,6 +333,7 @@ class MeterReadingForm(_StyledForm):
 
     def __init__(self, *args, organization, **kwargs):
         super().__init__(*args, **kwargs)
+        initialize_occurrence_key(self, "source_key")
         self.fields["meter"].queryset = EquipmentMeter.objects.filter(
             organization=organization, is_active=True
         )
@@ -357,6 +360,7 @@ class UsageForm(_StyledForm):
 
     def __init__(self, *args, organization, **kwargs):
         super().__init__(*args, **kwargs)
+        initialize_occurrence_key(self, "source_key")
         self.fields["equipment"].queryset = Equipment.objects.filter(
             organization=organization, archived_at__isnull=True
         )
@@ -376,6 +380,7 @@ class FuelForm(_StyledForm):
 
     def __init__(self, *args, organization, **kwargs):
         super().__init__(*args, **kwargs)
+        initialize_occurrence_key(self, "source_key")
         self.fields["equipment"].queryset = Equipment.objects.filter(
             organization=organization, archived_at__isnull=True
         )
@@ -519,6 +524,7 @@ class CostAllocationForm(_StyledForm):
 
     def __init__(self, *args, organization, **kwargs):
         super().__init__(*args, **kwargs)
+        initialize_occurrence_key(self, "source_key")
         self.fields["usage"].queryset = EquipmentUsageLog.objects.filter(
             organization=organization, deployment__isnull=False
         ).select_related("equipment", "deployment")
@@ -528,13 +534,38 @@ class CostHandoffForm(_StyledForm):
     allocation = forms.ModelChoiceField(
         label="تخصیص نهایی", queryset=EquipmentCostAllocation.objects.none()
     )
-    occurrence_key = forms.CharField(label="کلید پیشنهاد", max_length=140)
+    occurrence_key = forms.CharField(
+        label="مرجع پیشنهاد", max_length=140, required=False
+    )
 
     def __init__(self, *args, organization, **kwargs):
         super().__init__(*args, **kwargs)
+        self.organization = organization
+        initialize_occurrence_key(
+            self,
+            "occurrence_key",
+            generate=False,
+            help_text="مرجع پیشنهاد از تخصیص نهایی انتخاب‌شده تعیین می‌شود. ارسال دوباره همان تخصیص، همان پیشنهاد را نگه می‌دارد. برای سازگاری با مرجع بیرونی موجود، آن را در بالا وارد کنید.",
+        )
         self.fields["allocation"].queryset = EquipmentCostAllocation.objects.filter(
             organization=organization, status="finalized"
         )
+
+    def clean(self):
+        data = super().clean()
+        allocation = data.get("allocation")
+        if allocation and not data.get("occurrence_key"):
+            existing = EquipmentCostSourceEnvelope.objects.filter(
+                organization=self.organization,
+                allocation=allocation,
+                consumer="project_cost",
+            ).first()
+            data["occurrence_key"] = (
+                existing.occurrence_key
+                if existing
+                else f"equipment:project_cost:{allocation.pk}"
+            )
+        return data
 
 
 class CostAllocationReversalForm(_StyledForm):
@@ -542,6 +573,15 @@ class CostAllocationReversalForm(_StyledForm):
     reversal_source_key = forms.CharField(
         label="کلید برگشت", max_length=120, required=False
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        initialize_occurrence_key(
+            self,
+            "reversal_source_key",
+            generate=False,
+            help_text="مرجع برگشت به‌طور پیش‌فرض از تخصیص اصلی تعیین می‌شود. فقط برای حفظ مرجع برگشت موجود، آن را در بالا وارد کنید.",
+        )
 
 
 class CostReconciliationForm(_StyledForm):

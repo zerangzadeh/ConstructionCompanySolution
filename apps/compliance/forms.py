@@ -21,6 +21,7 @@ from apps.documents.models import DocumentVersion
 from apps.organizations.models import MembershipStatus, Organization
 from apps.projects.models import Project, ProjectSite
 from core.forms import JalaliDateMixin, attach_parent_choice_ui
+from core.ui_forms import StructuredDataWidget
 
 
 class StyledForm(JalaliDateMixin):
@@ -75,6 +76,11 @@ class TemplatePublishForm(StyledForm, forms.Form):
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            field.widget = StructuredDataWidget(
+                empty_value="{}" if name == "outcome_rules" else "[]"
+            )
+            field.help_text = "ساختار و نام‌های مستند موجود را وارد کنید؛ این ویرایشگر معنای قاعده یا الزام جدیدی تعیین نمی‌کند. نسخه‌های منتشرشده تغییر نمی‌کنند."
         self.style()
 
 

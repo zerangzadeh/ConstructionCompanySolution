@@ -27,19 +27,19 @@ status_precedence:
 - Original static/runtime finding status
 summary:
   total_findings: 135
-  resolved_explicitly: 96
-  remaining_not_explicitly_closed: 39
+  resolved_explicitly: 105
+  remaining_not_explicitly_closed: 30
   remaining_by_severity:
     MEDIUM: 14
-    HIGH: 25
+    HIGH: 16
   master_status_counts:
-    RESOLVED: 96
+    RESOLVED: 105
     DEFERRED_NON_UAT_BLOCKING: 30
-    PRODUCT_DECISION_REQUIRED: 9
+    PRODUCT_DECISION_REQUIRED: 0
   codex_action_counts:
-    SKIP_RESOLVED: 96
+    SKIP_RESOLVED: 105
     POST_UAT_CLOSURE: 30
-    STOP_FOR_PRODUCT_DECISION: 9
+    STOP_FOR_PRODUCT_DECISION: 0
   known_register_header_issue: UIUX_FINDINGS_REGISTER.yaml header counts/status are historical/stale; actual reconciled scope
     is F-001 through F-135.
   ux_ready_for_uat: NOT_ISSUED
@@ -1875,9 +1875,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: NOT_EVALUATED
-  master_status: PRODUCT_DECISION_REQUIRED
-  codex_action: STOP_FOR_PRODUCT_DECISION
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Explicit Human option A approval; bounded Stage 3A implementation and focused validation recorded below.
   problem: The project-closeout detail behaves like a control/evidence console, exposing hashes, source-domain codes, revision internals and raw
     workflow transitions in the primary UI.
   user_impact: A project closeout reviewer sees the implementation/control model instead of a clear readiness checklist explaining which closeout
@@ -1918,6 +1918,27 @@ findings:
       does not establish an accountable human owner or new blocker/next-action projection.
     initial_decision_rationale: Approve the closeout owner/responsibility and source-owned blocker/action projection contract
       before adding ownership or task-routing meaning. Keep this projection from becoming domain-closeout authority.
+  stage3a_implementation:
+    recorded_on: '2026-10-24'
+    human_decision: 045-A explicitly approved in this chat; implemented within that bounded choice
+    baseline_head: 3034861b438d2d1d005fe437cbe70d6c078db95b
+    implementation: Business readiness checklist uses existing Persian family names, recorded outcomes and source-domain
+      responsibility. Human owner and prescribed next action are explicitly unavailable. Existing readable DMS evidence
+      is linked; hashes, raw states, codes and snapshot summaries are audit disclosure only, with existing sensitive-data
+      masks.
+    changed_paths:
+    - apps/reporting/closeout_ui.py
+    - apps/reporting/views.py
+    - templates/reporting/project_closeout_detail.html
+    validation: Closeout GET before/after assessment, Persian checklist, evidence visibility and sensitive-hash masking
+      PASS; 15 existing closeout regression tests PASS. No source-domain transition or ownership/routing contract
+      added.
+    shared_validation: Stage 3A focused tests 17/17 PASS; related regressions 31 PASS, 3 attributed baseline authorization-fixture
+      failures; isolated Chromium interaction assertions 15/15 PASS. Django checks, changed-code Ruff lint/format,
+      page/widget compilation, JS syntax and Django static discovery PASS.
+    test_path: tests/test_uiux_stage3a.py
+    closure: RESOLVED against the explicitly approved minimum. No UAT execution, readiness certification, CEP/Gate/EXT
+      change, migration, immutable-history rewrite or Git write.
 - finding_id: UIUX-F-046
   module: Reporting
   surface_id: SURF-163
@@ -1928,9 +1949,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: NOT_EVALUATED
-  master_status: PRODUCT_DECISION_REQUIRED
-  codex_action: STOP_FOR_PRODUCT_DECISION
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Explicit Human option A approval; bounded Stage 3A implementation and focused validation recorded below.
   problem: The closeout evidence form requires the user to type a raw DMS document-version identifier and an evidence-role code.
   user_impact: Business reviewers must know internal DMS version IDs and evidence-role codes to attach closeout evidence, making an ordinary evidence-linking
     task technical and error-prone.
@@ -1970,6 +1991,25 @@ findings:
       replacing the free evidence-role string with a governed purpose catalogue/custom-role policy.
     initial_decision_rationale: Approve the evidence-purpose catalogue/custom-role compatibility and the document-version discovery
       contract (including historical/sensitive versions) before substituting selectors or restricting existing roles.
+  stage3a_implementation:
+    recorded_on: '2026-10-24'
+    human_decision: 046-A explicitly approved in this chat; implemented within that bounded choice
+    baseline_head: 3034861b438d2d1d005fe437cbe70d6c078db95b
+    implementation: Authorized DMS document/exact-version picker includes safe historical versions within existing
+      document visibility. Existing closeout_support is the labeled default; explicit custom purposes and legacy evidence_role
+      submissions remain compatible. Canonical link service and exact version/hash pin remain unchanged.
+    changed_paths:
+    - apps/reporting/closeout_ui.py
+    - apps/reporting/views.py
+    - templates/reporting/project_closeout_detail.html
+    validation: Authorized historical-version selection and exact hash pin, custom-purpose/legacy compatibility, unlinked/foreign
+      document exclusion, unsafe version exclusion and missing membership denial PASS.
+    shared_validation: Stage 3A focused tests 17/17 PASS; related regressions 31 PASS, 3 attributed baseline authorization-fixture
+      failures; isolated Chromium interaction assertions 15/15 PASS. Django checks, changed-code Ruff lint/format,
+      page/widget compilation, JS syntax and Django static discovery PASS.
+    test_path: tests/test_uiux_stage3a.py
+    closure: RESOLVED against the explicitly approved minimum. No UAT execution, readiness certification, CEP/Gate/EXT
+      change, migration, immutable-history rewrite or Git write.
 - finding_id: UIUX-F-047
   module: Reporting
   surface_id: SURF-163
@@ -2464,9 +2504,9 @@ findings:
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: 'DOMAIN_RESOLUTION_VERIFIED_NO_EXPLICIT_FINDING_CLOSURE: Approved Timesheet producer, explicit quantity mapping and
     server-derived immutable input provenance implemented and verified under D02.'
-  master_status: PRODUCT_DECISION_REQUIRED
-  codex_action: STOP_FOR_PRODUCT_DECISION
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Explicit Human option A approval; bounded Stage 3A implementation and focused validation recorded below.
   problem: Several normal payroll forms require operators to enter implementation/control metadata such as raw JSON snapshots, source versions/statuses
     and idempotency keys.
   user_impact: Payroll staff are required to behave like integration/debug operators and manually provide metadata that should normally be derived
@@ -2502,6 +2542,29 @@ findings:
       inputs before replacing those contracts. No statutory source values or mappings invented.
     validation: Current-source review only; no fabricated business schema, source, financial default or domain execution.
     original_status_basis: wave_c_domain_resolution_addendum affected_findings; no explicit closure
+  stage3a_implementation:
+    recorded_on: '2026-10-24'
+    human_decision: 059-A explicitly approved in this chat; implemented within that bounded choice
+    baseline_head: 3034861b438d2d1d005fe437cbe70d6c078db95b
+    implementation: Existing payroll evidence and identity objects use schema-neutral structured editing. Reversal/export
+      local retry keys are hidden and retained on resubmission. Export outcome, artifact name, provider references
+      and error evidence remain manual with business labels; supplied correlation references are retained and only
+      an absent reference falls back to the local attempt key.
+    changed_paths:
+    - apps/payroll/forms.py
+    - templates/payroll/form.html
+    - core/ui_forms.py
+    - templates/components/widgets/structured_data.html
+    - apps/accounts/static/js/structured-data.js
+    validation: Retry-key retention, supplied external correlation preservation, object-contract compatibility and
+      widget rendering PASS. Structured editor browser assertions preserve nesting, numeric lexemes, booleans/nulls
+      and technical-input compatibility. No statutory values, source mapping, export outcome or new privilege inferred.
+    shared_validation: Stage 3A focused tests 17/17 PASS; related regressions 31 PASS, 3 attributed baseline authorization-fixture
+      failures; isolated Chromium interaction assertions 15/15 PASS. Django checks, changed-code Ruff lint/format,
+      page/widget compilation, JS syntax and Django static discovery PASS.
+    test_path: tests/test_uiux_stage3a.py
+    closure: RESOLVED against the explicitly approved minimum. No UAT execution, readiness certification, CEP/Gate/EXT
+      change, migration, immutable-history rewrite or Git write.
 - finding_id: UIUX-F-060
   module: Procurement Supplier Portal
   surface_id: SURF-273
@@ -2561,9 +2624,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: PRODUCT_DECISION_REQUIRED
-  codex_action: STOP_FOR_PRODUCT_DECISION
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Explicit Human option A approval; bounded Stage 3A implementation and focused validation recorded below.
   problem: Equipment operational forms require users to type source keys and other provenance references that the system could generate or derive.
   user_impact: Operators recording meter readings, usage or fuel are burdened with provenance mechanics unrelated to the physical operation they
     are recording.
@@ -2590,6 +2653,30 @@ findings:
       Replacing supplied provenance with fresh random keys could change duplicate recognition.
     validation: Current-source review only; no fabricated business schema, source, financial default or domain execution.
     original_status_basis: finding original/latest stored status only
+  stage3a_implementation:
+    recorded_on: '2026-10-24'
+    human_decision: 061-A explicitly approved in this chat; implemented within that bounded choice
+    baseline_head: 3034861b438d2d1d005fe437cbe70d6c078db95b
+    implementation: Manual meter/usage/fuel forms generate one internal source key per new form and retain it through
+      validation/resubmission. A separate new form is a separate occurrence. Explicit existing-source disclosure preserves
+      supplied external/legacy provenance keys; existing services and duplicate recognition remain unchanged.
+    changed_paths:
+    - apps/equipment/forms.py
+    - core/ui_forms.py
+    - templates/components/widgets/occurrence_key.html
+    validation: Real form-to-service meter/usage/fuel checks prove same-key retries return the original record and
+      separately opened forms create distinct occurrences. Missing-key validation and explicit supplied-source compatibility
+      PASS.
+    baseline_test_debt: Two existing P8EquipmentOperationsTests fail unchanged require_business_permission before
+      any changed form/UI code. EquipmentTestBase creates legacy memberships without explicit scope grants; fixture,
+      service and authorization paths match HEAD. The new form-to-service tests use explicit role assignments/scope
+      and PASS; no baseline fixture or permission system changed.
+    shared_validation: Stage 3A focused tests 17/17 PASS; related regressions 31 PASS, 3 attributed baseline authorization-fixture
+      failures; isolated Chromium interaction assertions 15/15 PASS. Django checks, changed-code Ruff lint/format,
+      page/widget compilation, JS syntax and Django static discovery PASS.
+    test_path: tests/test_uiux_stage3a.py
+    closure: RESOLVED against the explicitly approved minimum. No UAT execution, readiness certification, CEP/Gate/EXT
+      change, migration, immutable-history rewrite or Git write.
 - finding_id: UIUX-F-062
   module: Compliance
   surface_id: SURF-354
@@ -2714,9 +2801,9 @@ findings:
   priority: HOLD-HUMAN
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: RUNTIME_CONFIRMED
-  master_status: PRODUCT_DECISION_REQUIRED
-  codex_action: STOP_FOR_PRODUCT_DECISION
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Explicit Human option A approval; bounded Stage 3A implementation and focused validation recorded below.
   problem: The canonical Home is intentionally implemented as a permission-aware directory of destinations rather than a role-aware operational
     dashboard.
   user_impact: After login, users are told where they may go but not what needs attention, what changed, which tasks are due, or which project/process
@@ -2763,6 +2850,23 @@ findings:
       contract before adding KPIs, urgency, recent activity or workload facts.'
     validation: Current composition/producer review only; no Home domain queries or permission changes.
     original_status_basis: latest finding runtime_revalidation_history disposition
+  stage3a_implementation:
+    recorded_on: '2026-10-24'
+    human_decision: 065-A explicitly approved in this chat; implemented within that bounded choice
+    baseline_head: 3034861b438d2d1d005fe437cbe70d6c078db95b
+    implementation: Human accepts a task-first launch page as the UAT Home. Active organization remains visible; existing
+      permitted assigned-work and notification links precede workspaces. No KPI, urgency, recent activity, workload
+      fact or domain summary query introduced.
+    changed_paths:
+    - templates/home.html
+    validation: Task/notification ordering render check PASS; existing Home authorization/state regression tests 12/12
+      PASS. Permission-aware navigation producer remains unchanged.
+    shared_validation: Stage 3A focused tests 17/17 PASS; related regressions 31 PASS, 3 attributed baseline authorization-fixture
+      failures; isolated Chromium interaction assertions 15/15 PASS. Django checks, changed-code Ruff lint/format,
+      page/widget compilation, JS syntax and Django static discovery PASS.
+    test_path: tests/test_uiux_stage3a.py
+    closure: RESOLVED against the explicitly approved minimum. No UAT execution, readiness certification, CEP/Gate/EXT
+      change, migration, immutable-history rewrite or Git write.
 - finding_id: UIUX-F-066
   module: Core / Home
   surface_id: SURF-001
@@ -3001,9 +3105,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: PRODUCT_DECISION_REQUIRED
-  codex_action: STOP_FOR_PRODUCT_DECISION
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Explicit Human option A approval; bounded Stage 3A implementation and focused validation recorded below.
   problem: Performance evaluation requires the HR user to enter a non-empty JSON object as «شواهد معیارها».
   user_impact: A business HR process is exposed as raw structured-data entry, making evaluation setup error-prone and inaccessible to normal HR
     users.
@@ -3032,6 +3136,27 @@ findings:
       a business-specific structured editor is introduced.
     validation: Current-source review only; no fabricated business schema, source, financial default or domain execution.
     original_status_basis: finding original/latest stored status only
+  stage3a_implementation:
+    recorded_on: '2026-10-24'
+    human_decision: 071-A explicitly approved in this chat; implemented within that bounded choice
+    baseline_head: 3034861b438d2d1d005fe437cbe70d6c078db95b
+    implementation: Criteria/evidence use a schema-neutral name/value editor supporting existing nested types. Existing
+      non-empty object validation and immutable evaluation storage remain authoritative. No criterion, score, rating,
+      weight or HR rubric is prescribed.
+    changed_paths:
+    - apps/workforce/forms.py
+    - templates/workforce/foundation_form.html
+    - core/ui_forms.py
+    - templates/components/widgets/structured_data.html
+    - apps/accounts/static/js/structured-data.js
+    validation: Existing arbitrary nested criteria object passes the unchanged field contract; page/widget compilation
+      and structured-editor browser interaction assertions PASS. Models/services and existing snapshots unchanged.
+    shared_validation: Stage 3A focused tests 17/17 PASS; related regressions 31 PASS, 3 attributed baseline authorization-fixture
+      failures; isolated Chromium interaction assertions 15/15 PASS. Django checks, changed-code Ruff lint/format,
+      page/widget compilation, JS syntax and Django static discovery PASS.
+    test_path: tests/test_uiux_stage3a.py
+    closure: RESOLVED against the explicitly approved minimum. No UAT execution, readiness certification, CEP/Gate/EXT
+      change, migration, immutable-history rewrite or Git write.
 - finding_id: UIUX-F-072
   module: Billing
   surface_id: SURF-109
@@ -3341,9 +3466,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: PRODUCT_DECISION_REQUIRED
-  codex_action: STOP_FOR_PRODUCT_DECISION
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Explicit Human option A approval; bounded Stage 3A implementation and focused validation recorded below.
   problem: Work Order Equipment and Maintenance Plan are independent organization-wide selections; related cost/handoff forms also ask users to
     manually create source/occurrence keys.
   user_impact: Maintenance users can pair a plan with the wrong equipment at interaction time, while cost operators are burdened with technical
@@ -3371,6 +3496,31 @@ findings:
       do not generate competing cost facts or financial source semantics.
     validation: Current-source review only; no fabricated business schema, source, financial default or domain execution.
     original_status_basis: finding original/latest stored status only
+  stage3a_implementation:
+    recorded_on: '2026-10-24'
+    human_decision: 078-A explicitly approved in this chat; implemented within that bounded choice
+    baseline_head: 3034861b438d2d1d005fe437cbe70d6c078db95b
+    implementation: New manual allocation forms retain one generated occurrence identity through resubmission; separate
+      forms remain separate allocations. Handoff reuses the allocation existing proposal identity, otherwise uses
+      a stable allocation-derived identity. Reversal leaves the key absent to use the existing service default. Supplied
+      keys, existing cascade, corrections and service conflict checks remain compatible.
+    changed_paths:
+    - apps/equipment/forms.py
+    - core/ui_forms.py
+    - templates/components/widgets/occurrence_key.html
+    validation: Real form-to-service checks prove allocation retry reuse, independent finalization requirement, one
+      handoff across repeated forms, default reversal identity/retry reuse and equal negative reversal amount. JournalEntry
+      and ProjectCostFact counts unchanged. Supplied proposal identity compatibility PASS.
+    baseline_test_debt: Existing P8CostAndFixedAssetTests.test_equipment_cost_is_conserved_proposal_with_no_actual_or_journal
+      fails unchanged authorization in create_cost_policy before any changed form/UI code. Its inherited legacy membership
+      fixture has no explicit scope; fixture/service/authorization paths match HEAD. New explicit-role/scope cost
+      form-to-service regression PASS; no financial/domain service or old fixture changed.
+    shared_validation: Stage 3A focused tests 17/17 PASS; related regressions 31 PASS, 3 attributed baseline authorization-fixture
+      failures; isolated Chromium interaction assertions 15/15 PASS. Django checks, changed-code Ruff lint/format,
+      page/widget compilation, JS syntax and Django static discovery PASS.
+    test_path: tests/test_uiux_stage3a.py
+    closure: RESOLVED against the explicitly approved minimum. No UAT execution, readiness certification, CEP/Gate/EXT
+      change, migration, immutable-history rewrite or Git write.
 - finding_id: UIUX-F-079
   module: Commercial
   surface_id: SURF-103
@@ -3422,9 +3572,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: PRODUCT_DECISION_REQUIRED
-  codex_action: STOP_FOR_PRODUCT_DECISION
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Explicit Human option A approval; bounded Stage 3A implementation and focused validation recorded below.
   problem: Knowledge workflows require users to type raw source/consumer UUIDs and even comma-formatted `type,uuid` lines to express business
     references.
   user_impact: Knowledge users must understand internal object types and identifiers rather than selecting the observation, inspection, support
@@ -3469,6 +3619,35 @@ findings:
         the currently open-ended reuse inputs; do not invent consumer ownership or broaden source access.
       validation: Current-source review only; no fabricated business schema, source, financial default or domain execution.
     original_status_basis: finding original/latest stored status only
+  stage3a_implementation:
+    recorded_on: '2026-10-24'
+    human_decision: 080-A explicitly approved in this chat; implemented within that bounded choice
+    baseline_head: 3034861b438d2d1d005fe437cbe70d6c078db95b
+    implementation: Source/consumer grouped selectors use only registered types and existing source-workspace permission,
+      tenant, object/project/site and identity-label boundaries. Support remains requester-owned. Source/version identifiers
+      are derived from selection; consumer versions are validated against current choices. Recurrence uses ordered
+      structured source rows. Legacy ID/version/encoded submissions still reach unchanged authoritative resolvers.
+    changed_paths:
+    - apps/knowledge/forms.py
+    - apps/knowledge/reference_ui.py
+    - apps/knowledge/views.py
+    - apps/knowledge/templates/knowledge/publication_detail.html
+    - apps/knowledge/templates/knowledge/recurrence.html
+    - apps/knowledge/templates/knowledge/reference_rows.html
+    - apps/accounts/static/js/reference-rows.js
+    validation: Requester/tenant/final-source-state/default-denial boundaries, nonfinal consumer compatibility, derived
+      identities/versions, forged/stale selection denial, legacy submissions and recurrence row payloads PASS. Four
+      existing Knowledge tenant/history/denial regressions PASS; browser row add/remove/order assertions PASS.
+    source_implementation_note: Existing partner_qualification.services.scoped_evaluations omits require_business_permission
+      mandatory message. Presentation discovery applies exactly its declared permission, organization queryset and
+      project/site scope with the required message; that unrelated domain helper remains unchanged. No generic unscoped
+      model enumeration or access expansion.
+    shared_validation: Stage 3A focused tests 17/17 PASS; related regressions 31 PASS, 3 attributed baseline authorization-fixture
+      failures; isolated Chromium interaction assertions 15/15 PASS. Django checks, changed-code Ruff lint/format,
+      page/widget compilation, JS syntax and Django static discovery PASS.
+    test_path: tests/test_uiux_stage3a.py
+    closure: RESOLVED against the explicitly approved minimum. No UAT execution, readiness certification, CEP/Gate/EXT
+      change, migration, immutable-history rewrite or Git write.
 - finding_id: UIUX-F-081
   module: Billing
   surface_id: SHARED-BILLING-COMPLIANCE-FORMS
@@ -4063,9 +4242,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: PRODUCT_DECISION_REQUIRED
-  codex_action: STOP_FOR_PRODUCT_DECISION
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Explicit Human option A approval; bounded Stage 3A implementation and focused validation recorded below.
   problem: Inspection-template publication requires administrators to enter checklist, required evidence, outcome rules and source references
     as raw JSON structures.
   user_impact: Even a specialist compliance administrator must author process configuration as serialized data rather than structured checklist/evidence/rule
@@ -4094,6 +4273,29 @@ findings:
       inventing a checklist/rules editor or changing rule meanings.
     validation: Current-source review only; no fabricated business schema, source, financial default or domain execution.
     original_status_basis: finding original/latest stored status only
+  stage3a_implementation:
+    recorded_on: '2026-10-24'
+    human_decision: 095-A explicitly approved in this chat; implemented within that bounded choice
+    baseline_head: 3034861b438d2d1d005fe437cbe70d6c078db95b
+    implementation: Checklist, evidence, outcome rules and source references use schema-neutral list/object editors
+      that serialize to the existing publish service. Existing property names, nesting, types and list order are supported;
+      technical input remains a compatibility path. Published versions and rule meanings are unchanged; no business
+      schema is invented.
+    changed_paths:
+    - apps/compliance/forms.py
+    - templates/compliance/form.html
+    - core/ui_forms.py
+    - templates/components/widgets/structured_data.html
+    - apps/accounts/static/js/structured-data.js
+    validation: All four fields retain existing arbitrary payloads; page/widget compilation PASS. Browser assertions
+      verify add/edit/remove, ordered nested values, exact numeric transport, duplicate-name/invalid-number feedback
+      and technical compatibility. No model/service/migration change.
+    shared_validation: Stage 3A focused tests 17/17 PASS; related regressions 31 PASS, 3 attributed baseline authorization-fixture
+      failures; isolated Chromium interaction assertions 15/15 PASS. Django checks, changed-code Ruff lint/format,
+      page/widget compilation, JS syntax and Django static discovery PASS.
+    test_path: tests/test_uiux_stage3a.py
+    closure: RESOLVED against the explicitly approved minimum. No UAT execution, readiness certification, CEP/Gate/EXT
+      change, migration, immutable-history rewrite or Git write.
 - finding_id: UIUX-F-096
   module: Equipment
   surface_id: SURF-310

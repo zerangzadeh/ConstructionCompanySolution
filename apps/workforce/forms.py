@@ -33,6 +33,7 @@ from apps.workforce.models import (
 )
 from core.forms import JalaliDateMixin
 from core.identifiers import canonicalize_upper_identifier
+from core.ui_forms import StructuredDataWidget
 
 
 class _StyledForm(JalaliDateMixin, forms.Form):
@@ -261,9 +262,17 @@ class EmployeeTrainingRecordForm(_StyledForm):
 class PerformanceEvaluationForm(_StyledForm):
     employee = forms.ModelChoiceField(label="کارمند", queryset=Employee.objects.none())
     period_start = forms.DateField(label="شروع دوره", widget=forms.DateInput(attrs={"type": "date"}))
-    period_end = forms.DateField(label="پایان دوره", widget=forms.DateInput(attrs={"type": "date"}))
-    criteria_snapshot = forms.JSONField(label="شواهد معیارها", widget=forms.Textarea(attrs={"rows": 5}), help_text="یک شیء JSON غیرخالی وارد کنید.")
-    result_summary = forms.CharField(label="نتیجه", widget=forms.Textarea(attrs={"rows": 4}))
+    period_end = forms.DateField(
+        label="پایان دوره", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    criteria_snapshot = forms.JSONField(
+        label="شواهد معیارها",
+        widget=StructuredDataWidget(),
+        help_text="نام معیار و شواهد آن را اضافه کنید؛ حداقل یک معیار لازم است. امتیاز یا وزن از پیش تعیین نشده است.",
+    )
+    result_summary = forms.CharField(
+        label="نتیجه", widget=forms.Textarea(attrs={"rows": 4})
+    )
 
     def __init__(self, *args: object, organization: Organization, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)

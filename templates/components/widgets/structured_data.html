@@ -1,0 +1,10 @@
+<div data-structured-editor class="space-y-3">
+  <div data-structured-controls class="space-y-3"></div>
+  <p data-structured-error class="text-sm text-red-700" role="alert" tabindex="-1" hidden></p>
+  <details data-structured-raw>
+    <summary class="cursor-pointer text-sm text-slate-600">نمای فنی داده‌ها / سازگاری با ورودی موجود</summary>
+    <textarea name="{{ widget.name }}"{% for name, value in widget.attrs.items %}{% if value is not False %} {{ name }}{% if value is not True %}="{{ value }}"{% endif %}{% endif %}{% endfor %}>{% if widget.value != None %}{{ widget.value }}{% endif %}</textarea>
+    <button type="button" data-structured-apply class="erp-btn erp-btn--secondary mt-2">نمایش این داده‌ها در ویرایشگر</button>
+  </details>
+  <noscript><p>برای استفاده از ویرایشگر ساختاری، جاوااسکریپت را فعال کنید؛ ورودی موجود در نمای فنی در دسترس است.</p></noscript>
+</div>

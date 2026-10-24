@@ -143,7 +143,9 @@ def candidate_detail(request, candidate_id):
         "knowledge/candidate_detail.html",
         {
             "item": item,
-            "source_form": SourceForm(),
+            "source_form": SourceForm(
+                organization=request.organization, actor=request.user
+            ),
             "review_form": ReviewForm(initial={"expected_status": item.status}),
             "can_submit": has_business_permission(
                 user=request.user,
@@ -173,7 +175,9 @@ def candidate_detail(request, candidate_id):
 @active_organization_required
 def candidate_submit(request, candidate_id):
     item = _candidate_for_request(request, candidate_id)
-    form = SourceForm(request.POST)
+    form = SourceForm(
+        request.POST, organization=request.organization, actor=request.user
+    )
     if form.is_valid():
         try:
             submit_candidate(
@@ -269,7 +273,11 @@ def publication_detail(request, version_id):
         "knowledge/publication_detail.html",
         {
             "item": item,
-            "reuse_form": ReuseForm(auto_id="reuse_%s"),
+            "reuse_form": ReuseForm(
+                auto_id="reuse_%s",
+                organization=request.organization,
+                actor=request.user,
+            ),
             "can_reuse": has_business_permission(
                 user=request.user,
                 organization=request.organization,
@@ -277,7 +285,7 @@ def publication_detail(request, version_id):
             ),
             "correction_form": PublicationCorrectionForm(
                 auto_id="correction_%s",
-                initial={"title": item.title, "body": item.body}
+                initial={"title": item.title, "body": item.body},
             ),
             "promotion_form": PromotionRequestForm(
                 auto_id="promotion_%s",
@@ -286,7 +294,7 @@ def publication_detail(request, version_id):
                     "body": item.body,
                     "audience": item.metadata.get("audience", ""),
                     "category_code": item.metadata.get("category", ""),
-                }
+                },
             ),
             "can_withdraw": item.publication.scope == KnowledgeScope.TENANT
             and has_business_permission(
@@ -411,8 +419,12 @@ def recurrence(request):
         request,
         "knowledge/recurrence.html",
         {
-            "form": RecurrenceForm(),
-            "correction_form": RecurrenceCorrectionForm(),
+            "form": RecurrenceForm(
+                organization=request.organization, actor=request.user
+            ),
+            "correction_form": RecurrenceCorrectionForm(
+                organization=request.organization, actor=request.user
+            ),
             "items": KnowledgeRecurrenceEvidence.objects.filter(
                 organization=request.organization
             ).prefetch_related("sources", "replacements")[:30],
@@ -423,7 +435,9 @@ def recurrence(request):
 @require_POST
 @active_organization_required
 def recurrence_record(request):
-    form = RecurrenceForm(request.POST)
+    form = RecurrenceForm(
+        request.POST, organization=request.organization, actor=request.user
+    )
     if form.is_valid():
         try:
             record_recurrence(
@@ -434,13 +448,19 @@ def recurrence_record(request):
             messages.success(request, "شاهد تکرار ثبت شد.")
         except (PermissionDenied, ValidationError) as error:
             messages.error(request, str(error))
+    else:
+        messages.error(
+            request, "منابع و اطلاعات شاهد تکرار معتبر نیست؛ منابع مجاز را انتخاب کنید."
+        )
     return redirect("knowledge:recurrence")
 
 
 @require_POST
 @active_organization_required
 def recurrence_correct(request, recurrence_id):
-    form = RecurrenceCorrectionForm(request.POST)
+    form = RecurrenceCorrectionForm(
+        request.POST, organization=request.organization, actor=request.user
+    )
     if form.is_valid():
         try:
             correct_recurrence(
@@ -482,7 +502,9 @@ def reuse(request):
 @require_POST
 @active_organization_required
 def reuse_record(request):
-    form = ReuseForm(request.POST)
+    form = ReuseForm(
+        request.POST, organization=request.organization, actor=request.user
+    )
     if form.is_valid():
         try:
             record_reuse(
@@ -498,6 +520,11 @@ def reuse_record(request):
             KnowledgePublicationVersion.DoesNotExist,
         ) as error:
             messages.error(request, str(error))
+    else:
+        messages.error(
+            request,
+            "رکورد مصرف‌کننده یا اطلاعات استفاده مجدد معتبر نیست؛ دوباره انتخاب کنید.",
+        )
     return redirect("knowledge:reuse")
 
 

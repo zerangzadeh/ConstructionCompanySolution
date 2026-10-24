@@ -21,6 +21,7 @@ from apps.projects.models import Project, ProjectSite
 from apps.timekeeping.models import Timesheet
 from apps.workforce.models import Employee
 from core.jalali import format_jalali
+from core.ui_forms import StructuredDataWidget, initialize_retry_key
 
 from .models import (
     AdjustmentKind,
@@ -51,9 +52,22 @@ class OrganizationForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.organization = organization
         self.actor = actor
+        for name in ("evidence_json", "identifiers_json"):
+            if name in self.fields:
+                self.fields[name].widget = StructuredDataWidget()
+                self.fields[name].label = (
+                    "شواهد تکمیلی"
+                    if name == "evidence_json"
+                    else "شناسه‌های مجاز طرح انتخاب‌شده"
+                )
+                self.fields[
+                    name
+                ].help_text = "نام‌ها و مقدارهای مستند موجود را وارد کنید؛ این ویرایشگر مقدار قانونی یا نگاشت جدیدی تعیین نمی‌کند."
         run_field = self.fields.get("run")
         if isinstance(run_field, forms.ModelChoiceField):
-            run_field.label_from_instance = lambda run: f"{run.code} · {run.get_kind_display()}"
+            run_field.label_from_instance = lambda run: (
+                f"{run.code} · {run.get_kind_display()}"
+            )
         if "idempotency_key" in self.fields:
             self.fields["idempotency_key"].widget = forms.HiddenInput()
             self.initial.setdefault("idempotency_key", str(uuid4()))
@@ -427,6 +441,10 @@ class ReversalForm(forms.Form):
         required=False, max_length=60, label="کد اجرای جایگزین"
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        initialize_retry_key(self)
+
 
 class StatutoryCalculationForm(OrganizationForm):
     run = forms.ModelChoiceField(queryset=PayrollRun.objects.none(), label="اجرای قطعی")
@@ -546,6 +564,24 @@ class StatutoryExportForm(forms.Form):
         widget=forms.Textarea(attrs={"rows": 3}),
         label="شرح رد/خطا",
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        initialize_retry_key(self)
+        self.fields["correlation_id"].required = False
+        self.fields["correlation_id"].label = "مرجع پیگیری موجود (اختیاری)"
+        self.fields[
+            "correlation_id"
+        ].help_text = "اگر مرجع بیرونی دارید همان را وارد کنید؛ در غیر این صورت مرجع داخلی همین تلاش استفاده می‌شود."
+        self.fields["status"].label = "نتیجه ثبت‌شده ارسال (ورود دستی)"
+        self.fields["artifact_name"].label = "نام فایل / مدرک خروجی"
+        self.fields["provider_reference"].label = "مرجع ارائه‌دهنده بیرونی"
+
+    def clean(self):
+        data = super().clean()
+        if not data.get("correlation_id"):
+            data["correlation_id"] = data.get("idempotency_key", "")
+        return data
 
 
 class StatutoryResolutionForm(forms.Form):

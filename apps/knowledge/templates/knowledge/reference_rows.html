@@ -1,0 +1,9 @@
+<div data-reference-rows class="space-y-3" id="{{ widget.attrs.id }}">
+  <input type="hidden" name="{{ widget.name }}_rows_present" value="1">
+  <div data-reference-list class="space-y-2">
+    {% for row in selected_rows %}<div data-reference-row class="flex gap-2">{{ row }}<button type="button" data-reference-remove class="erp-btn erp-btn--secondary">حذف ردیف</button></div>{% endfor %}
+  </div>
+  <template><div data-reference-row class="flex gap-2">{{ empty_row }}<button type="button" data-reference-remove class="erp-btn erp-btn--secondary">حذف ردیف</button></div></template>
+  <button type="button" data-reference-add class="erp-btn erp-btn--secondary">افزودن منبع</button>
+  <noscript>{{ empty_row }}{{ empty_row }}</noscript>
+</div>

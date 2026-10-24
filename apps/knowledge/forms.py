@@ -3,6 +3,52 @@ from django import forms
 from core.forms import JalaliDateMixin
 
 from .models import KnowledgeAuthority, KnowledgeSensitivity, ReuseType
+from .reference_ui import visible_references
+
+
+class ReferenceRowsWidget(forms.SelectMultiple):
+    template_name = "knowledge/reference_rows.html"
+
+    class Media:
+        js = ("js/reference-rows.js",)
+
+    def value_from_datadict(self, data, files, name):
+        if data.get(f"{name}_rows_present"):
+            values = (
+                data.getlist(f"{name}_rows")
+                if hasattr(data, "getlist")
+                else data.get(f"{name}_rows", [])
+            )
+            if isinstance(values, str):
+                values = [values]
+            return "\n".join(value for value in values if value)
+        return data.get(name, "")
+
+    def format_value(self, value):
+        return str(value or "").splitlines()
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context["selected_rows"] = [
+            forms.Select(choices=self.choices).render(
+                f"{name}_rows",
+                row,
+                attrs={
+                    "class": "w-full rounded border border-slate-300 p-2",
+                    "aria-label": "منبع",
+                },
+            )
+            for row in self.format_value(value)
+        ]
+        context["empty_row"] = forms.Select(choices=self.choices).render(
+            f"{name}_rows",
+            "",
+            attrs={
+                "class": "w-full rounded border border-slate-300 p-2",
+                "aria-label": "منبع",
+            },
+        )
+        return context
 
 
 class CandidateForm(forms.Form):
@@ -53,6 +99,35 @@ class SourceForm(forms.Form):
     source_id = forms.UUIDField(label="شناسه منبع")
     citation_purpose = forms.CharField(label="هدف استناد", max_length=160)
 
+    def __init__(self, *args, organization=None, actor=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.references = None
+        if organization is not None and actor is not None:
+            choices, self.references = visible_references(
+                organization=organization, actor=actor
+            )
+            self.fields["reference"] = forms.ChoiceField(
+                label="منبع قابل مشاهده",
+                choices=[("", "انتخاب منبع"), *choices],
+                required=False,
+            )
+            for name in ("source_type", "source_id"):
+                self.fields[name].required = False
+                self.fields[name].widget = forms.HiddenInput()
+            self.order_fields(
+                ("reference", "citation_purpose", "source_type", "source_id")
+            )
+
+    def clean(self):
+        data = super().clean()
+        if self.references is not None:
+            reference = self.references.get(data.pop("reference", ""))
+            if reference:
+                data.update(source_type=reference["type"], source_id=reference["id"])
+            elif not data.get("source_type") or not data.get("source_id"):
+                self.add_error("reference", "منبع مجاز را انتخاب کنید.")
+        return data
+
 
 class ReviewForm(forms.Form):
     outcome = forms.ChoiceField(
@@ -76,11 +151,43 @@ class RecurrenceForm(JalaliDateMixin, forms.Form):
     period_end = forms.DateField(label="پایان دوره")
     sources = forms.CharField(label="منابع", help_text="هر خط: type,uuid")
 
+    def __init__(self, *args, organization=None, actor=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.allowed_sources = None
+        if organization is not None and actor is not None:
+            groups, references = visible_references(
+                organization=organization, actor=actor
+            )
+            self.allowed_sources = {
+                f"{value['type']},{value['id']}" for value in references.values()
+            }
+            choices = [("", "انتخاب منبع")]
+            for label, group in groups:
+                choices.append(
+                    (
+                        label,
+                        [
+                            (f"{references[key]['type']},{references[key]['id']}", text)
+                            for key, text in group
+                        ],
+                    )
+                )
+            self.fields["sources"].widget = ReferenceRowsWidget(choices=choices)
+            self.fields[
+                "sources"
+            ].help_text = "هر منبع را در یک ردیف انتخاب کنید؛ فقط منابع واجد شرایط و قابل مشاهده در فضای منبع نمایش داده می‌شوند."
+
     def clean_sources(self):
         values = []
         for line in self.cleaned_data["sources"].splitlines():
             if not line.strip():
                 continue
+            if (
+                self.allowed_sources is not None
+                and self.data.get("sources_rows_present")
+                and line.strip() not in self.allowed_sources
+            ):
+                raise forms.ValidationError("منبع انتخاب‌شده دیگر در فهرست مجاز نیست.")
             try:
                 source_type, source_id = [part.strip() for part in line.split(",", 1)]
             except ValueError as exc:
@@ -95,6 +202,49 @@ class ReuseForm(forms.Form):
     consumer_id = forms.UUIDField(label="شناسه مصرف‌کننده")
     consumer_version = forms.CharField(label="نسخه مصرف‌کننده", max_length=80)
     purpose = forms.CharField(label="هدف", max_length=240)
+
+    def __init__(self, *args, organization=None, actor=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.references = None
+        if organization is not None and actor is not None:
+            choices, self.references = visible_references(
+                organization=organization, actor=actor, sources=False
+            )
+            self.fields["reference"] = forms.ChoiceField(
+                label="رکورد مصرف‌کننده قابل مشاهده",
+                choices=[("", "انتخاب رکورد"), *choices],
+                required=False,
+            )
+            for name in ("consumer_type", "consumer_id", "consumer_version"):
+                self.fields[name].required = False
+                self.fields[name].widget = forms.HiddenInput()
+            self.order_fields(
+                (
+                    "reuse_type",
+                    "reference",
+                    "purpose",
+                    "consumer_type",
+                    "consumer_id",
+                    "consumer_version",
+                )
+            )
+
+    def clean(self):
+        data = super().clean()
+        if self.references is not None:
+            reference = self.references.get(data.pop("reference", ""))
+            if reference:
+                data.update(
+                    consumer_type=reference["type"],
+                    consumer_id=reference["id"],
+                    consumer_version=reference["version"],
+                )
+            elif not all(
+                data.get(name)
+                for name in ("consumer_type", "consumer_id", "consumer_version")
+            ):
+                self.add_error("reference", "رکورد مصرف‌کننده مجاز را انتخاب کنید.")
+        return data
 
 
 class PublicationCorrectionForm(forms.Form):
