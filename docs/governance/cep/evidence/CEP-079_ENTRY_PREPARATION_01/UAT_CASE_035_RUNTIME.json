@@ -1,0 +1,68 @@
+{
+  "authorization_corrections": [
+    {
+      "role": "cep079_uat_61bd172be16f",
+      "assignment": "56d52208-3698-4492-80b4-4339fdf6f2c9",
+      "route": "native_platform_initial_grant_no_lawful_pair",
+      "added_permissions": [
+        "leave_balances.manage"
+      ],
+      "existing_scope_unchanged": true
+    }
+  ],
+  "native_workflows": {
+    "at": "2026-10-24T23:07:09.776896+00:00",
+    "attendance": "71a4bc1e-a076-4574-b494-e275484d17f5",
+    "attendance_state": "finalized",
+    "leave": "2658b87f-8842-49d7-8277-fdb3324c6acf",
+    "leave_state": "approved",
+    "reservation": "50f1338e-2246-40d9-ab38-c6393befd6dd",
+    "policy": "02aa8382-5fa2-4687-961f-939553a3a782",
+    "opening_source_preserved": true,
+    "mission_overtime": [
+      {
+        "model": "LeaveMissionRequest",
+        "id": "81eb1bc0-4b76-4b15-99b4-824b8cacec72",
+        "state": "rejected",
+        "approval_denial": "['تأیید بدون مرجع سیاست مصوب مجاز نیست.']"
+      },
+      {
+        "model": "OvertimeRequest",
+        "id": "36395215-ca82-4389-9d6c-9fbbe9dac0e8",
+        "state": "rejected",
+        "approval_denial": "['تأیید بدون مرجع سیاست مصوب مجاز نیست.']"
+      }
+    ],
+    "independent_reviewer": "account.demo-construction-01.owner"
+  },
+  "finding016": {
+    "cause": "Scoped Time forms do not cascade site choices after selected project",
+    "fix": "Existing shared attach_parent_choice_ui on ScopedForm; existing server relationship/tenant validation unchanged",
+    "runtime": "BeforeProjectA selection still shows B/C/D sites; afterfix ProjectA only2sites; native form created scoped leave",
+    "result": "FIXED"
+  },
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T23:07:29.028353+00:00",
+      "workflow": "Ordinary attendance and leave forms/Jalali/cascade; independent final attendance; existing approved synthetic leave policy+opening pinned reservation and independent approval; mission/overtime submit, missing-policy approval denial, independent rejection; native browser final readback",
+      "browser_evidence": "UAT_CASE_035_BROWSER.json",
+      "mission_overtime_approval_claimed": false,
+      "no_statutory_or_payroll_policy_invented": true,
+      "finding016": "FIXED; shared cascading helper, server validation unchanged",
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS",
+  "temporary_leave_duty_revoked": {
+    "assignment": "56d52208-3698-4492-80b4-4339fdf6f2c9",
+    "revoked_at": "2026-10-24T23:07:29.106536+00:00",
+    "ordinary_dual_control": true
+  },
+  "handoff_browser_availability": {
+    "operation": "tab.markHandoff",
+    "result": "Local browser use is disabled in Work settings",
+    "classification": "ENV002_RECURRED_AT_HANDOFF",
+    "impact": "No scenario invalidated;036 not attempted; verify Browser in next session",
+    "no_mutation_attempted": true
+  }
+}

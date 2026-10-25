@@ -1,0 +1,36 @@
+{
+  "native_independent_finalization": {
+    "at": "2026-10-25T00:28:19.200718+00:00",
+    "run": "a828c72f-9dd7-481e-a5f6-fae9ef1aaef4",
+    "period": "ba872047-84c9-4b6b-b583-3cffdfedf6b3",
+    "status": "finalized",
+    "creator": "uiux.wavec.payroll",
+    "reviewer": "account.demo-construction-01.owner",
+    "finalizer": "account.demo-construction-01.owner",
+    "input_digest": "9dbcc18c724dba1cfc156580e75e7f155dce3cbfde25a7e96bb1fc9a139860a9",
+    "calculation_digest": "8450f0ed1845d26f0f15a03faa148bac83d50a8734ff28e125c7eef9ae188243",
+    "results": [
+      {
+        "id": "ab47e951-6736-48da-ba59-11160b7297f3",
+        "employee_id": "9a4904d8-c421-4919-9162-0084aa9a9b0f",
+        "gross_amount": "2.00",
+        "net_amount": "2.00",
+        "status": "finalized"
+      }
+    ],
+    "new_targets_only": true,
+    "no_statutory_activation": true,
+    "harness_correction": "Finalization succeeded; evidence collector referenced nonexistent snapshot_digest; corrected to actual input_digest without repeating mutation."
+  },
+  "continuation_execution": [
+    {
+      "at": "2026-10-25T00:28:35.946604+00:00",
+      "workflow": "Ordinary Payroll navigation, new run and explicit employees, approved-timesheet/rule source input with Jalali dates, input lock, calculate and submit; native independent owner approval/finalization; Browser final readback/payslip link",
+      "run": "a828c72f-9dd7-481e-a5f6-fae9ef1aaef4",
+      "browser_evidence": "UAT_CASE_037_BROWSER.json",
+      "statutory_scope": "Existing nonstatutory synthetic rule only; no new statutory policy or activation",
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

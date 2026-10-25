@@ -1,0 +1,42 @@
+{
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T21:31:32.578973+00:00",
+      "actor": "account.demo-construction-01.accountant",
+      "independent_checker": "account.demo-construction-01.owner",
+      "method": "Owning Accounting services create manual -> debit -> unbalanced-submit rejection -> balancing credit -> submit -> self-post denied -> independent post; native HTTP detail readback",
+      "journal": "2085431c-45dc-42fa-b063-db6a1b483dcc",
+      "number": 8,
+      "period": "47c2e583-15a1-4dbd-8a34-873af35b42d9",
+      "status": "posted",
+      "line_values": [
+        {
+          "account": "3fbeab2f-258b-494d-9bfd-23f45996d59b",
+          "debit": "0.000000",
+          "credit": "1.000000",
+          "project": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8"
+        },
+        {
+          "account": "50713ab0-e338-40b0-bf48-6b582144dab1",
+          "debit": "1.000000",
+          "credit": "0.000000",
+          "project": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8"
+        }
+      ],
+      "negative_controls": [
+        "unbalanced submit rejected",
+        "self approval rejected"
+      ],
+      "detail": {
+        "url": "/accounting/journals/2085431c-45dc-42fa-b063-db6a1b483dcc/",
+        "status": 200,
+        "sha256": "01fe0467b2608426628cf95b967fd8a78055f30c365ad84706330b31953e1510",
+        "bytes": 56884
+      },
+      "source_preservation": "Only new CEP079 journal posted; prepared source read-only",
+      "initial_harness_attempt": "Rolled back atomically for wrong readback attribute name; original and current sequence state unchanged until successful retry",
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

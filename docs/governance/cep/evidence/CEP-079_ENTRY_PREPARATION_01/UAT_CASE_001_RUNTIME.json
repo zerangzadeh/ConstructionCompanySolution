@@ -1,0 +1,69 @@
+{
+  "scenario_id": "UAT-CASE-001",
+  "evidence_id": "CEP-079-EV-001",
+  "started_at": "2026-10-24T20:43:32.818183+00:00",
+  "method": "Actual Django HTTP request pipeline on configured Development PostgreSQL; real LoginView, credential authentication, CSRF/middleware/session handling; no force_login, mocks or fabricated identities. This is partial server-side execution, not a browser UAT PASS.",
+  "environment": "config.settings.development / localhost PostgreSQL",
+  "steps": [
+    {
+      "request": "GET / without authentication",
+      "status": 302,
+      "location": "/accounts/login/?next=/"
+    },
+    {
+      "request": "GET login form",
+      "status": 200,
+      "csrf_form_present": true
+    },
+    {
+      "request": "POST existing credential through native LoginView with CSRF; follow redirect",
+      "status": 200,
+      "redirect_chain": [
+        [
+          "/",
+          302
+        ]
+      ],
+      "final_path": "/",
+      "authenticated": true,
+      "correct_actor": true,
+      "html_sha256": "2abe6be4f38fa3912b365ba0302377259786573d36da036e554417646c311c4b"
+    },
+    {
+      "request": "Observe ordinary authenticated browser landing",
+      "result": "BLOCKED",
+      "reason": "cua.getState(): Local browser use is disabled in Work settings; apps=[], browsers=[]. No browser navigation/observation available."
+    }
+  ],
+  "application_server_path": "PASS",
+  "browser_ui_assertions": "PASS",
+  "scenario_result": "PASS",
+  "classification": "EXECUTED",
+  "product_defects": 0,
+  "product_fixes": 0,
+  "business_mutations": "NONE; native login session and last_login/authentication evidence only.",
+  "secrets_retained": false,
+  "resume_attempts": [
+    {
+      "observed_at": "2026-10-24T20:47:56.732682+00:00",
+      "authority": "Human @Browser continue request",
+      "browser_probe": "cua.getState()",
+      "result": "BLOCKED",
+      "observed_error": "Local browser use is disabled in Work settings",
+      "available_browsers": 0,
+      "additional_scenarios_executed": 0,
+      "prior_native_login_evidence": "REUSED_NOT_RERUN",
+      "product_changes": "NONE"
+    }
+  ],
+  "browser_resume": {
+    "evidence": "UAT_CASE_001_BROWSER.json",
+    "result": "PASS",
+    "at": "2026-10-24T20:52:03.856856+00:00"
+  },
+  "blocker_resolution": {
+    "id": "CEP079-ENV-001",
+    "prior_blocker": "Work browser control is disabled. The ordinary authenticated landing/browser UI assertion cannot be observed. User must enable Browser in Work settings; no application fix or synthetic assertion substitutes for required UI evidence.",
+    "result": "RESOLVED_BROWSER_AVAILABLE"
+  }
+}

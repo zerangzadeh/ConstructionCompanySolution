@@ -1,0 +1,144 @@
+{
+  "finding017": {
+    "classification": "PRODUCT_FORM_SCOPE",
+    "pre_fix": "Browser ordinary Document upload has no targets for project-scoped Project Manager; has_business_permission called without object or allow_any_scope rejects all project grants. Owning target service already validates source project/site.",
+    "touch_set": [
+      "apps/documents/forms.py",
+      "apps/documents/test_cep079_form_scope.py"
+    ],
+    "correction": "Allow scoped permission entry and intersect every target queryset with existing membership scope and tenant. Preserve target service and field-observation capture/draft guards.",
+    "result": "FIXED",
+    "validation": {
+      "pre_fix": "5 tests:4PASS/1FAIL; permitted project choices empty",
+      "focused": "6/6PASS0.733s; permission, active membership, granted/ungranted/foreign project, contract context and tenant scope",
+      "affected_regression": "Upload/version/secure-download PASS; endpoint cross-tenant and single-target links2/2PASS4.123s in subsequent isolated process",
+      "initial_test_infrastructure_failure": "Combined3tests: first passed; its response.close at apps/documents/tests.py:503 triggered closed PostgreSQL connection; later2failed in setUp before changed form. Both2 rerun separatelyPASS; not product regression.",
+      "lint": "Ruff checkPASS;format checkPASS;Django0issues",
+      "browser_rerun": "Only granted projectsA/B and related scoped sources offered; no unrelated/foreign options",
+      "broad_regression": "NOT_RUN"
+    }
+  },
+  "data_changes": {
+    "new_document": "5f8ede36-3d2c-4522-99f9-c2f69c2ee744",
+    "upload_selected": true,
+    "new_version": true,
+    "links_added": true
+  },
+  "continuation_execution": [
+    {
+      "at": "2026-10-25T00:44:09.436489+00:00",
+      "workflow": "Ordinary Documents > Create form; Finding017 pre-fix and corrected target choices; exact safe synthetic JPEG chosen via documented Browser filechooser API; rejected before file selection",
+      "actor": "uiux.persona.project-manager",
+      "browser_evidence": "UAT_CASE_042_BROWSER.json",
+      "blocker": "CEP079-ENV-003",
+      "classification": "BLOCKER-ENVIRONMENT",
+      "failure_boundary": "fileChooser.setFiles requires Chrome ChatGPT extension Allow access to file URLs",
+      "required_resolution": "Human enable extension Allow access to file URLs, then resume same042 form and version/link/download/negative assertions; no HTTP-only substitute",
+      "ordinary_browser_readable": true,
+      "no_upload_or_document_mutation_occurred": true,
+      "result": "BLOCKED"
+    },
+    {
+      "at": "2026-10-25T01:14:08.122390+00:00",
+      "workflow": "Browser same preserved form upload, numbered v2, same-project contract link, quarantined download403, two actual Defender clean scans and audited assessments, ordinary current/v1 downloads with exact SHA256, Browser foreign/unauthorized confidential document denial and native403 downloads",
+      "document": "5f8ede36-3d2c-4522-99f9-c2f69c2ee744",
+      "browser_evidence": "UAT_CASE_042_BROWSER.json",
+      "versions_preserved": 2,
+      "environment_blocker_resolved": "CEP079-ENV-003",
+      "new_target_only": true,
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS",
+  "environment_resolution": {
+    "at": "2026-10-25T01:10:04.264745+00:00",
+    "blocker": "CEP079-ENV-003",
+    "result": "RESOLVED",
+    "evidence": "Same preserved Chrome form successfully selected approved JPEG and created quarantined document after Human enabled extension file URLs",
+    "document": "5f8ede36-3d2c-4522-99f9-c2f69c2ee744"
+  },
+  "actual_scans": [
+    {
+      "version": "0c465b45-543c-46fd-8644-f310b31c3080",
+      "number": 1,
+      "sha256": "afc9c450f88d7e96930aa86bfba29acc1de2e6306e3d3854d5cad629d11a31ed",
+      "exit_code": 0,
+      "stdout": "Scan starting...\nScan finished.\nScanning E:\\Construction_Company_Solution\\protected_documents\\organizations\\cca028cb-a2ff-4485-83ab-a9c1bd1e47b2\\documents\\5f8ede36-3d2c-4522-99f9-c2f69c2ee744\\versions\\46f478f9-db26-4286-b561-22ca79b91175.jpg found no threats.\n",
+      "stderr": "",
+      "at": "2026-10-25T01:12:39.706918+00:00"
+    },
+    {
+      "version": "5fb3fcc2-6008-40c7-8765-3261818922eb",
+      "number": 2,
+      "sha256": "afc9c450f88d7e96930aa86bfba29acc1de2e6306e3d3854d5cad629d11a31ed",
+      "exit_code": 0,
+      "stdout": "Scan starting...\nScan finished.\nScanning E:\\Construction_Company_Solution\\protected_documents\\organizations\\cca028cb-a2ff-4485-83ab-a9c1bd1e47b2\\documents\\5f8ede36-3d2c-4522-99f9-c2f69c2ee744\\versions\\dabd6a0a-b9e1-47b1-af70-e8da100ed473.jpg found no threats.\n",
+      "stderr": "",
+      "at": "2026-10-25T01:12:39.756556+00:00"
+    }
+  ],
+  "pre_scan_download_status": 403,
+  "scanner_version": "CurrentVersion",
+  "scanning_duty": {
+    "assignment": "e06721b7-1b2c-40bf-90ab-640bea7f8354",
+    "ends_at": "2026-10-25T01:17:39.759558+00:00"
+  },
+  "assessments": [
+    "ff97a211-e51b-4a98-bef7-18ed4c2c5aca",
+    "d08e6569-7d3c-480c-a72e-98f40592ae94"
+  ],
+  "versions": [
+    {
+      "id": "0c465b45-543c-46fd-8644-f310b31c3080",
+      "number": 1,
+      "sha256": "afc9c450f88d7e96930aa86bfba29acc1de2e6306e3d3854d5cad629d11a31ed"
+    },
+    {
+      "id": "5fb3fcc2-6008-40c7-8765-3261818922eb",
+      "number": 2,
+      "sha256": "afc9c450f88d7e96930aa86bfba29acc1de2e6306e3d3854d5cad629d11a31ed"
+    }
+  ],
+  "native_downloads": [
+    {
+      "url": "/documents/5f8ede36-3d2c-4522-99f9-c2f69c2ee744/versions/0c465b45-543c-46fd-8644-f310b31c3080/download/",
+      "status": 200,
+      "sha256": "afc9c450f88d7e96930aa86bfba29acc1de2e6306e3d3854d5cad629d11a31ed",
+      "bytes": 15062
+    },
+    {
+      "url": "/documents/5f8ede36-3d2c-4522-99f9-c2f69c2ee744/versions/5fb3fcc2-6008-40c7-8765-3261818922eb/download/",
+      "status": 200,
+      "sha256": "afc9c450f88d7e96930aa86bfba29acc1de2e6306e3d3854d5cad629d11a31ed",
+      "bytes": 15062
+    }
+  ],
+  "foreign_denial": {
+    "url": "/documents/52127753-fe11-4fe6-bc8b-a072549d7c31/",
+    "status": 403,
+    "sha256": "315e0ca0467c562e1d29e18c46481e3e216cdb75fd4cc97d60bf708231597b8c",
+    "bytes": 38435
+  },
+  "unauthorized_denials": [
+    {
+      "url": "/documents/5f8ede36-3d2c-4522-99f9-c2f69c2ee744/",
+      "status": 403,
+      "sha256": "4f1df87739fc9c26c174976cda71f0aba4363bafb47d2eaaed2b8ec05c837b11",
+      "bytes": 36695
+    },
+    {
+      "url": "/documents/5f8ede36-3d2c-4522-99f9-c2f69c2ee744/download/",
+      "status": 403,
+      "sha256": "dff81be380b275abf9f2190d4dc05d10fa4eec53529456ac2850ebdbb4d378a7",
+      "bytes": 36704
+    },
+    {
+      "url": "/documents/5f8ede36-3d2c-4522-99f9-c2f69c2ee744/versions/0c465b45-543c-46fd-8644-f310b31c3080/download/",
+      "status": 403,
+      "sha256": "b6b6d134e2e181d268419016e3d212ee97fca9519a7438ac91fddd592b23490f",
+      "bytes": 36750
+    }
+  ],
+  "expired_duty_preservation": "Admin expired unrevoked duty caused native unique constraint rejection; no row mutated or privilege re-enabled. Existing previously qualified synthetic reference identity account.demo-construction-03.viewer receives5minute audited platform_operations duty under retained Human bootstrap authority; tenant membership/scope unchanged. Only one active Superuser; actual assignment actor/approver both superuser per existing native service; no independent scanner-approval claim.",
+  "harness_observation": "File selection succeeded; unsupported read-only el.files iteration raised TypeError; subsequent actual upload proved capability. No second document creation."
+}

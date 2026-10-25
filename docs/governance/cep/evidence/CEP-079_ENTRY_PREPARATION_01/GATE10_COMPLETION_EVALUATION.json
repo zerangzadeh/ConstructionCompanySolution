@@ -1,0 +1,39 @@
+{
+  "at": "2026-10-25T01:40:51.560515+00:00",
+  "source": {
+    "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_IMPLEMENTATION_ROADMAP_CONSOLIDATED_LATEST.zip",
+    "sha256": "54082de6f32d9a26805aaa3050f24a9863d73f840d827274f0cd3145988b6784",
+    "member": "BONIRA_IMPLEMENTATION_GATE_REGISTER.csv",
+    "member_sha256": "4eca43cb04f5f32afdc2ec177c2c4c8ec1963115d3e23f91e3b07c8b5579358d"
+  },
+  "canonical_contract": {
+    "Gate ID": "GATE-10",
+    "Gate Name": "Representative UAT Completion",
+    "Gate Type": "UAT COMPLETION GATE",
+    "Purpose": "Record completion of the approved representative UAT execution without conflating UAT with Production Certification or Human Sign-off.",
+    "Required IMB IDs": "IMB-0110",
+    "Required External Dependencies": "EXT-0025",
+    "Evidence Required": "Scenario-by-scenario runtime results for all 44 approved representative cases with build/environment identity.",
+    "Pass Condition": "All 44 approved representative UAT scenarios are executed as applicable; required evidence is captured; unresolved failures are explicitly dispositioned; no exhaustive-UAT claim is made. Passing GATE-10 does not constitute Human Sign-off.",
+    "Failure Consequence": "Production acceptance/human sign-off cannot claim UAT completion.",
+    "Downstream Work Unlocked": "GATE-11 — Production Certification review",
+    "UTV?": "YES until executed",
+    "Human Sign-off?": "NO",
+    "Notes": "REPRESENTATIVE UAT COMPLETE ≠ PRODUCTION CERTIFICATION COMPLETE ≠ HUMAN SIGN-OFF. HUMAN SIGN-OFF: NOT EXECUTED."
+  },
+  "result": "PASS",
+  "scenario_results": "44/44 actually executed PASS;48/48 mappings satisfied",
+  "environment": "Isolated local Development Django/PostgreSQL; actual Chrome ordinary UI",
+  "version": {
+    "branch": "main",
+    "head": "5a0a81dafbdd4d6e2142273a87efa45fc9a2c919",
+    "local_origin_main": "5a0a81dafbdd4d6e2142273a87efa45fc9a2c919",
+    "working_tree": "Retained and authorized uncommitted corrections; exact files hashed in evidence/change manifests"
+  },
+  "unresolved_failures": 0,
+  "ext0025": "READY_RETAINED_RUNTIME_CORROBORATED",
+  "exhaustive_claim": false,
+  "human_signoff": "NOT_EXECUTED",
+  "production_certification": "NOT_EXECUTED",
+  "next_cep": "STOP_BY_HUMAN_SCOPE"
+}

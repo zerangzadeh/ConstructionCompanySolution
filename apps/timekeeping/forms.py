@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from apps.organizations.authorization import get_active_membership, scope_queryset
 from apps.projects.models import Activity, Project, ProjectSite
 from apps.workforce.models import Employee
+from core.forms import attach_parent_choice_ui
 
 from .models import ShiftDefinition, WorkCalendar
 
@@ -159,6 +160,7 @@ class ScopedForm(StyledForm):
                 project_lookup="project_id",
                 site_lookup="id",
             )
+        attach_parent_choice_ui(self, "site", "project", "project_id")
 
     def clean(self):
         cleaned = super().clean()

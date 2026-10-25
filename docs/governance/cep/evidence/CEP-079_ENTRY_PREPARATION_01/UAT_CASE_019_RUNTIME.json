@@ -1,0 +1,46 @@
+{
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T21:39:20.748573+00:00",
+      "actor": "account.demo-construction-01.accountant",
+      "checker": "account.demo-construction-01.owner",
+      "browser": "Native Treasury -> Statements -> retained accepted Development bank import -> exact suggestion; no fixture re-import. Proposal visible after reload.",
+      "workflow": "Actual generate_statement_match_suggestions -> native self-confirm denied -> independent confirm -> unused alternate proposal explicitly rejected -> bank reconciliation -> owning statement view",
+      "statement_import": "33f50bfe-aa3f-45b6-a7d7-e226b54b9aa3",
+      "statement_line": "f2a90f46-7c9d-4cd6-8597-62c29cde54c7",
+      "matched_movement": "b30b7ab1-4543-45d0-bb0a-6b39fbd73995",
+      "clearing": "d6aaf2a3-6980-48f0-bbe8-950f838f4d9b",
+      "bank_reconciliation": "85bfa821-9168-48f9-aacc-9a7591377ba2",
+      "snapshot": {
+        "_state": "omitted",
+        "id": "85bfa821-9168-48f9-aacc-9a7591377ba2",
+        "created_at": "2026-10-24 21:39:17.615498+00:00",
+        "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+        "statement_import_id": "33f50bfe-aa3f-45b6-a7d7-e226b54b9aa3",
+        "account_id": "e5e16370-64ed-43c5-b3c4-498417594128",
+        "as_of_date": "2026-10-24",
+        "idempotency_key": "CEP079-UAT019-BANK-RECON",
+        "evidence_hash": "fb375cf7db4c748342d8b3d8254b74fb5fcab3cf4a19a3746447da5cb29a0d4b",
+        "statement_in": "1.000000",
+        "statement_out": "0",
+        "cleared_book_in": "1.000000",
+        "cleared_book_out": "0",
+        "unmatched_line_ids": [],
+        "uncleared_movement_ids": [],
+        "exceptions": [],
+        "run_by_id": "381e4525-6f98-4b4d-ad6f-44008dbb9643",
+        "grain_revision": 1,
+        "supersedes_id": null
+      },
+      "native_detail": {
+        "url": "/treasury/statements/",
+        "status": 200,
+        "sha256": "56c07ffd7b65cd179b57d2644eba056d4574a94b523f398d8392bb7032ba1ff5",
+        "bytes": 46299
+      },
+      "data_scope": "Prepared DEV-BANK-01 only; existing sources immutable; no external bank interaction",
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

@@ -1,0 +1,109 @@
+{
+  "scenario": "UAT-CASE-016",
+  "steps": [
+    {
+      "at": "2026-10-24T21:33:13.137383+00:00",
+      "step": "create new synthetic progress",
+      "model": "billing.ProgressRecord",
+      "id": "27d711e2-1f64-4c02-9ef2-425d7e316e38",
+      "status": "draft"
+    },
+    {
+      "at": "2026-10-24T21:33:13.652193+00:00",
+      "step": "submit progress",
+      "model": "workflows.WorkflowInstance",
+      "id": "78138aa8-fe35-455e-b8e3-c254e72a42f1",
+      "status": "active"
+    },
+    {
+      "at": "2026-10-24T21:33:13.804527+00:00",
+      "step": "create source-pinned claim",
+      "model": "billing.ProgressClaim",
+      "id": "c274c8c7-16c9-427f-8b31-6e1fdd1e5875",
+      "status": "draft"
+    },
+    {
+      "at": "2026-10-24T21:34:19.038725+00:00",
+      "step": "verify progress independently",
+      "model": "billing.ProgressRecord",
+      "id": "27d711e2-1f64-4c02-9ef2-425d7e316e38",
+      "status": "verified"
+    },
+    {
+      "at": "2026-10-24T21:34:20.131152+00:00",
+      "step": "submit positive source-pinned claim",
+      "model": "billing.ProgressClaim",
+      "id": "c274c8c7-16c9-427f-8b31-6e1fdd1e5875",
+      "status": "submitted"
+    },
+    {
+      "at": "2026-10-24T21:34:20.635724+00:00",
+      "step": "approve claim",
+      "model": "billing.ProgressClaim",
+      "id": "c274c8c7-16c9-427f-8b31-6e1fdd1e5875",
+      "status": "approved"
+    }
+  ],
+  "authorization_correction": {
+    "role": "cep079_uat_110dbfe0b4c1",
+    "assignment": "c1f25696-ed0d-485a-bd9f-1bbbf27f93ef",
+    "route": "ordinary_dual_control",
+    "added_permissions": [
+      "claims.submit"
+    ],
+    "existing_scope_unchanged": true
+  },
+  "last_failure": {
+    "at": "2026-10-24T21:34:20.709423+00:00",
+    "step": "AR source recognition",
+    "type": "ValidationError",
+    "message": "['نگاشت مؤثر حساب کنترل برای این تعهد تأیید نشده است.']"
+  },
+  "AR_configuration_correction": {
+    "mapping": "31165f02-cc6d-44d1-9a59-d2e9878b68e3",
+    "source_kind": "billing.progress_claim.v1",
+    "direction": "receivable",
+    "control_account": "b5863d8f-e80d-494d-841c-796245d6bb17",
+    "control_code": "1200",
+    "basis": "Existing seeded chart AR1200 asset; native registered receivable source and Accounting control-account pin contract; specific Human authorization permits required Development configuration",
+    "effective_from": "2026-10-24",
+    "new_posting_rule": false
+  },
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T21:35:10.394095+00:00",
+      "actor": "account.demo-construction-01.accountant",
+      "workflow": "Native source progress measurement/submission/independent verification -> source-pinned positive claim/submit/independent approve -> AR recognition from registered Billing source; native AP recognition retry returns existing prepared obligation; AP and AR aging/reconciliation executed; owning workspace readback",
+      "progress": "27d711e2-1f64-4c02-9ef2-425d7e316e38",
+      "claim": "c274c8c7-16c9-427f-8b31-6e1fdd1e5875",
+      "net": "161252460000.0000",
+      "AR": "cf018c8e-0a3f-40b2-9530-7d71e7439d36",
+      "AP": "ec09053f-f138-46b8-ae47-ce1736b425de",
+      "aging_runs": [
+        "20db0544-4363-426a-bafc-cb153c7eb589",
+        "97ca9b71-8c95-47da-94ac-3933693858c7"
+      ],
+      "reconciliation_runs": [
+        "79e6d8f6-d42f-49a5-8ead-32789833b3f4",
+        "fa7c359f-e25a-4f25-978f-d613108d0c99"
+      ],
+      "detail": {
+        "url": "/subledgers/",
+        "status": 200,
+        "sha256": "67879330145b696ad955b817a66146b759ec6aa508d2a21d9eb4c74b4ab6c67f",
+        "bytes": 57135
+      },
+      "financial_authority": "Billing source owner retained; AP/AR authority only; no GL posting inferred",
+      "configuration_fixes": [
+        "exact claims.submit grant to existing maker using native dual control",
+        "native source-specific AR control mapping to existing chart1200 under current bounded Human authorization"
+      ],
+      "defects_fixed": [
+        "CEP-079-FINDING-006 missing maker submit grant",
+        "CEP-079-FINDING-007 missing Development AR control mapping"
+      ],
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

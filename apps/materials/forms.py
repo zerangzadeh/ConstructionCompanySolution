@@ -39,6 +39,8 @@ class MaterialForm(forms.ModelForm):
         self, *args: object, organization_id: object, **kwargs: object
     ) -> None:
         super().__init__(*args, **kwargs)
+        if self.instance._state.adding:
+            self.instance.organization_id = organization_id
         self.fields["category"].queryset = MaterialCategory.objects.filter(
             organization_id=organization_id, archived_at__isnull=True, is_active=True
         )

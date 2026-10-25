@@ -599,6 +599,7 @@ def scoped_evaluations(*, organization: Organization, actor: User):
         user=actor,
         organization=organization,
         permission=BusinessPermissionCode.PARTNER_VIEW,
+        message="اجازه مشاهده صلاحیت و عملکرد همکاران را ندارید.",
     )
     return scope_queryset(
         PartnerEvaluation.objects.filter(organization=organization),

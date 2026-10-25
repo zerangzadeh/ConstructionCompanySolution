@@ -74,6 +74,12 @@ class DocumentTargetForm(forms.Form):
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
+        membership = None
+        if user is not None and organization is not None:
+            try:
+                membership = get_active_membership(user=user, organization=organization)
+            except PermissionDenied:
+                pass
         querysets = {
             "project": Project.objects.filter(
                 organization=organization, deleted_at__isnull=True
@@ -98,12 +104,28 @@ class DocumentTargetForm(forms.Form):
             ).order_by("-created_at"),
         }
         for field_name, queryset in querysets.items():
-            if user is None or not has_business_permission(
+            if membership is None or not has_business_permission(
                 user=user,
                 organization=organization,
                 permission=TARGET_PERMISSIONS[field_name],
+                allow_any_scope=True,
             ):
                 queryset = queryset.none()
+            else:
+                queryset = scope_queryset(
+                    queryset,
+                    membership=membership,
+                    project_lookup="id" if field_name == "project" else "project_id",
+                    site_lookup=(
+                        "site_id"
+                        if any(
+                            field.name == "site"
+                            for field in queryset.model._meta.fields
+                        )
+                        else None
+                    ),
+                    include_site_parent=field_name == "project",
+                )
             if document is not None:
                 link_lookup = (
                     (

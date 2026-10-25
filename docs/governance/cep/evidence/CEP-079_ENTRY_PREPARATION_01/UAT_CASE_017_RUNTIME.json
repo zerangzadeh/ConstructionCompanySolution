@@ -1,0 +1,47 @@
+{
+  "scenario": "UAT-CASE-017",
+  "failure": {
+    "type": "ValidationError",
+    "message": "['این جفت فقط با دامنه کامل شرکت قابل اجرا است.']"
+  },
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T21:36:26.445045+00:00",
+      "actor": "uiux.audit.reporting",
+      "workflow": "Native manual/opening/correction reconciliation -> retained trial balance -> full-tenant APAR/GL source-owned tie -> native details and governed Reporting review",
+      "accounting_reconciliation": "5bb66a94-0198-42ef-bdae-af6a41637e5d",
+      "trial_balance": "f272da5d-32b0-4961-806a-40e43cfd84ee",
+      "governed_reconciliation": "6c00c111-4443-4145-a260-0b7ec7db2638",
+      "native_details": [
+        {
+          "url": "/accounting/reconciliations/5bb66a94-0198-42ef-bdae-af6a41637e5d/",
+          "status": 200,
+          "sha256": "8e2883c732a4e2fab497ca7eac1250e040239c1b0bd7e7b7e489befe16525c2b",
+          "bytes": 48885
+        },
+        {
+          "url": "/accounting/statements/f272da5d-32b0-4961-806a-40e43cfd84ee/",
+          "status": 200,
+          "sha256": "8dbaaa687da1ccfcfbb58eef1b6e329125774d05005a36e34ddb7ff61259b246",
+          "bytes": 47827
+        },
+        {
+          "url": "/reporting/reconciliations/6c00c111-4443-4145-a260-0b7ec7db2638/",
+          "status": 200,
+          "sha256": "11d05b91821db39cf2df66b172fd18c13d5fcf995cb5cde69530ab55306abf1a",
+          "bytes": 48875
+        },
+        {
+          "url": "/reporting/",
+          "status": 200,
+          "sha256": "c13c78d137d7246e69c8ea92943189a2690ff7200134a3e9c34bc7803b7a83cc",
+          "bytes": 64745
+        }
+      ],
+      "scope_guard": "Initial project-scoped subledger_gl request correctly rejected; registered pair requires complete tenant scope, rerun with existing approved organization authority; no scope/grants changed",
+      "financial_scope": "Unreviewed/incomplete evidence stays explicit; Reporting remains projection-only",
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

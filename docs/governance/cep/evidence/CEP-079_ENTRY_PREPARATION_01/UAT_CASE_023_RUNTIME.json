@@ -1,0 +1,29 @@
+{
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T22:20:36.790468+00:00",
+      "actor": "account.demo-construction-01.accountant",
+      "workflow": "Native posted Treasury receipt -> existing recognized Billing AR -> native exact-source settlement; retry same allocation; native claim readback",
+      "claim": "c274c8c7-16c9-427f-8b31-6e1fdd1e5875",
+      "AR": "cf018c8e-0a3f-40b2-9530-7d71e7439d36",
+      "cash": "7f2318b9-3877-48e8-8726-d02ca38bbc9b",
+      "allocation": "8feea4c9-faf0-4cd9-b5ec-8e59b12a9211",
+      "summary": {
+        "claim_id": "c274c8c7-16c9-427f-8b31-6e1fdd1e5875",
+        "approved_net_amount": "161252460000.0000",
+        "settled_amount": "161252460000.000000",
+        "outstanding_amount": "0.000000"
+      },
+      "legacy_payment_model_absent": true,
+      "idempotent": true,
+      "readback": {
+        "url": "/billing/claims/c274c8c7-16c9-427f-8b31-6e1fdd1e5875/",
+        "status": 200,
+        "sha256": "b8de232b0eca2e9ec4dab0c734ee7b6c855779216fab933f611bf86591b82d45",
+        "bytes": 51845
+      },
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

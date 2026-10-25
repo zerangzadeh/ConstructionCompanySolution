@@ -1,0 +1,384 @@
+{
+  "finding018": {
+    "classification": "PRODUCT_WORKFLOW_OBJECT_SCOPE",
+    "pre_fix": "Browser ProjectA/siteA Safety create denied in loader and rolled back; Quality identical precheck",
+    "touch_set": [
+      "apps/safety/workflow.py",
+      "apps/quality/workflow.py",
+      "apps/safety/test_cep079_hse_scope.py"
+    ],
+    "correction": "Subject load and transition entry use any-scope coarse checks plus authoritative project/site permission recheck; no domain lifecycle changes",
+    "result": "FIXED",
+    "validation": "7 tests PASS3.084s; original4 affected lifecycle/access tests PASS; new scoped PM Safety/Quality actions reach closure"
+  },
+  "safetyincident": {
+    "id": "1df6fc4b-d933-4ee8-9361-4e4516a0b424",
+    "status": "closed",
+    "transitions": [
+      {
+        "service": "start_corrective_action",
+        "actor": "account.demo-construction-01.owner",
+        "status": "action_in_progress"
+      },
+      {
+        "service": "resolve_safety_incident",
+        "actor": "account.demo-construction-01.owner",
+        "status": "resolved"
+      },
+      {
+        "service": "close_safety_incident",
+        "error": "بستن حادثه مستلزم تأیید جداگانه رکورد است."
+      }
+    ],
+    "record_review_status": "approved",
+    "maker": "uiux.persona.project-manager",
+    "approver": "account.demo-construction-01.owner"
+  },
+  "qualityissue": {
+    "id": "e8f1009e-39e0-45ee-a3ef-17a46fa212bf",
+    "status": "closed",
+    "transitions": [
+      {
+        "service": "review_quality_issue",
+        "actor": "account.demo-construction-01.owner",
+        "status": "under_review"
+      },
+      {
+        "service": "assign_quality_issue",
+        "actor": "account.demo-construction-01.owner",
+        "status": "assigned"
+      },
+      {
+        "service": "start_quality_corrective_action",
+        "actor": "account.demo-construction-01.owner",
+        "status": "action_in_progress"
+      },
+      {
+        "service": "submit_quality_issue_for_verification",
+        "actor": "account.demo-construction-01.owner",
+        "status": "awaiting_verification"
+      },
+      {
+        "service": "verify_quality_issue",
+        "actor": "account.demo-construction-01.owner",
+        "status": "verified"
+      },
+      {
+        "service": "close_quality_issue",
+        "error": "بستن مسئله مستلزم تأیید جداگانه رکورد است."
+      }
+    ],
+    "record_review_status": "approved",
+    "maker": "uiux.persona.project-manager",
+    "approver": "account.demo-construction-01.owner"
+  },
+  "finding019": {
+    "classification": "PRODUCT_COMPLIANCE_NAVIGATION_AND_SCOPED_READ",
+    "pre_fix": {
+      "missing_ordinary_link": "HSE and Quality lists have no Compliance workspace link",
+      "project_manager_workbench": {
+        "url": "/compliance/",
+        "status": 403,
+        "sha256": "32f479ab70f5b780a7103df38ddcc9905efd717d29b71b98f762120fa5d8c546",
+        "bytes": 38868
+      }
+    },
+    "touch_set": [
+      "templates/safety/list.html",
+      "templates/quality/list.html",
+      "apps/compliance/views.py",
+      "apps/compliance/services.py",
+      "apps/compliance/test_cep079_scope.py",
+      "apps/organizations/context_processors.py"
+    ],
+    "correction": "Permission-gated ordinary HSE/Quality link; coarse read permission admits active applicable scope followed by existing list/detail object scoping. No org-scope grant or business-policy change.",
+    "result": "FIXED",
+    "validation": "2 focused read tests PASS1.311s; actual PM ordinary workspace/detail Browser PASS; existing3 setup errors attributed to unchanged permission fixture"
+  },
+  "compliance_native": [
+    {
+      "inspection": "88f8763b-247b-49b8-aa18-3ad76415cfdc",
+      "source_template": "88b6e9fc-1208-421f-be96-84ef30e4f37a",
+      "pinned_hash": "58354cb458cba0b1d31741d48c43c9b51d9feb47e697012ea955649741a28ff6"
+    },
+    {
+      "evidence": "87052336-cc27-4407-af22-ad799965404b",
+      "version": "34d00b33-a6d7-4654-b756-c44dd0164ad8",
+      "sha256": "001d98cf2c5ce5c1553b5744ca26278996271b3a01d1180216dde6d2fed6461f"
+    },
+    {
+      "id": "88f8763b-247b-49b8-aa18-3ad76415cfdc",
+      "model": "inspection",
+      "to": "in_progress",
+      "actor": "uiux.persona.project-manager"
+    },
+    {
+      "id": "88f8763b-247b-49b8-aa18-3ad76415cfdc",
+      "model": "inspection",
+      "to": "submitted",
+      "actor": "uiux.persona.project-manager"
+    },
+    {
+      "id": "88f8763b-247b-49b8-aa18-3ad76415cfdc",
+      "model": "inspection",
+      "to": "under_review",
+      "actor": "account.demo-construction-01.owner"
+    },
+    {
+      "id": "88f8763b-247b-49b8-aa18-3ad76415cfdc",
+      "model": "inspection",
+      "to": "passed",
+      "actor": "account.demo-construction-01.owner"
+    },
+    {
+      "id": "96ceb1a7-0790-4cd5-9072-c43bf6924146",
+      "model": "inspectionfinding",
+      "to": "triaged",
+      "actor": "uiux.persona.project-manager"
+    },
+    {
+      "id": "96ceb1a7-0790-4cd5-9072-c43bf6924146",
+      "model": "inspectionfinding",
+      "to": "assigned",
+      "actor": "uiux.persona.project-manager"
+    },
+    {
+      "id": "96ceb1a7-0790-4cd5-9072-c43bf6924146",
+      "model": "inspectionfinding",
+      "to": "correction_in_progress",
+      "actor": "uiux.persona.project-manager"
+    },
+    {
+      "id": "96ceb1a7-0790-4cd5-9072-c43bf6924146",
+      "model": "inspectionfinding",
+      "to": "pending_verification",
+      "actor": "uiux.persona.project-manager"
+    },
+    {
+      "same_implementer_verification_denied": "96ceb1a7-0790-4cd5-9072-c43bf6924146"
+    },
+    {
+      "id": "96ceb1a7-0790-4cd5-9072-c43bf6924146",
+      "model": "inspectionfinding",
+      "to": "verified",
+      "actor": "account.demo-construction-01.owner"
+    },
+    {
+      "id": "96ceb1a7-0790-4cd5-9072-c43bf6924146",
+      "model": "inspectionfinding",
+      "to": "closed",
+      "actor": "account.demo-construction-01.owner"
+    },
+    {
+      "id": "036e55cf-40c0-4c01-b8aa-7108ff090261",
+      "model": "nonconformance",
+      "to": "issued",
+      "actor": "account.demo-construction-01.owner"
+    },
+    {
+      "id": "036e55cf-40c0-4c01-b8aa-7108ff090261",
+      "model": "nonconformance",
+      "to": "disposition_pending",
+      "actor": "uiux.persona.project-manager"
+    },
+    {
+      "id": "036e55cf-40c0-4c01-b8aa-7108ff090261",
+      "model": "nonconformance",
+      "to": "action_in_progress",
+      "actor": "uiux.persona.project-manager"
+    },
+    {
+      "id": "036e55cf-40c0-4c01-b8aa-7108ff090261",
+      "model": "nonconformance",
+      "to": "pending_verification",
+      "actor": "uiux.persona.project-manager"
+    },
+    {
+      "id": "036e55cf-40c0-4c01-b8aa-7108ff090261",
+      "model": "nonconformance",
+      "to": "verified",
+      "actor": "account.demo-construction-01.owner"
+    },
+    {
+      "id": "036e55cf-40c0-4c01-b8aa-7108ff090261",
+      "model": "nonconformance",
+      "to": "closed",
+      "actor": "account.demo-construction-01.owner"
+    },
+    {
+      "id": "98760d26-3988-4419-ac1a-1e579549db8d",
+      "model": "capaaction",
+      "to": "approved",
+      "actor": "account.demo-construction-01.owner"
+    },
+    {
+      "id": "98760d26-3988-4419-ac1a-1e579549db8d",
+      "model": "capaaction",
+      "to": "assigned",
+      "actor": "uiux.persona.project-manager"
+    },
+    {
+      "id": "98760d26-3988-4419-ac1a-1e579549db8d",
+      "model": "capaaction",
+      "to": "in_progress",
+      "actor": "uiux.persona.project-manager"
+    },
+    {
+      "id": "98760d26-3988-4419-ac1a-1e579549db8d",
+      "model": "capaaction",
+      "to": "pending_verification",
+      "actor": "uiux.persona.project-manager"
+    },
+    {
+      "id": "98760d26-3988-4419-ac1a-1e579549db8d",
+      "model": "capaaction",
+      "to": "verified",
+      "actor": "account.demo-construction-01.owner"
+    },
+    {
+      "id": "98760d26-3988-4419-ac1a-1e579549db8d",
+      "model": "capaaction",
+      "to": "effectiveness_pending",
+      "actor": "account.demo-construction-01.owner"
+    },
+    {
+      "id": "98760d26-3988-4419-ac1a-1e579549db8d",
+      "model": "capaaction",
+      "to": "effective",
+      "actor": "account.demo-construction-01.owner"
+    },
+    {
+      "id": "98760d26-3988-4419-ac1a-1e579549db8d",
+      "model": "capaaction",
+      "to": "closed",
+      "actor": "uiux.persona.tenant-admin"
+    },
+    {
+      "prepared_source_and_template_unchanged": true,
+      "inspection_final": "passed",
+      "finding_final": "closed",
+      "ncr_final": "closed",
+      "capa_final": "closed",
+      "no_downstream_proposals": true,
+      "automatic_critical_evaluation_not_asserted": true
+    }
+  ],
+  "partner": {
+    "new": "b444f330-49ae-4572-b9c5-1830a3c5a007",
+    "status": "approved",
+    "source": "20f4b5a9-22fa-4b69-8552-dd7a63484ce0",
+    "profile": "ad6853cf-d1d0-4adc-a83c-55d450d09fc6",
+    "requirement": "6cd71025-4ecd-4b5a-968f-fb366fb8d78a",
+    "evidence": "2fe061b9-05cf-4d57-a621-d71ea8bc91e0",
+    "sha256": "001d98cf2c5ce5c1553b5744ca26278996271b3a01d1180216dde6d2fed6461f",
+    "maker": "account.demo-construction-01.owner",
+    "reviewer": "uiux.persona.tenant-admin",
+    "source_unchanged": true,
+    "actor_scope_note": "Existing organization master custodian as Case029; Project Manager scope unchanged",
+    "advanced_partner_performance": "EXCLUDED_POST_V1"
+  },
+  "scanner_duty_at_closeout": {
+    "effective": false,
+    "expired_history": [
+      {
+        "id": "783e95b6-9a95-4c77-9305-c8f1b9d9928b",
+        "role": "platform_operations",
+        "starts_at": "2026-10-22 00:41:31.739455+00:00",
+        "ends_at": "2026-10-22 01:41:31.739455+00:00",
+        "revoked_at": "2026-10-22 00:41:38.866449+00:00"
+      },
+      {
+        "id": "e06721b7-1b2c-40bf-90ab-640bea7f8354",
+        "role": "platform_operations",
+        "starts_at": "2026-10-25 01:12:39.759558+00:00",
+        "ends_at": "2026-10-25 01:17:39.759558+00:00",
+        "revoked_at": null
+      }
+    ]
+  },
+  "focused_scoped_action_reruns": [
+    {
+      "model": "safetyincident",
+      "id": "d31c6dac-fe2b-41ba-a784-402575f68468",
+      "status": "closed",
+      "transitions": [
+        {
+          "service": "review_safety_incident",
+          "actor": "uiux.persona.project-manager",
+          "status": "under_review"
+        },
+        {
+          "service": "assign_safety_incident",
+          "actor": "uiux.persona.project-manager",
+          "status": "assigned"
+        },
+        {
+          "service": "start_corrective_action",
+          "actor": "uiux.persona.project-manager",
+          "status": "action_in_progress"
+        },
+        {
+          "service": "resolve_safety_incident",
+          "actor": "uiux.persona.project-manager",
+          "status": "resolved"
+        }
+      ],
+      "maker": "uiux.persona.project-manager",
+      "record_approver_and_closer": "account.demo-construction-01.owner"
+    },
+    {
+      "model": "qualityissue",
+      "id": "32056fa1-33b6-43dc-af1e-9225be6972fd",
+      "status": "closed",
+      "transitions": [
+        {
+          "service": "review_quality_issue",
+          "actor": "uiux.persona.project-manager",
+          "status": "under_review"
+        },
+        {
+          "service": "assign_quality_issue",
+          "actor": "uiux.persona.project-manager",
+          "status": "assigned"
+        },
+        {
+          "service": "start_quality_corrective_action",
+          "actor": "uiux.persona.project-manager",
+          "status": "action_in_progress"
+        },
+        {
+          "service": "submit_quality_issue_for_verification",
+          "actor": "uiux.persona.project-manager",
+          "status": "awaiting_verification"
+        },
+        {
+          "service": "verify_quality_issue",
+          "actor": "account.demo-construction-01.owner",
+          "status": "verified"
+        }
+      ],
+      "maker": "uiux.persona.project-manager",
+      "record_approver_and_closer": "account.demo-construction-01.owner"
+    }
+  ],
+  "continuation_execution": [
+    {
+      "at": "2026-10-25T01:38:11.229783+00:00",
+      "workflow": "Ordinary Browser Project Manager Safety/Quality create and closed readback; actual scoped native lifecycle reruns; independent record decisions; ordinary Compliance navigation/list/detail with source-pinned QA inspection passed, Finding/NCR/CAPA closed; pinned Partner qualification independently approved and ordinary owner master-workspace readback",
+      "browser_evidence": "UAT_CASE_044_BROWSER.json",
+      "primary_actor": "uiux.persona.project-manager",
+      "organization_master_custodian": "account.demo-construction-01.owner",
+      "independent_reviewers": [
+        "account.demo-construction-01.owner",
+        "uiux.persona.tenant-admin"
+      ],
+      "actor_scope_preserved": true,
+      "findings018_019": "FIXED; HSE7+affected4 and Compliance2 focused tests PASS; three existing Compliance setup errors attributed to unchanged legacy authorization fixtures",
+      "immutable_sources": "Prepared inspection remains draft; published template/hash, original approved partner source/requirement and document bytes unchanged",
+      "excluded": "Advanced partner-performance/PostV1; automatic critical evaluator claims; downstream posting; Production; Human Sign-off",
+      "unresolved_blocking_defects": 0,
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

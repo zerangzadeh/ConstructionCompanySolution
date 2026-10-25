@@ -7,6 +7,10 @@
     <p class="text-xs font-semibold text-blue-700">گزارش‌ها و اطلاعات مدیریتی</p>
     <h1 class="mt-2 text-2xl font-bold text-slate-900">داشبورد شاخص‌های حاکم‌شده</h1>
     <p class="mt-2 text-sm text-slate-600">وضعیت عملیات، استثناها و نتایج مدیریتی از شواهد حاکم‌شده؛ هر نتیجه با زمان مبنا و مسیر منبع.</p>
+    <nav aria-label="فضاهای گزارش‌گیری" class="mt-4 flex flex-wrap gap-3">
+      {% if "reporting.reconciliation_run.view" in business_permission_codes %}<a class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-blue-700" href="{% url 'reporting:reconciliation_workbench' %}">تطبیق منابع</a>{% endif %}
+      {% if "reporting.project_closeout_case.view" in business_permission_codes %}<a class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-blue-700" href="{% url 'reporting:project_closeout_workbench' %}">آمادگی اختتام پروژه</a>{% endif %}
+    </nav>
   </header>
 
   <p class="text-sm text-slate-600">زمان مشاهده: {{ read_model.observed_at|jalali_datetime }} · انتخاب شواهد تا: {{ read_model.as_of|jalali_datetime }}. وضعیت تازگی، وضعیت ثبت‌شده منبع در زمان مشاهده است.</p>

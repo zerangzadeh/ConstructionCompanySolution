@@ -1,0 +1,27 @@
+{
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T21:41:14.768306+00:00",
+      "actor": "account.demo-construction-01.accountant",
+      "workflow": "Native AP allocation from prepared dedicated posted cash -> exact idempotent retry -> over-capacity rejection -> cash-post retry returns same movement/journal -> owning AP workspace review",
+      "obligation": "ec09053f-f138-46b8-ae47-ce1736b425de",
+      "movement": "12465a0a-09e2-4197-ad0f-c6c2c06c6889",
+      "allocation": "44102561-7ac3-4097-91b4-4de63220f9ea",
+      "amount": "1.000000",
+      "accounting_consequence": {
+        "native_cash_journal": "229fdb75-807b-4d36-b6d3-3ab587884db6",
+        "journal_set_unchanged_by_allocation_or_retry": true,
+        "no_duplicate_cash_occurrence": true
+      },
+      "negative_control": "Over-settlement rejected",
+      "owning_view": {
+        "url": "/subledgers/",
+        "status": 200,
+        "sha256": "6ea2f3b521ea159dec980fc8616aac25cdd44521cad507b023379776e7f7d39b",
+        "bytes": 58007
+      },
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

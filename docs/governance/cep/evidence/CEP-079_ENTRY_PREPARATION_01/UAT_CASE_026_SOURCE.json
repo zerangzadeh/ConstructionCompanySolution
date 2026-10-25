@@ -1,0 +1,88 @@
+{
+  "created_at": "2026-10-24 22:40:29.304756+00:00",
+  "rfq": "e0d37d58-4c42-4b64-8e66-3099189e0183",
+  "version": "29c93b00-eaa2-47c1-90fc-f87cb72d69e6",
+  "revision": "89bf03c2-2a9d-448f-87ae-afa38facc877",
+  "source_sha256": "aa6f5770b6878672e7edec6bf71013baf921db637637e5532baacd1aed4b5361",
+  "payload_path": "docs/governance/uiux/rv007_controlled_time/SYNTHETIC_QUOTE.pdf",
+  "closing_at": "2026-10-24 22:42:16.672128+00:00",
+  "earliest_opening_at": "2026-10-24 22:42:16.672128+00:00",
+  "clock": "REAL_UNMODIFIED",
+  "source": "Existing approved synthetic Development PDF; no actual vendor quote",
+  "manifest": "5f7c98c7-c376-4cd1-a38f-465301587963",
+  "evidence": "9e060116-1f68-4324-b3d7-995b92159fd3",
+  "document_version": "1d72d4e7-b2a6-4d70-9117-f8f721f08b8a",
+  "scan": {
+    "at": "2026-10-24T22:43:02.104336+00:00",
+    "adapter": "microsoft-defender-mpcmdrun",
+    "version": "CurrentVersion",
+    "exit_code": 0,
+    "stdout": "Scan starting...\nScan finished.\nScanning E:\\Construction_Company_Solution\\protected_documents\\organizations\\cca028cb-a2ff-4485-83ab-a9c1bd1e47b2\\documents\\d22e9415-9266-49f0-b6ea-49dea4ab259e\\versions\\5625cbe3-8e2e-424c-b898-e40e96d63427.pdf found no threats.\n",
+    "stderr": ""
+  },
+  "scanner_duty": "3f0eac51-5d61-4b39-8f69-65ff22ee29ea",
+  "assessment": "4518aced-8dc2-4e34-90d0-98f4b8d8459c",
+  "same_actor_opening_denied": true,
+  "opening_request": "d47a9d08-0f60-4100-aa77-b6568fb24ea1",
+  "opening": "3bfd6f71-78a3-4a4e-94c4-1ccf0c3769f1",
+  "access_grants": [
+    "8651de87-40e0-486c-a425-438b65d1ae52",
+    "e1f78ee5-7921-462c-b0a0-128d0b5533b2"
+  ],
+  "admissibility": "7d5e3c26-eb29-48e4-b9fe-025205cc6dfe",
+  "scope": "af5fcae8-aeab-43db-8be1-5fee600098e7",
+  "qualified_at": "2026-10-24T22:43:49.726972+00:00",
+  "comparison": "342db6a8-3e39-4465-841f-432ebdfd67df",
+  "appointment": "4158ad6a-97fe-4475-9362-f0b732d89a2f",
+  "evaluation": "35e60853-e644-4352-897a-4b64599edc32",
+  "finalizer_role_assignment": "a454b5c9-5178-4f1d-aee9-d5267254a1d3",
+  "finding011": {
+    "classification": "MISSING_CONFIGURATION",
+    "failure": "Finalization fail-closed: no active tenant policy",
+    "correction": [
+      {
+        "code": "rfq-comparison-self-finalization",
+        "version": "3043a24d-6250-4b29-bba3-de56c621d939",
+        "selection": "c20f9e4d-b1a8-4f27-9080-67b51c05de3a",
+        "parameters": {
+          "allow_self_approval": false
+        },
+        "effective_to": "2026-10-26"
+      },
+      {
+        "code": "rfq-sourcing-award-self-finalization",
+        "version": "f516a203-7686-4b1e-a5f2-e03297bfd0bf",
+        "selection": "d734118f-5026-4c90-bc12-b8631dc38dd4",
+        "parameters": {
+          "allow_self_approval": false
+        },
+        "effective_to": "2026-10-26"
+      }
+    ],
+    "source": "Registered policy catalogue + explicit Human independent-approval instruction",
+    "result": "FIXED"
+  },
+  "finalized_comparison": "9abda583-e0e7-4256-9807-50cfe19ace55",
+  "comparison_finalizer": "uiux.wavec.custodian",
+  "preparation": "43b77321-9e4c-4f36-9c51-f63f0d419e9b",
+  "award": "00e03101-5ae6-4ce0-8eff-fabb61b7d2e2",
+  "award_finalizer": "uiux.wavec.custodian",
+  "idempotent_finalization": true,
+  "downstream_before": {
+    "PurchaseOrder": 15,
+    "JournalEntry": 19,
+    "TreasuryMovement": 13,
+    "Obligation": 3,
+    "ProjectCostFact": 0,
+    "Contract": 20
+  },
+  "downstream_after": {
+    "PurchaseOrder": 15,
+    "JournalEntry": 19,
+    "TreasuryMovement": 13,
+    "Obligation": 3,
+    "ProjectCostFact": 0,
+    "Contract": 20
+  },
+  "completed_at": "2026-10-24T22:45:24.676621+00:00"
+}

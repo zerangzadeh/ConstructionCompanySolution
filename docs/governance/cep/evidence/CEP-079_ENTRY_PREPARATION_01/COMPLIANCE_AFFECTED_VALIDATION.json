@@ -1,0 +1,24 @@
+{
+  "scoped_read_tests": {
+    "count": 2,
+    "pass": 2,
+    "duration_seconds": 1.311,
+    "covers": [
+      "scoped list/detail/navigation flag",
+      "same-tenant ungranted",
+      "foreign tenant404",
+      "unknown404",
+      "missing permission",
+      "inactive membership"
+    ]
+  },
+  "existing_regression_attempt": {
+    "count": 3,
+    "executed_test_bodies": 0,
+    "setup_errors": 3,
+    "attribution": "All fail in unchanged create_template->_permission at setUp line114 due legacy membership authorization fixture; before corrected scoped read selector or view",
+    "unchanged_permission_function_sha256": "5c5ffc83bed9bfec3d287b966976a1e2afcc2a8b7fe38873be96a1fd63978595",
+    "matches_HEAD": true
+  },
+  "live_lifecycle": "Synthetic QA inspection passed, Finding/NCR/CAPA closed with independent verifier/closer; template and prepared source unchanged"
+}

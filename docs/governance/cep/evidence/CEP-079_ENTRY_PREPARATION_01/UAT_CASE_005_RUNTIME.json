@@ -1,0 +1,382 @@
+{
+  "scenario": "UAT-CASE-005",
+  "at": "2026-10-24T20:55:01.217881+00:00",
+  "attempts": [
+    {
+      "result": "FAIL",
+      "failure_boundary": "Reporting dashboard reached normally by uiux.audit.reporting; no visible route to existing reconciliation or project closeout workspaces",
+      "classification": "PRODUCT_IMPLEMENTATION",
+      "defect": "CEP-079-FINDING-001",
+      "evidence": "Browser dashboard visible-link inventory and templates/reporting/dashboard.html plus navigation_links.html; only metric layers/drillthrough/export exposed",
+      "decision_required": false,
+      "minimum_correction": "Add two permission-gated links to existing workspaces. No new role, permission, endpoint or domain behavior."
+    },
+    {
+      "at": "2026-10-24T20:58:22.960Z",
+      "result": "BLOCKED",
+      "classification": "CONFIGURATION_AUTHORITY",
+      "defect": "CEP-079-FINDING-002",
+      "blocker": "BLOCKER-SECURITY",
+      "workflow": "Dashboard -> new permission-gated closeout link -> existing permitted-case list -> owning case link -> access denied",
+      "url": "http://127.0.0.1:8000/reporting/project-closeout/7285efd1-be6c-489e-94af-27e98a64d113/",
+      "expected": "Review incomplete closeout evidence under approved source permissions",
+      "actual": "Native closeout_case_detail raises PermissionDenied: Financial source access required; exact missing permission payroll_results.view",
+      "required_resolution": "Human-authorized, membership/project-scoped Payroll-result read access for approved UAT reviewer, or an already-authorized replacement actor with the full source permission intersection. No grant or control weakening performed."
+    },
+    {
+      "at": "2026-10-24T21:14:47.718Z",
+      "result": "PASS",
+      "workflow": "Resumed exact denied closeout detail after native least-permission assignment",
+      "observed": [
+        "Owning closeout detail now visible",
+        "Active case with no current assessment or linked evidence is shown truthfully",
+        "No project, source or period closure inferred"
+      ],
+      "url": "http://127.0.0.1:8000/reporting/project-closeout/7285efd1-be6c-489e-94af-27e98a64d113/"
+    }
+  ],
+  "focused_validation": {
+    "actual_template_rendering": [
+      {
+        "permission_set": [],
+        "result": "PASS"
+      },
+      {
+        "permission_set": [
+          "reporting.reconciliation_run.view"
+        ],
+        "result": "PASS"
+      },
+      {
+        "permission_set": [
+          "reporting.project_closeout_case.view"
+        ],
+        "result": "PASS"
+      },
+      {
+        "permission_set": [
+          "reporting.project_closeout_case.view",
+          "reporting.reconciliation_run.view"
+        ],
+        "result": "PASS"
+      }
+    ],
+    "backend_changed": false,
+    "regression_scope": "Dashboard link permission visibility and existing browser destination enforcement only"
+  },
+  "reconciliation": {
+    "at": "2026-10-24T20:55:45.966Z",
+    "url": "http://127.0.0.1:8000/reporting/reconciliations/413b11d5-741d-47dd-9c03-ddebffc6a0c5/",
+    "observed": [
+      "Owning source models ProjectCostSourceContract and ProjectCostFact",
+      "Both sides uncomparable; absent amounts remain unknown",
+      "Resolved exact tolerance is not applied to unaligned dimensions",
+      "Material exception retained; no source mutation"
+    ]
+  },
+  "authority_diagnostic": {
+    "method": "Read-only native permission checks for exact closeout boundary on approved project A; existing qualified actors only; no grants changed",
+    "required_permissions": [
+      "accounting.view",
+      "accounting_recognition.view",
+      "claims.view",
+      "compliance.view",
+      "contracts.view",
+      "documents.view",
+      "equipment.view",
+      "field_observations.view",
+      "fixed_assets.view",
+      "inventory_reconciliations.view",
+      "inventory_valuation.view",
+      "knowledge.publications_view",
+      "payable_certificates.view",
+      "payroll_results.view",
+      "project_cost.reconciliations_view",
+      "projects.view",
+      "reporting.metric_result.view",
+      "reporting.project_closeout_case.view",
+      "reporting.reconciliation_run.view",
+      "subledgers.view",
+      "treasury.view"
+    ],
+    "qualified_actor_checks": [
+      {
+        "actor": "account.demo-construction-01.accountant",
+        "missing_permissions": [
+          "knowledge.publications_view",
+          "payroll_results.view",
+          "project_cost.reconciliations_view",
+          "reporting.metric_result.view",
+          "reporting.project_closeout_case.view",
+          "reporting.reconciliation_run.view"
+        ]
+      },
+      {
+        "actor": "account.demo-construction-01.owner",
+        "missing_permissions": [
+          "accounting_recognition.view",
+          "reporting.metric_result.view",
+          "reporting.project_closeout_case.view",
+          "reporting.reconciliation_run.view"
+        ]
+      },
+      {
+        "actor": "cep078.synthetic.accessibility",
+        "missing_permissions": [
+          "accounting_recognition.view",
+          "payroll_results.view"
+        ]
+      },
+      {
+        "actor": "cep078.synthetic.operations",
+        "missing_permissions": [
+          "accounting.view",
+          "accounting_recognition.view",
+          "claims.view",
+          "compliance.view",
+          "contracts.view",
+          "documents.view",
+          "equipment.view",
+          "field_observations.view",
+          "fixed_assets.view",
+          "inventory_reconciliations.view",
+          "inventory_valuation.view",
+          "knowledge.publications_view",
+          "payable_certificates.view",
+          "payroll_results.view",
+          "project_cost.reconciliations_view",
+          "projects.view",
+          "reporting.metric_result.view",
+          "reporting.project_closeout_case.view",
+          "reporting.reconciliation_run.view",
+          "subledgers.view",
+          "treasury.view"
+        ]
+      },
+      {
+        "actor": "uiux.audit.reporting",
+        "missing_permissions": [
+          "payroll_results.view"
+        ]
+      },
+      {
+        "actor": "uiux.persona.project-manager",
+        "missing_permissions": [
+          "accounting_recognition.view",
+          "payroll_results.view",
+          "project_cost.reconciliations_view",
+          "reporting.metric_result.view",
+          "reporting.reconciliation_run.view"
+        ]
+      },
+      {
+        "actor": "uiux.wavec.buyer",
+        "missing_permissions": [
+          "accounting.view",
+          "accounting_recognition.view",
+          "claims.view",
+          "compliance.view",
+          "contracts.view",
+          "documents.view",
+          "equipment.view",
+          "field_observations.view",
+          "fixed_assets.view",
+          "inventory_reconciliations.view",
+          "inventory_valuation.view",
+          "knowledge.publications_view",
+          "payable_certificates.view",
+          "payroll_results.view",
+          "project_cost.reconciliations_view",
+          "projects.view",
+          "reporting.metric_result.view",
+          "reporting.project_closeout_case.view",
+          "reporting.reconciliation_run.view",
+          "subledgers.view",
+          "treasury.view"
+        ]
+      },
+      {
+        "actor": "uiux.wavec.hr",
+        "missing_permissions": [
+          "accounting.view",
+          "accounting_recognition.view",
+          "claims.view",
+          "compliance.view",
+          "contracts.view",
+          "documents.view",
+          "equipment.view",
+          "field_observations.view",
+          "fixed_assets.view",
+          "inventory_reconciliations.view",
+          "inventory_valuation.view",
+          "knowledge.publications_view",
+          "payable_certificates.view",
+          "payroll_results.view",
+          "project_cost.reconciliations_view",
+          "projects.view",
+          "reporting.metric_result.view",
+          "reporting.project_closeout_case.view",
+          "reporting.reconciliation_run.view",
+          "subledgers.view",
+          "treasury.view"
+        ]
+      },
+      {
+        "actor": "uiux.wavec.payroll",
+        "missing_permissions": [
+          "accounting.view",
+          "accounting_recognition.view",
+          "claims.view",
+          "compliance.view",
+          "contracts.view",
+          "documents.view",
+          "equipment.view",
+          "field_observations.view",
+          "fixed_assets.view",
+          "inventory_reconciliations.view",
+          "inventory_valuation.view",
+          "knowledge.publications_view",
+          "payable_certificates.view",
+          "project_cost.reconciliations_view",
+          "projects.view",
+          "reporting.metric_result.view",
+          "reporting.project_closeout_case.view",
+          "reporting.reconciliation_run.view",
+          "subledgers.view",
+          "treasury.view"
+        ]
+      },
+      {
+        "actor": "uiux.wavec.time",
+        "missing_permissions": [
+          "accounting.view",
+          "accounting_recognition.view",
+          "claims.view",
+          "compliance.view",
+          "contracts.view",
+          "equipment.view",
+          "field_observations.view",
+          "fixed_assets.view",
+          "inventory_reconciliations.view",
+          "inventory_valuation.view",
+          "knowledge.publications_view",
+          "payable_certificates.view",
+          "payroll_results.view",
+          "project_cost.reconciliations_view",
+          "projects.view",
+          "reporting.metric_result.view",
+          "reporting.project_closeout_case.view",
+          "reporting.reconciliation_run.view",
+          "subledgers.view",
+          "treasury.view"
+        ]
+      },
+      {
+        "actor": "uiux.audit.project",
+        "missing_permissions": [
+          "accounting_recognition.view",
+          "fixed_assets.view",
+          "payroll_results.view",
+          "project_cost.reconciliations_view",
+          "reporting.metric_result.view",
+          "reporting.project_closeout_case.view",
+          "reporting.reconciliation_run.view"
+        ]
+      },
+      {
+        "actor": "uiux.persona.tenant-admin",
+        "missing_permissions": [
+          "accounting_recognition.view",
+          "payroll_results.view",
+          "reporting.project_closeout_case.view"
+        ]
+      },
+      {
+        "actor": "uiux.wavec.custodian",
+        "missing_permissions": [
+          "accounting.view",
+          "accounting_recognition.view",
+          "claims.view",
+          "compliance.view",
+          "contracts.view",
+          "documents.view",
+          "equipment.view",
+          "field_observations.view",
+          "fixed_assets.view",
+          "inventory_reconciliations.view",
+          "inventory_valuation.view",
+          "knowledge.publications_view",
+          "payable_certificates.view",
+          "payroll_results.view",
+          "project_cost.reconciliations_view",
+          "projects.view",
+          "reporting.metric_result.view",
+          "reporting.project_closeout_case.view",
+          "reporting.reconciliation_run.view",
+          "subledgers.view",
+          "treasury.view"
+        ]
+      },
+      {
+        "actor": "uiux.wavec.opening-approver",
+        "missing_permissions": [
+          "accounting.view",
+          "accounting_recognition.view",
+          "claims.view",
+          "compliance.view",
+          "contracts.view",
+          "documents.view",
+          "equipment.view",
+          "field_observations.view",
+          "fixed_assets.view",
+          "inventory_reconciliations.view",
+          "inventory_valuation.view",
+          "knowledge.publications_view",
+          "payable_certificates.view",
+          "payroll_results.view",
+          "project_cost.reconciliations_view",
+          "projects.view",
+          "reporting.metric_result.view",
+          "reporting.project_closeout_case.view",
+          "reporting.reconciliation_run.view",
+          "subledgers.view",
+          "treasury.view"
+        ]
+      }
+    ]
+  },
+  "scenario_result": "PASS",
+  "defects": [
+    {
+      "id": "CEP-079-FINDING-001",
+      "kind": "PRODUCT_IMPLEMENTATION",
+      "status": "FIXED",
+      "correction": "Two permission-gated links only; existing routes and backend authorization unchanged"
+    },
+    {
+      "id": "CEP-079-FINDING-002",
+      "kind": "CONFIGURATION_AUTHORITY",
+      "status": "FIXED_NATIVE_AUTHORIZATION",
+      "missing_permission": "payroll_results.view",
+      "affected_actor": "uiux.audit.reporting"
+    }
+  ],
+  "authorized_access_resolution": {
+    "at": "2026-10-24T21:14:17.988613+00:00",
+    "route": "Native create_organization_role then ordinary dual-control assign_membership_role",
+    "role": "cep079_payroll_result_reader",
+    "role_id": "c0fcbf0f-d0f2-43f3-bf15-ac812895a74a",
+    "assignment": "1f82f678-d022-42e7-a1ce-db4007498d86",
+    "actor": "account.demo-construction-01.owner",
+    "independent_approver": "uiux.persona.tenant-admin",
+    "target": "uiux.audit.reporting",
+    "added_permissions": [
+      "payroll_results.view"
+    ],
+    "removed_permissions": [],
+    "existing_scope_unchanged": true,
+    "effective_scope": "Existing organization scope; native union-of-roles semantics retained",
+    "source_detail_service": "PASS",
+    "schema_or_migration_changes": false
+  }
+}

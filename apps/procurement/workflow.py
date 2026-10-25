@@ -155,12 +155,6 @@ def load_purchase_request_subject(
     actor: User,
     for_update: bool,
 ) -> SubjectSnapshot:
-    require_business_permission(
-        user=actor,
-        organization=organization,
-        permission=BusinessPermissionCode.PURCHASE_REQUESTS_VIEW,
-        message="اجازه مشاهده این درخواست خرید را ندارید.",
-    )
     queryset = PurchaseRequest.objects.select_related(
         "project", "created_by", "updated_by"
     )
@@ -172,6 +166,13 @@ def load_purchase_request_subject(
         raise PermissionDenied("درخواست خرید در این سازمان یافت نشد.") from exc
     if purchase_request.project.organization_id != organization.pk:
         raise PermissionDenied("پروژه درخواست خرید متعلق به این سازمان نیست.")
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.PURCHASE_REQUESTS_VIEW,
+        project=purchase_request.project,
+        message="اجازه مشاهده این درخواست خرید را ندارید.",
+    )
     return SubjectSnapshot(
         subject=purchase_request,
         subject_id=str(purchase_request.pk),

@@ -220,6 +220,7 @@ def load_quality_subject(
         user=actor,
         organization=organization,
         permission=BusinessPermissionCode.QUALITY_ISSUES_VIEW,
+        allow_any_scope=True,
         message="اجازه مشاهده مسئله کیفیت را ندارید.",
     )
     queryset = QualityIssue.objects.select_related(
@@ -242,6 +243,15 @@ def load_quality_subject(
         or (issue.site_id and issue.site.project_id != issue.project_id)
     ):
         raise PermissionDenied("دامنه مسئله کیفیت نامعتبر است.")
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.QUALITY_ISSUES_VIEW,
+        project=issue.project,
+        site=issue.site,
+        allow_site_parent=True,
+        message="اجازه مشاهده مسئله کیفیت را ندارید.",
+    )
     return SubjectSnapshot(
         subject=issue,
         subject_id=str(issue.pk),
@@ -746,12 +756,22 @@ def perform_quality_transition(
         user=actor,
         organization=organization,
         permission=permission,
+        allow_any_scope=True,
         message="اجازه انجام این اقدام کیفیت را ندارید.",
     ) or get_active_membership(user=actor, organization=organization)
     try:
         issue = QualityIssue.objects.get(pk=issue_id, organization=organization)
     except QualityIssue.DoesNotExist as exc:
         raise PermissionDenied("مسئله کیفیت در این سازمان یافت نشد.") from exc
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=permission,
+        project=issue.project,
+        site=issue.site,
+        allow_site_parent=True,
+        message="اجازه انجام این اقدام کیفیت را ندارید.",
+    )
     if issue.status != expected_status:
         raise ValueError("وضعیت مسئله برای این اقدام معتبر نیست.")
     if not WorkflowInstance.objects.filter(

@@ -723,12 +723,18 @@ def get_progress_records(
 ) -> QuerySet[ProgressRecord]:
     """Return progress sources from the caller's active organization only."""
 
-    _require_progress_permission(
-        actor=actor,
+    membership = require_business_permission(
+        user=actor,
         organization=organization,
         permission=BusinessPermissionCode.PROGRESS_VIEW,
+        message="مجوز لازم برای مشاهده پیشرفت را ندارید.",
+        allow_any_scope=True,
     )
-    return ProgressRecord.objects.filter(organization=organization).select_related(
+    return scope_queryset(
+        ProgressRecord.objects.filter(organization=organization),
+        membership=membership,
+        project_lookup="baseline__project_id",
+    ).select_related(
         "baseline", "baseline_item", "created_by", "verified_by", "corrects"
     )
 
@@ -738,12 +744,18 @@ def get_progress_claims(
 ) -> QuerySet[ProgressClaim]:
     """Return only claims visible in the caller's active organization."""
 
-    _require_progress_permission(
-        actor=actor,
+    membership = require_business_permission(
+        user=actor,
         organization=organization,
         permission=BusinessPermissionCode.CLAIMS_VIEW,
+        message="مجوز لازم برای مشاهده صورت‌وضعیت را ندارید.",
+        allow_any_scope=True,
     )
-    return ProgressClaim.objects.filter(organization=organization).select_related(
+    return scope_queryset(
+        ProgressClaim.objects.filter(organization=organization),
+        membership=membership,
+        project_lookup="project_id",
+    ).select_related(
         "project",
         "contract",
         "baseline",

@@ -19,7 +19,7 @@ from apps.partner_qualification.services import scoped_evaluations
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.PARTNER_VIEW)
 def workbench(request):
-    organization = request.active_organization
+    organization = request.organization
     return render(
         request,
         "partner_qualification/workbench.html",

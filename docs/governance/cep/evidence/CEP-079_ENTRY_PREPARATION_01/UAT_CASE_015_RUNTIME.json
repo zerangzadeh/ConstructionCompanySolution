@@ -1,0 +1,37 @@
+{
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T21:31:52.394272+00:00",
+      "actor": "account.demo-construction-01.accountant",
+      "checker": "account.demo-construction-01.owner",
+      "workflow": "Actual reverse_journal (reversing entry posted) -> create linked replacement -> balance/submit -> independent post -> native owning detail lineage review",
+      "original": "2085431c-45dc-42fa-b063-db6a1b483dcc",
+      "reversal": "bd960ecd-8578-416d-91ca-e032c254c1b4",
+      "replacement": "ccafb95e-5ecf-4cd2-86b6-0050dc86c2aa",
+      "original_header_and_posted_lines_unchanged": true,
+      "native_details": [
+        {
+          "url": "/accounting/journals/2085431c-45dc-42fa-b063-db6a1b483dcc/",
+          "status": 200,
+          "sha256": "dc699d98c163b94f7b2e52f3de38c522d6f36b900e43b652d16b0d9dd68d2d27",
+          "bytes": 56884
+        },
+        {
+          "url": "/accounting/journals/bd960ecd-8578-416d-91ca-e032c254c1b4/",
+          "status": 200,
+          "sha256": "5618d5d6a1659ea83640d06df06482e53d77497125c86eb8653f8216107e8978",
+          "bytes": 57083
+        },
+        {
+          "url": "/accounting/journals/ccafb95e-5ecf-4cd2-86b6-0050dc86c2aa/",
+          "status": 200,
+          "sha256": "c90241a909d9ab814a16cf86734a6f03a932312180d1d83233d17f0b91731e58",
+          "bytes": 57029
+        }
+      ],
+      "sources": "Only new CEP079 UAT014 original corrected; accepted historical journals untouched",
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

@@ -1,0 +1,66 @@
+{
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T21:25:44.328425+00:00",
+      "actor": "uiux.persona.project-manager",
+      "browser_workflow": "Home Contracts -> exact contract: signed date1404/01/25 and execution range Jalali; approved classified termv2 and supersededv1 visible. Navigation Billing -> Claims truthful no-records status -> new existing-permission links -> verified progress list/detail with Jalali date1404/02/19.",
+      "native_requests": [
+        {
+          "url": "/contracts/c1731b3b-d971-40e5-95ef-3d3ce2c4b838/",
+          "status": 200,
+          "sha256": "067ea4431b0d643b01008370955231a01949945e30b89b8492ee5bafd41f6ac1",
+          "bytes": 42168
+        },
+        {
+          "url": "/billing/claims/",
+          "status": 200,
+          "sha256": "2f9f9f31cc2416fc1aed8e2061132ad4ffbf23496d365569535230eb0aace397",
+          "bytes": 40177
+        },
+        {
+          "url": "/billing/progress/",
+          "status": 200,
+          "sha256": "31ffcd1132f00ba0bbe7d4a7bf1bd28b962baa791d2b06a1b764de74a6277f76",
+          "bytes": 39709
+        },
+        {
+          "url": "/billing/progress/36da3b94-cc2e-47bb-915c-f5d020367fbd/",
+          "status": 200,
+          "sha256": "dd8f7d984ca52cf28b56bbb2010b9e661e734fafbea54dd78329669bb2ea0af2",
+          "bytes": 39133
+        },
+        {
+          "url": "/billing/baselines/",
+          "status": 200,
+          "sha256": "b29444cfe3fbdb70b9748a71db4da185cdc32190545fcc001495f86a9a22b035",
+          "bytes": 39701
+        }
+      ],
+      "expected_review_results": {
+        "contract_status": "active_receivable",
+        "progress_status": "verified",
+        "claims_status": "No claims yet; source creation/settlement is later case023; no inference of financial acceptance"
+      },
+      "defects": [
+        {
+          "id": "CEP-079-FINDING-003",
+          "extension": "Same scoped-read selector error also affected get_progress_claims; fixed using native allow_any_scope plus project_id scope_queryset; no mutation permission changes"
+        },
+        {
+          "id": "CEP-079-FINDING-004",
+          "root": "Ordinary Billing entry lacked baseline/progress links",
+          "fix": "Two existing-permission-gated links in claim_list; Browser navigation PASS"
+        }
+      ],
+      "read_only_sources": true,
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS",
+  "focused_validation_after_read_selector_changes": {
+    "result": "5/5 PASS",
+    "tests": "4 ProgressReadScopeTests plus exact claim project/tenant scope regression",
+    "system_checks": "0 issues",
+    "native_affected_paths": "progress and claim list200 for project-scoped actors"
+  }
+}

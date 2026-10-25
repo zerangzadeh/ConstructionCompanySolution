@@ -308,6 +308,7 @@ def scoped_inspections(
         user=actor,
         organization=organization,
         permission=BusinessPermissionCode.COMPLIANCE_VIEW,
+        allow_any_scope=True,
         message="اجازه مشاهده کارگاه HSE/QA را ندارید.",
     )
     queryset = Inspection.objects.filter(organization=organization).select_related(
@@ -371,9 +372,7 @@ def compliance_export_rows(
     return rows
 
 
-def reconcile_compliance(
-    *, organization: Organization, actor: User
-) -> dict[str, Any]:
+def reconcile_compliance(*, organization: Organization, actor: User) -> dict[str, Any]:
     membership = require_business_permission(
         user=actor,
         organization=organization,

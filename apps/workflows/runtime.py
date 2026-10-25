@@ -186,10 +186,20 @@ def _load_subject(
     if unknown:
         raise ValidationError("آداپتور ویژگی ثبت‌نشده برگرداند.")
     if check_start_permission and adapter.start_permission:
+        scope_instance = WorkflowInstance(
+            organization=organization, subject_context=dict(snapshot.attributes)
+        )
+        project, site = workflow_scope_objects(scope_instance)
+        if (snapshot.attributes.get("project_id") and project is None) or (
+            snapshot.attributes.get("site_id") and site is None
+        ):
+            raise PermissionDenied("دامنه موضوع گردش‌کار معتبر نیست.")
         _require_permission(
             actor=actor,
             organization=organization,
             permission=adapter.start_permission,
+            project=project,
+            site=site,
         )
     return snapshot
 

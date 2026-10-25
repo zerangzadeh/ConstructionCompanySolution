@@ -1,0 +1,53 @@
+{
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T21:27:24.201796+00:00",
+      "actor": "uiux.persona.project-manager",
+      "browser_workflow": "Sidebar Field Operations -> exact ProjectA/Site01 daily report; status/date/author/labor/equipment/material sections and tenant-shared material choices reviewed",
+      "native_requests": [
+        {
+          "url": "/daily-reports/",
+          "status": 200,
+          "sha256": "dfd44f0556daa1bad7226c6b521552eaf17058afc4a96ed728588fa5435be943",
+          "bytes": 63249
+        },
+        {
+          "url": "/daily-reports/ba570e1f-6d53-45e1-a1a1-38a9b5760a29/",
+          "status": 200,
+          "sha256": "59a258789e3a35cdc1b37545e5609ea0defa72aaa25696cd06052bbfe0184208",
+          "bytes": 64864
+        },
+        {
+          "url": "/daily-reports/create/",
+          "status": 200,
+          "sha256": "4cca550f342f6550b82816f2c092cd9acddfe3f6e4cc5e9b7643bf2e3ca8d869",
+          "bytes": 47090
+        },
+        {
+          "url": "/procurement/",
+          "status": 200,
+          "sha256": "ae47d7f03dff3309faf322c6d20be4da759bad8f4802a14ab83e79606dbe8c86",
+          "bytes": 45751
+        },
+        {
+          "url": "/procurement/orders/",
+          "status": 200,
+          "sha256": "ee307da0ecacbe530160ce4c13ddf78158896875f9bd73dc0f9b8699533e41ae",
+          "bytes": 45882
+        }
+      ],
+      "context_validation": {
+        "allowed_projects": [
+          "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "de3b5756-9d3e-4e67-a08b-97dbd2824c2f"
+        ],
+        "all_order_projects_subset_of_actor_scope": true,
+        "daily_form_project_scope": "PASS"
+      },
+      "master_catalog_control": "Supplementary /materials/ browse denied403 for project-only scope; normal project report material choices remain available. Organization master management is not required by this read-only scenario.",
+      "read_only": true,
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

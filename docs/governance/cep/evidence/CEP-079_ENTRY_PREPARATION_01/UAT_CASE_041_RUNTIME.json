@@ -1,0 +1,43 @@
+{
+  "at": "2026-10-25T00:37:22.296710+00:00",
+  "request": "234cad6a-bf88-43b8-8cb9-d56d685b9329",
+  "request_status_after_denial": "submitted",
+  "maker_approval_denial": "اجازه تعیین تکلیف این درخواست خرید را ندارید.",
+  "protected_dual_control_denial": "تأییدکننده باید مستقل از عامل و گیرنده باشد.",
+  "no_role_assignment_created": true,
+  "independent_approval_pending": false,
+  "native_scoped_readbacks": [
+    {
+      "url": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/",
+      "status": 200,
+      "sha256": "9e625b6c7f7ece6a084751af65501fedd858dba937e6ba23ebe079e45b8ff7a1",
+      "bytes": 44001
+    },
+    {
+      "url": "/projects/f61f52ed-3c85-4570-af2b-5e89c025ab4e/",
+      "status": 403,
+      "sha256": "341d8da6682d54aba4141d5560161b184ab541de643d0354897e5dc30c0d78d4",
+      "bytes": 36714
+    },
+    {
+      "url": "/projects/63063dae-394e-46e4-9abb-09284e821561/",
+      "status": 403,
+      "sha256": "a87d2ec492264ec175b4f32a2a2c5304c240a181c5f5ca8bfd6ec73f56525de5",
+      "bytes": 36714
+    }
+  ],
+  "unauthorized_csrf_valid_post_status": 403,
+  "final_status": "approved",
+  "independent_approver": "account.demo-construction-01.owner",
+  "continuation_execution": [
+    {
+      "at": "2026-10-25T00:38:13.771392+00:00",
+      "workflow": "Browser ordinary scoped portfolio/detail positive, known ungranted/foreign project denial, tenant actor admin denial; maker request UI; native403 reads/POST, protected dual-control denial without new role, independent owner approval and final Browser readback",
+      "browser_evidence": "UAT_CASE_041_BROWSER.json",
+      "no_authority_expansion": true,
+      "request": "234cad6a-bf88-43b8-8cb9-d56d685b9329",
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

@@ -1,0 +1,102 @@
+{
+  "scenario": "UAT-CASE-008",
+  "attempts": [
+    {
+      "at": "2026-10-24T21:20:41.481595+00:00",
+      "result": "FAIL",
+      "defect": "CEP-079-FINDING-003",
+      "classification": "PRODUCT_IMPLEMENTATION",
+      "root_cause": "get_progress_records requires organization scope despite valid progress.view and assigned project scope; endpoint403 after actual native login. No missing permission exists.",
+      "minimum_fix": "Use native permission allow_any_scope then tenant/project scope_queryset over baseline.project; retain mutation authorization unchanged."
+    }
+  ],
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T21:21:14.732884+00:00",
+      "actor": "cep078.synthetic.accessibility",
+      "browser": "Assigned A Controls -> accepted-budget comparison -> governed Reports; current100IRR budget and incomplete ProjectCost source coverage observed",
+      "native_workflows": [
+        {
+          "url": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/",
+          "status": 200,
+          "sha256": "d60eb923484b0e6f5692931e62c93167e35cc2b283a64ab1c19d169748c48885",
+          "bytes": 63340
+        },
+        {
+          "url": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/comparison/",
+          "status": 200,
+          "sha256": "3650bcba83dacc29684c6f701c91e4c5c08f5af107b7786d8b880e5128c19abc",
+          "bytes": 40647
+        },
+        {
+          "url": "/billing/baselines/",
+          "status": 200,
+          "sha256": "8ea58c0f62f4d0e0f4e9f21e35b48e6c2e0db5034e1775d02ca06a44880b2968",
+          "bytes": 39360
+        },
+        {
+          "url": "/billing/progress/",
+          "status": 200,
+          "sha256": "6398299dbd2dc49ff0db50a24e0488ff09ac094654722199fb65e67a4dbdd825",
+          "bytes": 39366
+        },
+        {
+          "url": "/reporting/",
+          "status": 200,
+          "sha256": "7bffa1d9f5bb3452253d99b7edf94bb14c2b95d4654a42a8e16c73335490d960",
+          "bytes": 55255
+        }
+      ],
+      "governing_budget": "bb71007d-7b06-4fcd-abad-a748d7f52062",
+      "governed_metrics": [
+        {
+          "layer": "operational",
+          "results": [
+            "260af769-f738-4f77-9768-4a20bcc97876",
+            "ef760fdb-10e3-4382-9c34-124950574caf",
+            "21f61b37-0dc5-4b8f-a401-58c663ae5d8c"
+          ]
+        },
+        {
+          "layer": "exception",
+          "results": [
+            "260af769-f738-4f77-9768-4a20bcc97876",
+            "21f61b37-0dc5-4b8f-a401-58c663ae5d8c"
+          ]
+        },
+        {
+          "layer": "management",
+          "results": [
+            "ef760fdb-10e3-4382-9c34-124950574caf"
+          ]
+        },
+        {
+          "layer": "executive",
+          "results": [
+            "ef760fdb-10e3-4382-9c34-124950574caf"
+          ]
+        }
+      ],
+      "progress_ids": [
+        "36da3b94-cc2e-47bb-915c-f5d020367fbd"
+      ],
+      "focused_scope_validation": "All returned progress belongs to granted Project A; foreign tenant denied; native endpoint200 after selector fix",
+      "defect": "CEP-079-FINDING-003 FIXED",
+      "read_only_sources": true,
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS",
+  "focused_regression": {
+    "command": "manage.py test apps.billing.test_cep079_read_scope --keepdb --noinput",
+    "result": "4/4 PASS",
+    "system_check": "0 issues",
+    "initial_test_fixture_error": "Explicit role_definition required by compatibility membership save; fixture corrected; no product bypass"
+  },
+  "focused_validation_after_read_selector_changes": {
+    "result": "5/5 PASS",
+    "tests": "4 ProgressReadScopeTests plus exact claim project/tenant scope regression",
+    "system_checks": "0 issues",
+    "native_affected_paths": "progress and claim list200 for project-scoped actors"
+  }
+}

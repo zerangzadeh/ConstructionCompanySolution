@@ -1,0 +1,39 @@
+{
+  "native_correction": {
+    "at": "2026-10-25T00:29:48.625847+00:00",
+    "original": "a828c72f-9dd7-481e-a5f6-fae9ef1aaef4",
+    "original_status": "reversed",
+    "original_input_and_calculation_digests_unchanged": true,
+    "original_payslip_digest_valid": true,
+    "negative_run": "913eb6e9-07a5-4119-876c-f1b831ba1271",
+    "negative_net": "-2.00",
+    "reversal_record": "81307ea7-4d13-491f-94ae-be0e4c2be2d5",
+    "replacement": "5e9a4d7b-bd04-494c-bfb5-ea2619d061b7",
+    "replacement_net": "3.00",
+    "replacement_state": "finalized",
+    "independent_reviewer": "account.demo-construction-01.owner",
+    "retry_same_record": true,
+    "no_financial_handoff_activation": true,
+    "new_targets_only": true
+  },
+  "handoff": {
+    "proposal": "72f9f2b8-4379-4210-819a-26649d486dd4",
+    "run": "e7ee7226-2ead-403b-b120-8774daae4e26",
+    "family": "payment",
+    "total": "2.00",
+    "source_digest": "b64a6e239a85abc51bcf11c5e9345fa7b3635813e76d44fb8e6f70b183baa3b3",
+    "no_downstream_effect": true,
+    "replacement_missing_predecessor_proposal_rejected": true
+  },
+  "continuation_execution": [
+    {
+      "at": "2026-10-25T00:31:06.301398+00:00",
+      "workflow": "Browser original payslip; controlled reversal and replacement; new explicit synthetic1IRR correction, source relink and calculation; native independent finalization; Browser replacement payslip/audit report/new non-posting proposal. Missing replacement predecessor fails closed.",
+      "browser_evidence": "UAT_CASE_038_BROWSER.json",
+      "original_only_new037": true,
+      "projection_authority_only": true,
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

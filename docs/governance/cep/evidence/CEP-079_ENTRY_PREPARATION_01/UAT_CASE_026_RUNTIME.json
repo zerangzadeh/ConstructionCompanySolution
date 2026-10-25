@@ -1,0 +1,42 @@
+{
+  "authorization_corrections": [
+    {
+      "at": "2026-10-24T22:39:51.333512+00:00",
+      "alias": "uiux.wavec.buyer",
+      "before_permissions": [
+        "rfq_quotes.capture",
+        "rfq_quotes.evaluate_comparison",
+        "rfq_quotes.open",
+        "rfq_quotes.prepare_admissibility",
+        "rfq_quotes.prepare_comparison",
+        "rfq_quotes.prepare_sourcing_award",
+        "rfq_quotes.submit",
+        "rfq_quotes.view_confidential",
+        "rfq_quotes.view_metadata",
+        "rfqs.view"
+      ],
+      "added_permissions": [
+        "rfqs.change",
+        "rfqs.create",
+        "rfqs.submit"
+      ],
+      "role": "cep079_cont_bf7d601d251fa746",
+      "assignment": "8bd3f974-c1dc-42d3-8bbb-90f56e9d5333",
+      "ends_at": "2026-10-25T10:39:51.245985+00:00",
+      "native_dual_control": true
+    }
+  ],
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T22:45:24.677627+00:00",
+      "workflow": "New real-clock RFQ issued/on-time sealed submission; actual close/custody/Defender scan; browser opening request; independent approval/exact access; independent admissibility; browser comparison+award preparation; independent immutable finalization+idempotent retry",
+      "source_evidence": "UAT_CASE_026_SOURCE.json",
+      "browser_evidence": "UAT_CASE_026_BROWSER.json",
+      "award": "00e03101-5ae6-4ce0-8eff-fabb61b7d2e2",
+      "downstream_unchanged": true,
+      "no_real_supplier_or_financial_commitment": true,
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

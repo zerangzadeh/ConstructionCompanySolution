@@ -54,6 +54,7 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
     ess_subject_available = False
     my_requests_workspace_available = False
     manager_workspace_entry_available = False
+    compliance_workspace_available = False
     if organization is not None and request.user.is_authenticated:
         try:
             membership = get_active_membership(
@@ -71,6 +72,11 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
                     allow_any_scope=permission_supports_object_scope(code),
                 )
             }
+            compliance_workspace_available = (
+                BusinessPermissionCode.COMPLIANCE_VIEW
+                in membership_permission_codes(membership)
+                and membership_has_scope(membership, allow_any_scope=True)
+            )
             context_projects = scoped_context_projects(
                 user=request.user, organization=organization
             )
@@ -96,7 +102,10 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
 
     return {
         "business_permission_codes": permission_codes,
-        "party_governance_available": BusinessPermissionCode.PARTIES_VIEW in permission_codes and bool(permission_codes & GOVERNANCE_PERMISSIONS),
+        "compliance_workspace_available": compliance_workspace_available,
+        "party_governance_available": BusinessPermissionCode.PARTIES_VIEW
+        in permission_codes
+        and bool(permission_codes & GOVERNANCE_PERMISSIONS),
         "platform_navigation_access": bool(
             request.user.is_authenticated and is_platform_admin(request.user)
         ),

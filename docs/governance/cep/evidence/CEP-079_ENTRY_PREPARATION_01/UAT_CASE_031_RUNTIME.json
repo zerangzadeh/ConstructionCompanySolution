@@ -1,0 +1,54 @@
+{
+  "authorization_corrections": [
+    {
+      "at": "2026-10-24T22:55:30.468886+00:00",
+      "alias": "cep078.synthetic.operations",
+      "before_permissions": [
+        "goods_receipt_items.add",
+        "goods_receipts.create",
+        "goods_receipts.post",
+        "goods_receipts.view",
+        "goods_receipts.void",
+        "projects.view",
+        "purchase_order_items.add",
+        "purchase_orders.create",
+        "purchase_orders.issue",
+        "purchase_orders.view",
+        "purchase_request_items.add",
+        "purchase_requests.create",
+        "purchase_requests.submit",
+        "purchase_requests.view",
+        "stock_balances.view",
+        "stock_transactions.view",
+        "warehouses.view"
+      ],
+      "added_permissions": [
+        "stock_transactions.create",
+        "stock_transactions.post"
+      ],
+      "role": "cep079_cont_9919a0073a80beff",
+      "assignment": "fcfb55fb-3451-4c1b-bd7d-56979020dd26",
+      "ends_at": "2026-10-25T10:55:30.398611+00:00",
+      "native_dual_control": true
+    }
+  ],
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T22:56:43.034931+00:00",
+      "workflow": "Ordinary Inventory create/post receipt form; equivalent create retry retains exact target; posted-state guard rejects repost with zero duplicate effect",
+      "transaction": "759ecebe-37c5-44b8-a2b0-f0814eead707",
+      "source_receipt_item": "d28c791e-43bd-48d0-aa2a-806ad5376480",
+      "status": "posted",
+      "balance_before_retry": "2.0000",
+      "balance_after_retry": "2.0000",
+      "targets_for_source": 1,
+      "post_retry": {
+        "result": "EXPLICIT_LIFECYCLE_REJECTION",
+        "message": "فقط تراکنش‌های انبار پیش‌نویس قابل نهایی‌سازی هستند."
+      },
+      "browser_evidence": "UAT_CASE_031_BROWSER.json",
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

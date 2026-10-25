@@ -1,0 +1,200 @@
+{
+  "at": "2026-10-24T20:53:15.523966+00:00",
+  "scenario": "UAT-CASE-003",
+  "method": "Actual owning application services on configured Development PostgreSQL; immutable sources read-only; only new governed projection refresh and review",
+  "actor": "uiux.audit.reporting",
+  "reviewer": "uiux.persona.tenant-admin",
+  "results": [
+    {
+      "id": "ef760fdb-10e3-4382-9c34-124950574caf",
+      "metric": "approved_budget",
+      "organization": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "project": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+      "value": {
+        "amount": "100.00"
+      },
+      "coverage": {
+        "complete": true,
+        "source_count": 1,
+        "covered_projects": 1,
+        "eligible_projects": 1
+      },
+      "freshness": "fresh",
+      "source_manifest": {
+        "model": "projects.BudgetAllocation",
+        "ids": [
+          "918f59ec-e1a3-4d91-8723-4d1368bd6356"
+        ],
+        "budget_versions": [
+          "bb71007d-7b06-4fcd-abad-a748d7f52062:v1"
+        ],
+        "scope_kind": "project_set",
+        "scope_project_ids": [
+          "58f517da-2139-45ac-8b7b-4f3d3a3d26e8"
+        ]
+      },
+      "as_of": "2026-10-24 20:53:15.641381+00:00",
+      "calculation_hash": "2fd32cc54c63b0896a0922ee8a67f51cc306673a41697f07751d0ca829719575",
+      "self_review_denied": true,
+      "review": "d89bca2d-502d-45f4-991f-431ce9ef6d28"
+    },
+    {
+      "id": "21f61b37-0dc5-4b8f-a401-58c663ae5d8c",
+      "metric": "committed_cost",
+      "organization": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "project": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+      "value": {
+        "amount": null
+      },
+      "coverage": {
+        "complete": false,
+        "covered_projects": 0,
+        "eligible_projects": 1,
+        "source_count": 0,
+        "coverage_reason": "project_cost_producer_coverage_not_certified"
+      },
+      "freshness": "incomplete",
+      "source_manifest": {
+        "model": "projects.ProjectCostFact",
+        "ids": [],
+        "source_versions": [],
+        "scope_kind": "project_set",
+        "scope_project_ids": [
+          "58f517da-2139-45ac-8b7b-4f3d3a3d26e8"
+        ]
+      },
+      "as_of": "2026-10-24 20:53:15.852849+00:00",
+      "calculation_hash": "4dcedf6a62471b2ebfe95932b623f1d63d4964cc8a8c43263e3b928c11013c91",
+      "self_review_denied": true,
+      "review": "51b2c17a-2f88-4f1f-9031-d44aecbb3b09"
+    },
+    {
+      "id": "260af769-f738-4f77-9768-4a20bcc97876",
+      "metric": "actual_cost_coverage",
+      "organization": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "project": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+      "value": {
+        "amount": null
+      },
+      "coverage": {
+        "complete": false,
+        "covered_projects": 0,
+        "eligible_projects": 1,
+        "source_count": 0,
+        "coverage_reason": "project_cost_producer_coverage_not_certified"
+      },
+      "freshness": "incomplete",
+      "source_manifest": {
+        "model": "projects.ProjectCostFact",
+        "ids": [],
+        "source_versions": [],
+        "scope_kind": "project_set",
+        "scope_project_ids": [
+          "58f517da-2139-45ac-8b7b-4f3d3a3d26e8"
+        ]
+      },
+      "as_of": "2026-10-24 20:53:16.076117+00:00",
+      "calculation_hash": "cf05568253413fc9574db1ca87c227fe773e4359be5668dd45aa1e41a52ccbc5",
+      "self_review_denied": true,
+      "review": "b224d9f1-6d11-420e-9181-9f7f1a2543dc"
+    },
+    {
+      "id": "8b8147d6-c8f3-4ca3-a0a4-403f70d37568",
+      "metric": "cleared_cash_position",
+      "organization": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "project": null,
+      "value": {
+        "amount": null
+      },
+      "coverage": {
+        "complete": false,
+        "source_count": 0
+      },
+      "freshness": "incomplete",
+      "source_manifest": {
+        "model": "treasury.TreasuryMovementClearing",
+        "ids": [],
+        "scope_kind": "organization",
+        "scope_project_ids": [
+          "0695fe41-284c-465f-9c72-e0353185c8a1",
+          "0e247093-c77c-4caf-a338-dc72b73a3cde",
+          "1c844691-aeba-4a9a-8228-78aaa240261d",
+          "22fe0eb9-0b82-4fe5-94fd-950a4f75ef3e",
+          "291525d3-d36a-4815-b534-15abd66fd6bf",
+          "2c0411f2-4062-410e-9c54-32eba094c1c9",
+          "335def28-e5d8-48f8-8a92-1c912ed5d2f2",
+          "3688b836-646a-483f-8866-ab3e52f342fc",
+          "430743f6-5574-4941-8dc8-c5e7ccf13457",
+          "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+          "5af6b33b-c1ef-413e-9a8d-5d892115be45",
+          "5b52af1a-66af-4274-8b74-4af7226bbbf5",
+          "623b4e02-b751-495f-b0e7-7e1601b9ccdf",
+          "67018370-f59e-44ad-b743-30a7caaf0f26",
+          "93262f1e-5529-4be5-8cb9-6ad375d5e27f",
+          "acef78ff-d814-489d-8bde-cbe6d4a5e0d9",
+          "aed349b3-525a-4aa5-8565-c9cc472b3858",
+          "b195596d-d931-45e1-a9c7-f172018b2964",
+          "b351b13c-cb19-4a37-a7d7-8526544a7b8b",
+          "c06e9b0b-31aa-4254-a70a-b470394a5a59",
+          "c1b34af0-438b-47eb-a385-613a9b96fe33",
+          "c51f2f71-c392-45b5-bad3-bb3526478ed0",
+          "cb0f4f93-f648-4bae-a23a-fb5139f1c8d1",
+          "cb16d7b8-bd3e-4643-adfd-53b6e80a8855",
+          "d5170f3f-ba10-482f-bf4d-5ca9639380d3",
+          "de3b5756-9d3e-4e67-a08b-97dbd2824c2f",
+          "eff3f00c-fe05-42ad-93ef-7b05396fcaff",
+          "f61f52ed-3c85-4570-af2b-5e89c025ab4e",
+          "fbb97a00-314b-401e-b6c3-b5c59a8c4489"
+        ]
+      },
+      "as_of": "2026-10-24 20:53:16.222058+00:00",
+      "calculation_hash": "d4e73d154ff0e65ef1b6704811bfab87962077304fadae6df7e5564f8c42b473",
+      "self_review_denied": true,
+      "review": "f2ca2fbe-9a01-410f-9d62-0645d3110b93"
+    }
+  ],
+  "layers": [
+    {
+      "code": "operational",
+      "cards": [
+        "260af769-f738-4f77-9768-4a20bcc97876",
+        "ef760fdb-10e3-4382-9c34-124950574caf",
+        "8b8147d6-c8f3-4ca3-a0a4-403f70d37568",
+        "21f61b37-0dc5-4b8f-a401-58c663ae5d8c"
+      ]
+    },
+    {
+      "code": "exception",
+      "cards": [
+        "260af769-f738-4f77-9768-4a20bcc97876",
+        "8b8147d6-c8f3-4ca3-a0a4-403f70d37568",
+        "21f61b37-0dc5-4b8f-a401-58c663ae5d8c"
+      ]
+    },
+    {
+      "code": "management",
+      "cards": [
+        "ef760fdb-10e3-4382-9c34-124950574caf"
+      ]
+    },
+    {
+      "code": "executive",
+      "cards": [
+        "ef760fdb-10e3-4382-9c34-124950574caf"
+      ]
+    }
+  ],
+  "browser": {
+    "at": "2026-10-24T20:53:37.001Z",
+    "entry": "Home Reports link",
+    "observed": [
+      "Project A approved budget 100 IRR after independent review",
+      "Incomplete Project Cost and cleared cash in exceptions without usable numeric totals",
+      "Management/executive share one current authoritative budget result",
+      "Drillthrough shows projects.BudgetAllocation ID, governing version and calculation hash"
+    ],
+    "source_url": "http://127.0.0.1:8000/reporting/results/ef760fdb-10e3-4382-9c34-124950574caf/sources/",
+    "result": "PASS"
+  },
+  "scenario_result": "PASS"
+}

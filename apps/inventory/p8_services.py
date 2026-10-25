@@ -514,16 +514,32 @@ def valuation_reconciliation(
         "accounting_proposal_anomalies": [],
         "project_cost_proposal_anomalies": [],
     }
+    matched_reversal_ids = set(
+        events.filter(
+            event_type=InventoryValuationEventType.REVERSAL,
+            stock_transaction__status=StockTransactionStatus.POSTED,
+            stock_transaction__reversal_of_id=F("reversal_of__stock_transaction_id"),
+            reversal_of__stock_transaction__status=StockTransactionStatus.REVERSED,
+            quantity=F("reversal_of__quantity"),
+            stock_transaction__quantity=F("reversal_of__quantity"),
+            value_amount=F("reversal_of__value_amount"),
+            currency=F("reversal_of__currency"),
+        ).values_list("reversal_of_id", flat=True)
+    )
     for event in events:
         if (
-            event.stock_transaction.status != StockTransactionStatus.POSTED
+            (
+                event.stock_transaction.status != StockTransactionStatus.POSTED
+                and not (
+                    event.stock_transaction.status == StockTransactionStatus.REVERSED
+                    and event.pk in matched_reversal_ids
+                )
+            )
             or event.quantity != event.stock_transaction.quantity
         ):
             findings["invalid_valuations"].append(str(event.pk))
         if event.event_type == InventoryValuationEventType.REVERSAL and (
-            not event.reversal_of_id
-            or event.reversal_of.stock_transaction.status
-            != StockTransactionStatus.REVERSED
+            event.reversal_of_id not in matched_reversal_ids
         ):
             findings["invalid_reversals"].append(str(event.pk))
         if event.event_type == InventoryValuationEventType.RETURN and (

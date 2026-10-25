@@ -1,0 +1,83 @@
+{
+  "scenario": "UAT-CASE-018",
+  "steps": [
+    {
+      "at": "2026-10-24T21:36:58.233142+00:00",
+      "step": "native end-of-period reconciliation",
+      "id": "79e3fb98-4b3b-4e00-82da-e10efe011842",
+      "status": null
+    },
+    {
+      "at": "2026-10-24T21:36:58.306791+00:00",
+      "step": "independent domain reconciliation review",
+      "id": "7e95fbb1-b3be-4f58-bafa-dc7f2a54e82b",
+      "status": null
+    },
+    {
+      "at": "2026-10-24T21:36:58.504910+00:00",
+      "step": "protected independent close",
+      "id": "5b592098-cd9d-4e41-bfd5-e2f0abd12ed8",
+      "status": "closed"
+    }
+  ],
+  "failure": {
+    "type": "PermissionDenied",
+    "message": "اختیار بازگشایی دوره مالی را ندارید."
+  },
+  "authorization_corrections": [
+    {
+      "role": "cep079_uat_5f6392aaa1d4",
+      "assignment": "e9b7fe79-321d-4fb5-a5eb-f02a31234ebd",
+      "route": "ordinary_dual_control",
+      "added_permissions": [
+        "accounting.periods_reopen"
+      ],
+      "existing_scope_unchanged": true
+    },
+    {
+      "role": "cep079_uat_5f6392aaa1d4",
+      "assignment": "4453a4d7-c189-48c5-9092-e61903431126",
+      "route": "ordinary_dual_control",
+      "added_permissions": [
+        "accounting.periods_reopen"
+      ],
+      "existing_scope_unchanged": true
+    }
+  ],
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T21:37:15.350597+00:00",
+      "actor": "account.demo-construction-01.accountant",
+      "close_approver": "account.demo-construction-01.owner",
+      "reopen_approver": "uiux.audit.reporting",
+      "period": "5b592098-cd9d-4e41-bfd5-e2f0abd12ed8",
+      "final_status": "open",
+      "negative_controls": [
+        "self-close denied",
+        "original close approver denied reopening"
+      ],
+      "events": [
+        {
+          "id": "a96f7dce-867a-4ecd-8452-544f64680058",
+          "sequence": 1,
+          "action": "close",
+          "requested_by_id": "381e4525-6f98-4b4d-ad6f-44008dbb9643",
+          "acted_by_id": "dd40accc-ac0d-4ff4-8df2-a5372933ce49",
+          "evidence_hash": "255b60e64309070931a008d75843af0a0bae498038fc8d1787c1b5997fd82500"
+        },
+        {
+          "id": "b0f5ec50-e901-4c0d-8210-8c103a3b5385",
+          "sequence": 2,
+          "action": "reopen",
+          "requested_by_id": "381e4525-6f98-4b4d-ad6f-44008dbb9643",
+          "acted_by_id": "7b867667-05fe-4344-a0c3-e2ca8d9233df",
+          "evidence_hash": "9e4f04e7f6f0e09d33d6e887c6b3b1c6e53b20df0d3720892733e1c872c5f74c"
+        }
+      ],
+      "correction": "CEP-079-FINDING-008: exact existing accounting.periods_reopen added to requester and independent opener through native dual-control roles; scopes unchanged",
+      "authority": "Native domain reconciliation review/fiscal control only; no program Human Sign-off; accepted periods untouched",
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

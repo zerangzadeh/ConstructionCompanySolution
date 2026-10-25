@@ -16,7 +16,7 @@
         {% if "estimates.view" in business_permission_codes %}<a data-nav-id="NAV-012" class="erp-nav-link{% if current_namespace == 'estimates' %} is-active{% endif %}" href="{% url 'estimates:list' %}">برآورد و فهرست‌بها</a>{% endif %}
         <span data-nav-id="NAV-013" class="erp-nav-link is-unavailable" aria-disabled="true">تجاری و مناقصه</span>
         {% if "daily_reports.view" in business_permission_codes %}<a data-nav-id="NAV-014" class="erp-nav-link{% if current_namespace == 'daily_reports' %} is-active{% endif %}" href="{% url 'daily_reports:list' %}">عملیات کارگاه</a>{% endif %}
-        <span data-nav-id="NAV-015" class="erp-nav-link is-unavailable" aria-disabled="true">HSE و کیفیت</span>
+        {% if "safety_incidents.view" in business_permission_codes %}<a data-nav-id="NAV-015" class="erp-nav-link{% if current_namespace == 'safety' or current_namespace == 'quality' %} is-active{% endif %}" href="{% url 'safety:list' %}">HSE و کیفیت</a>{% elif "quality_issues.view" in business_permission_codes %}<a data-nav-id="NAV-015" class="erp-nav-link{% if current_namespace == 'quality' %} is-active{% endif %}" href="{% url 'quality:list' %}">HSE و کیفیت</a>{% else %}<span data-nav-id="NAV-015" class="erp-nav-link is-unavailable" aria-disabled="true">HSE و کیفیت</span>{% endif %}
         {% if "documents.view" in business_permission_codes %}<a data-nav-id="NAV-016" class="erp-nav-link{% if current_namespace == 'documents' %} is-active{% endif %}" href="{% url 'documents:list' %}">اسناد پروژه</a>{% endif %}
     </div></details>
     <details data-nav-id="NAV-017" class="erp-nav-group" open><summary><span>تأمین و تدارکات</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">

@@ -115,9 +115,15 @@ def _scoped(queryset: Any, request: HttpRequest) -> Any:
 
 
 @active_organization_required
-@organization_permission_required(BusinessPermissionCode.COMPLIANCE_VIEW)
 @require_GET
 def workbench(request: HttpRequest) -> HttpResponse:
+    require_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.COMPLIANCE_VIEW,
+        allow_any_scope=True,
+        message="اجازه مشاهده کارگاه HSE/QA را ندارید.",
+    )
     inspections = scoped_inspections(
         organization=request.organization, actor=request.user
     )
@@ -290,9 +296,15 @@ def template_publish(request: HttpRequest, template_id: str) -> HttpResponse:
 
 
 @active_organization_required
-@organization_permission_required(BusinessPermissionCode.COMPLIANCE_VIEW)
 @require_GET
 def record_detail(request: HttpRequest, kind: str, record_id: str) -> HttpResponse:
+    require_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.COMPLIANCE_VIEW,
+        allow_any_scope=True,
+        message="اجازه مشاهده کارگاه HSE/QA را ندارید.",
+    )
     model = MODEL_MAP.get(kind)
     if model is None:
         raise Http404

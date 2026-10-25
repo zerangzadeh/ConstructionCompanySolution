@@ -205,6 +205,7 @@ def load_safety_subject(
         user=actor,
         organization=organization,
         permission=BusinessPermissionCode.SAFETY_INCIDENTS_VIEW,
+        allow_any_scope=True,
         message="اجازه مشاهده حادثه ایمنی را ندارید.",
     )
     queryset = SafetyIncident.objects.select_related(
@@ -227,6 +228,15 @@ def load_safety_subject(
         or (incident.site_id and incident.site.project_id != incident.project_id)
     ):
         raise PermissionDenied("دامنه حادثه ایمنی نامعتبر است.")
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.SAFETY_INCIDENTS_VIEW,
+        project=incident.project,
+        site=incident.site,
+        allow_site_parent=True,
+        message="اجازه مشاهده حادثه ایمنی را ندارید.",
+    )
     return SubjectSnapshot(
         subject=incident,
         subject_id=str(incident.pk),
@@ -724,12 +734,22 @@ def perform_safety_transition(
         user=actor,
         organization=organization,
         permission=permission,
+        allow_any_scope=True,
         message="اجازه انجام این اقدام ایمنی را ندارید.",
     ) or get_active_membership(user=actor, organization=organization)
     try:
         incident = SafetyIncident.objects.get(pk=incident_id, organization=organization)
     except SafetyIncident.DoesNotExist as exc:
         raise PermissionDenied("حادثه در این سازمان یافت نشد.") from exc
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=permission,
+        project=incident.project,
+        site=incident.site,
+        allow_site_parent=True,
+        message="اجازه انجام این اقدام ایمنی را ندارید.",
+    )
     if incident.status != expected_status:
         raise ValueError("وضعیت حادثه برای این اقدام معتبر نیست.")
     if not WorkflowInstance.objects.filter(

@@ -1,0 +1,84 @@
+{
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T21:30:08.850685+00:00",
+      "actor": "cep078.synthetic.accessibility",
+      "browser": "Assigned ProjectA -> Controls -> Source Cost Reconciliation; accepted100IRR budget, missing cost/facts shown unknown, differences uncomparable, 5 excluded uncoded expenses explicit; no missing-source zero",
+      "native_request": {
+        "url": "/projects/58f517da-2139-45ac-8b7b-4f3d3a3d26e8/controls/cost-reconciliation/",
+        "status": 200,
+        "sha256": "83180506ef86f3d1aea3f17f9023a34f2ea1b2d03c1901c796f9d55e697f7980",
+        "bytes": 41670
+      },
+      "owning_source_snapshot": {
+        "budget_id": "bb71007d-7b06-4fcd-abad-a748d7f52062",
+        "budget_payload_hash": "71b68f89a73258c9beb129decaa90b57c0aadd78b89dc7f1ba85e6ed65cab37d",
+        "currency": "IRR",
+        "lines": [
+          {
+            "cbs_code": "C1",
+            "cbs_name": "Synthetic direct",
+            "wbs_code": "B06-W-A",
+            "wbs_title": "B06 synthetic WBS A",
+            "cost_center_code": "CC1",
+            "accepted_budget_amount": "100.00",
+            "approved_or_recorded_expense_amount": null,
+            "inert_project_cost_actual_amount": null,
+            "unresolved_difference": null,
+            "budget_allocation_count": 1,
+            "expense_allocation_count": 0,
+            "project_cost_fact_count": 0
+          }
+        ],
+        "sources": [],
+        "exclusions": [
+          {
+            "code": "unallocated_expense",
+            "disposition": "excluded",
+            "count": 5,
+            "amount": "1137500000.00",
+            "note": "Approved/recorded expense evidence has no comparable coded allocation."
+          },
+          {
+            "code": "non_governing_budget_expense",
+            "disposition": "excluded",
+            "count": 0,
+            "amount": null,
+            "note": "Expense allocations are pinned to a different accepted budget."
+          },
+          {
+            "code": "non_actual_project_cost_fact",
+            "disposition": "excluded",
+            "count": 0,
+            "amount": null,
+            "note": "Commitment/accrual facts are not actual-expense equivalence evidence."
+          },
+          {
+            "code": "currency_mismatch_project_cost_fact",
+            "disposition": "excluded",
+            "count": 0,
+            "amount": null,
+            "note": "Project Cost fact currency does not match the governing budget."
+          },
+          {
+            "code": "actual_fact_without_budget_lineage",
+            "disposition": "uncomparable",
+            "count": 0,
+            "amount": null,
+            "note": "Existing Project Cost facts do not retain a budget-version key; side-by-side values cannot establish same-budget source equivalence."
+          }
+        ],
+        "accepted_budget_total": "100.00",
+        "approved_or_recorded_expense_total": null,
+        "inert_project_cost_actual_total": null,
+        "unresolved_total_difference": null,
+        "coverage_complete": false,
+        "source_equivalence_established": false
+      },
+      "scope": "58f517da-2139-45ac-8b7b-4f3d3a3d26e8",
+      "financial_effect": "NONE; read-only projection",
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}

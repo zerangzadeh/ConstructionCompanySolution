@@ -347,6 +347,10 @@ class Material(UUIDModel, TimeStampedModel):
         self.specifications = self.specifications.strip()
         if not self.code or not self.name:
             raise ValidationError("وارد کردن کد و نام مصالح الزامی است.")
+        if not self.unit_of_measure_id:
+            raise ValidationError(
+                {"unit_of_measure": "انتخاب واحد اندازه‌گیری الزامی است."}
+            )
         if self.organization_id != self.unit_of_measure.organization_id:
             raise ValidationError(
                 {"unit_of_measure": "واحد اندازه‌گیری باید متعلق به همین سازمان باشد."}

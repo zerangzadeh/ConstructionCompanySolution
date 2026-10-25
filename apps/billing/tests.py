@@ -643,6 +643,60 @@ class ProgressRecordWorkflowTests(ProjectBaselineWorkflowTests):
 
 
 class ProgressClaimCalculationTests(ProgressRecordWorkflowTests):
+    def test_claim_reader_is_intersected_with_project_and_tenant(self):
+        from importlib import import_module
+
+        from django.apps import apps
+        from django.utils import timezone
+
+        from apps.billing.services import get_progress_claims
+        from apps.organizations.models import (
+            BusinessPermission,
+            MembershipRoleAssignment,
+            MembershipScopeGrant,
+            OrganizationMembership,
+            OrganizationRole,
+        )
+
+        # Reused test databases can retain schema after a prior flush; restore
+        # the exact code-owned fixtures required by this test's native workflow.
+        for module, seed in (
+            ("0018_project_baseline_compatibility_catalog", "seed_project_baseline_catalog"),
+            ("0019_progress_verification_compatibility_catalog", "seed_progress_catalog"),
+            ("0020_progress_claim_approval_compatibility_catalog", "seed_progress_claim_catalog"),
+        ):
+            getattr(import_module("apps.workflows.migrations." + module), seed)(apps, None)
+        claim = self._claim()
+        reader = User.objects.create_user(username="uat-claim-reader")
+        role = OrganizationRole.objects.create(
+            organization=self.organization, code="uat-claim-read", name="Reader"
+        )
+        role.permissions.add(BusinessPermission.objects.get(code="claims.view"))
+        member = OrganizationMembership.objects.create(
+            organization=self.organization, user=reader, status="active", role_definition=role
+        )
+        MembershipRoleAssignment.objects.create(
+            organization=self.organization, membership=member, role=role, reason="Test explicit reader"
+        )
+        grant = MembershipScopeGrant.objects.create(
+            organization=self.organization, membership=member,
+            scope_type="project", project=self.project, reason="Test assigned project"
+        )
+        self.assertEqual(list(get_progress_claims(actor=reader, organization=self.organization)), [claim])
+        grant.revoked_at = timezone.now()
+        grant.save(update_fields=["revoked_at"])
+        other_project = create_project(
+            organization=self.organization, actor=self.owner, code="UAT-OTHER", name="Other project"
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization, membership=member,
+            scope_type="project", project=other_project, reason="Test ungranted claim project"
+        )
+        self.assertFalse(get_progress_claims(actor=reader, organization=self.organization).exists())
+        foreign = Organization.objects.create(name="Other UAT", slug="other-uat-claim")
+        with self.assertRaises(PermissionDenied):
+            get_progress_claims(actor=reader, organization=foreign)
+
     def _verified_record(self):
         record = self._record()
         request_progress_verification(

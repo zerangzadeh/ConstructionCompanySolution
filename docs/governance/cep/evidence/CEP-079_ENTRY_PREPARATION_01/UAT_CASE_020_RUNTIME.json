@@ -1,0 +1,96 @@
+{
+  "scenario": "UAT-CASE-020",
+  "steps": [
+    {
+      "step": "receipt",
+      "model": "treasury.TreasuryMovement",
+      "id": "27b565c6-51ba-4d41-a6d2-ae73420f447d",
+      "status": "posted"
+    },
+    {
+      "step": "disbursement",
+      "model": "treasury.TreasuryMovement",
+      "id": "2c68d76c-9a38-4025-8094-31e3fc39a5d6",
+      "status": "posted"
+    },
+    {
+      "step": "release payment request",
+      "model": "treasury.PaymentRequest",
+      "id": "c90554d8-ed2b-4112-8790-1b9a8234a1cd",
+      "status": "released"
+    },
+    {
+      "step": "open advance",
+      "model": "treasury.TreasuryAdvance",
+      "id": "c6e4b50b-1997-4e6a-a4d8-2b1b08a1dd82",
+      "status": "open"
+    }
+  ],
+  "failure": {
+    "type": "ValidationError",
+    "message": "['نگاشت حسابداری مؤثر برای حساب خزانه\\u200cداری موجود نیست.']",
+    "transaction": "ROLLED_BACK"
+  },
+  "retry": {
+    "at": "2026-10-24T21:40:36.486163+00:00",
+    "correction": "Use already-approved bank fixture transaction date2026-10-24; old manual example accounting date precedes bank mapping and was correctly rejected. No mapping/rule changed.",
+    "steps": [
+      {
+        "step": "receipt",
+        "model": "treasury.TreasuryMovement",
+        "id": "d9ef9fa5-73b5-4ea1-907b-a945246b410b",
+        "status": "posted"
+      },
+      {
+        "step": "disbursement",
+        "model": "treasury.TreasuryMovement",
+        "id": "2920b8ca-156f-4535-975e-b411ca06c641",
+        "status": "posted"
+      },
+      {
+        "step": "release payment request",
+        "model": "treasury.PaymentRequest",
+        "id": "3271a324-dcc8-47b3-916c-9ef16896ff76",
+        "status": "released"
+      },
+      {
+        "step": "open advance",
+        "model": "treasury.TreasuryAdvance",
+        "id": "04649a1b-4621-4da3-8d3a-06deec23cc97",
+        "status": "open"
+      },
+      {
+        "step": "clear cheque",
+        "model": "treasury.ChequeInstrument",
+        "id": "89bb73a8-3e4c-482c-a673-1708e18ca122",
+        "status": "cleared"
+      }
+    ]
+  },
+  "continuation_execution": [
+    {
+      "at": "2026-10-24T21:40:41.189634+00:00",
+      "actor": "account.demo-construction-01.accountant",
+      "checker": "account.demo-construction-01.owner",
+      "workflow": "Native receipt -> submit -> post; vendor advance request -> submit -> approve; separate posted cash -> release -> open advance; incoming cheque received/deposited/presented/cleared via atomic Treasury+Accounting service",
+      "amount": "1",
+      "day": "2026-10-24",
+      "account": "3afc57b7-49af-4a16-8478-8d16f734e87b",
+      "bank": "e5e16370-64ed-43c5-b3c4-498417594128",
+      "receipt": "d9ef9fa5-73b5-4ea1-907b-a945246b410b",
+      "advance_cash": "2920b8ca-156f-4535-975e-b411ca06c641",
+      "payment_request": "3271a324-dcc8-47b3-916c-9ef16896ff76",
+      "advance": "04649a1b-4621-4da3-8d3a-06deec23cc97",
+      "cheque": "89bb73a8-3e4c-482c-a673-1708e18ca122",
+      "native_workspace": {
+        "url": "/treasury/operations/",
+        "status": 200,
+        "sha256": "6abf109899889115547b0b4e4552dee8eee2562da8c2ee6c368cf8633bef07c3",
+        "bytes": 65878
+      },
+      "authority": "Existing Treasury cash/Accounting posting contracts and approved bank date reused; no new mapping or posting rule",
+      "result": "PASS"
+    }
+  ],
+  "scenario_result": "PASS"
+}
