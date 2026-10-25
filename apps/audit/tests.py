@@ -170,3 +170,22 @@ class AuditServiceTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Audit Company")
         self.assertNotContains(response, "Other Audit Company")
+
+    def test_audit_view_uses_one_bounded_paginator(self) -> None:
+        for index in range(26):
+            record_audit_event(
+                action=AuditAction.PROJECT_CREATED,
+                entity_type="projects.Project",
+                entity_id=str(index),
+                organization=self.organization,
+                actor=self.user,
+                metadata={"code": f"PRJ-{index}"},
+            )
+        self.client.force_login(self.user)
+        set_active_organization(self.client.session, self.organization)
+        response = self.client.get(reverse("audit:log"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'aria-label="صفحه‌بندی"', count=1)
+        self.assertContains(response, 'rel="next"')
+        self.assertContains(response, "PRJ-")
+        self.assertContains(response, "شناسه‌های ردیابی رویداد")

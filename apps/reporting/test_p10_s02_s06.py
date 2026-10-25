@@ -473,7 +473,7 @@ class P10S02S06AcceptanceTests(TestCase):
         response = self.client.get(reverse("reporting:dashboard"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dir="rtl"')
-        self.assertContains(response, "داشبورد شاخص‌های حاکم‌شده")
+        self.assertContains(response, "داشبورد مدیریت")
         self.assertEqual(response["Cache-Control"], "private, no-store, max-age=0")
 
     def test_16_refresh_and_export_have_no_source_mutation_and_are_audited(

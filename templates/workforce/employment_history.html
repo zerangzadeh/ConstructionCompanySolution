@@ -27,7 +27,7 @@
           <div><dt class="text-xs text-slate-500">پایان اثر ثبت‌شده</dt><dd class="mt-1 font-bold">{{ row.effective_to|jalali_date|default:"ثبت نشده" }}</dd></div>
         </dl>
         {% if row.can_download %}
-          <a class="mt-5 inline-flex rounded-xl bg-blue-700 px-4 py-2 font-bold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" href="{% url 'documents:employee-version-download' row.document_id row.document_version_id %}">دریافت نسخه مجاز سند</a>
+          <a class="mt-5 inline-flex rounded-xl bg-blue-700 px-4 py-2 font-bold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" href="{% url 'documents:employee-version-download' row.document_id row.document_version_id %}">دریافت سند</a>
         {% else %}<p class="mt-4 text-sm text-slate-600" role="status">دریافت این نسخه سند در دسترس نیست.</p>{% endif %}
       </article>
       {% empty %}<p class="erp-surface rounded-2xl p-5" role="status">سابقه استخدام مجازی برای نمایش موجود نیست.</p>{% endfor %}

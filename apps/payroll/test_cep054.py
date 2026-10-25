@@ -407,7 +407,7 @@ class ESSPayrollTests(baseline.StatutoryPayrollTests):
         response = self.client.get(
             reverse("payroll:ess_inquiry_detail", args=[item.pk])
         )
-        self.assertContains(response, "اخذ کار پاسخ‌گویی مجاز")
+        self.assertContains(response, "پذیرش مسئولیت پاسخ‌گویی")
         self.assertEqual(
             self.client.post(
                 reverse("payroll:ess_inquiry_claim", args=[item.pk, work_item.pk]),

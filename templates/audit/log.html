@@ -20,9 +20,10 @@
                         <div class="text-sm text-slate-500" dir="ltr">{{ event.created_at|jalali_datetime }}</div>
                         <div>
                             <p class="font-medium text-slate-900">{{ event.get_action_display }}</p>
-                            <p class="text-sm text-slate-500">
-                                {{ event.entity_type }}{% if event.entity_id %} · {{ event.entity_id }}{% endif %}
-                            </p>
+                            <div class="text-sm text-slate-500">
+                                {{ event.entity_type|audit_entity_label }} · {{ event|audit_business_reference }}
+<details class="mt-1 text-xs text-slate-500"><summary class="cursor-pointer">شناسه‌های ردیابی رویداد</summary><p class="mt-2 break-all" dir="ltr">{{ event.entity_type }}{% if event.entity_id %} · {{ event.entity_id }}{% endif %}</p></details>
+                            </div>
                         </div>
                         <div class="text-sm text-slate-500">
                             {% if event.actor %}{{ event.actor.username }}{% else %}سامانه{% endif %}

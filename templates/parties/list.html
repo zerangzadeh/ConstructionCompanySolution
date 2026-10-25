@@ -6,7 +6,7 @@
 {% include "parties/_surface_navigation.html" %}
 {% table_filters filters "party-filters" %}
     {% if party_governance_available %}{% url "parties:governance" as governance_url %}{% endif %}
-    {% include "components/page_header.html" with page_eyebrow="نمای عملیاتی" page_title="طرف‌های تجاری" page_description=request.organization.name page_action_url=governance_url page_action_label="ورود به حاکمیت" only %}
+    {% include "components/page_header.html" with page_eyebrow="نمای عملیاتی" page_title="طرف‌های تجاری" page_description=request.organization.name page_action_url=governance_url page_action_label="مدیریت و سوابق" only %}
 
     <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست طرف‌های تجاری">
         {% if parties %}

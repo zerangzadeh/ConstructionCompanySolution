@@ -16,13 +16,13 @@
             <div class="erp-table-wrap">
                 <table class="w-full min-w-[900px] border-collapse text-right text-sm">
                     <thead class="bg-slate-50 text-[11px] font-semibold text-slate-500">
-                        <tr><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "code" "کد پروژه" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "name" "نام پروژه" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "status" "وضعیت" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "start_date" "تاریخ شروع" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "end_date" "تاریخ پایان" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "estimated_budget" "بودجه تخمینی" %} ({{ request.organization.currency }})</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "actual_budget" "بودجه واقعی" %} ({{ request.organization.currency }})</th><th class="w-16 border-b border-slate-200 px-4 py-3 text-center">عملیات</th></tr>
+                        <tr><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "code" "کد پروژه" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "name" "نام پروژه" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "status" "وضعیت" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "start_date" "تاریخ شروع" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "end_date" "تاریخ پایان" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "estimated_budget" "بودجه تخمینی" %} ({{ request.organization.currency }})</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "actual_budget" "بودجه واقعی" %} ({{ request.organization.currency }})</th><th class="border-b border-slate-200 px-4 py-3 text-center">جزئیات</th></tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 bg-white">
                         {% for project in projects %}
                             <tr class="group transition hover:bg-blue-50/40">
                                 <td class="whitespace-nowrap px-4 py-3.5"><a class="font-medium text-blue-700 hover:text-blue-900" dir="ltr" href="{% url 'projects:detail' project.id %}">{{ project.code }}</a></td>
-                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'projects:detail' project.id %}">{{ project.name }}</a>{% if project.description %}<p class="mt-0.5 max-w-sm truncate text-[11px] text-slate-400">{{ project.description }}</p>{% endif %}</td>
+                                <td class="px-4 py-3.5"><a class="font-semibold text-blue-700 hover:underline" href="{% url 'projects:detail' project.id %}">{{ project.name }}</a>{% if project.description %}<p class="mt-0.5 max-w-sm truncate text-[11px] text-slate-400">{{ project.description }}</p>{% endif %}</td>
                                 <td class="whitespace-nowrap px-4 py-3.5">
                                     {% include "components/status_badge.html" with status=project.status label=project.get_status_display only %}
                                 </td>
@@ -30,7 +30,7 @@
                                 <td class="whitespace-nowrap px-4 py-3.5 text-slate-600" dir="ltr">{{ project.end_date|default:"—" }}</td>
                                 <td class="whitespace-nowrap px-4 py-3.5 text-left font-medium tabular-nums text-slate-800" dir="ltr">{{ project.estimated_budget|erp_number }}</td>
                                 <td class="whitespace-nowrap px-4 py-3.5 text-left font-medium tabular-nums text-slate-800" dir="ltr">{{ project.actual_budget|erp_number }}</td>
-                                <td class="px-4 py-3.5 text-center"><a class="inline-grid h-8 w-8 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-blue-300 hover:text-blue-700" href="{% url 'projects:detail' project.id %}" aria-label="مشاهده {{ project.name }}"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></td>
+                                <td class="px-4 py-3.5 text-center">{% url 'projects:detail' project.id as detail_url %}{% include "components/record_detail_link.html" with detail_url=detail_url record_label=project.name only %}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

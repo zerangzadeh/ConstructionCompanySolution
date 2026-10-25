@@ -108,8 +108,8 @@
         const render = () => {
             const selected = project.options[project.selectedIndex];
             label.textContent = selected?.value
-                ? `پروژه مؤثر این ثبت: ${selected.textContent}`
-                : "پروژه مؤثر این ثبت هنوز انتخاب نشده است.";
+                ? `پروژه این ثبت: ${selected.textContent}`
+                : "پروژه این ثبت هنوز انتخاب نشده است.";
         };
         project.addEventListener("change", render);
         render();

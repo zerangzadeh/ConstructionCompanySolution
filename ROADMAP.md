@@ -109,6 +109,41 @@ release controls. This is a capability map, not a claim that every item is an
 approved next task. Exact ownership, order, scope, and stop conditions remain
 with the canonical CEP program and frozen decisions.
 
+### 10.1 Accounting Gap — Fiscal-Year Closing & Opening Balance Roll-forward
+
+**Status:** `DEFERRED_UNTIL_CURRENT_CEP_PROGRAM_COMPLETES`. Recorded by explicit
+Human/Product decision on 2026-10-25. This is an independent Accounting functional
+gap scheduled for consideration after the current CEP program completes. It is
+not classified as Post-V1 and is not implementation authority or a production
+readiness/certification claim. It changes no current CEP scope, dependency or Gate.
+
+**Current implementation:** Initial / Migration Opening Import exists as a
+controlled, independently reviewed import of supplied opening balances and
+external source/evidence/reconciliation references. Automatic fiscal-year
+roll-forward is missing. Period close retains controls and reporting evidence
+but generates no next-year Opening Journal. Report-derived opening balances
+remain read models and do not implement this missing process.
+
+**Minimum future scope to define and authorize:**
+
+- Derive eligible closing balances from POSTED Ledger.
+- Distinguish permanent versus temporary accounts.
+- Provide controlled year-end closing.
+- Generate the next-year Opening Journal.
+- Retain fiscal-year linkage and cutoff.
+- Enforce idempotency and prevent duplicate roll-forward, including double
+  counting against the continuing Ledger.
+- Require approval and separation of duties (SoD).
+- Define correction/reversal behavior without rewriting finalized history.
+- Prove closing-to-opening reconciliation.
+- Retain an audit trail.
+
+**Boundary:** UIUX-F-076 concerns only initial setup / migration from the previous
+accounting system. Its closure does not deliver or close this Accounting gap.
+After the current CEP program completes, establish the bounded Product/Accounting
+contract and execution authority before implementation. No roll-forward
+implementation or schema/migration is included in the present UI clarification.
+
 ## 11. Production and verification path
 
 Implementation evidence alone does not certify production. The CEP-069–CEP-072

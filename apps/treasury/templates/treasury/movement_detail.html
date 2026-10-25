@@ -4,15 +4,16 @@
 <section class="mx-auto max-w-4xl space-y-6">
   <header><a href="{% url 'treasury:workbench' %}">خزانه‌داری</a><h1 class="mt-3 text-2xl font-bold">{{ movement.get_kind_display }}</h1></header>
   <dl class="erp-surface grid gap-4 rounded-xl p-6 sm:grid-cols-2">
-    <div><dt>شناسه</dt><dd><bdi dir="ltr">{{ movement.pk }}</bdi></dd></div>
+    <div><dt>مرجع دریافت یا پرداخت</dt><dd>{{ movement.description }} · {{ movement.movement_date|jalali_date }}</dd></div>
     <div><dt>وضعیت</dt><dd>{{ movement.get_status_display }}</dd></div>
     <div><dt>مبلغ (ریال)</dt><dd>{{ movement.amount }}</dd></div>
     <div><dt>تاریخ</dt><dd>{{ movement.movement_date|jalali_date }}</dd></div>
     <div><dt>پروژه</dt><dd>{{ movement.project|default:"—" }}</dd></div>
     <div><dt>طرف حساب</dt><dd>{{ movement.party|default:"—" }}</dd></div>
     <div><dt>شرح</dt><dd>{{ movement.description }}</dd></div>
-    <div><dt>سند حسابداری</dt><dd><bdi dir="ltr">{{ movement.journal_id|default:"—" }}</bdi></dd></div>
+    <div><dt>سند حسابداری</dt><dd>{% if linked_journal %}<a class="text-blue-700 underline" href="{% url 'accounting:journal_detail' linked_journal.pk %}">سند شماره {{ linked_journal.number|default:"تخصیص نیافته" }}</a>{% elif movement.journal_id %}ثبت شده؛ مشاهده سند به دسترسی حسابداری نیاز دارد.{% else %}هنوز سندی ثبت نشده است.{% endif %}</dd></div>
   </dl>
+<details class="erp-surface rounded-xl p-4 text-xs text-slate-500"><summary class="cursor-pointer">شناسه‌های ردیابی</summary><p class="mt-2 break-all" dir="ltr">{{ movement.pk }}</p>{% if linked_journal %}<p class="mt-2 break-all" dir="ltr">{{ linked_journal.pk }}</p>{% endif %}</details>
   {% if movement.status == "draft" and can_submit %}
   <form method="post" action="{% url 'treasury:movement_submit' movement.pk %}" class="erp-surface space-y-3 rounded-xl p-6">{% csrf_token %}<label for="submit-reason">دلیل ارسال</label><input id="submit-reason" name="reason" required maxlength="1000"><button class="erp-btn erp-btn--primary">ارسال برای تأیید</button></form>
   {% endif %}

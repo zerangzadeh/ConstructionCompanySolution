@@ -559,7 +559,9 @@ def opening_create(request: HttpRequest) -> HttpResponse:
         else:
             return redirect("accounting:opening_detail", opening_id=opening.pk)
     return render(
-        request, "accounting/form.html", {"form": form, "title": "ورودی مانده افتتاحیه"}
+        request,
+        "accounting/form.html",
+        {"form": form, "title": "ورود مانده افتتاحیه اولیه / مهاجرت"},
     )
 
 

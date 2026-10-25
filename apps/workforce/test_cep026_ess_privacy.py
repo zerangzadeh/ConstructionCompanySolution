@@ -1,6 +1,7 @@
 """CEP-026 ESS identity, own-scope, masking and direct-route security tests."""
 
 from datetime import timedelta
+from html.parser import HTMLParser
 
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
@@ -9,7 +10,10 @@ from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.organizations.models import (
+    AuthorizationScopeType,
     MembershipRole,
+    MembershipRoleAssignment,
+    MembershipScopeGrant,
     MembershipStatus,
     OrganizationMembership,
     OrganizationRole,
@@ -21,7 +25,26 @@ from apps.workforce.ess_services import (
     resolve_ess_subject,
 )
 from apps.workforce.models import WorkRelationship
-from apps.workforce.person_services import create_person, create_work_relationship
+from apps.workforce.person_services import (
+    create_person,
+    create_work_relationship,
+    end_work_relationship,
+)
+
+
+class _NavigationParser(HTMLParser):
+    def __init__(self, content: bytes) -> None:
+        super().__init__()
+        self.entries = []
+        self.feed(content.decode())
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        if "data-nav-id" in attributes:
+            self.entries.append((tag, attributes))
+
+    def links(self, nav_id):
+        return [attrs for tag, attrs in self.entries if attrs["data-nav-id"] == nav_id]
 
 
 class ESSOwnDataPrivacyTests(TestCase):
@@ -100,9 +123,7 @@ class ESSOwnDataPrivacyTests(TestCase):
 
     def test_username_email_and_employee_number_similarity_never_infer_identity(self):
         with self.assertRaises(PermissionDenied):
-            resolve_ess_subject(
-                user=self.unlinked_user, organization=self.organization
-            )
+            resolve_ess_subject(user=self.unlinked_user, organization=self.organization)
 
     def test_other_person_and_cross_tenant_relationships_are_denied(self):
         with self.assertRaises(PermissionDenied):
@@ -181,15 +202,86 @@ class ESSOwnDataPrivacyTests(TestCase):
         )
         response = self.client.get(reverse("home"))
         self.assertTrue(response.context["ess_subject_available"])
-        self.assertContains(response, reverse("workforce:ess_dashboard"))
+        navigation = _NavigationParser(response.content)
+        entries = navigation.links("NAV-006")
+        self.assertEqual(len(entries), 2)  # Desktop sidebar and mobile drawer.
+        self.assertEqual(reverse("workforce:ess_dashboard"), "/workforce/ess/")
+        for entry in entries:
+            self.assertEqual(entry["href"], reverse("workforce:ess_dashboard"))
+            self.assertNotIn("aria-disabled", entry)
+            self.assertNotIn("is-unavailable", entry["class"])
+            dashboard = self.client.get(entry["href"])
+            self.assertContains(dashboard, "داشبورد خدمات من")
+            self.assertEqual(
+                dashboard.context["dashboard"].profile.person.pk, self.person.pk
+            )
+            self.assertNotContains(dashboard, self.other_relationship.employee_number)
 
         self._login(self.unlinked_user)
         response = self.client.get(reverse("home"))
         self.assertNotContains(response, reverse("workforce:ess_dashboard"))
-        self.assertContains(response, "خدمات من")
+        self.assertNotContains(response, 'data-nav-id="NAV-006"')
+        self.assertEqual(
+            self.client.get(reverse("workforce:ess_dashboard")).status_code, 403
+        )
         self.assertEqual(
             self.client.get(reverse("workforce:ess_profile")).status_code, 403
         )
+
+    def test_multi_role_employee_retains_other_authorized_navigation(self):
+        membership = OrganizationMembership.objects.get(
+            organization=self.organization, user=self.employee_user
+        )
+        for code in (MembershipRole.VIEWER, MembershipRole.ACCOUNTANT):
+            MembershipRoleAssignment.objects.create(
+                organization=self.organization,
+                membership=membership,
+                role=OrganizationRole.objects.get(code=code, organization__isnull=True),
+                reason="Synthetic ESS navigation regression fixture",
+            )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Synthetic ESS navigation regression fixture",
+        )
+        self._login(self.employee_user)
+        response = self.client.get(reverse("home"))
+        entries = _NavigationParser(response.content)
+        self.assertEqual(len(entries.links("NAV-006")), 2)
+        self.assertEqual(len(entries.links("NAV-008")), 2)
+        self.assertEqual(len(entries.links("NAV-027")), 2)
+        for nav_id in ("NAV-006", "NAV-008", "NAV-027"):
+            self.assertEqual(
+                self.client.get(entries.links(nav_id)[0]["href"]).status_code, 200
+            )
+
+    def _assert_ess_navigation_and_direct_url_denied(self):
+        self._login(self.employee_user)
+        response = self.client.get(reverse("home"))
+        self.assertNotContains(response, 'data-nav-id="NAV-006"')
+        self.assertEqual(
+            self.client.get(reverse("workforce:ess_dashboard")).status_code, 403
+        )
+
+    def test_expired_identity_hides_entry_and_denies_direct_url(self):
+        end_work_relationship(
+            organization=self.organization,
+            actor=self.owner,
+            relationship=self.relationship,
+            effective_end=timezone.localdate() - timedelta(days=1),
+        )
+        self._assert_ess_navigation_and_direct_url_denied()
+
+    def test_ambiguous_identity_hides_entry_and_denies_direct_url(self):
+        # Deliberately corrupt synthetic data: the resolver must still fail closed.
+        WorkRelationship.objects.create(
+            organization=self.organization,
+            person=self.person,
+            employee_number="E-026-AMBIGUOUS",
+            effective_start=timezone.localdate() - timedelta(days=1),
+        )
+        self._assert_ess_navigation_and_direct_url_denied()
 
     def test_inactive_membership_is_denied_even_with_authoritative_identity(self):
         membership = OrganizationMembership.objects.get(
@@ -198,6 +290,12 @@ class ESSOwnDataPrivacyTests(TestCase):
         membership.status = MembershipStatus.SUSPENDED
         membership.save(update_fields={"status"})
         with self.assertRaises(PermissionDenied):
-            resolve_ess_subject(
-                user=self.employee_user, organization=self.organization
-            )
+            resolve_ess_subject(user=self.employee_user, organization=self.organization)
+        self._login(self.employee_user)
+        response = self.client.get(reverse("home"))
+        self.assertNotContains(response, 'data-nav-id="NAV-006"', status_code=403)
+        # Re-select the stale tenant: the first rejected request clears it.
+        self._login(self.employee_user)
+        self.assertEqual(
+            self.client.get(reverse("workforce:ess_dashboard")).status_code, 403
+        )

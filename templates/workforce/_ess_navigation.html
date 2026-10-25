@@ -1,12 +1,14 @@
-<nav class="erp-surface mb-5 flex flex-wrap gap-4 rounded-2xl p-4 text-sm font-bold" aria-label="خدمات شخصی کارکنان">
-  <a class="text-blue-700" href="{% url 'workforce:ess_timekeeping' %}">مرخصی، حضور و کارکرد من</a>
-  <a class="text-blue-700" href="{% url 'workforce:ess_dashboard' %}"{% if request.resolver_match.url_name == 'ess_dashboard' %} aria-current="page"{% endif %}>داشبورد من</a>
-  <a class="text-blue-700" href="{% url 'workforce:ess_profile' %}"{% if request.resolver_match.url_name == 'ess_profile' or request.resolver_match.url_name == 'ess_profile_relationship' %} aria-current="page"{% endif %}>پروفایل من</a>
-  {% if "employment_records.view_own" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:employment_history' %}"{% if request.resolver_match.url_name == 'employment_history' %} aria-current="page"{% endif %}>قرارداد و احکام من</a>{% endif %}
-  {% if "payroll_ess.view_own" in business_permission_codes %}<a class="text-blue-700" href="{% url 'payroll:ess_history' %}">سوابق حقوق من</a>{% endif %}
-  {% if "payroll_inquiries.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'payroll:ess_inquiries' %}">پرسش‌های حقوق</a>{% endif %}
+<nav class="erp-surface mb-5 rounded-xl p-4 text-sm" aria-label="خدمات شخصی کارکنان">
+    <a class="text-blue-700" href="{% url 'workforce:ess_dashboard' %}"{% if request.resolver_match.url_name == 'ess_dashboard' %} aria-current="page"{% endif %}>داشبورد من</a>
+  <div class="mt-3 grid gap-4 sm:grid-cols-3">
+<section><h2 class="mb-2 text-xs font-bold text-slate-500">درخواست‌ها و حضور</h2><div class="flex flex-wrap gap-3">  <a class="text-blue-700" href="{% url 'workforce:ess_timekeeping' %}">مرخصی، حضور و کارکرد من</a>
   {% if my_requests_workspace_available %}<a class="text-blue-700" href="{% url 'workforce:ess_requests' %}">درخواست‌های من</a>{% endif %}
-  {% if "personal_data.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:personal_change_inbox' %}">تغییر اطلاعات شخصی</a>{% endif %}
+  {% if "personal_data.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:personal_change_inbox' %}">تغییر اطلاعات شخصی</a>{% endif %}</div></section>
+{% if "payroll_ess.view_own" in business_permission_codes or "payroll_inquiries.view" in business_permission_codes %}<section><h2 class="mb-2 text-xs font-bold text-slate-500">حقوق و مزایا</h2><div class="flex flex-wrap gap-3">  {% if "payroll_ess.view_own" in business_permission_codes %}<a class="text-blue-700" href="{% url 'payroll:ess_history' %}">سوابق حقوق من</a>{% endif %}
+  {% if "payroll_inquiries.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'payroll:ess_inquiries' %}">پرسش‌های حقوق</a>{% endif %}</div></section>{% endif %}
+<section><h2 class="mb-2 text-xs font-bold text-slate-500">اطلاعات شغلی و اسناد</h2><div class="flex flex-wrap gap-3">  <a class="text-blue-700" href="{% url 'workforce:ess_profile' %}"{% if request.resolver_match.url_name == 'ess_profile' or request.resolver_match.url_name == 'ess_profile_relationship' %} aria-current="page"{% endif %}>پروفایل من</a>
+  {% if "employment_records.view_own" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:employment_history' %}"{% if request.resolver_match.url_name == 'employment_history' %} aria-current="page"{% endif %}>قرارداد و احکام من</a>{% endif %}
   {% if "ess_evidence.view_own" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:own_evidence' %}">سوابق و اسناد من</a>{% endif %}
-  {% if "hr_certificates.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:certificate_index' %}">گواهی‌های من</a>{% endif %}
+  {% if "hr_certificates.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:certificate_index' %}">گواهی‌های من</a>{% endif %}</div></section>
+  </div>
 </nav>

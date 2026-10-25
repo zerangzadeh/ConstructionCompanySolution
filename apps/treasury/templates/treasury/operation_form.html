@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load ui_actions %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 <section class="mx-auto max-w-3xl space-y-6">
   <header><a href="{% url 'treasury:operations' %}" class="text-sm text-slate-600">عملیات خزانه‌داری</a><h1 class="mt-2 text-2xl font-bold">{{ title }}</h1>{% if target %}<p class="mt-2 text-slate-600">وضعیت فعلی: {{ target.get_status_display }}</p>{% endif %}</header>
   {% if summary %}<dl class="erp-surface grid gap-4 rounded-xl p-5 sm:grid-cols-2">{% for label,value in summary %}<div class="min-w-0"><dt class="text-sm text-slate-500">{{ label }}</dt><dd class="mt-1 break-words">{{ value }}</dd></div>{% endfor %}</dl>{% endif %}
-  <form method="post" enctype="multipart/form-data" class="erp-surface space-y-5 rounded-xl p-5">{% csrf_token %}{% if form.non_field_errors %}<div class="erp-alert erp-alert--error" role="alert">{{ form.non_field_errors }}</div>{% endif %}{% for field in form %}{% if field.is_hidden %}{{ field }}{{ field.errors }}{% else %}{% include "components/form_field.html" with field=field %}{% endif %}{% endfor %}<div class="flex flex-wrap gap-3"><button class="erp-btn erp-btn--primary" type="submit">ثبت {{ title }}</button><a class="erp-btn erp-btn--secondary" href="{% url 'treasury:operations' %}">بازگشت</a></div></form>
+  <form method="post" enctype="multipart/form-data" class="erp-surface space-y-5 rounded-xl p-5">{% csrf_token %}{% if form.non_field_errors %}<div class="erp-alert erp-alert--error" role="alert">{{ form.non_field_errors }}</div>{% endif %}{% for field in form %}{% if field.is_hidden %}{{ field }}{{ field.errors }}{% else %}{% include "components/form_field.html" with field=field %}{% endif %}{% endfor %}<div class="flex flex-wrap gap-3"><button class="erp-btn erp-btn--primary" type="submit">{{ title|form_action_label }}</button><a class="erp-btn erp-btn--secondary" href="{% url 'treasury:operations' %}">انصراف</a></div></form>
 </section>
 {% endblock %}

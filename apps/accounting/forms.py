@@ -195,15 +195,29 @@ class JournalLineForm(AccountingFormMixin, forms.Form):
 
 class OpeningImportForm(AccountingFormMixin, JalaliDateMixin, forms.Form):
     fiscal_year = forms.ModelChoiceField(
-        queryset=FiscalYear.objects.none(), label="سال مالی"
+        queryset=FiscalYear.objects.none(),
+        label="سال مالی",
+        help_text="برای استقرار اولیه یا مهاجرت از سیستم حسابداری قبلی؛ این فرم برای انتقال سالانه مانده‌ها نیست.",
     )
     period = forms.ModelChoiceField(
         queryset=FiscalPeriod.objects.none(), label="دوره افتتاحیه"
     )
-    source_reference = forms.CharField(max_length=500, label="مرجع منبع")
+    source_reference = forms.CharField(
+        max_length=500,
+        label="مرجع مانده‌های مبنای افتتاحیه",
+        help_text="شماره یا نشانی منبع مانده‌های اولیه را از مدارک تحویلی وارد کنید.",
+    )
     cutoff_date = forms.DateField(label="تاریخ برش")
-    evidence_reference = forms.CharField(max_length=500, label="مرجع مدرک")
-    reconciliation_reference = forms.CharField(max_length=500, label="مرجع تطبیق")
+    evidence_reference = forms.CharField(
+        max_length=500,
+        label="مرجع مدرک پشتیبان افتتاحیه",
+        help_text="شماره یا نشانی مدرک پشتیبان همین مانده‌ها؛ این مرجع از انتخاب سال مالی قابل استخراج نیست.",
+    )
+    reconciliation_reference = forms.CharField(
+        max_length=500,
+        label="مرجع بررسی و تطبیق مانده‌ها",
+        help_text="شماره یا نشانی نتیجه تطبیق مانده‌های افتتاحیه را وارد کنید.",
+    )
 
     def __init__(
         self, *args: object, organization: Organization, **kwargs: object

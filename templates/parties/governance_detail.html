@@ -1,4 +1,4 @@
-{% extends "base.html" %}{% load erp_format %}
+{% extends "base.html" %}{% load erp_format ui_actions %}
 {% block title %}حاکمیت {{ party.display_name }} | بنیرا{% endblock %}
 {% block content %}
 {% include "parties/_surface_navigation.html" %}
@@ -30,7 +30,7 @@
     {% if item.key == 'merge' %}<p class="mt-4 text-sm text-slate-600">طرف مرجع را صریح انتخاب کنید. سابقه هویت و ارجاع تراکنش‌های قبلی حفظ می‌شود.</p>{% endif %}
     <form class="mt-4 space-y-4" method="post" action="{% url 'parties:governance_action' party.pk item.key %}">{% csrf_token %}
       {% include "components/form_errors.html" with form=item.form %}{% for field in item.form %}{% include "components/form_field.html" with field=field %}{% endfor %}
-      <button class="rounded-xl bg-blue-700 px-4 py-2 font-bold text-white">ثبت در منبع</button>
+      <button class="rounded-xl bg-blue-700 px-4 py-2 font-bold text-white">{{ item.title|form_action_label }}</button>
     </form>
   </details>{% empty %}<p class="erp-surface rounded-2xl p-5 text-sm text-slate-600" role="status">اقدام تکمیلی مجازی برای این وضعیت منبع در دسترس نیست.</p>{% endfor %}</div>
 </section>

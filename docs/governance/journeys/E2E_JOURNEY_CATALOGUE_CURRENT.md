@@ -1,0 +1,679 @@
+# BONIRA — Current E2E Journey Catalogue
+
+**Current baseline:** `4817aa2c50258e2ed741f3617d868bf1d65e5f79`  
+**Previous inventory baseline:** `d75a9334d8e27683159c5f756725c0540651ec43`  
+**Repository:** `zerangzadeh/ConstructionCompanySolution` / `main`  
+**Reconciled:** `2026-10-25`  
+**Method:** retained 584-row canonical inventory + targeted repository/CEP delta reconciliation; no blind full rediscovery.  
+
+## Interpretation
+
+- `CORRECT` is an implementation/static disposition, not Production certification.
+- `PARTIAL` means an implemented boundary still requires a separately governed posting/activation/runtime condition.
+- `NOT APPLICABLE` rows are retained historical/compatibility journeys that are no longer current authoritative paths.
+- Runtime/production evidence is assessed separately in the companion Risk & Coverage workbook.
+
+## Summary
+
+**Journey entries: 608**
+
+| Status | Count |
+|---|---:|
+| `CORRECT` | 593 |
+| `PARTIAL` | 5 |
+| `MISSING` | 0 |
+| `INCORRECT` | 0 |
+| `DEFERRED-BY-DESIGN` | 2 |
+| `NOT APPLICABLE` | 8 |
+| `UNABLE TO VERIFY` | 0 |
+
+## Domain coverage
+
+| Domain | Count |
+|---|---:|
+| HSE و QA/QC مشترک | 18 |
+| Legacy / Compatibility | 7 |
+| Workflow | 24 |
+| ارزیابی طرف تجاری | 8 |
+| انبار و موجودی | 22 |
+| ایمنی | 7 |
+| برآورد | 15 |
+| تدارکات و خرید | 38 |
+| حسابداری | 23 |
+| حساب‌های پرداختنی/دریافتنی | 14 |
+| حضور و زمان | 22 |
+| حقوق و دستمزد | 32 |
+| خزانه‌داری | 33 |
+| دارایی ثابت | 14 |
+| ردپای حسابرسی | 3 |
+| سازمان و مجوزها | 25 |
+| صورت‌وضعیت و گواهی پرداخت | 37 |
+| طرف‌های تجاری | 17 |
+| قراردادها | 26 |
+| ماشین‌آلات و تجهیزات | 21 |
+| مدیریت اسناد | 20 |
+| مدیریت دانش | 15 |
+| مصالح و واحدها | 21 |
+| منابع انسانی پایه | 21 |
+| مناقصات و پیشنهاد تجاری | 4 |
+| ناوبری | 1 |
+| هزینه‌ها | 11 |
+| هویت و حساب کاربری | 8 |
+| پروژه و کنترل پروژه | 45 |
+| پشتیبانی | 11 |
+| کیفیت | 7 |
+| گزارش روزانه و عملیات میدانی | 15 |
+| گزارش، تطبیق و اختتام | 23 |
+
+## Complete catalogue
+
+| ID | Domain | Level | Journey | Business path | Status | UI | Runtime | Reference | Notes |
+|---|---|---|---|---|---|---|---|---|---|
+| `E2E-AUTH-001` | هویت و حساب کاربری | Micro | ورود کاربر | `Credentials → authenticated session` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-AUTH-002` | هویت و حساب کاربری | Micro | اجبار تغییر رمز اولیه | `must_change_password → password change → normal session` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-AUTH-003` | هویت و حساب کاربری | Micro | مسدودسازی کاربر | `active user → blocked → login denied` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-AUTH-004` | هویت و حساب کاربری | Micro | بازگردانی کاربر مسدود | `blocked user → authorized unblock → login eligible` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-AUTH-005` | هویت و حساب کاربری | Micro | تغییر رمز کاربر | `authenticated user → password change` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-AUTH-006` | هویت و حساب کاربری | Micro | به‌روزرسانی پروفایل | `authenticated user → profile update` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-AUTH-007` | هویت و حساب کاربری | Micro | تغییر تصویر پروفایل | `user → profile image` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-AUTH-008` | هویت و حساب کاربری | Micro | تنظیمات صفحه ورود | `platform configuration → login presentation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-001` | سازمان و مجوزها | Domain | ایجاد سازمان و Bootstrap مالک | `platform authority → organization → owner membership` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-002` | سازمان و مجوزها | Domain | فعال/غیرفعال‌سازی سازمان | `organization → status change` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-003` | سازمان و مجوزها | Domain | ایجاد عضویت | `organization + user → membership` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-004` | سازمان و مجوزها | Domain | تعلیق/فعال‌سازی عضویت | `membership → suspended/active` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-005` | سازمان و مجوزها | Domain | اعطای Role | `membership → role assignment` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-006` | سازمان و مجوزها | Domain | لغو Role | `role assignment → revoke` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-007` | سازمان و مجوزها | Domain | اعطای Grant سطح سازمان | `membership → organization grant` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-008` | سازمان و مجوزها | Domain | اعطای Grant سطح پروژه | `membership → project grant` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-009` | سازمان و مجوزها | Domain | اعطای Grant سطح کارگاه | `membership → site grant` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-010` | سازمان و مجوزها | Domain | لغو Grant | `active grant → revoke` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-011` | سازمان و مجوزها | Domain | ایجاد دسترسی واگذارشده | `authorized admin → bounded delegation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-012` | سازمان و مجوزها | Domain | لغو/انقضای Delegation | `delegation → revoke/expire` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-013` | سازمان و مجوزها | Domain | درخواست اتصال حساب سازمانی | `user/organization → connection request` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-014` | سازمان و مجوزها | Domain | تأیید/رد اتصال حساب سازمانی | `connection request → decision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-015` | سازمان و مجوزها | Domain | Provision مستقیم کاربر سازمان | `authorized admin → user + membership` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-016` | سازمان و مجوزها | Domain | Reset رمز عضو توسط مدیر مجاز | `member → admin reset → must-change state` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-017` | سازمان و مجوزها | Domain | تغییر Organization Settings | `tenant admin → settings update/version` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-018` | سازمان و مجوزها | Domain | اعمال Platform Policy در Tenant | `published policy → tenant application` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-019` | سازمان و مجوزها | Domain | جایگزینی Policy مؤثر | `current policy → new published version` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-020` | سازمان و مجوزها | Domain | حفظ Snapshot سیاست تاریخی | `historical transaction → pinned policy evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-021` | سازمان و مجوزها | Domain | Cross-Tenant authorization rejection | `foreign object → denied` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-022` | سازمان و مجوزها | Domain | Cross-Project authorization rejection | `foreign project/site → denied` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-ORG-023` | سازمان و مجوزها | Domain | Superuser tenant-operation denial | `technical superuser → tenant business data → denied` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-001` | Workflow | Domain | ایجاد Workflow draft | `tenant workflow service → draft` | `CORRECT` | Available / governed administration workspace | `REQUIRED` | CEP-046 | Tenant workflow administration UI/services delivered; runtime evidence remains assessed separately. |
+| `E2E-WF-002` | Workflow | Domain | ایجاد Workflow version | `workflow → draft version` | `CORRECT` | Available / governed administration workspace | `REQUIRED` | CEP-046 | Tenant workflow administration UI/services delivered; runtime evidence remains assessed separately. |
+| `E2E-WF-003` | Workflow | Domain | ویرایش Step/Condition/Transition | `draft version → configured version` | `CORRECT` | Available / governed administration workspace | `REQUIRED` | CEP-046 | Tenant workflow administration UI/services delivered; runtime evidence remains assessed separately. |
+| `E2E-WF-004` | Workflow | Domain | اعتبارسنجی Workflow | `draft version → valid/invalid` | `CORRECT` | Available / governed administration workspace | `REQUIRED` | CEP-046 | Tenant workflow administration UI/services delivered; runtime evidence remains assessed separately. |
+| `E2E-WF-005` | Workflow | Domain | Publish Workflow | `validated draft → published` | `CORRECT` | Available / governed administration workspace | `REQUIRED` | CEP-046 | Tenant workflow administration UI/services delivered; runtime evidence remains assessed separately. |
+| `E2E-WF-006` | Workflow | Domain | Retire Workflow | `published workflow → retired` | `CORRECT` | Available / governed administration workspace | `REQUIRED` | CEP-046 | Tenant workflow administration UI/services delivered; runtime evidence remains assessed separately. |
+| `E2E-WF-007` | Workflow | Domain | Supersede Workflow | `published workflow → successor` | `CORRECT` | Available / governed administration workspace | `REQUIRED` | CEP-046 | Tenant workflow administration UI/services delivered; runtime evidence remains assessed separately. |
+| `E2E-WF-008` | Workflow | Micro | ایجاد Workflow Instance | `domain event → workflow instance` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-009` | Workflow | Micro | ایجاد Step Instance | `workflow instance → current step` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-010` | Workflow | Micro | ایجاد WorkItem | `step → work item` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-011` | Workflow | Micro | Candidate resolution | `work item → eligible actors` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-012` | Workflow | Micro | Claim WorkItem | `candidate → assigned actor` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-013` | Workflow | Micro | Approve WorkItem | `assigned item → approved transition` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-014` | Workflow | Micro | Reject WorkItem | `assigned item → rejected transition` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-015` | Workflow | Micro | Return WorkItem | `assigned item → returned transition` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-016` | Workflow | Micro | واگذاری زمان‌دار | `assignment → delegated actor` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-017` | Workflow | Micro | انقضای Delegation | `delegation → expired` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-018` | Workflow | Micro | Overdue detection | `due work item → overdue` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-019` | Workflow | Micro | Escalation routing | `overdue item → escalation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-020` | Workflow | Micro | Cancel Workflow | `active instance → cancelled` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-021` | Workflow | Micro | Complete Workflow | `required steps → completed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-022` | Workflow | Micro | Idempotent workflow retry | `same action key → same business result` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-023` | Workflow | Micro | Protected self-approval denial | `requester == protected approver → denied` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WF-024` | Workflow | Micro | Workflow fallback | `no applicable workflow → accepted fallback policy` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-001` | مدیریت اسناد | Micro | ایجاد Document | `metadata → document` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-002` | مدیریت اسناد | Micro | بارگذاری Version اولیه | `document → version 1` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-003` | مدیریت اسناد | Micro | بارگذاری Version جدید | `document → immutable successor version` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-004` | مدیریت اسناد | Micro | لینک سند به موجودیت | `version → typed link → domain object` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-005` | مدیریت اسناد | Micro | لغو/آرشیو Link | `typed link → inactive while document history remains` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-006` | مدیریت اسناد | Micro | طبقه‌بندی سند | `document/version → classification` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-007` | مدیریت اسناد | Micro | Sensitivity assignment | `document/version → access sensitivity` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-008` | مدیریت اسناد | Micro | Retention classification | `document → retention class` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-009` | مدیریت اسناد | Micro | ایجاد Disposal Intent | `retention-eligible document → disposal intent` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-010` | مدیریت اسناد | Micro | تصمیم Disposal | `intent → approved/rejected` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-011` | مدیریت اسناد | Micro | Recovery evidence | `recovery operation → retained evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-012` | مدیریت اسناد | Micro | ایجاد Export Manifest | `selected versions → immutable export manifest` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-013` | مدیریت اسناد | Micro | دانلود Export مجاز | `manifest → authorized download` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-014` | مدیریت اسناد | Micro | پردازش فایل | `uploaded version → processing result` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-015` | مدیریت اسناد | Micro | ثبت failure پردازش | `processing error → retained failure evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-016` | مدیریت اسناد | Micro | Sealed evidence access | `sealed version → protected access` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-017` | مدیریت اسناد | Micro | ثبت Photo Metadata | `photo → metadata` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-018` | مدیریت اسناد | Micro | لینک عکس پروژه | `photo → project link` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-019` | مدیریت اسناد | Micro | لینک عکس کارگاه | `photo → site link` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-DOC-020` | مدیریت اسناد | Micro | دسترسی غیرمجاز به سند حساس | `unauthorized actor → denied` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-MAT-001` | مصالح و واحدها | Micro | ایجاد Material Master | `tenant → material` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-002` | مصالح و واحدها | Micro | ویرایش Material | `material → governed update` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-003` | مصالح و واحدها | Micro | Archive Material | `material → archived` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-004` | مصالح و واحدها | Micro | ثبت Alias | `material → alias/history` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-005` | مصالح و واحدها | Micro | تشخیص Duplicate Material | `identity normalization → duplicate candidate` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-006` | مصالح و واحدها | Micro | تصمیم Duplicate Candidate | `candidate → accepted/rejected` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-007` | مصالح و واحدها | Micro | Merge Material | `duplicate materials → canonical survivor` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-008` | مصالح و واحدها | Micro | ایجاد Unit Family | `unit governance → family` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-009` | مصالح و واحدها | Micro | ایجاد Unit of Measure | `unit family → UOM` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-010` | مصالح و واحدها | Micro | ایجاد Conversion Version | `source UOM → target UOM conversion version` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-011` | مصالح و واحدها | Micro | فعال‌سازی Conversion | `conversion draft → active version` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-012` | مصالح و واحدها | Micro | ایجاد Quantity Rounding Policy | `rounding policy → version` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-013` | مصالح و واحدها | Micro | فعال‌سازی Rounding Policy | `policy version → active` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-014` | مصالح و واحدها | Micro | تعریف Material Attribute | `attribute definition → governed schema` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-015` | مصالح و واحدها | Micro | ثبت Attribute Value | `material → typed value` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-016` | مصالح و واحدها | Micro | Import Material Preview | `file → preview` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-017` | مصالح و واحدها | Micro | Accept Material Import | `validated preview → materials` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-018` | مصالح و واحدها | Micro | Technical Approval | `material evidence → technical approval` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-019` | مصالح و واحدها | Micro | تعریف Equivalent | `material A → equivalent material B` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-020` | مصالح و واحدها | Micro | تعریف Substitute | `material A → substitute material B` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-MAT-021` | مصالح و واحدها | Micro | لینک سند فنی | `material → document link` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-031 / CEP-079 | Materials governance workspace delivered; tenant/object scoping was additionally exercised during representative UAT. |
+| `E2E-PARTY-001` | طرف‌های تجاری | Micro | ایجاد BusinessParty | `tenant → business party` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-002` | طرف‌های تجاری | Micro | ویرایش هویت Party | `party → governed identity update` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-003` | طرف‌های تجاری | Micro | Archive Party | `party → archived/inactive` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-004` | طرف‌های تجاری | Micro | ثبت Alias/نام سابق | `party → alias/history` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-005` | طرف‌های تجاری | Micro | ثبت شناسه مالیاتی | `party → tax identity` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-006` | طرف‌های تجاری | Micro | ثبت شناسه حقوقی | `party → legal identity` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-007` | طرف‌های تجاری | Micro | ثبت اطلاعات بانکی | `party → bank evidence` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-008` | طرف‌های تجاری | Micro | ثبت نماینده مجاز | `party → representative` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-009` | طرف‌های تجاری | Micro | ثبت امضادار مجاز | `party → signatory` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-010` | طرف‌های تجاری | Micro | ثبت Category/Tag | `party → classification` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-011` | طرف‌های تجاری | Micro | تشخیص Duplicate Party | `identity normalization → duplicate candidate` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-012` | طرف‌های تجاری | Micro | تصمیم Duplicate Party | `candidate → accepted/rejected` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-013` | طرف‌های تجاری | Micro | Merge Party | `duplicates → canonical party` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-014` | طرف‌های تجاری | Micro | ثبت Restriction | `party → restriction` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-015` | طرف‌های تجاری | Micro | رفع Restriction | `restriction → revoked/expired` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-016` | طرف‌های تجاری | Micro | Transaction restriction enforcement | `restricted party → operation denied` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PARTY-017` | طرف‌های تجاری | Micro | ثبت violation history | `party → violation evidence` | `CORRECT` | Available / governance workspace | `REQUIRED` | CEP-030 / CEP-079 | Party governance workspace delivered; governed organization-master/partner paths retained and representative paths exercised in UAT. |
+| `E2E-PQUAL-001` | ارزیابی طرف تجاری | Domain | ایجاد Qualification Assessment | `party → assessment` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PQUAL-002` | ارزیابی طرف تجاری | Domain | ثبت معیار و Evidence | `assessment → criterion evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PQUAL-003` | ارزیابی طرف تجاری | Domain | محاسبه/ثبت Score | `evidence → explainable score` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PQUAL-004` | ارزیابی طرف تجاری | Domain | Review Assessment | `assessment → review` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PQUAL-005` | ارزیابی طرف تجاری | Domain | انتشار Qualification State | `reviewed assessment → qualification state` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PQUAL-006` | ارزیابی طرف تجاری | Domain | ثبت Performance Evidence | `executed relationship → performance evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PQUAL-007` | ارزیابی طرف تجاری | Domain | تجدید ارزیابی | `prior assessment → new revision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PQUAL-008` | ارزیابی طرف تجاری | Domain | انقضا و Requalification | `expired state → new assessment required` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-001` | برآورد | Domain | ایجاد Estimate | `project → estimate` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-002` | برآورد | Domain | ایجاد Estimate Revision | `estimate → revision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-003` | برآورد | Domain | افزودن Estimate Item | `revision → item` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-004` | برآورد | Domain | ویرایش Estimate Item | `draft revision item → update` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-005` | برآورد | Domain | تحلیل Resource | `estimate item → resources` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-006` | برآورد | Domain | تحلیل Material | `estimate item → material resources` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-007` | برآورد | Domain | تحلیل Equipment | `estimate item → equipment resources` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-008` | برآورد | Domain | اعمال Coefficient | `revision → governed coefficient` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-009` | برآورد | Domain | مقایسه Revisionها | `revision A ↔ revision B` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-010` | برآورد | Domain | Import Preview | `tabular estimate → preview` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-011` | برآورد | Domain | Accept Import | `validated preview → revision/items` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-012` | برآورد | Domain | Submit Estimate | `draft → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-013` | برآورد | Domain | Approve Estimate | `submitted → approved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-014` | برآورد | Domain | Return Estimate | `submitted → returned` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EST-015` | برآورد | Domain | Estimate → Budget handoff | `approved current revision → budget source manifest` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-001` | پروژه و کنترل پروژه | Domain | ایجاد Project | `organization → project` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-002` | پروژه و کنترل پروژه | Domain | ایجاد Project Site | `project → site` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-003` | پروژه و کنترل پروژه | Domain | ایجاد Phase | `site → phase` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-004` | پروژه و کنترل پروژه | Domain | فعال‌سازی Phase | `planning → active` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-005` | پروژه و کنترل پروژه | Domain | Hold Phase | `active → on_hold` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-006` | پروژه و کنترل پروژه | Domain | Complete Phase | `active → completed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-007` | پروژه و کنترل پروژه | Domain | ایجاد WBS | `project → WBS` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-008` | پروژه و کنترل پروژه | Domain | ایجاد Activity | `project/WBS → activity` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-009` | پروژه و کنترل پروژه | Domain | فعال‌سازی Activity | `planning → active` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-010` | پروژه و کنترل پروژه | Domain | Hold Activity | `active → on_hold` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-011` | پروژه و کنترل پروژه | Domain | Complete Activity | `active → completed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-012` | پروژه و کنترل پروژه | Domain | Cancel Activity | `eligible activity → cancelled` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-013` | پروژه و کنترل پروژه | Domain | ایجاد CBS | `cost structure → CBS` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-014` | پروژه و کنترل پروژه | Domain | ایجاد Cost Center | `organization → cost center` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-015` | پروژه و کنترل پروژه | Domain | ایجاد Cost Structure Version | `CBS/cost center → version` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-016` | پروژه و کنترل پروژه | Domain | Accept/Lock Cost Structure | `draft version → accepted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-017` | پروژه و کنترل پروژه | Domain | ساخت Budget Draft | `accepted estimate → budget draft` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-018` | پروژه و کنترل پروژه | Domain | ثبت Budget Allocation | `budget → WBS/CBS/cost center allocation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-019` | پروژه و کنترل پروژه | Domain | Budget conservation check | `allocations → exact conservation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-020` | پروژه و کنترل پروژه | Domain | Accept Budget Version | `validated budget → accepted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-021` | پروژه و کنترل پروژه | Domain | Supersede Budget Version | `accepted budget → successor` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-022` | پروژه و کنترل پروژه | Domain | Set Governing Budget | `project control → accepted budget pointer` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-023` | پروژه و کنترل پروژه | Domain | ایجاد Project Cost Source Contract | `producer class → source contract` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-024` | پروژه و کنترل پروژه | Domain | Approve Source Contract | `source contract → approved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-025` | پروژه و کنترل پروژه | Domain | Retire Source Contract | `approved contract → retired` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-026` | پروژه و کنترل پروژه | Domain | ایجاد Commitment Fact | `eligible source → commitment` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-027` | پروژه و کنترل پروژه | Domain | ایجاد Accrual Fact | `eligible source → accrual` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-028` | پروژه و کنترل پروژه | Domain | ایجاد Actual Cost Fact | `eligible active source → actual` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-047 / CEP-048 / CEP-079 | Governed source-specific Project Cost producers/reconciliation implemented; tenant-specific activation values remain fail-closed and are assessed separately for production readiness. |
+| `E2E-PROJ-029` | پروژه و کنترل پروژه | Domain | Reverse Project Cost Fact | `fact → reversal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-030` | پروژه و کنترل پروژه | Domain | Replace Accrual with Actual | `accrual → actual replacement` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-031` | پروژه و کنترل پروژه | Domain | ثبت Coverage/Watermark | `producer → coverage` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-047 / CEP-048 / CEP-079 | Governed source-specific Project Cost producers/reconciliation implemented; tenant-specific activation values remain fail-closed and are assessed separately for production readiness. |
+| `E2E-PROJ-032` | پروژه و کنترل پروژه | Domain | ساخت Forecast Draft | `budget + facts → forecast snapshot` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-033` | پروژه و کنترل پروژه | Domain | ایجاد Schedule Revision | `project → schedule revision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-034` | پروژه و کنترل پروژه | Domain | ایجاد Schedule Item/Milestone | `schedule revision → item` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-035` | پروژه و کنترل پروژه | Domain | ایجاد Dependency | `schedule items → dependency` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-036` | پروژه و کنترل پروژه | Domain | ثبت Issue | `project controls → issue` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-037` | پروژه و کنترل پروژه | Domain | ثبت Constraint | `project controls → constraint` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-038` | پروژه و کنترل پروژه | Domain | ثبت Risk | `project controls → risk` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-039` | پروژه و کنترل پروژه | Domain | ثبت Delay | `project controls → delay` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-040` | پروژه و کنترل پروژه | Domain | ثبت Change Proposal | `control evidence → change proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-041` | پروژه و کنترل پروژه | Domain | ثبت Rebaseline Proposal | `change evidence → rebaseline proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-042` | پروژه و کنترل پروژه | Domain | Approve/Reject Rebaseline | `proposal → decision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-043` | پروژه و کنترل پروژه | Domain | Project Controls comparison | `budget + expense + facts → comparison` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROJ-044` | پروژه و کنترل پروژه | Domain | Project Cost reconciliation | `budget + expense + actual evidence → bounded reconciliation` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-047 / CEP-048 / CEP-079 | Governed source-specific Project Cost producers/reconciliation implemented; tenant-specific activation values remain fail-closed and are assessed separately for production readiness. |
+| `E2E-PROJ-045` | پروژه و کنترل پروژه | Domain | Export Project Controls | `comparison/reconciliation → audited CSV` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EXP-001` | هزینه‌ها | Micro | ثبت Expense Legacy | `project → recorded expense` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EXP-002` | هزینه‌ها | Micro | Void Expense Legacy | `recorded expense → void` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EXP-003` | هزینه‌ها | Micro | ایجاد Expense Draft idempotent | `source evidence → draft` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EXP-004` | هزینه‌ها | Micro | ثبت Split Allocation | `draft → WBS/CBS/Activity/CostCenter allocations` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EXP-005` | هزینه‌ها | Micro | Submit Expense | `draft → submitted + budget snapshot` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EXP-006` | هزینه‌ها | Micro | Approve Expense | `submitted → approved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EXP-007` | هزینه‌ها | Micro | Return Expense | `submitted → returned` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EXP-008` | هزینه‌ها | Micro | Void Expense | `eligible expense → void` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EXP-009` | هزینه‌ها | Micro | ایجاد Recurring Template | `project → recurrence template` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EXP-010` | هزینه‌ها | Micro | تولید recurrence occurrence | `due template → reviewable draft` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EXP-011` | هزینه‌ها | Cross-domain | Expense → Accounting | `approved expense → accounting journal` | `PARTIAL` | Available / service-backed | `REQUIRED` | CEP-042 | Approved Direct Expense can create an Accounting-owned recognition draft; final journal submission/posting is still separately governed. |
+| `E2E-PROC-001` | تدارکات و خرید | Micro | ایجاد Purchase Request | `requester → PR draft` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-002` | تدارکات و خرید | Micro | افزودن PR line | `PR draft → line` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-003` | تدارکات و خرید | Micro | ویرایش PR line | `PR draft line → update` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-004` | تدارکات و خرید | Micro | Submit PR | `draft → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-005` | تدارکات و خرید | Micro | Approve PR | `submitted → approved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-006` | تدارکات و خرید | Micro | Return/Reject PR | `submitted → returned/rejected` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-007` | تدارکات و خرید | Micro | Cancel PR | `eligible PR → cancelled` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-008` | تدارکات و خرید | Micro | ایجاد RFQ | `approved need → RFQ draft` | `CORRECT` | Available / RFQ buyer workspace | `REQUIRED` | CEP-032 / CEP-079 | Governed RFQ/buyer actions and ordinary workspace delivered; representative Procurement workflow exercised in UAT. |
+| `E2E-PROC-009` | تدارکات و خرید | Micro | ایجاد RFQ Version | `RFQ → version` | `CORRECT` | Available / RFQ buyer workspace | `REQUIRED` | CEP-032 / CEP-079 | Governed RFQ/buyer actions and ordinary workspace delivered; representative Procurement workflow exercised in UAT. |
+| `E2E-PROC-010` | تدارکات و خرید | Micro | دعوت Supplier | `RFQ → invited party` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-011` | تدارکات و خرید | Micro | Publish/Issue RFQ | `draft version → issued` | `CORRECT` | Available / RFQ buyer workspace | `REQUIRED` | CEP-032 / CEP-079 | Governed RFQ/buyer actions and ordinary workspace delivered; representative Procurement workflow exercised in UAT. |
+| `E2E-PROC-012` | تدارکات و خرید | Micro | Close RFQ | `open RFQ → closed` | `CORRECT` | Available / RFQ buyer workspace | `REQUIRED` | CEP-032 / CEP-079 | Governed RFQ/buyer actions and ordinary workspace delivered; representative Procurement workflow exercised in UAT. |
+| `E2E-PROC-013` | تدارکات و خرید | Micro | ثبت Supplier Quote | `invited supplier → quote/version` | `CORRECT` | Available / RFQ buyer workspace | `REQUIRED` | CEP-032 / CEP-079 | Governed RFQ/buyer actions and ordinary workspace delivered; representative Procurement workflow exercised in UAT. |
+| `E2E-PROC-014` | تدارکات و خرید | Micro | اصلاح Quote | `quote → revised version` | `CORRECT` | Available / RFQ buyer workspace | `REQUIRED` | CEP-032 / CEP-079 | Governed RFQ/buyer actions and ordinary workspace delivered; representative Procurement workflow exercised in UAT. |
+| `E2E-PROC-015` | تدارکات و خرید | Micro | Withdraw Quote | `quote → withdrawn` | `CORRECT` | Available / RFQ buyer workspace | `REQUIRED` | CEP-032 / CEP-079 | Governed RFQ/buyer actions and ordinary workspace delivered; representative Procurement workflow exercised in UAT. |
+| `E2E-PROC-016` | تدارکات و خرید | Micro | Sealed Quote custody | `submitted quote → sealed custody` | `CORRECT` | Available / RFQ buyer workspace | `REQUIRED` | CEP-032 / CEP-079 | Governed RFQ/buyer actions and ordinary workspace delivered; representative Procurement workflow exercised in UAT. |
+| `E2E-PROC-017` | تدارکات و خرید | Micro | Protected Quote opening | `closed RFQ → opened quote evidence` | `CORRECT` | Available / RFQ buyer workspace | `REQUIRED` | CEP-032 / CEP-079 | Governed RFQ/buyer actions and ordinary workspace delivered; representative Procurement workflow exercised in UAT. |
+| `E2E-PROC-018` | تدارکات و خرید | Micro | Admissibility review | `opened quote → admissibility decision` | `CORRECT` | Available / RFQ buyer workspace | `REQUIRED` | CEP-032 / CEP-079 | Governed RFQ/buyer actions and ordinary workspace delivered; representative Procurement workflow exercised in UAT. |
+| `E2E-PROC-019` | تدارکات و خرید | Micro | Normalized comparison | `admissible quotes → comparison` | `CORRECT` | Available / RFQ buyer workspace | `REQUIRED` | CEP-032 / CEP-079 | Governed RFQ/buyer actions and ordinary workspace delivered; representative Procurement workflow exercised in UAT. |
+| `E2E-PROC-020` | تدارکات و خرید | Micro | Review comparison | `comparison → reviewed` | `CORRECT` | Available / RFQ buyer workspace | `REQUIRED` | CEP-032 / CEP-079 | Governed RFQ/buyer actions and ordinary workspace delivered; representative Procurement workflow exercised in UAT. |
+| `E2E-PROC-021` | تدارکات و خرید | Micro | Award decision | `reviewed comparison → award` | `CORRECT` | Available / RFQ buyer workspace | `REQUIRED` | CEP-032 / CEP-079 | Governed RFQ/buyer actions and ordinary workspace delivered; representative Procurement workflow exercised in UAT. |
+| `E2E-PROC-022` | تدارکات و خرید | Micro | ایجاد Purchase Order | `award/source → PO draft` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-023` | تدارکات و خرید | Micro | ایجاد PO Version/Change | `PO → immutable version` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-024` | تدارکات و خرید | Micro | Submit PO | `draft → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-025` | تدارکات و خرید | Micro | Approve PO | `submitted → approved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-026` | تدارکات و خرید | Micro | Cancel PO | `eligible PO → cancelled` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-027` | تدارکات و خرید | Micro | ایجاد Goods Receipt | `approved PO → receipt` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-028` | تدارکات و خرید | Micro | Post Goods Receipt | `receipt → posted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-029` | تدارکات و خرید | Micro | Void Goods Receipt | `posted receipt → void` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-030` | تدارکات و خرید | Micro | ایجاد Service Acceptance | `PO service line → acceptance` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-031` | تدارکات و خرید | Micro | Approve Service Acceptance | `acceptance → approved/posted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-032` | تدارکات و خرید | Micro | ایجاد Supplier Invoice | `supplier/PO/receipt → invoice` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-033` | تدارکات و خرید | Micro | Version Supplier Invoice | `invoice → revision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-034` | تدارکات و خرید | Micro | Run 2/3-way Match | `invoice + PO + receipt/acceptance → match` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-035` | تدارکات و خرید | Micro | Resolve Match discrepancy | `match exception → disposition` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-036` | تدارکات و خرید | Micro | Supplier Portal invitation | `RFQ → supplier portal access` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-037` | تدارکات و خرید | Micro | Supplier Portal quote submission | `portal supplier → quote` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PROC-038` | تدارکات و خرید | Cross-domain | Supplier Invoice Match → AP | `approved retained match evidence → AP obligation` | `PARTIAL` | Available / service-backed | `REQUIRED` | CEP-044 | Supplier-invoice match source/recognition contract is implemented after explicit AP acceptance; production tenant mappings/activation remain to be assessed. |
+| `E2E-CON-001` | قراردادها | Domain | ایجاد Contract | `project + party → contract` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-002` | قراردادها | Domain | ویرایش Contract | `eligible contract → update` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-003` | قراردادها | Domain | فعال‌سازی Contract | `draft/approved → active` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-004` | قراردادها | Domain | Complete Contract | `active → completed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-005` | قراردادها | Domain | Terminate Contract | `eligible contract → terminated` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-006` | قراردادها | Domain | ثبت Contract Term Version | `contract → immutable terms` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-007` | قراردادها | Domain | ایجاد Amendment | `contract → amendment draft` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-008` | قراردادها | Domain | Submit Amendment | `draft amendment → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-009` | قراردادها | Domain | Approve Amendment | `submitted amendment → approved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-010` | قراردادها | Domain | Reject/Return Amendment | `submitted amendment → decision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-011` | قراردادها | Domain | ثبت Contract Document Link | `contract → DMS evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-012` | قراردادها | Domain | ثبت Site Instruction | `contract/project → instruction` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-013` | قراردادها | Domain | ثبت Variation/Change Order | `instruction/change evidence → variation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-014` | قراردادها | Domain | ثبت Contractual Claim | `contract → claim record` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-015` | قراردادها | Domain | ثبت EOT | `contract → EOT record` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-016` | قراردادها | Domain | افزودن Contractual Evidence | `record → evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-017` | قراردادها | Domain | Submit Contractual Record | `draft record → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-018` | قراردادها | Domain | Approve Contractual Record | `submitted → approved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-019` | قراردادها | Domain | Reject/Return Contractual Record | `submitted → decision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-020` | قراردادها | Domain | Withdraw Contractual Record | `eligible record → withdrawn` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-021` | قراردادها | Domain | Supersede Contractual Record | `record → successor` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-022` | قراردادها | Domain | Cancel Contractual Record | `record → cancelled` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-023` | قراردادها | Domain | Commercial Review timeline | `contract + claim/certificate facts → read-only timeline` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-CON-024` | قراردادها | Cross-domain | Variation → Contract Value | `approved variation → automatic contract-value mutation` | `DEFERRED-BY-DESIGN` | Available / service-backed | `REQUIRED` | Accepted P6 boundary | Silent contract-value mutation is intentionally not authorized. |
+| `E2E-CON-025` | قراردادها | Cross-domain | Variation → Billing | `approved variation → automatic Billing effect` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-037 | Approved Variation now has an explicit fail-closed Billing eligibility handoff; Billing retains independent financial decision authority. |
+| `E2E-BIL-001` | صورت‌وضعیت و گواهی پرداخت | Micro | ایجاد Project Baseline تجاری | `contract/BOQ → Billing baseline` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-002` | صورت‌وضعیت و گواهی پرداخت | Micro | ثبت Progress Record | `project progress → progress evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-003` | صورت‌وضعیت و گواهی پرداخت | Micro | ایجاد Progress Claim | `baseline/progress/terms → claim draft` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-004` | صورت‌وضعیت و گواهی پرداخت | Micro | محاسبه Progress Claim | `claim inputs → calculated claim` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-005` | صورت‌وضعیت و گواهی پرداخت | Micro | Submit Claim | `draft claim → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-006` | صورت‌وضعیت و گواهی پرداخت | Micro | Approve Claim | `submitted → approved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-007` | صورت‌وضعیت و گواهی پرداخت | Micro | Return/Reject Claim | `submitted → decision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-008` | صورت‌وضعیت و گواهی پرداخت | Micro | Correction Claim | `approved/superseded claim → correction` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-009` | صورت‌وضعیت و گواهی پرداخت | Micro | Cancel Claim | `eligible claim → cancelled` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-010` | صورت‌وضعیت و گواهی پرداخت | Micro | Supersede Claim | `claim → successor` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-011` | صورت‌وضعیت و گواهی پرداخت | Micro | Progress Claim → AR | `approved claim → explicit AR obligation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-012` | صورت‌وضعیت و گواهی پرداخت | Micro | Legacy Claim Settlement allocation | `PaymentAllocation → ClaimSettlementAllocation` | `NOT APPLICABLE` | Retired / compatibility only | `NOT REQUIRED` | Legacy Payment retirement / CEP-079 | Legacy Payment/PaymentAllocation settlement is no longer a current authoritative journey; Treasury owns current cash authority. |
+| `E2E-BIL-013` | صورت‌وضعیت و گواهی پرداخت | Micro | Reverse Claim Settlement | `active settlement → reversed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-014` | صورت‌وضعیت و گواهی پرداخت | Micro | ایجاد Payable Certificate | `contractor/source → certificate draft` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-015` | صورت‌وضعیت و گواهی پرداخت | Micro | محاسبه Payable Certificate | `certificate → amounts/adjustments` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-016` | صورت‌وضعیت و گواهی پرداخت | Micro | Submit Payable Certificate | `draft → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-017` | صورت‌وضعیت و گواهی پرداخت | Micro | Approve Payable Certificate | `submitted → approved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-018` | صورت‌وضعیت و گواهی پرداخت | Micro | Correct Payable Certificate | `approved → correction` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-019` | صورت‌وضعیت و گواهی پرداخت | Micro | Cancel Payable Certificate | `eligible → cancelled` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-020` | صورت‌وضعیت و گواهی پرداخت | Micro | Supersede Payable Certificate | `certificate → successor` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-021` | صورت‌وضعیت و گواهی پرداخت | Micro | Payable Certificate → AP | `approved certificate → AP obligation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-022` | صورت‌وضعیت و گواهی پرداخت | Micro | Retention withholding | `certificate → retention amount` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-023` | صورت‌وضعیت و گواهی پرداخت | Micro | Retention release request | `eligible retention → release request` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-024` | صورت‌وضعیت و گواهی پرداخت | Micro | Approve Retention release | `request + compliance → release evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-025` | صورت‌وضعیت و گواهی پرداخت | Micro | Guarantee registration | `contract → guarantee` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-026` | صورت‌وضعیت و گواهی پرداخت | Micro | Guarantee release/expiry | `guarantee → released/expired` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-027` | صورت‌وضعیت و گواهی پرداخت | Micro | Insurance/compliance assessment | `contractor evidence → assessment` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-028` | صورت‌وضعیت و گواهی پرداخت | Micro | Statutory submission snapshot | `approved source → submission evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-BIL-029` | صورت‌وضعیت و گواهی پرداخت | Cross-domain | Billing/AR → Treasury authoritative settlement | `AR/claim settlement → Treasury` | `CORRECT` | Available / service-backed | `REQUIRED` | Legacy Payment retirement / CEP-079 UAT-CASE-023 | Authoritative Treasury receipt/payment lineage resolves Billing/AR settlement; representative settlement and retry passed UAT. |
+| `E2E-SUB-001` | حساب‌های پرداختنی/دریافتنی | Micro | Recognize AR from registered source | `approved source snapshot → AR obligation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUB-002` | حساب‌های پرداختنی/دریافتنی | Micro | Recognize AP from registered source | `approved source snapshot → AP obligation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUB-003` | حساب‌های پرداختنی/دریافتنی | Micro | Prevent duplicate source recognition | `same source/version → idempotent prevention` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUB-004` | حساب‌های پرداختنی/دریافتنی | Micro | Allocate Treasury movement | `posted movement → obligation settlement` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUB-005` | حساب‌های پرداختنی/دریافتنی | Micro | Reverse allocation | `active allocation → reversed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUB-006` | حساب‌های پرداختنی/دریافتنی | Micro | Run AP aging | `AP obligations → as-of aging` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUB-007` | حساب‌های پرداختنی/دریافتنی | Micro | Run AR aging | `AR obligations → as-of aging` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUB-008` | حساب‌های پرداختنی/دریافتنی | Micro | Run AP/AR reconciliation | `subledger → reconciliation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUB-009` | حساب‌های پرداختنی/دریافتنی | Micro | Review AP/AR reconciliation | `run → independent review` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUB-010` | حساب‌های پرداختنی/دریافتنی | Micro | Supplier Invoice Match review workbench | `match evidence → review` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUB-011` | حساب‌های پرداختنی/دریافتنی | Exception | Create write-off proposal | `eligible obligation → write-off proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-044 | Governed write-off proposal/approval/full reversal/optional replacement lifecycle implemented with retained lineage and fail-closed controls. |
+| `E2E-SUB-012` | حساب‌های پرداختنی/دریافتنی | Exception | Approve/execute write-off | `write-off proposal → obligation adjustment` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-044 | Governed write-off proposal/approval/full reversal/optional replacement lifecycle implemented with retained lineage and fail-closed controls. |
+| `E2E-SUB-013` | حساب‌های پرداختنی/دریافتنی | Exception | Reverse write-off | `write-off → reversal` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-044 | Governed write-off proposal/approval/full reversal/optional replacement lifecycle implemented with retained lineage and fail-closed controls. |
+| `E2E-SUB-014` | حساب‌های پرداختنی/دریافتنی | Cross-domain | Subledger → GL recognition/tie-out | `AP/AR obligation → Accounting recognition/tie-out` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-042 / CEP-044 / CEP-066 | Source-versioned AP/AR recognition/tie-out contracts and closeout evidence are implemented; production mappings/activation are assessed separately. |
+| `E2E-TRE-001` | خزانه‌داری | Micro | ایجاد Treasury Account | `tenant → treasury account` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-002` | خزانه‌داری | Micro | ایجاد Account Mapping Version | `treasury account → accounting mapping` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-003` | خزانه‌داری | Micro | تغییر وضعیت Treasury Account | `account → active/inactive/closed` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-004` | خزانه‌داری | Micro | ایجاد Movement | `business source → movement draft` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-005` | خزانه‌داری | Micro | Submit Movement | `draft → submitted` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-006` | خزانه‌داری | Micro | Approve/Post Movement | `submitted → posted` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-007` | خزانه‌داری | Micro | Reverse Posted Movement | `posted → reversal` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-008` | خزانه‌داری | Micro | ایجاد Cheque | `treasury context → cheque` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-009` | خزانه‌داری | Micro | Transition Cheque | `cheque → next allowed status` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-010` | خزانه‌داری | Micro | Clear Cheque | `issued cheque → cleared` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-011` | خزانه‌داری | Micro | Bounce Cleared Cheque | `cleared cheque → bounced` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-012` | خزانه‌داری | Micro | Run Treasury→GL reconciliation | `treasury movements → GL tie-out` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-013` | خزانه‌داری | Micro | Review Treasury→GL reconciliation | `run → independent review` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-014` | خزانه‌داری | Micro | Verify reconciliation review | `review → verification evidence` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-015` | خزانه‌داری | Micro | ایجاد Payment Request | `business payable/request → payment request` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-016` | خزانه‌داری | Micro | Submit Payment Request | `draft → submitted` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-017` | خزانه‌داری | Micro | Approve/Reject Payment Request | `submitted → decision` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-018` | خزانه‌داری | Micro | Cancel Payment Request | `eligible request → cancelled` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-019` | خزانه‌داری | Micro | Release Payment Request | `approved request → release/movement` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-020` | خزانه‌داری | Micro | Open Advance | `employee/vendor → advance` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-021` | خزانه‌داری | Micro | Create Advance Settlement | `advance → settlement draft` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-022` | خزانه‌داری | Micro | Submit Advance Settlement | `draft → submitted` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-023` | خزانه‌داری | Micro | Approve/Reject Advance Settlement | `submitted → decision` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-024` | خزانه‌داری | Micro | Reverse Advance Issue | `advance issue → reversal` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-025` | خزانه‌داری | Micro | Reverse Advance Settlement | `settlement → reversal` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-026` | خزانه‌داری | Micro | Run Advance reconciliation | `advance + settlement → reconciliation` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-027` | خزانه‌داری | Micro | Preview Bank Statement import | `file/account → preview` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-028` | خزانه‌داری | Micro | Accept Bank Statement import | `validated preview → statement` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-029` | خزانه‌داری | Micro | Cancel Bank Statement import | `statement import → cancelled` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-030` | خزانه‌داری | Micro | Generate Match Suggestions | `statement row → movement candidates` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-031` | خزانه‌داری | Micro | Confirm Statement Match | `proposal → clearing` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-032` | خزانه‌داری | Micro | Reverse Statement Clearing | `clearing → reversed` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-TRE-033` | خزانه‌داری | Micro | Run Bank Reconciliation | `statement + clearing/movement → reconciliation` | `CORRECT` | Service-backed / Treasury workbench | `REQUIRED` | — | — |
+| `E2E-GL-001` | حسابداری | Domain | ایجاد GL Account | `chart → account` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-002` | حسابداری | Domain | ویرایش مجاز GL Account | `account → governed update` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-003` | حسابداری | Domain | Inactive/Archive Account | `account → inactive/archive` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-004` | حسابداری | Domain | ایجاد Fiscal Period | `fiscal calendar → period` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-005` | حسابداری | Domain | Open Fiscal Period | `period → open` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-006` | حسابداری | Domain | Close Fiscal Period | `open period → protected close` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-007` | حسابداری | Domain | Reopen Fiscal Period | `closed period → protected reopen` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-008` | حسابداری | Domain | ایجاد Journal Draft | `manual/source → journal draft` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-009` | حسابداری | Domain | افزودن Journal Line | `draft → debit/credit line` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-010` | حسابداری | Domain | Validate Balanced Journal | `journal → balance check` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-011` | حسابداری | Domain | Submit Journal | `draft balanced → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-012` | حسابداری | Domain | Approve/Post Journal | `submitted → posted immutable journal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-013` | حسابداری | Domain | Reverse Journal | `posted journal → reversal journal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-014` | حسابداری | Domain | Source Posting Registry | `domain source → unique journal posting` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-015` | حسابداری | Domain | Treasury → Accounting | `posted treasury movement → journal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-016` | حسابداری | Domain | Opening Balance prepare/import | `opening source → batch` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-017` | حسابداری | Domain | Finalize Opening Balance | `validated batch → final` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-018` | حسابداری | Domain | Run GL reconciliation | `source/ledger → reconciliation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-019` | حسابداری | Domain | Review GL reconciliation | `run → independent review` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-020` | حسابداری | Domain | Prepare Financial Statements | `posted ledger → statements` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-021` | حسابداری | Domain | Create Close Adjustment | `period close evidence → adjustment` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-022` | حسابداری | Domain | Approve/Post Close Adjustment | `adjustment → posted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-GL-023` | حسابداری | Cross-domain | Accounting → Project Cost | `eligible accounting source → Project Cost actual` | `DEFERRED-BY-DESIGN` | Available / service-backed | `REQUIRED` | INT-ACTUAL-001 / source-contract activation | — |
+| `E2E-WORK-001` | منابع انسانی پایه | Micro | ایجاد Department | `organization → department` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-002` | منابع انسانی پایه | Micro | ایجاد Position | `department → position` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-003` | منابع انسانی پایه | Micro | تعریف Position hierarchy | `position → parent/child` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-004` | منابع انسانی پایه | Micro | ایجاد Employee | `organization → employee` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-005` | منابع انسانی پایه | Micro | Assign Employee to Position | `employee → position assignment` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-006` | منابع انسانی پایه | Micro | End Position Assignment | `assignment → ended` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-007` | منابع انسانی پایه | Micro | Assign Employee to Project | `employee → project assignment` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-008` | منابع انسانی پایه | Micro | End Project Assignment | `project assignment → ended` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-009` | منابع انسانی پایه | Micro | ثبت Skill | `employee → skill evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-010` | منابع انسانی پایه | Micro | ثبت Qualification | `employee → qualification evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-011` | منابع انسانی پایه | Micro | ثبت Training Record | `employee → training` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-012` | منابع انسانی پایه | Micro | ثبت Performance Record | `employee → performance` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-013` | منابع انسانی پایه | Micro | ایجاد Labor Rate Version | `employee/category → rate version` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-014` | منابع انسانی پایه | Micro | فعال‌سازی Labor Rate | `rate draft → effective` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-015` | منابع انسانی پایه | Micro | ثبت Employment/Pay Rule evidence | `employee → governed payroll input` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-016` | منابع انسانی پایه | Micro | تغییر تصویر Employee | `employee → profile image` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-017` | منابع انسانی پایه | Micro | Organization Chart | `departments/positions → chart` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-WORK-018` | منابع انسانی پایه | Micro | Position Chart | `positions → hierarchy view` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-001` | حضور و زمان | Micro | تعریف Work Calendar | `organization/project → calendar` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-002` | حضور و زمان | Micro | تعریف Shift/Schedule | `calendar → shift` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-003` | حضور و زمان | Micro | Import Attendance | `source rows → import` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-004` | حضور و زمان | Micro | ثبت Attendance دستی | `employee/date → attendance` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-005` | حضور و زمان | Micro | Duplicate Attendance guard | `same source/day → duplicate prevention` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-006` | حضور و زمان | Micro | ایجاد Attendance Correction Request | `attendance → correction request` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-007` | حضور و زمان | Micro | Approve/Reject Attendance Correction | `request → decision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-008` | حضور و زمان | Micro | Apply Attendance Correction | `approved correction → corrected lineage` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-009` | حضور و زمان | Micro | ثبت Leave Request | `employee → leave` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-010` | حضور و زمان | Micro | Approve/Reject Leave | `leave → decision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-011` | حضور و زمان | Micro | ثبت Mission | `employee/project → mission` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-012` | حضور و زمان | Micro | Approve/Reject Mission | `mission → decision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-013` | حضور و زمان | Micro | ثبت Overtime Request | `employee/time → overtime` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-014` | حضور و زمان | Micro | Approve/Reject Overtime | `overtime → decision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-015` | حضور و زمان | Micro | ایجاد Timesheet | `employee/project/period → timesheet` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-016` | حضور و زمان | Micro | Submit Timesheet | `draft → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-017` | حضور و زمان | Micro | Approve Timesheet | `submitted → approved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-018` | حضور و زمان | Micro | ثبت Labor Distribution | `approved time → WBS/activity distribution` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-TIME-019` | حضور و زمان | Micro | Timekeeping → Payroll input | `approved time evidence → payroll input` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-001` | حقوق و دستمزد | Micro | ایجاد Payroll Run | `period/context → run` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-002` | حقوق و دستمزد | Micro | جمع‌آوری Payroll Inputs | `employee/time/rules → run inputs` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-003` | حقوق و دستمزد | Micro | Calculate Payroll | `inputs + policy → calculated result` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-004` | حقوق و دستمزد | Micro | ثبت Calculation Issues | `calculation → issue register` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-005` | حقوق و دستمزد | Micro | Submit Payroll for Review | `calculated → in_review` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-006` | حقوق و دستمزد | Micro | Approve Payroll | `in_review → approved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-007` | حقوق و دستمزد | Micro | Return/Reject Payroll | `review → decision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-008` | حقوق و دستمزد | Micro | Finalize Payroll | `approved → finalized result` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-009` | حقوق و دستمزد | Micro | Generate Payslip | `finalized result → payslip` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-010` | حقوق و دستمزد | Micro | Create Payroll Adjustment | `finalized payroll → adjustment` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-011` | حقوق و دستمزد | Micro | Correction/Replacement Payroll | `prior result → successor` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-012` | حقوق و دستمزد | Micro | Payroll Reversal | `finalized result → reversal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-013` | حقوق و دستمزد | Micro | Prepare Payroll Tax Output | `finalized payroll → tax output` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-014` | حقوق و دستمزد | Micro | Review/Finalize Tax Output | `tax output → final` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-015` | حقوق و دستمزد | Micro | Prepare Insurance Output | `finalized payroll → insurance output` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-016` | حقوق و دستمزد | Micro | Review/Finalize Insurance Output | `insurance output → final` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-017` | حقوق و دستمزد | Micro | Export Statutory Output | `final output → export` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-018` | حقوق و دستمزد | Micro | Register Submission Evidence | `submission → evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-019` | حقوق و دستمزد | Micro | Create AP Handoff Proposal | `finalized payroll → AP proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-020` | حقوق و دستمزد | Micro | Create Accounting Handoff Proposal | `finalized payroll → GL proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-021` | حقوق و دستمزد | Micro | Create Treasury Handoff Proposal | `finalized payroll → payment proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-022` | حقوق و دستمزد | Micro | Create Project Cost Handoff Proposal | `finalized payroll → cost proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-023` | حقوق و دستمزد | Micro | Review Handoff Proposal | `proposal → reviewed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-024` | حقوق و دستمزد | Micro | Acknowledge Handoff Proposal | `proposal → acknowledged` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-025` | حقوق و دستمزد | Micro | Reconcile Handoff Proposal | `proposal → reconciliation evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-PAYR-026` | حقوق و دستمزد | Cross-domain | Payroll → AP final obligation | `finalized payroll → AP obligation` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-043 | Explicit AP enrollment/consumption from finalized Payroll creates AP-owned draft/obligation under separate AP authority; tenant activation remains explicit. |
+| `E2E-PAYR-027` | حقوق و دستمزد | Cross-domain | Payroll → Accounting final journal | `finalized payroll → journal` | `PARTIAL` | Available / service-backed | `REQUIRED` | CEP-042 | Payroll source-recognition adapter can create Accounting-owned balanced drafts, but final submission/posting still requires a separately approved posting contract. |
+| `E2E-PAYR-028` | حقوق و دستمزد | Cross-domain | Payroll → Treasury final payment | `finalized payroll → cash movement` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-061 | Reviewed finalized Payroll payment proposals can drive Treasury-owned requests/payment/reversal lineage through explicit target authority; no automatic cash effect. |
+| `E2E-PAYR-029` | حقوق و دستمزد | Cross-domain | Payroll → Project Cost actual | `finalized payroll/labor → Project Cost fact` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-048 | Reviewed finalized Payroll project-cost allocation can be explicitly consumed by Project Controls; runtime tenant bindings remain fail-closed until configured. |
+| `E2E-INV-001` | انبار و موجودی | Micro | ایجاد Receipt Stock Transaction | `warehouse/material → receipt` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-002` | انبار و موجودی | Micro | ایجاد Issue Stock Transaction | `warehouse/material/project → issue` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-003` | انبار و موجودی | Micro | ایجاد Transfer | `source warehouse → destination` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-004` | انبار و موجودی | Micro | ایجاد Adjustment | `inventory evidence → adjustment` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-005` | انبار و موجودی | Micro | Submit Stock Transaction | `draft → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-006` | انبار و موجودی | Micro | Approve/Post Stock Transaction | `submitted → posted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-007` | انبار و موجودی | Micro | Reverse Stock Transaction | `posted → reversal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-008` | انبار و موجودی | Micro | Create Reservation | `demand/project → reservation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-009` | انبار و موجودی | Micro | Release Reservation | `reservation → released` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-010` | انبار و موجودی | Micro | Consume Reservation | `reservation → issue consumption` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-011` | انبار و موجودی | Micro | Create Inventory Count | `warehouse/location → count` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-012` | انبار و موجودی | Micro | Capture Count Lines | `physical count → lines` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-013` | انبار و موجودی | Micro | Reconcile Count Difference | `book vs physical → discrepancy` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-014` | انبار و موجودی | Micro | Create Count Adjustment | `approved discrepancy → adjustment` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-015` | انبار و موجودی | Micro | Run Inventory Valuation | `posted stock → valuation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-016` | انبار و موجودی | Micro | Handle Valuation Exception | `valuation ambiguity → exception` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-017` | انبار و موجودی | Micro | Rebuild/Reconcile Valuation | `custody ↔ valuation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-018` | انبار و موجودی | Micro | Create Accounting Envelope | `valuation → accounting proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-019` | انبار و موجودی | Micro | Create Project Cost Envelope | `project consumption → cost proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-INV-020` | انبار و موجودی | Cross-domain | Goods Receipt → Inventory | `posted procurement receipt → stock transaction` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-034 / CEP-079 | Goods Receipt → Inventory receipt contract now retains explicit source/retry identity and governed handoff semantics. |
+| `E2E-INV-021` | انبار و موجودی | Cross-domain | Inventory → Accounting | `valuation event → GL final fact` | `PARTIAL` | Available / service-backed | `REQUIRED` | CEP-042 | Inventory valuation source adapter creates Accounting-owned recognition drafts; final posting/activation remains separately governed. |
+| `E2E-INV-022` | انبار و موجودی | Cross-domain | Inventory → Project Cost | `consumption event → Project Cost actual` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-047 | Posted Inventory project consumption has a governed explicit Project Cost consumption contract; runtime binding registry remains activation-dependent. |
+| `E2E-EQP-001` | ماشین‌آلات و تجهیزات | Micro | ایجاد Equipment | `tenant → equipment` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-002` | ماشین‌آلات و تجهیزات | Micro | Assign Equipment | `equipment → project/site assignment` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-003` | ماشین‌آلات و تجهیزات | Micro | Start Assignment | `assignment → active` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-004` | ماشین‌آلات و تجهیزات | Micro | Complete Assignment | `active → completed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-005` | ماشین‌آلات و تجهیزات | Micro | Cancel Assignment | `eligible → cancelled` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-006` | ماشین‌آلات و تجهیزات | Micro | ثبت Meter Reading | `equipment → meter` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-007` | ماشین‌آلات و تجهیزات | Micro | ثبت Usage Log | `equipment/project → usage` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-008` | ماشین‌آلات و تجهیزات | Micro | ثبت Fuel Log | `equipment → fuel` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-009` | ماشین‌آلات و تجهیزات | Micro | ایجاد Maintenance Work Order | `condition → work order` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-010` | ماشین‌آلات و تجهیزات | Micro | Submit Maintenance WO | `draft → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-011` | ماشین‌آلات و تجهیزات | Micro | Approve/Start Maintenance | `submitted → in progress` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-012` | ماشین‌آلات و تجهیزات | Micro | Complete Maintenance | `work order → completed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-013` | ماشین‌آلات و تجهیزات | Micro | Cancel Maintenance | `work order → cancelled` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-014` | ماشین‌آلات و تجهیزات | Micro | Attach Maintenance Evidence | `work order → evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-015` | ماشین‌آلات و تجهیزات | Micro | Reference Spare Part | `maintenance → spare-part reference` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-016` | ماشین‌آلات و تجهیزات | Micro | Create Cost Policy Version | `equipment costing → policy version` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-017` | ماشین‌آلات و تجهیزات | Micro | Publish Cost Policy | `draft → active policy` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-018` | ماشین‌آلات و تجهیزات | Micro | Create Equipment Cost Rate | `policy/class → rate` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-019` | ماشین‌آلات و تجهیزات | Micro | Calculate Equipment Cost | `usage + rate → cost evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-020` | ماشین‌آلات و تجهیزات | Micro | Create Project Cost Envelope | `equipment cost → cost proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-EQP-021` | ماشین‌آلات و تجهیزات | Cross-domain | Equipment → Project Cost | `finalized equipment cost → Project Cost actual` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-047 | Approved Equipment usage/allocation has a governed explicit Project Cost consumption contract; runtime binding remains activation-dependent. |
+| `E2E-FA-001` | دارایی ثابت | Micro | ایجاد Fixed Asset | `acquisition/evidence → asset` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FA-002` | دارایی ثابت | Micro | Capitalize Asset | `eligible asset → capitalized` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FA-003` | دارایی ثابت | Micro | Reject Asset | `candidate asset → rejected` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FA-004` | دارایی ثابت | Micro | Transfer Asset | `asset → new project/site/custody dimensions` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FA-005` | دارایی ثابت | Micro | Create Depreciation Run | `asset book + period → run` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FA-006` | دارایی ثابت | Micro | Finalize Depreciation | `run → final` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FA-007` | دارایی ثابت | Micro | Reverse Depreciation | `final depreciation → reversal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FA-008` | دارایی ثابت | Micro | Dispose Asset | `asset → disposed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FA-009` | دارایی ثابت | Micro | Retire Asset | `asset → retired` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FA-010` | دارایی ثابت | Micro | Attach Audit Evidence | `asset/run → evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FA-011` | دارایی ثابت | Micro | Create Accounting Envelope | `asset event → accounting proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FA-012` | دارایی ثابت | Micro | Create Project Cost Envelope | `project depreciation → cost proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FA-013` | دارایی ثابت | Cross-domain | Fixed Assets → Accounting | `capitalization/depreciation/disposal → final journal` | `PARTIAL` | Available / service-backed | `REQUIRED` | CEP-042 | Fixed Asset capitalization/disposal/depreciation source adapter creates Accounting-owned recognition drafts; final posting remains separately governed. |
+| `E2E-FA-014` | دارایی ثابت | Cross-domain | Fixed Assets → Project Cost | `project depreciation → Project Cost actual` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-047 | Reviewed finalized depreciation evidence can be explicitly consumed into Project Cost under governed source mappings; activation remains fail-closed. |
+| `E2E-FIELD-001` | گزارش روزانه و عملیات میدانی | Micro | ایجاد Daily Report | `project/site/date → report` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-002` | گزارش روزانه و عملیات میدانی | Micro | ثبت Daily Activity | `report → activity` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-003` | گزارش روزانه و عملیات میدانی | Micro | ثبت نیروی انسانی روزانه | `report → workforce evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-004` | گزارش روزانه و عملیات میدانی | Micro | ثبت Equipment روزانه | `report → equipment evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-005` | گزارش روزانه و عملیات میدانی | Micro | ثبت Material روزانه | `report → material evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-006` | گزارش روزانه و عملیات میدانی | Micro | Attach Daily Report Document | `report → DMS` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-007` | گزارش روزانه و عملیات میدانی | Micro | Submit Daily Report | `draft → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-008` | گزارش روزانه و عملیات میدانی | Micro | Approve/Return Daily Report | `submitted → decision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-009` | گزارش روزانه و عملیات میدانی | Micro | Create Field Observation | `field context → observation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-010` | گزارش روزانه و عملیات میدانی | Micro | Attach Observation Evidence | `observation → evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-011` | گزارش روزانه و عملیات میدانی | Micro | Submit/Review Observation | `observation → review` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-012` | گزارش روزانه و عملیات میدانی | Micro | Accept Observation | `reviewed → accepted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-013` | گزارش روزانه و عملیات میدانی | Micro | Reject Observation | `reviewed → rejected` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-014` | گزارش روزانه و عملیات میدانی | Micro | Supersede Observation | `observation → successor` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-FIELD-015` | گزارش روزانه و عملیات میدانی | Micro | Create Downstream Proposal | `accepted observation → proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-001` | HSE و QA/QC مشترک | Micro | ایجاد Inspection | `project/site → inspection` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-002` | HSE و QA/QC مشترک | Micro | ثبت Checklist/Results | `inspection → result evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-003` | HSE و QA/QC مشترک | Micro | Pass Inspection | `inspection → passed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-004` | HSE و QA/QC مشترک | Micro | Fail Inspection | `inspection → failed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-005` | HSE و QA/QC مشترک | Micro | Cancel/Supersede Inspection | `inspection → terminal history` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-006` | HSE و QA/QC مشترک | Micro | Create Inspection Finding | `inspection → finding` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-007` | HSE و QA/QC مشترک | Micro | Classify Finding | `finding → severity/category` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-008` | HSE و QA/QC مشترک | Micro | Create Nonconformance | `finding/evidence → NCR` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-009` | HSE و QA/QC مشترک | Micro | Submit/Review NCR | `NCR → review` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-010` | HSE و QA/QC مشترک | Micro | Create CAPA Action | `finding/NCR → action` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-011` | HSE و QA/QC مشترک | Micro | Assign CAPA | `action → assignee` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-012` | HSE و QA/QC مشترک | Micro | Complete CAPA | `action → completed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-013` | HSE و QA/QC مشترک | Micro | Verify CAPA | `completed action → verification` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-014` | HSE و QA/QC مشترک | Micro | Close CAPA | `verified → closed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-015` | HSE و QA/QC مشترک | Micro | Cancel CAPA | `eligible action → cancelled` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-016` | HSE و QA/QC مشترک | Micro | Create Permit/Test Evidence | `control → permit/test` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-017` | HSE و QA/QC مشترک | Micro | Review Permit/Test | `permit/test → decision` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-HSEQ-018` | HSE و QA/QC مشترک | Micro | Link DMS Evidence | `HSE/QA record → document` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SAF-001` | ایمنی | Micro | ایجاد Safety Record | `project/site → safety record` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SAF-002` | ایمنی | Micro | Submit Safety Record | `draft → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SAF-003` | ایمنی | Micro | Approve Safety Record | `submitted → approved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SAF-004` | ایمنی | Micro | Reject Safety Record | `submitted → rejected` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SAF-005` | ایمنی | Micro | Return Safety Record | `submitted → returned` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SAF-006` | ایمنی | Micro | Close Safety Record | `resolved → closed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SAF-007` | ایمنی | Micro | Attach Safety Evidence | `record → evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-QA-001` | کیفیت | Micro | ایجاد Quality Record | `project/site → quality record` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-QA-002` | کیفیت | Micro | Submit Quality Record | `draft → submitted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-QA-003` | کیفیت | Micro | Approve Quality Record | `submitted → approved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-QA-004` | کیفیت | Micro | Reject Quality Record | `submitted → rejected` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-QA-005` | کیفیت | Micro | Return Quality Record | `submitted → returned` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-QA-006` | کیفیت | Micro | Close Quality Record | `resolved → closed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-QA-007` | کیفیت | Micro | Attach Quality Evidence | `record → evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-001` | مدیریت دانش | Domain | Create Knowledge Candidate | `source case → candidate` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-002` | مدیریت دانش | Domain | Pin Source Provenance | `candidate → exact source pins` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-003` | مدیریت دانش | Domain | Review Candidate | `candidate → review` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-004` | مدیریت دانش | Domain | Reject Candidate | `candidate → rejected` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-005` | مدیریت دانش | Domain | Create Publication Version | `approved candidate → draft publication` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-006` | مدیریت دانش | Domain | Review Publication | `publication → reviewed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-007` | مدیریت دانش | Domain | Publish Knowledge | `reviewed → published_current` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-008` | مدیریت دانش | Domain | Supersede Publication | `published → successor` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-009` | مدیریت دانش | Domain | Mark Review Due | `published → review_due` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-010` | مدیریت دانش | Domain | Archive/Retract Publication | `publication → archived/retracted` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-011` | مدیریت دانش | Domain | Detect Recurrence | `multiple sources → recurrence evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-012` | مدیریت دانش | Domain | Promote to Controlled Action | `reviewed knowledge → owning-domain proposal` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-013` | مدیریت دانش | Domain | Record Reuse | `publication → reuse evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-014` | مدیریت دانش | Domain | Record Effectiveness | `reuse → effectiveness feedback` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-KNOW-015` | مدیریت دانش | Domain | Platform Promotion Review | `tenant publication → platform promotion candidate` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUP-001` | پشتیبانی | Micro | Create Support Case | `user/context → case` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUP-002` | پشتیبانی | Micro | Classify/Prioritize Case | `case → category/priority` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUP-003` | پشتیبانی | Micro | Assign Case | `case → assignee` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUP-004` | پشتیبانی | Micro | Add Timeline Event | `case → event/comment` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUP-005` | پشتیبانی | Micro | Attach Evidence | `case → evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUP-006` | پشتیبانی | Micro | Escalate Overdue Case | `SLA/due → escalation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUP-007` | پشتیبانی | Micro | Resolve Case | `active → resolved` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUP-008` | پشتیبانی | Micro | Close Case | `resolved → closed` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUP-009` | پشتیبانی | Micro | Reopen Case | `closed/resolved → reopened` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUP-010` | پشتیبانی | Micro | Temporary Support Access Request | `case → support access` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-SUP-011` | پشتیبانی | Micro | Expire/Revoke Support Access | `temporary access → expired/revoked` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-REP-001` | گزارش، تطبیق و اختتام | Domain | Publish Metric Definition Version | `metric draft → published` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-REP-002` | گزارش، تطبیق و اختتام | Domain | Run Metric Refresh | `metric + scope → refresh` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-REP-003` | گزارش، تطبیق و اختتام | Domain | Create Metric Result | `refresh → immutable result` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-REP-004` | گزارش، تطبیق و اختتام | Domain | Independent Metric Review | `result → review` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-REP-005` | گزارش، تطبیق و اختتام | Domain | Save Reporting View | `user → saved view` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-REP-006` | گزارش، تطبیق و اختتام | Domain | Share/Archive Saved View | `saved view → shared/archived` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-REP-007` | گزارش، تطبیق و اختتام | Domain | Create Metric Export Manifest | `results → export manifest` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-REP-008` | گزارش، تطبیق و اختتام | Domain | Publish Reconciliation Pair Version | `pair draft → published` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-REP-009` | گزارش، تطبیق و اختتام | Domain | Run P10 Reconciliation | `pair + cutoff → run` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-041 / CEP-065 / CEP-067 / CEP-079 | Fail-closed tolerance/read models and bounded reconciliation behavior were remediated; production certification remains a separate assessment. |
+| `E2E-REP-010` | گزارش، تطبیق و اختتام | Domain | Create Tie-out Outcome | `run → tie-out` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-041 / CEP-065 / CEP-067 / CEP-079 | Fail-closed tolerance/read models and bounded reconciliation behavior were remediated; production certification remains a separate assessment. |
+| `E2E-REP-011` | گزارش، تطبیق و اختتام | Domain | Create Reconciliation Exception | `mismatch/incomplete → exception` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-041 / CEP-065 / CEP-067 / CEP-079 | Fail-closed tolerance/read models and bounded reconciliation behavior were remediated; production certification remains a separate assessment. |
+| `E2E-REP-012` | گزارش، تطبیق و اختتام | Domain | Assign Reconciliation Exception | `exception → assignee` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-041 / CEP-065 / CEP-067 / CEP-079 | Fail-closed tolerance/read models and bounded reconciliation behavior were remediated; production certification remains a separate assessment. |
+| `E2E-REP-013` | گزارش، تطبیق و اختتام | Domain | Resolve Reconciliation Exception | `exception → resolution` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-041 / CEP-065 / CEP-067 / CEP-079 | Fail-closed tolerance/read models and bounded reconciliation behavior were remediated; production certification remains a separate assessment. |
+| `E2E-REP-014` | گزارش، تطبیق و اختتام | Domain | Reopen Reconciliation Exception | `resolved → reopened` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-041 / CEP-065 / CEP-067 / CEP-079 | Fail-closed tolerance/read models and bounded reconciliation behavior were remediated; production certification remains a separate assessment. |
+| `E2E-REP-015` | گزارش، تطبیق و اختتام | Domain | Independent Reconciliation Review | `run/tie-out → review` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-041 / CEP-065 / CEP-067 / CEP-079 | Fail-closed tolerance/read models and bounded reconciliation behavior were remediated; production certification remains a separate assessment. |
+| `E2E-REP-016` | گزارش، تطبیق و اختتام | Domain | Run Rebuild/Replay Check | `prior run → rebuild evidence` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-041 / CEP-065 / CEP-067 / CEP-079 | Fail-closed tolerance/read models and bounded reconciliation behavior were remediated; production certification remains a separate assessment. |
+| `E2E-REP-017` | گزارش، تطبیق و اختتام | Domain | Create Project Closeout Case | `project → case` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-REP-018` | گزارش، تطبیق و اختتام | Domain | Run Project Closeout Assessment | `case → source snapshots` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-066 / CEP-079 UAT-CASE-005 | Closeout now requires explicit source-family verification and independently governed exceptions; representative closeout review passed UAT. |
+| `E2E-REP-019` | گزارش، تطبیق و اختتام | Domain | Coordinate Closeout | `case → coordination event` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-REP-020` | گزارش، تطبیق و اختتام | Domain | Review/Accept/Reject Closeout | `assessment → decision` | `CORRECT` | Available / service-backed | `REQUIRED` | CEP-066 / CEP-079 UAT-CASE-005 | Closeout now requires explicit source-family verification and independently governed exceptions; representative closeout review passed UAT. |
+| `E2E-REP-021` | گزارش، تطبیق و اختتام | Domain | Reopen Closeout | `accepted/rejected → reopened` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-REP-022` | گزارش، تطبیق و اختتام | Domain | Link Closeout Evidence | `case → DMS version` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-REP-023` | گزارش، تطبیق و اختتام | Domain | Export Closeout Evidence | `case → export` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-LEG-001` | Legacy / Compatibility | Domain | Legacy Payment create/update | `legacy payment surface → Payment` | `NOT APPLICABLE` | Retired / historical compatibility | `NOT REQUIRED` | Legacy Payment retirement / PD-032 / CEP-079 | Retained only as historical compatibility inventory; not a current authoritative business journey. |
+| `E2E-LEG-002` | Legacy / Compatibility | Domain | Legacy Payment Allocation | `Payment → PaymentAllocation` | `NOT APPLICABLE` | Retired / historical compatibility | `NOT REQUIRED` | Legacy Payment retirement / PD-032 / CEP-079 | Retained only as historical compatibility inventory; not a current authoritative business journey. |
+| `E2E-LEG-003` | Legacy / Compatibility | Domain | Reverse Payment Allocation | `allocation → reversal reason` | `NOT APPLICABLE` | Retired / historical compatibility | `NOT REQUIRED` | Legacy Payment retirement / PD-032 / CEP-079 | Retained only as historical compatibility inventory; not a current authoritative business journey. |
+| `E2E-LEG-004` | Legacy / Compatibility | Domain | Billing settlement via legacy Payment | `PaymentAllocation → claim settlement` | `NOT APPLICABLE` | Retired / historical compatibility | `NOT REQUIRED` | Legacy Payment retirement / PD-032 / CEP-079 | Retained only as historical compatibility inventory; not a current authoritative business journey. |
+| `E2E-LEG-005` | Legacy / Compatibility | Domain | Legacy Financials dashboard | `legacy financial sources → compatibility dashboard` | `NOT APPLICABLE` | Retired / historical compatibility | `NOT REQUIRED` | Legacy Payment retirement / PD-032 / CEP-079 | Retained only as historical compatibility inventory; not a current authoritative business journey. |
+| `E2E-LEG-006` | Legacy / Compatibility | Domain | Legacy Payment → Treasury cutover | `legacy cash authority → Treasury authority` | `NOT APPLICABLE` | Retired / historical compatibility | `NOT REQUIRED` | Legacy Payment retirement / PD-032 / CEP-079 | Retained only as historical compatibility inventory; not a current authoritative business journey. |
+| `E2E-LEG-007` | Legacy / Compatibility | Domain | Legacy read models → authoritative sources | `mixed legacy/new readers → canonical sources` | `NOT APPLICABLE` | Retired / historical compatibility | `NOT REQUIRED` | Legacy Payment retirement / PD-032 / CEP-079 | Retained only as historical compatibility inventory; not a current authoritative business journey. |
+| `E2E-AUD-001` | ردپای حسابرسی | Micro | Record Audit Event | `domain mutation → append-only event` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-AUD-002` | ردپای حسابرسی | Micro | View/Filter Audit Evidence | `authorized reviewer → event stream` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-AUD-003` | ردپای حسابرسی | Micro | Correlate Source/Target Lineage | `source action → downstream audit correlation` | `CORRECT` | Available / service-backed | `REQUIRED` | — | — |
+| `E2E-NAV-001` | ناوبری | Domain | Canonical authenticated landing | `authenticated user → permission-aware authoritative dashboard` | `CORRECT` | Available / canonical authenticated Home | `REQUIRED` | PD-032 / CEP-079 UAT-CASE-001 | Canonical permission-aware authenticated Home is current; legacy Financials remains a separate compatibility workspace. |
+| `E2E-COM-001` | مناقصات و پیشنهاد تجاری | Domain | ثبت فرصت/پیشنهاد مناقصه | `active tender policy + authorized preparer → immutable TenderBid + draft revision` | `CORRECT` | Available / commercial workspace | `REQUIRED` | CEP-032 | Commercial-owned pre-award identity; no Procurement/Contract effect. |
+| `E2E-COM-002` | مناقصات و پیشنهاد تجاری | Domain | بازنگری پیشنهاد و پیوند Evidence | `active bid → append-only revision + pinned DMS DocumentVersion` | `CORRECT` | Available / commercial workspace | `REQUIRED` | CEP-032 | Post-submission revision requires reason; evidence is immutable and tenant-scoped. |
+| `E2E-COM-003` | مناقصات و پیشنهاد تجاری | Domain | ارسال و ورود پیشنهاد به بررسی | `draft → submitted → under_review` | `CORRECT` | Available / commercial workspace | `REQUIRED` | CEP-032 | Submission/reference and governed transition permissions are required. |
+| `E2E-COM-004` | مناقصات و پیشنهاد تجاری | Domain | ثبت نتیجه یا خاتمه پیشنهاد | `under_review/submitted → won/lost/withdrawn/cancelled` | `CORRECT` | Available / commercial workspace | `REQUIRED` | CEP-032 | Terminal result/withdraw/cancel transitions are append-only and audited. |
+| `E2E-BIL-030` | صورت‌وضعیت و گواهی پرداخت | Micro | ثبت نسخه قانون تعدیل | `contract + explicit source/specification → immutable IndexationRuleVersion` | `CORRECT` | Service-backed / governed | `REQUIRED` | CEP-036 | Framework ships without invented official rule; missing adapter/policy fails closed. |
+| `E2E-BIL-031` | صورت‌وضعیت و گواهی پرداخت | Micro | محاسبه تعدیل قراردادی | `effective rule + approved source receipt + inputs → immutable calculation snapshot` | `CORRECT` | Service-backed / governed | `REQUIRED` | CEP-036 | No claim adjustment/posting/settlement occurs automatically. |
+| `E2E-BIL-032` | صورت‌وضعیت و گواهی پرداخت | Micro | اصلاح محاسبه تعدیل | `prior calculation + corrected approved inputs → correction snapshot` | `CORRECT` | Service-backed / governed | `REQUIRED` | CEP-036 | Prior lineage, hashes and idempotency are retained. |
+| `E2E-BIL-033` | صورت‌وضعیت و گواهی پرداخت | Micro | برگشت محاسبه تعدیل | `prior calculation → governed reverse calculation` | `CORRECT` | Service-backed / governed | `REQUIRED` | CEP-036 | Reversal is explicit and lineage-bound; no silent economic mutation. |
+| `E2E-BIL-034` | صورت‌وضعیت و گواهی پرداخت | Cross-domain | Variation تأییدشده → Billing Eligibility | `latest approved variation → versioned eligibility availability record` | `CORRECT` | Service-backed / governed | `REQUIRED` | CEP-037 | Availability only; amount/financial decision remains with Billing. |
+| `E2E-BIL-035` | صورت‌وضعیت و گواهی پرداخت | Micro | Retry دست‌به‌دست‌سازی Variation به Billing | `failed/pending eligibility handoff → authorized idempotent retry` | `CORRECT` | Service-backed / governed | `REQUIRED` | CEP-037 | Retry revalidates source, actor scope and source digest. |
+| `E2E-BIL-036` | صورت‌وضعیت و گواهی پرداخت | Micro | Reconcile اهلیت Billing برای Variation | `variation series + eligibility versions → current availability reconciliation` | `CORRECT` | Service-backed / governed | `REQUIRED` | CEP-037 | Correction/cancellation lineage remains explicit and fail-closed. |
+| `E2E-ORG-024` | سازمان و مجوزها | Domain | مدیریت کاتالوگ Insurance Classification | `Platform Admin → versioned insurance classification catalogue` | `CORRECT` | Available / platform policy catalogue | `REQUIRED` | B03 / CEP-079 entry preparation | Classification is platform-governed and not hard-coded on Contract rates. |
+| `E2E-ORG-025` | سازمان و مجوزها | Domain | انتشار Regulatory Policy طبقه‌بندی‌شده | `source-backed tax/insurance rules + classification + accepted review → published policy version` | `CORRECT` | Available / platform policy lifecycle | `REQUIRED` | B03 / CEP-079 entry preparation | Publication uses existing lifecycle/authorization and retains real source identity. |
+| `E2E-CON-026` | قراردادها | Domain | تخصیص Insurance Classification به ContractTermVersion | `new immutable term version → classification → independent approval` | `CORRECT` | Available / service-backed | `REQUIRED` | B03 / CEP-079 entry preparation | Historical approved term versions remain immutable. |
+| `E2E-BIL-037` | صورت‌وضعیت و گواهی پرداخت | Cross-domain | Resolve نرخ و مبنای مالیات/بیمه از Regulatory Policy | `approved ContractTermVersion → classification → published policy → tax/insurance rate+basis` | `CORRECT` | Service-backed / governed | `REQUIRED` | B03 / CEP-079 | Rates resolve from published policy, not Contract hard-coding; representative UAT configuration used 10% VAT and 6.6% insurance. |
+| `E2E-PAYR-030` | حقوق و دستمزد | Micro | ESS مشاهده تاریخچه حقوق و فیش خود | `employee identity → own finalized payroll history/payslip → optional export` | `CORRECT` | Available / ESS | `REQUIRED` | CEP-053 / CEP-054 | Own-data only; project/site/employee scope and export permission are enforced. |
+| `E2E-PAYR-031` | حقوق و دستمزد | Micro | ثبت Payroll Inquiry توسط کارمند | `own payslip + registered inquiry category + optional DMS evidence → workflow inquiry` | `CORRECT` | Available / ESS | `REQUIRED` | CEP-054 | Category must be registered/published; no invented inquiry state. |
+| `E2E-PAYR-032` | حقوق و دستمزد | Micro | رسیدگی و پاسخ به Payroll Inquiry | `open inquiry work item → claim → governed response/outcome → employee-visible status` | `CORRECT` | Available / ESS + workflow | `REQUIRED` | CEP-054 | Handler authority is workflow/permission-scoped; employee sees only authorized inquiry/evidence. |
+| `E2E-WORK-019` | منابع انسانی پایه | Domain | داشبورد ESS و پروفایل فقط‌خواندنی کارمند | `authenticated employee → own-data ESS dashboard/profile` | `CORRECT` | Available / ESS | `REQUIRED` | CEP-053 | Own-data surface; no cross-employee inference. |
+| `E2E-WORK-020` | منابع انسانی پایه | Micro | درخواست و پیگیری تغییر اطلاعات شخصی | `employee own-data change request → governed review/status` | `CORRECT` | Available / ESS | `REQUIRED` | CEP-055 | Request/status is employee-scoped; authoritative HR mutation remains governed. |
+| `E2E-WORK-021` | منابع انسانی پایه | Micro | درخواست و پیگیری گواهی اشتغال | `employee request → governed certificate workflow/evidence → own status` | `CORRECT` | Available / ESS | `REQUIRED` | CEP-056 | Certificate framework is governed and evidence-backed; own-request visibility only. |
+| `E2E-TIME-020` | حضور و زمان | Micro | ESS ثبت و پیگیری مرخصی خود | `employee → own leave request → governed approval/status/effect` | `CORRECT` | Available / ESS | `REQUIRED` | CEP-023 / CEP-063 | Distinct self-service journey over the existing Leave domain lifecycle; authoritative balance/policy remains governed. |
+| `E2E-TIME-021` | حضور و زمان | Micro | ESS ثبت و پیگیری مأموریت خود | `employee → own mission request → governed approval/status/effect` | `CORRECT` | Available / ESS | `REQUIRED` | CEP-062 / CEP-068 | Distinct self-service journey over the existing Mission lifecycle; effect persistence remains source-governed. |
+| `E2E-TIME-022` | حضور و زمان | Micro | ESS ثبت و پیگیری اضافه‌کاری خود | `employee → own overtime request → governed approval/status/effect` | `CORRECT` | Available / ESS | `REQUIRED` | CEP-068 | Distinct self-service journey over the existing Overtime lifecycle with own-data constraints. |

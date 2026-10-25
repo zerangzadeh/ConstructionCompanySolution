@@ -12,7 +12,7 @@
     <script src="{% static 'js/erp_jalali.js' %}?v=20261023-cep078-month-focus" defer></script>
     <script src="{% static 'js/erp_money.js' %}" defer></script>
     <script src="{% static 'js/erp_table.js' %}?v=20261023-cep078-associated-filters" defer></script>
-    <script src="{% static 'js/erp_context.js' %}?v=20261024-uiux-derived-choices" defer></script>
+    <script src="{% static 'js/erp_context.js' %}?v=20261025-uiux-business-context" defer></script>
     <style>
          :root {
             --erp-canvas: #f8fafc;
@@ -674,7 +674,7 @@
                 <span><strong class="block text-sm font-semibold text-white">بنیرا</strong><small class="mt-0.5 block text-[10px] text-slate-400">راهکار یکپارچه مدیریت ساخت</small></span>
             </a>
             <div class="erp-scrollbar flex-1 overflow-y-auto px-3 py-4">
-                {% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available party_governance_available=party_governance_available party_governance_surface=party_governance_surface only %}
+                {% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available party_governance_available=party_governance_available party_governance_surface=party_governance_surface my_requests_workspace_available=my_requests_workspace_available manager_workspace_available=manager_workspace_available only %}
             </div>
             {% if platform_navigation_access %}
             <section data-nav-id="NAV-042" class="border-t border-amber-400/30 bg-amber-500/10 px-3 py-3" aria-labelledby="platform-administration-title">
@@ -698,7 +698,7 @@
                 <details class="erp-mobile-nav lg:hidden" data-mobile-nav>
                     <summary class="grid h-10 w-10 cursor-pointer list-none place-items-center rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50" aria-label="باز کردن فهرست" aria-expanded="false"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></summary>
                     <button class="erp-mobile-nav__backdrop" type="button" data-mobile-nav-close aria-label="بستن فهرست"></button>
-                    <div class="erp-mobile-nav__panel"><button class="erp-btn erp-btn--secondary mb-3 w-full" type="button" data-mobile-nav-close>بستن فهرست</button>{% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available party_governance_available=party_governance_available party_governance_surface=party_governance_surface only %}
+                    <div class="erp-mobile-nav__panel"><button class="erp-btn erp-btn--secondary mb-3 w-full" type="button" data-mobile-nav-close>بستن فهرست</button>{% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available party_governance_available=party_governance_available party_governance_surface=party_governance_surface my_requests_workspace_available=my_requests_workspace_available manager_workspace_available=manager_workspace_available only %}
                         <form method="post" action="{% url 'accounts:logout' %}" class="mt-3">{% csrf_token %}<button class="erp-btn erp-btn--secondary w-full" type="submit">خروج از حساب</button></form>
                     </div>
                 </details>
@@ -739,42 +739,7 @@
                 }
             });
         })();
-        (() => {
-            const persianLabels = new Map([
-                ["Draft", "پیش‌نویس"],
-                ["Active", "فعال"],
-                ["Approved", "تأییدشده"],
-                ["Completed", "تکمیل‌شده"],
-                ["Labor", "نیروی انسانی"],
-                ["Equipment", "تجهیزات"],
-                ["Material", "مصالح"],
-                ["Other", "سایر"],
-                ["Planning", "در حال برنامه‌ریزی"],
-                ["On hold", "متوقف‌شده"],
-                ["Cancelled", "لغوشده"],
-                ["Submitted", "ارسال‌شده"],
-                ["Terminated", "خاتمه‌یافته"],
-                ["Recorded", "ثبت‌شده"],
-                ["Posted", "ثبت‌شده"],
-                ["Void", "باطل‌شده"],
-            ]);
-            const skippedTags = new Set(["SCRIPT", "STYLE", "TEXTAREA", "CODE", "PRE"]);
-            const localize = () => {
-                const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-                const nodes = [];
-                while (walker.nextNode()) {
-                    if (!skippedTags.has(walker.currentNode.parentElement?.tagName)) nodes.push(walker.currentNode);
-                }
-                nodes.forEach((node) => {
-                    const trimmed = node.nodeValue.trim();
-                    if (persianLabels.has(trimmed)) node.nodeValue = node.nodeValue.replace(trimmed, persianLabels.get(trimmed));
-                });
-            };
-            if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", localize, {
-                once: true
-            });
-            else localize();
-        })();
+
     </script>
     {% block extra_scripts %}{% endblock %}
 </body>

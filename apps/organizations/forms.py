@@ -328,7 +328,7 @@ class OrganizationMemberPasswordResetForm(SetPasswordForm):
 
 class MembershipRoleAssignmentForm(forms.Form):
     role = forms.ModelChoiceField(
-        label="نقش مستقل",
+        label="نقش عضو",
         queryset=OrganizationRole.objects.none(),
     )
     approver_membership = forms.ModelChoiceField(
@@ -368,7 +368,8 @@ class MembershipRoleAssignmentForm(forms.Form):
 
 class MembershipScopeGrantForm(forms.Form):
     scope_type = forms.ChoiceField(
-        label="نوع دامنه", choices=AuthorizationScopeType.choices
+        label="سطح دسترسی به شرکت، پروژه یا کارگاه",
+        choices=AuthorizationScopeType.choices,
     )
     project = forms.ModelChoiceField(
         label="پروژه", queryset=Project.objects.none(), required=False

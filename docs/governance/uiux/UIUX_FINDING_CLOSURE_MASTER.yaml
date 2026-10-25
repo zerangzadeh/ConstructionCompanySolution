@@ -27,22 +27,52 @@ status_precedence:
 - Original static/runtime finding status
 summary:
   total_findings: 135
-  resolved_explicitly: 105
-  remaining_not_explicitly_closed: 30
+  resolved_explicitly: 135
+  remaining_not_explicitly_closed: 0
   remaining_by_severity:
-    MEDIUM: 14
-    HIGH: 16
+    HIGH: 0
+    MEDIUM: 0
   master_status_counts:
-    RESOLVED: 105
-    DEFERRED_NON_UAT_BLOCKING: 30
+    RESOLVED: 135
+    DEFERRED_NON_UAT_BLOCKING: 0
     PRODUCT_DECISION_REQUIRED: 0
   codex_action_counts:
-    SKIP_RESOLVED: 105
-    POST_UAT_CLOSURE: 30
+    SKIP_RESOLVED: 135
+    POST_UAT_CLOSURE: 0
     STOP_FOR_PRODUCT_DECISION: 0
-  known_register_header_issue: UIUX_FINDINGS_REGISTER.yaml header counts/status are historical/stale; actual reconciled scope
-    is F-001 through F-135.
+  known_register_header_issue: UIUX_FINDINGS_REGISTER.yaml header counts/status are historical/stale; actual reconciled
+    scope is F-001 through F-135.
   ux_ready_for_uat: NOT_ISSUED
+  last_targeted_remediation:
+    date: '2026-10-25'
+    head: 4817aa2c50258e2ed741f3617d868bf1d65e5f79
+    reviewed: 30
+    resolved: 30
+    remaining: []
+    validation: 46 focused tests PASS in final combined run; one earlier Treasury advance affected test PASS (47
+      distinct tests). 34 changed templates compile; Ruff lint/format for 13 changed Python files and Django checks
+      PASS. No full regression or new audit run.
+    browser: Authenticated changed surfaces at existing desktop viewport and 390x844; existing reference accounts
+      reused. No new fixtures, domain writes, statutory activation, CEP/Gate changes or production action.
+    grounding:
+      branch: main
+      head: 4817aa2c50258e2ed741f3617d868bf1d65e5f79
+      origin_main: 4817aa2c50258e2ed741f3617d868bf1d65e5f79
+      initial_tracked_diff: EMPTY
+      initial_untracked_preserved: docs/governance/journeys/
+      git_writes: NOT EXECUTED
+    f104_closure_followup:
+      date: '2026-10-25'
+      previous_result: 28 of 30 resolved; F-076 and F-104 remained deferred in the prior targeted remediation.
+      result: F-104 closed under the newer explicit Human/Product historical-reference decision; F-076 remains unchanged.
+      verification: findings::UIUX-F-104::closure; 9/9 focused tests and authenticated local browser PASS; no additional product code.
+    f076_closure_followup:
+      date: '2026-10-25'
+      previous_result: 29 of 30 resolved; F-076 remained deferred after F-104 closure.
+      result: F-076 resolved for Initial / Migration Opening Balance under explicit Human/Product decision.
+      verification: findings::UIUX-F-076::closure; 4/4 focused tests and authenticated changed-presentation browser PASS.
+      functional_gap: ROADMAP.md::10.1; Fiscal-Year Closing & Opening Balance Roll-forward remains unimplemented and
+        DEFERRED_UNTIL_CURRENT_CEP_PROGRAM_COMPLETES; not classified as Post-V1.
   stage2:
     status: COMPLETE
     completed_on: '2026-10-24'
@@ -247,6 +277,14 @@ findings:
       without changing handlers.
     validation: View title contract review and changed-template compilation.
     original_status_basis: finding original/latest stored status only
+  conformance_followup:
+    date: '2026-10-25'
+    classification: REOPENED_REMEDIATION_GAP
+    resolution: RESOLVED
+    batch: CC105-SYSTEMIC-CONFORMANCE-20261025
+    surfaces: ["templates/timekeeping/form.html"]
+    result: "The title-concatenated CTA repeats action words on request forms; explicit concise task labels and consistent cancel text now preserve the existing draft/submit distinction."
+    verification: execution_history::CC105-SYSTEMIC-CONFORMANCE-20261025
 - finding_id: UIUX-F-004
   module: Timekeeping
   surface_id: SURF-224
@@ -474,9 +512,9 @@ findings:
   priority: P1
   original_status: PILOT_CONFIRMED_STATIC
   latest_disposition_raw: PILOT_CONFIRMED_STATIC
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The Parties workspace uses abstract governance/source terminology for routine party management.
   user_impact: Routine master-data work is framed in architecture/governance terms, making the page feel more technical than the user task requires.
   recommendation: Use a business-facing title and labels such as management/status/history, while keeping governance/source semantics in help
@@ -498,6 +536,12 @@ findings:
       in this secondary maintenance surface remains post-UAT copy work; operational party routes unchanged.
     validation: Current-source task/field/control review; no cosmetic closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-02-master-data
+    result: Party management now leads with party status, search and history; the shared party navigation uses the
+      same business title.
+    verification: execution_history::D30-02-master-data
 - finding_id: UIUX-F-011
   module: Documents
   surface_id: SURF-148
@@ -581,9 +625,9 @@ findings:
   priority: P0
   original_status: PILOT_CONFIRMED_STATIC
   latest_disposition_raw: PILOT_CONFIRMED_STATIC
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The subledger workbench combines allocation, write-off proposal, aging, reconciliation, reversal, and independent review in one dense
     operational page without a clear task hierarchy.
   user_impact: Users must understand several distinct financial jobs and control stages simultaneously, making the page difficult to learn and
@@ -609,6 +653,12 @@ findings:
       existing named operations remain usable.
     validation: Current-source task/control review; no design closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-03-operations-finance
+    result: Open obligations remain the primary task. Aging/reconciliation, allocation history/reversal and independent
+      review are separate native disclosures; forms and financial semantics are retained.
+    verification: execution_history::D30-03-operations-finance
 - finding_id: UIUX-F-014
   module: Subledgers
   surface_id: SURF-052
@@ -771,9 +821,9 @@ findings:
   priority: P0
   original_status: PILOT_CONFIRMED_STATIC
   latest_disposition_raw: RUNTIME_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The sidebar contains unconditional unavailable placeholders for capabilities that are partly implemented or reachable elsewhere, producing
     a misleading application map.
   user_impact: The sidebar can tell users that a capability is unavailable even though related functionality exists, making discovery and mental
@@ -818,6 +868,12 @@ findings:
       link are retained; sidebar catalogue consistency does not prevent executing their existing routes. Post-UAT navigation
       cleanup; no claim of closure.
     original_status_basis: latest finding runtime_revalidation_history disposition
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-01-shared
+    result: Removed misleading unavailable/duplicate placeholders and empty permission groups. Desktop/mobile includes
+      now pass the existing My Requests and Manager availability flags; one permitted Commercial destination remains.
+    verification: execution_history::D30-01-shared
 - finding_id: UIUX-F-018
   module: Shared List Pattern
   surface_id: SHARED-LIST-DETAIL-AFFORDANCE
@@ -828,9 +884,9 @@ findings:
   priority: P0
   original_status: PILOT_CONFIRMED_STATIC
   latest_disposition_raw: PILOT_CONFIRMED_STATIC
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The interaction used to open a record detail is inconsistent across modules.
   user_impact: Users must relearn where to click on every list. The same visual table/list language does not imply the same interaction.
   recommendation: Adopt one canonical list-to-detail convention for the ERP. Prefer a consistently identifiable primary record link and one explicit
@@ -857,6 +913,12 @@ findings:
     result: Different list affordances remain, but every cited record has a named native detail link and Project icon has an
       accessible name. Presentation consistency retained for post-UAT.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-01-shared
+    result: Projects, Equipment, Warehouses, Counts and Transfers use a named primary record link and the shared explicit
+      accessible detail link; whole-card and icon-only detail conventions were removed from the cited surfaces.
+    verification: execution_history::D30-01-shared
 - finding_id: UIUX-F-019
   module: Projects
   surface_id: SURF-082
@@ -900,9 +962,9 @@ findings:
   priority: P1
   original_status: PILOT_CONFIRMED_STATIC
   latest_disposition_raw: RUNTIME_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The access-administration screen uses governance vocabulary such as «دامنه صریح», «قرنطینه دسترسی» and «تأیید دوگانه» as its primary
     task language.
   user_impact: Even though this is an administrative screen, the operator must understand internal access-model terms rather than being guided
@@ -944,6 +1006,12 @@ findings:
       terminology remains a security-administration copy residual; no weakening/relabeling of approval or quarantine policy.
     validation: Current-source task/field/control review; no cosmetic closure or runtime PASS claimed.
     original_status_basis: latest finding runtime_revalidation_history disposition
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-02-master-data
+    result: Membership authorization now describes selecting a role, company/project/site access, validity and an
+      independent approver. Required controls, quarantine activation criteria and revocation semantics are unchanged.
+    verification: execution_history::D30-02-master-data
 - finding_id: UIUX-F-021
   module: Workforce / ESS
   surface_id: SURF-179
@@ -996,9 +1064,9 @@ findings:
   original_status: PILOT_CONFIRMED_STATIC
   latest_disposition_raw: 'OPEN: four-link prepared own-data shape usable at mobile; broad grouping/priority redesign not performed or globally
     closed'
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: ESS presents a flat navigation strip of many equally weighted destinations instead of grouping employee tasks by intent.
   user_impact: The employee portal behaves more like a module link strip than a guided self-service portal, making frequent tasks harder to scan
     on smaller screens or for occasional users.
@@ -1021,6 +1089,12 @@ findings:
     result: ESS links remain a flat strip, with named destinations and existing permission predicates. Grouping is post-UAT
       information hierarchy work; current tasks remain directly navigable.
     original_status_basis: UIUX_FINDINGS_REGISTER.yaml::wave_de_fixture_closure.current_dispositions
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-01-shared
+    result: ESS navigation groups requests/attendance, pay/benefits and employment/documents; existing identity and
+      permission predicates remain, and the payroll group is omitted when empty.
+    verification: execution_history::D30-01-shared
 - finding_id: UIUX-F-023
   module: Inventory
   surface_id: SURF-292
@@ -1099,9 +1173,9 @@ findings:
   priority: P0
   original_status: PILOT_CONFIRMED_STATIC
   latest_disposition_raw: PILOT_CONFIRMED_STATIC
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The Equipment Operations workspace exposes up to eight top-level actions with nearly identical visual weight and no role/state-aware
     recommended action.
   user_impact: Operators and maintenance users must scan a command palette rather than being shown the task appropriate to current equipment state,
@@ -1127,6 +1201,12 @@ findings:
       priority invented.
     validation: Current-source task/control review; no design closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-03-operations-finance
+    result: Equipment actions are grouped into daily recording, maintenance and planning/cost. Existing work-order
+      status/date identifies overdue unfinished work and exposes the permitted follow-up action.
+    verification: execution_history::D30-03-operations-finance
 - finding_id: UIUX-F-026
   module: Equipment
   surface_id: SURF-309
@@ -1137,9 +1217,9 @@ findings:
   priority: P1
   original_status: PILOT_CONFIRMED_STATIC
   latest_disposition_raw: PILOT_CONFIRMED_STATIC
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: Equipment Operations uses evidence/reference vocabulary in the main operational interface.
   user_impact: Maintenance work is described through governance/data-link concepts instead of normal concepts such as parts used, attachments,
     meter readings, maintenance plans, and work-order progress.
@@ -1162,6 +1242,12 @@ findings:
       actions are business-named; wording is retained as post-UAT copy cleanup.
     validation: Current-source task/control review; no design closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-03-operations-finance
+    result: Equipment operations uses readings, usage, parts and attachments vocabulary instead of evidence/reference
+      language.
+    verification: execution_history::D30-03-operations-finance
 - finding_id: UIUX-F-027
   module: Fixed Assets
   surface_id: SURF-326
@@ -1172,9 +1258,9 @@ findings:
   priority: P0
   original_status: PILOT_CONFIRMED_STATIC
   latest_disposition_raw: PILOT_CONFIRMED_STATIC
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The fixed-assets workbench is dominated by internal lifecycle/governance terms that are difficult to map to normal fixed-asset operations.
   user_impact: A fixed-assets accountant must translate system-boundary language before understanding asset registration, capitalization, depreciation,
     disposal/adjustment, and accounting handoff.
@@ -1199,6 +1285,12 @@ findings:
       as ledger transactions.
     validation: Current-source task/control review; no design closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-03-operations-finance
+    result: Fixed Assets presents initial registration, acquisition review, capitalization, depreciation and proposals
+      in business language. Exact source-family codes are retained in disclosure; proposals remain non-posting.
+    verification: execution_history::D30-03-operations-finance
 - finding_id: UIUX-F-028
   module: Fixed Assets
   surface_id: SURF-326
@@ -1209,9 +1301,9 @@ findings:
   priority: P0
   original_status: PILOT_CONFIRMED_STATIC
   latest_disposition_raw: PILOT_CONFIRMED_STATIC
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The fixed-assets landing page presents many preparation, policy, depreciation, handoff, and audit commands at the same top-level hierarchy.
   user_impact: The workspace exposes system capabilities rather than prioritizing what the accountant should do next for the current period or
     asset lifecycle.
@@ -1235,6 +1327,12 @@ findings:
       actions are distinct. Toolbar hierarchy is post-UAT; no new task-ranking or activation policy inferred.
     validation: Current-source task/control review; no design closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-03-operations-finance
+    result: Fixed Assets separates operational, depreciation/handoff and setup tasks. Asset records precede depreciation
+      and transaction status/actions; policy configuration is collapsed at the end.
+    verification: execution_history::D30-03-operations-finance
 - finding_id: UIUX-F-029
   module: Shared Localization
   surface_id: SHARED-LOCALIZATION
@@ -1245,9 +1343,9 @@ findings:
   priority: P1
   original_status: PILOT_CONFIRMED_STATIC
   latest_disposition_raw: PILOT_CONFIRMED_STATIC
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The base template performs a client-side DOM text sweep to translate a limited set of exact English labels after rendering.
   user_impact: User-facing language can depend on JavaScript execution and exact source text, increasing the chance of mixed Persian/English terminology
     and inconsistent status wording across modules.
@@ -1269,6 +1367,12 @@ findings:
     result: Exact-label DOM translation sweep remains. Server-side localization migration is residual infrastructure work; no
       new source finding or blanket localization PASS.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-01-shared
+    result: Removed the body-wide JavaScript text sweep. Existing Persian producer labels and the shared server-rendered
+      status filter/component are authoritative; arbitrary document/user text is no longer rewritten.
+    verification: execution_history::D30-01-shared
 - finding_id: UIUX-F-030
   module: Accounting
   surface_id: SURF-036
@@ -1328,9 +1432,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The Treasury landing page foregrounds evidence, retained reconciliation and independent-control terminology instead of normal treasury
     tasks.
   user_impact: Treasury users are presented with control-framework language and hashes before the everyday objectives of cash account review,
@@ -1356,6 +1460,12 @@ findings:
       are unchanged.
     validation: Current-source review of existing business fields/actions; no closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-03-operations-finance
+    result: Treasury leads with accounts, receipts/payments and bank differences. Reconciliation results/review remain
+      visible; the full evidence hash is retained only inside a closed traceability disclosure.
+    verification: execution_history::D30-03-operations-finance
 - finding_id: UIUX-F-032
   module: Treasury
   surface_id: SURF-050
@@ -1366,9 +1476,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The bank-statement workspace explains idempotency/source immutability controls in the primary page introduction instead of guiding
     the reconciliation task.
   user_impact: The user must interpret implementation/control guarantees before understanding which bank lines are unmatched, what candidate movement
@@ -1394,6 +1504,12 @@ findings:
       controls are explicit. Intro/help wording is post-UAT copy work; no matching policy expanded.
     validation: Current-source review of existing business fields/actions; no closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-03-operations-finance
+    result: The bank-statement introduction guides matching and review. Duplicate-import and immutability guarantees
+      are secondary help; matching, rejection and reversal controls are unchanged.
+    verification: execution_history::D30-03-operations-finance
 - finding_id: UIUX-F-033
   module: Reporting
   surface_id: SURF-157
@@ -1404,9 +1520,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The management dashboard is framed as a governed read-model/evidence surface rather than an executive decision dashboard.
   user_impact: Executives and managers are asked to think in governance/read-model terms rather than quickly understanding performance, exceptions,
     trend, freshness and where attention is required.
@@ -1432,6 +1548,13 @@ findings:
       invented.
     validation: Current-source task/field/control review; no cosmetic closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-04-dashboards
+    result: The management dashboard leads with performance, attention, values, coverage/freshness and drillthrough.
+      Metric governance, owner/version and the definition catalogue are secondary disclosures; no trend or financial
+      authority was invented.
+    verification: execution_history::D30-04-dashboards
 - finding_id: UIUX-F-034
   module: Reporting
   surface_id: SURF-157
@@ -1789,9 +1912,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: NOT_EVALUATED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The reconciliation workbench exposes roadmap-stage metadata and governance model terms as core UI concepts.
   user_impact: 'Finance/control users must reason about governed pair definitions and source authorities rather than the practical question: what
     two business totals/processes are being reconciled and which differences need action?'
@@ -1822,6 +1945,12 @@ findings:
       codes are residual specialist presentation; no reconciliation pairing or source policy changed.
     validation: Current-source task/field/control review; no cosmetic closure or runtime PASS claimed.
     original_status_basis: finding runtime_assessment disposition
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-04-dashboards
+    result: Reconciliation lists business purposes and localized source names/readiness, cutoff, differences and follow-up.
+      P10 and raw pair/source/version codes are secondary traceability details.
+    verification: execution_history::D30-04-dashboards
 - finding_id: UIUX-F-044
   module: Reporting
   surface_id: SURF-159
@@ -1939,6 +2068,14 @@ findings:
     test_path: tests/test_uiux_stage3a.py
     closure: RESOLVED against the explicitly approved minimum. No UAT execution, readiness certification, CEP/Gate/EXT
       change, migration, immutable-history rewrite or Git write.
+  conformance_followup:
+    date: '2026-10-25'
+    classification: REOPENED_REMEDIATION_GAP
+    resolution: RESOLVED
+    batch: CC105-SYSTEMIC-CONFORMANCE-20261025
+    surfaces: ["templates/reporting/project_closeout_detail.html"]
+    result: "Assessment, acceptance and reopening CTAs still foregrounded implementation boundaries. Concise business actions now retain all permission gates, POST targets, revision values and adjacent safeguards."
+    verification: execution_history::CC105-SYSTEMIC-CONFORMANCE-20261025
 - finding_id: UIUX-F-046
   module: Reporting
   surface_id: SURF-163
@@ -2172,9 +2309,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The material master-data governance surface is written primarily in versioning, segregation-of-duties and immutable-source language
     rather than material-master tasks.
   user_impact: Material-data stewards must understand governance implementation concepts before performing routine tasks such as aliases, equivalents,
@@ -2200,6 +2337,12 @@ findings:
       changed.
     validation: Current-source task/field/control review; no cosmetic closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-02-master-data
+    result: Material maintenance uses master-data, alternatives, technical approval, attribute and conversion task
+      labels; versioning/approval requirements and scoped selectors are retained.
+    verification: execution_history::D30-02-master-data
 - finding_id: UIUX-F-052
   module: Accounting
   surface_id: SURF-041
@@ -2210,9 +2353,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The accounting reconciliation detail is presented primarily as an immutable evidence/audit console and exposes hashes, raw source UUIDs
     and internal exception codes.
   user_impact: Accounting reviewers must parse evidence hashes and source identifiers before understanding the practical reconciliation result,
@@ -2239,6 +2382,12 @@ findings:
       exception meanings.
     validation: Current-source review of existing business fields/actions; no closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-03-operations-finance
+    result: Accounting reconciliation leads with cutoff, exception count and review status. Issue codes have business
+      labels; hashes, raw UUIDs and original codes are retained in closed traceability details.
+    verification: execution_history::D30-03-operations-finance
 - finding_id: UIUX-F-053
   module: Treasury
   surface_id: SURF-049
@@ -2249,9 +2398,9 @@ findings:
   priority: P1
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: Treasury movement detail presents raw movement and journal identifiers as normal business fields.
   user_impact: Users see database-oriented identifiers instead of a human transaction/reference number or a direct link to the related accounting
     document.
@@ -2273,6 +2422,12 @@ findings:
       existing actions. Business reference presentation is post-UAT; no cross-domain journal link or permission inferred.
     validation: Current-source review of existing business fields/actions; no closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-03-operations-finance
+    result: Movement description/date provides the business reference. The real linked journal number is read only
+      with existing Accounting view authority and matching tenant; raw IDs are secondary disclosure.
+    verification: execution_history::D30-03-operations-finance
 - finding_id: UIUX-F-054
   module: Procurement
   surface_id: SURF-282
@@ -2576,9 +2731,9 @@ findings:
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: 'DOMAIN_RESOLUTION_VERIFIED_NO_EXPLICIT_FINDING_CLOSURE: Actual PDF/DOCX original retained with server-authoritative
     SHA-256 and immutable evidence; quarantine, comparison and replay boundaries verified under D04.'
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: Supplier-facing submission requires the user to provide a SHA-256 integrity fingerprint, and related sealed-evidence forms define additional
     technical storage/integrity inputs.
   user_impact: External suppliers are exposed to file-integrity/storage mechanics that should normally be computed by the platform, making proposal
@@ -2614,6 +2769,13 @@ findings:
       entire aggregate resolved.
     validation: Current-source verification of visible/hidden supplier fields and portal multipart rendering.
     original_status_basis: wave_c_domain_resolution_addendum affected_findings; no explicit closure
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-06-source-references
+    result: The supplier upload already uses server-authoritative hashing. Internal sealed upload now generates a
+      hidden stable-on-redisplay retry key, uses business file/attachment labels and places optional comparison hashing
+      in disclosure. The service still computes the byte hash; no storage or custody contract changed.
+    verification: execution_history::D30-06-source-references
 - finding_id: UIUX-F-061
   module: Equipment
   surface_id: SHARED-EQUIPMENT-OPERATION-FORMS
@@ -2877,9 +3039,9 @@ findings:
   priority: P1
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: RUNTIME_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: 'The Home composition is visually flat: organization context, workspace destinations, assigned work and alerts are mostly plain bordered
     cards/links with little differentiation by urgency, frequency or business importance.'
   user_impact: The landing experience feels generic and administrative rather than like a professional ERP command center, and important work
@@ -2919,6 +3081,12 @@ findings:
       separately blocked by F065, not inferred from styling authority.
     validation: Current-source task/field/control review; no cosmetic closure or runtime PASS claimed.
     original_status_basis: latest finding runtime_revalidation_history disposition
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-04-dashboards
+    result: Home visually distinguishes assigned work and alerts from workspace navigation, with compact organization
+      context and responsive enterprise surfaces; only existing authorized links are used.
+    verification: execution_history::D30-04-dashboards
 - finding_id: UIUX-F-067
   module: Payroll
   surface_id: SURF-252
@@ -2974,9 +3142,9 @@ findings:
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: 'DOMAIN_RESOLUTION_VERIFIED_NO_EXPLICIT_FINDING_CLOSURE: Statutory unavailable-source/output prerequisite boundary verified;
     successful official output explicitly unvalidated under D03.'
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The statutory payroll workspace is dominated by implementation/integration language rather than statutory payroll operations.
   user_impact: Payroll/legal users must decode architecture and integration boundaries before understanding tax/insurance calculation, review,
     output preparation and exception handling.
@@ -3007,6 +3175,13 @@ findings:
       revision/schema/source traceability in table cells remains post-UAT presentation work; no statutory activation or full
       runtime journey PASS claimed.
     original_status_basis: wave_c_domain_resolution_addendum affected_findings; no explicit closure
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-05-statutory
+    result: Statutory calculation/review/output tasks remain primary. Correction UUIDs and policy/schema identifiers
+      are in disclosures; amounts, review, submission and exception information remain visible. Effective-source checks
+      and sending limitations are unchanged.
+    verification: execution_history::D30-05-statutory
 - finding_id: UIUX-F-069
   module: Payroll
   surface_id: SURF-262
@@ -3369,9 +3544,10 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Explicit Human/Product initial-setup/migration-only decision and focused-test/authenticated-browser
+    verification on 2026-10-25; see closure. Fiscal-year roll-forward is a separately deferred Accounting gap.
   problem: Opening import treats Fiscal Year and Opening Period as independent organization-wide selections and also requires multiple provenance
     references as manual text.
   user_impact: Users can choose a period unrelated to the selected fiscal year and must manually type several traceability values the system could
@@ -3419,6 +3595,65 @@ findings:
       - apps/accounting/forms.py
       validation: Current-source review only; no fabricated business schema, source, financial default or domain execution.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-06-source-references
+    result: 'PARTIAL: verified the existing Fiscal Year to Period cascade, stale-selection reset and required provenance
+      fields; added business-specific labels/help. No approved canonical opening-source/evidence/reconciliation producer
+      exists to replace these external references with selectors or derived metadata. The original aggregate finding
+      is not closed.'
+    verification: execution_history::D30-06-source-references
+    remaining_requirement: Canonical opening provenance producer/selector contract is absent. Required source, evidence
+      and reconciliation references may not be fabricated, defaulted or silently replaced.
+  closure:
+    date: '2026-10-25'
+    head: 4817aa2c50258e2ed741f3617d868bf1d65e5f79
+    scope: Initial setup / migration from previous accounting system only.
+    human_product_decision: The current Opening Balance form is for initial/migration balances, not routine annual
+      roll-forward inside BONIRA. Preserve Fiscal Year to Opening Period cascade and supplied amounts. Keep required
+      source_reference, evidence_reference and reconciliation_reference under their existing external-provenance
+      contract until a canonical internal producer exists; no fabricated selector, default or reference.
+    historical_requirement_disposition: Prior partial assessments remain historical. The newer Human/Product decision
+      confirms that retaining external provenance is final and acceptable for this initial/migration UI scope; an
+      internal producer/selector is not a prerequisite for F-076 closure.
+    ui_delta: opening_create now titles the form ورود مانده افتتاحیه اولیه / مهاجرت; OpeningImportForm fiscal-year
+      help explicitly identifies initial setup/migration and excludes annual balance transfer.
+    preserved_behavior: Cascade, monetary entry, required references, tenant/project scope, permissions, approval,
+      posting, reconciliation and audit contracts are unchanged.
+    focused_tests:
+      commands:
+      - >-
+        .\.venv\Scripts\python.exe manage.py test
+        core.test_cep003_localization_accessibility.Cep003LocalizationAccessibilityTests.test_manual_journal_retry_key_and_required_opening_references_are_preserved
+        core.test_cep003_localization_accessibility.Cep003LocalizationAccessibilityTests.test_parent_choice_binding_adds_metadata_without_expanding_validation
+        core.test_cep003_localization_accessibility.Cep003LocalizationAccessibilityTests.test_related_parent_choices_use_the_same_contract_metadata
+        --noinput
+      - >-
+        .\.venv\Scripts\python.exe manage.py test
+        apps.accounting.tests.AccountingFoundationTests.test_reviewable_opening_import_posts_without_fabricated_history
+        --keepdb --noinput
+      result: 4/4 PASS; existing required-reference/cascade metadata and controlled opening import behavior preserved.
+      checks: Django system checks and Ruff lint/format checks for apps/accounting/forms.py and apps/accounting/views.py PASS.
+    browser:
+      result: PASS for the changed initial/migration presentation.
+      route: http://127.0.0.1:8000/accounting/openings/create/
+      environment: Existing authenticated local session and existing active tenant; desktop viewport.
+      verified: New title and scope help are readable; all three provenance inputs remain visible and required;
+        period selection is disabled in the current empty-year state. No opening or amount was submitted.
+      limitation: Active tenant has no fiscal years, so populated-year switching/stale-period reset was not repeated
+        live in this follow-up. Existing cascade code is unchanged and focused parent-choice contract tests PASS.
+    independent_accounting_gap:
+      reference: ROADMAP.md::10.1 Accounting Gap — Fiscal-Year Closing & Opening Balance Roll-forward
+      status: DEFERRED_UNTIL_CURRENT_CEP_PROGRAM_COMPLETES
+      classification: Independent functional gap; not classified as Post-V1.
+      implementation: NOT IMPLEMENTED; initial/migration F-076 closure does not close or deliver roll-forward.
+    touch_set:
+    - apps/accounting/forms.py
+    - apps/accounting/views.py
+    - ROADMAP.md
+    - docs/governance/uiux/UIUX_FINDING_CLOSURE_MASTER.yaml
+    boundaries: Existing dirty changes and prior closure history preserved. No roll-forward implementation,
+      schema/migration, source automation, new audit/report/evidence pack, CEP/Gate change, production action or Git write.
 - finding_id: UIUX-F-077
   module: Support
   surface_id: SURF-362
@@ -3735,6 +3970,14 @@ findings:
       unchanged.
     validation: Existing view title context review and changed-template compilation.
     original_status_basis: finding original/latest stored status only
+  conformance_followup:
+    date: '2026-10-25'
+    classification: REOPENED_REMEDIATION_GAP
+    resolution: RESOLVED
+    batch: CC105-SYSTEMIC-CONFORMANCE-20261025
+    surfaces: ["apps/accounting/templates/accounting/form.html", "templates/procurement/form.html", "templates/payroll/form.html"]
+    result: "Concatenating save with task titles produced long or duplicated actions. Explicit presentation labels identify each existing operation in 2-4 words without changing handlers."
+    verification: execution_history::CC105-SYSTEMIC-CONFORMANCE-20261025
 - finding_id: UIUX-F-083
   module: Billing
   surface_id: SURF-110
@@ -4043,9 +4286,9 @@ findings:
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: 'PARTIALLY_REMEDIATED_RUNTIME_VERIFIED: observed action_in_progress=>info; verified/closed=>success; other lifecycle
     statuses not closed'
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The shared semantic badge maps only a small fixed set of status codes; common lifecycle states used by Safety and Quality therefore
     fall back to the neutral family even when they represent active progress, successful resolution or closure.
   user_impact: The text label remains correct, but color/semantic emphasis stops reflecting lifecycle meaning, weakening rapid scanning across
@@ -4072,6 +4315,13 @@ findings:
     result: Current shared badge handles verified/closed/action_in_progress. Other states still use neutral styling; explicit
       lifecycle labels remain the task authority. Residual color-family coverage deferred.
     original_status_basis: UIUX_FINDINGS_REGISTER.yaml::wave_d_e_runtime_reconciliation.current_dispositions
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-01-shared
+    result: Centralized the five semantic families on the server with explicit coverage for every Safety/Quality lifecycle
+      state, including reported, assigned, resolved and awaiting verification; canonical domain labels and neutral
+      fallback are preserved.
+    verification: execution_history::D30-01-shared
 - finding_id: UIUX-F-091
   module: Shared Date Presentation
   surface_id: SHARED-DATE-DISPLAY
@@ -4306,9 +4556,9 @@ findings:
   priority: P0
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The equipment cost workbench exposes delivery-phase metadata, technical handoff keys and subsystem-boundary language directly in the
     operational UI.
   user_impact: Equipment/cost users must interpret roadmap-stage and integration-boundary concepts instead of seeing a straightforward costing/allocation/handoff
@@ -4335,6 +4585,12 @@ findings:
       are explicit. Traceability presentation is post-UAT; unresolved source-key ownership is separately retained under F061/F078.
     validation: Current-source task/control review; no design closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-04-dashboards
+    result: Equipment costing removes P8 and raw handoff keys from the primary view. Equipment, rate/allocation amount
+      and review status remain visible; exact occurrence/consumer references are retained in traceability disclosure.
+    verification: execution_history::D30-04-dashboards
 - finding_id: UIUX-F-097
   module: Equipment
   surface_id: SURF-307
@@ -4379,9 +4635,9 @@ findings:
   priority: P1
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The Workforce foundation workspace explains permission/domain boundaries and tenancy implementation in its primary copy.
   user_impact: HR users are asked to process technical authorization and subsystem-boundary wording while performing ordinary skills, training,
     qualification and performance tasks.
@@ -4405,6 +4661,12 @@ findings:
       wording is a post-UAT copy residual; no new workforce identity, permission or financial effect inferred.
     validation: Current-source task/field/control review; no cosmetic closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-02-master-data
+    result: Workforce foundation leads with skills, qualifications, training and development; technical tenancy/authorization
+      wording is replaced with contextual HR language without changing sensitivity gates.
+    verification: execution_history::D30-02-master-data
 - finding_id: UIUX-F-099
   module: Knowledge
   surface_id: SURF-371
@@ -4542,9 +4804,9 @@ findings:
   priority: P1
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The Treasury operations page mixes ordinary operational records with retained-reconciliation evidence language and a visible evidence
     hash.
   user_impact: Treasury users reviewing requests, cheques and advances encounter audit evidence metadata in the same operational workspace.
@@ -4567,6 +4829,12 @@ findings:
       exception count. Retained reconciliation hash/copy remains a traceability presentation residual.
     validation: Current-source review of existing business fields/actions; no closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-03-operations-finance
+    result: Treasury advance results retain cutoff, paid/settled/outstanding amounts and exception count; the full
+      hash is moved into a closed traceability disclosure.
+    verification: execution_history::D30-03-operations-finance
 - finding_id: UIUX-F-103
   module: Knowledge
   surface_id: SURF-372
@@ -4578,9 +4846,9 @@ findings:
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: 'PARTIALLY_REMEDIATED: producer-derived type/status and review labels, technical identifiers disclosed; richer source-business
     references not inferred'
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: Even in the dedicated history view, some lifecycle/source fields are rendered as raw canonical values instead of localized human labels.
   user_impact: Authorized reviewers can trace provenance, but must decode raw outcome/source/status identifiers rather than human-readable source
     references.
@@ -4605,6 +4873,13 @@ findings:
       separately. Dedicated authorized history still shows exact document-version UUID/hash without business title enrichment;
       retained for post-UAT without adding unauthorized cross-domain lookups.
     original_status_basis: UIUX_FINDINGS_REGISTER.yaml::wave_de_fixture_closure.current_dispositions
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-06-source-references
+    result: Publication history reuses the existing scoped Knowledge reference selector for an exact type/id/version
+      business label and the existing DMS access service for permitted document number/title/pinned version. Localized
+      source/review labels remain primary; identifiers/hashes are retained in disclosure.
+    verification: execution_history::D30-06-source-references
 - finding_id: UIUX-F-104
   module: Audit
   surface_id: SURF-026
@@ -4615,9 +4890,10 @@ findings:
   priority: P1
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Explicit Human/Product historical-reference decision and current-source, focused-test and authenticated
+    browser PASS on 2026-10-25; see closure. Prior partial remediation is historical.
   problem: The user-facing audit log shows raw entity type and entity identifier values beneath otherwise human-readable event actions.
   user_impact: Authorized reviewers can understand the action but must decode model/entity identifiers to know what business object the event
     concerns.
@@ -4639,6 +4915,51 @@ findings:
     result: Audit actions/date/actor are readable; exact entity type/ID remain diagnostic references. Business-title enrichment
       across domains is post-UAT and must preserve per-source access; no generic privileged object lookup introduced.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-06-source-references
+    result: 'PARTIAL: audit rows show localized object types and allowlisted retained business references, with exact
+      identifiers in disclosure and an explicit missing-reference fallback. Duplicate automatic pagination discovered
+      during this changed-view mobile verification was suppressed using the existing pagination_rendered contract.
+      Many historical Workflow events lack a business reference; their original object-reference requirement remains
+      open.'
+    verification: execution_history::D30-06-source-references
+    remaining_requirement: Recognizable references for immutable events without stored business metadata need a source-authorized
+      resolver contract. Current Workflow workbench access is assignment/source/scope bound; Audit permission does
+      not authorize a generic lookup of all archived subjects.
+  closure:
+    date: '2026-10-25'
+    head: 4817aa2c50258e2ed741f3617d868bf1d65e5f79
+    basis: ALREADY_RESOLVED_CURRENT_SOURCE
+    result: Existing /audit/ presentation satisfies the explicit Human/Product decision; no additional product code required.
+    human_product_decision: Historical events without a reference/title retained at creation are accepted as final with a
+      localized business object type and the explicit missing-reference fallback. Show existing retained allowlisted business
+      references when present; keep canonical type/identifier inside traceability disclosure. Audit permission does not grant
+      access to Workflow, Payroll, Contracts or other source-domain records; no generic or cross-domain object lookup.
+    historical_requirement_disposition: The prior targeted_remediation PARTIAL result and remaining_requirement are preserved
+      as history. This newer Human/Product decision supersedes the historical resolver requirement; no resolver contract,
+      backfill, historical-data rewrite or completion of missing historical references is required for F-104.
+    focused_tests:
+      command: >-
+        .\.venv\Scripts\python.exe manage.py test
+        core.test_cep003_localization_accessibility.DeferredUiReferenceTests.test_audit_reference_uses_retained_allowlist_and_never_live_object_lookup
+        apps.audit.tests.AuditServiceTests --keepdb --noinput
+      result: 9/9 PASS; Django system check identified no issues.
+    browser:
+      result: PASS
+      environment: Authenticated existing local browser session and existing tenant data; desktop viewport.
+      routes:
+      - http://127.0.0.1:8000/audit/
+      - http://127.0.0.1:8000/audit/?page=2
+      retained_reference: Existing purchase-order event displays B05-RUNTIME-PO-X as its readable business reference.
+      historical_event: Existing Workflow event displays سابقه گردش‌کار and مرجع تجاری در این رویداد ثبت نشده است.
+      traceability: Raw type/identifier absent from initial primary presentation; opening and closing the
+        شناسه‌های ردیابی رویداد disclosure reveals and hides canonical tracing details successfully.
+    source_review: audit_entity_label uses model metadata/localized labels only; audit_business_reference uses retained
+      allowlisted event metadata only. Existing tenant, project and source-domain authorization boundaries are preserved.
+    touch_set: Only this F-104 entry and the existing summary in UIUX_FINDING_CLOSURE_MASTER.yaml.
+    boundaries: Existing dirty changes preserved; no new product code, fixture or business-data writes, schema/migration,
+      backfill, resolver, execution_history, report/evidence/backlog, CEP/Gate/audit state, production action or Git write.
 - finding_id: UIUX-F-105
   module: Estimates
   surface_id: SURF-134
@@ -4649,9 +4970,9 @@ findings:
   priority: P1
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: RUNTIME_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: Estimate creation still foregrounds authorization/context mechanics in an otherwise well-structured business form.
   user_impact: Estimating users encounter permission/context language before completing a routine estimate-creation task.
   recommendation: Keep the current-project context visible in business language, but remove the authorization disclaimer from the primary task
@@ -4682,6 +5003,12 @@ findings:
       is secondary copy work for post-UAT; no scope/default or security behavior changed.
     validation: Current-source task/field/control review; no cosmetic closure or runtime PASS claimed.
     original_status_basis: latest finding runtime_revalidation_history disposition
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-02-master-data
+    result: Estimate creation retains current-project context in business language and removes the authorization disclaimer
+      from the task flow; the shared context script uses the same business wording.
+    verification: execution_history::D30-02-master-data
 - finding_id: UIUX-F-106
   module: Partner Qualification
   surface_id: SURF-356
@@ -4692,9 +5019,9 @@ findings:
   priority: P1
   original_status: STATIC_CONFIRMED
   latest_disposition_raw: STATIC_CONFIRMED
-  master_status: DEFERRED_NON_UAT_BLOCKING
-  codex_action: POST_UAT_CLOSURE
-  status_basis: Stage 2 current-source revalidation; see stage2_revalidation.
+  master_status: RESOLVED
+  codex_action: SKIP_RESOLVED
+  status_basis: Targeted 2026-10-25 remediation; see targeted_remediation.
   problem: The entire partner-qualification module is presented as a very sparse four-list workbench with minimal hierarchy, no standard page-header
     structure, no task guidance and implementation-oriented wording.
   user_impact: Qualification users can inspect data, but the workspace does not clearly communicate priority, qualification status, expiring requirements,
@@ -4721,6 +5048,13 @@ findings:
       introduced.
     validation: Current-source task/control review; no design closure or runtime PASS claimed.
     original_status_basis: finding original/latest stored status only
+  targeted_remediation:
+    date: '2026-10-25'
+    batch: D30-04-dashboards
+    result: Partner qualification now uses the shared page header and surfaces, status/validity/reference columns,
+      the existing expired-property warning, evaluation history and requirement guidance. Existing tenant/project
+      read authority is unchanged.
+    verification: execution_history::D30-04-dashboards
 - finding_id: UIUX-F-107
   module: Accounts
   surface_id: SURF-004
@@ -5799,3 +6133,179 @@ execution_history:
   stop_conditions: Product/domain/authorization change, schema change, unbounded fix or attributable regression; isolate affected
     finding.
   validation_scope: Current-source review and explicitly named focused checks only; no audit, wave, CEP or UAT execution.
+- batch: D30-01-shared
+  date: '2026-10-25'
+  head: 4817aa2c50258e2ed741f3617d868bf1d65e5f79
+  findings:
+  - UIUX-F-017
+  - UIUX-F-018
+  - UIUX-F-022
+  - UIUX-F-029
+  - UIUX-F-090
+  touch_set:
+  - apps/accounts/templatetags/erp_format.py
+  - core/test_cep003_localization_accessibility.py
+  - templates/base.html
+  - templates/components/navigation_links.html
+  - templates/components/record_detail_link.html
+  - templates/components/status_badge.html
+  - templates/equipment/list.html
+  - templates/inventory/custody_workbench.html
+  - templates/inventory/warehouse_list.html
+  - templates/projects/list.html
+  - templates/workforce/_ess_navigation.html
+  result: 5 RESOLVED; No remaining attributable regression.
+  validation: 26 shared/localization/reference SimpleTestCase checks PASS. Authenticated Projects/Equipment/Warehouses/Custody
+    detail affordances, Safety/Quality badges and dedicated own-data ESS desktop/mobile observed; no identity inferred.
+    Empty and populated list states were used; transfer counterpart rendered in focused test.
+  boundaries: Direct Human non-production UI remediation only; no audit/Wave, CEP, Gate, Product Decision, schema/migration,
+    production or Git write. Existing closure records only; no new report/evidence/backlog.
+- batch: D30-02-master-data
+  date: '2026-10-25'
+  head: 4817aa2c50258e2ed741f3617d868bf1d65e5f79
+  findings:
+  - UIUX-F-010
+  - UIUX-F-020
+  - UIUX-F-051
+  - UIUX-F-098
+  - UIUX-F-105
+  touch_set:
+  - apps/accounts/static/js/erp_context.js
+  - apps/organizations/forms.py
+  - templates/estimates/create.html
+  - templates/materials/governance.html
+  - templates/organizations/member_authorization.html
+  - templates/organizations/members.html
+  - templates/parties/_surface_navigation.html
+  - templates/parties/governance_list.html
+  - templates/workforce/foundation.html
+  result: 5 RESOLVED; No remaining attributable regression.
+  validation: Authenticated party/material/workforce/estimate/member authorization screens verified. Member forms
+    retain required independent approver/reason/validity fields. Shared focused tests and template compilation PASS;
+    no selector queryset or validation broadened.
+  boundaries: Direct Human non-production UI remediation only; no audit/Wave, CEP, Gate, Product Decision, schema/migration,
+    production or Git write. Existing closure records only; no new report/evidence/backlog.
+- batch: D30-03-operations-finance
+  date: '2026-10-25'
+  head: 4817aa2c50258e2ed741f3617d868bf1d65e5f79
+  findings:
+  - UIUX-F-013
+  - UIUX-F-025
+  - UIUX-F-026
+  - UIUX-F-027
+  - UIUX-F-028
+  - UIUX-F-031
+  - UIUX-F-032
+  - UIUX-F-052
+  - UIUX-F-053
+  - UIUX-F-102
+  touch_set:
+  - apps/accounting/templates/accounting/reconciliation_detail.html
+  - apps/accounts/templatetags/erp_format.py
+  - apps/fixed_assets/templates/fixed_assets/workbench.html
+  - apps/subledgers/templates/subledgers/workbench.html
+  - apps/treasury/templates/treasury/movement_detail.html
+  - apps/treasury/templates/treasury/operations.html
+  - apps/treasury/templates/treasury/statement_workbench.html
+  - apps/treasury/templates/treasury/workbench.html
+  - apps/treasury/test_cep060_workspace.py
+  - apps/treasury/views.py
+  - templates/equipment/operations_workbench.html
+  result: 10 RESOLVED; No remaining attributable regression.
+  validation: Authenticated populated maintenance, Fixed Assets, obligations, Treasury movement/journal 17 and Accounting
+    reconciliation verified. Native disclosures opened without submitting financial operations. Mobile layout checked;
+    focused rendered hash-retention and authorization tests plus Treasury UI/advance affected tests PASS. Some retained-run/exception
+    branches have no live fixture and are covered by focused rendering, not invented business data.
+  boundaries: Direct Human non-production UI remediation only; no audit/Wave, CEP, Gate, Product Decision, schema/migration,
+    production or Git write. Existing closure records only; no new report/evidence/backlog.
+- batch: D30-04-dashboards
+  date: '2026-10-25'
+  head: 4817aa2c50258e2ed741f3617d868bf1d65e5f79
+  findings:
+  - UIUX-F-033
+  - UIUX-F-043
+  - UIUX-F-066
+  - UIUX-F-096
+  - UIUX-F-106
+  touch_set:
+  - apps/accounts/templatetags/erp_format.py
+  - apps/partner_qualification/templates/partner_qualification/workbench.html
+  - apps/reporting/templates/reporting/_read_model_card.html
+  - apps/reporting/test_p10_s02_s06.py
+  - apps/reporting/test_p10_s07_s13.py
+  - templates/equipment/cost_workbench.html
+  - templates/home.html
+  - templates/reporting/dashboard.html
+  - templates/reporting/reconciliation_workbench.html
+  result: 5 RESOLVED; No remaining attributable regression.
+  validation: Authenticated Reporting specialist verified available/incomplete metric cards and reconciliation sources/readiness.
+    Existing Owner verified Home, partner qualification and equipment cost UI. Desktop/mobile no page overflow;
+    Home and reporting privacy/tenant tests PASS. No unsupported metric/trend or expiry projection was added.
+  boundaries: Direct Human non-production UI remediation only; no audit/Wave, CEP, Gate, Product Decision, schema/migration,
+    production or Git write. Existing closure records only; no new report/evidence/backlog.
+- batch: D30-05-statutory
+  date: '2026-10-25'
+  head: 4817aa2c50258e2ed741f3617d868bf1d65e5f79
+  findings:
+  - UIUX-F-068
+  touch_set:
+  - apps/payroll/test_p7_s23_s28_statutory_payroll.py
+  - core/test_cep003_localization_accessibility.py
+  - templates/payroll/statutory_workbench.html
+  result: 1 RESOLVED; No remaining attributable regression.
+  validation: Authenticated statutory workspace verified with explicit unavailable current prerequisites, without
+    calculation/output/submission. Focused populated correction-row rendering and statutory permission/tenant/RTL
+    test PASS. This is presentation verification, not statutory activation or certification.
+  boundaries: Direct Human non-production UI remediation only; no audit/Wave, CEP, Gate, Product Decision, schema/migration,
+    production or Git write. Existing closure records only; no new report/evidence/backlog.
+- batch: D30-06-source-references
+  date: '2026-10-25'
+  head: 4817aa2c50258e2ed741f3617d868bf1d65e5f79
+  findings:
+  - UIUX-F-060
+  - UIUX-F-076
+  - UIUX-F-103
+  - UIUX-F-104
+  touch_set:
+  - apps/accounting/forms.py
+  - apps/accounts/templatetags/erp_format.py
+  - apps/audit/tests.py
+  - apps/audit/views.py
+  - apps/knowledge/templates/knowledge/publication_history.html
+  - apps/knowledge/views.py
+  - apps/procurement/forms.py
+  - core/test_cep003_localization_accessibility.py
+  - templates/audit/log.html
+  - templates/procurement/sealed_evidence_custody.html
+  result: 2 RESOLVED; F076/F104 remain DEFERRED_NON_UAT_BLOCKING with explicit contract limitations.
+  validation: Authenticated custodian sealed form verified hidden retry key, optional collapsed hash, keyboard expansion
+    and mobile layout; no upload performed. Opening year changes retain only their own periods and clear stale selection.
+    Knowledge history shows the real existing field-observation title via the approved selector. Audit rows and
+    one bounded mobile paginator verified. DMS/tenant denial, retry redisplay and metadata allowlist tests PASS;
+    F076/F104 remain partial.
+  boundaries: Direct Human non-production UI remediation only; no audit/Wave, CEP, Gate, Product Decision, schema/migration,
+    production or Git write. Existing closure records only; no new report/evidence/backlog.
+
+- batch: CC105-SYSTEMIC-CONFORMANCE-20261025
+  date: "2026-10-25"
+  head: "4817aa2c50258e2ed741f3617d868bf1d65e5f79"
+  scope: "Systemic rules from the 105 pre-D30 RESOLVED findings only; current accepted dirty tree is the baseline. No new audit or reassessment of 135 findings."
+  rules_checked: 16
+  rules: ["existing-master selectors and business labels", "tenant/project/site selector scope", "dependent child choices", "derived master data", "list/detail identity and navigation", "concise consistent business action labels", "permission-aware unique navigation", "shared field labels/errors and create/edit validation", "Persian source-owned statuses", "technical metadata disclosure", "Jalali input and display", "RTL and single main landmark", "filter/sort/pagination continuity", "task sequence and empty-state guidance", "hidden platform-generated control metadata", "date-picker keyboard dismissal"]
+  surfaces_checked: 89
+  surface_count_unit: "Unique template/component files inspected against applicable rules; shared generic templates counted once. Code/form/helper seams inspected as needed."
+  reopened_remediation_gaps: 3
+  reopened_finding_ids: ["UIUX-F-003", "UIUX-F-045", "UIUX-F-082"]
+  reopened_surface_count: 5
+  systemic_conformance_gaps: 25
+  gap_count_unit: "Original reopened finding for the three direct gaps; one grouped related-rule gap per additional changed template/component for propagation."
+  fixed_gaps: 28
+  changed_templates: 30
+  resolution: "RESOLVED"
+  change_summary: "Presentation only: explicit task CTAs, consistent cancel text, business navigation/claim/download labels, shared ESS field/error/hidden-field rendering, localized ESS statuses and source-model commercial statuses/Jalali dates. No service, authorization, workflow, financial, schema or migration changes."
+  focused_validation: "20/20 existing focused tests PASS (13 localization/component, 1 closeout, 5 affected ESS/history/download, 1 Home). 30 changed templates compile; 18 invalid shared-form renders retain field/non-field errors and retry fields; 79 known task CTAs have 2-4 words. Populated commercial date/status render and all three source-model status choice sets PASS. Ruff lint/format PASS for the new tag library and three label-assertion test files."
+  browser_verification: "17 distinct changed templates reached in the existing authenticated local browser; available actions/links and timekeeping invalid POST verified. 390x844 accounting/procurement/treasury forms retain RTL, short labels and no document overflow; original viewport restored. Empty lists do not prove populated branches. Payroll/manager/reporting and extended ESS routes unavailable to the current account; those populated/permission branches rely on focused tests and template/render checks, not claimed as live-browser PASS."
+  limitations: "No new fixture, permission broadening, impersonation or business record was used to fill browser coverage. Unavailable live branches remain unverified in this browser session; this does not change existing permissions or prior closure evidence."
+  blockers: []
+  git_writes: "NOT EXECUTED"
+  touch_set: ["templates/timekeeping/form.html", "templates/payroll/form.html", "templates/procurement/form.html", "apps/accounting/templates/accounting/form.html", "apps/billing/templates/billing/payable_form.html", "apps/billing/templates/billing/commercial_form.html", "apps/treasury/templates/treasury/operation_form.html", "templates/reporting/project_closeout_detail.html", "templates/materials/material_list.html", "templates/parties/detail.html", "apps/accounting/templates/accounting/journal_list.html", "templates/payroll/payslip.html", "templates/workforce/certificate_detail.html", "templates/workforce/personal_change_detail.html", "templates/payroll/ess_inquiry_detail.html", "templates/workforce/personal_change_requests.html", "templates/workforce/employment_history.html", "templates/workforce/ess_profile.html", "templates/workforce/certificate_form.html", "templates/workforce/personal_change_form.html", "templates/payroll/ess_inquiry_form.html", "templates/parties/list.html", "templates/parties/governance_detail.html", "templates/workflows/manager_workspace.html", "templates/workflows/my_requests.html", "apps/workforce/templates/workforce/ess_timekeeping_form.html", "templates/contracts/commercial_review.html", "templates/home.html", "apps/fixed_assets/templates/fixed_assets/workbench.html", "apps/reporting/templates/reporting/_read_model_card.html", "apps/accounts/templatetags/ui_actions.py", "apps/workforce/test_cep022.py", "apps/workforce/test_cep056.py", "apps/payroll/test_cep054.py", "docs/governance/uiux/UIUX_FINDING_CLOSURE_MASTER.yaml"]

@@ -294,7 +294,7 @@ class CertificateTests(TestCase):
         response = self.client.get(
             reverse("workforce:certificate_detail", args=[item.pk])
         )
-        self.assertContains(response, "دریافت نسخه مجاز سند")
+        self.assertContains(response, "دریافت سند")
         self._capture56("generated", response)
         form = self.client.get(reverse("workforce:certificate_create"))
         self.assertContains(form, "ثبت درخواست گواهی")

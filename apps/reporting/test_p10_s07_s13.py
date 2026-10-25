@@ -421,7 +421,7 @@ class P10S07S13AcceptanceTests(TestCase):
         response = self.client.get(reverse("reporting:reconciliation_workbench"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dir="rtl"')
-        self.assertContains(response, "۱۳ جفت حاکم‌شده")
+        self.assertContains(response, "موضوع‌های تطبیق")
         self.assertContains(response, "نامعلوم")
         self.assertEqual(response["Cache-Control"], "private, no-store, max-age=0")
 

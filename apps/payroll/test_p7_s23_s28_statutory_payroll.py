@@ -671,8 +671,8 @@ class StatutoryPayrollTests(TestCase):
         session.save()
         response = self.client.get(reverse("payroll:statutory_workbench"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "کارگاه مقرراتی مالیات و بیمه کارکنان")
-        self.assertContains(response, "provider-neutral")
+        self.assertContains(response, "مالیات و بیمه کارکنان")
+        self.assertContains(response, "محدودیت خروجی و ارسال")
         self.assertContains(response, 'dir="rtl"')
         self.client.force_login(self.denied)
         session = self.client.session

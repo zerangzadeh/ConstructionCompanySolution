@@ -29,5 +29,7 @@ def audit_log(request: HttpRequest) -> HttpResponse:
         per_page=25,
     )
     return render(
-        request, "audit/log.html", {"events": page.object_list, "page_obj": page}
+        request,
+        "audit/log.html",
+        {"events": page.object_list, "page_obj": page, "pagination_rendered": True},
     )

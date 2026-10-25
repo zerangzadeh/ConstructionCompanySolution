@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django import forms
 from django.utils import timezone
 
@@ -293,17 +295,22 @@ class SupplierPortalSubmissionForm(_StyledForm):
 
 class SealedEvidenceUploadForm(_StyledForm):
     evidence_type = forms.ChoiceField(
-        label="نوع شاهد",
+        label="نوع فایل پیشنهاد",
         choices=(
             ("supplier_original", "اصل پیشنهاد تأمین‌کننده"),
             ("supplier_attachment", "پیوست تأمین‌کننده"),
         ),
     )
     evidence_slot = forms.CharField(
-        label="شناسه فنی پیوست", required=False, max_length=80
+        label="نام کوتاه پیوست",
+        required=False,
+        max_length=80,
+        help_text="برای پیوست تکمیلی، یک نام یکتا با حروف لاتین، عدد یا خط تیره وارد کنید؛ برای اصل پیشنهاد لازم نیست.",
     )
-    upload = forms.FileField(label="فایل شاهد")
-    idempotency_key = forms.CharField(label="کلید یکتای نگهداری", max_length=128)
+    upload = forms.FileField(label="فایل پیشنهاد یا پیوست")
+    idempotency_key = forms.CharField(
+        max_length=128, widget=forms.HiddenInput(), initial=lambda: uuid4().hex
+    )
     expected_sha256 = forms.CharField(
         label="هش مورد انتظار SHA-256", required=False, max_length=64
     )

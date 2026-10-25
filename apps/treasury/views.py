@@ -9,6 +9,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
+from apps.accounting.models import JournalEntry
 from apps.organizations.authorization import (
     get_active_membership,
     has_business_permission,
@@ -311,6 +312,23 @@ def _visible_movement(request, movement_id):
     )
 
 
+def _linked_journal(request: HttpRequest, movement: TreasuryMovement):
+    """Expose the linked number only to the existing Accounting view authority."""
+    if not movement.journal_id or not has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.ACCOUNTING_VIEW,
+    ):
+        return None
+    return (
+        JournalEntry.objects.filter(
+            pk=movement.journal_id, organization=request.organization
+        )
+        .only("pk", "number")
+        .first()
+    )
+
+
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.TREASURY_VIEW)
 @require_GET
@@ -331,6 +349,7 @@ def movement_detail(request: HttpRequest, movement_id) -> HttpResponse:
         "treasury/movement_detail.html",
         {
             "movement": movement,
+            "linked_journal": _linked_journal(request, movement),
             "can_submit": allowed(BusinessPermissionCode.TREASURY_MOVEMENTS_SUBMIT),
             "can_post": allowed(BusinessPermissionCode.TREASURY_MOVEMENTS_APPROVE)
             and allowed(BusinessPermissionCode.TREASURY_MOVEMENTS_POST),

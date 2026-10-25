@@ -237,7 +237,7 @@ class EmploymentTests(TestCase):
         self._client()
         response = self.client.get(reverse("workforce:employment_history"))
         self.assertContains(response, "قرارداد و احکام استخدام من")
-        self.assertContains(response, "دریافت نسخه مجاز سند")
+        self.assertContains(response, "دریافت سند")
         self.assertNotContains(response, "PRIVATE-SOURCE-REASON")
         self.assertNotContains(response, 'name="record_key"')
         self.assertIn("no-store", response["Cache-Control"])
@@ -330,14 +330,14 @@ class EmploymentTests(TestCase):
         self._client()
         response = self.client.get(reverse("workforce:employment_history"))
         self.assertContains(response, "دریافت این نسخه سند در دسترس نیست.")
-        self.assertNotContains(response, "دریافت نسخه مجاز سند")
+        self.assertNotContains(response, "دریافت سند")
         self._capture("download_unavailable", response)
         self._allow(current=True, history=True, download=True)
         self.role.permissions.remove(
             BusinessPermission.objects.get(code=P.DOCUMENTS_DOWNLOAD)
         )
         response = self.client.get(reverse("workforce:employment_history"))
-        self.assertNotContains(response, "دریافت نسخه مجاز سند")
+        self.assertNotContains(response, "دریافت سند")
         self.assertEqual(len(self._own().rows), 1)
 
     def test_empty_and_unavailable_document_states(self):

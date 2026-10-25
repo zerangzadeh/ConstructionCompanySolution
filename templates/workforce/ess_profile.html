@@ -37,6 +37,6 @@
 <section class="erp-surface mt-5 rounded-2xl p-5 sm:p-6" aria-labelledby="documents-heading">
   <h2 id="documents-heading" class="text-lg font-black text-slate-950">اسناد من</h2>
   <p class="mt-2 text-sm text-slate-600">نمایش و دریافت اسناد تابع سیاست دسته سند و مجوزهای منبع است.</p>
-  {% if "documents.view" in business_permission_codes %}<a class="mt-4 inline-flex font-bold text-blue-700" href="{% url 'documents:employee-list' %}">مشاهده اسناد مجاز</a>{% else %}<p class="mt-4 text-sm text-slate-500">دسترسی به اسناد برای این حساب فعال نیست.</p>{% endif %}
+  {% if "documents.view" in business_permission_codes %}<a class="mt-4 inline-flex font-bold text-blue-700" href="{% url 'documents:employee-list' %}">مشاهده اسناد</a>{% else %}<p class="mt-4 text-sm text-slate-500">دسترسی به اسناد برای این حساب فعال نیست.</p>{% endif %}
 </section>
 {% endblock %}

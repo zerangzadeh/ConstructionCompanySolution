@@ -1,25 +1,25 @@
 {% extends "base.html" %}
 {% block title %}توانمندی و توسعه نیروی انسانی | سامانه مدیریت ساخت{% endblock %}
 {% block content %}
-{% include "components/page_header.html" with page_eyebrow="منابع انسانی" page_title="توانمندی، صلاحیت و توسعه" page_description="سوابق منابع انسانی با دسترسی کنترل‌شده؛ بدون اثر حقوق، مالی یا مجوز دسترسی" only %}
+{% include "components/page_header.html" with page_eyebrow="منابع انسانی" page_title="توانمندی، صلاحیت و توسعه" page_description="مهارت‌ها، صلاحیت‌ها و آموزش کارکنان را ثبت و مسیر توسعه آن‌ها را پیگیری کنید." only %}
 {% include "workforce/_tabs.html" %}
 
 <section class="mt-5 grid gap-4 lg:grid-cols-2">
     <article class="erp-surface rounded-2xl p-5">
-        <div class="flex items-start justify-between gap-4"><div><h2 class="font-black text-slate-950">مهارت‌ها و شایستگی‌ها</h2><p class="mt-1 text-xs leading-6 text-slate-500">تعاریف Tenant-local؛ هیچ‌کدام نقش یا دسترسی ایجاد نمی‌کنند.</p></div>{% if can_manage_skills %}<a class="erp-btn erp-btn--secondary" href="{% url 'workforce:skill_create' %}">مهارت جدید</a>{% endif %}</div>
+        <div class="flex items-start justify-between gap-4"><div><h2 class="font-black text-slate-950">مهارت‌ها و شایستگی‌ها</h2><p class="mt-1 text-xs leading-6 text-slate-500">مهارت‌ها و شایستگی‌های مورد نیاز کارکنان این شرکت را تعریف کنید.</p></div>{% if can_manage_skills %}<a class="erp-btn erp-btn--secondary" href="{% url 'workforce:skill_create' %}">مهارت جدید</a>{% endif %}</div>
         <div class="mt-4 grid gap-3 sm:grid-cols-2"><div><h3 class="text-xs font-bold text-slate-600">مهارت‌ها</h3><ul class="mt-2 space-y-2 text-sm">{% for item in skills %}<li class="rounded-lg bg-slate-50 px-3 py-2"><span class="font-bold">{{ item.name }}</span><span class="mr-2 text-xs text-slate-500" dir="ltr">{{ item.code }}</span></li>{% empty %}<li class="text-xs text-slate-500">موردی ثبت نشده است.</li>{% endfor %}</ul></div><div><div class="flex items-center justify-between"><h3 class="text-xs font-bold text-slate-600">شایستگی‌ها</h3>{% if can_manage_skills %}<a class="text-xs font-bold text-blue-700" href="{% url 'workforce:competency_create' %}">افزودن</a>{% endif %}</div><ul class="mt-2 space-y-2 text-sm">{% for item in competencies %}<li class="rounded-lg bg-slate-50 px-3 py-2"><span class="font-bold">{{ item.name }}</span><span class="mr-2 text-xs text-slate-500" dir="ltr">{{ item.code }}</span></li>{% empty %}<li class="text-xs text-slate-500">موردی ثبت نشده است.</li>{% endfor %}</ul></div></div>
         {% if can_manage_skills %}<a class="erp-btn erp-btn--primary mt-4" href="{% url 'workforce:employee_skill_create' %}">ثبت سابقه مهارت کارمند</a>{% endif %}
     </article>
 
     <article class="erp-surface rounded-2xl p-5">
-        <div class="flex items-start justify-between gap-4"><div><h2 class="font-black text-slate-950">صلاحیت و آموزش</h2><p class="mt-1 text-xs leading-6 text-slate-500">اعتبار، ابطال و شواهد در سابقه حفظ می‌شوند.</p></div>{% if can_manage_qualifications %}<a class="erp-btn erp-btn--secondary" href="{% url 'workforce:qualification_create' %}">صلاحیت جدید</a>{% endif %}</div>
+        <div class="flex items-start justify-between gap-4"><div><h2 class="font-black text-slate-950">صلاحیت و آموزش</h2><p class="mt-1 text-xs leading-6 text-slate-500">اعتبار صلاحیت‌ها و سوابق دوره‌های آموزشی کارکنان را پیگیری کنید.</p></div>{% if can_manage_qualifications %}<a class="erp-btn erp-btn--secondary" href="{% url 'workforce:qualification_create' %}">صلاحیت جدید</a>{% endif %}</div>
         <ul class="mt-4 space-y-2 text-sm">{% for item in requirements %}<li class="rounded-lg bg-slate-50 px-3 py-2"><span class="font-bold">{{ item.name }}</span><span class="mr-2 text-xs text-slate-500" dir="ltr">{{ item.code }}</span>{% if item.project %}<span class="mr-2 text-xs text-slate-500">{{ item.project.name }}</span>{% endif %}</li>{% empty %}<li class="text-xs text-slate-500">الزام آموزشی ثبت نشده است.</li>{% endfor %}</ul>
         {% if can_manage_qualifications %}<div class="mt-4 flex flex-wrap gap-2"><a class="erp-btn erp-btn--primary" href="{% url 'workforce:training_requirement_create' %}">الزام آموزشی</a><a class="erp-btn erp-btn--secondary" href="{% url 'workforce:training_record_create' %}">ثبت سابقه آموزش</a></div>{% endif %}
     </article>
 
     <article class="erp-surface rounded-2xl p-5 lg:col-span-2">
-        <h2 class="font-black text-slate-950">اطلاعات حساس</h2><p class="mt-1 text-xs leading-6 text-slate-500">ارزیابی عملکرد و نرخ نیروی کار فقط با مجوز صریح نمایش داده می‌شوند و در فهرست عمومی کارکنان ظاهر نمی‌شوند.</p>
-        <div class="mt-4 flex flex-wrap gap-2">{% if "workforce_performance.manage" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'workforce:performance_create' %}">ثبت ارزیابی عملکرد</a>{% endif %}{% if "workforce_labor_rates.manage" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'workforce:labor_rate_create' %}">ثبت نسخه نرخ</a>{% endif %}{% if not can_view_performance and not can_view_labor_rates %}<span class="text-xs text-slate-500">مجوز مشاهده اطلاعات حساس به این عضویت اعطا نشده است.</span>{% endif %}</div>
+        <h2 class="font-black text-slate-950">ارزیابی عملکرد و نرخ نیروی کار</h2><p class="mt-1 text-xs leading-6 text-slate-500">سوابق ارزیابی و نرخ‌ها محرمانه‌اند؛ فقط مسئولان مجاز می‌توانند آن‌ها را مشاهده کنند.</p>
+        <div class="mt-4 flex flex-wrap gap-2">{% if "workforce_performance.manage" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'workforce:performance_create' %}">ثبت ارزیابی عملکرد</a>{% endif %}{% if "workforce_labor_rates.manage" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'workforce:labor_rate_create' %}">ثبت نسخه نرخ</a>{% endif %}{% if not can_view_performance and not can_view_labor_rates %}<span class="text-xs text-slate-500">برای مشاهده این سوابق با مسئول منابع انسانی تماس بگیرید.</span>{% endif %}</div>
     </article>
 </section>
 {% endblock %}

@@ -1,28 +1,28 @@
 {% extends "base.html" %}
 {% load erp_format %}
-{% block title %}داشبورد شاخص‌های حاکم‌شده{% endblock %}
+{% block title %}داشبورد مدیریت{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-7xl space-y-6 px-4 py-6" dir="rtl">
   <header class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
     <p class="text-xs font-semibold text-blue-700">گزارش‌ها و اطلاعات مدیریتی</p>
-    <h1 class="mt-2 text-2xl font-bold text-slate-900">داشبورد شاخص‌های حاکم‌شده</h1>
-    <p class="mt-2 text-sm text-slate-600">وضعیت عملیات، استثناها و نتایج مدیریتی از شواهد حاکم‌شده؛ هر نتیجه با زمان مبنا و مسیر منبع.</p>
+    <h1 class="mt-2 text-2xl font-bold text-slate-900">داشبورد مدیریت</h1>
+    <p class="mt-2 text-sm text-slate-600">وضعیت عملکرد و موارد نیازمند توجه را ببینید؛ برای بررسی علت هر نتیجه وارد جزئیات شوید.</p>
     <nav aria-label="فضاهای گزارش‌گیری" class="mt-4 flex flex-wrap gap-3">
       {% if "reporting.reconciliation_run.view" in business_permission_codes %}<a class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-blue-700" href="{% url 'reporting:reconciliation_workbench' %}">تطبیق منابع</a>{% endif %}
       {% if "reporting.project_closeout_case.view" in business_permission_codes %}<a class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-blue-700" href="{% url 'reporting:project_closeout_workbench' %}">آمادگی اختتام پروژه</a>{% endif %}
     </nav>
   </header>
 
-  <p class="text-sm text-slate-600">زمان مشاهده: {{ read_model.observed_at|jalali_datetime }} · انتخاب شواهد تا: {{ read_model.as_of|jalali_datetime }}. وضعیت تازگی، وضعیت ثبت‌شده منبع در زمان مشاهده است.</p>
+  <p class="text-sm text-slate-600">زمان مشاهده: {{ read_model.observed_at|jalali_datetime }} · نتایج تا: {{ read_model.as_of|jalali_datetime }}. وضعیت تازگی، وضعیت ثبت‌شده منبع در زمان مشاهده است.</p>
   <nav aria-label="لایه‌های گزارش" class="flex flex-wrap gap-3">
     {% for layer in read_model.layers %}<a class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-blue-700" href="#reporting-{{ layer.code }}">{{ layer.title }}</a>{% endfor %}
   </nav>
   {% for layer in read_model.layers %}
   <section id="reporting-{{ layer.code }}" aria-labelledby="title-{{ layer.code }}" class="space-y-3">
     <h2 id="title-{{ layer.code }}" class="text-lg font-bold text-slate-900">{{ layer.title }}</h2>
-    <p class="text-sm text-slate-600">{{ layer.description }}</p>
+    <details class="text-xs text-slate-500"><summary class="cursor-pointer">درباره شاخص‌های این بخش</summary><p class="mt-2">{{ layer.description }}</p></details>
     {% if not layer.available %}
-      <p class="rounded-xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">این لایه در دامنه مجاز شما در دسترس نیست.</p>
+      <p class="rounded-xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">این بخش برای حساب شما در دسترس نیست.</p>
     {% else %}
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {% for card in layer.cards %}
@@ -31,19 +31,19 @@
         {% else %}
           {% include 'reporting/_read_model_card.html' with show_values=False %}
         {% endif %}
-      {% empty %}<p class="rounded-xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">نتیجه واجد شرایطی در دامنه مجاز شما وجود ندارد.</p>{% endfor %}
+      {% empty %}<p class="rounded-xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">نتیجه قابل نمایشی برای شما موجود نیست.</p>{% endfor %}
     </div>
     {% endif %}
   </section>
   {% endfor %}
   {% if "reporting.export.create" in business_permission_codes and "reporting.export.download" in business_permission_codes %}<form method="post" action="{% url 'reporting:export' %}">{% csrf_token %}
     <input type="hidden" name="purpose" value="داشبورد مدیریتی">
-    <button class="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white" type="submit">خروجی کنترل‌شده CSV</button>
+    <button class="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white" type="submit">دریافت گزارش CSV</button>
   </form>{% endif %}
 
-  <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="catalogue-title">
-    <h2 id="catalogue-title" class="text-lg font-bold text-slate-900">کاتالوگ شاخص‌های مصوب</h2>
+  <details class="rounded-xl border border-slate-200 bg-white p-5">
+    <summary class="cursor-pointer font-bold text-slate-700">تعریف و منابع شاخص‌ها</summary>
     <div class="mt-4 overflow-x-auto"><table class="min-w-full text-right text-sm"><thead><tr class="border-b text-slate-500"><th class="p-2">شناسه</th><th class="p-2">نام فارسی</th><th class="p-2">دامنه منبع</th><th class="p-2">مالک منبع</th></tr></thead><tbody>{% for metric in definitions %}<tr class="border-b border-slate-100"><td class="p-2 font-mono" dir="ltr">{{ metric.code }}</td><td class="p-2 font-semibold">{{ metric.persian_name }}</td><td class="p-2">{{ metric.source_domain }}</td><td class="p-2">{{ metric.source_owner }}</td></tr>{% endfor %}</tbody></table></div>
-  </section>
+  </details>
 </div>
 {% endblock %}

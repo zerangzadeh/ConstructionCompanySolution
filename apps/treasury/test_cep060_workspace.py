@@ -270,7 +270,7 @@ class NativeTreasuryWorkspaceTests(TestCase):
             TreasuryAdvanceReconciliationRun.objects.latest("created_at").exceptions, []
         )
         response = self.client.get(reverse("treasury:operations"))
-        self.assertContains(response, "تطبیق‌های نگهداری‌شده تنخواه")
+        self.assertContains(response, "نتایج تطبیق تنخواه")
         self.fixture("advance_recon", response)
 
     def test_transfer_uses_native_two_leg_draft_without_posting(self):

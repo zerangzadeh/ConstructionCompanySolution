@@ -7,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_POST
 
+from apps.documents.services import get_organization_document
 from apps.organizations.authorization import has_business_permission, is_platform_admin
 from apps.organizations.decorators import (
     active_organization_required,
@@ -35,6 +36,7 @@ from .models import (
     KnowledgeSensitivity,
     PublicationStatus,
 )
+from .reference_ui import visible_references
 from .services import (
     approve_candidate,
     approve_platform_promotion,
@@ -348,6 +350,49 @@ def publication_correct(request, version_id):
     return redirect("knowledge:publication_detail", version_id=version_id)
 
 
+def _history_source_rows(request, item):
+    """Enrich only an already-authorized pin through the DMS access boundary."""
+    groups, _ = visible_references(
+        organization=request.organization, actor=request.user, sources=False
+    )
+    labels = {key: label for _, choices in groups for key, label in choices}
+    rows = []
+    for pin in item.candidate_revision.source_pins.all():
+        document_reference = ""
+        source_reference = ""
+        if pin.source_organization_id == request.organization.pk:
+            key = f"{pin.source_type}:{pin.source_id}:{pin.source_version}"
+            source_reference = labels.get(key, "")
+        if pin.source_organization_id == request.organization.pk and pin.document_id:
+            try:
+                document = get_organization_document(
+                    user=request.user,
+                    organization=request.organization,
+                    document_id=str(pin.document_id),
+                )
+            except PermissionDenied:
+                pass
+            else:
+                version = pin.document_version
+                if (
+                    version is not None
+                    and version.document_id == document.pk
+                    and version.organization_id == request.organization.pk
+                ):
+                    document_reference = (
+                        f"{document.document_number} — {document.title}"
+                        f" · نسخه {version.version_number}"
+                    )
+        rows.append(
+            {
+                "pin": pin,
+                "source_reference": source_reference,
+                "document_reference": document_reference,
+            }
+        )
+    return rows
+
+
 @never_cache
 @require_GET
 @active_organization_required
@@ -364,7 +409,13 @@ def publication_history(request, version_id):
     return render(
         request,
         "knowledge/publication_history.html",
-        {"item": item, "expose_sources": expose_sources},
+        {
+            "item": item,
+            "expose_sources": expose_sources,
+            "source_rows": _history_source_rows(request, item)
+            if expose_sources
+            else [],
+        },
     )
 
 
