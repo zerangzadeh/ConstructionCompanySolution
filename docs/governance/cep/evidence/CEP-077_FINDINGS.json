@@ -28,6 +28,30 @@
         "product_regression": "NOT_PROVEN_NOT_CLASSIFIED",
         "acquisition_or_downstream_rerun": false
       }
-    ]
+    ],
+    "current_frontier_disposition": {
+      "at": "2026-10-25T20:13:52.045287+00:00",
+      "status": "RESOLVED_DNS_ONLY",
+      "evidence": "FRONTIER_069_078_20261025/CEP077_RETRY.json",
+      "historical_status_preserved": true,
+      "downstream_scan_pass": false
+    }
+  },
+  {
+    "finding_id": "CEP-077-FINDING-002",
+    "status": "OPEN",
+    "classification": "BLOCKER-SECURITY",
+    "imb": "IMB-0107",
+    "affected_ac": [
+      1,
+      3
+    ],
+    "actual": "Current official image tag differs from approved index/platform digests; actual unchanged gate exits1 before acquisition",
+    "evidence": [
+      "FRONTIER_069_078_20261025/CEP077_RETRY.json",
+      "FRONTIER_069_078_20261025/CEP077_RUNTIME/gate-result.json"
+    ],
+    "resolution": "Separately authorized artifact/provenance review and approved digest remediation before retry; no control bypass/automatic policy edit",
+    "identified_at": "2026-10-25T20:13:52.045287+00:00"
   }
 ]

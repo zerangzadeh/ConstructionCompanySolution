@@ -15,3 +15,7 @@ Actual changes: intake/manifests/report/Registry only. Models, code, schema, mig
 Resolution: supply a current official Iranian statutory package with identifiable source/version/effective dates, classifications/bases/caps/exemptions/shares, YTD/rounding/retroactivity/schema and accepted professional review/evidence; verify the intended configured environment; obtain the separate Human authority required for any final certification/production action. Do not invent missing values, sign-off or deployment semantics. A development schema deployment alone would not resolve the official-evidence blocker.
 
 Registry: 35 COMPLETE, two PARTIAL (CEP-028 and CEP-069), five independent verified implementation candidates CEP-022/036/054/055/056. CEP-028 dataset work remains skipped. Next independent non-production implementation candidate CEP-054 is NOT STARTED. Automatic serial continuation stops on the newly partial/blocked packet under the current session stop rule; independent packages do not acquire a dependency on CEP-069. No dependency graph or package scope changed.
+
+## Current frontier recheck - 2026-10-25
+
+Current loopback Development PostgreSQL18.6 read-only transaction confirms source-package schema present but0packages,0statutory versions and0published versions. No official currentness/professional review/activation evidence supplied. [Measured recheck](../evidence/FRONTIER_069_078_20261025/CEP069_SOURCE_RECHECK.json). EXECUTION PARTIAL0/5certified, DoD NOT_MET; no production/Human/Git action.

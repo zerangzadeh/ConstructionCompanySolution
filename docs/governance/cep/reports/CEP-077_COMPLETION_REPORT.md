@@ -107,3 +107,26 @@ then-grounded candidate with fresh evidence; close only if all required AC/DoD p
 057 remains PARTIAL0/7,065 entry BLOCKED,05/06 NOT_PASSED; no migration, business-data
 mutation, Production authority/action or Git write. This recheck/evidence remains
 uncommitted with the earlier077 verification work.
+
+## Current frontier retry — 2026-10-25
+
+**EXECUTION PARTIAL.** Accepted main566073b35f2f5bb8b08267b56856fb85b7a0fcf0;
+sole013 prerequisite COMPLETE; prompt/recovery identities verified and all9 control
+inputs unchanged. Finding001 DNS resolved by current approved-host DNS and PyPI
+HTTPS200. Existing unchanged runtime gate executed at19:53:48–19:53:51UTC; exit1.
+Locks/config PASS, official image identity FAIL before any acquisition.
+
+New **CEP-077-FINDING-002 / BLOCKER-SECURITY**: current official image tag no
+longer matches pinned index/platform digests. [Expected/observed identity and
+provenance](../evidence/FRONTIER_069_078_20261025/CEP077_RETRY.json),
+[actual result](../evidence/FRONTIER_069_078_20261025/CEP077_RUNTIME/gate-result.json)
+and command output retained. No digest substitution or controls bypass. Separate
+authorized supply-chain artifact review/remediation is required before retry.
+No current image clearance, acquisition, OSV, license, SBOM or provenance PASS.
+
+AC2/4/5/6 remain4of6 traceability PASS; AC1/3 incomplete. DoD NOT_MET. GATE08
+NOT_PASSED. Previous DNS-failed run remains immutable historical evidence.
+No application/schema/dependency/policy/CI/business-data change, migration or
+extra baseline test rerun. Current evidence uncommitted; no Git writes. Production
+Certification/Cutover and Human Sign-off NOT_EXECUTED. Continue only independently
+actionable frontier paths under the current Human instruction.

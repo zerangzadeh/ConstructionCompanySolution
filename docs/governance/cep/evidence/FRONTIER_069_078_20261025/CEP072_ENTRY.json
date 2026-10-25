@@ -1,0 +1,40 @@
+{
+  "at": "2026-10-25T20:03:57.918509+00:00",
+  "head": "566073b35f2f5bb8b08267b56856fb85b7a0fcf0",
+  "canonical_prompt": {
+    "path": "docs/governance/cep/PROMPTS/CEP-072_EXECUTION_PROMPT.md",
+    "sha256": "9c52431a1c52c2ca41c2e10ca0eb35eea4871a8ebb7d38e3d57600ca1bbf0940",
+    "verified": true
+  },
+  "dependencies": [],
+  "entry": "Nonproduction telemetry foundation eligible; EXT0022 blocks production, not build. No operational owners assigned. IMB0100 first; IMB0101 only against stable existing controls and approved responsibilities.",
+  "operating_spec": {
+    "member": "BONIRA_OPERATING_SPECIFICATION.md",
+    "sha256": "d144b3cfa3266564d2467b659d70597fe9d0b1923814a4db59c97ac5c7e48633",
+    "content": "# BONIRA \u2014 Approved Operating Specification\n\nGoverned by `PD-005`.\n\n| Responsibility | Requirement |\n|---|---|\n| Release Owner | Designated accountable responsibility per production release; exact assignee not invented |\n| Incident Owner | Designated accountable responsibility per incident |\n| Production Activation Authority | Explicitly designated; technical superuser status alone is insufficient |\n| Escalation Responsibility | Explicit path required; no timer/severity/SLA invented |\n| Emergency / Support Access Authority | Explicit, scoped, auditable and revocable |\n| Rollback / Roll-forward Responsibility | Recorded in release/incident evidence |\n| Access Revocation Responsibility | Explicit owner for expiry/revoke |\n\nRelease evidence includes version/change/migration/activation/rollback-or-roll-forward evidence.\nIncident evidence includes identity/timestamps/owner/log evidence/actions/access grants/resolution evidence.\n\n`ON-CALL POLICY \u2260 AUTOMATIC 24\u00d77 STAFFED ROTATION`\n\nNo SLA, SLO, response time, severity scheme or staffed rotation is invented.\n\n`PRODUCTION-OPERATIONS-READINESS: NOT YET PROVEN`\n`HUMAN SIGN-OFF: NOT EXECUTED`\n`IMPLEMENTATION AUTHORIZATION: NOT YET GRANTED`\n"
+  },
+  "frozen_pd": {
+    "member": "BONIRA_FINAL_PRODUCT_DECISION_REGISTER.md",
+    "sha256": "bbd1068b60162cb6b027eb66f1aae2cb3f23ad65e8f2bc9b82f1acce8fe20eda",
+    "decision": " \u2014 Explicit Operating Ownership\n\n**Domain:** Production / Operations  \n**Accepted option / disposition:** Option B \u2014 Explicit Operating Ownership  \n**V1 position:** PRODUCTION ESSENTIAL  \n**Status:** `FROZEN`\n\n**Decision statement:** Release Owner, Incident Owner, escalation, emergency/support access, production activation responsibility and incident evidence require explicit operating policy; on-call does not imply 24\u00d77 staffing.\n\n**Production / evidence boundary:** `Approved Operating Specification` is required before Production Operations Readiness. It may define only explicitly approved operating-policy details. Runtime drills and human operational readiness remain separate.\n\n**Source provenance:** `PD-005`  \n**Affected Integration / governing links:** \u2014  \n**Affected PDM:** \u2014  \n**Affected Journeys:** \u2014\n\n**Guardrail / fail-closed rule:** UNSPECIFIED OPERATING POLICY \u2014 DO NOT INVENT\n\n"
+  },
+  "baseline": {
+    "config/settings/base.py": "3fbc4a51c521be84a25fcf15c3ad71f29e39fc00b844f1d35e00175c88f25009",
+    "apps/support/services.py": "56327ba32a0e4b4df8562519556d422abca19823559176c329be4fd857e45c67"
+  },
+  "touch_set": [
+    "core/telemetry.py",
+    "core/test_cep072_telemetry.py",
+    "config/settings/base.py",
+    "CEP_EXECUTION_REGISTRY.yaml",
+    "docs/governance/cep/manifests/CEP-072_EXECUTION_MANIFEST.md",
+    "docs/governance/cep/reports/CEP-072_COMPLETION_REPORT.md",
+    "docs/governance/cep/evidence/CEP-072_*",
+    "docs/governance/cep/evidence/FRONTIER_069_078_20261025/CEP072_*"
+  ],
+  "implementation": "Server-generated request correlation id and structured request outcome/duration logs only, with fixed allowlisted fields; no request body/query/headers/path/actor/tenant identifiers or exception text. Standard-library logging only; no external sink or new endpoint. Preserve response/business behavior when telemetry delivery fails; sanitized stderr failure signal, no readiness claim.",
+  "boundary": "No financial/domain workflow instrumentation or semantics invented. Existing support access request-confirm-independent approve-use-revoke/audit services referenced, not replaced. Named responsibilities/alert destination/operational signals and acceptance evidence remain missing; no alert threshold/SLA/rotation/emergency bypass/approval UI invented.",
+  "migration": "NONE",
+  "product_frontend_authorization_changes": "NONE",
+  "git_production_signoff": "NOT_EXECUTED"
+}

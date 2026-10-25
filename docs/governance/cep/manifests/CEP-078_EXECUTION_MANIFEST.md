@@ -65,3 +65,7 @@ count/state, and whitespace checks apply to this documentation-only closeout.
 Final findings, criterion results, evidence IDs, and resume conditions are in the
 [completion report](../reports/CEP-078_COMPLETION_REPORT.md). The Registry remains the
 sole live-state authority.
+
+## Frontier resume20261025
+
+Current accepted main566073b; current Human069..078 frontier scope. Retained003/017/scoped07/Chrome-Edge entry; actual browser control restored. Pending-clause runtime only; source identity and bounded evidence/Registry/report touch set recorded in FRONTIER_069_078_20261025/CEP078_ENTRY.json before execution. No product/data/permissions/financial changes, migrations, Git or production action. Prior078 observations preserved.

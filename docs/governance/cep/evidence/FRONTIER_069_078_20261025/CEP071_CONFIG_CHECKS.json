@@ -1,0 +1,86 @@
+{
+  "at": "2026-10-25T20:02:25.976400+00:00",
+  "settings_sha256": "f10ca3ac8b70bff5fa9751279dced7aab063aead8a5d72006faa486f4a6d0152",
+  "environment": "SYNTHETIC_IMPORT_ONLY_NO_DOTENV_OR_DATABASE_CONNECTION",
+  "cases": [
+    {
+      "case": "configured_synthetic_no_connection",
+      "expected": "LOADED",
+      "actual": {
+        "outcome": "LOADED",
+        "debug": false,
+        "sslmode": "verify-full",
+        "redirect": true,
+        "session_secure": true,
+        "csrf_secure": true
+      },
+      "result": "PASS"
+    },
+    {
+      "case": "missing_secret",
+      "expected": "REJECTED",
+      "actual": {
+        "outcome": "REJECTED",
+        "reason": "DJANGO_SECRET_KEY must be configured in production."
+      },
+      "result": "PASS"
+    },
+    {
+      "case": "placeholder_secret",
+      "expected": "REJECTED",
+      "actual": {
+        "outcome": "REJECTED",
+        "reason": "DJANGO_SECRET_KEY must be configured in production."
+      },
+      "result": "PASS"
+    },
+    {
+      "case": "missing_database_host",
+      "expected": "REJECTED",
+      "actual": {
+        "outcome": "REJECTED",
+        "reason": "DB_HOST must be configured in production."
+      },
+      "result": "PASS"
+    },
+    {
+      "case": "insecure_database_ssl",
+      "expected": "REJECTED",
+      "actual": {
+        "outcome": "REJECTED",
+        "reason": "Production PostgreSQL connections must use DB_SSLMODE=verify-full."
+      },
+      "result": "PASS"
+    },
+    {
+      "case": "local_email",
+      "expected": "REJECTED",
+      "actual": {
+        "outcome": "REJECTED",
+        "reason": "Production password recovery requires Django SMTP."
+      },
+      "result": "PASS"
+    },
+    {
+      "case": "plaintext_email",
+      "expected": "REJECTED",
+      "actual": {
+        "outcome": "REJECTED",
+        "reason": "Production password-recovery email must use TLS."
+      },
+      "result": "PASS"
+    },
+    {
+      "case": "process_local_cache",
+      "expected": "REJECTED",
+      "actual": {
+        "outcome": "REJECTED",
+        "reason": "Production password recovery requires a shared cache backend."
+      },
+      "result": "PASS"
+    }
+  ],
+  "passed": 8,
+  "total": 8,
+  "certification": "NOT_EXECUTED"
+}

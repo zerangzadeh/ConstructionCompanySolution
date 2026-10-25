@@ -70,3 +70,7 @@ existing `main`; local/origin/remote verified, tree clean after push. Normal
 `git add`, `git commit`, `git push origin main` executed under current explicit
 Human authority. Direct commit, no merge. This follow-up records integration
 metadata only; execution remains PARTIAL and no production authority is granted.
+
+## Current frontier recheck - 2026-10-25
+
+Canonical recovery matrix rechecked by unchanged approved archive/member identity in [frontier entry](../evidence/FRONTIER_069_078_20261025/ENTRY.json). Objectives/owners remain UNSPECIFIED. Retain9focused tests and synthetic PostgreSQL/file interoperability evidence without rerun. No actual ERP restore, numeric recovery objective, named acceptance owner or environment control is inferred. EXECUTION PARTIAL0/6certified, DoD NOT_MET; no production/Human/Git action.

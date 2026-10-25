@@ -58,6 +58,7 @@ INSTALLED_APPS: list[str] = [
 ]
 
 MIDDLEWARE: list[str] = [
+    "core.telemetry.RequestTelemetryMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -68,6 +69,27 @@ MIDDLEWARE: list[str] = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# Restricted technical outcome stream. Operational sinks, retention and alerts
+# require their own approved environment/ownership; this grants no readiness.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {"request_json": {"()": "core.telemetry.RequestJsonFormatter"}},
+    "handlers": {
+        "request_console": {
+            "class": "logging.StreamHandler",
+            "formatter": "request_json",
+        },
+    },
+    "loggers": {
+        "bonira.request": {
+            "handlers": ["request_console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
 
 ROOT_URLCONF = "config.urls"
 AUTH_USER_MODEL = "accounts.User"

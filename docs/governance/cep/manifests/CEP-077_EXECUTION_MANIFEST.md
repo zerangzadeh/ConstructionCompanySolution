@@ -65,3 +65,24 @@ history. Re-ground and unchanged-input/prompt/hash checks passed; direct approve
 artifact-host DNS probe still failed. No full gate or unrelated tests repeated;
 prior PASS artifacts retained and actual downstream checks remain unverified.
 Execution PARTIAL, open environment blocker and all protected states unchanged.
+
+## Current non-production retry — 2026-10-25
+
+Current Human requests independent frontier advancement of069..078;079 skipped.
+Accepted main/HEAD/local origin566073b35f2f5bb8b08267b56856fb85b7a0fcf0; entry clean.
+Canonical prompt/member hashes and sole mandatory COMPLETE013 verified; all nine
+control-input hashes match retained runtime provenance. Historical DNS failure
+preserved; current approved-host DNS and PyPI HTTPS200 clear that environment
+precondition only. Prior9 baseline tests reused on unchanged controls.
+
+Touch set before retry: Registry, this manifest/report, existing077 evidence,
+acceptance/change manifests, FRONTIER_069_078_20261025/ENTRY.json and fresh
+CEP077_RUNTIME results/log/provenance in that directory. Disposable artifacts
+only in ignored .pytest_cache/cep-077-20261025. No application/schema/lock/policy/CI
+change, migration, business-data mutation or package installation. Existing
+gate verifies approved CPython3.11.17 Debian12 linux/amd64 artifacts on Windows;
+Linux installation and signed production attestation remain separate UTV.
+Runtime failures stay open; no suppression, alternate source or version change.
+GATE08 cannot pass from one contributor. No Git write or production action.
+
+Current retry closeout: EXECUTION PARTIAL4/6 traceability AC, DoD NOT_MET. DNS resolved; actual approved image identity FAIL creates Finding002 SECURITY. See current report/retry evidence. No mutation of controls; independent frontier continuation only.

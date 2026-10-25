@@ -143,3 +143,30 @@ CEP-079, Production deployment/certification/cutover, Human Sign-off: **NOT EXEC
 
 **STOP after this blocked CEP-078 final reconciliation.** Resume only after the exact
 entry gaps above are supported; no downstream readiness or risk acceptance is issued.
+
+## Current frontier continuation - 2026-10-25
+
+**EXECUTION PARTIAL.** Accepted main566073b35f2f5bb8b08267b56856fb85b7a0fcf0.
+Canonical entry retained and current Chrome155.0.8059.82/Edge156.0.4314.42 control
+restored. [Current closeout](../evidence/FRONTIER_069_078_20261025/CEP078_CLOSEOUT.json)
+records12new actual cells,84PASS assertions. Six workforce chart keyboard
+open/close/Escape/focus/list/filter cells across1440x900,1024x768,390x844 PASS;
+Finding031 current runtime resolved. Six document unauthorized-state cells PASS;
+this closes only that dimension, not distinct error-state coverage. Historical
+failures and older passing evidence remain unchanged; no blanket freshness claim.
+
+[Exact remaining limits](../evidence/FRONTIER_069_078_20261025/CEP078_SCOPE_LIMITS.json):
+Finding016 approved statutory values/bases/provenance/review and Finding032
+Product discovery/readiness decision remain open. Home403/503, exact PO mismatch,
+document error, commercial detail/review keyboard, external portal keyboard,
+reduced motion and native screenreader remain unexecuted. Current browser sessions
+provide no qualified permitted data for outstanding positive commercial/portal
+checks. No identity/role elevation, grant/token issuance, source data invention,
+fault injection or static-to-runtime promotion. AC2/4/5/6 PASS; AC1/3 PARTIAL;
+DoD NOT_MET. Global07/08 remain unpassed.
+
+No product/config/schema/business-data change, migration or extra source-test
+rerun. Temporary viewport overrides reset; original Chrome active organization
+restored through governed selector and verified in fresh accessibility state; Edge
+context unchanged. Only session navigation/context and evidence changed. Git
+writes, Production Certification/Cutover and Human Sign-off NOT_EXECUTED.

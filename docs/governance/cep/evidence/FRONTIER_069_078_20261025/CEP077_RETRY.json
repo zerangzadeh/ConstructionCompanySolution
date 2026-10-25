@@ -1,0 +1,54 @@
+{
+  "at": "2026-10-25T19:54:49.281880+00:00",
+  "head": "566073b35f2f5bb8b08267b56856fb85b7a0fcf0",
+  "host": {
+    "python": "3.11.1",
+    "os": "Windows-10-10.0.26200-SP0"
+  },
+  "command": ".venv/Scripts/python.exe scripts/supply_chain.py gate --wheelhouse .pytest_cache/cep-077-20261025/wheelhouse --output docs/governance/cep/evidence/FRONTIER_069_078_20261025/CEP077_RUNTIME",
+  "exit_code": 1,
+  "dns_blocker": "RESOLVED_CURRENT_HOST_DNS_AND_PYPI_HTTPS200",
+  "expected_image": {
+    "schema_version": 1,
+    "source": "docker.io/library/python",
+    "tag": "3.11.17-slim-bookworm",
+    "target": "linux/amd64",
+    "python": "CPython 3.11.17",
+    "os": "Debian 12 bookworm",
+    "index_digest": "sha256:0a310eeecf4e1f5a0743f9a6520c90c88d089c903ca5fd283f501e3a805f5f89",
+    "platform_digest": "sha256:8a00ecb83ed9d0864dfd102a1bdb2067fda907ceb30bb86d09da9ee558b19590"
+  },
+  "observed_image": {
+    "index_digest": "sha256:f06d01d4ba3f8ad5af45a3ec87df19c1d317d8e8961edc0fabda61811af6f7cf",
+    "linux_amd64_digests": [
+      "sha256:8fb0b110b022c70cbe09d3ff1fb313654f31f9c814abb0d48180af56d906a199"
+    ]
+  },
+  "result": {
+    "schema_version": 1,
+    "started_at": "2026-10-25T19:53:48.200909+00:00",
+    "status": "BLOCKED",
+    "production_readiness": "UTV",
+    "source": "https://pypi.org/simple/",
+    "target": "CPython 3.11.17 Debian 12 linux/amd64",
+    "checks": {
+      "locks": "PASS",
+      "secret_config": "PASS"
+    },
+    "failure": "Official build-image tag no longer matches pinned digests",
+    "completed_at": "2026-10-25T19:53:51.529988+00:00"
+  },
+  "finding": "CEP-077-FINDING-002 / BLOCKER-SECURITY / Official tag identity no longer matches approved immutable image pins. No update, bypass or waiver under verification-only scope. Requires separately authorized supply-chain artifact review and pin remediation.",
+  "acquisition_scan_license_sbom": "NOT_EXECUTED_AFTER_IMAGE_IDENTITY_FAIL",
+  "ac": {
+    "passed": 4,
+    "total": 6,
+    "meaning": "AC2/4/5/6 traceability only; AC1/3 incomplete"
+  },
+  "dod": "NOT_MET",
+  "outputs": {
+    "docs\\governance\\cep\\evidence\\FRONTIER_069_078_20261025\\CEP077_RUNTIME\\gate-result.json": "e99adf92a9d0624a269b7b8ecc729c283333e9fd3642cbc6c818c54127cc6c23"
+  },
+  "locks_policy_ci_product_unchanged": true,
+  "production": "NOT_EXECUTED"
+}

@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-25T20:10:02.772819+00:00",
+  "head": "566073b35f2f5bb8b08267b56856fb85b7a0fcf0",
+  "source_hashes": {
+    "core/telemetry.py": "4412cd3d2060b1479c1d4b71d5fd94a161ac10bf871f02927a36163cbaf198fb",
+    "core/test_cep072_telemetry.py": "3e11cb11ac30908f59e83fffe87f8e681d167c1d2a7c472f7443d971a3126a1c",
+    "config/settings/base.py": "3b2499e354232e970b3a2696bea59e92767444f5de8be0ad96ad8fc93d388301"
+  },
+  "focused": "7PASS_5SUBTESTS_PASS",
+  "affected_boundary_regression": "2PASS_HOME_AUTHENTICATION_AND_INVALID_TENANT_SCOPE",
+  "ruff": "PASS",
+  "format": "PASS",
+  "django_check": "PASS",
+  "scoped_implementation": "Server request UUID correlation and restricted JSON response/status/handler-duration signals available. No raw request/headers/payload/URL-path/exception logging in new stream. Existing business/authorization/support-audit authority unchanged.",
+  "failure_handling": "Ordinary logging failure keeps response and records sanitized telemetry.delivery_failed to stderr; if fallback also unavailable, delivery flags only. This is no delivery durability/readiness proof.",
+  "limitations": [
+    "No selected external telemetry sink/retention/alert routing or named owners",
+    "No approved critical-domain operational signal/alert acceptance catalog; HTTP outcomes are not transaction audit/financial posting/settlement facts",
+    "Duration is handler response creation time, not full streaming delivery; no performance/stream-runtime certification",
+    "Existing support request/confirm/independent approve/use/expiry/revoke/audit code unchanged, not reimplemented or production-qualified",
+    "No process/deployment readiness endpoint or external activation",
+    "No production runtime/drill evidence"
+  ],
+  "ac": {
+    "passed": 0,
+    "total": 12,
+    "semantics": "Production-certification criteria UNVERIFIED; foundation tests not certification"
+  },
+  "dod": "PARTIAL_NOT_MET",
+  "schema_migration_dependency_ui_changes": "NONE",
+  "git_production_signoff": "NOT_EXECUTED"
+}
