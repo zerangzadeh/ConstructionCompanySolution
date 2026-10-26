@@ -1,0 +1,49 @@
+{
+  "at": "2026-10-26T11:38:13.334992+00:00",
+  "authority": "Current direct Human request prioritizes CEP077 image identity blocker and authorizes safely attributable Development configuration defects; separate bounded implementation action before verification, per canonical CEP077 section7",
+  "technical_review": "Official HTTPS registry index/platform/config content hashes all verified. Same approved source/tag/OS/architecture/Python source hash/environment/config and identical Python build instructions. Debian bookworm base snapshot timestamp changed from1791158400 to1792531975; initial full-history equality assertion caught this expected base rebuild and stopped before mutation. Official rebuild created2026-10-21; old artifact remains retrievable. No target, application dependency, license, vulnerability, CI-permission, signing or fail-closed policy changes.",
+  "old": {
+    "schema_version": 1,
+    "source": "docker.io/library/python",
+    "tag": "3.11.17-slim-bookworm",
+    "target": "linux/amd64",
+    "python": "CPython 3.11.17",
+    "os": "Debian 12 bookworm",
+    "index_digest": "sha256:0a310eeecf4e1f5a0743f9a6520c90c88d089c903ca5fd283f501e3a805f5f89",
+    "platform_digest": "sha256:8a00ecb83ed9d0864dfd102a1bdb2067fda907ceb30bb86d09da9ee558b19590"
+  },
+  "new_index": "sha256:f06d01d4ba3f8ad5af45a3ec87df19c1d317d8e8961edc0fabda61811af6f7cf",
+  "new_platform": "sha256:8fb0b110b022c70cbe09d3ff1fb313654f31f9c814abb0d48180af56d906a199",
+  "upstream_annotations": {
+    "com.docker.official-images.bashbrew.arch": "amd64",
+    "org.opencontainers.image.base.digest": "sha256:ec31d744f83f4a73447ba045aaab9409997efe5cc706eca4890c1be36cc1606a",
+    "org.opencontainers.image.base.name": "debian:bookworm-slim",
+    "org.opencontainers.image.created": "2026-10-21T01:04:45Z",
+    "org.opencontainers.image.revision": "cede844ace77284e32c03b61ebc35cdfc945e862",
+    "org.opencontainers.image.source": "https://github.com/docker-library/python.git#cede844ace77284e32c03b61ebc35cdfc945e862:3.11/slim-bookworm",
+    "org.opencontainers.image.url": "https://hub.docker.com/_/python",
+    "org.opencontainers.image.version": "3.11.17-slim-bookworm"
+  },
+  "checks": {
+    "all_fetched_content_addresses_match": true,
+    "same_runtime_config": true,
+    "same_build_instructions": true,
+    "same_approved_target": true
+  },
+  "mutations": {
+    "security/supply_chain/build_image.json": {
+      "before": "9abbed393fbf07eb311453d3c0ac4f05b111f519c17b4257446900fa11606c4b",
+      "after": "1957b2602ed7b8d886d74f3cc0451a27600fb10ec81906fd4e492b12b388df25"
+    },
+    ".github/workflows/supply-chain.yml": {
+      "before": "9300796599fd753a261aacd40d578ab49dcb6abc9f193173aafdd5af21bd101f",
+      "after": "be35af165b4f2cfb6610f97639f6aeaee53f79bf1d3a3d6ffef307c6753dffc2"
+    },
+    ".github/workflows/cep013-pure-psycopg-verify.yml": {
+      "before": "24f18803e3b9a3a445c1d6020ae76bb91ec53bfc33f96e3e0182d2bcc7b530cc",
+      "after": "be682ae0bc7d6a34ff09ffe124b575895746e7a6c3aa86efc94cfe964949e8ec"
+    }
+  },
+  "remaining_validation": "Fresh existing gate and focused fail-closed tests required; prior supply-chain PASS invalid for refreshed image",
+  "production_attestation_certification": "NOT_EXECUTED; no Security Reviewer impersonation, waiver or residual risk acceptance"
+}

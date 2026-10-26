@@ -1,0 +1,54 @@
+{
+  "at": "2026-10-26T17:49:20.857731+00:00",
+  "scope": "Existing CEP012 IMB0096/0097 proof recovery only, not package reexecution or new audit",
+  "local_targets": {
+    "docs/governance/cep/reports/CEP-012_COMPLETION_REPORT.md": false,
+    "docs/governance/cep/evidence/CEP-012_VALIDATION.json": false,
+    "docs/governance/cep/manifests/CEP-012_EXECUTION_MANIFEST.md": false
+  },
+  "targeted_git_history": "",
+  "canonical_gate": {
+    "Gate ID": "GATE-06",
+    "Gate Name": "Data Migration Readiness",
+    "Gate Type": "DATA MIGRATION GATE",
+    "Purpose": "Ensure migration implementations preserve history, reconciliation and rollback before runtime migration verification.",
+    "Required IMB IDs": "IMB-0050; IMB-0070; IMB-0075; IMB-0080; IMB-0096; IMB-0097",
+    "Required External Dependencies": "EXT-0015; EXT-0017; EXT-0023 for runtime verification",
+    "Evidence Required": "Source→target mapping; before/after counts; exception handling; rollback/cutover plan; source preservation; approved datasets where required.",
+    "Pass Condition": "Migration code/process is repeatable and reconcilable; required migration datasets exist before execution.",
+    "Failure Consequence": "Migration execution and IMB-0103 verification remain blocked.",
+    "Downstream Work Unlocked": "PostgreSQL migration/runtime verification",
+    "UTV?": "YES until target PostgreSQL execution",
+    "Human Sign-off?": "NO",
+    "Notes": "Migration implementation ≠ migration execution."
+  },
+  "historical_complete_preserved": true,
+  "archives": [
+    {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip",
+      "sha256": "15f8d71a3f3e14feed9e7162b81f74ad39b546df9aff3ec5b01e1a676deaf429",
+      "targeted_member_names": [
+        "BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_COMPLETION_AUDIT.md",
+        "packages/CEP-012.md"
+      ]
+    },
+    {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_CONTROLLED_CEP_AUTHORIZATION_CONSOLIDATED_LATEST.zip",
+      "sha256": "a77745fc409b81fc1e848406e2b62bbb8f356b5b145074a8e89a23bbf3cfa655",
+      "targeted_member_names": [
+        "BONIRA_CEP_AUTHORIZATION_COMPLETION_AUDIT.md"
+      ]
+    },
+    {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_CODEX_IMPLEMENTATION_PLAYBOOK_CONSOLIDATED_LATEST.zip",
+      "sha256": "f2b4a3e356595398bc81a67b26dc365cbca3dfca00e45074ff032bb8e7b986c8",
+      "targeted_member_names": [
+        "BONIRA_CODEX_COMPLETION_REPORT_TEMPLATE.md",
+        "BONIRA_CODEX_IMPLEMENTATION_PLAYBOOK_COMPLETION_AUDIT.md"
+      ]
+    }
+  ],
+  "result": "REQUIRED_EXECUTED_CEP012_MAPPING_HISTORY_RECONCILIATION_ROLLBACK_PROOF_NOT_RECOVERED_IN_TARGETED_LOCATIONS",
+  "no_absence_inference": "This is not proof that evidence does not exist elsewhere. Package cards/authorization/design-completion audits are not execution results. No replacement report, migration, source dataset or Gate PASS invented.",
+  "next_technical_requirement": "Recover/qualify actual IMB0096/0097 migration preservation evidence, or establish separately bounded requalification against approved source/dataset semantics; then qualify exact-build EXT0023 before073 execution."
+}

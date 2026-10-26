@@ -1,0 +1,140 @@
+- link "رفتن به محتوای اصلی":
+  - /url: "#main-content"
+- banner:
+  - generic "باز کردن فهرست" [active]:
+  - button "بستن فهرست"
+  - button "بستن فهرست"
+  - navigation "ناوبری اصلی":
+    - link "خانه":
+      - /url: /
+    - generic "کار من":
+      - generic: کار من
+      - generic: ⌄
+    - link "وظایف من":
+      - /url: /workflows/workbench/
+    - generic "پروژه‌ها":
+      - generic: پروژه‌ها
+      - generic: ⌄
+    - link "نمای پروژه":
+      - /url: /projects/
+    - link "قراردادها":
+      - /url: /contracts/
+    - link "صورت‌وضعیت و صورتحساب":
+      - /url: /billing/claims/
+    - link "برآورد و فهرست‌بها":
+      - /url: /estimates/
+    - link "عملیات کارگاه":
+      - /url: /daily-reports/
+    - link "HSE و کیفیت":
+      - /url: /safety/
+    - link "اسناد پروژه":
+      - /url: /documents/
+    - generic "تأمین و تدارکات":
+      - generic: تأمین و تدارکات
+      - generic: ⌄
+    - link "درخواست‌های خرید":
+      - /url: /procurement/
+    - link "استعلام و انتخاب تأمین‌کننده":
+      - /url: /procurement/rfqs/
+    - link "سفارش‌های خرید":
+      - /url: /procurement/orders/
+    - link "رسید کالا":
+      - /url: /procurement/receipts/
+    - link "انبار":
+      - /url: /inventory/
+    - link "تجاری و مناقصه":
+      - /url: /commercial/
+    - generic "مالی":
+      - generic: مالی
+      - generic: ⌄
+    - link "هزینه‌ها":
+      - /url: /expenses/
+    - generic "منابع انسانی":
+      - generic: منابع انسانی
+      - generic: ⌄
+    - link "حضور و زمان":
+      - /url: /timekeeping/
+    - link "پروفایل کاربر":
+      - /url: /accounts/settings/
+  - button "خروج از حساب"
+  - link "شرکت سازه‌پردازان پارس":
+    - /url: /organizations/
+    - generic: شرکت سازه‌پردازان پارس
+  - link "تنظیمات شخصی":
+    - /url: /accounts/settings/
+    - generic: U
+- region "انتخاب پروژه و کارگاه":
+  - generic: شرکت
+  - generic: شرکت سازه‌پردازان پارس
+  - generic: پروژه
+  - combobox "پروژه":
+    - option "همه پروژه‌های در دسترس" [selected]
+    - option "PRJ-01-01 — مجتمع مسکونی باغستان"
+  - button "انتخاب پروژه و کارگاه"
+- main:
+  - navigation "مسیر صفحه":
+    - link "خانه":
+      - /url: /
+    - link "صورت‌وضعیت‌ها":
+      - /url: /billing/claims/
+    - generic: CTR-01-01-01
+  - generic "CTR-01-01-01":
+    - paragraph: مجتمع مسکونی باغستان
+    - heading "CTR-01-01-01" [level=1]
+  - paragraph: ناخالص
+  - paragraph: "219690000000.0000"
+  - paragraph: کسور و تعدیلات
+  - paragraph: "-58437540000.0000"
+  - paragraph: خالص صورت‌وضعیت
+  - paragraph: 161252460000.0000 ریال
+  - paragraph: وضعیت
+  - paragraph:
+    - generic: تأییدشده
+  - link "راهنمای اصلاح و بازیابی":
+    - /url: /billing/claims/recovery/
+  - link "کارتابل تأییدها":
+    - /url: /workflows/workbench/
+  - heading "مبنای محاسبه" [level=2]
+  - term: ناخالص تأییدشده قبلی
+  - definition: "0"
+  - term: سقف مؤثر قرارداد
+  - definition: "610250000000.00"
+  - term: مهلت پرداخت (روز)
+  - definition: "30"
+  - term: سررسید
+  - definition: ۱۴۰۵/۰۹/۰۲
+  - term: شروع دوره
+  - definition: ۱۴۰۵/۰۷/۰۹
+  - term: حد برش اندازه‌گیری
+  - definition: ۱۴۰۵/۰۸/۰۳
+  - generic "ردیابی و ممیزی محاسبه"
+  - heading "ردیف‌ها و مقادیر تجمعی" [level=2]
+  - table:
+    - rowgroup:
+      - row "ردیف شرح تجمعی قبلی مقدار جاری تجمعی جدید نرخ ارزش جاری":
+        - columnheader "ردیف"
+        - columnheader "شرح"
+        - columnheader "تجمعی قبلی"
+        - columnheader "مقدار جاری"
+        - columnheader "تجمعی جدید"
+        - columnheader "نرخ"
+        - columnheader "ارزش جاری"
+    - rowgroup:
+      - row "F6-01 نمونه مبنای تجاری صورت‌وضعیت 0.0000 0.3600 0.3600 610250000000.0000 219690000000.0000":
+        - cell "F6-01"
+        - cell "نمونه مبنای تجاری صورت‌وضعیت"
+        - cell "0.0000"
+        - cell "0.3600"
+        - cell "0.3600"
+        - cell "610250000000.0000"
+        - cell "219690000000.0000"
+  - heading "کسور و تعدیلات" [level=3]
+  - list:
+    - generic: کسور تضمین — contract_term.retention
+    - generic: "-21969000000.0000"
+    - generic: بازیافت پیش‌پرداخت — contract_term.advance_recovery
+    - generic: "-43938000000.0000"
+    - generic: مالیات — regulatory.tax
+    - generic: "21969000000.0000"
+    - generic: کسور بیمه مقرراتی — regulatory.insurance
+    - generic: "-14499540000.0000"

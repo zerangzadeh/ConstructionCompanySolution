@@ -1,3 +1,4 @@
 from .base import *
 
 DEBUG = True
+REFERENCE_PERSONA_CATALOGUE_ENABLED = True

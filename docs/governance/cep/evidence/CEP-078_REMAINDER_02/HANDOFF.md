@@ -1,0 +1,17 @@
+# Continue CEP078 only
+
+Repository E:/Construction_Company_Solution; main; baseline HEAD/originmain961e3fd942c668337012c22d42f59545c5e9fc0a. Reground actual state before mutation. No Git writes or Production. Preserve prior UIUX remediation and List → Detail consistency: RESOLVED. Do not rerun completed coverage or other CEPs.
+
+Read current Registry and CEP-078_REMAINDER_01/REMAINDER_REPORT.md, RUNTIME_QUALIFIED.json, STATUTORY_REQUIREMENTS.md, INTEGRITY.json; then CEP-078_REMAINDER_02/ENTRY.json, SC033_EDGE390.json, INTERRUPTED_RUNTIME.json.
+
+Product decision resolved: direct Human approved all26 Development-only read-only catalogue for governed Platform Admins, no protected tenant/object disclosure or authority grants. Implemented and7tests+8subtests PASS. Five canonical CSS cells previously PASS; new exact Edge390x844 executed PASS after native Ctrl0 confirmed100%. New raw evidence in this02directory, not yet synchronized into Registry/manifests; retain old claims/history and add qualified delta.
+
+Statutory source/review no longer missing for existing approved Development/UAT contract: current effective published regulatory v2/source links and real Human-qualified accepted UAT review resolve; native resolver and authenticated scoped Django200 claim render passed. Existing claim c274c8c7-16c9-427f-8b31-6e1fdd1e5875. No new statutory policy/values/reviewer invented. SC014 populated-detail6browser cells remain unexecuted.
+
+This resume temporarily toggled native Windows Animation effects Off. Actual Chrome+Edge media reduce=true. Edge390 actual drawer opened, aria-expanded true, transition1e-05s, scroll auto; Escape closed and focus returned SUMMARY. Only bounded observations; full reduced-motion suite pending. Windows setting restored On and visually confirmed. Native screen-reader product utterances remain UTV: heading/history shortcut sent on owned Edge tab, but Speech Recap content not inspected. Never substitute browser AX for native speech evidence.
+
+Fresh browser inventory now returns no browsers because Local browser use is disabled in Work settings. Do not bypass settings with shell/CDP/other browser channels. Use supported browser tools when re-enabled; native Computer Use skill@oai/sky for Windows settings/Narrator only. Native screenshots occasionally mismatch target (Codex displayed for Edge); never act on mismatched images. Settings controlled correctly after activate+fresh state. No helper elevation or Windows security weakening.
+
+At interruption, browser cleanup was rejected by disabled setting. Check temporary localhost test tabs/viewport overrides and page zoom; previous Edge original75%, reset100% for exact390, restoration attempted but unverified. Normal127.0.0.1 user sessions were not changed. Existing localhost Platform Admin test session remains; do not reset passwords/elevate actors. Narrator/Home/Recap window inventory still present despite Human Ready; reobserve and cleanup safely.
+
+Next: restore browser capability; qualify/synchronize new Edge390 evidence; execute only remaining reduced-motion scenarios, actual native reader announcements for canonical SC024 login/employee/reporting/closeout routes, and SC014 sixbrowser cells. Fix attributable technical defects without policy/domain weakening; focused affected checks only. Update CEP078 Registry/evidence and exact frontier after proof. Current AC2/4/5/6PASS,AC1/3PARTIAL,DoDNOT_MET,globalGates unchanged,next_executable_frontier[].

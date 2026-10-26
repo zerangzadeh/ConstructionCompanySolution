@@ -1,0 +1,73 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "command": [
+        ".venv-2/Scripts/python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "scripts/cep012_preservation_proof.py",
+        "scripts/cep073_capture.py",
+        "tests/test_cep073_runtime.py"
+      ],
+      "exit_code": 0,
+      "output": "All checks passed!\n"
+    },
+    {
+      "command": [
+        ".venv-2/Scripts/python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "scripts/cep012_preservation_proof.py",
+        "scripts/cep073_capture.py",
+        "tests/test_cep073_runtime.py"
+      ],
+      "exit_code": 0,
+      "output": "3 files already formatted\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "CEP_EXECUTION_REGISTRY.yaml",
+        "apps/audit/migrations/0016_membership_provisioned_action.py",
+        "apps/billing/migrations/0006_tenantbillingconfiguration_and_more.py",
+        "apps/billing/migrations/0008_p6_s01_s06_seed_reset_and_required_snapshots.py"
+      ],
+      "exit_code": 0,
+      "output": "warning: in the working copy of 'CEP_EXECUTION_REGISTRY.yaml', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/audit/migrations/0016_membership_provisioned_action.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/billing/migrations/0008_p6_s01_s06_seed_reset_and_required_snapshots.py', LF will be replaced by CRLF the next time Git touches it\n"
+    }
+  ],
+  "registry_counts": {
+    "execution_state_complete": 72,
+    "authorized_not_started": 0,
+    "eligible_under_standing_authority": 0,
+    "in_progress": 0,
+    "blocked_current": 3,
+    "partial_current": 4,
+    "failed_current": 0,
+    "not_started_other_current_governed": 0,
+    "deferred_post_v1": 7,
+    "remote_main_verified_complete_from_last_audit": 68,
+    "last_updated": "2026-10-26",
+    "remote_main_complete_count_status": "VERIFIED_REGISTRY_68_COMPLETE_REPORTS_64_PRESENT_4_UNRECOVERED",
+    "v1_closure_counts": {
+      "COMPLETE": 68,
+      "PARTIAL": 0,
+      "BLOCKED": 0
+    },
+    "v1_blocked_count_semantics": "Not-started records with explicit current entry/dependency blockers; partials separate"
+  },
+  "canonical_frontier": [],
+  "gate06": "PASS",
+  "gate08": "NOT_PASSED",
+  "head": "961e3fd942c668337012c22d42f59545c5e9fc0a",
+  "git_writes": false,
+  "production_actions": false,
+  "report_manifest_links_and_csv_paths": "PASS"
+}

@@ -1,0 +1,412 @@
+{
+  "BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip": {
+    "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip",
+    "sha256": "15f8d71a3f3e14feed9e7162b81f74ad39b546df9aff3ec5b01e1a676deaf429",
+    "members": {
+      "BONIRA_CEP_DEPENDENCY_REGISTER.csv": {
+        "sha256": "c9ea5e693410d9c6f2e86044fdc1d91df03289082adfe304fce620947e5c88f6",
+        "rows": [
+          {
+            "Dependency ID": "CEP-DEP-021",
+            "Prerequisite CEP": "CEP-006",
+            "Dependent CEP": "CEP-073",
+            "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+            "Source IMB Edge IDs / IMB Pair": "DEP-0036:IMB-0048→IMB-0109; DEP-0060:IMB-0066→IMB-0109",
+            "Strength": "MANDATORY",
+            "Condition": "ALWAYS",
+            "Roadmap Compatibility": "PASS",
+            "Justification": "PostgreSQL performance/concurrency verification requires the Reporting refresh scalability remediation remediation to exist before measuring its runtime effect.; PostgreSQL performance/concurrency verification requires the High-volume GL/Audit list bounding remediation to exist before measuring its runtime effect.",
+            "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+          },
+          {
+            "Dependency ID": "CEP-DEP-029",
+            "Prerequisite CEP": "CEP-009",
+            "Dependent CEP": "CEP-073",
+            "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+            "Source IMB Edge IDs / IMB Pair": "DEP-0061:IMB-0067→IMB-0109; DEP-0062:IMB-0068→IMB-0109",
+            "Strength": "MANDATORY",
+            "Condition": "ALWAYS",
+            "Roadmap Compatibility": "PASS",
+            "Justification": "PostgreSQL performance/concurrency verification requires the Inventory balance query optimization remediation to exist before measuring its runtime effect.; PostgreSQL performance/concurrency verification requires the Canonical Inventory transfer lock order remediation to exist before measuring its runtime effect.",
+            "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+          },
+          {
+            "Dependency ID": "CEP-DEP-043",
+            "Prerequisite CEP": "CEP-012",
+            "Dependent CEP": "CEP-073",
+            "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+            "Source IMB Edge IDs / IMB Pair": "DEP-0105:IMB-0096→IMB-0103; DEP-0106:IMB-0097→IMB-0103",
+            "Strength": "MANDATORY",
+            "Condition": "ALWAYS",
+            "Roadmap Compatibility": "PASS",
+            "Justification": "PostgreSQL migration/runtime verification must execute the repaired audit-history migration behavior rather than infer it statically.; PostgreSQL migration/runtime verification must execute the repaired ProgressClaim/SettlementAllocation migration behavior on the target database.",
+            "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+          },
+          {
+            "Dependency ID": "CEP-DEP-074",
+            "Prerequisite CEP": "CEP-028",
+            "Dependent CEP": "CEP-073",
+            "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+            "Source IMB Edge IDs / IMB Pair": "DEP-0044:IMB-0050→IMB-0103",
+            "Strength": "CONDITIONAL",
+            "Condition": "When Legacy Payment reference/data migration to Treasury is included in the PostgreSQL migration verification run.",
+            "Roadmap Compatibility": "PASS",
+            "Justification": "PostgreSQL migration/runtime verification of Legacy Payment reference/data migration to Treasury requires that migration implementation to exist before the scenario can be executed.",
+            "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+          },
+          {
+            "Dependency ID": "CEP-DEP-077",
+            "Prerequisite CEP": "CEP-029",
+            "Dependent CEP": "CEP-073",
+            "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+            "Source IMB Edge IDs / IMB Pair": "DEP-0076:IMB-0070→IMB-0103",
+            "Strength": "CONDITIONAL",
+            "Condition": "When Employee → WorkRelationship migration and rehire history is included in the PostgreSQL migration verification run.",
+            "Roadmap Compatibility": "PASS",
+            "Justification": "PostgreSQL migration/runtime verification of Employee → WorkRelationship migration and rehire history requires that migration implementation to exist before the scenario can be executed.",
+            "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+          },
+          {
+            "Dependency ID": "CEP-DEP-095",
+            "Prerequisite CEP": "CEP-052",
+            "Dependent CEP": "CEP-069",
+            "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+            "Source IMB Edge IDs / IMB Pair": "DEP-0090:IMB-0082→IMB-0083",
+            "Strength": "MANDATORY",
+            "Condition": "ALWAYS",
+            "Roadmap Compatibility": "PASS",
+            "Justification": "Current statutory package activation can only occur after the versioned statutory source-package engine exists.",
+            "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+          },
+          {
+            "Dependency ID": "CEP-DEP-097",
+            "Prerequisite CEP": "CEP-057",
+            "Dependent CEP": "CEP-073",
+            "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+            "Source IMB Edge IDs / IMB Pair": "DEP-0079:IMB-0075→IMB-0103",
+            "Strength": "CONDITIONAL",
+            "Condition": "When Leave opening balance migration is included in the PostgreSQL migration verification run.",
+            "Roadmap Compatibility": "PASS",
+            "Justification": "PostgreSQL migration/runtime verification of Leave opening balance migration requires that migration implementation to exist before the scenario can be executed.",
+            "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+          },
+          {
+            "Dependency ID": "CEP-DEP-098",
+            "Prerequisite CEP": "CEP-058",
+            "Dependent CEP": "CEP-073",
+            "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+            "Source IMB Edge IDs / IMB Pair": "DEP-0089:IMB-0080→IMB-0103",
+            "Strength": "CONDITIONAL",
+            "Condition": "When Historical Payroll/YTD opening-state migration is included in the PostgreSQL migration verification run.",
+            "Roadmap Compatibility": "PASS",
+            "Justification": "PostgreSQL migration/runtime verification of Historical Payroll/YTD opening-state migration requires that migration implementation to exist before the scenario can be executed.",
+            "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+          },
+          {
+            "Dependency ID": "CEP-DEP-110",
+            "Prerequisite CEP": "CEP-070",
+            "Dependent CEP": "CEP-074",
+            "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+            "Source IMB Edge IDs / IMB Pair": "DEP-0107:IMB-0098→IMB-0104",
+            "Strength": "MANDATORY",
+            "Condition": "ALWAYS",
+            "Roadmap Compatibility": "PASS",
+            "Justification": "A production-equivalent restore drill requires the production backup mechanism to exist and produce restorable backup material.",
+            "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+          },
+          {
+            "Dependency ID": "CEP-DEP-111",
+            "Prerequisite CEP": "CEP-071",
+            "Dependent CEP": "CEP-075",
+            "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+            "Source IMB Edge IDs / IMB Pair": "DEP-0108:IMB-0099→IMB-0105",
+            "Strength": "MANDATORY",
+            "Condition": "ALWAYS",
+            "Roadmap Compatibility": "PASS",
+            "Justification": "A production-equivalent deployment drill requires the hardened deployment/configuration process to exist.",
+            "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+          },
+          {
+            "Dependency ID": "CEP-DEP-112",
+            "Prerequisite CEP": "CEP-072",
+            "Dependent CEP": "CEP-076",
+            "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+            "Source IMB Edge IDs / IMB Pair": "DEP-0110:IMB-0101→IMB-0106",
+            "Strength": "MANDATORY",
+            "Condition": "ALWAYS",
+            "Roadmap Compatibility": "PASS",
+            "Justification": "Observability/incident drills require configured alerting/runbooks/incident-access governance to execute the approved scenarios.",
+            "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+          }
+        ]
+      },
+      "BONIRA_CEP_EXTERNAL_DEPENDENCY_REGISTER.csv": {
+        "sha256": "e1dae585c60060459c75ac8676b0c5aeb2cbaaaeb1d5422f7a8d23bd3b23c2af",
+        "rows": [
+          {
+            "External Dependency ID": "EXT-0018",
+            "CEP ID": "CEP-069",
+            "Dependency Phase": "PRODUCTION",
+            "Blocks Build?": "NO",
+            "Blocks Activation?": "NO",
+            "Blocks Verification?": "NO",
+            "Blocks Production?": "YES",
+            "Required Gate": "GATE-11",
+            "Fail-Closed Behavior": "CURRENT VALUES/EVIDENCE UTV",
+            "Notes": "Current official Iranian Payroll statutory source package — Effective-dated official Tax/Labor/Social Security evidence, reviewed package/version and activation record"
+          },
+          {
+            "External Dependency ID": "EXT-0020",
+            "CEP ID": "CEP-070",
+            "Dependency Phase": "PRODUCTION",
+            "Blocks Build?": "NO",
+            "Blocks Activation?": "NO",
+            "Blocks Verification?": "NO",
+            "Blocks Production?": "YES",
+            "Required Gate": "GATE-11",
+            "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-CERTIFIED",
+            "Notes": "Approved recovery objectives — Approved numeric RPO/RTO/PITR/retention/test objectives and acceptance authority"
+          },
+          {
+            "External Dependency ID": "EXT-0020",
+            "CEP ID": "CEP-074",
+            "Dependency Phase": "VERIFICATION",
+            "Blocks Build?": "NO",
+            "Blocks Activation?": "NO",
+            "Blocks Verification?": "YES",
+            "Blocks Production?": "NO",
+            "Required Gate": "Relevant implementation gate + external verification dependency",
+            "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-CERTIFIED",
+            "Notes": "Approved recovery objectives — Approved numeric RPO/RTO/PITR/retention/test objectives and acceptance authority"
+          },
+          {
+            "External Dependency ID": "EXT-0021",
+            "CEP ID": "CEP-071",
+            "Dependency Phase": "PRODUCTION",
+            "Blocks Build?": "NO",
+            "Blocks Activation?": "NO",
+            "Blocks Verification?": "NO",
+            "Blocks Production?": "YES",
+            "Required Gate": "GATE-11",
+            "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-VALIDATED",
+            "Notes": "Approved production topology and environment configuration — Selected topology, environment schema, secrets/static/media/process configuration and deployment target evidence"
+          },
+          {
+            "External Dependency ID": "EXT-0021",
+            "CEP ID": "CEP-075",
+            "Dependency Phase": "VERIFICATION",
+            "Blocks Build?": "NO",
+            "Blocks Activation?": "NO",
+            "Blocks Verification?": "YES",
+            "Blocks Production?": "NO",
+            "Required Gate": "Relevant implementation gate + external verification dependency",
+            "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-VALIDATED",
+            "Notes": "Approved production topology and environment configuration — Selected topology, environment schema, secrets/static/media/process configuration and deployment target evidence"
+          },
+          {
+            "External Dependency ID": "EXT-0022",
+            "CEP ID": "CEP-072",
+            "Dependency Phase": "PRODUCTION",
+            "Blocks Build?": "NO",
+            "Blocks Activation?": "NO",
+            "Blocks Verification?": "NO",
+            "Blocks Production?": "YES",
+            "Required Gate": "GATE-11",
+            "Fail-Closed Behavior": "NOT YET PROVEN",
+            "Notes": "Named operating responsibilities and approved runbook ownership — Named release/incident/activation/access responsibilities and approved runbook/access evidence"
+          },
+          {
+            "External Dependency ID": "EXT-0022",
+            "CEP ID": "CEP-076",
+            "Dependency Phase": "VERIFICATION",
+            "Blocks Build?": "NO",
+            "Blocks Activation?": "NO",
+            "Blocks Verification?": "YES",
+            "Blocks Production?": "NO",
+            "Required Gate": "Relevant implementation gate + external verification dependency",
+            "Fail-Closed Behavior": "NOT YET PROVEN",
+            "Notes": "Named operating responsibilities and approved runbook ownership — Named release/incident/activation/access responsibilities and approved runbook/access evidence"
+          },
+          {
+            "External Dependency ID": "EXT-0023",
+            "CEP ID": "CEP-073",
+            "Dependency Phase": "VERIFICATION",
+            "Blocks Build?": "NO",
+            "Blocks Activation?": "NO",
+            "Blocks Verification?": "YES",
+            "Blocks Production?": "NO",
+            "Required Gate": "Relevant implementation gate + external verification dependency",
+            "Fail-Closed Behavior": "NOT EXECUTED",
+            "Notes": "Target PostgreSQL verification environment — Target PostgreSQL version/configuration, exact application SHA/build, representative data/scenario setup and evidence capture"
+          }
+        ]
+      }
+    }
+  },
+  "BONIRA_IMPLEMENTATION_ROADMAP_CONSOLIDATED_LATEST.zip": {
+    "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_IMPLEMENTATION_ROADMAP_CONSOLIDATED_LATEST.zip",
+    "sha256": "54082de6f32d9a26805aaa3050f24a9863d73f840d827274f0cd3145988b6784",
+    "members": {
+      "BONIRA_IMPLEMENTATION_GATE_REGISTER.csv": {
+        "sha256": "4eca43cb04f5f32afdc2ec177c2c4c8ec1963115d3e23f91e3b07c8b5579358d",
+        "rows": [
+          {
+            "Gate ID": "GATE-06",
+            "Gate Name": "Data Migration Readiness",
+            "Gate Type": "DATA MIGRATION GATE",
+            "Purpose": "Ensure migration implementations preserve history, reconciliation and rollback before runtime migration verification.",
+            "Required IMB IDs": "IMB-0050; IMB-0070; IMB-0075; IMB-0080; IMB-0096; IMB-0097",
+            "Required External Dependencies": "EXT-0015; EXT-0017; EXT-0023 for runtime verification",
+            "Evidence Required": "Source→target mapping; before/after counts; exception handling; rollback/cutover plan; source preservation; approved datasets where required.",
+            "Pass Condition": "Migration code/process is repeatable and reconcilable; required migration datasets exist before execution.",
+            "Failure Consequence": "Migration execution and IMB-0103 verification remain blocked.",
+            "Downstream Work Unlocked": "PostgreSQL migration/runtime verification",
+            "UTV?": "YES until target PostgreSQL execution",
+            "Human Sign-off?": "NO",
+            "Notes": "Migration implementation ≠ migration execution."
+          },
+          {
+            "Gate ID": "GATE-07",
+            "Gate Name": "UI / ESS Readiness",
+            "Gate Type": "UI / ESS READINESS GATE",
+            "Purpose": "Converge shared UI/security with employee-facing/domain capabilities before browser/UAT acceptance.",
+            "Required IMB IDs": "IMB-0003; IMB-0004; IMB-0005; IMB-0007; IMB-0011; IMB-0012; IMB-0013; IMB-0014; IMB-0015; IMB-0084; IMB-0085; IMB-0086; IMB-0087; IMB-0088; IMB-0089; IMB-0090; IMB-0091; IMB-0092; IMB-0093",
+            "Required External Dependencies": "EXT-0014; EXT-0016; EXT-0019 where affected capability activation applies",
+            "Evidence Required": "Backend authorization tests; UI state tests; Persian/RTL/Jalali checks; request/status/deep-link evidence; sensitive-data controls.",
+            "Pass Condition": "User-facing target capabilities are functionally integrated without widening source-domain authority.",
+            "Failure Consequence": "Browser verification and affected representative UAT scenarios remain blocked.",
+            "Downstream Work Unlocked": "IMB-0108 and affected IMB-0110 scenarios",
+            "UTV?": "YES for final browser/runtime evidence",
+            "Human Sign-off?": "NO",
+            "Notes": "Capability-by-capability emergence is allowed; this gate summarizes convergence."
+          },
+          {
+            "Gate ID": "GATE-08",
+            "Gate Name": "Runtime Verification",
+            "Gate Type": "RUNTIME VERIFICATION GATE",
+            "Purpose": "Record environment-specific verification only after implementation availability.",
+            "Required IMB IDs": "IMB-0103; IMB-0104; IMB-0105; IMB-0106; IMB-0107; IMB-0108; IMB-0109",
+            "Required External Dependencies": "EXT-0020; EXT-0021; EXT-0022; EXT-0023; EXT-0024 as applicable",
+            "Evidence Required": "Executed runtime scenarios, environment/build identity, logs/results, explicit PASS/FAIL per verification item.",
+            "Pass Condition": "Required verification items have executed evidence; no static evidence is promoted to runtime PASS.",
+            "Failure Consequence": "Affected production/UAT/certification decisions remain blocked or UTV.",
+            "Downstream Work Unlocked": "UAT convergence and Production Certification evidence",
+            "UTV?": "YES until executed",
+            "Human Sign-off?": "NO",
+            "Notes": "Not every feature requires every verification item."
+          },
+          {
+            "Gate ID": "GATE-11",
+            "Gate Name": "Production Certification",
+            "Gate Type": "PRODUCTION CERTIFICATION GATE",
+            "Purpose": "Certify production/system-operational readiness only after GATE-10 Representative UAT Completion and all existing production readiness controls/evidence are satisfied.",
+            "Required IMB IDs": "IMB-0083; IMB-0098; IMB-0099; IMB-0100; IMB-0101; IMB-0104; IMB-0105; IMB-0106; IMB-0107",
+            "Required External Dependencies": "EXT-0018; EXT-0020; EXT-0021; EXT-0022",
+            "Evidence Required": "Activated official statutory package where applicable; backup/restore evidence; deployment drill; observability/incident drill; supply-chain re-verification; approved topology/recovery/operating evidence.",
+            "Pass Condition": "GATE-10 Representative UAT Completion has PASSED; all required Production Certification IMB items are complete; required runtime/production evidence is available; required external production evidence is available; and no unresolved production-certification blocker remains.",
+            "Failure Consequence": "Production certification remains NOT COMPLETE regardless of feature/UAT state.",
+            "Downstream Work Unlocked": "Future production release decision and Human Sign-off review",
+            "UTV?": "YES until production-equivalent evidence exists",
+            "Human Sign-off?": "NO",
+            "Notes": "GATE-10 → GATE-11 is mandatory. PRODUCTION CERTIFICATION ≠ HUMAN SIGN-OFF. GATE-11 is not currently passed."
+          }
+        ]
+      }
+    }
+  },
+  "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip": {
+    "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip",
+    "sha256": "cf45d1f6db5821084205e3cdf0553cd68c036855cd4c1d5bbe1ee28c7e6693be",
+    "members": {
+      "BONIRA_RECOVERY_POLICY_MATRIX.csv": {
+        "sha256": "579ac8da6323078508b486410880b9affcee4842aea5e8fb57b2ea2e219a7494",
+        "rows": [
+          {
+            "Environment / Criticality": "Production / Critical",
+            "Service / Data Class": "Transactional relational database",
+            "RPO": "UNSPECIFIED — DO NOT INVENT",
+            "RTO": "UNSPECIFIED — DO NOT INVENT",
+            "PITR Window": "UNSPECIFIED — DO NOT INVENT",
+            "Backup Frequency": "UNSPECIFIED — DO NOT INVENT",
+            "Backup Retention": "UNSPECIFIED — DO NOT INVENT",
+            "Restore Responsibility": "Must be explicitly assigned before production readiness",
+            "Restore Test Frequency": "UNSPECIFIED — DO NOT INVENT",
+            "Restore Acceptance Criteria": "Integrity, accessibility, tenant isolation and required evidence proven after restore",
+            "Responsible Owner": "UNSPECIFIED ASSIGNEE — must be designated",
+            "Required Evidence": "Backup evidence + restore test + integrity validation + exception record",
+            "Exception Handling": "No production certification while objective/evidence missing",
+            "Governing PD": "PD-003",
+            "Implementation Eligibility": "PRODUCTION-CERTIFICATION ONLY",
+            "Status": "RECOVERY OBJECTIVES UNSPECIFIED — NOT ELIGIBLE FOR PRODUCTION CERTIFICATION"
+          },
+          {
+            "Environment / Criticality": "Production / Critical",
+            "Service / Data Class": "Document/media evidence required by business records",
+            "RPO": "UNSPECIFIED — DO NOT INVENT",
+            "RTO": "UNSPECIFIED — DO NOT INVENT",
+            "PITR Window": "UNSPECIFIED — DO NOT INVENT",
+            "Backup Frequency": "UNSPECIFIED — DO NOT INVENT",
+            "Backup Retention": "UNSPECIFIED — DO NOT INVENT",
+            "Restore Responsibility": "Must be explicitly assigned before production readiness",
+            "Restore Test Frequency": "UNSPECIFIED — DO NOT INVENT",
+            "Restore Acceptance Criteria": "Integrity, accessibility, tenant isolation and required evidence proven after restore",
+            "Responsible Owner": "UNSPECIFIED ASSIGNEE — must be designated",
+            "Required Evidence": "Backup evidence + restore test + integrity validation + exception record",
+            "Exception Handling": "No production certification while objective/evidence missing",
+            "Governing PD": "PD-003",
+            "Implementation Eligibility": "PRODUCTION-CERTIFICATION ONLY",
+            "Status": "RECOVERY OBJECTIVES UNSPECIFIED — NOT ELIGIBLE FOR PRODUCTION CERTIFICATION"
+          },
+          {
+            "Environment / Criticality": "Production / Critical",
+            "Service / Data Class": "Deployment/configuration metadata required to reconstruct service",
+            "RPO": "UNSPECIFIED — DO NOT INVENT",
+            "RTO": "UNSPECIFIED — DO NOT INVENT",
+            "PITR Window": "UNSPECIFIED — DO NOT INVENT",
+            "Backup Frequency": "UNSPECIFIED — DO NOT INVENT",
+            "Backup Retention": "UNSPECIFIED — DO NOT INVENT",
+            "Restore Responsibility": "Must be explicitly assigned before production readiness",
+            "Restore Test Frequency": "UNSPECIFIED — DO NOT INVENT",
+            "Restore Acceptance Criteria": "Integrity, accessibility, tenant isolation and required evidence proven after restore",
+            "Responsible Owner": "UNSPECIFIED ASSIGNEE — must be designated",
+            "Required Evidence": "Backup evidence + restore test + integrity validation + exception record",
+            "Exception Handling": "No production certification while objective/evidence missing",
+            "Governing PD": "PD-003",
+            "Implementation Eligibility": "PRODUCTION-CERTIFICATION ONLY",
+            "Status": "RECOVERY OBJECTIVES UNSPECIFIED — NOT ELIGIBLE FOR PRODUCTION CERTIFICATION"
+          },
+          {
+            "Environment / Criticality": "Production / Governed",
+            "Service / Data Class": "Audit/operational evidence retained by approved logging policy",
+            "RPO": "UNSPECIFIED — DO NOT INVENT",
+            "RTO": "UNSPECIFIED — DO NOT INVENT",
+            "PITR Window": "UNSPECIFIED — DO NOT INVENT",
+            "Backup Frequency": "UNSPECIFIED — DO NOT INVENT",
+            "Backup Retention": "UNSPECIFIED — DO NOT INVENT",
+            "Restore Responsibility": "Must be explicitly assigned before production readiness",
+            "Restore Test Frequency": "UNSPECIFIED — DO NOT INVENT",
+            "Restore Acceptance Criteria": "Integrity, accessibility, tenant isolation and required evidence proven after restore",
+            "Responsible Owner": "UNSPECIFIED ASSIGNEE — must be designated",
+            "Required Evidence": "Backup evidence + restore test + integrity validation + exception record",
+            "Exception Handling": "No production certification while objective/evidence missing",
+            "Governing PD": "PD-003",
+            "Implementation Eligibility": "PRODUCTION-CERTIFICATION ONLY",
+            "Status": "RECOVERY OBJECTIVES UNSPECIFIED — NOT ELIGIBLE FOR PRODUCTION CERTIFICATION"
+          }
+        ]
+      },
+      "BONIRA_PRODUCTION_DEPLOYMENT_SPECIFICATION.md": {
+        "sha256": "437f4515abf52524421a5ad27286f06a7b774f52719069f5054d52f40b4dc0bc",
+        "text": "# BONIRA — Production Deployment Specification\n\n## Status\n`SPECIFICATION STRUCTURE COMPLETE`\n`UNSPECIFIED PRODUCTION TOPOLOGY — DO NOT INVENT / DO NOT CERTIFY`\n\nGoverned by `PD-004`.\n\n- Production and non-production boundaries must be explicit.\n- Exact host count, cloud provider, Kubernetes/container platform, HA topology, replica count and failover architecture are UNSPECIFIED.\n- Database, application, static/media, proxy/load-balancer and background-worker components are deployed only where the actual approved runtime requires them.\n- TLS and environment-scoped secrets handling are mandatory; exact product/provider is not specified.\n- Migrations require versioned sequencing, pre-check, rollback/roll-forward decision and evidence.\n- Production release must retain version, migration/config change, activation authority and deployment evidence.\n- Backup/recovery integrates with `BONIRA_RECOVERY_POLICY_MATRIX`.\n- Monitoring/logging must support incident, security and audit traceability; tooling/thresholds are not invented.\n- Tenant isolation/object scope are invariant.\n- Support/emergency access follows the Operating Specification.\n\n`CONDITIONALLY READY FOR BACKLOG`\n`IMPLEMENTATION AUTHORIZATION: NOT YET GRANTED`\n"
+      },
+      "BONIRA_OPERATING_SPECIFICATION.md": {
+        "sha256": "d144b3cfa3266564d2467b659d70597fe9d0b1923814a4db59c97ac5c7e48633",
+        "text": "# BONIRA — Approved Operating Specification\n\nGoverned by `PD-005`.\n\n| Responsibility | Requirement |\n|---|---|\n| Release Owner | Designated accountable responsibility per production release; exact assignee not invented |\n| Incident Owner | Designated accountable responsibility per incident |\n| Production Activation Authority | Explicitly designated; technical superuser status alone is insufficient |\n| Escalation Responsibility | Explicit path required; no timer/severity/SLA invented |\n| Emergency / Support Access Authority | Explicit, scoped, auditable and revocable |\n| Rollback / Roll-forward Responsibility | Recorded in release/incident evidence |\n| Access Revocation Responsibility | Explicit owner for expiry/revoke |\n\nRelease evidence includes version/change/migration/activation/rollback-or-roll-forward evidence.\nIncident evidence includes identity/timestamps/owner/log evidence/actions/access grants/resolution evidence.\n\n`ON-CALL POLICY ≠ AUTOMATIC 24×7 STAFFED ROTATION`\n\nNo SLA, SLO, response time, severity scheme or staffed rotation is invented.\n\n`PRODUCTION-OPERATIONS-READINESS: NOT YET PROVEN`\n`HUMAN SIGN-OFF: NOT EXECUTED`\n`IMPLEMENTATION AUTHORIZATION: NOT YET GRANTED`\n"
+      },
+      "BONIRA_PAYROLL_STATUTORY_SOURCE_PACKAGE_SPECIFICATION.md": {
+        "sha256": "1b9daf5c9487ee3c30ddf641dda77345c2dbd0c97ee21566bfa9a17298d8b81b",
+        "text": "# BONIRA — Payroll Statutory Source Package Specification\n\nGoverned by `PD-031`.\n\nEvery activated statutory package must be versioned/effective-dated and tied to official Tax/Labor/Social Security authority, component classification, taxable/insurable bases, caps/exemptions/shares, YTD treatment, rounding, retroactivity, schema version, review/approval and evidence.\n\nNo current Iranian rate/cap/threshold/value is supplied here.\n\n`NO OFFICIAL STATUTORY EVIDENCE → DO NOT INVENT CURRENT VALUE`\n\nCurrent statutory values/evidence remain UTV.\n"
+      }
+    }
+  }
+}

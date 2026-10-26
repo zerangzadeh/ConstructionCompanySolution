@@ -1,0 +1,491 @@
+{
+  "sources": [
+    {
+      "path": "docs/governance/uiux/UIUX_REFERENCE_PERSONA_CATALOGUE.yaml",
+      "sha256": "39248283826a1aedab2089b9f974b11ac494ab9cadd287e000b9838456081c7e"
+    },
+    {
+      "path": "docs/governance/uiux/UIUX_RUNTIME_PERSONA_DATA_MATRIX.yaml",
+      "sha256": "c363605feae33e6b63b32098e5c2469e0628473d703f8f901caea2a27550b1dc"
+    }
+  ],
+  "documented_at": "2026-10-21",
+  "personas": [
+    {
+      "persona_id": "P-01",
+      "label": "کاربر عادی شرکت",
+      "target_alias": "uiux.persona.ordinary-user",
+      "documented_identity": "uiux.audit.project",
+      "documented_readiness": "PROVISIONED",
+      "authority_shape": "Active tenant membership; ordinary read permissions; no privileged admin assumptions.",
+      "context_requirements": [
+        "active organization",
+        "at least two visible workspaces",
+        "at least one no-result search"
+      ],
+      "scenario_ids": [
+        "RV-001",
+        "RV-002",
+        "RV-003",
+        "RV-004",
+        "RV-005",
+        "RV-023",
+        "RV-025"
+      ]
+    },
+    {
+      "persona_id": "P-02",
+      "label": "کاربر عملیاتی پروژه / مهندس کارگاه",
+      "target_alias": "uiux.persona.project-operations",
+      "documented_identity": "uiux.audit.project",
+      "documented_readiness": "PARTIAL",
+      "authority_shape": "Project-scoped membership with create/view permissions for selected operational surfaces.",
+      "context_requirements": [
+        "two projects",
+        "at least two sites across different projects",
+        "project phases",
+        "project contracts",
+        "expense categories"
+      ],
+      "scenario_ids": [
+        "RV-006",
+        "RV-025"
+      ]
+    },
+    {
+      "persona_id": "P-03",
+      "label": "کارشناس تدارکات",
+      "target_alias": "uiux.persona.procurement-buyer",
+      "documented_identity": "uiux.audit.project",
+      "documented_readiness": "PARTIAL",
+      "authority_shape": "Procurement view/create/evaluate permissions within bounded project scope.",
+      "context_requirements": [
+        "RFQ in actionable state",
+        "approved purchase request",
+        "multiple projects/suppliers"
+      ],
+      "scenario_ids": [
+        "RV-007",
+        "RV-008"
+      ]
+    },
+    {
+      "persona_id": "P-04",
+      "label": "کارشناس تجهیزات و ناوگان",
+      "target_alias": "uiux.persona.equipment-fleet",
+      "documented_identity": null,
+      "documented_readiness": "NOT_PROVISIONED",
+      "authority_shape": "Equipment/fleet permissions within known tenant/project scope; no inventory-custody authority inferred.",
+      "context_requirements": [
+        "multiple equipment assets",
+        "project/site assignments",
+        "maintenance plan and work order",
+        "usage/fuel/downtime records"
+      ],
+      "scenario_ids": [
+        "RV-019",
+        "RV-025"
+      ]
+    },
+    {
+      "persona_id": "P-05",
+      "label": "حسابدار",
+      "target_alias": "uiux.persona.accountant",
+      "documented_identity": "account.demo-construction-01.accountant",
+      "documented_readiness": "PARTIAL",
+      "authority_shape": "Accounting view/create permissions for non-production test organization.",
+      "context_requirements": [
+        "fiscal year/period",
+        "accounts",
+        "projects/sites/WBS",
+        "statement run"
+      ],
+      "scenario_ids": [
+        "RV-010",
+        "RV-011"
+      ]
+    },
+    {
+      "persona_id": "P-06",
+      "label": "کارشناس خزانه‌داری",
+      "target_alias": "uiux.persona.treasury",
+      "documented_identity": null,
+      "documented_readiness": "NOT_PROVISIONED",
+      "authority_shape": "Treasury movement and operation permissions only as required by scenario.",
+      "context_requirements": [
+        "approved payment request",
+        "treasury accounts",
+        "posted movement/reconciliation sample"
+      ],
+      "scenario_ids": [
+        "RV-012"
+      ]
+    },
+    {
+      "persona_id": "P-07",
+      "label": "کارشناس صورتحساب، مطالبات و پرداخت‌های پیمان",
+      "target_alias": "uiux.persona.billing-claims",
+      "documented_identity": "uiux.audit.project",
+      "documented_readiness": "PARTIAL",
+      "authority_shape": "Billing/AP-AR/subledger permissions only as actually granted; no Contract Admin or Treasury authority inferred.",
+      "context_requirements": [
+        "claim/progress records",
+        "payable certificate/measurement data",
+        "subledger settlement/allocation data",
+        "commercial billing control examples"
+      ],
+      "scenario_ids": [
+        "RV-013",
+        "RV-014",
+        "RV-025"
+      ]
+    },
+    {
+      "persona_id": "P-08",
+      "label": "کارشناس عملیات منابع انسانی و پرونده پرسنلی",
+      "target_alias": "uiux.persona.hr-operations",
+      "documented_identity": null,
+      "documented_readiness": "NOT_PROVISIONED",
+      "authority_shape": "Workforce/employee administration permissions; no Payroll, Timekeeping or Tenant Admin authority inferred.",
+      "context_requirements": [
+        "employees and organizational units",
+        "positions and project assignments",
+        "skills/qualifications/training/performance examples",
+        "employee documents/relationships"
+      ],
+      "scenario_ids": [
+        "RV-015",
+        "RV-025",
+        "RV-029"
+      ]
+    },
+    {
+      "persona_id": "P-09",
+      "label": "کارمند در خودخدمتی",
+      "target_alias": "uiux.persona.ess-employee",
+      "documented_identity": null,
+      "documented_readiness": "NOT_PROVISIONED",
+      "authority_shape": "Self-service own-data access only.",
+      "context_requirements": [
+        "linked person/work relationship",
+        "own payroll/time/leave/request records"
+      ],
+      "scenario_ids": [
+        "RV-016"
+      ]
+    },
+    {
+      "persona_id": "P-10",
+      "label": "کارشناس حضور و غیاب و کارکرد",
+      "target_alias": "uiux.persona.timekeeping",
+      "documented_identity": "uiux.audit.project",
+      "documented_readiness": "PARTIAL",
+      "authority_shape": "Timekeeping permissions within tenant/employee scope; no Payroll calculation authority inferred.",
+      "context_requirements": [
+        "working calendar and shifts",
+        "attendance records and corrections",
+        "leave/mission and overtime requests",
+        "timesheets in reviewable states"
+      ],
+      "scenario_ids": [
+        "RV-017",
+        "RV-025"
+      ]
+    },
+    {
+      "persona_id": "P-11",
+      "label": "کارشناس HSE و ایمنی",
+      "target_alias": "uiux.persona.hse-safety",
+      "documented_identity": "uiux.audit.project",
+      "documented_readiness": "PARTIAL",
+      "authority_shape": "Safety/HSE permissions in known tenant/project scope; no Quality/QC authority inferred.",
+      "context_requirements": [
+        "safety incidents in multiple states",
+        "corrective-action examples",
+        "project/site context",
+        "HSE evidence where applicable"
+      ],
+      "scenario_ids": [
+        "RV-020",
+        "RV-025"
+      ]
+    },
+    {
+      "persona_id": "P-12",
+      "label": "متولی دانش",
+      "target_alias": "uiux.persona.knowledge-curator",
+      "documented_identity": null,
+      "documented_readiness": "NOT_PROVISIONED",
+      "authority_shape": "Knowledge curate/review permissions; platform review tested only with actual platform authority.",
+      "context_requirements": [
+        "published knowledge version",
+        "source references",
+        "promotion candidate"
+      ],
+      "scenario_ids": [
+        "RV-021"
+      ]
+    },
+    {
+      "persona_id": "P-13",
+      "label": "مدیر گردش‌کار",
+      "target_alias": "uiux.persona.workflow-admin",
+      "documented_identity": null,
+      "documented_readiness": "NOT_PROVISIONED",
+      "authority_shape": "Actual workflow administration permission; no generic tenant-admin inference.",
+      "context_requirements": [
+        "workflow definition/version with multiple steps/outcomes"
+      ],
+      "scenario_ids": [
+        "RV-022"
+      ]
+    },
+    {
+      "persona_id": "P-14",
+      "label": "کاربر آزمون دسترس‌پذیری",
+      "target_alias": "uiux.persona.accessibility",
+      "documented_identity": "uiux.audit.reporting",
+      "documented_readiness": "BLOCKED",
+      "authority_shape": "Use actual least-privileged identities appropriate for each visited surface.",
+      "context_requirements": [
+        "representative records for high-risk detail/list/form pages"
+      ],
+      "scenario_ids": [
+        "RV-024",
+        "RV-025"
+      ]
+    },
+    {
+      "persona_id": "P-15",
+      "label": "مالک شرکت / Tenant Owner",
+      "target_alias": "uiux.persona.tenant-owner",
+      "documented_identity": "account.demo-construction-01.owner",
+      "documented_readiness": "PROVISIONED",
+      "authority_shape": "Actual Tenant Owner authority only; never substitute Platform Admin. Organization-wide visibility may exist, but platform or other-tenant authority must not.",
+      "context_requirements": [
+        "organization with multiple projects/workspaces",
+        "representative attention/exception/approval items where naturally available",
+        "organization-level search data",
+        "at least one lower-privilege comparison identity"
+      ],
+      "scenario_ids": [
+        "RV-002",
+        "RV-004",
+        "RV-005",
+        "RV-025",
+        "RV-026"
+      ]
+    },
+    {
+      "persona_id": "P-16",
+      "label": "ادمین شرکت / Tenant Admin",
+      "target_alias": "uiux.persona.tenant-admin",
+      "documented_identity": null,
+      "documented_readiness": "BLOCKED",
+      "authority_shape": "Actual Tenant Admin/local-admin authority under BONIRA governance; no implicit Owner or Platform Admin authority.",
+      "context_requirements": [
+        "active tenant with multiple memberships",
+        "dedicated disposable/non-production test membership",
+        "existing tenant roles and scope grants",
+        "organization settings/configuration data"
+      ],
+      "scenario_ids": [
+        "RV-004",
+        "RV-025",
+        "RV-026"
+      ]
+    },
+    {
+      "persona_id": "P-17",
+      "label": "مدیر پروژه / Project Manager",
+      "target_alias": "uiux.persona.project-manager",
+      "documented_identity": "uiux.audit.project",
+      "documented_readiness": "BLOCKED",
+      "authority_shape": "Actual project-manager-equivalent effective permissions and project scope; do not infer broad financial/HR authority from title.",
+      "context_requirements": [
+        "one active project with sites/phases/contracts",
+        "project operational records across multiple modules",
+        "actionable/exception states where naturally available",
+        "at least one out-of-scope project for boundary comparison"
+      ],
+      "scenario_ids": [
+        "RV-002",
+        "RV-004",
+        "RV-006",
+        "RV-007",
+        "RV-008",
+        "RV-019",
+        "RV-020",
+        "RV-025"
+      ]
+    },
+    {
+      "persona_id": "P-18",
+      "label": "ادمین پلتفرم / Platform Admin",
+      "target_alias": "uiux.persona.platform-admin",
+      "documented_identity": "admin",
+      "documented_readiness": "PROVISIONED",
+      "authority_shape": "Actual Platform Admin authority. This persona is not a Tenant Owner or Tenant Admin substitute and must not be used for ordinary tenant journeys.",
+      "context_requirements": [
+        "at least two non-production tenants",
+        "platform role catalogue",
+        "protected-operation configuration",
+        "platform-level policy/configuration surfaces"
+      ],
+      "scenario_ids": [
+        "RV-004",
+        "RV-021",
+        "RV-025",
+        "RV-027"
+      ]
+    },
+    {
+      "persona_id": "P-19",
+      "label": "مسئول کنترل اسناد / Document Controller",
+      "target_alias": "uiux.persona.document-controller",
+      "documented_identity": "uiux.audit.project",
+      "documented_readiness": "PARTIAL",
+      "authority_shape": "Document-management permissions within known tenant/project scope; no Knowledge-curator or Platform authority inferred.",
+      "context_requirements": [
+        "documents in multiple states",
+        "at least one document with multiple versions",
+        "project/business-object link targets",
+        "own-document and organization-document examples"
+      ],
+      "scenario_ids": [
+        "RV-025",
+        "RV-028"
+      ]
+    },
+    {
+      "persona_id": "P-20",
+      "label": "کارشناس حقوق و دستمزد",
+      "target_alias": "uiux.persona.payroll",
+      "documented_identity": null,
+      "documented_readiness": "NOT_PROVISIONED",
+      "authority_shape": "Payroll calculation/review permissions only; no Timekeeping source-edit authority or Treasury final-payment authority inferred.",
+      "context_requirements": [
+        "payroll period",
+        "employees eligible for payroll",
+        "timekeeping/input data",
+        "earnings/deductions/rules",
+        "run with reviewable result"
+      ],
+      "scenario_ids": [
+        "RV-018",
+        "RV-025"
+      ]
+    },
+    {
+      "persona_id": "P-21",
+      "label": "کارشناس احکام و سوابق استخدامی",
+      "target_alias": "uiux.persona.employment-records",
+      "documented_identity": null,
+      "documented_readiness": "NEEDS_PRODUCT_REVIEW",
+      "authority_shape": "Existing employment-record management and employee-view permissions; do not infer Payroll or Tenant Admin authority.",
+      "context_requirements": [
+        "employee with active work relationship and revision",
+        "source document with safe available version",
+        "current and historical employment records where available",
+        "ESS employee able to view own employment history"
+      ],
+      "scenario_ids": [
+        "RV-015",
+        "RV-025",
+        "RV-029"
+      ]
+    },
+    {
+      "persona_id": "P-22",
+      "label": "انباردار / کارشناس کنترل موجودی",
+      "target_alias": "uiux.persona.inventory-storekeeper",
+      "documented_identity": "uiux.audit.project",
+      "documented_readiness": "PARTIAL",
+      "authority_shape": "Inventory/material permissions for assigned warehouses/projects; no Equipment or Accounting authority inferred.",
+      "context_requirements": [
+        "warehouse with stock",
+        "material catalogue",
+        "inventory transactions",
+        "reservation/count/transfer examples",
+        "valuation data where authorized"
+      ],
+      "scenario_ids": [
+        "RV-009",
+        "RV-025"
+      ]
+    },
+    {
+      "persona_id": "P-23",
+      "label": "کارشناس قراردادها و امور تجاری",
+      "target_alias": "uiux.persona.contracts-commercial",
+      "documented_identity": "uiux.audit.project",
+      "documented_readiness": "PARTIAL",
+      "authority_shape": "Contracts/commercial permissions within tenant/project scope; no Procurement Buyer or Billing settlement authority inferred.",
+      "context_requirements": [
+        "contract in active/reviewable state",
+        "contractual records and revisions",
+        "commercial/tender case with evidence",
+        "project and counterparty context"
+      ],
+      "scenario_ids": [
+        "RV-025",
+        "RV-030"
+      ]
+    },
+    {
+      "persona_id": "P-24",
+      "label": "کارشناس کنترل پروژه / دفتر فنی",
+      "target_alias": "uiux.persona.project-controls",
+      "documented_identity": "uiux.audit.project",
+      "documented_readiness": "PARTIAL",
+      "authority_shape": "Project-controls/estimate permissions for explicitly scoped projects; no Project Owner or Accounting authority inferred.",
+      "context_requirements": [
+        "project with WBS/activities/sites/phases",
+        "estimate data",
+        "progress/comparison/exception data",
+        "cost-reconciliation view data where authorized"
+      ],
+      "scenario_ids": [
+        "RV-006",
+        "RV-025",
+        "RV-031"
+      ]
+    },
+    {
+      "persona_id": "P-25",
+      "label": "کارشناس کیفیت / QA-QC",
+      "target_alias": "uiux.persona.quality-qaqc",
+      "documented_identity": "uiux.audit.project",
+      "documented_readiness": "PARTIAL",
+      "authority_shape": "Quality/QA-QC permissions within known project/site scope; no HSE authority inferred.",
+      "context_requirements": [
+        "quality issues in multiple states",
+        "inspection/nonconformance/CAPA examples where applicable",
+        "corrective actions",
+        "project/site context"
+      ],
+      "scenario_ids": [
+        "RV-020",
+        "RV-025"
+      ]
+    },
+    {
+      "persona_id": "P-26",
+      "label": "تأمین‌کننده / شریک بیرونی در پرتال",
+      "target_alias": "uiux.persona.external-supplier",
+      "documented_identity": null,
+      "documented_readiness": "BLOCKED",
+      "authority_shape": "External/portal grant only for the intended invitation/receipt/opportunity; no ordinary tenant membership assumed.",
+      "context_requirements": [
+        "active RFQ invitation or portal grant",
+        "supplier/partner identity",
+        "allowed receipt/quote/evidence target",
+        "second tenant/opportunity for isolation comparison"
+      ],
+      "scenario_ids": [
+        "RV-025",
+        "RV-032"
+      ]
+    }
+  ]
+}

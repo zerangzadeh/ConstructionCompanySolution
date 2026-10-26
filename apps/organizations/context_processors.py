@@ -10,6 +10,7 @@ from apps.organizations.authorization import (
 )
 from apps.organizations.context import scoped_context_projects, scoped_context_sites
 from apps.organizations.models import BusinessPermissionCode
+from apps.organizations.reference_personas import reference_catalogue_enabled
 from apps.parties.presentation import GOVERNANCE_PERMISSIONS
 from apps.workflows.personal_workspaces import (
     manager_workspace_available,
@@ -109,6 +110,7 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
         "platform_navigation_access": bool(
             request.user.is_authenticated and is_platform_admin(request.user)
         ),
+        "reference_persona_catalogue_enabled": reference_catalogue_enabled(),
         "can_view_contracts": BusinessPermissionCode.CONTRACTS_VIEW in permission_codes,
         "can_manage_contracts": BusinessPermissionCode.CONTRACTS_CREATE
         in permission_codes,

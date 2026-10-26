@@ -1,0 +1,135 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ CurrentReportingRuntimeTests.test_populated_refresh_queries_reconcile_without_source_writeback _
+
+self = <test_cep073_runtime.CurrentReportingRuntimeTests testMethod=test_populated_refresh_queries_reconcile_without_source_writeback>
+
+    def test_populated_refresh_queries_reconcile_without_source_writeback(self):
+        membership = self.organization.memberships.get(user=self.owner)
+        role = OrganizationRole.objects.create(
+            organization=self.organization,
+            code="cep073-reporting",
+            name="Synthetic reporting",
+        )
+        role.permissions.set(
+            BusinessPermission.objects.filter(
+                code__in=(
+                    BusinessPermissionCode.REPORTING_METRIC_REFRESH_RUN,
+                    BusinessPermissionCode.REPORTING_PORTFOLIO_VIEW,
+                    BusinessPermissionCode.INVENTORY_VALUATION_VIEW,
+                )
+            )
+        )
+        receipt = self.create_and_post(
+            number="CEP073-SYNTHETIC-IN",
+            transaction_type=StockTransactionType.ADJUSTMENT_IN,
+            quantity=Decimal(10),
+            destination=self.central,
+            actor=self.owner,
+        )
+        finalize_valuation(
+            organization=self.organization,
+            actor=self.owner,
+            stock_transaction=receipt,
+            source_reference="CEP073-SYNTHETIC-ONLY",
+            source_version="1",
+            unit_cost=Decimal(7),
+            idempotency_key="CEP073-SYNTHETIC-IN",
+        )
+        template = InventoryValuationPool.objects.get(organization=self.organization)
+        MembershipRoleAssignment.objects.create(
+            organization=self.organization,
+            membership=membership,
+            role=role,
+            reason="CEP073 explicit test-only permission; existing organization scope",
+        )
+        query_counts = []
+        for size in (1, 17):
+            if size > 1:
+                for number in range(1, size):
+                    material = Material.objects.create(
+                        organization=self.organization,
+                        code=f"CEP073-{number}",
+                        name=f"Synthetic {number}",
+                        unit_of_measure=self.unit,
+                    )
+                    InventoryValuationPool.objects.create(
+                        organization=self.organization,
+                        material=material,
+                        quantity=template.quantity,
+                        value_amount=template.value_amount,
+                        average_cost=template.average_cost,
+                        currency=template.currency,
+                        monetary_precision_version=template.monetary_precision_version,
+                        rounding_policy_version=template.rounding_policy_version,
+                    )
+                InventoryValuationPool.objects.create(
+                    organization=self.other_organization,
+                    material=self.other_material,
+                    quantity=Decimal(999),
+                    value_amount=Decimal(999),
+                    average_cost=Decimal(1),
+                    currency=template.currency,
+                    monetary_precision_version=template.monetary_precision_version,
+                    rounding_policy_version=template.rounding_policy_version,
+                )
+            sources = (InventoryValuationPool, StockTransaction, JournalEntry)
+            before = {
+                m._meta.label: list(m.objects.order_by("pk").values()) for m in sources
+            }
+            key = f"cep073-refresh-{size}"
+            with CaptureQueriesContext(connection) as queries:
+>               result = refresh_metric(
+                    organization=self.organization,
+                    actor=self.owner,
+                    metric_code="inventory_quantity_value",
+                    idempotency_key=key,
+                )
+
+tests\test_cep073_runtime.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\reporting\services.py:370: in refresh_metric
+    projects = _allowed_projects(user=actor, organization=organization)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\reporting\services.py:91: in _allowed_projects
+    membership = require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: inventory-owner>, organization = <Organization: Inventory Co>
+permission = BusinessPermissionCode.REPORTING_METRIC_RESULT_VIEW
+message = 'اجازه مشاهده نتیجه شاخص را ندارید.', project = None, site = None
+allow_any_scope = True, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: اجازه مشاهده نتیجه شاخص را ندارید.
+
+apps\organizations\authorization.py:436: PermissionDenied
+=========================== short test summary info ===========================
+FAILED tests/test_cep073_runtime.py::CurrentReportingRuntimeTests::test_populated_refresh_queries_reconcile_without_source_writeback
+1 failed in 8.26s

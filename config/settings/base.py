@@ -6,6 +6,9 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+# Approved reference-persona discovery is limited to Development/UAT.
+REFERENCE_PERSONA_CATALOGUE_ENABLED = False
+
 # Local values remain outside source control; deployed environments use process values.
 load_dotenv(BASE_DIR / ".env")
 

@@ -684,6 +684,7 @@
                     <a class="erp-nav-link" href="{% url 'organizations:platform_role_catalog' %}">کاتالوگ نقش‌ها</a>
                     <a class="erp-nav-link" href="{% url 'organizations:protected_operation_catalog' %}">عملیات حفاظت‌شده</a>
                     <a class="erp-nav-link" href="{% url 'organizations:platform_policy_catalog' %}">سیاست‌های پلتفرم</a>
+                    {% if reference_persona_catalogue_enabled %}<a class="erp-nav-link" href="{% url 'organizations:reference_personas' %}">پرسوناهای مرجع توسعه</a>{% endif %}
                     {% if request.user.is_superuser %}<a class="erp-nav-link border-t border-amber-400/20 pt-2 text-amber-100" href="{% url 'admin:index' %}">دسترسی فنی Django Admin</a>{% endif %}
                 </div>
             </section>

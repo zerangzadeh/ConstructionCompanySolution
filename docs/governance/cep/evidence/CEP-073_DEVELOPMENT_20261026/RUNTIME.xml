@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="10" time="60.366" timestamp="2026-10-26T23:02:17.126546+03:30" hostname="Zerangzadeh"><testcase classname="apps.accounting.test_imb0066.JournalListBoundingTests" name="test_pages_are_bounded_stable_disjoint_and_complete" time="21.612" /><testcase classname="apps.accounting.test_imb0066.JournalListBoundingTests" name="test_queries_limit_journals_and_first_debit_without_line_prefetch" time="5.317" /><testcase classname="apps.accounting.test_imb0066.JournalListBoundingTests" name="test_active_tenant_scope_and_detail_links_are_preserved" time="4.038" /><testcase classname="apps.audit.test_imb0066.AuditListBoundingTests" name="test_pages_are_bounded_stable_disjoint_and_complete" time="3.756" /><testcase classname="apps.audit.test_imb0066.AuditListBoundingTests" name="test_one_bounded_source_read_includes_actor_and_no_writes" time="2.912" /><testcase classname="apps.audit.test_imb0066.AuditListBoundingTests" name="test_permission_scope_membership_tenant_and_login_fail_closed" time="3.797" /><testcase classname="apps.inventory.test_cep009.InventoryBalanceQueryTests" name="test_single_scoped_aggregate_preserves_transfer_and_reversal_history" time="1.841" /><testcase classname="apps.inventory.test_cep009.InventoryBalanceQueryTests" name="test_warehouse_locks_follow_uuid_order_for_either_direction" time="0.291" /><testcase classname="tests.test_cep073_runtime.CurrentReportingRuntimeTests" name="test_populated_refresh_queries_reconcile_without_source_writeback" time="0.801"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد تراکنش انبار در این سازمان را ندارید.">self = &lt;test_cep073_runtime.CurrentReportingRuntimeTests testMethod=test_populated_refresh_queries_reconcile_without_source_writeback&gt;
+
+    def test_populated_refresh_queries_reconcile_without_source_writeback(self):
+        membership = self.organization.memberships.get(user=self.owner)
+        role = OrganizationRole.objects.create(
+            organization=self.organization,
+            code="cep073-reporting",
+            name="Synthetic reporting",
+        )
+        role.permissions.set(
+            BusinessPermission.objects.filter(
+                code__in=(
+                    BusinessPermissionCode.REPORTING_METRIC_REFRESH_RUN,
+                    BusinessPermissionCode.REPORTING_PORTFOLIO_VIEW,
+                    BusinessPermissionCode.INVENTORY_VALUATION_VIEW,
+                )
+            )
+        )
+        MembershipRoleAssignment.objects.create(
+            organization=self.organization,
+            membership=membership,
+            role=role,
+            reason="CEP073 explicit test-only permission; existing organization scope",
+        )
+&gt;       receipt = self.create_and_post(
+            number="CEP073-SYNTHETIC-IN",
+            transaction_type=StockTransactionType.ADJUSTMENT_IN,
+            quantity=Decimal(10),
+            destination=self.central,
+            actor=self.owner,
+        )
+
+tests\test_cep073_runtime.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\inventory\tests.py:166: in create_and_post
+    transaction_record = create_stock_transaction(
+apps\inventory\services.py:335: in create_stock_transaction
+    return _create_stock_transaction_domain(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\services.py:416: in _create_stock_transaction_domain
+    _require_role(
+apps\inventory\services.py:63: in _require_role
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: inventory-owner&gt;, organization = &lt;Organization: Inventory Co&gt;
+permission = BusinessPermissionCode.STOCK_TRANSACTIONS_CREATE
+message = 'اجازه ایجاد تراکنش انبار در این سازمان را ندارید.', project = None
+site = None, allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد تراکنش انبار در این سازمان را ندارید.
+
+apps\organizations\authorization.py:436: PermissionDenied</failure></testcase><testcase classname="apps.inventory.test_cep009.InventoryTransferLockOrderTests" name="test_opposing_transfers_post_once_without_lost_update" time="14.218" /></testsuite></testsuites>

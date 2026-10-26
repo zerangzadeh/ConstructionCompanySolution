@@ -1,3 +1,22 @@
+# CEP-078 current completion — 2026-10-26
+
+**EXECUTION COMPLETE — AC6/6 PASS; scoped DoD MET.** Current main/HEAD/origin/main
+`961e3fd942c668337012c22d42f59545c5e9fc0a`, with existing dirty work preserved.
+[Current remaining-runtime closeout](../evidence/CEP-078_REMAINDER_02/REMAINDER_REPORT.md)
+and [evidence index](../evidence/CEP-078_REMAINDER_02/ARTIFACT_INDEX.json) prove the
+exact Edge390 delta, six populated SC014 cells/84 checks, eight native Narrator
+SC024 browser/route pairings and actual reduced motion. No product change,
+completed-coverage rerun, other CEP, broad regression, Git write or Production.
+Bounded scope, historical limits and prior-session tab cleanup limit are explicit.
+Other85 CEPs/all global Gate records preserved; frontier[]. Human Sign-off,
+Production Certification and Cutover NOT EXECUTED.
+
+---
+
+The dated records below are retained historical execution evidence. Their earlier
+dispositions and blocker descriptions do not override the current result above
+or the live Registry.
+
 # CEP-078 Completion Report — 2026-10-23
 
 **Supported terminal disposition: BLOCKED_BEFORE_ENTRY.**
@@ -170,3 +189,60 @@ rerun. Temporary viewport overrides reset; original Chrome active organization
 restored through governed selector and verified in fresh accessibility state; Edge
 context unchanged. Only session navigation/context and evidence changed. Git
 writes, Production Certification/Cutover and Human Sign-off NOT_EXECUTED.
+
+
+## Current frontier continuation — 2026-10-26
+
+**EXECUTION PARTIAL.** Current main/origin `961e3fd942c668337012c22d42f59545c5e9fc0a`.
+[Current evidence](../evidence/FRONTIER_20261026/CEP078_CLOSEOUT.json): **39actual PASS cells,
+469assertions**, Chrome155.0.8059.82 / Edge156.0.4314.42, CSS1440x900/1024x768/390x844.
+All14initial failed attempts remain:6actual missing-navigation failures fixed by the
+bounded per-project link predicate;6stylesheet-probe assumptions and2mobile fixed-index
+assumptions corrected without product changes. No unresolved attributable defect from
+this continuation. The optional document-category technical label was observed as a
+nonblocking adjacent limitation; no complete document semantic-conformance claim.
+
+[Exact clause delta](../evidence/FRONTIER_20261026/CEP078_CLAUSE_DELTA.csv) records:
+Home403/503 and keyboard recovery12cells; contract detail/review keyboard6cells;
+document native400error6cells plus3Chrome rejected-upload cells; external portal/receipt
+keyboard and native required-file error6cells; exactPO mismatch POST/error semantics6cells.
+Home and PO use a labelled disposable loopback8002 current DjangoWSGI/static fixture:
+Home exception seam and invalid-request generator only. PO response is from the unchanged
+canonical endpoint with normal CSRF/auth/tenant enforcement; all test IDs were permitted,
+cross-project mismatch rejected, **zero orders created**. These are controlled technical
+fixture results, not a real outage or a claim that ordinary users can select a hidden option.
+
+Finding033 fixed: project-scoped reviewer could reach commercial review directly while
+the contract-detail template hid its link. The detail now calls the existing project-bound
+permission predicate. No authorization semantics, role, default grant, workflow, domain
+service or schema change.3focused tests+2scope subtestsPASS;20affected ListDetail tests+
+24subtestsPASS; RuffPASS; Django0issues. Accepted UIUX closure master unchanged;
+`List → Detail consistency: RESOLVED` retained. No broad regression rerun.
+
+Document-error submissions preserve all preexisting Document/Version/Link fingerprints.
+Expired external portal fixture replaced through the same canonical synthetic lifecycle;
+new labelled RFQ/version/grant/quote/receipt/custody retained, old source/expiry untouched.
+The new45minute grant was canonically revoked after verification; external tenant
+memberships0, browser quote submissions0. Shared8000server unchanged;8002stopped.
+Temporary viewport overrides reset; Edge original actor restored. Chrome test session
+logged out: original02owner credential was not in custody, so its login cannot be restored
+without user authentication; no credential reset or session injection occurred.
+
+AC2/4/5/6 PASS, AC1/3 PARTIAL; scopedDoD NOT_MET. Remaining blockers are exactly
+Finding016 accepted statutory values/bases/provenance/professional review, Finding032
+governed global/unprovisioned persona-discovery representation, and actual reduced-motion/
+native screen-reader execution unavailable on enabled browser-only controls. No WCAG
+conformance, missing runtime PASS, blanket requalification of older144cells, Human
+Sign-off or Production Certification is inferred. Prior observations and UTV remain.
+069..076 entry rechecked; canonical prerequisites/authoritative-input gaps unchanged.
+Gate statuses unchanged; next executable frontier empty. Git writes/Production NOT_EXECUTED.
+
+
+## CEP078-only remainder — 2026-10-26
+
+EXECUTION PARTIAL. [Current exact result](../evidence/CEP-078_REMAINDER_01/REMAINDER_REPORT.md) supersedes only the old F016/F032 blocker descriptions. Direct Human SC033 decision implemented: Development-only read-only all26 catalogue, existing active Platform Admin guard, no authority grant/protected tenant details. Six final supported browser size cells PASS;7focused tests+8subtests PASS. Existing effective Human-qualified UAT statutory source/review and populated claim recovered; native resolver and authenticated Django200 render PASS. No missing statutory input/review or persona Product question for this target. Required reduced-motion/native screen-reader target runtime and SC014 six actual browser cells remain UTV due external native/browser input limits. Narrator is available; the earlier browser-only-unavailability statement is historical, not current. AC2/4/5/6 PASS;AC1/3 PARTIAL;DoD NOT_MET;Gates unchanged;next_executable_frontier []. All prior evidence and completed coverage retained. No Git writes, otherCEP execution, Production or Human Sign-off.
+
+
+### Final CSS viewport qualification correction
+
+Measured CSS dimensions supersede the initial requested-size description above: **5canonical catalogue cells PASS** (Chrome1440/1024/390, Edge1440/1024). Edge75% page zoom required calibrated physical viewport settings. Exact Edge390x844 remains UTV: integer API produces389/391 CSS pixels, fractional292.5 rejected, Ctrl+0 unresponsive. Nearest391 renders all26 without overflow but is not an exact390 PASS. Original captures retained; only affected Edge dimensions reverified. See `CEP-078_REMAINDER_01/RUNTIME_QUALIFIED.json`. Product decision/source qualification remain resolved; AC/DoD and Gate states unchanged.

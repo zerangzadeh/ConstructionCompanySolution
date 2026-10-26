@@ -3,11 +3,13 @@
 from django.db import migrations, models
 
 
-def remove_legacy_invitation_events(apps, schema_editor):
-    audit_event_model = apps.get_model("audit", "AuditEvent")
-    audit_event_model.objects.filter(
-        action__in=["membership.invited", "membership.accepted"]
-    ).delete()
+def preserve_legacy_invitation_events(apps, schema_editor):
+    """Choice evolution must leave existing append-only evidence unchanged.
+
+    Historical action values remain valid stored evidence even when the current
+    application no longer offers them for new events. There is no backfill or
+    authority transfer, and reversing/retrying this step must also be a no-op.
+    """
 
 
 class Migration(migrations.Migration):
@@ -17,7 +19,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(
-            remove_legacy_invitation_events,
+            preserve_legacy_invitation_events,
             migrations.RunPython.noop,
         ),
         migrations.AlterField(

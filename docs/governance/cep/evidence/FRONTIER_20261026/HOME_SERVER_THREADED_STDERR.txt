@@ -1,0 +1,74 @@
+{"timestamp":"2026-10-26T11:54:29.439311+00:00","event":"http.response","request_id":"f0ae4585-67a0-4634-97c6-a7f35a7bd144","method":"GET","route":"home","status_code":403,"duration_ms":857}
+Forbidden: /
+127.0.0.1 - - [26/Oct/2026 15:24:29] "GET /?cep078_fixture=403 HTTP/1.1" 403 30029
+127.0.0.1 - - [26/Oct/2026 15:24:29] "GET /static/css/erp_jalali.css HTTP/1.1" 200 2778
+127.0.0.1 - - [26/Oct/2026 15:24:29] "GET /static/js/erp_table.js?v=20261023-cep078-associated-filters HTTP/1.1" 200 13153
+127.0.0.1 - - [26/Oct/2026 15:24:29] "GET /static/js/erp_context.js?v=20261025-uiux-business-context HTTP/1.1" 200 5655
+127.0.0.1 - - [26/Oct/2026 15:24:29] "GET /static/css/erp_money.css HTTP/1.1" 200 1270
+127.0.0.1 - - [26/Oct/2026 15:24:29] "GET /static/fonts/vazirmatn/Vazirmatn-Regular.woff2 HTTP/1.1" 200 50684
+127.0.0.1 - - [26/Oct/2026 15:24:29] "GET /static/fonts/vazirmatn/Vazirmatn-Bold.woff2 HTTP/1.1" 200 51020
+127.0.0.1 - - [26/Oct/2026 15:24:29] "GET /static/fonts/vazirmatn/Vazirmatn-SemiBold.woff2 HTTP/1.1" 200 51032
+127.0.0.1 - - [26/Oct/2026 15:24:29] "GET /static/fonts/vazirmatn/Vazirmatn-Medium.woff2 HTTP/1.1" 200 51128
+127.0.0.1 - - [26/Oct/2026 15:24:29] "GET /static/js/erp_money.js HTTP/1.1" 200 9107
+127.0.0.1 - - [26/Oct/2026 15:24:29] "GET /static/js/erp_jalali.js?v=20261023-cep078-month-focus HTTP/1.1" 200 17043
+{"timestamp":"2026-10-26T11:54:30.068582+00:00","event":"http.response","request_id":"c1308440-cebd-4798-aac6-0197b1597b88","method":"GET","route":null,"status_code":404,"duration_ms":78}
+Not Found: /favicon.ico
+127.0.0.1 - - [26/Oct/2026 15:24:30] "GET /favicon.ico HTTP/1.1" 404 7599
+127.0.0.1 - - [26/Oct/2026 15:24:30] "GET /static/js/erp_table.js?v=20261023-cep078-associated-filters HTTP/1.1" 200 13153
+127.0.0.1 - - [26/Oct/2026 15:24:30] "GET /static/js/erp_money.js HTTP/1.1" 200 9107
+127.0.0.1 - - [26/Oct/2026 15:24:30] "GET /static/js/erp_jalali.js?v=20261023-cep078-month-focus HTTP/1.1" 200 17043
+127.0.0.1 - - [26/Oct/2026 15:24:30] "GET /static/js/erp_context.js?v=20261025-uiux-business-context HTTP/1.1" 200 5655
+{"timestamp":"2026-10-26T11:54:31.069984+00:00","event":"http.response","request_id":"980eb94d-7ee3-4411-8ea8-833674fd3b57","method":"GET","route":"organizations:select","status_code":200,"duration_ms":272}
+127.0.0.1 - - [26/Oct/2026 15:24:31] "GET /organizations/ HTTP/1.1" 200 30891
+{"timestamp":"2026-10-26T11:54:31.771243+00:00","event":"http.response","request_id":"e52b486f-1615-4546-8b1f-034c1876ad70","method":"GET","route":"home","status_code":403,"duration_ms":179}
+Forbidden: /
+127.0.0.1 - - [26/Oct/2026 15:24:31] "GET /?cep078_fixture=403 HTTP/1.1" 403 30029
+{"timestamp":"2026-10-26T11:54:36.445520+00:00","event":"http.response","request_id":"cf511347-a196-44f4-87d8-1cafd657818a","method":"GET","route":"organizations:select","status_code":200,"duration_ms":250}
+127.0.0.1 - - [26/Oct/2026 15:24:36] "GET /organizations/ HTTP/1.1" 200 30891
+{"timestamp":"2026-10-26T11:54:39.313513+00:00","event":"http.response","request_id":"4fca4da3-5f2e-4d42-8fca-62119194e68f","method":"GET","route":"home","status_code":403,"duration_ms":195}
+Forbidden: /
+127.0.0.1 - - [26/Oct/2026 15:24:39] "GET /?cep078_fixture=403 HTTP/1.1" 403 30029
+{"timestamp":"2026-10-26T11:54:45.027797+00:00","event":"http.response","request_id":"97c1fcf6-2a04-45d3-b99e-4fd61b6e5d98","method":"GET","route":"organizations:select","status_code":200,"duration_ms":456}
+127.0.0.1 - - [26/Oct/2026 15:24:45] "GET /organizations/ HTTP/1.1" 200 30891
+Canonical Home link resolution failed
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\core\views.py", line 37, in home
+    workspaces, assigned_work, alerts = authorized_home_links(
+                                        ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\docs\governance\cep\evidence\FRONTIER_20261026\home_fault_server.py", line 31, in home_links
+    if mode=='error': raise RuntimeError('CEP078_SAFE_FAULT_FIXTURE')
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: CEP078_SAFE_FAULT_FIXTURE
+{"timestamp":"2026-10-26T11:54:45.639475+00:00","event":"http.response","request_id":"8096c3a2-0529-455c-ba28-8a7e0f8869e6","method":"GET","route":"home","status_code":503,"duration_ms":175}
+Service Unavailable: /
+127.0.0.1 - - [26/Oct/2026 15:24:45] "GET /?cep078_fixture=503 HTTP/1.1" 503 29992
+{"timestamp":"2026-10-26T11:54:48.634377+00:00","event":"http.response","request_id":"26ccbfbe-8cf1-45aa-bd88-0b6f4f64ec82","method":"GET","route":"organizations:select","status_code":200,"duration_ms":321}
+127.0.0.1 - - [26/Oct/2026 15:24:48] "GET /organizations/ HTTP/1.1" 200 30891
+Canonical Home link resolution failed
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\core\views.py", line 37, in home
+    workspaces, assigned_work, alerts = authorized_home_links(
+                                        ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\docs\governance\cep\evidence\FRONTIER_20261026\home_fault_server.py", line 31, in home_links
+    if mode=='error': raise RuntimeError('CEP078_SAFE_FAULT_FIXTURE')
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: CEP078_SAFE_FAULT_FIXTURE
+{"timestamp":"2026-10-26T11:54:51.296038+00:00","event":"http.response","request_id":"630e5440-e6ba-430c-9835-db9df0e96775","method":"GET","route":"home","status_code":503,"duration_ms":238}
+Service Unavailable: /
+127.0.0.1 - - [26/Oct/2026 15:24:51] "GET /?cep078_fixture=503 HTTP/1.1" 503 29992
+{"timestamp":"2026-10-26T11:54:56.130172+00:00","event":"http.response","request_id":"6d358bca-34b9-4d6c-8a85-ad536cff313c","method":"GET","route":"organizations:select","status_code":200,"duration_ms":441}
+127.0.0.1 - - [26/Oct/2026 15:24:56] "GET /organizations/ HTTP/1.1" 200 30891
+Canonical Home link resolution failed
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\core\views.py", line 37, in home
+    workspaces, assigned_work, alerts = authorized_home_links(
+                                        ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\docs\governance\cep\evidence\FRONTIER_20261026\home_fault_server.py", line 31, in home_links
+    if mode=='error': raise RuntimeError('CEP078_SAFE_FAULT_FIXTURE')
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: CEP078_SAFE_FAULT_FIXTURE
+{"timestamp":"2026-10-26T11:54:58.134902+00:00","event":"http.response","request_id":"7c051744-c24d-4454-96aa-c42db69acd89","method":"GET","route":"home","status_code":503,"duration_ms":190}
+Service Unavailable: /
+127.0.0.1 - - [26/Oct/2026 15:24:58] "GET /?cep078_fixture=503 HTTP/1.1" 503 29992
+{"timestamp":"2026-10-26T11:55:03.798128+00:00","event":"http.response","request_id":"12d3aee4-2472-42e0-b72d-bc5e9037eed1","method":"GET","route":"organizations:select","status_code":200,"duration_ms":215}
+127.0.0.1 - - [26/Oct/2026 15:25:03] "GET /organizations/ HTTP/1.1" 200 30891

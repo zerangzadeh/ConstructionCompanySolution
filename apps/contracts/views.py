@@ -172,7 +172,18 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
                 on_date=term.effective_from, prefix=str(term.pk)
             )
     return render(
-        request, "contracts/detail.html", {"contract": contract, "term_versions": terms}
+        request,
+        "contracts/detail.html",
+        {
+            "contract": contract,
+            "term_versions": terms,
+            "can_review_commercial": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.CONTRACTUAL_RECORDS_VIEW,
+                project=contract.project,
+            ),
+        },
     )
 
 
@@ -183,7 +194,9 @@ def commercial_review(request: HttpRequest, contract_id: str) -> HttpResponse:
 
     try:
         review = get_commercial_review(
-            organization=request.organization, actor=request.user, contract_id=contract_id
+            organization=request.organization,
+            actor=request.user,
+            contract_id=contract_id,
         )
     except (PermissionDenied, ValidationError):
         raise PermissionDenied("اجازه مشاهده مرور تجاری این قرارداد را ندارید.")

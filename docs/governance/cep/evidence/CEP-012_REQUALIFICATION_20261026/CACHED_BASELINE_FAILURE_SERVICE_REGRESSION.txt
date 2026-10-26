@@ -1,0 +1,224 @@
+........FF.F                                                             [100%]
+================================== FAILURES ===================================
+_ ProgressClaimCalculationTests.test_claim_revision_reuses_sources_without_rewriting_history _
+
+self = <apps.billing.tests.ProgressClaimCalculationTests testMethod=test_claim_revision_reuses_sources_without_rewriting_history>
+
+    def test_claim_revision_reuses_sources_without_rewriting_history(self) -> None:
+>       claim = self._claim()
+                ^^^^^^^^^^^^^
+
+apps\billing\tests.py:778: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\tests.py:713: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:701: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:503: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:492: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv-2\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <QuerySet []>, args = ()
+kwargs = {'workflow_type': <WorkflowType: billing.project_baseline_approval>, 'code': 'project_baseline_f61', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv-2\Lib\site-packages\django\db\models\query.py:635: DoesNotExist
+_ ProgressClaimCalculationTests.test_claim_snapshots_ignore_later_party_and_configuration_changes _
+
+self = <apps.billing.tests.ProgressClaimCalculationTests testMethod=test_claim_snapshots_ignore_later_party_and_configuration_changes>
+
+    def test_claim_snapshots_ignore_later_party_and_configuration_changes(self) -> None:
+>       claim = self._claim()
+                ^^^^^^^^^^^^^
+
+apps\billing\tests.py:894: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\tests.py:713: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:701: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:503: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:492: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv-2\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <QuerySet []>, args = ()
+kwargs = {'workflow_type': <WorkflowType: billing.project_baseline_approval>, 'code': 'project_baseline_f61', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv-2\Lib\site-packages\django\db\models\query.py:635: DoesNotExist
+_ ProgressClaimApprovalWorkflowTests.test_returned_correction_revision_preserves_lineage _
+
+self = <apps.billing.tests.ProgressClaimApprovalWorkflowTests testMethod=test_returned_correction_revision_preserves_lineage>
+
+    def test_returned_correction_revision_preserves_lineage(self) -> None:
+        self._configure_reporting_line()
+>       original = self._approve_claim(self._claim_for_approval())
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\billing\tests.py:1136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\tests.py:984: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:713: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:701: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:503: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:492: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv-2\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <QuerySet []>, args = ()
+kwargs = {'workflow_type': <WorkflowType: billing.project_baseline_approval>, 'code': 'project_baseline_f61', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv-2\Lib\site-packages\django\db\models\query.py:635: DoesNotExist
+=========================== short test summary info ===========================
+FAILED apps/billing/tests.py::ProgressClaimCalculationTests::test_claim_revision_reuses_sources_without_rewriting_history
+FAILED apps/billing/tests.py::ProgressClaimCalculationTests::test_claim_snapshots_ignore_later_party_and_configuration_changes
+FAILED apps/billing/tests.py::ProgressClaimApprovalWorkflowTests::test_returned_correction_revision_preserves_lineage
+3 failed, 9 passed in 39.33s

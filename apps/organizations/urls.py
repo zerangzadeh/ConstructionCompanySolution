@@ -1,10 +1,16 @@
 from django.urls import path
 
 from apps.organizations import views
+from apps.organizations.reference_personas import reference_persona_catalogue
 
 app_name = "organizations"
 
 urlpatterns = [
+    path(
+        "platform/reference-personas/",
+        reference_persona_catalogue,
+        name="reference_personas",
+    ),
     path("members/<uuid:membership_id>/", views.member_detail, name="member_detail"),
     path("", views.select_organization, name="select"),
     path("create/", views.create_organization, name="create"),

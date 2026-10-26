@@ -1,0 +1,20 @@
+{
+  "classification": "TEST_INFRASTRUCTURE_DEBT",
+  "status": "RESOLVED",
+  "cause": "Existing empty cached test database had current migration records but lacked migration-seeded starter templates",
+  "target": "test_bonira_cep073_runtime_20261026",
+  "actions": [
+    "0016_inventory_stock_transaction_compatibility_catalog.seed_w56_inventory_catalog",
+    "0018_project_baseline_compatibility_catalog.seed_project_baseline_catalog",
+    "0019_progress_verification_compatibility_catalog.seed_progress_catalog",
+    "0020_progress_claim_approval_compatibility_catalog.seed_progress_claim_catalog",
+    "0022_p1_1_routing_policy.remove_privileged_owner_routes",
+    "0023_p1_1_remove_deferred_self_approval.remove_deferred_self_approval_flags"
+  ],
+  "templates_before": 0,
+  "templates_after": 5,
+  "organizations": 0,
+  "users": 0,
+  "production_or_business_database_accessed": false,
+  "authorization_catalog_compatibility_guards_reapplied": true
+}

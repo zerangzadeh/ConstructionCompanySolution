@@ -1,0 +1,24 @@
+{
+  "command": [
+    "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+    "-m",
+    "pytest",
+    "-q",
+    "--reuse-db",
+    "-p",
+    "scripts.cep073_capture",
+    "--junitxml",
+    "docs\\governance\\cep\\evidence\\CEP-073_DEVELOPMENT_20261026\\RUNTIME.xml",
+    "--durations=10",
+    "apps/accounting/test_imb0066.py::JournalListBoundingTests::test_pages_are_bounded_stable_disjoint_and_complete",
+    "apps/accounting/test_imb0066.py::JournalListBoundingTests::test_queries_limit_journals_and_first_debit_without_line_prefetch",
+    "apps/accounting/test_imb0066.py::JournalListBoundingTests::test_active_tenant_scope_and_detail_links_are_preserved",
+    "apps/audit/test_imb0066.py::AuditListBoundingTests::test_pages_are_bounded_stable_disjoint_and_complete",
+    "apps/audit/test_imb0066.py::AuditListBoundingTests::test_one_bounded_source_read_includes_actor_and_no_writes",
+    "apps/audit/test_imb0066.py::AuditListBoundingTests::test_permission_scope_membership_tenant_and_login_fail_closed",
+    "apps/inventory/test_cep009.py",
+    "tests/test_cep073_runtime.py::CurrentReportingRuntimeTests::test_populated_refresh_queries_reconcile_without_source_writeback"
+  ],
+  "exit_code": 1,
+  "seconds": 66.68799999996554
+}

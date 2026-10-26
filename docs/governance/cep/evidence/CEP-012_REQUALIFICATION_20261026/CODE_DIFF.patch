@@ -1,0 +1,159 @@
+diff --git a/apps/audit/migrations/0016_membership_provisioned_action.py b/apps/audit/migrations/0016_membership_provisioned_action.py
+index da6deed..a554843 100644
+--- a/apps/audit/migrations/0016_membership_provisioned_action.py
++++ b/apps/audit/migrations/0016_membership_provisioned_action.py
+@@ -3,11 +3,13 @@
+ from django.db import migrations, models
+ 
+ 
+-def remove_legacy_invitation_events(apps, schema_editor):
+-    audit_event_model = apps.get_model("audit", "AuditEvent")
+-    audit_event_model.objects.filter(
+-        action__in=["membership.invited", "membership.accepted"]
+-    ).delete()
++def preserve_legacy_invitation_events(apps, schema_editor):
++    """Choice evolution must leave existing append-only evidence unchanged.
++
++    Historical action values remain valid stored evidence even when the current
++    application no longer offers them for new events. There is no backfill or
++    authority transfer, and reversing/retrying this step must also be a no-op.
++    """
+ 
+ 
+ class Migration(migrations.Migration):
+@@ -17,7 +19,7 @@ class Migration(migrations.Migration):
+ 
+     operations = [
+         migrations.RunPython(
+-            remove_legacy_invitation_events,
++            preserve_legacy_invitation_events,
+             migrations.RunPython.noop,
+         ),
+         migrations.AlterField(
+diff --git a/apps/billing/migrations/0006_tenantbillingconfiguration_and_more.py b/apps/billing/migrations/0006_tenantbillingconfiguration_and_more.py
+index 4d2aa8c..6ffd69c 100644
+--- a/apps/billing/migrations/0006_tenantbillingconfiguration_and_more.py
++++ b/apps/billing/migrations/0006_tenantbillingconfiguration_and_more.py
+@@ -32,14 +32,10 @@ class Migration(migrations.Migration):
+             model_name='billingpolicy',
+             name='updated_by',
+         ),
+-        migrations.RemoveField(
+-            model_name='progressclaim',
+-            name='policy_snapshot',
+-        ),
+-        migrations.AddField(
++        migrations.RenameField(
+             model_name='progressclaim',
+-            name='billing_configuration_snapshot',
+-            field=models.JSONField(default=dict),
++            old_name='policy_snapshot',
++            new_name='billing_configuration_snapshot',
+         ),
+         migrations.AddField(
+             model_name='progressclaim',
+diff --git a/apps/billing/migrations/0008_p6_s01_s06_seed_reset_and_required_snapshots.py b/apps/billing/migrations/0008_p6_s01_s06_seed_reset_and_required_snapshots.py
+index 3f25dd3..ec9522d 100644
+--- a/apps/billing/migrations/0008_p6_s01_s06_seed_reset_and_required_snapshots.py
++++ b/apps/billing/migrations/0008_p6_s01_s06_seed_reset_and_required_snapshots.py
+@@ -1,16 +1,83 @@
++import json
++
+ import django.db.models.deletion
+ from django.db import migrations, models
+ 
+ 
+-def discard_preproduction_claim_seed_data(apps, schema_editor):
+-    del schema_editor
+-    ClaimSettlementAllocation = apps.get_model(
+-        "billing", "ClaimSettlementAllocation"
+-    )
++def preservation_report(apps, schema_editor):
++    """Reconcile in place; absent historical snapshots are explicit exceptions.
++
++    Never derive an approved snapshot from today's configuration, reprice a
++    claim, clear revision lineage, or delete a claim/allocation to satisfy a
++    non-null constraint. Operators must resolve exceptions through separately
++    governed historical evidence before retrying this migration.
++    """
++    alias = schema_editor.connection.alias
+     ProgressClaim = apps.get_model("billing", "ProgressClaim")
+-    ClaimSettlementAllocation.objects.all().delete()
+-    ProgressClaim.objects.update(returned_revision=None)
+-    ProgressClaim.objects.all().delete()
++    Allocation = apps.get_model("billing", "ClaimSettlementAllocation")
++    mapping = []
++    exceptions = []
++    for claim in ProgressClaim.objects.using(alias).order_by("pk").iterator():
++        invalid = []
++        for field in (
++            "contract_term_version",
++            "party_identity_snapshot",
++            "regulatory_rule_version",
++        ):
++            if getattr(claim, f"{field}_id") is None:
++                invalid.append(field)
++        if not claim.currency_code or len(claim.currency_code) != 3:
++            invalid.append("currency_code")
++        if claim.contract_term_version_id and (
++            claim.contract_term_version.contract_id != claim.contract_id
++            or claim.contract_term_version.organization_id != claim.organization_id
++        ):
++            invalid.append("contract_term_version_scope")
++        if claim.party_identity_snapshot_id and (
++            claim.party_identity_snapshot.organization_id != claim.organization_id
++        ):
++            invalid.append("party_identity_snapshot_scope")
++        for field in ("contract", "project", "baseline"):
++            if getattr(claim, field).organization_id != claim.organization_id:
++                invalid.append(f"{field}_scope")
++        if (
++            claim.baseline.contract_id != claim.contract_id
++            or (claim.baseline.project_id != claim.project_id)
++            or claim.contract.project_id != claim.project_id
++        ):
++            invalid.append("project_contract_baseline_scope")
++        if claim.returned_revision_id and (
++            claim.returned_revision.organization_id != claim.organization_id
++            or claim.returned_revision.contract_id != claim.contract_id
++            or claim.returned_revision.project_id != claim.project_id
++        ):
++            invalid.append("returned_revision_scope")
++        key = {"model": "billing.ProgressClaim", "source": str(claim.pk)}
++        if invalid:
++            exceptions.append({**key, "invalid_fields": invalid})
++        else:
++            mapping.append({**key, "target": str(claim.pk)})
++    for row in Allocation.objects.using(alias).order_by("pk").iterator():
++        key = {"model": "billing.ClaimSettlementAllocation", "source": str(row.pk)}
++        if (
++            row.claim.organization_id != row.organization_id
++            or row.payment_allocation.organization_id != row.organization_id
++            or row.payment_allocation.payment.organization_id != row.organization_id
++            or row.payment_allocation.contract_id != row.claim.contract_id
++        ):
++            exceptions.append({**key, "invalid_fields": ["allocation_scope"]})
++        else:
++            mapping.append({**key, "target": str(row.pk)})
++    return {"mapping": mapping, "exceptions": exceptions}
++
++
++def preserve_claim_history(apps, schema_editor):
++    report = preservation_report(apps, schema_editor)
++    if report["exceptions"]:
++        raise RuntimeError(
++            "CEP012 historical snapshot/reference evidence required; source unchanged: "
++            + json.dumps(report, sort_keys=True)
++        )
+ 
+ 
+ class Migration(migrations.Migration):
+@@ -20,7 +87,7 @@ class Migration(migrations.Migration):
+ 
+     operations = [
+         migrations.RunPython(
+-            discard_preproduction_claim_seed_data,
++            preserve_claim_history,
+             migrations.RunPython.noop,
+         ),
+         migrations.AlterField(

@@ -32,14 +32,10 @@ class Migration(migrations.Migration):
             model_name='billingpolicy',
             name='updated_by',
         ),
-        migrations.RemoveField(
+        migrations.RenameField(
             model_name='progressclaim',
-            name='policy_snapshot',
-        ),
-        migrations.AddField(
-            model_name='progressclaim',
-            name='billing_configuration_snapshot',
-            field=models.JSONField(default=dict),
+            old_name='policy_snapshot',
+            new_name='billing_configuration_snapshot',
         ),
         migrations.AddField(
             model_name='progressclaim',

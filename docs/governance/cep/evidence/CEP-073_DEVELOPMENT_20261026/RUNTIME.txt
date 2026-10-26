@@ -1,0 +1,98 @@
+........F.                                                               [100%]
+================================== FAILURES ===================================
+_ CurrentReportingRuntimeTests.test_populated_refresh_queries_reconcile_without_source_writeback _
+
+self = <test_cep073_runtime.CurrentReportingRuntimeTests testMethod=test_populated_refresh_queries_reconcile_without_source_writeback>
+
+    def test_populated_refresh_queries_reconcile_without_source_writeback(self):
+        membership = self.organization.memberships.get(user=self.owner)
+        role = OrganizationRole.objects.create(
+            organization=self.organization,
+            code="cep073-reporting",
+            name="Synthetic reporting",
+        )
+        role.permissions.set(
+            BusinessPermission.objects.filter(
+                code__in=(
+                    BusinessPermissionCode.REPORTING_METRIC_REFRESH_RUN,
+                    BusinessPermissionCode.REPORTING_PORTFOLIO_VIEW,
+                    BusinessPermissionCode.INVENTORY_VALUATION_VIEW,
+                )
+            )
+        )
+        MembershipRoleAssignment.objects.create(
+            organization=self.organization,
+            membership=membership,
+            role=role,
+            reason="CEP073 explicit test-only permission; existing organization scope",
+        )
+>       receipt = self.create_and_post(
+            number="CEP073-SYNTHETIC-IN",
+            transaction_type=StockTransactionType.ADJUSTMENT_IN,
+            quantity=Decimal(10),
+            destination=self.central,
+            actor=self.owner,
+        )
+
+tests\test_cep073_runtime.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\inventory\tests.py:166: in create_and_post
+    transaction_record = create_stock_transaction(
+apps\inventory\services.py:335: in create_stock_transaction
+    return _create_stock_transaction_domain(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\services.py:416: in _create_stock_transaction_domain
+    _require_role(
+apps\inventory\services.py:63: in _require_role
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: inventory-owner>, organization = <Organization: Inventory Co>
+permission = BusinessPermissionCode.STOCK_TRANSACTIONS_CREATE
+message = 'اجازه ایجاد تراکنش انبار در این سازمان را ندارید.', project = None
+site = None, allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد تراکنش انبار در این سازمان را ندارید.
+
+apps\organizations\authorization.py:436: PermissionDenied
+============================ slowest 10 durations =============================
+14.71s setup    apps/accounting/test_imb0066.py::JournalListBoundingTests::test_pages_are_bounded_stable_disjoint_and_complete
+8.52s call     apps/inventory/test_cep009.py::InventoryTransferLockOrderTests::test_opposing_transfers_post_once_without_lost_update
+6.91s call     apps/accounting/test_imb0066.py::JournalListBoundingTests::test_pages_are_bounded_stable_disjoint_and_complete
+5.70s setup    apps/inventory/test_cep009.py::InventoryTransferLockOrderTests::test_opposing_transfers_post_once_without_lost_update
+5.31s call     apps/accounting/test_imb0066.py::JournalListBoundingTests::test_queries_limit_journals_and_first_debit_without_line_prefetch
+4.04s call     apps/accounting/test_imb0066.py::JournalListBoundingTests::test_active_tenant_scope_and_detail_links_are_preserved
+3.79s call     apps/audit/test_imb0066.py::AuditListBoundingTests::test_permission_scope_membership_tenant_and_login_fail_closed
+3.69s call     apps/audit/test_imb0066.py::AuditListBoundingTests::test_pages_are_bounded_stable_disjoint_and_complete
+2.91s call     apps/audit/test_imb0066.py::AuditListBoundingTests::test_one_bounded_source_read_includes_actor_and_no_writes
+1.72s call     apps/inventory/test_cep009.py::InventoryBalanceQueryTests::test_single_scoped_aggregate_preserves_transfer_and_reversal_history
+=========================== short test summary info ===========================
+FAILED tests/test_cep073_runtime.py::CurrentReportingRuntimeTests::test_populated_refresh_queries_reconcile_without_source_writeback
+1 failed, 9 passed in 60.42s (0:01:00)

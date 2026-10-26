@@ -1,0 +1,57 @@
+{
+  "LINT": {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "scripts/cep012_preservation_proof.py",
+      "scripts/cep073_capture.py",
+      "tests/test_cep073_runtime.py"
+    ],
+    "exit_code": 0
+  },
+  "MIGRATION_LINT": {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "--ignore",
+      "RUF012",
+      "apps/billing/migrations/0008_p6_s01_s06_seed_reset_and_required_snapshots.py"
+    ],
+    "exit_code": 0
+  },
+  "FORMAT": {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "scripts/cep012_preservation_proof.py",
+      "scripts/cep073_capture.py",
+      "tests/test_cep073_runtime.py"
+    ],
+    "exit_code": 0
+  },
+  "DJANGO_CHECK": {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+      "manage.py",
+      "check"
+    ],
+    "exit_code": 0
+  },
+  "MIGRATION_DRIFT": {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+      "manage.py",
+      "makemigrations",
+      "--check",
+      "--dry-run"
+    ],
+    "exit_code": 0
+  }
+}

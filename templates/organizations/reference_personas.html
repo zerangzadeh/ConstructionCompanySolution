@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}پرسوناهای مرجع توسعه | بنیرا{% endblock %}
+{% block content %}
+  {% include "components/page_header.html" with page_eyebrow="مدیریت پلتفرم · توسعه و UAT" page_title="پرسوناهای مرجع توسعه" page_description="فهرست فقط‌خواندنی تعریف‌ها و آمادگی مستند؛ پرسونا نقش یا مجوز دسترسی نیست." only %}
+  <section class="erp-surface mt-5 rounded-xl p-5" aria-labelledby="readiness-source-title">
+    <h2 id="readiness-source-title" class="font-bold">منبع و اعتبار آمادگی</h2>
+    <p class="mt-2">وضعیت ثبت‌شده در منبع مصوب به تاریخ <span dir="ltr">{{ catalogue.documented_at }}</span> نمایش داده می‌شود. موجود بودن و فعال بودن حساب نگاشت‌شده در همین درخواست بررسی می‌شود؛ این بررسی به معنی آمادگی اجرای فعلی نیست. عضویت، مجوز و دامنه دسترسی باید پیش از هر آزمون دوباره بررسی شود.</p>
+    <p class="mt-2">شناسه پیشنهادی به معنی حساب موجود نیست. این فهرست حساب ایجاد نمی‌کند و دسترسی به اطلاعات شرکت یا عملیات اجرایی نمی‌دهد.</p>
+    <h3 class="mt-3 font-bold">مراجع تعریف و آمادگی</h3>
+    <ul class="mt-2 space-y-2">{% for source in catalogue.sources %}<li class="break-all text-sm" dir="ltr">{{ source.path }}</li>{% endfor %}</ul>
+  </section>
+  <section class="mt-6" aria-labelledby="reference-personas-title">
+    <h2 id="reference-personas-title" class="text-lg font-bold">۲۶ تعریف مرجع</h2>
+    <div class="mt-4 grid gap-4 xl:grid-cols-2">
+      {% for persona in catalogue.personas %}
+        <article class="erp-surface min-w-0 rounded-xl p-5" data-reference-persona="{{ persona.persona_id }}" aria-labelledby="persona-{{ persona.persona_id }}">
+          <h3 id="persona-{{ persona.persona_id }}" class="font-bold"><span dir="ltr">{{ persona.persona_id }}</span> · {{ persona.label }}</h3>
+          <dl class="mt-3 space-y-3 text-sm">
+            <div><dt class="font-bold">شناسه پیشنهادی</dt><dd class="break-all" dir="ltr">{{ persona.target_alias }}</dd></div>
+            <div><dt class="font-bold">هویت مرجع مستند</dt><dd class="break-all" dir="ltr">{{ persona.documented_identity|default:"در منبع نگاشت نشده" }}</dd></div>
+            <div><dt class="font-bold">آمادگی مستند</dt><dd dir="ltr">{{ persona.documented_readiness }}</dd></div>
+            <div><dt class="font-bold">وضعیت فعلی حساب مرجع</dt><dd>{{ persona.identity_state }}</dd></div>
+            <div><dt class="font-bold">شکل اختیار و دامنه مورد نیاز</dt><dd dir="auto">{{ persona.authority_shape }}</dd></div>
+            <div><dt class="font-bold">بستر مورد نیاز اعتبارسنجی</dt><dd><ul class="space-y-1">{% for requirement in persona.context_requirements %}<li dir="auto">{{ requirement }}</li>{% endfor %}</ul></dd></div>
+            <div><dt class="font-bold">سناریوهای مرجع</dt><dd dir="ltr">{{ persona.scenario_ids|join:", " }}</dd></div>
+          </dl>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,78 @@
+{
+  "prompts": {
+    "CEP-012": {
+      "path": "docs/governance/cep/PROMPTS/CEP-012_EXECUTION_PROMPT.md",
+      "sha256": "c75ba3ea83131b3dc49d6acfcf5f7c41648cfe4109402e527f14723f253c89d8",
+      "status": "PASS"
+    },
+    "CEP-069": {
+      "path": "docs/governance/cep/PROMPTS/CEP-069_EXECUTION_PROMPT.md",
+      "sha256": "41d138764cb8fcde81dfea26f6c6df82202c54e4da3a641b2b18382811f2ebba",
+      "status": "PASS"
+    },
+    "CEP-070": {
+      "path": "docs/governance/cep/PROMPTS/CEP-070_EXECUTION_PROMPT.md",
+      "sha256": "7d3de81556e62ed46c5fe90d1742742c5d0f07caa5dcf4b7d19b549fe2139e82",
+      "status": "PASS"
+    },
+    "CEP-071": {
+      "path": "docs/governance/cep/PROMPTS/CEP-071_EXECUTION_PROMPT.md",
+      "sha256": "e456aa9b63a18286448f513d29f1d81e47a1b2c2a555121110f89938bc4d3801",
+      "status": "PASS"
+    },
+    "CEP-072": {
+      "path": "docs/governance/cep/PROMPTS/CEP-072_EXECUTION_PROMPT.md",
+      "sha256": "9c52431a1c52c2ca41c2e10ca0eb35eea4871a8ebb7d38e3d57600ca1bbf0940",
+      "status": "PASS"
+    },
+    "CEP-073": {
+      "path": "docs/governance/cep/PROMPTS/CEP-073_EXECUTION_PROMPT.md",
+      "sha256": "1ddfee26cd4eeba482856d4785ece6648241c8612bdf1e67943930a0e93356b4",
+      "status": "PASS"
+    },
+    "CEP-074": {
+      "path": "docs/governance/cep/PROMPTS/CEP-074_EXECUTION_PROMPT.md",
+      "sha256": "7e723b4147d417418f6033b2185a843af92d14e297c649418624d805b34811b9",
+      "status": "PASS"
+    },
+    "CEP-075": {
+      "path": "docs/governance/cep/PROMPTS/CEP-075_EXECUTION_PROMPT.md",
+      "sha256": "2df7a9665e89d737046844df7ff4439f9ab08591f34e0844ab1871f1db9c7df0",
+      "status": "PASS"
+    },
+    "CEP-076": {
+      "path": "docs/governance/cep/PROMPTS/CEP-076_EXECUTION_PROMPT.md",
+      "sha256": "2d93e72adae5830ffeca0e3fe2cc711baecd0f313078620d4cd21717be50c2aa",
+      "status": "PASS"
+    }
+  },
+  "recovery_archive_hashes": {
+    "BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip": "15f8d71a3f3e14feed9e7162b81f74ad39b546df9aff3ec5b01e1a676deaf429",
+    "BONIRA_IMPLEMENTATION_ROADMAP_CONSOLIDATED_LATEST.zip": "54082de6f32d9a26805aaa3050f24a9863d73f840d827274f0cd3145988b6784",
+    "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip": "cf45d1f6db5821084205e3cdf0553cd68c036855cd4c1d5bbe1ee28c7e6693be"
+  },
+  "canonical_gate": {
+    "Gate ID": "GATE-06",
+    "Gate Name": "Data Migration Readiness",
+    "Gate Type": "DATA MIGRATION GATE",
+    "Purpose": "Ensure migration implementations preserve history, reconciliation and rollback before runtime migration verification.",
+    "Required IMB IDs": "IMB-0050; IMB-0070; IMB-0075; IMB-0080; IMB-0096; IMB-0097",
+    "Required External Dependencies": "EXT-0015; EXT-0017; EXT-0023 for runtime verification",
+    "Evidence Required": "Source\u2192target mapping; before/after counts; exception handling; rollback/cutover plan; source preservation; approved datasets where required.",
+    "Pass Condition": "Migration code/process is repeatable and reconcilable; required migration datasets exist before execution.",
+    "Failure Consequence": "Migration execution and IMB-0103 verification remain blocked.",
+    "Downstream Work Unlocked": "PostgreSQL migration/runtime verification",
+    "UTV?": "YES until target PostgreSQL execution",
+    "Human Sign-off?": "NO",
+    "Notes": "Migration implementation \u2260 migration execution."
+  },
+  "verified_archive_members": {
+    "BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip/BONIRA_CEP_DEPENDENCY_REGISTER.csv": "c9ea5e693410d9c6f2e86044fdc1d91df03289082adfe304fce620947e5c88f6",
+    "BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip/BONIRA_CEP_EXTERNAL_DEPENDENCY_REGISTER.csv": "e1dae585c60060459c75ac8676b0c5aeb2cbaaaeb1d5422f7a8d23bd3b23c2af",
+    "BONIRA_IMPLEMENTATION_ROADMAP_CONSOLIDATED_LATEST.zip/BONIRA_IMPLEMENTATION_GATE_REGISTER.csv": "4eca43cb04f5f32afdc2ec177c2c4c8ec1963115d3e23f91e3b07c8b5579358d",
+    "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip/BONIRA_RECOVERY_POLICY_MATRIX.csv": "579ac8da6323078508b486410880b9affcee4842aea5e8fb57b2ea2e219a7494",
+    "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip/BONIRA_PRODUCTION_DEPLOYMENT_SPECIFICATION.md": "437f4515abf52524421a5ad27286f06a7b774f52719069f5054d52f40b4dc0bc",
+    "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip/BONIRA_OPERATING_SPECIFICATION.md": "d144b3cfa3266564d2467b659d70597fe9d0b1923814a4db59c97ac5c7e48633",
+    "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip/BONIRA_PAYROLL_STATUTORY_SOURCE_PACKAGE_SPECIFICATION.md": "1b9daf5c9487ee3c30ddf641dda77345c2dbd0c97ee21566bfa9a17298d8b81b"
+  }
+}
