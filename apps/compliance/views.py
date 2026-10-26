@@ -9,6 +9,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Model
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from apps.compliance.forms import (
@@ -409,3 +410,37 @@ def evidence_link(request: HttpRequest, kind: str, record_id: str) -> HttpRespon
     else:
         messages.error(request, "نسخه یا کاربرد شاهد معتبر نیست.")
     return redirect("compliance:detail", kind=kind, record_id=record_id)
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.COMPLIANCE_VIEW)
+@require_GET
+def template_detail(request: HttpRequest, template_id: str) -> HttpResponse:
+    record = get_object_or_404(
+        InspectionTemplate.objects.filter(organization=request.organization),
+        pk=template_id,
+    )
+    version = record.versions.filter(
+        organization=request.organization, pk=record.current_version_id
+    ).first()
+    return render(
+        request,
+        "components/read_only_record_detail.html",
+        {
+            "detail_title": record.title,
+            "back_url": reverse("compliance:workbench"),
+            "detail_rows": [
+                ("کد", record.code, "text"),
+                ("پروفایل", record.get_profile_display(), "text"),
+                ("وضعیت", record.get_status_display(), "text"),
+                ("نسخه جاری", version.version_number if version else None, "number"),
+            ],
+            "detail_sections": [
+                ("چک‌لیست نسخه جاری", version.checklist),
+                ("شواهد مورد نیاز", version.required_evidence),
+                ("قواعد نتیجه نسخه جاری", version.outcome_rules),
+            ]
+            if version
+            else [],
+        },
+    )

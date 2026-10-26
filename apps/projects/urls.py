@@ -5,6 +5,11 @@ from apps.projects import views
 app_name = "projects"
 
 urlpatterns = [
+    path(
+        "<uuid:project_id>/sites/<uuid:site_id>/",
+        views.project_site_detail,
+        name="site_detail",
+    ),
     path("", views.project_list, name="list"),
     path("sites/", views.site_list, name="all_site_list"),
     path("create/", views.project_create, name="create"),

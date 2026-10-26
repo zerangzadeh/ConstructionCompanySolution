@@ -3,6 +3,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.audit.models import AuditEvent
@@ -460,4 +461,38 @@ def handoff_reconcile(request, envelope_id):
         request,
         "fixed_assets/form.html",
         {"form": form, "title": "تطبیق پیشنهاد دارایی ثابت"},
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.FIXED_ASSETS_VIEW)
+@require_GET
+def transaction_detail(request: HttpRequest, transaction_id: str) -> HttpResponse:
+    record = get_object_or_404(
+        AssetTransaction.objects.filter(
+            organization=request.organization,
+            asset__in=visible_assets(
+                organization=request.organization, actor=request.user
+            ),
+        ).select_related("asset"),
+        pk=transaction_id,
+    )
+    return render(
+        request,
+        "components/read_only_record_detail.html",
+        {
+            "detail_title": record.get_transaction_type_display(),
+            "back_url": reverse("fixed_assets:workbench"),
+            "detail_rows": [
+                ("شماره دارایی", record.asset.asset_number, "text"),
+                ("نام دارایی", record.asset.name, "text"),
+                ("نوع رویداد", record.get_transaction_type_display(), "text"),
+                ("وضعیت", record.get_status_display(), "text"),
+                ("تاریخ", record.occurred_on, "date"),
+                ("مبلغ", record.amount, "number"),
+                ("ارز", record.currency_code, "text"),
+                ("دلیل", record.reason, "text"),
+                ("زمان نهایی‌شدن", record.finalized_at, "datetime"),
+            ],
+        },
     )

@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.organizations.authorization import get_active_membership, scope_queryset
@@ -610,3 +611,76 @@ def timesheet_preview(request: HttpRequest, timesheet_id) -> HttpResponse:
     except (ValidationError, PermissionDenied) as exc:
         messages.error(request, _error_message(exc))
     return redirect("timekeeping:timesheet_detail", timesheet_id=sheet.pk)
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.ATTENDANCE_VIEW)
+@require_GET
+def record_detail(request: HttpRequest, kind: str, record_id: str) -> HttpResponse:
+    # Back-office read access deliberately does not reuse ESS identity routes.
+    models = {
+        "attendance": AttendanceRecord,
+        "correction": AttendanceCorrectionRequest,
+        "leave": LeaveMissionRequest,
+        "overtime": OvertimeRequest,
+    }
+    model = models.get(kind)
+    if model is None:
+        raise Http404
+    records = model.objects.filter(organization=request.organization)
+    if kind == "correction":
+        records = scope_queryset(
+            records,
+            membership=get_active_membership(
+                user=request.user, organization=request.organization
+            ),
+            project_lookup="attendance__project_id",
+            site_lookup="attendance__site_id",
+        )
+    else:
+        records = _scoped(records, request)
+    record = get_object_or_404(records, pk=record_id)
+    if kind == "attendance":
+        title = "سابقه حضور"
+        rows = [
+            ("کارمند", record.employee, "text"),
+            ("تاریخ", record.work_date, "date"),
+            ("ورود", record.check_in_at, "datetime"),
+            ("خروج", record.check_out_at, "datetime"),
+            ("وضعیت", record.get_state_display(), "text"),
+            ("شرح استثنا", record.exception_notes, "text"),
+        ]
+    elif kind == "correction":
+        title = "درخواست اصلاح حضور"
+        rows = [
+            ("کارمند", record.attendance.employee, "text"),
+            ("تاریخ حضور", record.attendance.work_date, "date"),
+            ("نوع", record.get_kind_display(), "text"),
+            ("وضعیت", record.get_status_display(), "text"),
+            ("دلیل درخواست", record.reason, "text"),
+            ("تاریخ پیشنهادی", record.replacement_work_date, "date"),
+            ("ورود پیشنهادی", record.replacement_check_in_at, "datetime"),
+            ("خروج پیشنهادی", record.replacement_check_out_at, "datetime"),
+            ("دلیل بررسی", record.review_reason, "text"),
+        ]
+    else:
+        title = record.get_kind_display() if kind == "leave" else "درخواست اضافه‌کاری"
+        rows = [
+            ("کارمند", record.employee, "text"),
+            ("پروژه", record.project, "text"),
+            ("کارگاه", record.site, "text"),
+            ("شروع", record.starts_at, "datetime"),
+            ("پایان", record.ends_at, "datetime"),
+            ("وضعیت", record.get_state_display(), "text"),
+            ("دلیل درخواست", record.reason, "text"),
+            ("دلیل بررسی", record.review_reason, "text"),
+        ]
+    return render(
+        request,
+        "components/read_only_record_detail.html",
+        {
+            "detail_title": title,
+            "detail_rows": rows,
+            "back_url": reverse("timekeeping:workbench"),
+        },
+    )

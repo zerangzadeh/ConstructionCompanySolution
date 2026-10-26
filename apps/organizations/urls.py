@@ -5,6 +5,7 @@ from apps.organizations import views
 app_name = "organizations"
 
 urlpatterns = [
+    path("members/<uuid:membership_id>/", views.member_detail, name="member_detail"),
     path("", views.select_organization, name="select"),
     path("create/", views.create_organization, name="create"),
     path("members/", views.organization_members, name="members"),

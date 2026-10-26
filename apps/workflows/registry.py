@@ -752,7 +752,7 @@ registry.register_subject_adapter(
         # change; the domain command rechecks the transition permission later.
         start_permission="maintenance_records.view",
         view_permission="maintenance_records.view",
-        detail_url_name="equipment:maintenance_status_change",
+        detail_url_name="equipment:maintenance_detail",
         detail_url_kwarg="record_id",
     )
 )

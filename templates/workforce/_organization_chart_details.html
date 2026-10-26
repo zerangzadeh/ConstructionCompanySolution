@@ -4,7 +4,7 @@
         <span class="org-chart-card__icon org-chart-card__icon--{{ node.theme }}" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
         </span>
-        <div><h3>{{ node.department.name }}</h3><p dir="ltr">{{ node.department.code }}</p></div>
+        <div><h3><a class="font-semibold text-blue-700 hover:underline" href="{% url 'workforce:department_detail' node.department.id %}">{{ node.department.name }}</a></h3><p dir="ltr">{{ node.department.code }}</p></div>
     </div>
 
     <dl class="org-chart-details__facts">

@@ -6309,3 +6309,1123 @@ execution_history:
   blockers: []
   git_writes: "NOT EXECUTED"
   touch_set: ["templates/timekeeping/form.html", "templates/payroll/form.html", "templates/procurement/form.html", "apps/accounting/templates/accounting/form.html", "apps/billing/templates/billing/payable_form.html", "apps/billing/templates/billing/commercial_form.html", "apps/treasury/templates/treasury/operation_form.html", "templates/reporting/project_closeout_detail.html", "templates/materials/material_list.html", "templates/parties/detail.html", "apps/accounting/templates/accounting/journal_list.html", "templates/payroll/payslip.html", "templates/workforce/certificate_detail.html", "templates/workforce/personal_change_detail.html", "templates/payroll/ess_inquiry_detail.html", "templates/workforce/personal_change_requests.html", "templates/workforce/employment_history.html", "templates/workforce/ess_profile.html", "templates/workforce/certificate_form.html", "templates/workforce/personal_change_form.html", "templates/payroll/ess_inquiry_form.html", "templates/parties/list.html", "templates/parties/governance_detail.html", "templates/workflows/manager_workspace.html", "templates/workflows/my_requests.html", "apps/workforce/templates/workforce/ess_timekeeping_form.html", "templates/contracts/commercial_review.html", "templates/home.html", "apps/fixed_assets/templates/fixed_assets/workbench.html", "apps/reporting/templates/reporting/_read_model_card.html", "apps/accounts/templatetags/ui_actions.py", "apps/workforce/test_cep022.py", "apps/workforce/test_cep056.py", "apps/payroll/test_cep054.py", "docs/governance/uiux/UIUX_FINDING_CLOSURE_MASTER.yaml"]
+
+- batch: LIST-DETAIL-CONFORMANCE-20261026
+  date: '2026-10-26'
+  head: 325b32f175178fc74dcf634899899d119645953c
+  origin_main: 325b32f175178fc74dcf634899899d119645953c
+  baseline: Clean main at 325b32f; UI checkpoint 566073b is an ancestor. No pre-existing working-tree changes. Local
+    tracking ref inspected; no fetch or Git write.
+  scope: Direct Human List → Detail consistency follow-up across all repository UI template roots. No new audit and no
+    reassessment/status changes to the 135 findings.
+  actual_touch_set: 44 templates/components, department-chart UI JavaScript, one focused navigation test module, and
+    this single appended execution_history entry. No views/services/URLs/models/permissions/migrations changed.
+  rule: List → Detail consistency
+  html_templates_inspected: 316
+  surfaces_checked: 184
+  surface_count_unit: Unique templates/components containing record Lists/Tables/Cards, including nested owned-record/history/projection
+    collections and list wrappers; shared components counted once. Form fields/formsets, selectors/options, navigation
+    groups and unsaved previews excluded from record-gap counts.
+  inconsistency_groups: 159
+  fixed_groups: 44
+  changed_templates: 44
+  surfaces_without_canonical_detail: 115
+  gap_count_unit: One grouped fixable presentation/navigation inconsistency per changed template/component, plus one
+    missing-record-Detail group per blocked template/component. A file can contribute one of each; these are conformance
+    groups, not new Finding IDs. Nested records without standalone Detail are retained as limitations; owner/source records
+    are not silently substituted for them.
+  change_summary: Reused the shared مشاهده جزئیات action with consistent secondary styling, accessible record labels
+    and no empty href; linked visible names/numbers to existing canonical routes. Preserved availability/permission guards.
+    Made member Edit, Timekeeping list fragments and maintenance transitions explicit operations. Department chart links
+    support Enter without the summary handler intercepting navigation. Photo titles link to their already-authorized
+    DMS Detail; preview/download guards remain intact.
+  focused_validation:
+    command: .venv/Scripts/python.exe -m pytest core/test_list_detail_navigation.py core/test_cep003_localization_accessibility.py
+      -q -k 'ListDetailNavigation or navigation or custody_records' --disable-warnings
+    result: 20/20 PASS; 24 subtests PASS. Primary/action destination agreement; all six compliance kinds including records
+      without title; source availability, per-result drillthrough and separate destination permission guards; own-identity
+      routes; list-fragment/Edit/transition separation; recursive chart links; standard action labels; photo Detail versus guarded preview. No database fixtures/business
+      mutations.
+    template_compile: 316/316 repository HTML templates PASS through the configured Django engine.
+  browser_verification:
+    environment: Existing authenticated local non-production Chrome session; current membership and tenant retained.
+    coverage: '15 distinct template surfaces reached: Safety List; Party List/Detail/Governance List; Estimate List/Detail;
+      Project List; Material List; Treasury Operations/Detail; Department Chart/Detail; Document List; Compliance Workbench;
+      Workflow Workbench. Four canonical Details opened, including department-name Enter navigation; Treasury Detail
+      contained no operation form.'
+    desktop_mobile: 'Populated Parties, Estimates, Projects and Materials at 1440x900 and 390x844: RTL retained, no document
+      overflow; Detail action/primary destination agreement held wherever an explicit action exists. Mobile table scrolling
+      retained. Shared actions inspected visually; temporary viewport reset.'
+    limitations: Compliance live list was empty; six populated kinds rely on focused rendering. No maintenance source
+      row in the live workbench; transition separation verified by focused test. Sensitive ESS/Payroll/Reporting branches
+      use focused rendered checks rather than live browser claims. No new fixture, identity inference, impersonation,
+      permission expansion or business record used.
+  resolution: PARTIAL — BLOCKED FOR RECORD COLLECTIONS WITHOUT CANONICAL DETAIL
+  blocker_policy: Existing route catalogues, generic-resource dispatch maps and source-URL producers inspected. No route/Detail
+    invented. Child/history records and source-owned projections lacking a record-specific URL contract remain listed
+    below; owner/source links, downloads, Edit, workflow actions and list fragments are not promoted to their Detail.
+    Requires bounded Product/Domain navigation decisions outside this UI-only scope.
+  blockers:
+  - template: apps/accounting/templates/accounting/_account_tree_nodes.html
+    collections: accounts (no account Detail route)
+  - template: apps/accounting/templates/accounting/journal_detail.html
+    collections: journal lines
+  - template: apps/accounting/templates/accounting/opening_detail.html
+    collections: opening lines
+  - template: apps/accounting/templates/accounting/period_list.html
+    collections: fiscal years and periods
+  - template: apps/accounting/templates/accounting/reconciliation_detail.html
+    collections: reconciliation exceptions and tie-outs
+  - template: apps/accounting/templates/accounting/source_detail.html
+    collections: source input lines
+  - template: apps/billing/templates/billing/baseline_detail.html
+    collections: baseline items
+  - template: apps/billing/templates/billing/claim_detail.html
+    collections: claim items, adjustments and settlements
+  - template: apps/billing/templates/billing/payable_certificate_detail.html
+    collections: certificate items and adjustments
+  - template: apps/billing/templates/billing/statutory_operations_dashboard.html
+    collections: statutory submission evidence
+  - template: apps/billing/templates/billing/statutory_record_detail.html
+    collections: submission attempts
+  - template: apps/commercial/templates/commercial/tender_detail.html
+    collections: tender revisions and evidence associations
+  - template: apps/fixed_assets/templates/fixed_assets/asset_detail.html
+    collections: asset source references
+  - template: apps/fixed_assets/templates/fixed_assets/audit_evidence.html
+    collections: audit events
+  - template: apps/fixed_assets/templates/fixed_assets/workbench.html
+    collections: depreciation runs, transactions, handoffs, classes and books
+  - template: apps/knowledge/templates/knowledge/platform_promotions.html
+    collections: sanitized promotion requests (review actions only)
+  - template: apps/knowledge/templates/knowledge/publication_history.html
+    collections: provenance pins, reviews and lifecycle events (version Detail fixed separately)
+  - template: apps/knowledge/templates/knowledge/recurrence.html
+    collections: recurrence evidence
+  - template: apps/knowledge/templates/knowledge/reuse.html
+    collections: reuse evidence
+  - template: apps/partner_qualification/templates/partner_qualification/workbench.html
+    collections: qualification profiles, requirements, qualifications and evaluations
+  - template: apps/subledgers/templates/subledgers/supplier_invoice_match_review.html
+    collections: match lines and discrepancies
+  - template: apps/subledgers/templates/subledgers/workbench.html
+    collections: obligations, settlement allocations and reconciliation runs
+  - template: apps/support/templates/support/case_detail.html
+    collections: case events and evidence associations
+  - template: apps/support/templates/support/workbench.html
+    collections: calendar projections and support access requests
+  - template: apps/treasury/templates/treasury/operations.html
+    collections: advance reconciliation runs
+  - template: apps/treasury/templates/treasury/statement_workbench.html
+    collections: statement lines, match proposals and clearings (import Detail exists)
+  - template: apps/treasury/templates/treasury/workbench.html
+    collections: bank and GL reconciliation runs (account Detail fixed separately)
+  - template: apps/workforce/templates/workforce/ess_timekeeping_detail.html
+    collections: mission routing evidence and timesheet entries
+  - template: templates/accounts/connection_requests.html
+    collections: connection requests
+  - template: templates/admin/accounts/user/change_form.html
+    collections: membership rows and account audit events
+  - template: templates/admin/change_list.html
+    collections: native Admin result list uses change/view form destinations
+  - template: templates/admin/change_list_results.html
+    collections: native Admin result rows; no separate canonical read Detail mapping
+  - template: templates/admin/index.html
+    collections: Admin log entries and native change-form destinations
+  - template: templates/admin/object_history.html
+    collections: Admin history events
+  - template: templates/audit/log.html
+    collections: audit events (no governed entity/source URL contract)
+  - template: templates/compliance/assurance.html
+    collections: compliance reconciliation exception rows
+  - template: templates/compliance/detail.html
+    collections: compliance lifecycle events
+  - template: templates/compliance/workbench.html
+    collections: inspection template cards
+  - template: templates/contracts/contractual_record_detail.html
+    collections: contractual evidence associations
+  - template: templates/contracts/detail.html
+    collections: term versions and contract items
+  - template: templates/daily_reports/detail.html
+    collections: daily labor, equipment, material, activity and delay entries
+  - template: templates/daily_reports/field_observation_detail.html
+    collections: observation transitions, evidence links and proposals
+  - template: templates/documents/detail.html
+    collections: document versions, source links, retention applications and legal holds
+  - template: templates/documents/employee_detail.html
+    collections: own-document source links and version metadata (download is not Detail)
+  - template: templates/documents/list.html
+    collections: document source-reference chips (document Detail exists)
+  - template: templates/equipment/assignment_list.html
+    collections: equipment assignments (equipment Detail is a related source)
+  - template: templates/equipment/cost_workbench.html
+    collections: equipment cost policies, allocations and handoffs
+  - template: templates/equipment/detail.html
+    collections: equipment assignments and maintenance rows
+  - template: templates/equipment/maintenance_list.html
+    collections: maintenance records (status form is not Detail)
+  - template: templates/equipment/operations_workbench.html
+    collections: maintenance work orders (transition/evidence forms are not Detail)
+  - template: templates/estimates/detail.html
+    collections: estimate revision items
+  - template: templates/expenses/detail.html
+    collections: expense allocations and budget assessments
+  - template: templates/expenses/recurrences.html
+    collections: recurrence templates and occurrences
+  - template: templates/inventory/count_detail.html
+    collections: inventory count lines
+  - template: templates/inventory/custody_workbench.html
+    collections: reservations and expiry-lot rows (count and transfer Detail already exist)
+  - template: templates/inventory/transfer_detail.html
+    collections: transfer lines
+  - template: templates/inventory/valuation_workbench.html
+    collections: valuation pools, events and handoff evidence
+  - template: templates/materials/governance.html
+    collections: aliases, relationships, approvals, attribute values/definitions and unit families
+  - template: templates/materials/unit_list.html
+    collections: measurement units
+  - template: templates/organizations/member_authorization.html
+    collections: role assignments and scope grants
+  - template: templates/organizations/members.html
+    collections: members (member_update is Edit; relabeled explicitly)
+  - template: templates/organizations/platform_policy_catalog.html
+    collections: platform policy/classification/source/version records
+  - template: templates/organizations/protected_operation_catalog.html
+    collections: protected-operation catalogue versions
+  - template: templates/organizations/role_catalog.html
+    collections: role definitions (Edit exists)
+  - template: templates/organizations/select.html
+    collections: organization cards (switch is not Detail)
+  - template: templates/organizations/tenant_policy_configuration.html
+    collections: tenant policy selection history and future-version rows
+  - template: templates/parties/detail.html
+    collections: party roles and contacts
+  - template: templates/parties/governance_detail.html
+    collections: party identity history, aliases, classifications, representatives, restrictions, roles and contacts
+  - template: templates/payroll/audit_history.html
+    collections: payroll audit events
+  - template: templates/payroll/configuration.html
+    collections: employment pay configurations, components and rule versions
+  - template: templates/payroll/ess_inquiry_detail.html
+    collections: inquiry responses and attachment versions (only authorized download supplied)
+  - template: templates/payroll/financial_handoff_detail.html
+    collections: handoff lines and reconciliation evidence
+  - template: templates/payroll/payslip.html
+    collections: payslip lines
+  - template: templates/payroll/run_detail.html
+    collections: run employee results, exceptions and result lines (payslip Detail is separate)
+  - template: templates/payroll/statutory_policies.html
+    collections: statutory policies and versions
+  - template: templates/payroll/statutory_workbench.html
+    collections: statutory calculations, outputs and export evidence
+  - template: templates/payroll/workbench.html
+    collections: run exceptions and employee results (run Detail is a related source)
+  - template: templates/procurement/order_detail.html
+    collections: order items
+  - template: templates/procurement/portal_context.html
+    collections: supplier portal RFQ lines
+  - template: templates/procurement/portal_invitation_manage.html
+    collections: portal invitation and grant history
+  - template: templates/procurement/receipt_detail.html
+    collections: receipt items
+  - template: templates/procurement/request_detail.html
+    collections: purchase request items
+  - template: templates/procurement/rfq_buyer_workspace.html
+    collections: commercial comparisons/inputs, award preparations/decisions and allocations
+  - template: templates/procurement/rfq_detail.html
+    collections: RFQ lines/versions/invitations, quote revisions, comparisons and awards; custody is an operation
+  - template: templates/projects/all_site_list.html
+    collections: sites (project site List is not site Detail)
+  - template: templates/projects/control_comparison.html
+    collections: budget comparison rows (no governed per-row drillthrough)
+  - template: templates/projects/control_exceptions.html
+    collections: budget assessments and project register items
+  - template: templates/projects/controls.html
+    collections: WBS nodes and project activities
+  - template: templates/projects/cost_reconciliation.html
+    collections: cost reconciliation/source-fact/exclusion rows (no approved source navigation contract)
+  - template: templates/projects/detail.html
+    collections: project cost facts (no approved per-fact Detail)
+  - template: templates/projects/site_list.html
+    collections: sites (phase List is separate navigation)
+  - template: templates/reporting/dashboard.html
+    collections: metric definition catalogue (result drillthrough is a different entity)
+  - template: templates/reporting/drillthrough.html
+    collections: manifest source facts and versions (no governed per-source URL contract)
+  - template: templates/reporting/project_closeout_detail.html
+    collections: closeout checklist snapshots and coordination events
+  - template: templates/reporting/reconciliation_detail.html
+    collections: side snapshots, exceptions and exception events
+  - template: templates/reporting/reconciliation_workbench.html
+    collections: reconciliation pair definitions (run Detail fixed separately)
+  - template: templates/timekeeping/timesheet_detail.html
+    collections: timesheet entries
+  - template: templates/timekeeping/workbench.html
+    collections: work calendars, attendance, corrections, leave/mission and overtime (back-office Detail absent; own
+      ESS route must not be substituted)
+  - template: templates/workflows/_work_item_row.html
+    collections: equipment.maintenance_record source adapter resolves to a status form
+  - template: templates/workflows/_work_item_table.html
+    collections: work-item table includes maintenance source rows without Detail
+  - template: templates/workflows/administration/detail.html
+    collections: workflow step and transition configuration rows
+  - template: templates/workflows/manager_workspace.html
+    collections: manager source URLs are Timekeeping list fragments, not Detail
+  - template: templates/workflows/my_requests.html
+    collections: legacy non-ESS Timekeeping source URLs are list fragments
+  - template: templates/workflows/workbench.html
+    collections: workbench includes maintenance source rows without Detail
+  - template: templates/workforce/_department_tree.html
+    collections: work teams in department tree
+  - template: templates/workforce/assignment_list.html
+    collections: project workforce assignments
+  - template: templates/workforce/department_detail.html
+    collections: department work-team rows
+  - template: templates/workforce/employee_detail.html
+    collections: position/project assignments, qualifications, training, performance and labor-rate versions
+  - template: templates/workforce/employment_history.html
+    collections: employment record versions (download is not Detail)
+  - template: templates/workforce/employment_manage.html
+    collections: employment records (manage/create surface only)
+  - template: templates/workforce/foundation.html
+    collections: skills, competencies and training requirements
+  - template: templates/workforce/own_evidence.html
+    collections: own qualifications, training and assignments
+  - template: templates/workforce/position_detail.html
+    collections: position assignments (employee Detail is a related source)
+  - template: templates/workforce/work_team_list.html
+    collections: work teams
+  - template: apps/accounting/templates/accounting/account_list.html
+    collections: account-tree wrapper; no per-account Detail
+  fixed_templates:
+  - apps/accounting/templates/accounting/opening_detail.html
+  - apps/accounting/templates/accounting/source_detail.html
+  - apps/commercial/templates/commercial/tender_list.html
+  - apps/fixed_assets/templates/fixed_assets/asset_detail.html
+  - apps/knowledge/templates/knowledge/publication_history.html
+  - apps/reporting/templates/reporting/_read_model_card.html
+  - apps/subledgers/templates/subledgers/supplier_invoice_match_review.html
+  - apps/support/templates/support/workbench.html
+  - apps/treasury/templates/treasury/operations.html
+  - apps/treasury/templates/treasury/statement_workbench.html
+  - apps/treasury/templates/treasury/workbench.html
+  - apps/workforce/templates/workforce/ess_timekeeping.html
+  - templates/compliance/_table.html
+  - templates/components/record_detail_link.html
+  - templates/contracts/contractual_record_list.html
+  - templates/core/global_search.html
+  - templates/daily_reports/list.html
+  - templates/documents/list.html
+  - templates/equipment/list.html
+  - templates/estimates/list.html
+  - templates/inventory/warehouse_detail.html
+  - templates/inventory/warehouse_list.html
+  - templates/materials/material_list.html
+  - templates/organizations/members.html
+  - templates/parties/governance_list.html
+  - templates/parties/list.html
+  - templates/payroll/ess_history.html
+  - templates/payroll/run_detail.html
+  - templates/procurement/request_list.html
+  - templates/procurement/rfq_list.html
+  - templates/projects/all_site_list.html
+  - templates/projects/gallery.html
+  - templates/reporting/reconciliation_workbench.html
+  - templates/workflows/_work_item_row.html
+  - templates/workflows/manager_workspace.html
+  - templates/workflows/my_requests.html
+  - templates/workforce/_department_tree.html
+  - templates/workforce/_organization_chart_details.html
+  - templates/workforce/_organization_chart_node.html
+  - templates/workforce/employee_detail.html
+  - templates/workforce/employee_list.html
+  - templates/workforce/ess_dashboard.html
+  - templates/workforce/ess_profile.html
+  - templates/workforce/personal_change_requests.html
+  boundaries: 135 Finding records and summary counts unchanged. No full audit, full regression, evidence pack, new backlog
+    file, production action, business/workflow/authorization/schema/accounting-semantics change or Git write.
+  git_writes: NOT EXECUTED
+- batch: LIST-DETAIL-CLASSIFICATION-20261026
+  date: '2026-10-26'
+  head: 325b32f175178fc74dcf634899899d119645953c
+  origin_main: 325b32f175178fc74dcf634899899d119645953c
+  baseline: main equals the user-specified baseline and local origin/main. Previous conformance working-tree edits
+    retained; no fetch or Git write.
+  source_batch: LIST-DETAIL-CONFORMANCE-20261026
+  scope: Only the existing 115 blocker entries, in original order. No repository-wide rescan or new audit. Supersedes
+    the prior blanket no-Detail blocker interpretation for these entries only; no reassessment of the 135 Findings.
+  inventory_sha256: 70b77f22f08d3be2061f7dc50f68a9d73637d59ea7cc0e1d37fd6e06e777291b
+  rule: List → Detail consistency
+  classification_unit: One existing grouped template/collection entry. Mixed entries retain one category for the actionable
+    record/source; incidental children, configuration and snapshots remain inline as explained in the case. Counts
+    are surfaces, not route counts.
+  total_classified: 115
+  classification_counts:
+    DETAIL_REQUIRED: 10
+    INLINE_CHILD_NO_DETAIL: 44
+    SIMPLE_MASTER_NO_DETAIL_REQUIRED: 15
+    HISTORICAL_SNAPSHOT_NO_DETAIL: 36
+    CANONICAL_SOURCE_NAVIGATION: 8
+    PRODUCT_DECISION_REQUIRED: 2
+  detail_cases_implemented: 10
+  canonical_source_navigation_cases_implemented: 8
+  intentional_no_detail_cases: 95
+  remaining_blockers: 2
+  classification_policy:
+    DETAIL_REQUIRED: Independently identifiable business entity or transaction needing separate inspection; reuse
+      shared read-only rendering and existing domain read selectors/permissions.
+    INLINE_CHILD_NO_DETAIL: Owned lines, adjustments, assignments, evidence and inline requests stay inspectable in
+      their owning record or inline collection. No standalone page solely because a row/UUID exists; related source
+      links are not called child Detail.
+    SIMPLE_MASTER_NO_DETAIL_REQUIRED: Small catalogue/configuration/context-selection records already expose relevant
+      fields inline. Edit/configuration actions retain their own labels.
+    HISTORICAL_SNAPSHOT_NO_DETAIL: Events, versions, attempts, logs, aggregates, snapshots and projection evidence
+      remain contextual history displays. Downloads and parent links are not their Detail.
+    CANONICAL_SOURCE_NAVIGATION: Navigate to the authoritative source Detail; never a projection duplicate, parent
+      substitute, status form or list fragment.
+    PRODUCT_DECISION_REQUIRED: Generic native Admin needs an approved read-only inspection/navigation contract across
+      platform and tenant models; Admin and domain permissions cannot be inferred equivalent.
+  implementation:
+  - 'Nine GET-only handlers cover 13 independently inspectable record types: project sites, maintenance records, equipment
+    work orders, membership, inspection templates, attendance/correction/leave/overtime, obligations, asset transactions,
+    partner qualifications and evaluations. No models or migrations changed.'
+  - Shared Persian/RTL Detail preserves zero values and escaping; primary-name/number links and the existing مشاهده
+    جزئیات component stay separate from operation forms. No new financial calculations or workflow behavior.
+  - Maintenance subject adapter now targets maintenance Detail; shared work-item row/table/workbench inherit it. Back-office
+    Timekeeping source URL production targets its own Detail; explicit ESS routes and existing source-availability
+    guards remain intact.
+  - Equipment maintenance rows navigate to their authoritative source. Valuation events link to stock transactions;
+    project budget evidence links to expenses. Source-link availability uses the destination selectors restricted
+    to displayed IDs, with exact object scope and PermissionDenied fallback.
+  - Existing active-organization and business read permission decorators retained. Existing selectors recheck project/site
+    scope; record lookups remain tenant-scoped. POST is rejected and no Detail contains a business operation form.
+  focused_validation:
+    command: .venv/Scripts/python.exe -m pytest core/test_list_detail_navigation.py core/test_list_detail_resolution.py
+      core/test_cep003_localization_accessibility.py -q -k 'ListDetailNavigation or ClassifiedNavigation or resolution
+      or navigation or custody_records' --reuse-db --disable-warnings --tb=short
+    result: 29/29 PASS; 41 subtests PASS; 23 unrelated tests deselected. All 13 new record-type read paths rendered
+      with authenticated test fixtures. Covers GET-only behavior, no main operation forms, known cross-tenant/direct-ID
+      and mismatched project/site denial, scoped/no-scope access, unknown kinds, source destinations/availability,
+      primary/action agreement, escaping and zero values.
+    fixtures: Synthetic isolated Django test database records only; no live fixtures, posting, workflow execution
+      or permission expansion.
+    affected_template_compile: 15/15 changed/new templates PASS through configured Django engine, including shared
+      work-item row restored to ordinary canonical subject navigation.
+    static: Changed Python AST parsing, test-module Ruff, affected-view undefined-name checks and git diff --check
+      PASS.
+    limits: Focused navigation verification only; no full regression or new audit.
+  browser_verification:
+    environment: Existing authenticated local non-production Chrome at 127.0.0.1:8000; existing membership and tenant
+      retained.
+    populated: All-sites, maintenance and membership lists expose own canonical links. Opened site, maintenance and
+      member Detail; inspected fields and zero main operation forms. Maintenance status/member Edit remain distinct
+      operations.
+    desktop_mobile: Populated site/maintenance/member lists at 1440x900 and 390x844; maintenance/member Detail at
+      both sizes. RTL and internal table scrolling retained; no document overflow. Maintenance Detail and mobile maintenance
+      list visually inspected. Temporary viewport reset.
+    empty_live_branches: Timekeeping, Subledgers, Fixed Assets, Partner Qualification, Equipment Operations and Compliance
+      workbenches reached authenticated at mobile width without document overflow. Relevant collections empty; populated
+      behavior for these branches proved by focused HTTP tests, not claimed live coverage.
+    boundaries: No impersonation, live fixture, identity inference, permission widening or business-record mutation.
+  resolution: PARTIAL — PRODUCT_DECISION_REQUIRED (2 generic Django Admin list surfaces)
+  cases:
+  - inventory_item: 1
+    template: apps/accounting/templates/accounting/_account_tree_nodes.html
+    collections: accounts (no account Detail route)
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 2
+    template: apps/accounting/templates/accounting/journal_detail.html
+    collections: journal lines
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 3
+    template: apps/accounting/templates/accounting/opening_detail.html
+    collections: opening lines
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 4
+    template: apps/accounting/templates/accounting/period_list.html
+    collections: fiscal years and periods
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 5
+    template: apps/accounting/templates/accounting/reconciliation_detail.html
+    collections: reconciliation exceptions and tie-outs
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 6
+    template: apps/accounting/templates/accounting/source_detail.html
+    collections: source input lines
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 7
+    template: apps/billing/templates/billing/baseline_detail.html
+    collections: baseline items
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 8
+    template: apps/billing/templates/billing/claim_detail.html
+    collections: claim items, adjustments and settlements
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 9
+    template: apps/billing/templates/billing/payable_certificate_detail.html
+    collections: certificate items and adjustments
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 10
+    template: apps/billing/templates/billing/statutory_operations_dashboard.html
+    collections: statutory submission evidence
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 11
+    template: apps/billing/templates/billing/statutory_record_detail.html
+    collections: submission attempts
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 12
+    template: apps/commercial/templates/commercial/tender_detail.html
+    collections: tender revisions and evidence associations
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 13
+    template: apps/fixed_assets/templates/fixed_assets/asset_detail.html
+    collections: asset source references
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 14
+    template: apps/fixed_assets/templates/fixed_assets/audit_evidence.html
+    collections: audit events
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 15
+    template: apps/fixed_assets/templates/fixed_assets/workbench.html
+    collections: depreciation runs, transactions, handoffs, classes and books
+    classification: DETAIL_REQUIRED
+    result: IMPLEMENTED
+    reason: Independent asset transaction; depreciation/handoff evidence stays inline and classes/books remain catalogues.
+    canonical_route: fixed_assets:transaction_detail
+  - inventory_item: 16
+    template: apps/knowledge/templates/knowledge/platform_promotions.html
+    collections: sanitized promotion requests (review actions only)
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 17
+    template: apps/knowledge/templates/knowledge/publication_history.html
+    collections: provenance pins, reviews and lifecycle events (version Detail fixed separately)
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 18
+    template: apps/knowledge/templates/knowledge/recurrence.html
+    collections: recurrence evidence
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 19
+    template: apps/knowledge/templates/knowledge/reuse.html
+    collections: reuse evidence
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 20
+    template: apps/partner_qualification/templates/partner_qualification/workbench.html
+    collections: qualification profiles, requirements, qualifications and evaluations
+    classification: DETAIL_REQUIRED
+    result: IMPLEMENTED
+    reason: Independent qualification reference and scoped performance evaluation; profiles/requirements remain descriptive
+      masters.
+    canonical_route: partner_qualification:record_detail
+  - inventory_item: 21
+    template: apps/subledgers/templates/subledgers/supplier_invoice_match_review.html
+    collections: match lines and discrepancies
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 22
+    template: apps/subledgers/templates/subledgers/workbench.html
+    collections: obligations, settlement allocations and reconciliation runs
+    classification: DETAIL_REQUIRED
+    result: IMPLEMENTED
+    reason: Independently recognized payable/receivable, read with the existing obligation selector. Allocations and
+      reconciliation snapshots remain inline.
+    canonical_route: subledgers:obligation_detail
+  - inventory_item: 23
+    template: apps/support/templates/support/case_detail.html
+    collections: case events and evidence associations
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 24
+    template: apps/support/templates/support/workbench.html
+    collections: calendar projections and support access requests
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 25
+    template: apps/treasury/templates/treasury/operations.html
+    collections: advance reconciliation runs
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 26
+    template: apps/treasury/templates/treasury/statement_workbench.html
+    collections: statement lines, match proposals and clearings (import Detail exists)
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 27
+    template: apps/treasury/templates/treasury/workbench.html
+    collections: bank and GL reconciliation runs (account Detail fixed separately)
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 28
+    template: apps/workforce/templates/workforce/ess_timekeeping_detail.html
+    collections: mission routing evidence and timesheet entries
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 29
+    template: templates/accounts/connection_requests.html
+    collections: connection requests
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 30
+    template: templates/admin/accounts/user/change_form.html
+    collections: membership rows and account audit events
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 31
+    template: templates/admin/change_list.html
+    collections: native Admin result list uses change/view form destinations
+    classification: PRODUCT_DECISION_REQUIRED
+    result: UNRESOLVED
+    reason: Native Django Admin spans unrelated platform and tenant models. Its generated result anchors use change/view
+      forms; no approved universal mapping to source Detail with equivalent Admin and domain object permissions exists.
+      Choosing that product-wide contract exceeds this navigation-only change.
+  - inventory_item: 32
+    template: templates/admin/change_list_results.html
+    collections: native Admin result rows; no separate canonical read Detail mapping
+    classification: PRODUCT_DECISION_REQUIRED
+    result: UNRESOLVED
+    reason: Native Django Admin spans unrelated platform and tenant models. Its generated result anchors use change/view
+      forms; no approved universal mapping to source Detail with equivalent Admin and domain object permissions exists.
+      Choosing that product-wide contract exceeds this navigation-only change.
+  - inventory_item: 33
+    template: templates/admin/index.html
+    collections: Admin log entries and native change-form destinations
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 34
+    template: templates/admin/object_history.html
+    collections: Admin history events
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 35
+    template: templates/audit/log.html
+    collections: audit events (no governed entity/source URL contract)
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 36
+    template: templates/compliance/assurance.html
+    collections: compliance reconciliation exception rows
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 37
+    template: templates/compliance/detail.html
+    collections: compliance lifecycle events
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 38
+    template: templates/compliance/workbench.html
+    collections: inspection template cards
+    classification: DETAIL_REQUIRED
+    result: IMPLEMENTED
+    reason: Identifiable inspection definition with published checklist content that must be inspectable separately
+      from Publish.
+    canonical_route: compliance:template_detail
+  - inventory_item: 39
+    template: templates/contracts/contractual_record_detail.html
+    collections: contractual evidence associations
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 40
+    template: templates/contracts/detail.html
+    collections: term versions and contract items
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 41
+    template: templates/daily_reports/detail.html
+    collections: daily labor, equipment, material, activity and delay entries
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 42
+    template: templates/daily_reports/field_observation_detail.html
+    collections: observation transitions, evidence links and proposals
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 43
+    template: templates/documents/detail.html
+    collections: document versions, source links, retention applications and legal holds
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 44
+    template: templates/documents/employee_detail.html
+    collections: own-document source links and version metadata (download is not Detail)
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 45
+    template: templates/documents/list.html
+    collections: document source-reference chips (document Detail exists)
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 46
+    template: templates/equipment/assignment_list.html
+    collections: equipment assignments (equipment Detail is a related source)
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 47
+    template: templates/equipment/cost_workbench.html
+    collections: equipment cost policies, allocations and handoffs
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 48
+    template: templates/equipment/detail.html
+    collections: equipment assignments and maintenance rows
+    classification: CANONICAL_SOURCE_NAVIGATION
+    result: IMPLEMENTED
+    reason: Maintenance rows link to their authoritative maintenance source; assignments remain owned child records.
+    canonical_route: equipment:maintenance_detail
+  - inventory_item: 49
+    template: templates/equipment/maintenance_list.html
+    collections: maintenance records (status form is not Detail)
+    classification: DETAIL_REQUIRED
+    result: IMPLEMENTED
+    reason: Independently numbered maintenance record; no use of its status-transition form as Detail.
+    canonical_route: equipment:maintenance_detail
+  - inventory_item: 50
+    template: templates/equipment/operations_workbench.html
+    collections: maintenance work orders (transition/evidence forms are not Detail)
+    classification: DETAIL_REQUIRED
+    result: IMPLEMENTED
+    reason: Independently numbered operational work order; no use of evidence/upload/transition forms as Detail.
+    canonical_route: equipment:work_order_detail
+  - inventory_item: 51
+    template: templates/estimates/detail.html
+    collections: estimate revision items
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 52
+    template: templates/expenses/detail.html
+    collections: expense allocations and budget assessments
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 53
+    template: templates/expenses/recurrences.html
+    collections: recurrence templates and occurrences
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 54
+    template: templates/inventory/count_detail.html
+    collections: inventory count lines
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 55
+    template: templates/inventory/custody_workbench.html
+    collections: reservations and expiry-lot rows (count and transfer Detail already exist)
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 56
+    template: templates/inventory/transfer_detail.html
+    collections: transfer lines
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 57
+    template: templates/inventory/valuation_workbench.html
+    collections: valuation pools, events and handoff evidence
+    classification: CANONICAL_SOURCE_NAVIGATION
+    result: IMPLEMENTED
+    reason: Valuation-event stock references link to the actual Inventory transaction when the destination permission
+      exists. Pools/envelopes remain projections.
+    canonical_route: inventory:transaction_detail
+  - inventory_item: 58
+    template: templates/materials/governance.html
+    collections: aliases, relationships, approvals, attribute values/definitions and unit families
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 59
+    template: templates/materials/unit_list.html
+    collections: measurement units
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 60
+    template: templates/organizations/member_authorization.html
+    collections: role assignments and scope grants
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 61
+    template: templates/organizations/members.html
+    collections: members (member_update is Edit; relabeled explicitly)
+    classification: DETAIL_REQUIRED
+    result: IMPLEMENTED
+    reason: Identifiable membership. Read only the name/username/effective roles/status already visible in the member
+      list; management remains separate.
+    canonical_route: organizations:member_detail
+  - inventory_item: 62
+    template: templates/organizations/platform_policy_catalog.html
+    collections: platform policy/classification/source/version records
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 63
+    template: templates/organizations/protected_operation_catalog.html
+    collections: protected-operation catalogue versions
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 64
+    template: templates/organizations/role_catalog.html
+    collections: role definitions (Edit exists)
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 65
+    template: templates/organizations/select.html
+    collections: organization cards (switch is not Detail)
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 66
+    template: templates/organizations/tenant_policy_configuration.html
+    collections: tenant policy selection history and future-version rows
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 67
+    template: templates/parties/detail.html
+    collections: party roles and contacts
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 68
+    template: templates/parties/governance_detail.html
+    collections: party identity history, aliases, classifications, representatives, restrictions, roles and contacts
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 69
+    template: templates/payroll/audit_history.html
+    collections: payroll audit events
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 70
+    template: templates/payroll/configuration.html
+    collections: employment pay configurations, components and rule versions
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 71
+    template: templates/payroll/ess_inquiry_detail.html
+    collections: inquiry responses and attachment versions (only authorized download supplied)
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 72
+    template: templates/payroll/financial_handoff_detail.html
+    collections: handoff lines and reconciliation evidence
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 73
+    template: templates/payroll/payslip.html
+    collections: payslip lines
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 74
+    template: templates/payroll/run_detail.html
+    collections: run employee results, exceptions and result lines (payslip Detail is separate)
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 75
+    template: templates/payroll/statutory_policies.html
+    collections: statutory policies and versions
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 76
+    template: templates/payroll/statutory_workbench.html
+    collections: statutory calculations, outputs and export evidence
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 77
+    template: templates/payroll/workbench.html
+    collections: run exceptions and employee results (run Detail is a related source)
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 78
+    template: templates/procurement/order_detail.html
+    collections: order items
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 79
+    template: templates/procurement/portal_context.html
+    collections: supplier portal RFQ lines
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 80
+    template: templates/procurement/portal_invitation_manage.html
+    collections: portal invitation and grant history
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 81
+    template: templates/procurement/receipt_detail.html
+    collections: receipt items
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 82
+    template: templates/procurement/request_detail.html
+    collections: purchase request items
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 83
+    template: templates/procurement/rfq_buyer_workspace.html
+    collections: commercial comparisons/inputs, award preparations/decisions and allocations
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 84
+    template: templates/procurement/rfq_detail.html
+    collections: RFQ lines/versions/invitations, quote revisions, comparisons and awards; custody is an operation
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 85
+    template: templates/projects/all_site_list.html
+    collections: sites (project site List is not site Detail)
+    classification: DETAIL_REQUIRED
+    result: IMPLEMENTED
+    reason: Site has its own code, name and project scope. New read Detail reuses the existing site selector.
+    canonical_route: projects:site_detail
+  - inventory_item: 86
+    template: templates/projects/control_comparison.html
+    collections: budget comparison rows (no governed per-row drillthrough)
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 87
+    template: templates/projects/control_exceptions.html
+    collections: budget assessments and project register items
+    classification: CANONICAL_SOURCE_NAVIGATION
+    result: IMPLEMENTED
+    reason: Budget-assessment rows link to their authoritative expense when the destination permission exists. Assessments/register
+      items stay inline.
+    canonical_route: expenses:detail
+  - inventory_item: 88
+    template: templates/projects/controls.html
+    collections: WBS nodes and project activities
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 89
+    template: templates/projects/cost_reconciliation.html
+    collections: cost reconciliation/source-fact/exclusion rows (no approved source navigation contract)
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 90
+    template: templates/projects/detail.html
+    collections: project cost facts (no approved per-fact Detail)
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 91
+    template: templates/projects/site_list.html
+    collections: sites (phase List is separate navigation)
+    classification: DETAIL_REQUIRED
+    result: IMPLEMENTED
+    reason: Project-site list shares the same site Detail; phase navigation remains a separate list operation.
+    canonical_route: projects:site_detail
+  - inventory_item: 92
+    template: templates/reporting/dashboard.html
+    collections: metric definition catalogue (result drillthrough is a different entity)
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 93
+    template: templates/reporting/drillthrough.html
+    collections: manifest source facts and versions (no governed per-source URL contract)
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 94
+    template: templates/reporting/project_closeout_detail.html
+    collections: closeout checklist snapshots and coordination events
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 95
+    template: templates/reporting/reconciliation_detail.html
+    collections: side snapshots, exceptions and exception events
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 96
+    template: templates/reporting/reconciliation_workbench.html
+    collections: reconciliation pair definitions (run Detail fixed separately)
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 97
+    template: templates/timekeeping/timesheet_detail.html
+    collections: timesheet entries
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 98
+    template: templates/timekeeping/workbench.html
+    collections: work calendars, attendance, corrections, leave/mission and overtime (back-office Detail absent; own
+      ESS route must not be substituted)
+    classification: DETAIL_REQUIRED
+    result: IMPLEMENTED
+    reason: Attendance and correction/leave/mission/overtime requests are independent operational records. Reuse back-office
+      view/object scope; never substitute own-identity ESS endpoints. Calendars remain descriptive masters.
+    canonical_route: timekeeping:record_detail
+  - inventory_item: 99
+    template: templates/workflows/_work_item_row.html
+    collections: equipment.maintenance_record source adapter resolves to a status form
+    classification: CANONICAL_SOURCE_NAVIGATION
+    result: IMPLEMENTED
+    reason: Subject adapter navigation points to the actual maintenance read Detail; no workflow command/state/routing
+      semantics changed.
+    canonical_route: equipment:maintenance_detail
+  - inventory_item: 100
+    template: templates/workflows/_work_item_table.html
+    collections: work-item table includes maintenance source rows without Detail
+    classification: CANONICAL_SOURCE_NAVIGATION
+    result: IMPLEMENTED
+    reason: Shared work-item row propagates the canonical subject source to this table wrapper.
+    canonical_route: equipment:maintenance_detail
+  - inventory_item: 101
+    template: templates/workflows/administration/detail.html
+    collections: workflow step and transition configuration rows
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 102
+    template: templates/workflows/manager_workspace.html
+    collections: manager source URLs are Timekeeping list fragments, not Detail
+    classification: CANONICAL_SOURCE_NAVIGATION
+    result: IMPLEMENTED
+    reason: Manager rows use the registered back-office source Detail, under existing source-link availability; no
+      list fragment or ESS identity substitution.
+    canonical_route: timekeeping:record_detail
+  - inventory_item: 103
+    template: templates/workflows/my_requests.html
+    collections: legacy non-ESS Timekeeping source URLs are list fragments
+    classification: CANONICAL_SOURCE_NAVIGATION
+    result: IMPLEMENTED
+    reason: Legacy non-ESS own-request source links use back-office Detail only when already allowed. Explicit ESS
+      routes continue to override as before.
+    canonical_route: timekeeping:record_detail
+  - inventory_item: 104
+    template: templates/workflows/workbench.html
+    collections: workbench includes maintenance source rows without Detail
+    classification: CANONICAL_SOURCE_NAVIGATION
+    result: IMPLEMENTED
+    reason: Shared work-item row propagates the canonical subject source to the workbench wrapper.
+    canonical_route: equipment:maintenance_detail
+  - inventory_item: 105
+    template: templates/workforce/_department_tree.html
+    collections: work teams in department tree
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 106
+    template: templates/workforce/assignment_list.html
+    collections: project workforce assignments
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 107
+    template: templates/workforce/department_detail.html
+    collections: department work-team rows
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 108
+    template: templates/workforce/employee_detail.html
+    collections: position/project assignments, qualifications, training, performance and labor-rate versions
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 109
+    template: templates/workforce/employment_history.html
+    collections: employment record versions (download is not Detail)
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 110
+    template: templates/workforce/employment_manage.html
+    collections: employment records (manage/create surface only)
+    classification: HISTORICAL_SNAPSHOT_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 111
+    template: templates/workforce/foundation.html
+    collections: skills, competencies and training requirements
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 112
+    template: templates/workforce/own_evidence.html
+    collections: own qualifications, training and assignments
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 113
+    template: templates/workforce/position_detail.html
+    collections: position assignments (employee Detail is a related source)
+    classification: INLINE_CHILD_NO_DETAIL
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 114
+    template: templates/workforce/work_team_list.html
+    collections: work teams
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  - inventory_item: 115
+    template: apps/accounting/templates/accounting/account_list.html
+    collections: account-tree wrapper; no per-account Detail
+    classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
+    result: INTENTIONAL_NO_DETAIL
+  boundaries: Original 115-item inventory, prior execution_history, all 135 Finding records and summary counts unchanged.
+    Only this follow-up appended to existing Closure Master; no new backlog/evidence pack. No business logic, workflow/accounting
+    semantics, authorization architecture, schema/migration or Git write.
+  git_writes: NOT EXECUTED
+- batch: LIST-DETAIL-ADMIN-PRODUCT-DECISION-20261026
+  date: '2026-10-26'
+  head: 325b32f175178fc74dcf634899899d119645953c
+  rule: List → Detail consistency
+  product_decision:
+    authority: Explicit Human Product Decision in this conversation, 2026-10-26.
+    decision: Generic Django Admin surfaces are not part of BONIRA's official operational product UI/UX contract.
+    effect: The Rule applies to official BONIRA operational product surfaces. Generic Django Admin is a technical/administrative
+      surface and may retain native list/change/detail navigation. Do not force domain Detail routes, introduce cross-domain
+      access mappings, redesign Admin or change existing authorization/security behavior.
+  reconciles:
+    batch: LIST-DETAIL-CLASSIFICATION-20261026
+    inventory_items:
+    - 31
+    - 32
+    precedence: This Human decision supersedes the two prior PRODUCT_DECISION_REQUIRED dispositions and their blocker
+      effect. Earlier entries remain historical snapshots; the other 113 classifications and all 18 implemented cases
+      remain unchanged.
+  dispositions:
+  - inventory_item: 31
+    template: templates/admin/change_list.html
+    previous_classification: PRODUCT_DECISION_REQUIRED
+    disposition: NOT_APPLICABLE_ADMIN_TECHNICAL_SURFACE
+    result: NOT_APPLICABLE
+    reason: Generic native Django Admin list machinery; excluded from the operational Rule by the explicit Human Product
+      Decision.
+  - inventory_item: 32
+    template: templates/admin/change_list_results.html
+    previous_classification: PRODUCT_DECISION_REQUIRED
+    disposition: NOT_APPLICABLE_ADMIN_TECHNICAL_SURFACE
+    result: NOT_APPLICABLE
+    reason: Generic native Django Admin list machinery; excluded from the operational Rule by the explicit Human Product
+      Decision.
+  effective_classification_counts:
+    DETAIL_REQUIRED: 10
+    INLINE_CHILD_NO_DETAIL: 44
+    SIMPLE_MASTER_NO_DETAIL_REQUIRED: 15
+    HISTORICAL_SNAPSHOT_NO_DETAIL: 36
+    CANONICAL_SOURCE_NAVIGATION: 8
+    PRODUCT_DECISION_REQUIRED: 0
+    NOT_APPLICABLE_ADMIN_TECHNICAL_SURFACE: 2
+  detail_cases_implemented: 10
+  canonical_source_navigation_cases_implemented: 8
+  intentional_no_detail_cases: 95
+  admin_technical_surfaces_not_applicable: 2
+  remaining_genuine_list_detail_gaps: 0
+  remaining_blockers: 0
+  verification:
+    inventory: Only the recorded 115 cases reconciled. Exactly two outstanding blockers, inventory items 31/32, match
+      the two generic Admin list templates. Effective operational PRODUCT_DECISION_REQUIRED count is zero; all DETAIL_REQUIRED
+      and CANONICAL_SOURCE_NAVIGATION entries remain IMPLEMENTED.
+    focused: 8/8 existing focused navigation tests PASS; 17 subtests PASS. New read-only Detail paths, financial/partner
+      tenant boundaries, canonical source producers/availability, maintenance work-item navigation, member Detail
+      and site Detail verified.
+    command: .venv/Scripts/python.exe -m pytest core/test_list_detail_resolution.py::ReadOnlyDetailBoundaryTests::test_resolution_details_are_get_only_read_views
+      core/test_list_detail_resolution.py::ReadOnlyDetailBoundaryTests::test_resolution_financial_partner_details_read_only_and_tenant_scoped
+      core/test_list_detail_navigation.py::ClassifiedNavigationTests core/test_list_detail_navigation.py::ListDetailNavigationTests::test_maintenance_work_item_navigation_uses_the_real_read_detail
+      core/test_list_detail_navigation.py::ListDetailNavigationTests::test_member_identity_does_not_disguise_edit_as_a_detail
+      core/test_list_detail_navigation.py::ListDetailNavigationTests::test_site_identity_does_not_disguise_a_project_site_list_as_a_detail
+      -q --reuse-db --disable-warnings --tb=short
+    preservation: Documentation-only follow-up. Existing code, routes, services, permissions, models, schema, Admin
+      templates and prior implementation edits retained. Prior Closure Master bytes preserved; YAML semantic append-only
+      check PASS.
+  resolution: RESOLVED
+  final_rule_status: 'List → Detail consistency: RESOLVED'
+  boundaries: Only this concise Product Decision follow-up appended to the existing Closure Master. No new audit,
+    repository-wide rescan, full regression, browser run, evidence pack or Git write.
+  git_writes: NOT EXECUTED

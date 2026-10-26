@@ -12,9 +12,10 @@ from django.http import (
     HttpResponseForbidden,
     JsonResponse,
 )
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from apps.accounts.models import User
@@ -1315,4 +1316,48 @@ def reset_member_password(request: HttpRequest, membership_id: str) -> HttpRespo
         request,
         "organizations/member_password_reset.html",
         {"form": form, "membership": membership},
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.MEMBERSHIP_VIEW)
+@require_GET
+def member_detail(request: HttpRequest, membership_id: str) -> HttpResponse:
+    include_inactive = has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.MEMBERSHIP_CHANGE_STATUS,
+    )
+    member = get_object_or_404(
+        get_organization_members(
+            user=request.user,
+            organization=request.organization,
+            include_inactive=include_inactive,
+        ),
+        pk=membership_id,
+    )
+    # Use the same effective-role projection as the member list; positions never grant access.
+    roles = {
+        item.role.code: item.role
+        for item in member.role_assignments.select_related("role")
+    }
+    if member.role_definition_id:
+        roles.setdefault(member.role_definition.code, member.role_definition)
+    role_names = [
+        role.name
+        for code, role in sorted(roles.items())
+        if membership_has_role(member, code)
+    ]
+    return render(
+        request,
+        "components/read_only_record_detail.html",
+        {
+            "detail_title": member.user.get_full_name() or member.user.username,
+            "back_url": reverse("organizations:members"),
+            "detail_rows": [
+                ("نام کاربری", member.user.username, "text"),
+                ("نقش‌های فعال", "، ".join(role_names), "text"),
+                ("وضعیت", member.get_status_display(), "text"),
+            ],
+        },
     )

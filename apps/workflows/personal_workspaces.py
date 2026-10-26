@@ -153,7 +153,7 @@ def manager_workspace_available(*, actor: User, organization: Organization) -> b
 def _source_url(source_type: str, source_id: object, *, allowed: bool) -> str:
     if not allowed:
         return ""
-    return f"{reverse('timekeeping:workbench')}#{source_type}-{source_id}"
+    return reverse("timekeeping:record_detail", args=[source_type, source_id])
 
 
 def _employee_label(employee: Employee) -> str:

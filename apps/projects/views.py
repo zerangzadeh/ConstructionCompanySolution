@@ -3,12 +3,14 @@ from pathlib import Path
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.documents.models import PhotoSource
 from apps.documents.photo_forms import PhotoUploadForm
 from apps.documents.photo_services import create_photo, get_project_photos
+from apps.expenses.services import get_organization_expenses
 from apps.organizations.authorization import has_business_permission
 from apps.organizations.decorators import (
     active_organization_required,
@@ -676,10 +678,24 @@ def project_controls_exceptions(request: HttpRequest, project_id: str) -> HttpRe
     snapshot = get_project_control_exceptions(
         organization=request.organization, project=project, actor=request.user
     )
+    try:
+        visible_expense_ids = set(
+            get_organization_expenses(
+                user=request.user, organization=request.organization
+            )
+            .filter(pk__in=[item.expense.pk for item in snapshot.advisory_overruns])
+            .values_list("pk", flat=True)
+        )
+    except PermissionDenied:
+        visible_expense_ids = set()
     return render(
         request,
         "projects/control_exceptions.html",
-        {"project": project, "snapshot": snapshot},
+        {
+            "project": project,
+            "snapshot": snapshot,
+            "visible_expense_ids": visible_expense_ids,
+        },
     )
 
 
@@ -863,3 +879,30 @@ def wbs_node_archive_view(
     except (PermissionDenied, ValueError) as exc:
         messages.error(request, str(exc))
     return redirect("projects:controls", project_id=project_id)
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECT_SITES_VIEW)
+@require_GET
+def project_site_detail(
+    request: HttpRequest, project_id: str, site_id: str
+) -> HttpResponse:
+    site = get_object_or_404(
+        get_organization_sites(user=request.user, organization=request.organization),
+        pk=site_id,
+        project_id=project_id,
+    )
+    return render(
+        request,
+        "components/read_only_record_detail.html",
+        {
+            "detail_title": site.name,
+            "back_url": reverse("projects:site_list", args=[site.project_id]),
+            "detail_rows": [
+                ("کد کارگاه", site.code, "text"),
+                ("پروژه", site.project.name, "text"),
+                ("نشانی", site.address, "text"),
+                ("وضعیت", "فعال" if site.is_active else "غیرفعال", "text"),
+            ],
+        },
+    )

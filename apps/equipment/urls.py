@@ -5,6 +5,16 @@ from apps.equipment import views
 app_name = "equipment"
 
 urlpatterns = [
+    path(
+        "operations/work-orders/<uuid:work_order_id>/",
+        views.work_order_detail,
+        name="work_order_detail",
+    ),
+    path(
+        "maintenance/<uuid:record_id>/",
+        views.maintenance_detail,
+        name="maintenance_detail",
+    ),
     path("", views.equipment_list, name="list"),
     path("create/", views.equipment_create, name="create"),
     path("<uuid:equipment_id>/", views.equipment_detail, name="detail"),

@@ -75,7 +75,7 @@
                             </div>
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <h3 class="font-bold text-slate-950">{{ position_assignment.position.title }}</h3>
+                                    <h3 class="font-bold text-slate-950">{% if "positions.view" in business_permission_codes %}<a class="font-semibold text-blue-700 hover:underline" href="{% url 'workforce:position_detail' position_assignment.position.id %}">{{ position_assignment.position.title }}</a>{% else %}{{ position_assignment.position.title }}{% endif %}</h3>
                                     {% if position_assignment.is_primary %}<span class="rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-bold text-white">سمت اصلی</span>{% endif %}
                                     <span class="rounded-full px-2 py-0.5 text-[10px] font-bold {% if position_assignment.status == 'active' %}bg-emerald-100 text-emerald-700{% else %}bg-slate-200 text-slate-600{% endif %}">{{ position_assignment.get_status_display }}</span>
                                 </div>

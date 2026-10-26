@@ -25,7 +25,7 @@
     {% empty %}<p class="mt-3 text-sm text-slate-500">منبعی ثبت نشده است.</p>{% endfor %}
   </section>
   <section class="erp-surface rounded-xl p-5"><h2 class="font-bold">اسناد مرتبط در مرجع حسابداری</h2>
-    {% for target in accounting_targets %}<div class="mt-3 border-t pt-3 text-sm"><a class="erp-btn erp-btn--secondary" href="{% url 'accounting:journal_detail' target.journal_id %}">مشاهدهٔ سند حسابداری</a><p class="mt-2 break-all text-xs text-slate-500">نسخهٔ منبع: {{ target.source_version_reference }}</p><p class="mt-1 text-xs text-slate-500">تاریخ حسابداری: {{ target.journal.accounting_date|jalali_date }} · {{ target.journal.get_status_display }} · نسخهٔ نگاشت {{ target.mapping.version }}</p></div>
+    {% for target in accounting_targets %}<div class="mt-3 border-t pt-3 text-sm">{% url 'accounting:journal_detail' target.journal_id as record_detail_url %}{% include "components/record_detail_link.html" with detail_url=record_detail_url record_label="سند حسابداری" only %}<p class="mt-2 break-all text-xs text-slate-500">نسخهٔ منبع: {{ target.source_version_reference }}</p><p class="mt-1 text-xs text-slate-500">تاریخ حسابداری: {{ target.journal.accounting_date|jalali_date }} · {{ target.journal.get_status_display }} · نسخهٔ نگاشت {{ target.mapping.version }}</p></div>
     {% empty %}<p class="mt-3 text-sm text-slate-500">سند مرتبط قابل‌نمایشی در دسترس نیست.</p>{% endfor %}
   </section>
 </div>

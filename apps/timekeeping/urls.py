@@ -5,6 +5,11 @@ from . import views
 app_name = "timekeeping"
 
 urlpatterns = [
+    path(
+        "records/<str:kind>/<uuid:record_id>/",
+        views.record_detail,
+        name="record_detail",
+    ),
     path("", views.workbench, name="workbench"),
     path("calendars/new/", views.calendar_create, name="calendar_create"),
     path("holidays/new/", views.holiday_create, name="holiday_create"),

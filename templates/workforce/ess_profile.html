@@ -26,8 +26,8 @@
   <ul class="mt-3 divide-y divide-slate-100">
     {% for relationship in profile.relationships %}
       <li class="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
-        <span><b dir="ltr">{{ relationship.employee_number }}</b> · {{ relationship.effective_start|jalali_date }} تا {% if relationship.effective_end %}{{ relationship.effective_end|jalali_date }}{% else %}اکنون{% endif %}</span>
-        <a class="font-bold text-blue-700" href="{% url 'workforce:ess_profile_relationship' relationship.id %}">مشاهده</a>
+        <span><a class="font-semibold text-blue-700 hover:underline" href="{% url 'workforce:ess_profile_relationship' relationship.id %}"><b dir="ltr">{{ relationship.employee_number }}</b></a> · {{ relationship.effective_start|jalali_date }} تا {% if relationship.effective_end %}{{ relationship.effective_end|jalali_date }}{% else %}اکنون{% endif %}</span>
+        {% url 'workforce:ess_profile_relationship' relationship.id as record_detail_url %}{% include "components/record_detail_link.html" with detail_url=record_detail_url record_label=relationship.employee_number only %}
       </li>
     {% endfor %}
   </ul>

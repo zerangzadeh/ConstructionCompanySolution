@@ -45,6 +45,7 @@ from apps.inventory.p8_services import (
     valuation_reconciliation,
 )
 from apps.organizations.authorization import has_business_permission
+from apps.inventory.services import get_organization_stock_transactions
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -121,6 +122,21 @@ def custody_workbench(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.INVENTORY_VALUATION_VIEW)
 @require_GET
 def valuation_workbench(request: HttpRequest) -> HttpResponse:
+    events = list(
+        InventoryValuationEvent.objects.filter(organization=request.organization)
+        .select_related("stock_transaction")
+        .order_by("-finalized_at")[:100]
+    )
+    try:
+        visible_transaction_ids = set(
+            get_organization_stock_transactions(
+                user=request.user, organization=request.organization
+            )
+            .filter(pk__in=[event.stock_transaction_id for event in events])
+            .values_list("pk", flat=True)
+        )
+    except PermissionDenied:
+        visible_transaction_ids = set()
     return render(
         request,
         "inventory/valuation_workbench.html",
@@ -128,11 +144,8 @@ def valuation_workbench(request: HttpRequest) -> HttpResponse:
             "pools": InventoryValuationPool.objects.filter(
                 organization=request.organization
             ).select_related("material")[:50],
-            "events": InventoryValuationEvent.objects.filter(
-                organization=request.organization
-            )
-            .select_related("stock_transaction")
-            .order_by("-finalized_at")[:100],
+            "events": events,
+            "visible_transaction_ids": visible_transaction_ids,
             "envelopes": DownstreamCostSourceEnvelope.objects.filter(
                 organization=request.organization
             ).select_related("valuation_event")[:100],

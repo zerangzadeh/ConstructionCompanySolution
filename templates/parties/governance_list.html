@@ -17,10 +17,10 @@
     <caption class="sr-only">طرف‌های تجاری و وضعیت طرف تجاری</caption>
     <thead><tr><th class="px-5 py-3">طرف تجاری</th><th class="px-5 py-3">نوع</th><th class="px-5 py-3">وضعیت</th><th class="px-5 py-3">آخرین تغییر</th><th class="px-5 py-3">دسترسی</th></tr></thead>
     <tbody>{% for party in parties %}<tr class="border-t border-slate-100">
-      <td class="px-5 py-4 font-bold">{{ party.display_name }}</td><td class="px-5 py-4">{{ party.get_party_kind_display }}</td>
+      <td class="px-5 py-4 font-bold"><a class="font-semibold text-blue-700 hover:underline" href="{% url 'parties:governance_detail' party.pk %}">{{ party.display_name }}</a></td><td class="px-5 py-4">{{ party.get_party_kind_display }}</td>
       <td class="px-5 py-4">{% if party.merged_into_id %}ادغام‌شده{% elif party.archived_at %}بایگانی‌شده{% else %}فعال{% endif %}</td>
       <td class="px-5 py-4">{{ party.updated_at|jalali_datetime }}</td>
-      <td class="px-5 py-4"><a class="font-bold text-blue-700" href="{% url 'parties:governance_detail' party.pk %}">سوابق و اقدامات</a></td>
+      <td class="px-5 py-4">{% url 'parties:governance_detail' party.pk as record_detail_url %}{% include "components/record_detail_link.html" with detail_url=record_detail_url record_label=party.display_name only %}</td>
     </tr>{% endfor %}</tbody>
   </table></div>{% include "components/table_pagination.html" %}
   {% else %}<p class="p-5 text-slate-600" role="status">طرف تجاری مجازی متناسب با جستجو برای نمایش موجود نیست.</p>{% endif %}

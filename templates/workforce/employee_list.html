@@ -29,7 +29,7 @@
                         {% endif %}
                         <div>
                             <a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'workforce:employee_detail' employee.id %}">{{ employee.first_name }} {{ employee.last_name }}</a>
-                            <p class="text-[11px] text-slate-500" dir="ltr">{{ employee.employee_number }}</p>
+                            <p class="text-[11px] text-slate-500" dir="ltr"><a class="font-semibold text-blue-700 hover:underline" href="{% url 'workforce:employee_detail' employee.id %}">{{ employee.employee_number }}</a></p>
                         </div>
                     </div>
                 </td>

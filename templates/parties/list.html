@@ -21,7 +21,7 @@
                                 <td class="px-4 py-3.5 text-slate-600">{{ party.get_party_kind_display }}</td>
                                 <td class="px-4 py-3.5"><div class="flex flex-wrap gap-1">{% for role in party.operational_roles %}<span class="erp-badge erp-badge--info">{{ role.get_role_display }}</span>{% empty %}<span class="text-xs text-slate-400">بدون نقش</span>{% endfor %}</div></td>
                                 <td class="whitespace-nowrap px-4 py-3.5 text-slate-600" dir="ltr">{{ party.tax_identifier|default:"—" }}</td>
-                                <td class="px-4 py-3.5 text-center"><a class="inline-grid h-8 w-8 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:border-blue-300 hover:text-blue-700" href="{% url 'parties:detail' party.pk %}" aria-label="مشاهده {{ party.display_name }}"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></td>
+                                <td class="px-4 py-3.5 text-center">{% url 'parties:detail' party.pk as record_detail_url %}{% include "components/record_detail_link.html" with detail_url=record_detail_url record_label=party.display_name only %}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

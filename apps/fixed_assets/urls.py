@@ -5,6 +5,11 @@ from apps.fixed_assets import views
 app_name = "fixed_assets"
 
 urlpatterns = [
+    path(
+        "transactions/<uuid:transaction_id>/",
+        views.transaction_detail,
+        name="transaction_detail",
+    ),
     path("", views.workbench, name="workbench"),
     path("audit/", views.audit_evidence, name="audit_evidence"),
     path("assets/create/", views.asset_create, name="asset_create"),

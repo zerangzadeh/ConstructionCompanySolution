@@ -124,8 +124,12 @@
             const owner = card.closest("[data-chart-node]");
             showDetails(owner?.dataset.departmentId || card.dataset.departmentId);
         };
-        card.addEventListener("click", open);
+        card.addEventListener("click", (event) => {
+            if (event.target.closest("a, button")) return;
+            open();
+        });
         card.addEventListener("keydown", (event) => {
+            if (event.target !== card) return;
             if (event.key === "Enter" || event.key === " ") { event.preventDefault(); open(); }
         });
     });

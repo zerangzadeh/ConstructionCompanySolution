@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.equipment.cost_services import (
@@ -999,5 +1000,68 @@ def maintenance_status_change(request: HttpRequest, record_id: str) -> HttpRespo
             "form": form,
             "title": "تغییر وضعیت سرویس یا تعمیر",
             "back_url": "equipment:maintenance_list",
+        },
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.MAINTENANCE_RECORDS_VIEW)
+@require_GET
+def maintenance_detail(request: HttpRequest, record_id: str) -> HttpResponse:
+    record = get_object_or_404(
+        get_organization_maintenance_records(
+            user=request.user, organization=request.organization
+        ),
+        pk=record_id,
+    )
+    return render(
+        request,
+        "components/read_only_record_detail.html",
+        {
+            "detail_title": record.record_number,
+            "back_url": reverse("equipment:maintenance_list"),
+            "detail_rows": [
+                ("عنوان", record.summary, "text"),
+                ("تجهیز", record.equipment.name, "text"),
+                ("پروژه", record.project, "text"),
+                ("کارگاه", record.site, "text"),
+                ("نوع", record.get_maintenance_type_display(), "text"),
+                ("وضعیت", record.get_status_display(), "text"),
+                ("تاریخ برنامه", record.scheduled_date, "date"),
+                ("شروع", record.started_date, "date"),
+                ("پایان", record.completed_date, "date"),
+                ("شرح", record.description, "text"),
+                ("یادداشت", record.notes, "text"),
+                ("هزینه ثبت‌شده", record.cost, "number"),
+            ],
+        },
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.EQUIPMENT_OPERATIONS_VIEW)
+@require_GET
+def work_order_detail(request: HttpRequest, work_order_id: str) -> HttpResponse:
+    # Same organization-wide operational read authority as operations_workbench.
+    record = get_object_or_404(
+        EquipmentWorkOrder.objects.filter(
+            organization=request.organization
+        ).select_related("equipment", "plan"),
+        pk=work_order_id,
+    )
+    return render(
+        request,
+        "components/read_only_record_detail.html",
+        {
+            "detail_title": record.number,
+            "back_url": reverse("equipment:operations_workbench"),
+            "detail_rows": [
+                ("عنوان", record.summary, "text"),
+                ("تجهیز", record.equipment.name, "text"),
+                ("وضعیت", record.get_status_display(), "text"),
+                ("تاریخ برنامه", record.scheduled_for, "date"),
+                ("زمان تکمیل", record.completed_at, "datetime"),
+                ("شرح تکمیل", record.completion_notes, "text"),
+            ],
         },
     )

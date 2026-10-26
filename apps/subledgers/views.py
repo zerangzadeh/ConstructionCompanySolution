@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.organizations.authorization import has_business_permission
@@ -278,3 +279,30 @@ def review_reconciliation(request: HttpRequest, run_id) -> HttpResponse:
     except (PermissionDenied, ValidationError) as exc:
         messages.error(request, str(exc))
     return redirect("subledgers:workbench")
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.SUBLEDGERS_VIEW)
+@require_GET
+def obligation_detail(request: HttpRequest, obligation_id: str) -> HttpResponse:
+    record = _scoped_obligation(request, obligation_id)
+    return render(
+        request,
+        "components/read_only_record_detail.html",
+        {
+            "detail_title": record.party_name_snapshot,
+            "back_url": reverse("subledgers:workbench"),
+            "detail_rows": [
+                ("طرف حساب", record.party_name_snapshot, "text"),
+                ("نوع قلم", record.get_direction_display(), "text"),
+                ("پروژه", record.project, "text"),
+                ("قرارداد", record.contract, "text"),
+                ("تاریخ شناسایی", record.recognized_on, "date"),
+                ("سررسید", record.due_date, "date"),
+                ("مبلغ اولیه", record.original_amount, "number"),
+                ("مانده", record.outstanding_amount, "number"),
+                ("ارز", record.currency, "text"),
+                ("نسخه منبع", record.source_version, "text"),
+            ],
+        },
+    )

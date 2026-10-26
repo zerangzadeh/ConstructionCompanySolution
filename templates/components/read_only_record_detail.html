@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load erp_format %}
+{% block title %}{{ detail_title }} | بنیرا{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_title=detail_title page_breadcrumb_label="بازگشت به فهرست" page_breadcrumb_url=back_url only %}
+<section class="erp-surface mt-5 min-w-0 rounded-xl p-5" aria-label="مشخصات رکورد">
+  <dl class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    {% for label, value, kind in detail_rows %}
+    <div class="min-w-0"><dt class="text-xs text-slate-500">{{ label }}</dt><dd class="mt-1 break-words font-semibold">{% if value == None or value == "" %}—{% elif kind == "date" %}{{ value|jalali_date }}{% elif kind == "datetime" %}{{ value|jalali_datetime }}{% elif kind == "number" %}<bdi>{{ value|erp_number }}</bdi>{% else %}{{ value }}{% endif %}</dd></div>
+    {% endfor %}
+  </dl>
+  {% for label, payload in detail_sections %}<details class="mt-5 rounded-lg border border-slate-200 p-3"><summary class="cursor-pointer font-semibold">{{ label }}</summary><pre class="mt-3 overflow-x-auto whitespace-pre-wrap break-words text-sm">{{ payload|pprint }}</pre></details>{% endfor %}
+</section>
+{% endblock %}
