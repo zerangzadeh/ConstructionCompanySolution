@@ -1,0 +1,46 @@
+{
+  "capture": {
+    "schema": "bonira.backup-capture.v1",
+    "environment": "non-production",
+    "source_revision": "de6e20863896e7587e58bf917f807cea75f95b7a",
+    "operator_reference": "Codex-authorized-nonproduction-executor",
+    "recovery_reference": "BONIRA-PE-NP-01-HUMAN-20261027",
+    "consistency_reference": "controlled-synthetic-no-other-business-writers",
+    "started_at": "2026-10-27T16:07:58.110236+00:00",
+    "capture_status": "CAPTURED_NOT_RESTORE_VERIFIED",
+    "restore_status": "NOT_EXECUTED",
+    "cross_store_consistency": "UNVERIFIED",
+    "production_certification": "NOT_EXECUTED",
+    "classes": {
+      "transactional_database": {
+        "sha256": "fa427d75890dc86d44d533f773233ea60ecd505fea810d816f9fa1353ab7230a"
+      },
+      "audit_operational": {
+        "files": 3,
+        "inventory_sha256": "aeb41ed2ab8d1fbf00a37bbf169e9b3e28ea47a928d8a93888ed0f124ad58b0f"
+      },
+      "configuration_metadata": {
+        "files": 3,
+        "inventory_sha256": "63197eeae7ff424cd7c7146b1f6ce7066e0c24cbdb4f0e9721334e7207887394"
+      },
+      "document_media": {
+        "files": 6,
+        "inventory_sha256": "f4a6ef5cb2086e6697b2b2becececccc61b49e6743152ad01b8b2cc35f22da7d"
+      }
+    },
+    "database_tool_exit_code": 0,
+    "completed_at": "2026-10-27T16:07:59.692538+00:00"
+  },
+  "receipt": {
+    "at": "2026-10-27T16:07:59.701475+00:00",
+    "capture_started_at": "2026-10-27T16:07:58.105549+00:00",
+    "retain_until": "2026-11-26T16:07:59.701475+00:00",
+    "next_backup_due": "2026-10-27T16:22:58.105549+00:00",
+    "capture_manifest_sha256": "a267b70bf8ff259ba6139f7b0173c31126d733b503afe25234e6edd03a0cd09c",
+    "profile": "BONIRA-PE-NP-01",
+    "bundle": "074-c7213234ab",
+    "exclusive_worker": "PASS_ACTUAL_SECOND_PROCESS_DENIED",
+    "production": false,
+    "cadence_scope": "supervised captures;future continuous service not asserted"
+  }
+}

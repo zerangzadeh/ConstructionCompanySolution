@@ -1,3 +1,5 @@
+> Historical Windows Development procedure. Current approved Linux shared-reference procedure/evidence: [BONIRA-PE-NP-01](SHARED_PRODUCTION_EQUIVALENT_TARGET_PROFILE.md). This retained procedure does not define a second production-equivalent target.
+
 # Approved synthetic Development recovery controls
 
 Authority: `CEP-070_EXT0020_HUMAN_APPROVAL_20261027.md`. Machine-readable

@@ -1,0 +1,84 @@
+{
+  "at": "2026-10-27T16:26:26.674672+00:00",
+  "profile": "BONIRA-PE-NP-01",
+  "qualification": "QUALIFIED_APPROVED_BOUNDED_PRODUCTION_EQUIVALENT_NONPRODUCTION_REFERENCE",
+  "authority": "docs/governance/cep/supporting/BONIRA-PE-NP-01_HUMAN_APPROVAL_20261027.md",
+  "mapping": "docs/governance/cep/supporting/SHARED_PRODUCTION_EQUIVALENT_TARGET_PROFILE.md",
+  "one_shared_persistent_linux_target": true,
+  "environment": {
+    "os": "Debian 12 / linux-amd64",
+    "python": "3.11.17",
+    "django": "5.2.17",
+    "psycopg": "3.3.5 pure Python / system libpq 15.19",
+    "postgresql": "18.6-bookworm / verified TLS",
+    "web": "Nginx 1.22.1 HTTPS -> private Unix socket -> Gunicorn 26.2.0 synchronous WSGI",
+    "settings": "config.settings.production",
+    "cache": "private single-host FileBasedCache verified between processes",
+    "lifecycle": "gracefully stopped; private artifacts retained"
+  },
+  "ceps": {
+    "CEP-070": {
+      "status": "COMPLETE",
+      "ac": "6/6 PASS",
+      "dod": "MET_APPROVED_NONPRODUCTION_SCOPE",
+      "result": "runtime/070_RESULT.json"
+    },
+    "CEP-074": {
+      "status": "COMPLETE",
+      "ac": "6/6 PASS",
+      "dod": "MET_APPROVED_NONPRODUCTION_SCOPE",
+      "result": "runtime/074_RESULT.json"
+    },
+    "CEP-075": {
+      "status": "COMPLETE",
+      "ac": "6/6 PASS",
+      "dod": "MET_APPROVED_NONPRODUCTION_SCOPE",
+      "result": "runtime/075_RESULT.json"
+    }
+  },
+  "recovery": {
+    "070": {
+      "rpo_seconds": 0,
+      "rto_seconds": 427.8891506150003,
+      "capture_interval_seconds": 530.530368
+    },
+    "074": {
+      "rpo_seconds": 0,
+      "rto_seconds": 54.498530749999986,
+      "capture_interval_seconds": 62.336269
+    }
+  },
+  "deployment": {
+    "actual_steps": 7,
+    "https_security_cases": 56,
+    "collected_assets_per_release": 153,
+    "migration_history_entries_preserved": 437,
+    "same_current_source_separate_release_packages": true
+  },
+  "defects_resolved": [
+    "Interrupted artifact download repaired with bounded ranges and publisher hash verification",
+    "Cloud seed attachment and scoped SSH key startup repaired",
+    "QEMU acceleration/network initialization repaired without disabling security mitigations",
+    "Source allowlist namespace-package assumption repaired",
+    "Database readiness now requires verified TLS SQL against the actual target database",
+    "Nginx live PID and Gunicorn readonly-root control-socket startup repaired",
+    "Private Unix socket ownership/GID repaired; internal network retained",
+    "Container pg_dump output path bridged to the allowed bundle with strict argument/path validation"
+  ],
+  "product_schema_permission_migration_changes": "NONE",
+  "checks": "CHECKS.json",
+  "evidence_hash_manifest": "EVIDENCE_MANIFEST.csv",
+  "gate_changes": {
+    "GATE-08": "NOT_PASSED -> PASS accepted bounded evidence set; prior contributor environments/limits retained",
+    "GATE-11": "NOT_PASSED unchanged; actual Production/statutory prerequisites remain unqualified"
+  },
+  "remaining_blocker_for_requested_three_ceps": null,
+  "remaining_program_boundary": "CEP-069 official current statutory/activation evidence; actual Production external evidence and final Human certification/sign-off",
+  "remaining_development_resolvable_or_reproducible_evidence_work": [],
+  "human_decision_request": null,
+  "production_action": false,
+  "production_certification": "NOT_EXECUTED",
+  "human_signoff": "NOT_EXECUTED",
+  "git_write": false,
+  "next_executable_frontier": []
+}

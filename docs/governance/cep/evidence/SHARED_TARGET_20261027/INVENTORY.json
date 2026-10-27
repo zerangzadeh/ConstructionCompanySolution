@@ -1,0 +1,48 @@
+{
+  "at": "2026-10-27T12:15:37.861660+00:00",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "python": "3.11.1",
+  "runtime_servers": {
+    "waitress": "NOT_INSTALLED",
+    "gunicorn": "NOT_INSTALLED",
+    "uvicorn": "NOT_INSTALLED",
+    "daphne": "NOT_INSTALLED",
+    "hypercorn": "NOT_INSTALLED"
+  },
+  "docker": null,
+  "podman": null,
+  "wsl": {
+    "exit_code": 1,
+    "status": "SUBSYSTEM_NOT_INSTALLED"
+  },
+  "openssl_existing": "D:\\Program Files\\Git\\usr\\bin\\openssl.exe",
+  "postgresql_existing": "D:\\Program Files\\PostgreSQL\\18\\bin",
+  "source_files_unchanged": 1510,
+  "clusters": [
+    {
+      "attempt": "CONTROLS_ATTEMPT_01.json",
+      "cluster_stopped": true,
+      "pg_ctl_status": 3
+    },
+    {
+      "attempt": "CONTROLS_ATTEMPT_02.json",
+      "cluster_stopped": true,
+      "pg_ctl_status": 3
+    },
+    {
+      "attempt": "CONTROLS.json",
+      "cluster_stopped": true,
+      "pg_ctl_status": 3
+    }
+  ],
+  "production_reference": "UNSPECIFIED_IN_HASH_VERIFIED_SPEC006",
+  "proposed_linux_artifact": {
+    "image": "python@sha256:8fb0b110b022c70cbe09d3ff1fb313654f31f9c814abb0d48180af56d906a199",
+    "source": ".github/workflows/cep013-pure-psycopg-verify.yml",
+    "source_sha256": "be682ae0bc7d6a34ff09ffe124b575895746e7a6c3aa86efc94cfe964949e8ec",
+    "prior_evidence": "docs/governance/cep/reports/CEP-013_COMPLETION_REPORT.md",
+    "rerun": false
+  },
+  "psycopg_implementation": "binary",
+  "libpq_version": 180004
+}

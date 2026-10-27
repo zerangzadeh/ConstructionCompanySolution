@@ -1,0 +1,143 @@
+{
+  "observed_at": "2026-10-27T00:49:55.958989+00:00",
+  "profile": "SYNTHETIC_IN_MEMORY_REQUESTS_ONLY",
+  "django": "5.2.17",
+  "python": "3.11.1",
+  "settings": "config.settings.production",
+  "deployment_checks": "PASS",
+  "requests": [
+    {
+      "interface": "WSGI",
+      "method": "GET",
+      "path": "/",
+      "https": false,
+      "host": "fixture.invalid",
+      "status": 301,
+      "result": "PASS"
+    },
+    {
+      "interface": "WSGI",
+      "method": "GET",
+      "path": "/",
+      "https": true,
+      "host": "fixture.invalid",
+      "status": 302,
+      "result": "PASS"
+    },
+    {
+      "interface": "WSGI",
+      "method": "POST",
+      "path": "/accounts/login/",
+      "https": true,
+      "host": "fixture.invalid",
+      "status": 403,
+      "result": "PASS"
+    },
+    {
+      "interface": "WSGI",
+      "method": "GET",
+      "path": "/media/fixture.txt",
+      "https": true,
+      "host": "fixture.invalid",
+      "status": 404,
+      "result": "PASS"
+    },
+    {
+      "interface": "WSGI",
+      "method": "GET",
+      "path": "/private/fixture.txt",
+      "https": true,
+      "host": "fixture.invalid",
+      "status": 404,
+      "result": "PASS"
+    },
+    {
+      "interface": "WSGI",
+      "method": "GET",
+      "path": "/static/accounts\\images\\bonira-login-visual.png",
+      "https": true,
+      "host": "fixture.invalid",
+      "status": 404,
+      "result": "PASS"
+    },
+    {
+      "interface": "WSGI",
+      "method": "GET",
+      "path": "/",
+      "https": true,
+      "host": "unapproved.invalid",
+      "status": 400,
+      "result": "PASS"
+    },
+    {
+      "interface": "ASGI",
+      "method": "GET",
+      "path": "/",
+      "https": false,
+      "host": "fixture.invalid",
+      "status": 301,
+      "result": "PASS"
+    },
+    {
+      "interface": "ASGI",
+      "method": "GET",
+      "path": "/",
+      "https": true,
+      "host": "fixture.invalid",
+      "status": 302,
+      "result": "PASS"
+    },
+    {
+      "interface": "ASGI",
+      "method": "POST",
+      "path": "/accounts/login/",
+      "https": true,
+      "host": "fixture.invalid",
+      "status": 403,
+      "result": "PASS"
+    },
+    {
+      "interface": "ASGI",
+      "method": "GET",
+      "path": "/media/fixture.txt",
+      "https": true,
+      "host": "fixture.invalid",
+      "status": 404,
+      "result": "PASS"
+    },
+    {
+      "interface": "ASGI",
+      "method": "GET",
+      "path": "/private/fixture.txt",
+      "https": true,
+      "host": "fixture.invalid",
+      "status": 404,
+      "result": "PASS"
+    },
+    {
+      "interface": "ASGI",
+      "method": "GET",
+      "path": "/static/accounts\\images\\bonira-login-visual.png",
+      "https": true,
+      "host": "fixture.invalid",
+      "status": 404,
+      "result": "PASS"
+    },
+    {
+      "interface": "ASGI",
+      "method": "GET",
+      "path": "/",
+      "https": true,
+      "host": "unapproved.invalid",
+      "status": 400,
+      "result": "PASS"
+    }
+  ],
+  "static_assets": 153,
+  "candidate_static_matches_previous": true,
+  "previous_static_preserved": true,
+  "database_dotenv_network": "FORBIDDEN",
+  "target_process_tls_proxy_storage_rollback": "UNVERIFIED",
+  "production_equivalence": "NOT_CLAIMED",
+  "cep075": "NOT_STARTED"
+}

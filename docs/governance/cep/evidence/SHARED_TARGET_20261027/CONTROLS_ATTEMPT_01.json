@@ -1,0 +1,47 @@
+{
+  "started_at": "2026-10-27T12:05:43.545352+00:00",
+  "profile": "BONIRA-PE-NP-01",
+  "scope": "NEW_CANDIDATE_CONTROL_QUALIFICATION_ONLY",
+  "production_equivalent": false,
+  "cep074_executed": false,
+  "configured_business_database_accessed": false,
+  "existing_postgresql_service_changed": false,
+  "store": "E:\\BONIRA_Operations\\SharedTarget\\9c8344e05ea04a37",
+  "runtime": {
+    "os": "Windows-10-10.0.26200-SP0",
+    "python": "3.11.1",
+    "django": "5.2.17",
+    "psycopg": "3.3.5"
+  },
+  "checks": [
+    {
+      "check": "synthetic TLS identity created in restricted run directory",
+      "result": "PASS",
+      "at": "2026-10-27T12:05:44.506930+00:00",
+      "cert_sha256": "1abea8882ec784d6eb26ce6fb1c5cfe71bebf903fb6de366db4638100dbe7830",
+      "trust": "explicit-per-client;no-global-store-change"
+    }
+  ],
+  "limitations": [
+    "No approved Production reference/permitted-difference mapping exists",
+    "Reference WSGI server is a qualification harness, not a Production server",
+    "Single Windows host does not prove Linux/HA/provider/failure-domain equivalence",
+    "File cache is shared across local processes only; no multi-host claim",
+    "Locally generated synthetic TLS/DB secrets do not qualify Production custody",
+    "SMTP configuration is an unused synthetic endpoint; no mail delivery claim",
+    "Recovery fixture is a small control fixture, not an ERP or CEP074 restore drill",
+    "No extension of Development objective approval to Production or equivalence"
+  ],
+  "result": "FAILED_CANDIDATE_CONTROL_ATTEMPT",
+  "failure": {
+    "type": "TimeoutExpired",
+    "message": "Command '['D:\\\\Program Files\\\\PostgreSQL\\\\18\\\\bin\\\\pg_ctl.exe', '-D', 'E:\\\\BONIRA_Operations\\\\SharedTarget\\\\9c8344e05ea04a37\\\\pgdata', '-l', 'E:\\\\BONIRA_Operations\\\\SharedTarget\\\\9"
+  },
+  "web_process_stopped": true,
+  "finished_at": "2026-10-27T12:07:26.854800+00:00",
+  "explicit_cleanup": {
+    "result": "PASS",
+    "action": "Only this new cluster stopped with native pg_ctl -m fast -w stop after inherited-pipe timeout",
+    "verified_at": "2026-10-27T12:15:36.807070+00:00"
+  }
+}

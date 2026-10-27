@@ -1,0 +1,50 @@
+{"timestamp":"2026-10-27T00:48:35.144083+00:00","event":"http.response","request_id":"87dd5f73-1bfc-4993-bb40-9996add1b9d4","method":"GET","route":null,"status_code":301,"duration_ms":0}
+{"timestamp":"2026-10-27T00:48:35.329389+00:00","event":"http.response","request_id":"f07b7be1-40c8-4193-8519-11a48cbf0639","method":"GET","route":"home","status_code":302,"duration_ms":184}
+{"timestamp":"2026-10-27T00:48:35.353385+00:00","event":"http.response","request_id":"f6df2a74-81a8-4613-9fc0-ac727d345aaf","method":"POST","route":"accounts:login","status_code":403,"duration_ms":23}
+{"timestamp":"2026-10-27T00:48:35.419357+00:00","event":"http.response","request_id":"c6343b04-cbb6-40b1-95e3-482746e3fe65","method":"GET","route":null,"status_code":404,"duration_ms":65}
+{"timestamp":"2026-10-27T00:48:35.421839+00:00","event":"http.response","request_id":"80c04ec7-5a76-4c4c-8a8b-4fb69a2bc09d","method":"GET","route":null,"status_code":404,"duration_ms":1}
+{"timestamp":"2026-10-27T00:48:35.422517+00:00","event":"http.response","request_id":"d7fe2e0b-40c8-4be6-89f3-708a4408046f","method":"GET","route":null,"status_code":404,"duration_ms":1}
+{"timestamp":"2026-10-27T00:48:35.424610+00:00","event":"http.response","request_id":"52d9c12a-8a41-4e20-af10-1bbfc081f2fa","method":"GET","route":null,"status_code":400,"duration_ms":0}
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\docs\governance\cep\evidence\CEP-071_EXT0021_REENTRY_20261027\preflight.py", line 162, in <module>
+    execute()
+  File "E:\Construction_Company_Solution\docs\governance\cep\evidence\CEP-071_EXT0021_REENTRY_20261027\preflight.py", line 142, in execute
+    asyncio.run(execute_asgi())
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\asyncio\runners.py", line 189, in run
+    with Runner(debug=debug) as runner:
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\asyncio\runners.py", line 59, in __enter__
+    self._lazy_init()
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\asyncio\runners.py", line 137, in _lazy_init
+    self._loop = events.new_event_loop()
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\asyncio\events.py", line 821, in new_event_loop
+    return get_event_loop_policy().new_event_loop()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\asyncio\events.py", line 710, in new_event_loop
+    return self._loop_factory()
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\asyncio\windows_events.py", line 315, in __init__
+    super().__init__(proactor)
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\asyncio\proactor_events.py", line 639, in __init__
+    self._make_self_pipe()
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\asyncio\proactor_events.py", line 784, in _make_self_pipe
+    self._ssock, self._csock = socket.socketpair()
+                               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\socket.py", line 641, in socketpair
+    csock.connect((addr, port))
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\mock.py", line 1118, in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\mock.py", line 1122, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\mock.py", line 1177, in _execute_mock_call
+    raise effect
+AssertionError: Network forbidden
+sys:1: RuntimeWarning: coroutine 'execute.<locals>.execute_asgi' was never awaited
+Exception ignored in: <function BaseEventLoop.__del__ at 0x0000020B2A07F4C0>
+Traceback (most recent call last):
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\asyncio\base_events.py", line 694, in __del__
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\asyncio\proactor_events.py", line 696, in close
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\asyncio\proactor_events.py", line 776, in _close_self_pipe
+AttributeError: 'ProactorEventLoop' object has no attribute '_ssock'

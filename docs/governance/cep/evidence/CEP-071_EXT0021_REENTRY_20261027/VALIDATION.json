@@ -1,0 +1,46 @@
+{
+  "at": "2026-10-27T00:55:20.800714+00:00",
+  "focused_configuration": {
+    "command": ".venv-2/Scripts/python.exe -m unittest discover -s tests -p test_production_configuration.py",
+    "exit_code": 0,
+    "tests": 6,
+    "seconds": 19.819,
+    "capture_source": "exec_command session 26123 plus write_stdin completion; copied observed output"
+  },
+  "synthetic_request_static_preflight": {
+    "command": ".venv-2/Scripts/python.exe docs/governance/cep/evidence/CEP-071_EXT0021_REENTRY_20261027/preflight.py",
+    "exit_code": 0,
+    "requests_passed": 14,
+    "static_assets": 153,
+    "profile": "SYNTHETIC_IN_MEMORY_REQUESTS_ONLY"
+  },
+  "initial_failure": {
+    "classification": "TEST_INFRASTRUCTURE_DEBT / REPRODUCIBLE_EVIDENCE",
+    "reason": "Windows asyncio internal socket-pair setup blocked by application network guard",
+    "resolution": "Initialize event loop before guard; app requests retain forbidden socket/DB/dotenv connects",
+    "evidence": "REQUEST_ATTEMPT_01_DIAGNOSTICS.txt",
+    "resolved": true
+  },
+  "retained_completed_cep_evidence": "Existing CEP013 release and EXT0022 operations/health evidence reused; no completed CEP re-executed",
+  "LINT": {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "docs/governance/cep/evidence/CEP-071_EXT0021_REENTRY_20261027/preflight.py"
+    ],
+    "exit_code": 0
+  },
+  "FORMAT": {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "docs/governance/cep/evidence/CEP-071_EXT0021_REENTRY_20261027/preflight.py"
+    ],
+    "exit_code": 0
+  }
+}

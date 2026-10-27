@@ -1,0 +1,66 @@
+{
+  "at": "2026-10-27T15:54:18.819224+00:00",
+  "cep": "CEP-070",
+  "execution": "COMPLETE",
+  "ac": {
+    "AC1": "PASS_APPROVED_NONPRODUCTION_TARGET",
+    "AC2": "PASS_APPROVED_NONPRODUCTION_TARGET",
+    "AC3": "PASS_APPROVED_NONPRODUCTION_TARGET",
+    "AC4": "PASS_APPROVED_NONPRODUCTION_TARGET",
+    "AC5": "PASS_APPROVED_NONPRODUCTION_TARGET",
+    "AC6": "PASS_APPROVED_NONPRODUCTION_TARGET"
+  },
+  "dod": "MET_APPROVED_NONPRODUCTION_SCOPE",
+  "profile": "BONIRA-PE-NP-01",
+  "checks": [
+    "actual approved runtime/TLS/non-superuser/shared-cache/source/config identity",
+    "actual Nginx/Gunicorn production-settings HTTPS boundary",
+    "actual complete four-class capture over verify-full TLS with OS process exclusion",
+    "corrupted bundle rejected before restore and never advances last-good",
+    "actual failing restore leaves explicit failure evidence",
+    "complete integrity/accessibility/tenant read/write denial and approved objectives",
+    "two actual supervised complete captures start within approved900-second maximum",
+    "30-day minimum retention receipts/due dates;no purge and no future-elapsed claim"
+  ],
+  "check_groups": 8,
+  "capture_interval_seconds": 530.530368,
+  "restore": {
+    "at": "2026-10-27T15:52:41.541174+00:00",
+    "phase": "070",
+    "result": "PASS",
+    "started_at": "2026-10-27T15:45:33.651752+00:00",
+    "rpo_seconds": 0,
+    "rto_seconds": 427.8891506150003,
+    "rpo_limit": 900,
+    "rto_limit": 3600,
+    "rpo_basis": "All rows/sequences/constraints and latest acknowledged synthetic version match;no concurrent business writers",
+    "rto_boundary": "New database/file provisioning through integrity and authorized/denied domain service accessibility",
+    "tables": 525,
+    "rows": 7758,
+    "constraints": 9507,
+    "sequences": 9,
+    "files": {
+      "document_media": "PASS_EXACT_COMPLETE_INVENTORY",
+      "configuration_metadata": "PASS_EXACT_COMPLETE_INVENTORY",
+      "audit_operational": "PASS_EXACT_COMPLETE_INVENTORY"
+    },
+    "next_restore_test_due": "2026-11-26T15:52:41.541864+00:00",
+    "profile": "BONIRA-PE-NP-01",
+    "production_certification": "NOT_EXECUTED"
+  },
+  "identity": {
+    "at": "2026-10-27T15:42:34.297127+00:00",
+    "release": "candidate",
+    "image_pid_started_uid": "sha256:d2f481516c0eb5229ba4224041880abf63ab96fceb5a8a7e11f0f7b85b9b5f27|4030|2026-10-27T15:40:18.749636069Z|10001:10001",
+    "source_head": "de6e20863896e7587e58bf917f807cea75f95b7a"
+  },
+  "authority": "BONIRA-PE-NP-01_HUMAN_APPROVAL_20261027",
+  "limitations": [
+    "synthetic lower-scale controlled dataset",
+    "no Production SLA/HA/provider/storage/key-custody claim",
+    "future retention/drill/continuous operation not asserted"
+  ],
+  "production_certification": "NOT_EXECUTED",
+  "human_signoff": "NOT_EXECUTED",
+  "git_write": false
+}

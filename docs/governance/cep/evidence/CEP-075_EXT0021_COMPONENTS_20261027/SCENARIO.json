@@ -1,0 +1,255 @@
+{
+  "at": "2026-10-27T02:04:09.934832+00:00",
+  "result": "PASS_APPROVED_DEVELOPMENT_PROFILE",
+  "environment": {
+    "at": "2026-10-27T02:03:14.347303+00:00",
+    "head": "de6e20863896e7587e58bf917f807cea75f95b7a",
+    "source_sha256": "e2776a8de8aebf9f2f97e7091fb4e388c0feb369006949ef15043f78560c7864",
+    "source_files": 1510,
+    "driver_sha256": "6d9037889ec9e98cf998f5365ec3ab58864eb3953786e5816503a4dd0aab7fba",
+    "python": "3.11.1",
+    "django": "5.2.17",
+    "psycopg": "3.3.5",
+    "settings": "config.settings.development",
+    "store": "E:\\BONIRA_Operations\\EXT0021\\940dfd1c1fff4cc6",
+    "secret_source": "existing-repository-private-.env-and-process-environment; no bytes copied",
+    "secret_source_acl": {
+      "paths_checked": 1,
+      "allowed_principals": [
+        "current operator",
+        "Local System",
+        "local Administrators"
+      ],
+      "encryption_qualification": "NOT_ESTABLISHED",
+      "owner_is_current_operator": true,
+      "status": "PASS"
+    },
+    "database_before": {
+      "applied_migrations": 437,
+      "history_sha256": "15ce69afca238e981d5e8552cf33cb623ab9e142111d3df2b33d90aa2974f378",
+      "scope": "existing-test-database-read-only"
+    },
+    "production_equivalent": false,
+    "production_readiness": "NOT_VALIDATED"
+  },
+  "steps": [
+    {
+      "step": "BUILD_CONFIG_STATIC",
+      "at": "2026-10-27T02:03:46.708912+00:00",
+      "result": "PASS",
+      "same_application_source": true,
+      "static_files": 153,
+      "secret_bytes_packaged": false
+    },
+    {
+      "step": "VERIFY_PREVIOUS_DEPLOYMENT",
+      "at": "2026-10-27T02:03:51.045615+00:00",
+      "result": "PASS",
+      "process": {
+        "pid": 53172,
+        "port": 62577,
+        "settings": null,
+        "debug": false,
+        "reference_personas": false,
+        "release": "previous",
+        "scope": "loopback-development-only"
+      },
+      "validation": {
+        "health": {
+          "signals": [
+            "database.reachable",
+            "cache.reachable"
+          ],
+          "production_readiness": "NOT_VALIDATED",
+          "scope": "database-and-cache-reachability-only"
+        },
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/",
+            "status": 302
+          },
+          {
+            "method": "POST",
+            "path": "/accounts/login/",
+            "status": 403
+          },
+          {
+            "method": "GET",
+            "path": "/media/fixture.txt",
+            "status": 404
+          },
+          {
+            "method": "GET",
+            "path": "/private/fixture.txt",
+            "status": 404
+          },
+          {
+            "method": "GET",
+            "path": "/static/accounts/images/bonira-login-visual.png",
+            "status": 200
+          }
+        ],
+        "static_files": 153,
+        "static_manifest_sha256": "8bd7c7a64e9982f35afe57c21045ab1a7523e13e170f04dcee49efefca99fee8"
+      }
+    },
+    {
+      "step": "FAILED_CANDIDATE_START_REJECTED",
+      "at": "2026-10-27T02:03:53.004589+00:00",
+      "result": "PASS",
+      "exit_code": 78,
+      "evidence": {
+        "result": "FAILED",
+        "reason": "controlled-candidate-startup-failure"
+      },
+      "activation": "REJECTED"
+    },
+    {
+      "step": "CANDIDATE_DEPLOYMENT",
+      "at": "2026-10-27T02:03:57.481288+00:00",
+      "result": "PASS",
+      "process": {
+        "pid": 58944,
+        "port": 62577,
+        "settings": null,
+        "debug": false,
+        "reference_personas": false,
+        "release": "candidate",
+        "scope": "loopback-development-only"
+      },
+      "validation": {
+        "health": {
+          "signals": [
+            "database.reachable",
+            "cache.reachable"
+          ],
+          "production_readiness": "NOT_VALIDATED",
+          "scope": "database-and-cache-reachability-only"
+        },
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/",
+            "status": 302
+          },
+          {
+            "method": "POST",
+            "path": "/accounts/login/",
+            "status": 403
+          },
+          {
+            "method": "GET",
+            "path": "/media/fixture.txt",
+            "status": 404
+          },
+          {
+            "method": "GET",
+            "path": "/private/fixture.txt",
+            "status": 404
+          },
+          {
+            "method": "GET",
+            "path": "/static/accounts/images/bonira-login-visual.png",
+            "status": 200
+          }
+        ],
+        "static_files": 153,
+        "static_manifest_sha256": "8bd7c7a64e9982f35afe57c21045ab1a7523e13e170f04dcee49efefca99fee8"
+      }
+    },
+    {
+      "step": "CANDIDATE_READINESS_FAILURE",
+      "at": "2026-10-27T02:04:01.459545+00:00",
+      "result": "PASS",
+      "exit_code": 1,
+      "signals": {
+        "signals": [
+          "database.unreachable",
+          "cache.reachable"
+        ],
+        "production_readiness": "NOT_VALIDATED",
+        "scope": "database-and-cache-reachability-only"
+      },
+      "activation": "REJECTED",
+      "database_mutation": false
+    },
+    {
+      "step": "ACTUAL_PREVIOUS_BUILD_CONFIG_ROLLBACK",
+      "at": "2026-10-27T02:04:05.914948+00:00",
+      "result": "PASS",
+      "process": {
+        "pid": 33508,
+        "port": 62577,
+        "settings": null,
+        "debug": false,
+        "reference_personas": false,
+        "release": "previous",
+        "scope": "loopback-development-only"
+      },
+      "validation": {
+        "health": {
+          "signals": [
+            "database.reachable",
+            "cache.reachable"
+          ],
+          "production_readiness": "NOT_VALIDATED",
+          "scope": "database-and-cache-reachability-only"
+        },
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/",
+            "status": 302
+          },
+          {
+            "method": "POST",
+            "path": "/accounts/login/",
+            "status": 403
+          },
+          {
+            "method": "GET",
+            "path": "/media/fixture.txt",
+            "status": 404
+          },
+          {
+            "method": "GET",
+            "path": "/private/fixture.txt",
+            "status": 404
+          },
+          {
+            "method": "GET",
+            "path": "/static/accounts/images/bonira-login-visual.png",
+            "status": 200
+          }
+        ],
+        "static_files": 153,
+        "static_manifest_sha256": "8bd7c7a64e9982f35afe57c21045ab1a7523e13e170f04dcee49efefca99fee8"
+      },
+      "compatibility": "same-code-and-existing-schema; no database rollback"
+    },
+    {
+      "step": "PRESERVATION_AND_RECOVERY_VALIDATED",
+      "at": "2026-10-27T02:04:05.950439+00:00",
+      "result": "PASS",
+      "previous_static_unchanged": true,
+      "media_private_unchanged": true,
+      "schema_history_unchanged": true
+    }
+  ],
+  "acl_after": {
+    "owner_is_current_operator": true,
+    "status": "PASS",
+    "encryption_qualification": "NOT_ESTABLISHED",
+    "paths_checked": 4635,
+    "allowed_principals": [
+      "current operator",
+      "Local System",
+      "local Administrators"
+    ]
+  },
+  "processes_stopped": true,
+  "production_equivalence": "NOT_ESTABLISHED_NOT_CLAIMED",
+  "production_readiness": "NOT_VALIDATED",
+  "database_migration_rollback": "NOT_EXECUTED"
+}

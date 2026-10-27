@@ -1,0 +1,125 @@
+{
+  "at": "2026-10-27T16:12:54.898501+00:00",
+  "cep": "CEP-075",
+  "execution": "COMPLETE",
+  "ac": {
+    "AC1": "PASS_APPROVED_NONPRODUCTION_TARGET",
+    "AC2": "PASS_APPROVED_NONPRODUCTION_TARGET",
+    "AC3": "PASS_APPROVED_NONPRODUCTION_TARGET",
+    "AC4": "PASS_APPROVED_NONPRODUCTION_TARGET",
+    "AC5": "PASS_APPROVED_NONPRODUCTION_TARGET",
+    "AC6": "PASS_APPROVED_NONPRODUCTION_TARGET"
+  },
+  "dod": "MET_APPROVED_NONPRODUCTION_SCOPE",
+  "profile": "BONIRA-PE-NP-01",
+  "steps": [
+    {
+      "step": "previous verified current-source build",
+      "identity": {
+        "at": "2026-10-27T16:11:16.334322+00:00",
+        "release": "previous",
+        "image_pid_started_uid": "sha256:d2f481516c0eb5229ba4224041880abf63ab96fceb5a8a7e11f0f7b85b9b5f27|2617|2026-10-27T16:11:12.40172216Z|10001:33",
+        "source_head": "de6e20863896e7587e58bf917f807cea75f95b7a"
+      },
+      "http_cases": 14,
+      "health": {
+        "at": "2026-10-27T16:11:29.274929+00:00",
+        "exit_code": 0,
+        "signals": [
+          "database.reachable",
+          "cache.reachable"
+        ],
+        "production_readiness": "NOT_VALIDATED",
+        "scope": "database-and-cache-reachability-only"
+      }
+    },
+    {
+      "step": "actual invalid candidate startup rejected",
+      "exit_code": 1
+    },
+    {
+      "step": "candidate actual deployment",
+      "identity": {
+        "at": "2026-10-27T16:11:40.680336+00:00",
+        "release": "candidate",
+        "image_pid_started_uid": "sha256:d2f481516c0eb5229ba4224041880abf63ab96fceb5a8a7e11f0f7b85b9b5f27|3091|2026-10-27T16:11:34.716540702Z|10001:33",
+        "source_head": "de6e20863896e7587e58bf917f807cea75f95b7a"
+      },
+      "http_cases": 14,
+      "health": {
+        "at": "2026-10-27T16:11:57.243720+00:00",
+        "exit_code": 0,
+        "signals": [
+          "database.reachable",
+          "cache.reachable"
+        ],
+        "production_readiness": "NOT_VALIDATED",
+        "scope": "database-and-cache-reachability-only"
+      }
+    },
+    {
+      "step": "failed candidate readiness rejected",
+      "health": {
+        "at": "2026-10-27T16:12:01.329135+00:00",
+        "exit_code": 1,
+        "signals": [
+          "database.unreachable",
+          "cache.reachable"
+        ],
+        "production_readiness": "NOT_VALIDATED",
+        "scope": "database-and-cache-reachability-only"
+      }
+    },
+    {
+      "step": "rollback to previously verified build/config/static",
+      "identity": {
+        "at": "2026-10-27T16:12:07.251516+00:00",
+        "release": "previous",
+        "image_pid_started_uid": "sha256:d2f481516c0eb5229ba4224041880abf63ab96fceb5a8a7e11f0f7b85b9b5f27|3573|2026-10-27T16:12:03.949498202Z|10001:33",
+        "source_head": "de6e20863896e7587e58bf917f807cea75f95b7a"
+      },
+      "http_cases": 14,
+      "health": {
+        "at": "2026-10-27T16:12:16.929427+00:00",
+        "exit_code": 0,
+        "signals": [
+          "database.reachable",
+          "cache.reachable"
+        ],
+        "production_readiness": "NOT_VALIDATED",
+        "scope": "database-and-cache-reachability-only"
+      }
+    },
+    {
+      "step": "return to verified candidate",
+      "identity": {
+        "at": "2026-10-27T16:12:22.693715+00:00",
+        "release": "candidate",
+        "image_pid_started_uid": "sha256:d2f481516c0eb5229ba4224041880abf63ab96fceb5a8a7e11f0f7b85b9b5f27|3947|2026-10-27T16:12:19.168814534Z|10001:33",
+        "source_head": "de6e20863896e7587e58bf917f807cea75f95b7a"
+      },
+      "http_cases": 14,
+      "health": {
+        "at": "2026-10-27T16:12:33.963796+00:00",
+        "exit_code": 0,
+        "signals": [
+          "database.reachable",
+          "cache.reachable"
+        ],
+        "production_readiness": "NOT_VALIDATED",
+        "scope": "database-and-cache-reachability-only"
+      }
+    },
+    {
+      "step": "source/config/migration-history/protected-file preservation",
+      "result": "PASS",
+      "migration_operations": "NONE"
+    }
+  ],
+  "source": "Both releases contain exact current source;no fictitious older code revision",
+  "runtime": "Nginx HTTPS -> Gunicorn synchronous WSGI;approved Linux application runtime",
+  "migration": "History read unchanged;no migration/reversal",
+  "production_certification": "NOT_EXECUTED",
+  "human_signoff": "NOT_EXECUTED",
+  "git_write": false
+}

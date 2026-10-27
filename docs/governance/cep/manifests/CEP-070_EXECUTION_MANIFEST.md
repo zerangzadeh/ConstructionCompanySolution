@@ -77,3 +77,45 @@ Before implementation: direct Human approval recorded in supporting/CEP-070_EXT0
 ### Approved Development closeout
 
 23 focused methods and20 actual recovery checks PASS. Two retained captures, observed start gap 720.962755s; quiescent RPO0s/RTO23.145745s. Restricted project-drive storage avoids packaged-app path expansion; original document paths retained. Secret-file DACL tightened, contents unchanged.30-day control boundaries simulated; no future/continuous operation claim. Canonical070 remains PARTIAL0/6 certified/DoD not met,074 NOT_STARTED. Gate06 PASS retained;08/11 NOT_PASSED. Evidence docs/governance/cep/evidence/CEP-070_EXT0020_DEVELOPMENT_20261027/RESULT.json. No Git/Production action.
+
+
+## Shared target qualification — 2026-10-27
+
+Before mutation, [ENTRY](../evidence/SHARED_TARGET_20261027/ENTRY.json)
+records verified contracts, dirty baseline, source freeze, authority and bounded
+touch set. New isolated candidate control harness/mapping/evidence plus selected
+070/074/075 Registry/report closeout only; no product/schema/settings or
+completed-CEP implementation mutation. [RESULT](../evidence/SHARED_TARGET_20261027/RESULT.json):
+14 control groups PASS; equivalence unqualified; prior AC/DoD retained.
+One consolidated reference-design decision request is in the shared profile.
+No Production/Git writes or completed-CEP/broad regression rerun.
+
+
+## Approved Linux reference execution entry — 2026-10-27
+
+Direct [Human authority](../supporting/BONIRA-PE-NP-01_HUMAN_APPROVAL_20261027.md)
+approves BONIRA-PE-NP-01 and reversible provisioning/repairs.
+[ENTRY](../evidence/SHARED_TARGET_APPROVED_20261027/ENTRY.json) records canonical
+hashes, dirty main baseline, bounded touch set and source freeze. Actual target:
+new Debian12 QEMU guest; approved Python image digest / CPython3.11.17;
+PostgreSQL18.6-bookworm; Nginx HTTPS and Gunicorn synchronous WSGI; pure
+Psycopg/system libpq; explicit production settings; private file cache/storage
+and synthetic per-target TLS/secrets. No host OS features changed.
+
+Existing Windows PostgreSQL was unavailable in recovery mode; no service change
+or business-database access was attempted. Verified retained synthetic seed is
+restored only into the new Linux fixture; actual current migration graph must
+match before qualification. Fresh committed document revision, complete four-class
+captures, restore/fingerprint reconciliation, exact Decimal/version accessibility,
+tenant read/write denial, TLS/security/cache/HTTP and failure/retention controls
+produce new target evidence. No historical result is promoted to target PASS.
+
+Only target harness/infrastructure, evidence/report/manifests and selected Registry
+closeout are intended. No product/schema migration authored or migration behavior
+verified. No completed unrelated CEP, full regression, Production or Git write.
+070 closes only on actual canonical AC/DoD evidence;074 entry follows closeout.
+
+
+## Approved shared-reference final closeout
+
+[Executed result](../evidence/SHARED_TARGET_APPROVED_20261027/runtime/070_RESULT.json), [verified closeout](../evidence/SHARED_TARGET_APPROVED_20261027/070_CLOSEOUT.json): COMPLETE, six canonical AC PASS, scoped DoD MET on BONIRA-PE-NP-01. Earlier pending/partial entries above are dated history, superseded for this scope. Exact executed tools, failures, target checks, final consistency and shutdown evidence are retained in the same directory. No product/schema/permission/migration change, Production action, Human Sign-off, final certification, unrelated COMPLETE CEP rerun or Git write. GATE08 PASS for accepted bounded evidence;GATE11 NOT_PASSED. Final next_executable_frontier: `[]`.

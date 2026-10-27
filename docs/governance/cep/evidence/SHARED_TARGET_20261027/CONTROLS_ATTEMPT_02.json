@@ -1,0 +1,99 @@
+{
+  "started_at": "2026-10-27T12:07:46.631222+00:00",
+  "profile": "BONIRA-PE-NP-01",
+  "scope": "NEW_CANDIDATE_CONTROL_QUALIFICATION_ONLY",
+  "production_equivalent": false,
+  "cep074_executed": false,
+  "configured_business_database_accessed": false,
+  "existing_postgresql_service_changed": false,
+  "store": "E:\\BONIRA_Operations\\SharedTarget\\edd1bc3257de4534",
+  "runtime": {
+    "os": "Windows-10-10.0.26200-SP0",
+    "python": "3.11.1",
+    "django": "5.2.17",
+    "psycopg": "3.3.5"
+  },
+  "checks": [
+    {
+      "check": "synthetic TLS identity created in restricted run directory",
+      "result": "PASS",
+      "at": "2026-10-27T12:07:48.087237+00:00",
+      "cert_sha256": "8b38597b7c40257c5327af5b333815132a5363e40b1d0889fe56ac58208cc89e",
+      "trust": "explicit-per-client;no-global-store-change"
+    },
+    {
+      "check": "isolated PostgreSQL with verify-full and observed TLS",
+      "result": "PASS",
+      "at": "2026-10-27T12:08:07.578512+00:00",
+      "version": "18.6",
+      "tls_version": "TLSv1.3",
+      "cipher": "TLS_AES_256_GCM_SHA384",
+      "bind": "127.0.0.1"
+    },
+    {
+      "check": "non-TLS database connection rejected",
+      "result": "PASS",
+      "at": "2026-10-27T12:08:07.723882+00:00"
+    },
+    {
+      "check": "untrusted database CA rejected",
+      "result": "PASS",
+      "at": "2026-10-27T12:08:07.847796+00:00"
+    },
+    {
+      "check": "wrong database password rejected",
+      "result": "PASS",
+      "at": "2026-10-27T12:08:08.032114+00:00"
+    },
+    {
+      "check": "actual production settings deployment check WARNING-fatal and collectstatic",
+      "result": "PASS",
+      "at": "2026-10-27T12:08:19.837723+00:00",
+      "settings": "config.settings.production",
+      "assets": 153,
+      "dotenv_loaded": false
+    },
+    {
+      "check": "cache write/read in separate fresh processes",
+      "result": "PASS",
+      "at": "2026-10-27T12:08:35.424431+00:00",
+      "backend": "django.core.cache.backends.filebased.FileBasedCache"
+    },
+    {
+      "check": "actual production-settings DB/cache read-only operational health",
+      "result": "PASS",
+      "at": "2026-10-27T12:08:42.482751+00:00",
+      "health": {
+        "signals": [
+          "database.reachable",
+          "cache.reachable"
+        ],
+        "production_readiness": "NOT_VALIDATED",
+        "scope": "database-and-cache-reachability-only"
+      }
+    },
+    {
+      "check": "unavailable DB dependency exits nonzero",
+      "result": "PASS",
+      "at": "2026-10-27T12:09:00.055206+00:00"
+    }
+  ],
+  "limitations": [
+    "No approved Production reference/permitted-difference mapping exists",
+    "Reference WSGI server is a qualification harness, not a Production server",
+    "Single Windows host does not prove Linux/HA/provider/failure-domain equivalence",
+    "File cache is shared across local processes only; no multi-host claim",
+    "Locally generated synthetic TLS/DB secrets do not qualify Production custody",
+    "SMTP configuration is an unused synthetic endpoint; no mail delivery claim",
+    "Recovery fixture is a small control fixture, not an ERP or CEP074 restore drill",
+    "No extension of Development objective approval to Production or equivalence"
+  ],
+  "result": "FAILED_CANDIDATE_CONTROL_ATTEMPT",
+  "failure": {
+    "type": "AssertionError",
+    "message": ""
+  },
+  "own_cluster_stopped": true,
+  "web_process_stopped": true,
+  "finished_at": "2026-10-27T12:09:14.633605+00:00"
+}

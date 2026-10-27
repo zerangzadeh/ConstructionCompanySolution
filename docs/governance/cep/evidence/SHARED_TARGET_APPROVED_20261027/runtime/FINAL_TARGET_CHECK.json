@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-27T16:20:52.522012+00:00",
+  "result": "PASS",
+  "profile": "BONIRA-PE-NP-01",
+  "kernel": "6.1.0-54-cloud-amd64",
+  "docker": "Docker version 20.10.24+dfsg1, build 297e128",
+  "base_id": "sha256:c8bff6acecbf3f8b9f87bc3193032b39ead42bcc39fb76a4875ebd89975874ee",
+  "app_id": "sha256:d2f481516c0eb5229ba4224041880abf63ab96fceb5a8a7e11f0f7b85b9b5f27",
+  "approved_base_layers_preserved": true,
+  "internal_network": true,
+  "published_database_ports": {},
+  "only_running_container": "bonira-db",
+  "app_process_stopped_after_scenarios": true,
+  "directory_modes": {
+    "secrets": "0o700",
+    "pki": "0o700",
+    "shared/document_media": "0o700",
+    "shared/configuration_metadata": "0o700",
+    "shared/audit_operational": "0o700"
+  },
+  "private_env_key_modes": "0600",
+  "nginx_cannot_read_existing_protected_bytes": true,
+  "executed_tools_sha256": {
+    "app_probe.py": "3b6241cd621bbf02cc7030be6a665357999945ad573f3483dae874850da59970",
+    "bootstrap_guest.py": "40b0cfbb8415c34816a02b8d2902c74d56ebd462a678b3bf8895670a59604036",
+    "pg_dump_bridge.py": "efa8b7dfd9cca8f07fe8f3460b6360c19f8c91f4d5b560d3911b9692bc5ae21e",
+    "guest_driver.py": "20efba252e49cb355a46d8a3b3132e745c83fb5e40e457ba92898fbcc501ba8a"
+  },
+  "public_artifacts_scanned": 52,
+  "synthetic_secrets_absent": true,
+  "private_key_blocks_absent": true,
+  "production_action": false
+}

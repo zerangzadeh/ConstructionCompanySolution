@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-27T02:02:12.777931+00:00",
+  "actual_deployment": "7 executed steps PASS;15 actual HTTP requests;3 healthy DB/cache commands plus failed DB readiness command",
+  "prior_settings_and_handler_evidence": "Reused after four current source hashes verified unchanged;6 configuration tests and14 WSGI/ASGI requests remain applicable",
+  "retained_source_sha256": {
+    "config/settings/base.py": "2581900504de4f27c62f343029e1db0d2e141b459ef29988b0ac90445c78945a",
+    "config/settings/development.py": "2b2b37c1e77d26ee5e6c7fefbead37a6e1a357fa3027bfa652b061814e00d9a9",
+    "config/settings/production.py": "2c47c0e985d47008887bfce55db5ec406bd45f9bd01d4c6814b1b990aa5abf29",
+    "tests/test_production_configuration.py": "e94c5762693609d5ceab93001db4939d0841274574c38122ea3074f4147fce82"
+  },
+  "driver_lint_repair": "Only package argument renamed name->release_name after execution to avoid variable-shadowing lint; exact executed driver retained and exact three replacements asserted. Application/release source unchanged.",
+  "LINT": {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "scripts/cep071_deployment_runtime.py"
+    ],
+    "exit_code": 0
+  },
+  "FORMAT": {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "scripts/cep071_deployment_runtime.py"
+    ],
+    "exit_code": 0
+  }
+}

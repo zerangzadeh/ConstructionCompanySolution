@@ -1,0 +1,81 @@
+{
+  "at": "2026-10-27T12:17:39.048978+00:00",
+  "profile": "BONIRA-PE-NP-01",
+  "mapping": "docs/governance/cep/supporting/SHARED_PRODUCTION_EQUIVALENT_TARGET_PROFILE.md",
+  "target_qualification": "NOT_PRODUCTION_EQUIVALENT_APPROVED_REFERENCE_AND_DIFFERENCES_UNESTABLISHED",
+  "candidate_controls": {
+    "result": "PASS",
+    "check_groups": 14,
+    "https_cases": 8,
+    "source": "CONTROLS.json",
+    "settings": "config.settings.production",
+    "production_process_server_qualified": false,
+    "erp_restore_or_cep074_claim": false
+  },
+  "resolved_development_work": [
+    "new isolated PostgreSQL18.6 TLS/SCRAM/verify-full with negative controls",
+    "actual HTTPS production-settings WSGI harness and static/protected-path/security checks",
+    "actual separate-process shared file-cache proof",
+    "actual production-settings read-only dependency health and failed dependency exit",
+    "four-class backup through TLS and exact synthetic control recovery",
+    "private storage ACL and structured telemetry",
+    "two attributable harness defects fixed; failed attempts retained",
+    "explicit canonical property/design mapping and one consolidated reviewable decision request"
+  ],
+  "not_rerun": [
+    "CEP-071",
+    "CEP-072",
+    "CEP-073",
+    "CEP-076",
+    "CEP-077",
+    "CEP-078",
+    "CEP-079",
+    "broad audits/regressions"
+  ],
+  "cep_status": {
+    "CEP-070": {
+      "execution": "PARTIAL",
+      "ac": "0/6 production-certified; approved Development controls retained; new candidate controls supporting only",
+      "dod": "PARTIAL_NOT_MET"
+    },
+    "CEP-074": {
+      "execution": "NOT_STARTED",
+      "ac": "6 UNEXECUTED",
+      "dod": "UNEXECUTED",
+      "entry": "BLOCKED_MANDATORY_CEP070_AND_QUALIFIED_EQUIVALENT_TARGET"
+    },
+    "CEP-075": {
+      "execution": "PARTIAL",
+      "ac": "AC3..6 supported for retained Development components; AC1/2 PARTIAL",
+      "dod": "PARTIAL_NOT_MET_PRODUCTION_EQUIVALENT_TARGET_PROPERTY"
+    }
+  },
+  "remaining": {
+    "HUMAN_APPROVAL_REQUIRED": "One explicit approved reference-design and permitted-differences decision; details in shared profile. Existing Development objectives/owners/profile approvals not requested again.",
+    "EXTERNAL_ENVIRONMENT_REQUIRED": "Designated isolated runtime for approved reference; proposed existing qualified Linux artifact cannot run locally because Docker/Podman/WSL unavailable. Linux is proposed, not canonically mandated.",
+    "PRODUCTION_ONLY": "Actual Production topology/policy/storage/key custody/activation/final certification remain deferred, not newly imposed non-production Build prerequisites."
+  },
+  "currently_executable_development_or_reproducible_work": [],
+  "dependent_after_reference_and_target_available": [
+    "qualify selected deployable server, exact runtime/config/storage/cache and approved mapping",
+    "complete070 only with fully supported canonical implementation AC/DoD",
+    "execute074 after mandatory070 entry verified",
+    "independently execute remaining075 qualified deployment/rollback scenario"
+  ],
+  "gate_changes": "NONE;GATE08/GATE11 NOT_PASSED;other gates retained",
+  "next_executable_frontier": [],
+  "product_changes": "NONE",
+  "migration": "NONE;new disposable infrastructure/control fixture only",
+  "git_writes": "NOT_EXECUTED",
+  "production_action": "NOT_EXECUTED",
+  "human_signoff": "NOT_EXECUTED",
+  "final_production_certification": "NOT_EXECUTED",
+  "cleanup": "All three new clusters and web processes stopped;private synthetic artifacts retained;existing services and business database untouched",
+  "focused_checks": {
+    "path": "CHECKS.json",
+    "passed": 13,
+    "result": "PASS"
+  },
+  "driver_sha256": "07e4f74fd0e02275e0735a2264deef43eb55b7f19f11604cfa431143d5af9471",
+  "inventory": "INVENTORY.json"
+}

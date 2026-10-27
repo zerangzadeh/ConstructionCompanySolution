@@ -94,7 +94,78 @@ must provision paths and test access without relocating/deleting existing bytes.
    designated acceptance decision. Rollback failure is a failure, never readiness
    PASS. The running artifact, schema version and retained media must agree.
 
-Synthetic local validation proves settings loading, Django deployment checks,
-WSGI/ASGI import and static collection without network/database access. It cannot
-qualify an unspecified target, process manager, proxy, durable storage or rollback
-execution there. See [EXT-0021 unresolved decisions](EXT-0021_DECISION_MATRIX_20261027.md).
+## Checkpoint re-entry and executable acceptance preparation
+
+At `de6e20863896e7587e58bf917f807cea75f95b7a`, local `main` and local
+`origin/main` agree; the entry working tree was clean. No remote refresh or Git
+write was performed. Canonical prompts 071/075 and recovered deployment/profile/
+dependency sources were hash-verified again. PD-004 remains explicit about
+selection; the configuration profile matrix contains no deployment default.
+
+[Current synthetic execution](../evidence/CEP-071_EXT0021_REENTRY_20261027/REQUEST_EXECUTION.json)
+uses Windows CPython 3.11.1 / Django 5.2.17 and production settings. The installed
+local runtime is distinct from the approved Linux artifact; no production
+equivalence is inferred. Both actual Django WSGI and ASGI handlers execute seven
+requests each: HTTP-to-HTTPS 301, anonymous business-root login redirect 302,
+missing-CSRF login POST 403, media/private/collected-static paths 404 and invalid
+Host 400. HTTPS responses retain HSTS. No authentication/tenant fixture or
+application permission behavior is changed. A 404 proves only the Django serving
+boundary, not a future proxy's storage access policy.
+
+`check --deploy --fail-level WARNING` passes. Two actual `collectstatic` runs
+produce matching hashes for 153 files in separate disposable release directories;
+the previous release stays unchanged through both request executions. This proves
+static preparation/preservation, not a deployed release switch or rollback.
+Dotenv, application network connects and database connects are forbidden. Windows
+event-loop initialization precedes the network guard because asyncio internally
+creates a local socket pair; no app request uses a socket or selected server.
+The failed initial harness attempt is retained, then corrected and rerun.
+
+Repeat this preparation from the repository root:
+
+```powershell
+.venv-2/Scripts/python.exe docs/governance/cep/evidence/CEP-071_EXT0021_REENTRY_20261027/preflight.py
+```
+
+After target selection, Development completes its launcher/path/configuration
+commands and executes the existing procedure above. Acceptance must retain:
+
+| Check | Required target result / failure handling |
+| --- | --- |
+| Identity and authority | Target, exact candidate/previous artifact and config hashes, runtime/settings, owners and approved scenario/equivalence reference. Missing references stop activation. |
+| Preflight | Explicit production settings; deploy checks with WARNING fatal; actual DB TLS identity, proxy/header trust, SMTP/cache contract and path permissions. Static synthetic fixtures are not credentials or dependency evidence. |
+| Process | Start selected launcher under selected runtime identity; inspect actual bind/settings/termination behavior and capture sanitized exit/failure logs. Import or in-memory execution is insufficient. |
+| Assets and media | Collect candidate static without clearing previous; verify target HTTP delivery and protected/legacy-media denial using disposable bytes and actual serving configuration. Preserve durable bytes and record ownership/backup references. |
+| Health and application acceptance | Execute `python manage.py operational_health --settings=config.settings.production` on the approved target, retain its signals and exit code, then run the approved application scenario. The command probes DB read-only and cache GET; its own `production_readiness` remains `NOT_VALIDATED`, including on success. |
+| Failed activation and recovery | Retain failed attempt; halt candidate; use recorded compatibility decision before switching previous artifact/config/static. Recheck process/assets/health and retained-media identity after actual recovery. A failed recovery remains open, never PASS. |
+| Release evidence | Timestamped command/result/exception record, artifact/config identities and designated acceptance result. No environment dump, secrets, invented business success, inferred Human review or migration reversal. |
+
+Existing approved EXT-0022 operating/acceptance owner and procedures are available
+as references, including OP-01..04, restricted diagnostics and read-only health
+qualification. Their approved Development target does not select EXT-0021's
+deployment design. The matrix proposes extending those existing responsibilities;
+it does not ask to invent new people or redo completed operating drills.
+
+The remaining blocker is the selected deployment contract and target evidence,
+not a generic requirement to deploy Production. `EXT-0021` blocks Production for
+071 and Verification for 075; missing Production-only clauses do not block valid
+non-production preparation. See the single [EXT-0021 request](EXT-0021_DECISION_MATRIX_20261027.md).
+
+## Approved profile qualification
+
+The subsequent [Human decision](EXT-0021_HUMAN_APPROVAL_20261027.md) selects the
+existing minimum Windows/loopback/isolated-test-PostgreSQL Development profile.
+The [matrix](EXT-0021_DECISION_MATRIX_20261027.md) now records approved selections;
+there is no outstanding request to select Linux or a new provider.
+[Selected runbook](EXT-0021_DEVELOPMENT_RUNBOOK_20261027.md) and
+[actual seven-step qualification](../evidence/CEP-071_EXT0021_APPROVED_20261027/SCENARIO.json)
+prove copied current-source releases, static delivery, real dependency probes,
+failed-candidate rejection and actual previous-build/config/process rollback
+without database mutation. CEP-071 is COMPLETE for this approved Development
+scope; Production configuration/runtime properties remain unqualified.
+
+CEP-075 uses fresh unchanged-source component execution. Its canonical
+production-equivalent target property remains unestablished, consistent with the
+Human instruction to make no such claim. Executable Development components and
+that final target-property limitation are recorded separately; no Production
+deployment or completed-CEP re-execution is required for these component checks.
