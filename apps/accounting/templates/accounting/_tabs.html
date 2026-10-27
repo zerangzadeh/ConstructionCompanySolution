@@ -6,4 +6,5 @@
     <a class="erp-btn erp-btn--secondary" href="{% url 'accounting:opening_list' %}">مانده افتتاحیه</a>
     <a class="erp-btn erp-btn--secondary" href="{% url 'accounting:reconciliation_list' %}">تطبیق‌ها</a>
     {% if "accounting.reports_view" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'accounting:statement_list' %}">تراز و صورت‌های مالی</a>{% endif %}
+    {% if "accounting.year_end_view" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'accounting:year_end_list' %}">بستن سال و انتقال مانده‌ها</a>{% endif %}
 </nav>

@@ -1,0 +1,64 @@
+{
+  "settings": "config.settings.development",
+  "database_backend": "postgresql",
+  "local_database": true,
+  "feature_migrations": [
+    {
+      "app": "accounting",
+      "migration": "0014_fiscal_year_closing",
+      "applied": true
+    },
+    {
+      "app": "accounting",
+      "migration": "0015_fiscal_year_closing_controls",
+      "applied": true
+    },
+    {
+      "app": "accounting",
+      "migration": "0016_fiscal_year_zero_entry_references",
+      "applied": true
+    },
+    {
+      "app": "organizations",
+      "migration": "0124_fiscal_year_closing_permissions",
+      "applied": true
+    },
+    {
+      "app": "audit",
+      "migration": "0055_fiscal_year_closing_actions",
+      "applied": true
+    }
+  ],
+  "django_check": "PASS",
+  "migration_drift": "NONE",
+  "ruff_check": "PASS",
+  "ruff_format_product_python": "PASS",
+  "production_actions": "NOT EXECUTED",
+  "final_qualification": {
+    "cases": 52,
+    "passed": 52,
+    "includes": [
+      "populated rollback/reapply preservation",
+      "concurrency",
+      "real browser",
+      "reporting regressions"
+    ]
+  },
+  "narrow_final_retry_checks": {
+    "cases": 3,
+    "passed": 3
+  },
+  "affected_regression": {
+    "cases": 62,
+    "passed": 59,
+    "pre_existing_registry_expected_failures": 3,
+    "legacy_serialized_fixture_adaptation": "runner only; assertions unchanged"
+  },
+  "new_permission_registry_faults": 0,
+  "git": {
+    "branch": "main",
+    "head": "a1322c38e5c89d399c6ba54c239444a2b61c119a",
+    "changes": "uncommitted",
+    "git_writes": "NOT EXECUTED"
+  }
+}

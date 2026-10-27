@@ -8,6 +8,9 @@ from core.models import CreatedAtModel, UUIDModel
 
 
 class AuditAction(models.TextChoices):
+    ACCOUNTING_YEAR_END_CONFIGURED = "accounting.year_end_configured", "حساب‌های بستن سال تنظیم شد"
+    ACCOUNTING_YEAR_END_TRANSITION = "accounting.year_end_transition", "وضعیت بستن سال تغییر کرد"
+
     PAYROLL_AP_ENROLLMENT_PREPARED = (
         "payroll_ap.enrollment_prepared",
         "تهیه ثبت بدهی حقوق در AP",

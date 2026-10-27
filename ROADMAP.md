@@ -109,40 +109,33 @@ release controls. This is a capability map, not a claim that every item is an
 approved next task. Exact ownership, order, scope, and stop conditions remain
 with the canonical CEP program and frozen decisions.
 
-### 10.1 Accounting Gap — Fiscal-Year Closing & Opening Balance Roll-forward
+### 10.1 Fiscal-Year Closing & Opening Balance Roll-forward
 
-**Status:** `DEFERRED_UNTIL_CURRENT_CEP_PROGRAM_COMPLETES`. Recorded by explicit
-Human/Product decision on 2026-10-25. This is an independent Accounting functional
-gap scheduled for consideration after the current CEP program completes. It is
-not classified as Post-V1 and is not implementation authority or a production
-readiness/certification claim. It changes no current CEP scope, dependency or Gate.
+**Status:** `IMPLEMENTED_AND_QUALIFIED_DEVELOPMENT_NON_PRODUCTION` on 2026-10-27,
+under a new explicit bounded Human Product/Accounting instruction after completion
+of the 79-CEP Development program. No completed CEP is reopened; no CEP scope,
+dependency or Gate changes. This is not production certification or cutover.
 
-**Current implementation:** Initial / Migration Opening Import exists as a
-controlled, independently reviewed import of supplied opening balances and
-external source/evidence/reconciliation references. Automatic fiscal-year
-roll-forward is missing. Period close retains controls and reporting evidence
-but generates no next-year Opening Journal. Report-derived opening balances
-remain read models and do not implement this missing process.
+The delivered workflow validates source/target years and period close evidence,
+freezes posted balances, closes income/expense accounts through configured
+Year-End Result into Retained Earnings, independently accepts a derived opening,
+and reconciles exact permanent balances and existing dimensions. Versioned
+linkage, database uniqueness, maker/checker, audit, atomic rollback and governed
+reversal/reopen protect history. Downstream posted transactions block automatic
+reopen. Financial reports use a coherent opening boundary without duplicate carry.
+Zero-balance cases retain explicit no-entry references without empty journals.
 
-**Minimum future scope to define and authorize:**
+Initial / Migration Opening Import remains available for supplied external
+balances and cannot conflict with a reserved roll-forward target. UIUX-F-076
+retains its original initial-setup/migration boundary.
 
-- Derive eligible closing balances from POSTED Ledger.
-- Distinguish permanent versus temporary accounts.
-- Provide controlled year-end closing.
-- Generate the next-year Opening Journal.
-- Retain fiscal-year linkage and cutoff.
-- Enforce idempotency and prevent duplicate roll-forward, including double
-  counting against the continuing Ledger.
-- Require approval and separation of duties (SoD).
-- Define correction/reversal behavior without rewriting finalized history.
-- Prove closing-to-opening reconciliation.
-- Retain an audit trail.
-
-**Boundary:** UIUX-F-076 concerns only initial setup / migration from the previous
-accounting system. Its closure does not deliver or close this Accounting gap.
-After the current CEP program completes, establish the bounded Product/Accounting
-contract and execution authority before implementation. No roll-forward
-implementation or schema/migration is included in the present UI clarification.
+See the [implementation contract and completion evidence](docs/architecture/FISCAL_YEAR_CLOSING_AND_ROLL_FORWARD.md).
+All five feature migrations are applied to local Development PostgreSQL. Runtime
+closing/opening reconciliation and browser workflow PASS; the report identifies
+three unrelated pre-existing global permission-registry assertions and the
+legacy test-runner fixture adaptation. No global full-suite PASS or production
+readiness claim is made. No memorandum/statistical account mechanism is invented;
+the existing five account classifications and tenant book authority govern scope.
 
 ## 11. Production and verification path
 

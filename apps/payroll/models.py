@@ -1416,6 +1416,63 @@ class StatutoryCalculationKind(models.TextChoices):
     EMPLOYEE_INSURANCE = "employee_insurance", "بیمه کارکنان"
 
 
+class StatutoryPayrollContext(ImmutablePayrollRecord):
+    """Reviewed population and opening facts; never inferred from identity or names."""
+
+    organization = models.ForeignKey("organizations.Organization", on_delete=models.PROTECT)
+    run_employee = models.OneToOneField(
+        PayrollRunEmployee, on_delete=models.PROTECT, related_name="statutory_context"
+    )
+    tax_year_start = models.DateField()
+    tax_year_end = models.DateField()
+    prior_through = models.DateField()
+    prior_taxable_income = models.DecimalField(max_digits=28, decimal_places=8)
+    prior_withholding = models.DecimalField(max_digits=24, decimal_places=2)
+    external_taxable_income = models.DecimalField(max_digits=28, decimal_places=8)
+    external_withholding = models.DecimalField(max_digits=24, decimal_places=2)
+    population = models.CharField(max_length=100)
+    insurance_profile = models.CharField(max_length=100)
+    unemployment_covered = models.BooleanField()
+    work_days = models.PositiveSmallIntegerField()
+    evidence_reference = models.TextField()
+    evidence_digest = models.CharField(max_length=64)
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(prior_taxable_income__gte=0) & Q(prior_withholding__gte=0)
+                & Q(external_taxable_income__gte=0) & Q(external_withholding__gte=0),
+                name="payroll_statutory_context_nonnegative",
+            ),
+            models.CheckConstraint(
+                condition=Q(work_days__gte=1) & Q(work_days__lte=31),
+                name="payroll_statutory_context_days",
+            ),
+        ]
+
+    def clean(self) -> None:
+        from datetime import timedelta
+
+        validate_related_organizations(
+            self, run_employee=self.run_employee if self.run_employee_id else None
+        )
+        if self.run_employee_id:
+            period = self.run_employee.run.period
+            if (
+                self.run_employee.status != ResultStatus.FINALIZED
+                or not self.tax_year_start <= period.starts_on <= period.ends_on <= self.tax_year_end
+                or self.prior_through != period.starts_on - timedelta(days=1)
+            ):
+                raise ValidationError("Reviewed YTD coverage must end immediately before the finalized period.")
+        if (
+            not self.evidence_reference.strip()
+            or len(self.evidence_digest) != 64
+            or any(c not in "0123456789abcdef" for c in self.evidence_digest)
+        ):
+            raise ValidationError("Retained opening/population evidence and SHA-256 are required.")
+
+
 class StatutoryRecordKind(models.TextChoices):
     ORIGINAL = "original", "اصلی"
     CORRECTION = "correction", "اصلاحی"

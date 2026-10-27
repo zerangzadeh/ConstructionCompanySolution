@@ -1,0 +1,112 @@
+{
+  "component_mappings": [
+    {
+      "component_code": "BASE",
+      "classification": "insurable",
+      "basis_factor": "1"
+    },
+    {
+      "component_code": "HOUSING",
+      "classification": "insurable",
+      "basis_factor": "1"
+    }
+  ],
+  "basis_mode": "insured_remuneration_and_days",
+  "contribution_categories": [
+    {
+      "code": "SSO_EMPLOYEE",
+      "payer": "employee",
+      "rate": "7"
+    },
+    {
+      "code": "SSO_EMPLOYER",
+      "payer": "employer",
+      "rate": "20"
+    },
+    {
+      "code": "SSO_GOVERNMENT",
+      "payer": "other",
+      "rate": "3"
+    },
+    {
+      "code": "UNEMPLOYMENT",
+      "payer": "employer",
+      "rate": "3"
+    }
+  ],
+  "thresholds": {
+    "floor": null,
+    "ceiling": null,
+    "daily_minimum": "5541850",
+    "daily_maximum": "38792950"
+  },
+  "exemptions": [],
+  "rounding": {
+    "method": "ROUND_HALF_UP",
+    "scale": 0,
+    "stage": "FINAL_LIABILITY",
+    "authority_type": "HUMAN_POLICY_WHERE_STATUTE_SILENT"
+  },
+  "correction_mode": "source_version_governed",
+  "statutory_governance": {
+    "scope": "NON_PRODUCTION_QUALIFICATION",
+    "population": "IR_LABOUR_ORDINARY_COMPULSORY",
+    "insurance_profile": "IR_SSO_ORDINARY_EMPLOYEE_1405",
+    "tax_year_start": "2026-03-21",
+    "tax_year_end": "2027-03-20",
+    "review_reference": "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+    "review_sha256": "6ea702db3548464d9d0f4ded1f08005d808402017a694af4d6b04be9e7d019fc",
+    "sources": [
+      {
+        "reference": "SSO-1000-1405-493",
+        "sha256": "12ab9ca986eb4f2c920695b648c958ab40927909bf06095541463c9ab70eb358",
+        "issued_on": "2026-04-27",
+        "published_on": "2026-05-04",
+        "effective_on": "2026-03-21",
+        "supersedes": null,
+        "treatment": "RETROACTIVE",
+        "correction_requirement": "Reconcile affected processed periods through governed replacement/delta; never overwrite."
+      },
+      {
+        "reference": "HOUSING-9234-T65481-1405",
+        "sha256": "89ac46623077ecda00970d7e0c7ab4cd6b04d526b3626eef854f8f40bf0f1929",
+        "issued_on": "2026-05-05",
+        "published_on": "2026-05-07",
+        "effective_on": "2026-03-21",
+        "supersedes": "SSO-1000-1405-493:paragraph4:9000000-IRR-observation",
+        "treatment": "RETROACTIVE",
+        "correction_requirement": "Housing entitlement 30000000 IRR monthly from 1405/01/01; retain 9000000 observation. Payroll owns replacement inputs; statutory engine never silently rewrites wages."
+      }
+    ],
+    "parameter_sources": {
+      "component_mappings": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "SSO-1000-1405-493"
+      ],
+      "basis_mode": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "SSO-1000-1405-493"
+      ],
+      "contribution_categories": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "SSO-1000-1405-493"
+      ],
+      "thresholds": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "SSO-1000-1405-493"
+      ],
+      "exemptions": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "SSO-1000-1405-493"
+      ],
+      "rounding": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "SSO-1000-1405-493"
+      ],
+      "correction_mode": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "SSO-1000-1405-493"
+      ]
+    }
+  }
+}

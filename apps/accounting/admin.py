@@ -21,11 +21,18 @@ from apps.accounting.models import (
 from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import BusinessPermissionCode
 
+from .closing_models import (
+    FiscalClosingConfiguration,
+    FiscalYearClosing,
+    FiscalYearClosingEvent,
+)
+
 
 class TenantReadOnlyAccountingAdmin(admin.ModelAdmin):
     """Admin inspection only: all accounting mutations use audited services/UI."""
 
     readonly_fields: tuple[str, ...] = ()
+    view_permission = BusinessPermissionCode.ACCOUNTING_VIEW
 
     def get_queryset(self, request: HttpRequest):
         queryset = super().get_queryset(request)
@@ -33,7 +40,7 @@ class TenantReadOnlyAccountingAdmin(admin.ModelAdmin):
         if organization is None or not has_business_permission(
             user=request.user,
             organization=organization,
-            permission=BusinessPermissionCode.ACCOUNTING_VIEW,
+            permission=self.view_permission,
         ):
             return queryset.none()
         return queryset.filter(organization=organization)
@@ -43,7 +50,7 @@ class TenantReadOnlyAccountingAdmin(admin.ModelAdmin):
         return bool(organization) and has_business_permission(
             user=request.user,
             organization=organization,
-            permission=BusinessPermissionCode.ACCOUNTING_VIEW,
+            permission=self.view_permission,
         )
 
     def has_view_permission(
@@ -55,7 +62,7 @@ class TenantReadOnlyAccountingAdmin(admin.ModelAdmin):
             and has_business_permission(
                 user=request.user,
                 organization=organization,
-                permission=BusinessPermissionCode.ACCOUNTING_VIEW,
+                permission=self.view_permission,
             )
             and (
                 obj is None or getattr(obj, "organization_id", None) == organization.pk
@@ -146,3 +153,11 @@ for model in (
             {"readonly_fields": _readonly_fields(model)},
         ),
     )
+
+
+@admin.register(FiscalClosingConfiguration, FiscalYearClosing, FiscalYearClosingEvent)
+class YearEndReadOnlyAdmin(TenantReadOnlyAccountingAdmin):
+    view_permission = BusinessPermissionCode.ACCOUNTING_YEAR_END_VIEW
+
+    def get_readonly_fields(self, request, obj=None):
+        return _readonly_fields(self.model)

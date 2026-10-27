@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load erp_format %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="حسابداری" page_title="بستن سال و انتقال مانده‌ها" page_description="مانده افتتاحیه سال بعد از دفترکل نهایی سال قبل تهیه می‌شود." only %}
+{% include "accounting/_tabs.html" %}
+{% if "accounting.year_end_configure" in business_permission_codes %}<a class="erp-btn erp-btn--secondary mt-5" href="{% url 'accounting:year_end_configuration' %}">تنظیم حساب نتیجه سال و سود انباشته</a>{% endif %}
+<section class="erp-surface mt-5 rounded-xl p-5"><h2 class="font-semibold">آمادگی بستن سال</h2>
+<p class="mt-2 text-sm text-slate-600">ابتدا همه دوره‌های سال مبدأ را پس از تطبیق مستقل ببندید. سال بعد و دوره افتتاحیه آن باید از قبل ایجاد شده باشند. ورود مانده اولیه برای استقرار یا مهاجرت از بخش مانده افتتاحیه انجام می‌شود.</p>
+<form class="mt-4" method="post">{% csrf_token %}{{ form.non_field_errors }}<div class="grid gap-4 sm:grid-cols-2">{% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}</div>
+<div class="mt-4 flex flex-wrap gap-3"><button class="erp-btn erp-btn--secondary" name="action" value="inspect">بررسی آمادگی</button>{% if "accounting.year_end_prepare" in business_permission_codes %}<button class="erp-btn erp-btn--primary" name="action" value="prepare">آغاز بستن و ارسال برای تأیید مستقل</button>{% endif %}</div></form>
+{% if readiness %}<div class="mt-4" role="status">{% if readiness.ready %}<p>کنترل‌های پیش از بستن تأیید شد. تأیید نهایی باید توسط فرد مجاز دیگری انجام شود.</p>{% else %}<h3 class="font-semibold text-red-700">موارد مانع بستن سال</h3><ul class="mt-2 list-inside list-disc text-sm">{% for issue in readiness.issues %}<li>{{ issue }}</li>{% endfor %}</ul>{% endif %}</div>{% endif %}</section>
+<section class="erp-surface mt-5 overflow-hidden rounded-xl"><div class="erp-panel-header"><h2 class="font-semibold">پرونده‌های بستن سال</h2></div><div class="erp-table-wrap"><table class="w-full text-right text-sm"><thead><tr><th class="px-4 py-3">سال مبدأ</th><th class="px-4 py-3">سال بعد</th><th class="px-4 py-3">وضعیت</th><th class="px-4 py-3">نتیجه سال</th><th class="px-4 py-3">بررسی</th></tr></thead><tbody>{% for closing in closings %}<tr><td class="px-4 py-3">{{ closing.source_year.name }}</td><td class="px-4 py-3">{{ closing.target_year.name }}</td><td class="px-4 py-3">{{ closing.get_status_display }}</td><td class="px-4 py-3" dir="ltr">{{ closing.annual_result|erp_number }} ریال</td><td class="px-4 py-3"><a href="{% url 'accounting:year_end_detail' closing.pk %}">مشاهده و اقدام</a></td></tr>{% empty %}<tr><td colspan="5" class="px-4 py-6">هنوز پرونده بستن سال ایجاد نشده است.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

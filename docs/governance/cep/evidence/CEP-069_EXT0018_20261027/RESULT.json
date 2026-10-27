@@ -1,0 +1,68 @@
+{
+  "client_date": "2026-10-27",
+  "head": "a1322c38e5c89d399c6ba54c239444a2b61c119a",
+  "authoritative_package": "EXT0018-IR-1405-20261027-REVIEW-v1",
+  "package_digest": "616ec973a2594e5f54e66ae4f9454c1b3ab3a1c995dc23b81af69fdbf07415df",
+  "official_sources": 9,
+  "EXT-0018": {
+    "status": "SOURCE_REVIEW_PACKAGE_PREPARED_NOT_ACTIVATED",
+    "remaining_blocker": "HUMAN_REVIEW_REQUIRED",
+    "review_request": "REVIEW_REQUEST.md",
+    "runtime_import": "NOT_EXECUTED"
+  },
+  "CEP-069": {
+    "execution": "PARTIAL",
+    "lifecycle": "BLOCKED",
+    "ac_certified": 0,
+    "ac_total": 5,
+    "dod": "NOT_MET"
+  },
+  "resolved": [
+    {
+      "classification": "AUTHORITATIVE_SOURCE_RETRIEVABLE",
+      "result": "Nine official government source records retained; unavailable search/direct HTTP recovered through normal browser; no secondary content used as statutory authority"
+    },
+    {
+      "classification": "REPRODUCIBLE_EVIDENCE",
+      "result": "16 synthetic safety tests PASS;6 native missing-source cutoff rejections PASS; current Development schema deployed/no pending migrations; disposable test DB removed"
+    },
+    {
+      "classification": "DEVELOPMENT_RESOLVABLE",
+      "result": "Evidence tooling/import formatting and lint corrected; source hashes/manifests generated; stale absence claims superseded. No product changes or defect found"
+    }
+  ],
+  "remaining": [
+    {
+      "classification": "HUMAN_REVIEW_REQUIRED",
+      "item": "Accepted Payroll currentness/applicability and exact statutory-to-engine mapping review; actual identity/qualification/independence/date/scope/reference, not inferred from Billing fixture"
+    },
+    {
+      "classification": "PRODUCTION_ONLY",
+      "item": "Separate actual production authority/evidence, final certification and Human Sign-off"
+    }
+  ],
+  "checks": "CHECKS.json",
+  "statutory_calculation_current_law": "UNVERIFIED_NO_APPROVED_RUNTIME_PARAMETERS",
+  "gates": {
+    "GATE-08": {
+      "before": "PASS",
+      "after": "PASS"
+    },
+    "GATE-11": {
+      "before": "NOT_PASSED",
+      "after": "NOT_PASSED"
+    }
+  },
+  "current_governed_counts": {
+    "COMPLETE": 78,
+    "PARTIAL": 1,
+    "NOT_STARTED": 0
+  },
+  "post_v1_deferred": 7,
+  "next_executable_frontier": [],
+  "completed_ceps_reopened": [],
+  "product_mutation": "NONE",
+  "migration_authored_or_business_deployment": "NONE",
+  "git_writes": "NOT_EXECUTED",
+  "production_signoff_certification_cutover": "NOT_EXECUTED"
+}

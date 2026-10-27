@@ -18,6 +18,15 @@ class PostingContract:
 
 
 _CONTRACTS = {
+    ("accounting_year_end", "closing"): PostingContract(
+        source_kind="accounting_year_end",
+        event_kind="closing",
+        rule_code="accounting.year-end.closing.v1",
+        rule_version=1,
+        source_owner="accounting",
+        source_model="accounting.FiscalYearClosing",
+        source_line_model="accounting.JournalLine",
+    ),
     ("manual", "manual_entry"): PostingContract(
         source_kind="manual",
         event_kind="manual_entry",
@@ -33,7 +42,7 @@ _CONTRACTS = {
         rule_code="core.opening-balance",
         rule_version=1,
         source_owner="accounting",
-        source_model="accounting.OpeningBalanceImport|accounting.JournalEntry",
+        source_model="accounting.OpeningBalanceImport|accounting.JournalEntry|accounting.FiscalYearClosing",
         source_line_model="accounting.OpeningBalanceImportLine|accounting.JournalLine",
     ),
     ("accounting", "reversal"): PostingContract(

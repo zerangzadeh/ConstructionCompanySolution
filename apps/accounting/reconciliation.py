@@ -183,8 +183,30 @@ def _self_source_tie_out(
             and journal.period.is_adjustment
             and journal.adjustment_reason.strip()
         )
+    year_end_source = None
+    if journal.kind == JournalKind.OPENING:
+        from .closing_models import FiscalYearClosing
+        from .closing_services import _opening_reconciliation
+
+        year_end_source = FiscalYearClosing.objects.filter(
+            organization=journal.organization,
+            opening_journal=journal,
+        ).first()
+        if year_end_source:
+            _opening_reconciliation(year_end_source, journal)
     evidence = {
-        "source_model": "accounting.JournalEntry",
+        "source_model": "accounting.FiscalYearClosing"
+        if year_end_source
+        else "accounting.JournalEntry",
+        **(
+            {
+                "source_final_hash": year_end_source.final_snapshot["hash"],
+                "source_fiscal_year": str(year_end_source.source_year_id),
+                "target_fiscal_year": str(year_end_source.target_year_id),
+            }
+            if year_end_source
+            else {}
+        ),
         "journal_kind": journal.kind,
         "journal_status": journal.status,
         "adjusts_journal_uuid": str(journal.adjusts_id) if journal.adjusts_id else None,
@@ -1080,9 +1102,7 @@ def verify_signed_reconciliation_run(
 ) -> ReconciliationReview:
     """Verify retained/sign-off evidence and prove it still covers the cutoff."""
 
-    evidence = _retained_reconciliation_evidence(
-        organization=organization, run=run
-    )
+    evidence = _retained_reconciliation_evidence(organization=organization, run=run)
     scope_payload = {
         "scope": run.scope,
         "scope_version": run.scope_version,

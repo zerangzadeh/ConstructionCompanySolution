@@ -116,6 +116,21 @@ def _policy_snapshot(policy: PlatformPolicyVersion) -> dict[str, Any]:
     )
     if not sources or not reviews:
         raise ValidationError("بسته منبع بدون منبع و بررسی پذیرفته‌شده مجاز نیست.")
+    governance = policy.parameters.get("statutory_governance")
+    if governance:
+        known_sources = {source.source_identifier for source in sources}
+        if not {row["reference"] for row in governance["sources"]} <= known_sources:
+            raise ValidationError(
+                "Governed runtime sources must be retained policy sources."
+            )
+        adopted = policy.review_evidence.filter(
+            evidence_reference=governance["review_reference"],
+            disposition=PolicyReviewDisposition.ACCEPTED_WITH_CONDITIONS,
+        ).first()
+        if adopted is None:
+            raise ValidationError(
+                "The adopted Human conditional decision must be retained."
+            )
     return {
         "id": str(policy.pk),
         "code": policy.policy.code,
@@ -158,6 +173,20 @@ def _policy_snapshot(policy: PlatformPolicyVersion) -> dict[str, Any]:
             }
             for review in reviews
         ],
+        **(
+            {
+                "adopted_review": {
+                    "id": str(adopted.pk),
+                    "evidence_reference": adopted.evidence_reference,
+                    "disposition": adopted.disposition,
+                    "conditions": adopted.conditions,
+                    "review_scope": adopted.review_scope,
+                    "review_sha256": governance["review_sha256"],
+                }
+            }
+            if governance
+            else {}
+        ),
     }
 
 
@@ -168,6 +197,8 @@ def package_content(*, policy: PlatformPolicyVersion, payload: dict) -> dict:
     known_references = {source["identifier"] for source in snapshot["sources"]} | {
         review["evidence_reference"] for review in snapshot["reviews"]
     }
+    if "adopted_review" in snapshot:
+        known_references.add(snapshot["adopted_review"]["evidence_reference"])
     if not set(payload["evidence_references"]) <= known_references:
         raise ValidationError("مدرک بسته باید به منبع یا بررسی ثبت‌شده متصل باشد.")
     return {**deepcopy(payload), "policy": snapshot}

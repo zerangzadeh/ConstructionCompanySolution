@@ -238,6 +238,12 @@ class PolicyReviewDisposition(models.TextChoices):
 
 
 class BusinessPermissionCode(models.TextChoices):
+    ACCOUNTING_YEAR_END_VIEW = "accounting.year_end_view", "مشاهده بستن سال مالی"
+    ACCOUNTING_YEAR_END_CONFIGURE = "accounting.year_end_configure", "تنظیم حساب‌های بستن سال"
+    ACCOUNTING_YEAR_END_PREPARE = "accounting.year_end_prepare", "تهیه بستن سال مالی"
+    ACCOUNTING_YEAR_END_APPROVE = "accounting.year_end_approve", "تأیید بستن سال و افتتاحیه"
+    ACCOUNTING_YEAR_END_REOPEN = "accounting.year_end_reopen", "بازگشایی سال مالی"
+
     """Business capabilities implemented and enforced by application services."""
 
     MEMBERSHIP_VIEW = "membership.view", "مشاهده اعضای شرکت"

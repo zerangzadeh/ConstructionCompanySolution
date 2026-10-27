@@ -5,11 +5,12 @@ from uuid import UUID
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import OuterRef, Subquery, Sum
+from django.db.models import OuterRef, Q, Subquery, Sum
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
+from apps.accounting.closing_models import FiscalYearClosing
 from apps.accounting.forms import (
     AccountForm,
     ControlledAdjustmentForm,
@@ -64,6 +65,7 @@ from apps.accounting.services import (
     submit_journal,
     submit_opening_import,
 )
+from apps.organizations.authorization import require_business_permission
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -365,6 +367,7 @@ def journal_detail(request: HttpRequest, journal_id: str) -> HttpResponse:
         "accounting/journal_detail.html",
         {
             "journal": journal,
+            "year_end_closing": _year_end_source(request.organization, journal),
             "lines": journal.lines.select_related(
                 "account", "project", "site", "wbs_node", "party"
             ),
@@ -510,6 +513,15 @@ def journal_replacement(request: HttpRequest, journal_id: str) -> HttpResponse:
 @require_GET
 def journal_source(request: HttpRequest, journal_id: str) -> HttpResponse:
     journal = _tenant_object(JournalEntry, request.organization, journal_id)
+    closing = _year_end_source(request.organization, journal)
+    if closing:
+        require_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission=BusinessPermissionCode.ACCOUNTING_YEAR_END_VIEW,
+            message="اختیار مشاهده پرونده بستن سال را ندارید.",
+        )
+        return redirect("accounting:year_end_detail", closing_id=closing.pk)
     opening = (
         OpeningBalanceImport.objects.filter(
             organization=request.organization, accepted_journal=journal
@@ -879,4 +891,17 @@ def controlled_adjustment_create(request: HttpRequest) -> HttpResponse:
             "title": "ایجاد تعدیل کنترل‌شده",
             "back_url": "accounting:journal_list",
         },
+    )
+
+
+def _year_end_source(organization, journal):
+    return (
+        FiscalYearClosing.objects.filter(organization=organization)
+        .filter(
+            Q(closing_journal=journal)
+            | Q(opening_journal=journal)
+            | Q(closing_reversal=journal)
+            | Q(opening_reversal=journal)
+        )
+        .first()
     )

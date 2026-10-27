@@ -1,0 +1,115 @@
+{
+  "component_mappings": [
+    {
+      "component_code": "BASE",
+      "classification": "taxable",
+      "basis_factor": "1"
+    }
+  ],
+  "calculation_basis": "CUMULATIVE_YTD",
+  "exemptions": [
+    {
+      "code": "ANNUAL-1405",
+      "amount": "4800000000"
+    }
+  ],
+  "brackets": [
+    {
+      "lower": "0",
+      "upper": "4800000000",
+      "rate": "10"
+    },
+    {
+      "lower": "4800000000",
+      "upper": "7200000000",
+      "rate": "15"
+    },
+    {
+      "lower": "7200000000",
+      "upper": "9600000000",
+      "rate": "20"
+    },
+    {
+      "lower": "9600000000",
+      "upper": "12000000000",
+      "rate": "25"
+    },
+    {
+      "lower": "12000000000",
+      "upper": null,
+      "rate": "30"
+    }
+  ],
+  "thresholds": {
+    "floor": null,
+    "ceiling": null
+  },
+  "rounding": {
+    "method": "ROUND_HALF_UP",
+    "scale": 0,
+    "stage": "FINAL_LIABILITY",
+    "authority_type": "HUMAN_POLICY_WHERE_STATUTE_SILENT"
+  },
+  "correction_mode": "source_version_governed",
+  "statutory_governance": {
+    "scope": "NON_PRODUCTION_QUALIFICATION",
+    "population": "IR_LABOUR_ORDINARY_COMPULSORY",
+    "insurance_profile": "IR_SSO_ORDINARY_EMPLOYEE_1405",
+    "tax_year_start": "2026-03-21",
+    "tax_year_end": "2027-03-20",
+    "review_reference": "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+    "review_sha256": "6ea702db3548464d9d0f4ded1f08005d808402017a694af4d6b04be9e7d019fc",
+    "sources": [
+      {
+        "reference": "INTA-200-1005-S-1405",
+        "sha256": "00fa07d469c00e3d8cf03496571808d0d7e9ec97ab102d060cd0356c51016711",
+        "issued_on": "2026-04-20",
+        "published_on": "2026-04-22",
+        "effective_on": "2026-03-21",
+        "supersedes": null,
+        "treatment": "RETROACTIVE",
+        "correction_requirement": "Reconcile affected processed periods through governed replacement/delta; never overwrite."
+      },
+      {
+        "reference": "INTA-200-1405-59",
+        "sha256": "876e19dea956c83692f67f34b7a765dfcfb07b2cdbaeacecfa4bd5420af903a8",
+        "issued_on": "2026-10-19",
+        "published_on": "2026-10-21",
+        "effective_on": "2026-10-19",
+        "supersedes": "INTA-200-1403-39",
+        "treatment": "PROSPECTIVE",
+        "correction_requirement": "Preserve finalized earlier periods; unresolved benefit conditions fail closed."
+      }
+    ],
+    "parameter_sources": {
+      "component_mappings": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "INTA-200-1005-S-1405"
+      ],
+      "calculation_basis": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "INTA-200-1005-S-1405"
+      ],
+      "exemptions": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "INTA-200-1005-S-1405"
+      ],
+      "brackets": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "INTA-200-1005-S-1405"
+      ],
+      "thresholds": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "INTA-200-1005-S-1405"
+      ],
+      "rounding": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "INTA-200-1005-S-1405"
+      ],
+      "correction_mode": [
+        "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "INTA-200-1005-S-1405"
+      ]
+    }
+  }
+}

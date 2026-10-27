@@ -1,10 +1,46 @@
 from django.urls import path
 
-from apps.accounting import views
+from apps.accounting import closing_views, views
 
 app_name = "accounting"
 
 urlpatterns = [
+    path(
+        "year-end/<uuid:closing_id>/cancel/",
+        closing_views.year_end_cancel,
+        name="year_end_cancel",
+    ),
+    path("year-end/", closing_views.year_end_list, name="year_end_list"),
+    path(
+        "year-end/configure/",
+        closing_views.year_end_configuration,
+        name="year_end_configuration",
+    ),
+    path(
+        "year-end/<uuid:closing_id>/",
+        closing_views.year_end_detail,
+        name="year_end_detail",
+    ),
+    path(
+        "year-end/<uuid:closing_id>/approve/",
+        closing_views.year_end_approve,
+        name="year_end_approve",
+    ),
+    path(
+        "year-end/<uuid:closing_id>/roll-forward/",
+        closing_views.year_end_roll_forward,
+        name="year_end_roll_forward",
+    ),
+    path(
+        "year-end/<uuid:closing_id>/reopen/",
+        closing_views.year_end_reopen,
+        name="year_end_reopen",
+    ),
+    path(
+        "year-end/<uuid:closing_id>/evidence/",
+        closing_views.year_end_evidence,
+        name="year_end_evidence",
+    ),
     path("", views.dashboard, name="dashboard"),
     path("accounts/", views.account_list, name="account_list"),
     path("accounts/create/", views.account_create, name="account_create"),

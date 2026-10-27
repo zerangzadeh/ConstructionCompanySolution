@@ -1,0 +1,21 @@
+Final narrow verification after preserving ordinary historical read-only retries; no product settings changed.
+Found 3 test(s).
+Using existing test database for alias 'default' ('test_construction_erp')...
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+test_existing_posted_journal_retry_remains_read_only_after_year_close (apps.accounting.test_fiscal_year_closing.FiscalYearClosingAdditionalTests.test_existing_posted_journal_retry_remains_read_only_after_year_close) ... ok
+test_balanced_opening_posts_once_with_independent_authorization (apps.accounting.tests.AccountingFoundationTests.test_balanced_opening_posts_once_with_independent_authorization) ... ok
+test_period_reopen_and_posting_cannot_bypass_annual_freeze (apps.accounting.test_fiscal_year_closing.FiscalYearClosingTests.test_period_reopen_and_posting_cannot_bypass_annual_freeze) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 4.717s
+
+OK
+Preserving test database for alias 'default' ('test_construction_erp')...

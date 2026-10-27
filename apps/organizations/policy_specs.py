@@ -339,10 +339,19 @@ def validate_policy_parameters(*, spec: PlatformPolicySpec, parameters: object) 
     if not isinstance(parameters, dict):
         raise ValidationError("پارامترهای سیاست باید یک شیء JSON باشند.")
     expected = {field.name for field in spec.fields}
-    if set(parameters) != expected:
+    optional = (
+        {"statutory_governance"}
+        if spec.code in {PAYROLL_TAX_REGULATORY_POLICY_CODE, EMPLOYEE_INSURANCE_REGULATORY_POLICY_CODE}
+        else set()
+    )
+    if not expected <= set(parameters) or set(parameters) - expected - optional:
         raise ValidationError(
             "پارامترهای سیاست دقیقاً با قرارداد کد-محور هم‌خوان نیستند."
         )
+    if "statutory_governance" in parameters:
+        from apps.payroll.statutory_governance import validate_governance
+
+        validate_governance(parameters, policy_code=spec.code)
     for field in spec.fields:
         value = parameters[field.name]
         if type(value) is not field.value_type or (

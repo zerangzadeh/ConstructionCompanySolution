@@ -1,0 +1,13 @@
+Local Development PostgreSQL; disposable test database; test-process-only MD5 hasher.
+Legacy serialized_rollback disabled only in this runner; canonical post_migrate bootstrap still executes. All business assertions unchanged.
+Three exact global registry baseline defects are expected failures; see baseline-attribution.json. No new faults.
+Labels: ['apps.accounting.tests', 'apps.accounting.test_p2_s28_s34', 'apps.accounting.test_p2_s35_s37', 'apps.organizations.test_permission_registry']
+Found 62 test(s).
+Using existing test database for alias 'default'...
+System check identified no issues (0 silenced).
+........................................................x.x.x.
+----------------------------------------------------------------------
+Ran 62 tests in 108.808s
+
+OK (expected failures=3)
+Preserving test database for alias 'default'...

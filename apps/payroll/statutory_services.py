@@ -104,7 +104,7 @@ def _round(value: Decimal, config: object) -> Decimal:
     stage = config.get("stage")
     if method not in ROUNDING_METHODS or type(scale) is not int or not 0 <= scale <= 8:
         raise ValidationError("روش یا دقت گرد کردن مقرراتی پشتیبانی نمی‌شود.")
-    if stage != "line":
+    if stage not in {"line", "FINAL_LIABILITY"}:
         raise ValidationError("مرحله گرد کردن باید صریحاً line باشد.")
     quantum = Decimal(1).scaleb(-scale)
     return value.quantize(quantum, rounding=ROUNDING_METHODS[method])
@@ -183,6 +183,10 @@ def _source_basis(run_employee, mapping: dict[str, dict]) -> tuple[Decimal, list
 
 
 def _tax_employee(run_employee, parameters: dict[str, Any]) -> EmployeeCalculation:
+    if "statutory_governance" in parameters:
+        from .statutory_governance import calculate_governed
+
+        return calculate_governed(run_employee, parameters)
     if parameters.get("calculation_basis") not in {"period", "cumulative"}:
         raise ValidationError("مبنای محاسبه مالیات ناشناخته است.")
     if parameters["calculation_basis"] == "cumulative":
@@ -262,6 +266,10 @@ def _tax_employee(run_employee, parameters: dict[str, Any]) -> EmployeeCalculati
 
 
 def _insurance_employee(run_employee, parameters: dict[str, Any]) -> EmployeeCalculation:
+    if "statutory_governance" in parameters:
+        from .statutory_governance import calculate_governed
+
+        return calculate_governed(run_employee, parameters, insurance=True)
     if parameters.get("correction_mode") != "successor_only":
         raise ValidationError("رفتار اصلاح بیمه باید successor_only باشد.")
     mapping = _mapping(parameters, allowed={"insurable", "non_insurable", "work_days"})
@@ -353,6 +361,7 @@ def calculate_statutory(
     record_kind: str = StatutoryRecordKind.ORIGINAL,
     corrects: StatutoryCalculation | None = None,
 ) -> StatutoryCalculation:
+    organization = Organization.objects.select_for_update().get(pk=organization.pk)
     permission = (
         BusinessPermissionCode.PAYROLL_STATUTORY_PREPARE
         if record_kind == StatutoryRecordKind.ORIGINAL

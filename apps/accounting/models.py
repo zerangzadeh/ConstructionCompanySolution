@@ -39,6 +39,8 @@ class FiscalYearStatus(models.TextChoices):
     DRAFT = "draft", "پیش‌نویس"
     ACTIVE = "active", "فعال"
     CLOSED = "closed", "بسته"
+    CLOSING = "closing", "در حال بستن"
+    ROLLED_FORWARD = "rolled_forward", "منتقل به سال بعد"
 
 
 class FiscalPeriodStatus(models.TextChoices):
@@ -47,6 +49,7 @@ class FiscalPeriodStatus(models.TextChoices):
 
 
 class JournalKind(models.TextChoices):
+    CLOSING = "closing", "اختتامیه"
     MANUAL = "manual", "دستی"
     OPENING = "opening", "افتتاحیه"
     REVERSAL = "reversal", "برگشت"
@@ -303,6 +306,13 @@ class FiscalYear(UUIDModel, TimeStampedModel):
 
     def save(self, *args: object, **kwargs: object) -> None:
         self.code = canonicalize_upper_identifier(self.code)
+        if (
+            not self._state.adding
+            and FiscalYear.objects.get(pk=self.pk).status != self.status
+        ):
+            raise ValidationError(
+                "وضعیت سال مالی فقط از فرایند بستن و بازگشایی تغییر می‌کند."
+            )
         if not self._state.adding and self.periods.exists():
             original = FiscalYear.objects.get(pk=self.pk)
             immutable = (
@@ -586,6 +596,7 @@ class JournalEntry(UUIDModel, TimeStampedModel):
                             JournalKind.REVERSAL,
                             JournalKind.REPLACEMENT,
                             JournalKind.OPERATIONAL,
+                            JournalKind.CLOSING,
                         ],
                         cutoff_date__isnull=True,
                     )
@@ -609,6 +620,7 @@ class JournalEntry(UUIDModel, TimeStampedModel):
                             JournalKind.MANUAL,
                             JournalKind.OPENING,
                             JournalKind.OPERATIONAL,
+                            JournalKind.CLOSING,
                         ],
                         reverses__isnull=True,
                         replaces__isnull=True,
@@ -648,6 +660,7 @@ class JournalEntry(UUIDModel, TimeStampedModel):
         ):
             raise ValidationError("سند افتتاحیه به مدرک و مرجع تطبیق نیاز دارد.")
         expected_contract = {
+            JournalKind.CLOSING: ("accounting_year_end", "closing"),
             JournalKind.MANUAL: ("manual", "manual_entry"),
             JournalKind.OPENING: ("opening", "opening_balance"),
             JournalKind.REVERSAL: ("accounting", "reversal"),
@@ -666,7 +679,10 @@ class JournalEntry(UUIDModel, TimeStampedModel):
             and self.event_kind in {DRAFT_EVENT, DRAFT_REVERSAL_EVENT}
             and self.status == JournalStatus.DRAFT
         )
-        if not recognition_draft and (self.source_kind, self.event_kind) != expected_contract:
+        if (
+            not recognition_draft
+            and (self.source_kind, self.event_kind) != expected_contract
+        ):
             raise ValidationError("نوع سند با قرارداد منبع/رویداد سازگار نیست.")
         for field_name in ("submitted_by", "posted_by"):
             membership = getattr(self, field_name, None)
@@ -1556,6 +1572,12 @@ class FiscalPeriodControlEvent(UUIDModel, CreatedAtModel):
 
 
 # Accounting-owned CEP-042 mapping and immutable source/draft evidence.
+from .closing_models import (  # noqa: F401
+    ClosingStatus,
+    FiscalClosingConfiguration,
+    FiscalYearClosing,
+    FiscalYearClosingEvent,
+)
 from .recognition_models import (  # noqa: F401
     RecognitionMappingApproval,
     RecognitionMappingVersion,

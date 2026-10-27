@@ -50,6 +50,13 @@ from apps.organizations.models import (
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project, ProjectSite, WBSNode
 
+from .closing_guards import (
+    _YEAR_END,
+    require_ordinary_journal,
+    require_ordinary_year,
+    require_unreserved_opening,
+)
+
 ACCOUNTING_PRECISION_POLICY_CODE = "accounting-money-precision"
 ACCOUNTING_ROUNDING_POLICY_CODE = "accounting-rounding"
 
@@ -385,6 +392,7 @@ def create_fiscal_period(
     ends_on: date,
     is_adjustment: bool = False,
 ) -> FiscalPeriod:
+    organization = _lock_accounting_organization(organization)
     require_business_permission(
         user=actor,
         organization=organization,
@@ -394,6 +402,8 @@ def create_fiscal_period(
     locked_year = FiscalYear.objects.select_for_update().get(pk=fiscal_year.pk)
     if locked_year.organization_id != organization.pk:
         raise PermissionDenied("سال مالی متعلق به Tenant دیگری است.")
+    if locked_year.status != FiscalYearStatus.ACTIVE:
+        raise ValidationError("سال مالی برای ایجاد دوره باز نیست.")
     if FiscalPeriod.objects.filter(
         fiscal_year=locked_year, starts_on__lte=ends_on, ends_on__gte=starts_on
     ).exists():
@@ -453,6 +463,7 @@ def create_journal(
     if kind not in JournalKind.values:
         raise ValidationError("نوع سند معتبر نیست.")
     default_contract = {
+        JournalKind.CLOSING: ("accounting_year_end", "closing"),
         JournalKind.MANUAL: ("manual", "manual_entry"),
         JournalKind.OPENING: ("opening", "opening_balance"),
         JournalKind.REVERSAL: ("accounting", "reversal"),
@@ -467,7 +478,16 @@ def create_journal(
     period = FiscalPeriod.objects.select_for_update().get(pk=period.pk)
     if period.organization_id != organization.pk:
         raise PermissionDenied("دوره مالی متعلق به Tenant دیگری است.")
-    if period.status != FiscalPeriodStatus.OPEN:
+    require_ordinary_year(period)
+    if not _YEAR_END.get() and (
+        kind == JournalKind.CLOSING or source_key.startswith("YEAR-END:")
+    ):
+        raise ValidationError("سند بستن سال فقط از فرایند سالانه قابل ایجاد است.")
+    if kind == JournalKind.OPENING:
+        require_unreserved_opening(
+            organization=organization, year_id=period.fiscal_year_id
+        )
+    if period.status != FiscalPeriodStatus.OPEN and not _YEAR_END.get():
         raise ValidationError("سند فقط در دوره مالی باز قابل تهیه است.")
     normalized_source_key = source_key.strip()
     existing = JournalEntry.objects.filter(
@@ -574,6 +594,7 @@ def create_controlled_adjustment(
         .select_related("period")
         .get(pk=original.pk)
     )
+    require_ordinary_journal(locked_original)
     locked_period = FiscalPeriod.objects.select_for_update().get(pk=period.pk)
     if (
         locked_original.organization_id != organization.pk
@@ -638,6 +659,7 @@ def add_journal_line(
     party: BusinessParty | None = None,
     source_line_uuid: uuid.UUID | None = None,
 ) -> JournalLine:
+    organization = _lock_accounting_organization(organization)
     require_business_permission(
         user=actor,
         organization=organization,
@@ -649,6 +671,8 @@ def add_journal_line(
     locked = JournalEntry.objects.select_for_update().get(pk=journal.pk)
     if locked.organization_id != organization.pk:
         raise PermissionDenied("سند متعلق به Tenant دیگری است.")
+    require_ordinary_year(locked.period)
+    require_ordinary_journal(locked)
     if locked.prepared_by.user_id != actor.pk:
         raise PermissionDenied("فقط تهیه‌کننده می‌تواند ردیف پیش‌نویس را تغییر دهد.")
     line = JournalLine(
@@ -674,6 +698,7 @@ def add_journal_line(
 def submit_journal(
     *, organization: Organization, actor: User, journal: JournalEntry
 ) -> JournalEntry:
+    organization = _lock_accounting_organization(organization)
     membership = require_business_permission(
         user=actor,
         organization=organization,
@@ -686,6 +711,8 @@ def submit_journal(
         or locked.status != JournalStatus.DRAFT
     ):
         raise ValidationError("فقط پیش‌نویس همین Tenant قابل ارسال است.")
+    require_ordinary_year(locked.period)
+    require_ordinary_journal(locked)
     if locked.prepared_by_id != membership.pk:
         raise PermissionDenied("فقط تهیه‌کننده سند می‌تواند آن را ارسال کند.")
     totals = locked.lines.aggregate(debit=Sum("debit"), credit=Sum("credit"))
@@ -758,13 +785,19 @@ def post_journal(
     period = FiscalPeriod.objects.select_for_update().get(pk=locked.period_id)
     if locked.organization_id != organization.pk:
         raise ValidationError("سند متعلق به این Tenant نیست.")
+    require_ordinary_journal(locked)
+    if locked.kind == JournalKind.OPENING:
+        require_unreserved_opening(
+            organization=organization, year_id=period.fiscal_year_id
+        )
     if locked.status == JournalStatus.POSTED:
         return locked
+    require_ordinary_year(period)
     if locked.status != JournalStatus.PROPOSED:
         raise ValidationError("فقط سند پیشنهادی همین Tenant قابل ثبت است.")
     if approver.pk == locked.prepared_by_id:
         raise PermissionDenied("تهیه‌کننده نمی‌تواند همان سند حفاظت‌شده را تأیید کند.")
-    if period.status != FiscalPeriodStatus.OPEN:
+    if period.status != FiscalPeriodStatus.OPEN and not _YEAR_END.get():
         raise ValidationError("دوره مالی بسته است.")
     if not locked.payload_hash or locked.payload_hash != _journal_payload_hash(locked):
         raise ValidationError("محتوای سند پس از ارسال تغییر کرده است.")
@@ -816,6 +849,7 @@ def create_replacement_journal(
 ) -> JournalEntry:
     organization = _lock_accounting_organization(organization)
     locked_original = JournalEntry.objects.select_for_update().get(pk=original.pk)
+    require_ordinary_journal(locked_original)
     if (
         locked_original.organization_id != organization.pk
         or locked_original.status != JournalStatus.POSTED
@@ -875,6 +909,7 @@ def reverse_journal(
         permission=BusinessPermissionCode.ACCOUNTING_JOURNALS_PREPARE,
     )
     locked_original = JournalEntry.objects.select_for_update().get(pk=original.pk)
+    require_ordinary_journal(locked_original)
     if (
         locked_original.organization_id != organization.pk
         or locked_original.status != JournalStatus.POSTED
@@ -956,6 +991,8 @@ def create_opening_import(
     period = FiscalPeriod.objects.select_for_update().get(pk=period.pk)
     if period.organization_id != organization.pk:
         raise PermissionDenied("دوره مالی متعلق به Tenant دیگری است.")
+    require_ordinary_year(period)
+    require_unreserved_opening(organization=organization, year_id=period.fiscal_year_id)
     if period.status != FiscalPeriodStatus.OPEN:
         raise ValidationError("افتتاحیه فقط در دوره مالی باز قابل تهیه است.")
     opening_import = OpeningBalanceImport(
@@ -1093,8 +1130,12 @@ def accept_opening_import(
     )
     if locked.organization_id != organization.pk:
         raise PermissionDenied("ورودی افتتاحیه متعلق به Tenant دیگری است.")
+    require_unreserved_opening(
+        organization=organization, year_id=locked.period.fiscal_year_id
+    )
     if locked.status == OpeningImportStatus.ACCEPTED and locked.accepted_journal_id:
         return locked.accepted_journal
+    require_ordinary_year(locked.period)
     if locked.status != OpeningImportStatus.PROPOSED:
         raise ValidationError("فقط ورودی آماده بررسی قابل پذیرش است.")
     if approver.pk == locked.prepared_by_id:
@@ -1328,6 +1369,7 @@ def reopen_period(
     locked = FiscalPeriod.objects.select_for_update().get(pk=period.pk)
     if locked.organization_id != organization.pk:
         raise PermissionDenied("دوره مالی متعلق به Tenant دیگری است.")
+    require_ordinary_year(locked)
     latest_event = locked.control_events.order_by("-sequence").first()
     if locked.status == FiscalPeriodStatus.OPEN:
         if (

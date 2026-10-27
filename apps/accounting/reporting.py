@@ -19,6 +19,7 @@ from apps.accounting.models import (
     FinancialStatementKind,
     FinancialStatementLineSnapshot,
     FinancialStatementRun,
+    JournalEntry,
     JournalLine,
     JournalStatus,
 )
@@ -27,6 +28,8 @@ from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import BusinessPermissionCode, Organization
+
+from .closing_guards import ledger_window
 
 ZERO = Decimal(0)
 BALANCE_SHEET_TYPES = frozenset(
@@ -115,12 +118,19 @@ def _validate_retained_statement(
             raise ValidationError("ردیف‌های گزارش نگهداری‌شده دستکاری شده است.")
 
 
-def _posted_lines(*, organization: Organization, ends_on: date) -> list[JournalLine]:
+def _posted_lines(
+    *, organization: Organization, ends_on: date, starts_on: date | None = None
+) -> list[JournalLine]:
     lines = list(
-        JournalLine.objects.filter(
+        ledger_window(
+            JournalLine.objects.filter(
+                organization=organization,
+                journal__status=JournalStatus.POSTED,
+                journal__accounting_date__lte=ends_on,
+            ),
             organization=organization,
-            journal__status=JournalStatus.POSTED,
-            journal__accounting_date__lte=ends_on,
+            ends_on=ends_on,
+            starts_on=starts_on,
         )
         .select_related("journal", "account")
         .order_by(
@@ -158,7 +168,21 @@ def build_statement(
     if starts_on and ends_on < starts_on:
         raise ValidationError("پایان بازه گزارش پیش از شروع آن است.")
 
-    source_lines = _posted_lines(organization=organization, ends_on=ends_on)
+    source_lines = _posted_lines(
+        organization=organization, ends_on=ends_on, starts_on=starts_on
+    )
+    if kind == FinancialStatementKind.PROFIT_LOSS:
+        closing_ids = set(
+            JournalEntry.objects.filter(
+                organization=organization, kind="closing"
+            ).values_list("pk", flat=True)
+        )
+        source_lines = [
+            line
+            for line in source_lines
+            if line.journal.kind != "closing"
+            and line.journal.reverses_id not in closing_ids
+        ]
     if kind == FinancialStatementKind.BALANCE_SHEET:
         allowed_types = BALANCE_SHEET_TYPES
     elif kind == FinancialStatementKind.PROFIT_LOSS:
@@ -433,6 +457,9 @@ def list_general_ledger(
         account=account,
         journal__status=JournalStatus.POSTED,
         journal__accounting_date__lte=ends_on,
+    )
+    queryset = ledger_window(
+        queryset, organization=organization, ends_on=ends_on, starts_on=starts_on
     )
     if starts_on:
         queryset = queryset.filter(journal__accounting_date__gte=starts_on)

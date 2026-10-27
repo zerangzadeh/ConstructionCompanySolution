@@ -1,0 +1,22 @@
+Found 5 test(s).
+Creating test database for alias 'default' ('test_cep069_delta_28287f69e81f')...
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+test_conditional_review_cannot_import (delta_tests.ConditionalReviewTests.test_conditional_review_cannot_import) ... ok
+test_conditional_review_cannot_bypass_through_publication (delta_tests.ConditionalReviewTests.test_conditional_review_cannot_bypass_through_publication) ... ok
+test_changed_to_conditional_evidence_blocks_existing_package_activation (delta_tests.ConditionalReviewTests.test_changed_to_conditional_evidence_blocks_existing_package_activation) ... ok
+test_missing_rounding_is_not_replaced_by_a_default (delta_tests.UnselectedSemanticsTests.test_missing_rounding_is_not_replaced_by_a_default) ... ok
+test_unsupported_cumulative_calculation_remains_fail_closed (delta_tests.UnselectedSemanticsTests.test_unsupported_cumulative_calculation_remains_fail_closed) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 3.367s
+
+OK
+Destroying test database for alias 'default' ('test_cep069_delta_28287f69e81f')...
