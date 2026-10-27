@@ -1,0 +1,21 @@
+...............F.......     [100%]
+================================== FAILURES ===================================
+_ OperationsTests.test_retention_plans_then_removes_only_owned_old_diagnostics _
+
+self = <test_operations.OperationsTests testMethod=test_retention_plans_then_removes_only_owned_old_diagnostics>
+
+    def test_retention_plans_then_removes_only_owned_old_diagnostics(self):
+        with LocalOperationsAdapter() as adapter:
+            adapter.emit("database.unreachable")
+            cutoff = datetime.now(UTC)
+            adapter.emit("database.reachable")
+            unrelated = adapter.directory / "audit.json"
+            unrelated.write_text("preserve")
+            selected = adapter.retain(cutoff=cutoff)
+>           self.assertEqual(len(selected), 1)
+E           AssertionError: 0 != 1
+
+tests\test_operations.py:122: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_operations.py::OperationsTests::test_retention_plans_then_removes_only_owned_old_diagnostics
+1 failed, 22 passed, 45 subtests passed in 25.90s

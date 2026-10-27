@@ -1,0 +1,7 @@
+# CEP-076 execution manifest
+
+2026-10-27;main`79f6a1e8b264b09f7a3177d5a9a95b6e49dd7ce4`;IMB0106. [Verified entry](../evidence/CEP-076_EXT0022_20261027/ENTRY.json) recorded before verification. Canonical prompt hash verified; DEP0110 configured operational outcome and EXT0022 verification condition satisfied by072 completion and direct Human approval. Relevant implementation convergence PASS only for approved Development. Global Gate11 is a Production exit gate, not a required Production approval for this bounded drill.
+
+Execute a fresh actual eight-step OP01..04 scenario with exact frozen product and driver sources. Loopback HTTP failure/recovery, real local sink outage/fallback, isolated PostgreSQL dependency failure/recovery, existing service access revoke/audit and actual elapsed expiry, durable receipts/retention/DACL reopen. Touch set: new076evidence, this manifest,076AC/evidence/change/report and relevant Registry/gate/frontier fields only. No product/config/schema/permission change. No new service, network sink or Production action. Any failed scenario remains failed; remediation must return to separately recorded072 implementation authority. No Git writes.
+
+Closeout: [RESULT](../evidence/CEP-076_EXT0022_20261027/RESULT.json), eight actual steps PASS;6/6AC, scoped DoD MET.1214source hashes unchanged. Product/configuration untouched. Gates08/11 remain NOT_PASSED; requested chain complete; frontier empty.

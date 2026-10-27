@@ -1,0 +1,246 @@
+{
+  "at": "2026-10-26T22:39:38.107044+00:00",
+  "client_date": "2026-10-27",
+  "head": "79f6a1e8b264b09f7a3177d5a9a95b6e49dd7ce4",
+  "origin_main": "79f6a1e8b264b09f7a3177d5a9a95b6e49dd7ce4",
+  "branch": "main",
+  "git_status": " M CEP_EXECUTION_REGISTRY.yaml\n M README.md\n M apps/support/test_p9_s16_s20.py\n M config/settings/base.py\n M config/settings/development.py\n M config/settings/production.py\n M docs/governance/cep/evidence/CEP-070_ACCEPTANCE_MAPPING.csv\n M docs/governance/cep/evidence/CEP-070_EVIDENCE_MANIFEST.csv\n M docs/governance/cep/evidence/CEP-071_ACCEPTANCE_MAPPING.csv\n M docs/governance/cep/evidence/CEP-071_CHANGE_MANIFEST.csv\n M docs/governance/cep/evidence/CEP-071_EVIDENCE_MANIFEST.csv\n M docs/governance/cep/evidence/CEP-072_ACCEPTANCE_MAPPING.csv\n M docs/governance/cep/evidence/CEP-072_CHANGE_MANIFEST.csv\n M docs/governance/cep/evidence/CEP-072_EVIDENCE_MANIFEST.csv\n M docs/governance/cep/manifests/CEP-070_CHANGE_MANIFEST.csv\n M docs/governance/cep/manifests/CEP-070_EXECUTION_MANIFEST.md\n M docs/governance/cep/manifests/CEP-071_EXECUTION_MANIFEST.md\n M docs/governance/cep/manifests/CEP-072_EXECUTION_MANIFEST.md\n M docs/governance/cep/reports/CEP-069_COMPLETION_REPORT.md\n M docs/governance/cep/reports/CEP-070_COMPLETION_REPORT.md\n M docs/governance/cep/reports/CEP-071_COMPLETION_REPORT.md\n M docs/governance/cep/reports/CEP-072_COMPLETION_REPORT.md\n M docs/governance/cep/supporting/CEP-070_BACKUP_PREPARATION.md\n M graphify-out/cache/last_query_stamp\n?? apps/support/management/\n?? core/operations.py\n?? docs/governance/cep/evidence/CEP-069_076_PREREQUISITES_20261026/\n?? docs/governance/cep/evidence/CEP-070_EXT0020_DEVELOPMENT_20261027/\n?? docs/governance/cep/evidence/CEP-071_072_DEVELOPMENT_20261027/\n?? docs/governance/cep/evidence/EXT0022_DEVELOPMENT_20261027/\n?? docs/governance/cep/supporting/CEP-070_DEVELOPMENT_RECOVERY_POLICY.json\n?? docs/governance/cep/supporting/CEP-070_DEVELOPMENT_RECOVERY_RUNBOOK.md\n?? docs/governance/cep/supporting/CEP-070_EXT0020_HUMAN_APPROVAL_20261027.md\n?? docs/governance/cep/supporting/CEP-070_EXT0020_HUMAN_DECISION_REQUEST_20261027.md\n?? docs/governance/cep/supporting/CEP-071_DEPLOYMENT_PREPARATION.md\n?? docs/governance/cep/supporting/CEP-072_OPERATIONS_PREPARATION.md\n?? docs/governance/cep/supporting/EXT-0021_DECISION_MATRIX_20261027.md\n?? docs/governance/cep/supporting/EXT-0022_DECISION_MATRIX_20261027.md\n?? docs/governance/cep/supporting/EXT-0022_HUMAN_APPROVAL_20261027.md\n?? scripts/cep070_erp_recovery_proof.py\n?? scripts/cep070_recovery_controls.py\n?? tests/test_cep070_recovery_controls.py\n?? tests/test_operations.py\n?? tests/test_production_configuration.py\n",
+  "prompt_hashes": {
+    "CEP-072": "9c52431a1c52c2ca41c2e10ca0eb35eea4871a8ebb7d38e3d57600ca1bbf0940",
+    "CEP-076": "2d93e72adae5830ffeca0e3fe2cc711baecd0f313078620d4cd21717be50c2aa"
+  },
+  "canonical_recovery_sources": {
+    "BONIRA_CEP_DEPENDENCY_REGISTER.csv": {
+      "sha256": "c9ea5e693410d9c6f2e86044fdc1d91df03289082adfe304fce620947e5c88f6",
+      "rows": [
+        {
+          "Dependency ID": "CEP-DEP-095",
+          "Prerequisite CEP": "CEP-052",
+          "Dependent CEP": "CEP-069",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0090:IMB-0082\u2192IMB-0083",
+          "Strength": "MANDATORY",
+          "Condition": "ALWAYS",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "Current statutory package activation can only occur after the versioned statutory source-package engine exists.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        },
+        {
+          "Dependency ID": "CEP-DEP-110",
+          "Prerequisite CEP": "CEP-070",
+          "Dependent CEP": "CEP-074",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0107:IMB-0098\u2192IMB-0104",
+          "Strength": "MANDATORY",
+          "Condition": "ALWAYS",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "A production-equivalent restore drill requires the production backup mechanism to exist and produce restorable backup material.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        },
+        {
+          "Dependency ID": "CEP-DEP-111",
+          "Prerequisite CEP": "CEP-071",
+          "Dependent CEP": "CEP-075",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0108:IMB-0099\u2192IMB-0105",
+          "Strength": "MANDATORY",
+          "Condition": "ALWAYS",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "A production-equivalent deployment drill requires the hardened deployment/configuration process to exist.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        },
+        {
+          "Dependency ID": "CEP-DEP-112",
+          "Prerequisite CEP": "CEP-072",
+          "Dependent CEP": "CEP-076",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0110:IMB-0101\u2192IMB-0106",
+          "Strength": "MANDATORY",
+          "Condition": "ALWAYS",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "Observability/incident drills require configured alerting/runbooks/incident-access governance to execute the approved scenarios.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        }
+      ]
+    },
+    "BONIRA_CEP_EXTERNAL_DEPENDENCY_REGISTER.csv": {
+      "sha256": "e1dae585c60060459c75ac8676b0c5aeb2cbaaaeb1d5422f7a8d23bd3b23c2af",
+      "rows": [
+        {
+          "External Dependency ID": "EXT-0018",
+          "CEP ID": "CEP-052",
+          "Dependency Phase": "ACTIVATION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "YES",
+          "Blocks Verification?": "NO",
+          "Blocks Production?": "NO",
+          "Required Gate": "GATE-03 (activation only)",
+          "Fail-Closed Behavior": "Build framework may proceed only where canonical IMB permits fail-closed construction; CURRENT VALUES/EVIDENCE UTV",
+          "Notes": "Current official Iranian Payroll statutory source package \u2014 Effective-dated official Tax/Labor/Social Security evidence, reviewed package/version and activation record"
+        },
+        {
+          "External Dependency ID": "EXT-0018",
+          "CEP ID": "CEP-069",
+          "Dependency Phase": "PRODUCTION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "NO",
+          "Blocks Verification?": "NO",
+          "Blocks Production?": "YES",
+          "Required Gate": "GATE-11",
+          "Fail-Closed Behavior": "CURRENT VALUES/EVIDENCE UTV",
+          "Notes": "Current official Iranian Payroll statutory source package \u2014 Effective-dated official Tax/Labor/Social Security evidence, reviewed package/version and activation record"
+        },
+        {
+          "External Dependency ID": "EXT-0020",
+          "CEP ID": "CEP-070",
+          "Dependency Phase": "PRODUCTION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "NO",
+          "Blocks Verification?": "NO",
+          "Blocks Production?": "YES",
+          "Required Gate": "GATE-11",
+          "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-CERTIFIED",
+          "Notes": "Approved recovery objectives \u2014 Approved numeric RPO/RTO/PITR/retention/test objectives and acceptance authority"
+        },
+        {
+          "External Dependency ID": "EXT-0020",
+          "CEP ID": "CEP-074",
+          "Dependency Phase": "VERIFICATION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "NO",
+          "Blocks Verification?": "YES",
+          "Blocks Production?": "NO",
+          "Required Gate": "Relevant implementation gate + external verification dependency",
+          "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-CERTIFIED",
+          "Notes": "Approved recovery objectives \u2014 Approved numeric RPO/RTO/PITR/retention/test objectives and acceptance authority"
+        },
+        {
+          "External Dependency ID": "EXT-0021",
+          "CEP ID": "CEP-071",
+          "Dependency Phase": "PRODUCTION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "NO",
+          "Blocks Verification?": "NO",
+          "Blocks Production?": "YES",
+          "Required Gate": "GATE-11",
+          "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-VALIDATED",
+          "Notes": "Approved production topology and environment configuration \u2014 Selected topology, environment schema, secrets/static/media/process configuration and deployment target evidence"
+        },
+        {
+          "External Dependency ID": "EXT-0021",
+          "CEP ID": "CEP-075",
+          "Dependency Phase": "VERIFICATION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "NO",
+          "Blocks Verification?": "YES",
+          "Blocks Production?": "NO",
+          "Required Gate": "Relevant implementation gate + external verification dependency",
+          "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-VALIDATED",
+          "Notes": "Approved production topology and environment configuration \u2014 Selected topology, environment schema, secrets/static/media/process configuration and deployment target evidence"
+        },
+        {
+          "External Dependency ID": "EXT-0022",
+          "CEP ID": "CEP-072",
+          "Dependency Phase": "PRODUCTION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "NO",
+          "Blocks Verification?": "NO",
+          "Blocks Production?": "YES",
+          "Required Gate": "GATE-11",
+          "Fail-Closed Behavior": "NOT YET PROVEN",
+          "Notes": "Named operating responsibilities and approved runbook ownership \u2014 Named release/incident/activation/access responsibilities and approved runbook/access evidence"
+        },
+        {
+          "External Dependency ID": "EXT-0022",
+          "CEP ID": "CEP-076",
+          "Dependency Phase": "VERIFICATION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "NO",
+          "Blocks Verification?": "YES",
+          "Blocks Production?": "NO",
+          "Required Gate": "Relevant implementation gate + external verification dependency",
+          "Fail-Closed Behavior": "NOT YET PROVEN",
+          "Notes": "Named operating responsibilities and approved runbook ownership \u2014 Named release/incident/activation/access responsibilities and approved runbook/access evidence"
+        }
+      ]
+    },
+    "BONIRA_IMPLEMENTATION_GATE_REGISTER.csv": {
+      "sha256": "4eca43cb04f5f32afdc2ec177c2c4c8ec1963115d3e23f91e3b07c8b5579358d",
+      "rows": [
+        {
+          "Gate ID": "GATE-08",
+          "Gate Name": "Runtime Verification",
+          "Gate Type": "RUNTIME VERIFICATION GATE",
+          "Purpose": "Record environment-specific verification only after implementation availability.",
+          "Required IMB IDs": "IMB-0103; IMB-0104; IMB-0105; IMB-0106; IMB-0107; IMB-0108; IMB-0109",
+          "Required External Dependencies": "EXT-0020; EXT-0021; EXT-0022; EXT-0023; EXT-0024 as applicable",
+          "Evidence Required": "Executed runtime scenarios, environment/build identity, logs/results, explicit PASS/FAIL per verification item.",
+          "Pass Condition": "Required verification items have executed evidence; no static evidence is promoted to runtime PASS.",
+          "Failure Consequence": "Affected production/UAT/certification decisions remain blocked or UTV.",
+          "Downstream Work Unlocked": "UAT convergence and Production Certification evidence",
+          "UTV?": "YES until executed",
+          "Human Sign-off?": "NO",
+          "Notes": "Not every feature requires every verification item."
+        },
+        {
+          "Gate ID": "GATE-10",
+          "Gate Name": "Representative UAT Completion",
+          "Gate Type": "UAT COMPLETION GATE",
+          "Purpose": "Record completion of the approved representative UAT execution without conflating UAT with Production Certification or Human Sign-off.",
+          "Required IMB IDs": "IMB-0110",
+          "Required External Dependencies": "EXT-0025",
+          "Evidence Required": "Scenario-by-scenario runtime results for all 44 approved representative cases with build/environment identity.",
+          "Pass Condition": "All 44 approved representative UAT scenarios are executed as applicable; required evidence is captured; unresolved failures are explicitly dispositioned; no exhaustive-UAT claim is made. Passing GATE-10 does not constitute Human Sign-off.",
+          "Failure Consequence": "Production acceptance/human sign-off cannot claim UAT completion.",
+          "Downstream Work Unlocked": "GATE-11 \u2014 Production Certification review",
+          "UTV?": "YES until executed",
+          "Human Sign-off?": "NO",
+          "Notes": "REPRESENTATIVE UAT COMPLETE \u2260 PRODUCTION CERTIFICATION COMPLETE \u2260 HUMAN SIGN-OFF. HUMAN SIGN-OFF: NOT EXECUTED."
+        },
+        {
+          "Gate ID": "GATE-11",
+          "Gate Name": "Production Certification",
+          "Gate Type": "PRODUCTION CERTIFICATION GATE",
+          "Purpose": "Certify production/system-operational readiness only after GATE-10 Representative UAT Completion and all existing production readiness controls/evidence are satisfied.",
+          "Required IMB IDs": "IMB-0083; IMB-0098; IMB-0099; IMB-0100; IMB-0101; IMB-0104; IMB-0105; IMB-0106; IMB-0107",
+          "Required External Dependencies": "EXT-0018; EXT-0020; EXT-0021; EXT-0022",
+          "Evidence Required": "Activated official statutory package where applicable; backup/restore evidence; deployment drill; observability/incident drill; supply-chain re-verification; approved topology/recovery/operating evidence.",
+          "Pass Condition": "GATE-10 Representative UAT Completion has PASSED; all required Production Certification IMB items are complete; required runtime/production evidence is available; required external production evidence is available; and no unresolved production-certification blocker remains.",
+          "Failure Consequence": "Production certification remains NOT COMPLETE regardless of feature/UAT state.",
+          "Downstream Work Unlocked": "Future production release decision and Human Sign-off review",
+          "UTV?": "YES until production-equivalent evidence exists",
+          "Human Sign-off?": "NO",
+          "Notes": "GATE-10 \u2192 GATE-11 is mandatory. PRODUCTION CERTIFICATION \u2260 HUMAN SIGN-OFF. GATE-11 is not currently passed."
+        },
+        {
+          "Gate ID": "GATE-12",
+          "Gate Name": "Human Business Sign-off",
+          "Gate Type": "HUMAN SIGN-OFF GATE",
+          "Purpose": "Record final explicit human/business acceptance only after Representative UAT Completion and Production Certification.",
+          "Required IMB IDs": "IMB-0110 (evidence input)",
+          "Required External Dependencies": "EXT-0026",
+          "Evidence Required": "Explicit authorized human sign-off linked to reviewed build and evidence set.",
+          "Pass Condition": "GATE-10 Representative UAT Completion has PASSED AND GATE-11 Production Certification has PASSED AND EXT-0026 contains an explicit authorized Human Business Sign-off record.",
+          "Failure Consequence": "HUMAN SIGN-OFF remains NOT EXECUTED; documentation/product decisions do not substitute.",
+          "Downstream Work Unlocked": "Future human-accepted release state",
+          "UTV?": "YES",
+          "Human Sign-off?": "YES \u2014 FUTURE / NOT EXECUTED",
+          "Notes": "GATE-10 \u2192 GATE-11 \u2192 GATE-12. EXT-0026 applies only to GATE-12. HUMAN SIGN-OFF: NOT EXECUTED."
+        }
+      ]
+    }
+  },
+  "authority": "docs/governance/cep/supporting/EXT-0022_HUMAN_APPROVAL_20261027.md",
+  "scope": "Development technical catalogue, restricted durable local receipt/30-day retention, OP01..04 and actual scenario. No production equivalence required by DEP0110; no dependency waiver.",
+  "touch_set": [
+    "core/operations.py",
+    "tests/test_operations.py",
+    "scripts/cep072_operations_runtime.py",
+    "scripts/cep072_qualification_scenarios.py",
+    "CEP072/076 manifests reports acceptance evidence change lists",
+    "EXT0022 supporting authority/runbook",
+    "CEP_EXECUTION_REGISTRY.yaml scoped records/gates/frontier"
+  ],
+  "migration": "NONE",
+  "git_writes": false
+}

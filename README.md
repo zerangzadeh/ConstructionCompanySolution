@@ -98,6 +98,10 @@ python manage.py check --deploy --settings=config.settings.production
 
 The deployment check expects a strong `DJANGO_SECRET_KEY` and non-empty
 `DJANGO_ALLOWED_HOSTS` supplied through environment variables.
+Production imports never load `.env`. They also require distinct absolute
+`DJANGO_STATIC_ROOT`, `DJANGO_MEDIA_ROOT`, and `DOCUMENT_PROTECTED_ROOT` paths.
+See the [deployment preparation contract](docs/governance/cep/supporting/CEP-071_DEPLOYMENT_PREPARATION.md)
+for the full environment and release-validation boundary.
 
 ## Development principles
 

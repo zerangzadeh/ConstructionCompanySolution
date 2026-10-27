@@ -74,3 +74,91 @@ metadata only; execution remains PARTIAL and no production authority is granted.
 ## Current frontier recheck - 2026-10-25
 
 Canonical recovery matrix rechecked by unchanged approved archive/member identity in [frontier entry](../evidence/FRONTIER_069_078_20261025/ENTRY.json). Objectives/owners remain UNSPECIFIED. Retain9focused tests and synthetic PostgreSQL/file interoperability evidence without rerun. No actual ERP restore, numeric recovery objective, named acceptance owner or environment control is inferred. EXECUTION PARTIAL0/6certified, DoD NOT_MET; no production/Human/Git action.
+
+## Development prerequisite advancement — 2026-10-27
+
+**EXECUTION PARTIAL; AC 0/6 production-certified; DoD NOT MET.** At main
+`79f6a1e8b264b09f7a3177d5a9a95b6e49dd7ce4`, current Human authority permitted
+objective-free isolated ERP recovery preparation. [Fresh proof](../evidence/CEP-069_076_PREREQUISITES_20261026/ERP_RECOVERY.json):
+20/20 checks PASS; 525 tables / 7,754 complete rows, 9 sequences and 9,507
+constraints preserved. Two synthetic tenants retain authorized document/version
+reads and four cross-tenant denial cases. Three immutable document versions and
+exact Decimal project budgets survive; all three recovered file classes match.
+The configured business database was never opened. Both new databases and private
+fixture files were removed; the empty cached test template was read/cloned only.
+Existing migrations provisioned the first fixture; retries reused an empty test
+schema with the exact current 437-node migration graph. No migration was authored
+or migration behavior certified. Populated business scenarios cover documents and
+projects; this is not financial posting, production data or full-domain recovery
+qualification.
+
+Two failed harness attempts remain retained: dump/restore succeeded, but a byte
+comparison of constraint SQL failed. Diagnostic retry isolated 19 CHECK and three
+exclusion predicates whose array casts PostgreSQL renders differently after
+reparse. The repaired comparison uses PostgreSQL planner output for these
+expressions and preserves names, types, definitions and validation/deferral flags.
+Every row and sequence still compares exactly. [Positive/negative controls](../evidence/CEP-069_076_PREREQUISITES_20261026/PLANNER_NORMALIZATION_CONTROLS.json)
+prove equivalent casts converge and changed array members / Decimal thresholds
+remain distinguishable. This is TEST INFRASTRUCTURE DEBT resolved, not a product
+constraint change or waived failed test.
+
+Evidence IDs EV-006 (fresh ERP recovery), EV-007 (normalization controls), EV-008
+(failed diagnostic attempt). Existing adapter tests are retained, not rerun.
+EXT-0020 objectives, designated restore/acceptance responsibility and qualified
+protected storage/encryption/key-recovery/operating target remain unavailable.
+Observed capture/restore durations are measurements without an RPO/RTO claim.
+CEP-074 stays NOT_STARTED; no production equivalence, Gate PASS, Human Sign-off,
+Production Certification, cutover or Git write. Independent CEP-071 may proceed.
+
+## EXT-0020 approved Development qualification — 2026-10-27
+
+EXECUTION PARTIAL; canonical AC 0/6 production-certified; DoD NOT MET.
+Development implementation and qualification COMPLETE for the approved supervised
+scope. Human authority and exact policy are recorded in supporting/CEP-070_EXT0020_HUMAN_APPROVAL_20261027.md
+and supporting/CEP-070_DEVELOPMENT_RECOVERY_POLICY.json. All four classes share
+RPO15m/RTO60m, backups at most15m apart,30-day retention/restore-test cadence;
+PITR is not required for Development only. Human Decision Authority is accountable
+and owns acceptance; Codex executed technically, without Human Sign-off.
+
+Fresh runtime:20/20 recovery checks PASS; 525 tables/7754 complete rows,
+9507 constraints/9 sequences, all three file classes and tenant
+service boundaries preserved. Two actual complete captures started 720.962755
+seconds apart (900-second maximum;180-second execution dispatch budget). No
+acknowledged quiescent fixture write was lost: measured scenario RPO0s; measured
+restore through reconciliation/tenant service validation RTO23.145745s.
+No changing-workload/provider/region/web-startup recovery guarantee is inferred.
+Both newly created databases and private temporary fixtures were removed; two
+complete bundles remain under verified restricted E:/BONIRA_Recovery storage.
+The configured business database was never accessed; cached test schema was only
+read/cloned. No model/schema/product-service/permission change or migration test.
+
+23 focused test methods PASS; actual cross-process worker exclusion, recursive
+DACL checks, capture/restore failure handling, corruption rejection, durable due
+dates and retention-boundary behavior verified. Bundles carry30-day minimum
+retention receipts; no purge operation exists. Thirty-day clock tests are
+simulations, not elapsed retention/future-drill evidence. Next restore test due:
+2026-11-25T21:54:41.550777+00:00. The session worker stopped cleanly; no unattended
+service was installed or future executor/continuous operation inferred.
+
+Resolved prerequisites: direct Human policy/owner input; scheduling/retention
+controls; overly broad Development credential-file ACL (contents unchanged,
+original ACL metadata private); native Windows path limits caused by packaged
+LocalAppData expansion (shorter protected project-drive paths); PowerShell5.1
+security-module loading failure (reuse existing PowerShell7 runtime). Four failed
+fixture attempts are retained as FAILED with database cleanup PASS, never renamed
+passing runs. An initial test fake used the wrong pg_dump argument form; corrected
+without modifying the existing capture adapter.
+
+Evidence EV009..014 and docs/governance/cep/evidence/CEP-070_EXT0020_DEVELOPMENT_20261027/RESULT.json distinguish approved policy, executed
+results, simulations and remaining UTV. CEP-070 canonical production certification
+remains unverified. CEP-074 remains NOT_STARTED: mandatory070 required outcome and
+production-equivalent target are unmet; the Human explicitly approved synthetic
+Development without equivalence. No canonical prompt/AC/DoD/dependency change or
+waiver is inferred. GATE06 PASS retained; GATE08/GATE11 NOT_PASSED.
+
+Remaining: approved production-equivalent non-production recovery profile/target
+and required backup/control qualification; later Production policy/storage/key
+recovery and final certification. Do not request the already-approved Development
+objectives/owners again. No Production action, broad regression or Git write.
+Exact next_executable_frontier: []. No Development-resolvable work remains within
+the approved current scope.

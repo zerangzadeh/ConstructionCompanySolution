@@ -1,0 +1,154 @@
+{
+  "incident_id": "db413572-cd28-44d6-9654-e0cdb0a0ca4e",
+  "started_at": "2026-10-26T22:44:24.755861+00:00",
+  "ended_at": "2026-10-26T22:44:37.035445+00:00",
+  "result": "PASS",
+  "environment": "isolated-test-postgresql-loopback-development",
+  "owner": "Human Decision Authority",
+  "executor": "Codex",
+  "authority": "EXT-0022-HUMAN-20261027",
+  "runbooks": "OP-01..04",
+  "escalation": "Human Decision Authority; no timer or SLA",
+  "sink": "E:\\BONIRA_Operations\\EXT0022\\c329dabf81b3400f",
+  "acl_before": {
+    "status": "PASS",
+    "owner_is_current_operator": true,
+    "paths_checked": 1,
+    "allowed_principals": [
+      "current operator",
+      "Local System",
+      "local Administrators"
+    ],
+    "encryption_qualification": "NOT_ESTABLISHED"
+  },
+  "acl_after": {
+    "status": "PASS",
+    "allowed_principals": [
+      "current operator",
+      "Local System",
+      "local Administrators"
+    ],
+    "owner_is_current_operator": true,
+    "encryption_qualification": "NOT_ESTABLISHED",
+    "paths_checked": 9
+  },
+  "steps": [
+    {
+      "step": "HTTP_FAILURE_RECEIPT",
+      "at": "2026-10-26T22:44:25.482658+00:00",
+      "result": "PASS",
+      "correlation": "c0474119-cef1-452f-9579-a6dbfba68243",
+      "status": 503
+    },
+    {
+      "step": "HTTP_RECOVERY",
+      "at": "2026-10-26T22:44:25.499952+00:00",
+      "result": "PASS",
+      "correlation": "39edf597-0fbe-4ac2-8905-64a6864ec92a",
+      "status": 200
+    },
+    {
+      "step": "DELIVERY_OUTAGE_FALLBACK_AND_RECOVERY",
+      "at": "2026-10-26T22:44:25.509161+00:00",
+      "result": "PASS",
+      "correlation": "3f758cfa-a112-4089-960d-4dea7b5a2a8e",
+      "successful_response_preserved": true,
+      "replayed_business_action": false
+    },
+    {
+      "step": "DEPENDENCY_FAILURE",
+      "at": "2026-10-26T22:44:30.756533+00:00",
+      "result": "PASS",
+      "exit_code": 1,
+      "signals": [
+        "database.unreachable",
+        "cache.reachable"
+      ]
+    },
+    {
+      "step": "DEPENDENCY_RECOVERY",
+      "at": "2026-10-26T22:44:32.935155+00:00",
+      "result": "PASS",
+      "exit_code": 0,
+      "signals": [
+        "database.reachable",
+        "cache.reachable"
+      ]
+    },
+    {
+      "step": "ACCESS_REQUEST_CONFIRM_APPROVE_USE_REVOKE_DENY",
+      "at": "2026-10-26T22:44:33.156787+00:00",
+      "result": "PASS",
+      "audit_actions": [
+        "support.access_approved",
+        "support.access_confirmed",
+        "support.access_requested",
+        "support.access_revoked",
+        "support.access_used"
+      ]
+    },
+    {
+      "step": "EXPIRED_ACCESS_DENIED",
+      "at": "2026-10-26T22:44:36.273429+00:00",
+      "result": "PASS",
+      "clock": "actual elapsed UTC, no timestamp mutation"
+    },
+    {
+      "step": "RESTART_AND_RETENTION",
+      "at": "2026-10-26T22:44:36.314104+00:00",
+      "result": "PASS",
+      "records_preserved": 8,
+      "retention_days": 30
+    }
+  ],
+  "synthetic_access_audit_trace": [
+    {
+      "id": "b7963f61-c510-42c7-a1f0-c239ec9d0edf",
+      "action": "support.access_requested",
+      "at": "2026-10-26T22:44:32.988997+00:00",
+      "source_request": "6d4abe54-bbc8-4f84-99a1-75b476fb0cbf",
+      "actor": "requester"
+    },
+    {
+      "id": "15d62e37-96e4-401a-8c8f-4c690264bb5b",
+      "action": "support.access_confirmed",
+      "at": "2026-10-26T22:44:33.036540+00:00",
+      "source_request": "6d4abe54-bbc8-4f84-99a1-75b476fb0cbf",
+      "actor": "tenant-confirmer"
+    },
+    {
+      "id": "b06cbb59-9574-4a7f-a5d7-536161ad4012",
+      "action": "support.access_approved",
+      "at": "2026-10-26T22:44:33.066313+00:00",
+      "source_request": "6d4abe54-bbc8-4f84-99a1-75b476fb0cbf",
+      "actor": "independent-platform-approver"
+    },
+    {
+      "id": "310da64e-cd0e-487b-987f-302447cbd004",
+      "action": "support.access_used",
+      "at": "2026-10-26T22:44:33.110139+00:00",
+      "source_request": "6d4abe54-bbc8-4f84-99a1-75b476fb0cbf",
+      "actor": "requester"
+    },
+    {
+      "id": "523e3f0c-dec5-4566-bc20-fdbd968259cc",
+      "action": "support.access_revoked",
+      "at": "2026-10-26T22:44:33.124707+00:00",
+      "source_request": "6d4abe54-bbc8-4f84-99a1-75b476fb0cbf",
+      "actor": "tenant-confirmer"
+    }
+  ],
+  "receipt_hashes": {
+    "1401783d-9ac0-41be-99f3-1e788bd9b6c7.json": "fccd9278dbd5bca84621bca52b97f2e10122c5b2197ef592e11438003bb2fab3",
+    "3588585a-c881-4ce3-9af5-916395ee68bd.json": "fcb66cc53301a7633ab0d3f866e783e67a32dab05253c69fc23b728aa0e7a67a",
+    "7f15d00e-956b-4d37-9ae5-74e4056a2888.json": "d4f2054c10e264c11cbcb9496603a231b4d5ac9ca28607e98e411b2d1db6bf47",
+    "9a3f3df0-5af6-48da-b4b6-3d14627d8f31.json": "04852f4e17045f9f0e5f1747ab420b88bed60edb05346d3c7bdb497a5d5d19e6",
+    "ac463f90-5af8-4ce5-b8f4-a76468ea1a5a.json": "257834fb734e7227558cfe4b1fa19de33c7f950f034223b4709a0ff569466eb9",
+    "b1de2af9-3541-421d-8526-ecec328c21dc.json": "b26c75971cb1a7c03245ea919a843061b1362d7111fe84f0c6e91395bf1ed6a5",
+    "dbdf7ee9-5f89-42a4-b879-8d9febc9da93.json": "25ba90611a08e83482c37905d83ec4b2ac06c5cae73148351e9a8c4d4832ff90",
+    "e48126cc-1790-41d5-895a-9286b53946c3.json": "19c258ae1720e4b2302bdb11386e0f89728840ea8a0e40967d46735d13d31890"
+  },
+  "minimum_retain_until": "2026-11-25T22:44:37.035445+00:00",
+  "production_readiness": "NOT_VALIDATED",
+  "human_signoff": "NOT_EXECUTED"
+}

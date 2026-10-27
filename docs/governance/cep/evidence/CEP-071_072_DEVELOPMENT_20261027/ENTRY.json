@@ -1,0 +1,122 @@
+{
+  "at": "2026-10-26T22:18:10.968584+00:00",
+  "client_date": "2026-10-27",
+  "head": "79f6a1e8b264b09f7a3177d5a9a95b6e49dd7ce4",
+  "branch": "main",
+  "entry_status": " M CEP_EXECUTION_REGISTRY.yaml\n M config/settings/production.py\n M docs/governance/cep/evidence/CEP-070_ACCEPTANCE_MAPPING.csv\n M docs/governance/cep/evidence/CEP-070_EVIDENCE_MANIFEST.csv\n M docs/governance/cep/evidence/CEP-071_ACCEPTANCE_MAPPING.csv\n M docs/governance/cep/evidence/CEP-071_CHANGE_MANIFEST.csv\n M docs/governance/cep/evidence/CEP-071_EVIDENCE_MANIFEST.csv\n M docs/governance/cep/manifests/CEP-070_CHANGE_MANIFEST.csv\n M docs/governance/cep/manifests/CEP-070_EXECUTION_MANIFEST.md\n M docs/governance/cep/manifests/CEP-071_EXECUTION_MANIFEST.md\n M docs/governance/cep/reports/CEP-069_COMPLETION_REPORT.md\n M docs/governance/cep/reports/CEP-070_COMPLETION_REPORT.md\n M docs/governance/cep/reports/CEP-071_COMPLETION_REPORT.md\n M docs/governance/cep/reports/CEP-072_COMPLETION_REPORT.md\n M docs/governance/cep/supporting/CEP-070_BACKUP_PREPARATION.md\n?? docs/governance/cep/evidence/CEP-069_076_PREREQUISITES_20261026/\n?? docs/governance/cep/evidence/CEP-070_EXT0020_DEVELOPMENT_20261027/\n?? docs/governance/cep/supporting/CEP-070_DEVELOPMENT_RECOVERY_POLICY.json\n?? docs/governance/cep/supporting/CEP-070_DEVELOPMENT_RECOVERY_RUNBOOK.md\n?? docs/governance/cep/supporting/CEP-070_EXT0020_HUMAN_APPROVAL_20261027.md\n?? docs/governance/cep/supporting/CEP-070_EXT0020_HUMAN_DECISION_REQUEST_20261027.md\n?? scripts/cep070_erp_recovery_proof.py\n?? scripts/cep070_recovery_controls.py\n?? tests/test_cep070_recovery_controls.py\n?? tests/test_production_configuration.py\n",
+  "prompts": {
+    "CEP-071": {
+      "sha256": "e456aa9b63a18286448f513d29f1d81e47a1b2c2a555121110f89938bc4d3801",
+      "verified": true
+    },
+    "CEP-072": {
+      "sha256": "9c52431a1c52c2ca41c2e10ca0eb35eea4871a8ebb7d38e3d57600ca1bbf0940",
+      "verified": true
+    },
+    "CEP-075": {
+      "sha256": "2df7a9665e89d737046844df7ff4439f9ab08591f34e0844ab1871f1db9c7df0",
+      "verified": true
+    },
+    "CEP-076": {
+      "sha256": "2d93e72adae5830ffeca0e3fe2cc711baecd0f313078620d4cd21717be50c2aa",
+      "verified": true
+    }
+  },
+  "sources": {
+    "BONIRA_CEP_EXTERNAL_DEPENDENCY_REGISTER.csv": {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip",
+      "sha256": "e1dae585c60060459c75ac8676b0c5aeb2cbaaaeb1d5422f7a8d23bd3b23c2af",
+      "rows": [
+        {
+          "External Dependency ID": "EXT-0021",
+          "CEP ID": "CEP-071",
+          "Dependency Phase": "PRODUCTION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "NO",
+          "Blocks Verification?": "NO",
+          "Blocks Production?": "YES",
+          "Required Gate": "GATE-11",
+          "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-VALIDATED",
+          "Notes": "Approved production topology and environment configuration \u2014 Selected topology, environment schema, secrets/static/media/process configuration and deployment target evidence"
+        },
+        {
+          "External Dependency ID": "EXT-0021",
+          "CEP ID": "CEP-075",
+          "Dependency Phase": "VERIFICATION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "NO",
+          "Blocks Verification?": "YES",
+          "Blocks Production?": "NO",
+          "Required Gate": "Relevant implementation gate + external verification dependency",
+          "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-VALIDATED",
+          "Notes": "Approved production topology and environment configuration \u2014 Selected topology, environment schema, secrets/static/media/process configuration and deployment target evidence"
+        },
+        {
+          "External Dependency ID": "EXT-0022",
+          "CEP ID": "CEP-072",
+          "Dependency Phase": "PRODUCTION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "NO",
+          "Blocks Verification?": "NO",
+          "Blocks Production?": "YES",
+          "Required Gate": "GATE-11",
+          "Fail-Closed Behavior": "NOT YET PROVEN",
+          "Notes": "Named operating responsibilities and approved runbook ownership \u2014 Named release/incident/activation/access responsibilities and approved runbook/access evidence"
+        },
+        {
+          "External Dependency ID": "EXT-0022",
+          "CEP ID": "CEP-076",
+          "Dependency Phase": "VERIFICATION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "NO",
+          "Blocks Verification?": "YES",
+          "Blocks Production?": "NO",
+          "Required Gate": "Relevant implementation gate + external verification dependency",
+          "Fail-Closed Behavior": "NOT YET PROVEN",
+          "Notes": "Named operating responsibilities and approved runbook ownership \u2014 Named release/incident/activation/access responsibilities and approved runbook/access evidence"
+        }
+      ]
+    },
+    "BONIRA_CONFIGURATION_PROFILE_MATRIX.csv": {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip",
+      "sha256": "ca891039bcd6a503d2e4c5e370487003e7ba5944858c8473e600bb6f1773eb52",
+      "content": "Configuration Key,Domain,Description,Allowed Value / Value Type,Default if explicitly approved,Small suggested value,Standard suggested value,Enterprise suggested value,User-configurable?,Effective-dated?,Tenant-specific?,Governing PD,Business impact,Required permission,Validation,Invariant or Configurable?,Effective Scope,Audit Requirement,Implementation Eligibility,Notes\r\nproject_controls.budget_overrun.response,Project Controls,Explicit tenant policy for over-budget response where PD-020 budget control is enabled.,ENUM: WARNING | HARD_STOP,UNSPECIFIED CONFIGURATION VALUE \u2014 DO NOT INVENT,UNSPECIFIED CONFIGURATION VALUE \u2014 DO NOT INVENT,UNSPECIFIED CONFIGURATION VALUE \u2014 DO NOT INVENT,UNSPECIFIED CONFIGURATION VALUE \u2014 DO NOT INVENT,YES \u2014 explicit tenant policy only,YES,YES,PD-020; PD-024,Controls warning vs blocking; never changes Budget.,EXPLICIT CONFIGURATION AUTHORITY \u2014 no codename defined here,Allowed enum only; profile label cannot set behavior implicitly.,CONFIGURABLE,Tenant / Project-Control policy scope,\"Old/new value, actor, effective time, reason where governed\",CONDITIONALLY READY FOR BACKLOG,PROFILE LABEL ALONE \u2192 MUST NEVER CHANGE BUSINESS BEHAVIOR.\r\nproject_controls.budget_overrun.override_enabled,Project Controls,Whether a governed override path may be used after an explicit Hard Stop/controlled overrun condition.,BOOLEAN,UNSPECIFIED CONFIGURATION VALUE \u2014 DO NOT INVENT,UNSPECIFIED CONFIGURATION VALUE \u2014 DO NOT INVENT,UNSPECIFIED CONFIGURATION VALUE \u2014 DO NOT INVENT,UNSPECIFIED CONFIGURATION VALUE \u2014 DO NOT INVENT,YES \u2014 explicit tenant policy only,YES,YES,PD-020; PD-016; PD-024,\"If enabled, override still requires explicit permission, mandatory reason and audit.\",EXPLICIT OVERRIDE AUTHORITY + CONFIGURATION AUTHORITY,Boolean only; cannot bypass Tenant/Object Scope or audit.,CONFIGURABLE,Tenant / Project-Control policy scope,Configuration change + every override actor/reason/evidence,CONDITIONALLY READY FOR BACKLOG,Enterprise label does not imply enabled.\r\nleave.accrual_preset,Timekeeping / Leave,Optional explicit simplified leave accrual preset permitted by PD-026.,ENUM: FULL_CREDIT | ZERO_ACCRUAL | POLICY_DEFINED,UNSPECIFIED CONFIGURATION VALUE \u2014 DO NOT INVENT,UNSPECIFIED CONFIGURATION VALUE \u2014 DO NOT INVENT,UNSPECIFIED CONFIGURATION VALUE \u2014 DO NOT INVENT,UNSPECIFIED CONFIGURATION VALUE \u2014 DO NOT INVENT,YES \u2014 explicit Leave Policy only,YES,YES,PD-026; PD-024,Selects governed leave accrual policy form; does not define entitlement amount.,EXPLICIT LEAVE POLICY CONFIGURATION AUTHORITY,Selection must reference a governed Leave Policy version.,CONFIGURABLE,Tenant / WorkRelationship policy applicability,Policy version/effective dates/actor,READY FOR BACKLOG,Never inferred from Small/Standard/Enterprise.\r\n"
+    },
+    "BONIRA_OPERATING_SPECIFICATION.md": {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip",
+      "sha256": "d144b3cfa3266564d2467b659d70597fe9d0b1923814a4db59c97ac5c7e48633",
+      "content": "# BONIRA \u2014 Approved Operating Specification\n\nGoverned by `PD-005`.\n\n| Responsibility | Requirement |\n|---|---|\n| Release Owner | Designated accountable responsibility per production release; exact assignee not invented |\n| Incident Owner | Designated accountable responsibility per incident |\n| Production Activation Authority | Explicitly designated; technical superuser status alone is insufficient |\n| Escalation Responsibility | Explicit path required; no timer/severity/SLA invented |\n| Emergency / Support Access Authority | Explicit, scoped, auditable and revocable |\n| Rollback / Roll-forward Responsibility | Recorded in release/incident evidence |\n| Access Revocation Responsibility | Explicit owner for expiry/revoke |\n\nRelease evidence includes version/change/migration/activation/rollback-or-roll-forward evidence.\nIncident evidence includes identity/timestamps/owner/log evidence/actions/access grants/resolution evidence.\n\n`ON-CALL POLICY \u2260 AUTOMATIC 24\u00d77 STAFFED ROTATION`\n\nNo SLA, SLO, response time, severity scheme or staffed rotation is invented.\n\n`PRODUCTION-OPERATIONS-READINESS: NOT YET PROVEN`\n`HUMAN SIGN-OFF: NOT EXECUTED`\n`IMPLEMENTATION AUTHORIZATION: NOT YET GRANTED`\n"
+    },
+    "BONIRA_PRODUCTION_DEPLOYMENT_SPECIFICATION.md": {
+      "archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip",
+      "sha256": "437f4515abf52524421a5ad27286f06a7b774f52719069f5054d52f40b4dc0bc",
+      "content": "# BONIRA \u2014 Production Deployment Specification\n\n## Status\n`SPECIFICATION STRUCTURE COMPLETE`\n`UNSPECIFIED PRODUCTION TOPOLOGY \u2014 DO NOT INVENT / DO NOT CERTIFY`\n\nGoverned by `PD-004`.\n\n- Production and non-production boundaries must be explicit.\n- Exact host count, cloud provider, Kubernetes/container platform, HA topology, replica count and failover architecture are UNSPECIFIED.\n- Database, application, static/media, proxy/load-balancer and background-worker components are deployed only where the actual approved runtime requires them.\n- TLS and environment-scoped secrets handling are mandatory; exact product/provider is not specified.\n- Migrations require versioned sequencing, pre-check, rollback/roll-forward decision and evidence.\n- Production release must retain version, migration/config change, activation authority and deployment evidence.\n- Backup/recovery integrates with `BONIRA_RECOVERY_POLICY_MATRIX`.\n- Monitoring/logging must support incident, security and audit traceability; tooling/thresholds are not invented.\n- Tenant isolation/object scope are invariant.\n- Support/emergency access follows the Operating Specification.\n\n`CONDITIONALLY READY FOR BACKLOG`\n`IMPLEMENTATION AUTHORIZATION: NOT YET GRANTED`\n"
+    }
+  },
+  "authority": "Current explicit Human request: complete Development-resolvable prerequisites in both chains; no Git writes or production actions. Standing authority and phase semantics verified.",
+  "touch_set": [
+    "config/settings/{base,development,production}.py",
+    "tests/test_production_configuration.py",
+    "core/operations.py",
+    "core/management/commands/operational_health.py",
+    "tests/test_operations.py",
+    "docs/governance/cep/supporting/CEP-071_DEPLOYMENT_PREPARATION.md",
+    "docs/governance/cep/supporting/CEP-072_OPERATIONS_PREPARATION.md",
+    "docs/governance/cep/supporting/EXT-0021_DECISION_MATRIX_20261027.md",
+    "docs/governance/cep/supporting/EXT-0022_DECISION_MATRIX_20261027.md",
+    "CEP-071/072 manifest/report/acceptance/evidence/change closeout",
+    "CEP_EXECUTION_REGISTRY.yaml relevant four CEPs/frontier only",
+    "docs\\governance\\cep\\evidence\\CEP-071_072_DEVELOPMENT_20261027",
+    "apps\\support\\management\\commands\\operational_health.py",
+    "README.md",
+    "apps/support/management/__init__.py",
+    "apps/support/management/commands/__init__.py",
+    "apps/support/test_p9_s16_s20.py"
+  ],
+  "migration": "NONE",
+  "scope": "Topology-independent env guards/static-media hooks; CLI health without endpoint; local alert/diagnostic adapters and explicit-cutoff retention planning; draft runbooks referencing existing support revocation. No production approval inferred. Targeted support-access test fixture repair: explicit membership role/scope grants for the two exercised access tests only; product authorization unchanged.",
+  "touch_set_adjustments": [
+    "Operational command placed in installed apps.support management namespace after command-discovery test; initial core command path is absent from the final tree.",
+    "Two selected legacy support-access scenarios received explicit current membership role/scope fixture evidence; other legacy scenarios and product authorization were unchanged."
+  ]
+}

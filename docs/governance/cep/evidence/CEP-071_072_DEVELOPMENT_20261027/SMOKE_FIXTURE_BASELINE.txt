@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "<string>", line 18, in <module>
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\__init__.py", line 194, in call_command
+    return command.execute(*args, **defaults)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\base.py", line 464, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\commands\check.py", line 81, in handle
+    self.check(
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\base.py", line 573, in check
+    raise SystemCheckError(msg)
+django.core.management.base.SystemCheckError: SystemCheckError: System check identified some issues:
+
+WARNINGS:
+?: (caches.W003) Your 'default' cache LOCATION path is relative. Use an absolute path instead.
+
+System check identified 1 issue (0 silenced).

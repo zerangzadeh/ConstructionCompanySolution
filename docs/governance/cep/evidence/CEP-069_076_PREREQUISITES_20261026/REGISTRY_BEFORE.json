@@ -1,0 +1,235 @@
+{
+  "summary": {
+    "execution_state_complete": 72,
+    "authorized_not_started": 0,
+    "eligible_under_standing_authority": 0,
+    "in_progress": 0,
+    "blocked_current": 3,
+    "partial_current": 4,
+    "failed_current": 0,
+    "not_started_other_current_governed": 0,
+    "deferred_post_v1": 7,
+    "remote_main_verified_complete_from_last_audit": 68,
+    "last_updated": "2026-10-26",
+    "remote_main_complete_count_status": "VERIFIED_REGISTRY_68_COMPLETE_REPORTS_64_PRESENT_4_UNRECOVERED",
+    "v1_closure_counts": {
+      "COMPLETE": 68,
+      "PARTIAL": 0,
+      "BLOCKED": 0
+    },
+    "v1_blocked_count_semantics": "Not-started records with explicit current entry/dependency blockers; partials separate"
+  },
+  "repository_state": {
+    "branch": "main",
+    "last_reconciled_head": "961e3fd942c668337012c22d42f59545c5e9fc0a",
+    "origin_main": "961e3fd942c668337012c22d42f59545c5e9fc0a",
+    "integration_checkpoint": "582e4183bb83e05bcb72860f0e2e546940b245d2",
+    "integration_method": "DIRECT_COMMIT_TO_MAIN",
+    "last_reconciled_at": "2026-10-26",
+    "pending_checkpoint_scope": "CURRENT_FRONTIER_20261026_UNCOMMITTED_CHANGES_ONLY",
+    "metadata_boundary": "Human checkpoints325b32f and961e3fd inspected read-only; local main and origin/main agree at current HEAD. Prior frontier foundation and UIUX changes committed by Human; current session uncommitted. No remote freshness query or Git writes."
+  },
+  "gates": {
+    "GATE-06": "PASS",
+    "GATE-08": "NOT_PASSED",
+    "GATE-11": "NOT_PASSED"
+  },
+  "ceps": {
+    "CEP-069": {
+      "execution": {
+        "status": "PARTIAL",
+        "lifecycle": "BLOCKED",
+        "advisor_review": "PENDING"
+      },
+      "acceptance": {
+        "passed": 0,
+        "total": 5,
+        "status": "UNVERIFIED"
+      },
+      "dod": "PARTIAL_NOT_MET",
+      "git": {
+        "committed": true,
+        "commit_sha": "4f37c118f920f99f1ec01940343fe83b18c8e84d",
+        "pushed": true,
+        "merged_to_main": false,
+        "remote_main_evidence": "PREPARATION_PACKET_ONLY",
+        "integration_method": "DIRECT_COMMIT_TO_MAIN",
+        "current_session_documentation_committed": false
+      },
+      "last_execution": {
+        "branch": "main",
+        "sha": "af9e843f0dfecd286441c53c130971eca6fcc86a"
+      }
+    },
+    "CEP-070": {
+      "execution": {
+        "status": "PARTIAL",
+        "lifecycle": "PARTIAL_PREPARATION_CERTIFICATION_BLOCKED",
+        "advisor_review": "NOT_REQUIRED_CURRENT_GOVERNANCE"
+      },
+      "acceptance": {
+        "passed": 0,
+        "total": 6,
+        "status": "CERTIFICATION_UNVERIFIED_NONPRODUCTION_MECHANISM_PROVED"
+      },
+      "dod": "PARTIAL_NOT_MET",
+      "git": {
+        "committed": true,
+        "commit_sha": "1b1eb74757f88ee914c32153e366b4a273a8a1bd",
+        "pushed": true,
+        "merged_to_main": false,
+        "remote_main_evidence": "VERIFIED_LOCAL_ORIGIN_REMOTE_MAIN_DIRECT_PUSH",
+        "current_session_documentation_committed": false
+      },
+      "last_execution": {
+        "branch": "main",
+        "sha": "24d782aefed64f92c953d6469af46759444eb151"
+      }
+    },
+    "CEP-071": {
+      "execution": {
+        "status": "PARTIAL",
+        "lifecycle": "PARTIAL_PREPARATION_PRODUCTION_SPECIFICATION_BLOCKED",
+        "advisor_review": "NOT_REQUIRED_CURRENT_GOVERNANCE"
+      },
+      "acceptance": {
+        "passed": 0,
+        "total": 6,
+        "status": "PRODUCTION_CERTIFICATION_UNVERIFIED_8_PREPARATION_CHECKS_PASS"
+      },
+      "dod": "PARTIAL_NOT_MET",
+      "git": {
+        "committed": false,
+        "commit_sha": null,
+        "pushed": false,
+        "merged_to_main": null,
+        "remote_main_evidence": "UNCOMMITTED_PREPARATION_ONLY"
+      },
+      "last_execution": {
+        "branch": "main",
+        "sha": "566073b35f2f5bb8b08267b56856fb85b7a0fcf0"
+      }
+    },
+    "CEP-072": {
+      "execution": {
+        "status": "PARTIAL",
+        "lifecycle": "PARTIAL_TELEMETRY_FOUNDATION_OPERATING_POLICY_BLOCKED",
+        "advisor_review": "NOT_REQUIRED_CURRENT_GOVERNANCE"
+      },
+      "acceptance": {
+        "passed": 0,
+        "total": 12,
+        "status": "PRODUCTION_CERTIFICATION_UNVERIFIED_TELEMETRY_FOUNDATION_PROVED"
+      },
+      "dod": "PARTIAL_NOT_MET",
+      "git": {
+        "committed": false,
+        "commit_sha": null,
+        "pushed": false,
+        "merged_to_main": null,
+        "remote_main_evidence": "UNCOMMITTED_FOUNDATION_AND_EVIDENCE"
+      },
+      "last_execution": {
+        "branch": "main",
+        "sha": "566073b35f2f5bb8b08267b56856fb85b7a0fcf0"
+      }
+    },
+    "CEP-073": {
+      "execution": {
+        "status": "COMPLETE",
+        "lifecycle": "CLOSED_VERIFIED_DEVELOPMENT_RUNTIME",
+        "advisor_review": "NOT_REQUIRED_CURRENT_GOVERNANCE"
+      },
+      "acceptance": {
+        "passed": 12,
+        "total": 12,
+        "status": "PASS_QUALIFIED_DEVELOPMENT_RUNTIME"
+      },
+      "dod": "MET_FOR_DEFINED_CURRENT_BUILD_DEVELOPMENT_SCENARIOS",
+      "git": {
+        "committed": false,
+        "commit_sha": null,
+        "pushed": false,
+        "merged_to_main": false,
+        "remote_main_evidence": "UNCOMMITTED_CURRENT_DEVELOPMENT_VERIFICATION"
+      },
+      "last_execution": {
+        "branch": "main",
+        "sha": "961e3fd942c668337012c22d42f59545c5e9fc0a",
+        "application_build_sha256": "c472f085aecd0de72985b72b61d234c6dc62502a6f68bbba1bd707c49a5aabbb"
+      }
+    },
+    "CEP-074": {
+      "execution": {
+        "status": "NOT_STARTED",
+        "lifecycle": "NOT_ELIGIBLE",
+        "advisor_review": "PENDING"
+      },
+      "acceptance": {
+        "passed": null,
+        "total": 6,
+        "status": "UNEXECUTED_NOT_ELIGIBLE"
+      },
+      "dod": "UNEXECUTED",
+      "git": {
+        "committed": null,
+        "commit_sha": null,
+        "pushed": null,
+        "merged_to_main": null,
+        "remote_main_evidence": "UNVERIFIED"
+      },
+      "last_execution": {
+        "branch": null,
+        "sha": null
+      }
+    },
+    "CEP-075": {
+      "execution": {
+        "status": "NOT_STARTED",
+        "lifecycle": "NOT_ELIGIBLE",
+        "advisor_review": "PENDING"
+      },
+      "acceptance": {
+        "passed": null,
+        "total": 6,
+        "status": "UNEXECUTED_NOT_ELIGIBLE"
+      },
+      "dod": "UNEXECUTED",
+      "git": {
+        "committed": null,
+        "commit_sha": null,
+        "pushed": null,
+        "merged_to_main": null,
+        "remote_main_evidence": "UNVERIFIED"
+      },
+      "last_execution": {
+        "branch": null,
+        "sha": null
+      }
+    },
+    "CEP-076": {
+      "execution": {
+        "status": "NOT_STARTED",
+        "lifecycle": "NOT_ELIGIBLE",
+        "advisor_review": "PENDING"
+      },
+      "acceptance": {
+        "passed": null,
+        "total": 6,
+        "status": "UNEXECUTED_NOT_ELIGIBLE"
+      },
+      "dod": "UNEXECUTED",
+      "git": {
+        "committed": null,
+        "commit_sha": null,
+        "pushed": null,
+        "merged_to_main": null,
+        "remote_main_evidence": "UNVERIFIED"
+      },
+      "last_execution": {
+        "branch": null,
+        "sha": null
+      }
+    }
+  }
+}

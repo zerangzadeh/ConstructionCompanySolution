@@ -2,15 +2,14 @@ import os
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
-from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Approved reference-persona discovery is limited to Development/UAT.
 REFERENCE_PERSONA_CATALOGUE_ENABLED = False
 
-# Local values remain outside source control; deployed environments use process values.
-load_dotenv(BASE_DIR / ".env")
+# Local dotenv loading belongs exclusively to development.py. Production imports
+# must never populate missing process secrets from a checkout-local file.
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "development-only-insecure-key")
 DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() == "true"

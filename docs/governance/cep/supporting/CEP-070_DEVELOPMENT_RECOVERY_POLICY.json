@@ -1,0 +1,18 @@
+{
+  "schema": "bonira.cep070.development-recovery.v1",
+  "authority": "EXT-0020-HUMAN-20261027",
+  "authority_source": "docs/governance/cep/supporting/CEP-070_EXT0020_HUMAN_APPROVAL_20261027.md",
+  "environment": "synthetic-development-only",
+  "data_classes": ["transactional_database", "document_media", "configuration_metadata", "audit_operational"],
+  "rpo_seconds": 900,
+  "rto_seconds": 3600,
+  "pitr_required": false,
+  "backup_interval_seconds": 900,
+  "minimum_retention_days": 30,
+  "restore_test_interval_days": 30,
+  "restore_owner": "Human Decision Authority accountable; Codex technical executor for this session",
+  "acceptance_authority": "Human Decision Authority",
+  "production_equivalent": false,
+  "production_authorized": false,
+  "purge_authorized": false
+}

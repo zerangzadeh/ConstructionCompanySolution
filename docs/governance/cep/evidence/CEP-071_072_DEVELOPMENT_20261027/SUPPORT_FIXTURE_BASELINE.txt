@@ -1,0 +1,119 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_ SupportP9S16S20Tests.test_support_access_sod_scope_expiry_revocation_and_audit _
+
+self = <apps.support.test_p9_s16_s20.SupportP9S16S20Tests testMethod=test_support_access_sod_scope_expiry_revocation_and_audit>
+
+    def test_support_access_sod_scope_expiry_revocation_and_audit(self):
+>       access = request_access(
+            organization=self.organization,
+            actor=self.operator,
+            purpose="diagnose-case",
+            scope="case:read",
+            expires_at=timezone.now() + timedelta(hours=1),
+            operation_key=uuid4(),
+        )
+
+apps\support\test_p9_s16_s20.py:472: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\support\services.py:298: in request_access
+    _allow(organization, actor, BusinessPermissionCode.SUPPORT_ACCESS_REQUEST)
+apps\support\services.py:39: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: support-operator>, organization = <Organization: P9 Support>
+permission = BusinessPermissionCode.SUPPORT_ACCESS_REQUEST
+message = 'مجوز لازم برای این عملیات پشتیبانی وجود ندارد.', project = None
+site = None, allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای این عملیات پشتیبانی وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied
+___ SupportP9S16S20Tests.test_expired_access_and_stale_approval_fail_closed ___
+
+self = <apps.support.test_p9_s16_s20.SupportP9S16S20Tests testMethod=test_expired_access_and_stale_approval_fail_closed>
+
+    def test_expired_access_and_stale_approval_fail_closed(self):
+>       access = request_access(
+            organization=self.organization,
+            actor=self.operator,
+            purpose="diagnose",
+            scope="case:read",
+            expires_at=timezone.now() + timedelta(minutes=5),
+        )
+
+apps\support\test_p9_s16_s20.py:581: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\support\services.py:298: in request_access
+    _allow(organization, actor, BusinessPermissionCode.SUPPORT_ACCESS_REQUEST)
+apps\support\services.py:39: in _allow
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: support-operator>, organization = <Organization: P9 Support>
+permission = BusinessPermissionCode.SUPPORT_ACCESS_REQUEST
+message = 'مجوز لازم برای این عملیات پشتیبانی وجود ندارد.', project = None
+site = None, allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای این عملیات پشتیبانی وجود ندارد.
+
+apps\organizations\authorization.py:436: PermissionDenied
+=========================== short test summary info ===========================
+FAILED apps/support/test_p9_s16_s20.py::SupportP9S16S20Tests::test_support_access_sod_scope_expiry_revocation_and_audit
+FAILED apps/support/test_p9_s16_s20.py::SupportP9S16S20Tests::test_expired_access_and_stale_approval_fail_closed
+2 failed in 7.87s

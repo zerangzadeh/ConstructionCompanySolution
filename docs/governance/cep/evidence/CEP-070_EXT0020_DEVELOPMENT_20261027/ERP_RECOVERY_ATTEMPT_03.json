@@ -1,0 +1,110 @@
+{
+  "started_at": "2026-10-26T21:37:50.020185+00:00",
+  "head": "79f6a1e8b264b09f7a3177d5a9a95b6e49dd7ce4",
+  "fixture": "SYNTHETIC_CURRENT_ERP_DEVELOPMENT_ONLY",
+  "configured_business_database_accessed": false,
+  "production_equivalent": false,
+  "cep074_executed": false,
+  "production_certification": "NOT_EXECUTED",
+  "objectives": "UNSPECIFIED_NO_RPO_RTO_OR_PITR_CLAIM",
+  "migration_verification": "NOT_EXECUTED_EXISTING_SCHEMA_FIXTURE_ONLY",
+  "status": "FAILED",
+  "checks": [
+    {
+      "check": "source connection uses newly created fixture database",
+      "status": "PASS"
+    },
+    {
+      "check": "both new disposable databases removed",
+      "status": "PASS"
+    }
+  ],
+  "source_sha256": {
+    "scripts/backup_bundle.py": "4365861d412a70c1586c8e7d6e8b65110962e6213f951375acec20cd54b79718",
+    "scripts/cep070_erp_recovery_proof.py": "3e8e8cfec7197ddd92f82f2bc4b77441bbcab78512fe3f7b4ba40abc92f5c2d7",
+    "apps/documents/services.py": "f1f0d423115732211d234f6fa1c61873b91ef9347fb5a08a4da9100ace940d29",
+    "apps/documents/storage.py": "8d3559e55350163e8ae6297570c1a8faed15d156a0fc35622f8b9196e0278b8c",
+    "apps/documents/tests.py": "1ba3977148952680ba7d8a7755c8bc8544b73bc539fcc66cca7defd6882de40c",
+    "tests/retirement_fixtures.py": "be8fb68b2b5cba03205368e7cadd856ba5d698c91bc0c8afe9a83c189ba485f6",
+    "scripts/cep070_recovery_controls.py": "eacdb0e820fbf332ec396475c7fe2ee96d55aa550c6d4b87cfdb3d06bd3c8058",
+    "docs/governance/cep/supporting/CEP-070_DEVELOPMENT_RECOVERY_POLICY.json": "f23c1275c0b3063bd696e90cb1891aa613b7c29ecbdfc3865a43e1059451e4f8",
+    "docs/governance/cep/supporting/CEP-070_EXT0020_HUMAN_APPROVAL_20261027.md": "fb93a2e7a0b9bf08947f90233186e710a304d76f7c98cb4a4531c52eaa8a4b75"
+  },
+  "approved_policy": {
+    "schema": "bonira.cep070.development-recovery.v1",
+    "authority": "EXT-0020-HUMAN-20261027",
+    "authority_source": "docs/governance/cep/supporting/CEP-070_EXT0020_HUMAN_APPROVAL_20261027.md",
+    "environment": "synthetic-development-only",
+    "data_classes": [
+      "transactional_database",
+      "document_media",
+      "configuration_metadata",
+      "audit_operational"
+    ],
+    "rpo_seconds": 900,
+    "rto_seconds": 3600,
+    "pitr_required": false,
+    "backup_interval_seconds": 900,
+    "minimum_retention_days": 30,
+    "restore_test_interval_days": 30,
+    "restore_owner": "Human Decision Authority accountable; Codex technical executor for this session",
+    "acceptance_authority": "Human Decision Authority",
+    "production_equivalent": false,
+    "production_authorized": false,
+    "purge_authorized": false,
+    "authority_sha256": "fb93a2e7a0b9bf08947f90233186e710a304d76f7c98cb4a4531c52eaa8a4b75",
+    "policy_sha256": "f23c1275c0b3063bd696e90cb1891aa613b7c29ecbdfc3865a43e1059451e4f8"
+  },
+  "private_store_reference": "%LOCALAPPDATA%/BONIRA/R/b8043bb10f4c40ba",
+  "secret_source_access": {
+    "owner_is_current_operator": true,
+    "encryption_qualification": "NOT_ESTABLISHED",
+    "paths_checked": 1,
+    "status": "PASS",
+    "allowed_principals": [
+      "current operator",
+      "Local System",
+      "local Administrators"
+    ],
+    "acl_remediated": false,
+    "contents_unchanged": true
+  },
+  "postgresql": "PostgreSQL 18.6 on x86_64-windows, compiled by msvc-19.44.35228, 64-bit",
+  "fixture_schema_source": "READ_ONLY_EMPTY_TEST_TEMPLATE_WITH_EXACT_CURRENT_MIGRATION_GRAPH",
+  "template_database": "test_construction_erp",
+  "failure_type": "FileNotFoundError",
+  "failure_stack": [
+    {
+      "file": "compiler.py",
+      "line": 1750,
+      "function": "pre_save_val"
+    },
+    {
+      "file": "files.py",
+      "line": 338,
+      "function": "pre_save"
+    },
+    {
+      "file": "files.py",
+      "line": 99,
+      "function": "save"
+    },
+    {
+      "file": "base.py",
+      "line": 49,
+      "function": "save"
+    },
+    {
+      "file": "filesystem.py",
+      "line": 95,
+      "function": "_save"
+    },
+    {
+      "file": "<frozen os>",
+      "line": 225,
+      "function": "makedirs"
+    }
+  ],
+  "failure_errno": 2,
+  "finished_at": "2026-10-26T21:38:15.669503+00:00"
+}

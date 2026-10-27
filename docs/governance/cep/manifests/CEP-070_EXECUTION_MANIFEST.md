@@ -63,3 +63,17 @@ existing `main`; local/origin/remote verified, tree clean after push. Normal
 `git add`, `git commit`, `git push origin main` executed under current explicit
 Human authority. Direct commit, no merge. This follow-up records integration
 metadata only; execution remains PARTIAL and no production authority is granted.
+
+## 2026-10-26 Development ERP recovery preparation
+
+Current clean main baseline `79f6a1e8b264b09f7a3177d5a9a95b6e49dd7ce4`. Current Human authorization permits the bounded reproducible-evidence work in [entry](../evidence/CEP-069_076_PREREQUISITES_20261026/ENTRY.json); its touch set and fixture-only schema provisioning apply before harness creation. No production objectives/owners or CEP074 entry are inferred. Product migration impact remains NONE; no migration implementation or migration-test claim. No Git writes authorized in this session.
+
+Closeout: [current execution/prerequisite result](../evidence/CEP-069_076_PREREQUISITES_20261026/RESULT.json). Evidence and Registry reconciled; no independent Development work remains. Canonical AC/DoD remain production-unverified and downstream entry blocked. No Git writes.
+
+## 2026-10-27 EXT-0020 approved Development control execution
+
+Before implementation: direct Human approval recorded in supporting/CEP-070_EXT0020_HUMAN_APPROVAL_20261027.md; exact policy in supporting/CEP-070_DEVELOPMENT_RECOVERY_POLICY.json. Touch set: recovery controls module, optional current-ERP proof integration, focused control tests, supporting runbook and CEP070 evidence/manifests/report plus Registry. Preserve accepted working tree and prior evidence. No business model/service/permission/schema changes, production equivalence, production action or Git write. Runtime uses only new synthetic loopback DBs/private trees and retains generated bundles under verified restricted local storage. Actual 15-minute cadence and fresh recovery proof are planned; clock-controlled tests are labeled simulations, not elapsed 30-day evidence. CEP074 remains unexecuted unless its canonical target and mandatory outcome become eligible.
+
+### Approved Development closeout
+
+23 focused methods and20 actual recovery checks PASS. Two retained captures, observed start gap 720.962755s; quiescent RPO0s/RTO23.145745s. Restricted project-drive storage avoids packaged-app path expansion; original document paths retained. Secret-file DACL tightened, contents unchanged.30-day control boundaries simulated; no future/continuous operation claim. Canonical070 remains PARTIAL0/6 certified/DoD not met,074 NOT_STARTED. Gate06 PASS retained;08/11 NOT_PASSED. Evidence docs/governance/cep/evidence/CEP-070_EXT0020_DEVELOPMENT_20261027/RESULT.json. No Git/Production action.

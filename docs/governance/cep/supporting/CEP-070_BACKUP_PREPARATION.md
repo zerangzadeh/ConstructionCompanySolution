@@ -74,3 +74,19 @@ recovery objectives and unassigned responsibility. Supply approved objectives,
 responsible owners and environment-specific backup/restore/access/integrity
 evidence before certification review. Any production action and final Production
 Certification still need their separate exact Human authority. GATE-11 is not PASS.
+
+The 2026-10-27 `scripts/cep070_erp_recovery_proof.py` additionally rehearses current
+ERP document/project recovery in two new disposable loopback databases and private
+temporary file trees. It uses the existing Development credentials against only
+the administrative database and disposable fixtures. Default provisioning applies
+existing migrations to an empty fixture; an optional
+`BONIRA_CEP070_TEMPLATE_DATABASE` names an empty `test_` database with no users or
+organizations and the exact current migration graph. The template is read/cloned,
+never migrated, flushed, disconnected or otherwise modified. A concurrent template
+connection may prevent cloning; do not terminate another session to force success.
+The restored database is always newly created. This is Development preparation,
+not CEP-074 execution or qualification of a protected production-equivalent target.
+
+## Approved EXT-0020 Development controls — 2026-10-27
+
+The subsequent Human approval and exact Development policy are in CEP-070_EXT0020_HUMAN_APPROVAL_20261027.md and CEP-070_DEVELOPMENT_RECOVERY_POLICY.json. The original capture adapter remains unchanged; cep070_recovery_controls.py implements the approved supervised cadence, private Windows storage, minimum-retention receipts and due-test/failure controls. See CEP-070_DEVELOPMENT_RECOVERY_RUNBOOK.md for execution and limits. Fresh runtime results are in evidence/CEP-070_EXT0020_DEVELOPMENT_20261027/RESULT.json. Earlier unspecified Development-policy statements above are historical, superseded only within this bounded approval. Production objectives/equivalence/storage/key qualification remain unapproved/unproved.

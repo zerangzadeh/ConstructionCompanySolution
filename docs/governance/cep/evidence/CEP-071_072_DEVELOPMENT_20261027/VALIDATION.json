@@ -1,0 +1,60 @@
+{
+  "FOCUSED_TESTS": {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "tests/test_production_configuration.py",
+      "tests/test_operations.py",
+      "core/test_cep072_telemetry.py",
+      "apps/support/test_p9_s16_s20.py::SupportP9S16S20Tests::test_support_access_sod_scope_expiry_revocation_and_audit",
+      "apps/support/test_p9_s16_s20.py::SupportP9S16S20Tests::test_expired_access_and_stale_approval_fail_closed",
+      "--reuse-db",
+      "-q",
+      "--disable-warnings"
+    ],
+    "exit_code": 0,
+    "seconds": 29.94
+  },
+  "LINT": {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "config/settings/base.py",
+      "config/settings/development.py",
+      "config/settings/production.py",
+      "tests/test_production_configuration.py",
+      "core/operations.py",
+      "apps/support/management/commands/operational_health.py",
+      "tests/test_operations.py",
+      "apps/support/test_p9_s16_s20.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.12
+  },
+  "FORMAT": {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "config/settings/base.py",
+      "config/settings/development.py",
+      "config/settings/production.py",
+      "tests/test_production_configuration.py",
+      "core/operations.py",
+      "apps/support/management/commands/operational_health.py",
+      "tests/test_operations.py",
+      "apps/support/test_p9_s16_s20.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.14
+  },
+  "DEPLOYMENT_SMOKE": {
+    "command": "synthetic isolated Django --deploy / collectstatic / WSGI+ASGI import",
+    "exit_code": 0
+  }
+}

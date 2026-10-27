@@ -1,0 +1,146 @@
+{
+  "at": "2026-10-26T22:49:30.813156+00:00",
+  "client_date": "2026-10-27",
+  "cep": "CEP-076",
+  "execution_state": "EXECUTION COMPLETE",
+  "imbs": [
+    "IMB-0106"
+  ],
+  "branch": "main",
+  "head": "79f6a1e8b264b09f7a3177d5a9a95b6e49dd7ce4",
+  "scope": "EXT0022_APPROVED_DEVELOPMENT_ONLY",
+  "ac": {
+    "AC1": {
+      "status": "PASS_APPROVED_TARGET",
+      "proof": "Fresh actual eight-step runtime drill proves logging/alerts/runbooks/existing access governance"
+    },
+    "AC2": {
+      "status": "PASS_APPROVED_TARGET",
+      "proof": "Exact scenario/target, Python/Django/Psycopg/pytest runtime and1214 source hashes retained in entry"
+    },
+    "AC3": {
+      "status": "PASS_APPROVED_TARGET",
+      "proof": "Executed live loopback WSGI, real unavailable sink/DB port, isolated PostgreSQL services and real elapsed grant expiry"
+    },
+    "AC4": {
+      "status": "PASS_APPROVED_TARGET",
+      "proof": "Timestamped PASS steps, fixed-field receipts, five source-linked audit events and process-exit persistence retained"
+    },
+    "AC5": {
+      "status": "PASS_APPROVED_TARGET",
+      "proof": "072 failed retention attempt remains FAILED and repaired before076 entry;076 has zero failed runtime attempts"
+    },
+    "AC6": {
+      "status": "PASS_APPROVED_TARGET",
+      "proof": "Only executed target is PASS; Production, equivalence and future30-day elapsed retention remain UTV"
+    }
+  },
+  "dod": "MET_ACTUAL_EXECUTION_EVIDENCE",
+  "scenario_steps": 8,
+  "scenario_seconds": 11.838633,
+  "runtime_command": ".venv-2/Scripts/python.exe -m pytest scripts/cep072_qualification_scenarios.py --reuse-db -q --disable-warnings",
+  "runtime_result": "1 passed; eight actual runtime steps PASS",
+  "source_freeze": {
+    "files": 1214,
+    "before": "PASS",
+    "after": "PASS",
+    "product_changes_during076": 0
+  },
+  "post_process_receipt_verification": "PASS",
+  "post_process_acl": {
+    "paths_checked": 10,
+    "encryption_qualification": "NOT_ESTABLISHED",
+    "allowed_principals": [
+      "current operator",
+      "Local System",
+      "local Administrators"
+    ],
+    "owner_is_current_operator": true,
+    "status": "PASS"
+  },
+  "retained_attempts": [
+    {
+      "directory": "E:\\BONIRA_Operations\\EXT0022\\1a3fc00b115e4edf",
+      "records": 9,
+      "acl": {
+        "allowed_principals": [
+          "current operator",
+          "Local System",
+          "local Administrators"
+        ],
+        "owner_is_current_operator": true,
+        "encryption_qualification": "NOT_ESTABLISHED",
+        "status": "PASS",
+        "paths_checked": 10
+      },
+      "retain_until": "2026-11-25T22:49:30.813156+00:00",
+      "successful_incident_present": true
+    },
+    {
+      "directory": "E:\\BONIRA_Operations\\EXT0022\\61d4ca17a67f4804",
+      "records": 8,
+      "acl": {
+        "allowed_principals": [
+          "current operator",
+          "Local System",
+          "local Administrators"
+        ],
+        "paths_checked": 9,
+        "status": "PASS",
+        "encryption_qualification": "NOT_ESTABLISHED",
+        "owner_is_current_operator": true
+      },
+      "retain_until": "2026-11-25T22:49:30.813156+00:00",
+      "successful_incident_present": false
+    },
+    {
+      "directory": "E:\\BONIRA_Operations\\EXT0022\\7aa7eaafdcf64720",
+      "records": 9,
+      "acl": {
+        "owner_is_current_operator": true,
+        "paths_checked": 10,
+        "allowed_principals": [
+          "current operator",
+          "Local System",
+          "local Administrators"
+        ],
+        "status": "PASS",
+        "encryption_qualification": "NOT_ESTABLISHED"
+      },
+      "retain_until": "2026-11-25T22:49:30.813156+00:00",
+      "successful_incident_present": true
+    },
+    {
+      "directory": "E:\\BONIRA_Operations\\EXT0022\\c329dabf81b3400f",
+      "records": 9,
+      "acl": {
+        "encryption_qualification": "NOT_ESTABLISHED",
+        "allowed_principals": [
+          "current operator",
+          "Local System",
+          "local Administrators"
+        ],
+        "paths_checked": 10,
+        "status": "PASS",
+        "owner_is_current_operator": true
+      },
+      "retain_until": "2026-11-25T22:49:30.813156+00:00",
+      "successful_incident_present": true
+    }
+  ],
+  "open_in_scope_findings": [],
+  "remaining_utv": [
+    "Production operations/equivalence, destination and certification are not established by this approved Development scenario",
+    "Actual30-day elapsed retention/future operation remains unverified; durable restricted copies retained with explicit hold receipts",
+    "Browser/performance/load outside this CEP's approved scenario not exercised"
+  ],
+  "production_actions": "NOT_EXECUTED",
+  "production_certification": "NOT_EXECUTED",
+  "human_signoff": "NOT_EXECUTED",
+  "human_post_run_review": "NOT_INFERRED_FROM_POLICY_APPROVAL",
+  "migration": "NONE",
+  "git_writes": "NOT_EXECUTED",
+  "gate08": "NOT_PASSED;074/075 required contributions remain unexecuted",
+  "gate11": "NOT_PASSED;required Production readiness and external evidence incomplete",
+  "next_executable_frontier": []
+}

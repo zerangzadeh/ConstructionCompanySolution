@@ -1,0 +1,104 @@
+{
+  "head": "79f6a1e8b264b09f7a3177d5a9a95b6e49dd7ce4",
+  "authority": "EXT-0020-HUMAN-20261027",
+  "execution_state": "EXECUTION PARTIAL",
+  "development_qualification": "COMPLETE_BOUNDED_SUPERVISED_SCOPE",
+  "cep070_canonical_ac": {
+    "passed": 0,
+    "total": 6,
+    "production_certification": "UNVERIFIED"
+  },
+  "cep070_dod": "PARTIAL_NOT_MET",
+  "cep074": "NOT_STARTED_NOT_ELIGIBLE",
+  "controls": {
+    "common_policy_all_four_classes": "APPROVED",
+    "actual_complete_captures": 2,
+    "maximum_backup_interval_seconds": 900,
+    "observed_start_interval_seconds": 720.962755,
+    "observed_completion_interval_seconds": 720.737274,
+    "dispatch_execution_budget_seconds": 180,
+    "rpo_seconds": 0,
+    "rpo_scope": "No acknowledged synthetic write lost: complete row/sequence/constraint and all file-class equality at a quiescent boundary. No changing-workload RPO claim.",
+    "rto_seconds": 23.145745,
+    "rto_boundary": "Preprovisioned empty target; restore invocation through database/file reconciliation and authorized tenant service validation. No web/provider/region recovery claim.",
+    "retention_days": 30,
+    "retained_bundle_count": 2,
+    "elapsed_30_day_retention_proved": false,
+    "automatic_purge": false,
+    "restore_test_interval_days": 30,
+    "next_restore_test_at": "2026-11-25T21:54:41.550777+00:00",
+    "future_drill_executed": false,
+    "unattended_service_installed": false,
+    "pitr_required": false,
+    "pitr_exception_scope": "DEVELOPMENT_ONLY",
+    "protected_storage": "ACTUAL_WINDOWS_DACL_VERIFIED",
+    "private_development_secret_source": "DACL_TIGHTENED_CONTENTS_UNCHANGED",
+    "production_encryption_or_key_custody": "NOT_QUALIFIED"
+  },
+  "runtime": {
+    "checks_passed": 20,
+    "tables": 525,
+    "full_rows": 7754,
+    "constraints": 9507,
+    "sequences": 9,
+    "focused_test_methods_passed": 23,
+    "source_hashes_current": true,
+    "worker_exit_code": 0
+  },
+  "resolved": [
+    {
+      "classification": "HUMAN_DECISION",
+      "item": "Development EXT0020 policy, target and owner decisions supplied by direct Human approval"
+    },
+    {
+      "classification": "DEVELOPMENT_RESOLVABLE",
+      "item": "Supervised cadence, durable backup/restore due dates, minimum-retention receipts, full-bundle integrity checks and OS process exclusion implemented"
+    },
+    {
+      "classification": "DEVELOPMENT_RESOLVABLE",
+      "item": "Development .env DACL had four unapproved access rules; restricted without changing contents, original ACL saved privately"
+    },
+    {
+      "classification": "DEVELOPMENT_RESOLVABLE",
+      "item": "Windows packaged-app path expansion exceeded native document path limits; short protected project-drive storage preserves document paths"
+    },
+    {
+      "classification": "DEVELOPMENT_RESOLVABLE",
+      "item": "Use existing PowerShell7 runtime after WindowsPowerShell5.1 duplicate TypeData security-module load failure; no dependency installed"
+    },
+    {
+      "classification": "REPRODUCIBLE_EVIDENCE",
+      "item": "Fresh actual two-capture cadence and complete current-ERP restore/reconciliation with objective measurements"
+    }
+  ],
+  "remaining": [
+    {
+      "classification": "AUTHORITATIVE_EXTERNAL_INPUT",
+      "item": "Canonical production-equivalent non-production recovery target/profile and required backup/control qualification are unavailable; current approval expressly excludes equivalence"
+    },
+    {
+      "classification": "PRODUCTION_ONLY",
+      "item": "Production recovery objectives, provider/storage/secret-key controls, production operation and final certification are not approved/proved"
+    },
+    {
+      "classification": "HUMAN_DECISION",
+      "item": "Any replacement of canonical CEP070/074 target/AC/DoD or mandatory required outcome needs explicit Human contract authority; none inferred"
+    }
+  ],
+  "future_evidence_not_claimed": [
+    "30 elapsed days of retention",
+    "Execution of the next 30-day drill",
+    "Continuous unattended operation after the bounded executor session"
+  ],
+  "gates": {
+    "GATE-06": "PASS_RETAINED",
+    "GATE-08": "NOT_PASSED",
+    "GATE-11": "NOT_PASSED"
+  },
+  "git_writes": false,
+  "production_actions": false,
+  "human_signoff": false,
+  "next_executable_frontier": [],
+  "next_input": "Approved production-equivalent non-production recovery profile/target and required backup/control qualification; current Development objectives/owners must not be requested again.",
+  "independent_prior_blockers": "EXT0018/0021/0022 unchanged; other CEPs are not reexecuted."
+}

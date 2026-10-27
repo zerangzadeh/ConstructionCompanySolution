@@ -1,0 +1,43 @@
+{
+  "started_at": "2026-10-26T20:05:38.069918+00:00",
+  "head": "79f6a1e8b264b09f7a3177d5a9a95b6e49dd7ce4",
+  "fixture": "SYNTHETIC_CURRENT_ERP_DEVELOPMENT_ONLY",
+  "configured_business_database_accessed": false,
+  "production_equivalent": false,
+  "cep074_executed": false,
+  "production_certification": "NOT_EXECUTED",
+  "objectives": "UNSPECIFIED_NO_RPO_RTO_OR_PITR_CLAIM",
+  "migration_verification": "NOT_EXECUTED_EXISTING_SCHEMA_FIXTURE_ONLY",
+  "status": "FAILED",
+  "checks": [
+    {
+      "check": "source connection uses newly created fixture database",
+      "status": "PASS"
+    },
+    {
+      "check": "PostgreSQL restore exits successfully",
+      "status": "PASS"
+    },
+    {
+      "check": "all complete table rows, constraints and sequences match",
+      "status": "FAIL"
+    },
+    {
+      "check": "both new disposable databases removed",
+      "status": "PASS"
+    }
+  ],
+  "source_sha256": {
+    "scripts/backup_bundle.py": "4365861d412a70c1586c8e7d6e8b65110962e6213f951375acec20cd54b79718",
+    "scripts/cep070_erp_recovery_proof.py": "dc5d132d65f71113c0c2c8c6ad269b1bf0a7b26637b3e8895e94720bb0c02c6b",
+    "apps/documents/services.py": "f1f0d423115732211d234f6fa1c61873b91ef9347fb5a08a4da9100ace940d29",
+    "apps/documents/storage.py": "8d3559e55350163e8ae6297570c1a8faed15d156a0fc35622f8b9196e0278b8c",
+    "apps/documents/tests.py": "1ba3977148952680ba7d8a7755c8bc8544b73bc539fcc66cca7defd6882de40c",
+    "tests/retirement_fixtures.py": "be8fb68b2b5cba03205368e7cadd856ba5d698c91bc0c8afe9a83c189ba485f6"
+  },
+  "postgresql": "PostgreSQL 18.6 on x86_64-windows, compiled by msvc-19.44.35228, 64-bit",
+  "capture_seconds_observed_no_objective": 1.1768627999117598,
+  "restore_seconds_observed_no_objective": 14.56625889998395,
+  "failure_type": "AssertionError",
+  "finished_at": "2026-10-26T20:30:52.796284+00:00"
+}

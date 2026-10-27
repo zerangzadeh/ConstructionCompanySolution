@@ -1,0 +1,23 @@
+{
+  "scope": "READ_ONLY_ISOLATED_IMPORT_NO_NETWORK_OR_DATABASE",
+  "cases": [
+    {
+      "disabled_setting": "DJANGO_SESSION_COOKIE_SECURE",
+      "exit_code": 0,
+      "accepted_flags": {
+        "session_secure": false,
+        "csrf_secure": true,
+        "sslmode": "verify-full"
+      }
+    },
+    {
+      "disabled_setting": "DJANGO_CSRF_COOKIE_SECURE",
+      "exit_code": 0,
+      "accepted_flags": {
+        "session_secure": true,
+        "csrf_secure": false,
+        "sslmode": "verify-full"
+      }
+    }
+  ]
+}

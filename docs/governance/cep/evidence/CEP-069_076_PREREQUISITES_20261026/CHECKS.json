@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-26T20:48:08.193169+00:00",
+  "canonical_prompt_hashes": "7/7 PASS_UNCHANGED",
+  "structured_evidence": "JSON/YAML/CSV PASS",
+  "report_relative_links": "PASS",
+  "lint_format_django_check": "PASS (retained command output in this directory)",
+  "erp_runtime_source_hashes": "PASS_CURRENT",
+  "disposable_cep070_erp_databases_remaining": 0,
+  "read_only_template_users_and_organizations_remaining": 0,
+  "unrelated_cep_states_and_gates": "UNCHANGED",
+  "git_diff_check": "PASS",
+  "actual_execution_commands": [
+    ".venv-2/Scripts/python.exe scripts/cep070_erp_recovery_proof.py",
+    "$env:BONIRA_CEP070_TEMPLATE_DATABASE='test_construction_erp'; .\\.venv-2\\Scripts\\python.exe scripts/cep070_erp_recovery_proof.py",
+    ".venv-2/Scripts/python.exe -m unittest tests.test_production_configuration -v"
+  ],
+  "attempts": {
+    "ERP_01": "FAILED raw rendering comparison; sanitized JSON retained; shell exit not captured",
+    "ERP_02": "FAILED raw rendering comparison; exit1 and diagnostics retained",
+    "ERP_03": "PASS20CHECKS; exit0 and result retained"
+  },
+  "git_writes": false,
+  "production_actions": false,
+  "next_executable_frontier": []
+}

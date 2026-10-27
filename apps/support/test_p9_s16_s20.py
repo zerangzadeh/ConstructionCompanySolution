@@ -23,6 +23,8 @@ from apps.documents.models import (
 from apps.organizations.models import (
     BusinessPermission,
     BusinessPermissionCode,
+    MembershipRoleAssignment,
+    MembershipScopeGrant,
     MembershipStatus,
     Organization,
     OrganizationMembership,
@@ -468,7 +470,28 @@ class SupportP9S16S20Tests(TestCase):
             ).exists()
         )
 
+    def _governed_access_fixture(self):
+        # These focused access scenarios require explicit current role and scope
+        # evidence. Legacy role_definition alone never grants object scope.
+        for membership in OrganizationMembership.objects.filter(
+            organization=self.organization,
+            user__in=(self.operator, self.recipient, self.confirmer, self.approver),
+        ):
+            MembershipRoleAssignment.objects.create(
+                organization=self.organization,
+                membership=membership,
+                role=self.support_role,
+                reason="Disposable operational access qualification",
+            )
+            MembershipScopeGrant.objects.create(
+                organization=self.organization,
+                membership=membership,
+                scope_type="organization",
+                reason="Disposable operational access qualification",
+            )
+
     def test_support_access_sod_scope_expiry_revocation_and_audit(self):
+        self._governed_access_fixture()
         access = request_access(
             organization=self.organization,
             actor=self.operator,
@@ -578,6 +601,7 @@ class SupportP9S16S20Tests(TestCase):
         )
 
     def test_expired_access_and_stale_approval_fail_closed(self):
+        self._governed_access_fixture()
         access = request_access(
             organization=self.organization,
             actor=self.operator,

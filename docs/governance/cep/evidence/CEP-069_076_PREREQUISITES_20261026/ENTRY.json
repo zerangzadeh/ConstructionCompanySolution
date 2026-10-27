@@ -1,0 +1,57 @@
+{
+  "at": "2026-10-26T20:04:33.095689+00:00",
+  "head": "79f6a1e8b264b09f7a3177d5a9a95b6e49dd7ce4",
+  "branch": "main",
+  "entry_working_tree": "CLEAN",
+  "canonical_prompts": {
+    "CEP-069": "41d138764cb8fcde81dfea26f6c6df82202c54e4da3a641b2b18382811f2ebba",
+    "CEP-070": "7d3de81556e62ed46c5fe90d1742742c5d0f07caa5dcf4b7d19b549fe2139e82",
+    "CEP-071": "e456aa9b63a18286448f513d29f1d81e47a1b2c2a555121110f89938bc4d3801",
+    "CEP-072": "9c52431a1c52c2ca41c2e10ca0eb35eea4871a8ebb7d38e3d57600ca1bbf0940",
+    "CEP-074": "7e723b4147d417418f6033b2185a843af92d14e297c649418624d805b34811b9",
+    "CEP-075": "2df7a9665e89d737046844df7ff4439f9ab08591f34e0844ab1871f1db9c7df0",
+    "CEP-076": "2d93e72adae5830ffeca0e3fe2cc711baecd0f313078620d4cd21717be50c2aa"
+  },
+  "authority": "Current Human instruction: exhaust safe Development/reproducible prerequisite work in CEP069..076. No Git writes or production.",
+  "classification": {
+    "CEP070_isolated_current_ERP_restore": "REPRODUCIBLE_EVIDENCE",
+    "EXT0020_objectives_and_owners": "HUMAN_DECISION",
+    "EXT0020_protected_target_storage_key_evidence": "AUTHORITATIVE_EXTERNAL_INPUT",
+    "EXT0021_approved_topology_contract": "HUMAN_DECISION",
+    "EXT0022_owners_runbooks_signal_catalog": "HUMAN_DECISION",
+    "EXT0018_official_reviewed_statutory_package": "AUTHORITATIVE_EXTERNAL_INPUT",
+    "final_certification_cutover": "PRODUCTION_ONLY"
+  },
+  "touch_set": [
+    "scripts/cep070_erp_recovery_proof.py",
+    "docs/governance/cep/evidence/CEP-069_076_PREREQUISITES_20261026/*",
+    "docs/governance/cep/manifests/CEP-070_EXECUTION_MANIFEST.md",
+    "docs/governance/cep/manifests/CEP-070_CHANGE_MANIFEST.csv",
+    "docs/governance/cep/reports/CEP-069_COMPLETION_REPORT.md",
+    "docs/governance/cep/reports/CEP-070_COMPLETION_REPORT.md",
+    "docs/governance/cep/reports/CEP-071_COMPLETION_REPORT.md",
+    "docs/governance/cep/reports/CEP-072_COMPLETION_REPORT.md",
+    "docs/governance/cep/evidence/CEP-070_*MAPPING.csv",
+    "docs/governance/cep/evidence/CEP-070_EVIDENCE_MANIFEST.csv",
+    "docs/governance/cep/supporting/CEP-070_BACKUP_PREPARATION.md",
+    "CEP_EXECUTION_REGISTRY.yaml"
+  ],
+  "scenario": "New uniquely named local disposable PostgreSQL source/restored databases only. Initialize current ERP schema using existing migrations (fixture provisioning, no migration verification or authored schema). Seed two synthetic tenants with explicit current role assignments, projects with Decimal budgets, versioned private documents and audit. Capture quiescent DB and three file classes with existing backup adapter, restore and compare full tables/sequences/constraints, tenant authorization and file hashes. No application DB opened. No numeric objectives selected. Not CEP074 execution.",
+  "migration_impact": "NONE: no product schema/data migration authored; existing migrations initialize only disposable fixtures",
+  "blocked_verification_packages": [
+    "CEP-074",
+    "CEP-075",
+    "CEP-076"
+  ],
+  "completed_packages_not_reexecuted": [
+    "CEP-073",
+    "CEP-077",
+    "CEP-078",
+    "CEP-079"
+  ],
+  "fixture_infrastructure_repair": {
+    "first_attempt": "fresh schema provisioned with current437 migration graph; restore succeeded but byte comparison of rendered constraint SQL failed; cleanup retained",
+    "retry": "Read-only test_construction_erp template has exact current migration graph and zero users/organizations; clone only into new UUID databases, no template mutation or forced disconnection",
+    "comparison": "Compare every row hash and sequence exactly. Compare constraint identities/definitions/validation/deferral flags using PostgreSQL planner output for check/exclusion predicates to remove engine-rendered constant-array cast differences; no Python rewriting of predicates. Positive and negative semantic controls retained."
+  }
+}

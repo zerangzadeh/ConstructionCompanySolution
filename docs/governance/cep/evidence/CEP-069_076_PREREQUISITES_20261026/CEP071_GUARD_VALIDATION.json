@@ -1,0 +1,54 @@
+{
+  "at": "2026-10-26T20:41:56.970653+00:00",
+  "finding": "CEP-071-FINDING-002",
+  "classification": "DEVELOPMENT_RESOLVABLE_RESOLVED",
+  "tests": {
+    "command": ".venv-2/Scripts/python.exe -m unittest tests.test_production_configuration -v",
+    "exit_code": 0,
+    "methods": 4,
+    "subtests": 17,
+    "file": "CEP071_GUARD_TESTS.txt",
+    "scope": "isolated synthetic imports; dotenv/network/DB forbidden"
+  },
+  "checks": {
+    "LINT": {
+      "command": [
+        "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "config/settings/production.py",
+        "tests/test_production_configuration.py",
+        "scripts/cep070_erp_recovery_proof.py"
+      ],
+      "exit_code": 0
+    },
+    "FORMAT": {
+      "command": [
+        "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "config/settings/production.py",
+        "tests/test_production_configuration.py",
+        "scripts/cep070_erp_recovery_proof.py"
+      ],
+      "exit_code": 0
+    },
+    "DJANGO_CHECK": {
+      "command": [
+        "E:\\Construction_Company_Solution\\.venv-2\\Scripts\\python.exe",
+        "-c",
+        "import os; os.environ['DJANGO_SETTINGS_MODULE']='config.settings.development'\nfrom unittest.mock import patch\nwith patch('psycopg.connect',side_effect=AssertionError('Business database forbidden')):\n import django; django.setup()\n from django.core.management import call_command\n call_command('check')"
+      ],
+      "exit_code": 0
+    }
+  },
+  "production_deployment": "NOT_EXECUTED",
+  "source_sha256": {
+    "config/settings/production.py": "d361c8a5fe48905def370b5430e9c1b36d2b0b39f75615247149973d55aee7e9",
+    "tests/test_production_configuration.py": "a1cc09968f5dba035071d60f2594483514c877904dbd60bd0cd6b49e17f68fd1"
+  },
+  "erp_proof_source_hashes_still_match": true
+}

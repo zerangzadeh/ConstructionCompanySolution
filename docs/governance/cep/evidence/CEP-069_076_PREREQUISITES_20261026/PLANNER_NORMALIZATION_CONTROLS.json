@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-26T20:38:45.358606+00:00",
+  "scope": "Read-only engine normalization controls; synthetic values are not business policy",
+  "checks": {
+    "equivalent_array_casts_equal": true,
+    "changed_array_member_detected": true,
+    "changed_decimal_threshold_detected": true
+  },
+  "canonical_equivalent_output": "((status)::text = ANY ('{planning,active}'::text[]))",
+  "changed_member_output": "((status)::text = ANY ('{planning,closed}'::text[]))",
+  "decimal_outputs": [
+    "(estimated_budget >= 0.00)",
+    "(estimated_budget >= 1.00)"
+  ],
+  "schema_or_data_mutation": false,
+  "proof_script_sha256": "551be497cff0204c6fea1df2f837d8d2bff6c3a3a14139d46d153ab60f1fb82b"
+}
