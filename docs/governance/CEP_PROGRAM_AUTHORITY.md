@@ -18,6 +18,7 @@ and residual capability descriptions do not form an execution queue.
 | Question | Authority |
 | --- | --- |
 | What is implemented? | Product code, migrations, and tests, verified against the configured environment. |
+| What is BONIRA's current commercial positioning and approved MVP exposure? | `docs/architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md`: frozen Human-approved D1–D7 product direction, capability surface and release requirements; not implementation, CEP scope or production authority. |
 | What may one CEP change and how is it accepted? | That CEP's canonical package/prompt: scope, acceptance criteria, Definition of Done, and execution contract. |
 | What is the current CEP state? | Root `CEP_EXECUTION_REGISTRY.yaml`: lifecycle, recorded authorization, blockers, completion, UTV, Git integration, and execution frontier. |
 | What is the program's delivery direction? | Root `ROADMAP.md`: CEP structure, dependency-ordered direction, residual and future scope. |

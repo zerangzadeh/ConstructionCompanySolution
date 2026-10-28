@@ -1,6 +1,8 @@
 # User Capability Map
 
-**Status:** product/UX target reference; not an authorization grant catalogue
+**Status:** full-platform capability/UX reference; not an authorization grant or MVP exposure catalogue
+
+**Current commercial exposure requirements:** [frozen D1–D7 strategy](PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md)
 
 **Exact current permissions:** `BusinessPermissionCode`, permission registry,
 role defaults, services, views and tests
@@ -16,6 +18,13 @@ requires active identity/membership, tenant state, business permission,
 project/site scope, object lifecycle and—where acting on workflow—current
 assignment/candidacy and separation rules.
 
+The matrices preserve backend capability and future ERP responsibility. Their
+`Current`, `Target`, accepted-phase or role labels do not make a capability
+customer-visible in the MVP. D2 defines inclusion per capability, so a mixed
+domain may expose operations while retaining financial, HR/ESS, technical or
+other hidden workspaces. UI-hidden capabilities remain backend-active within
+their existing governed boundaries, not removed or backend-disabled.
+
 ## 2. Access layers
 
 ```text
@@ -28,6 +37,12 @@ Authenticated User
   + workflow assignment/candidacy and separation rule [when acting]
   = permitted operation
 ```
+
+Future user-facing access also requires the centralized Product Surface Exposure
+decision described by D3, including direct URLs and shared links. Its mechanism
+is not frozen or claimed implemented here; it never supplies a missing access
+factor above. Customer-facing Organization/user/access administration belongs to
+the MVP; technical/platform administration does not.
 
 Position, department, team, employee relationship, UI visibility and possession
 of an object UUID do not independently grant access.
@@ -71,8 +86,10 @@ systems.
 
 ## 4. Internal user capability matrix
 
-Legend: **Current** means useful repository behavior exists; **Target** means
-scheduled roadmap scope; **Controlled** means sensitive or separation-dependent.
+Legend: **Current** records backend behavior, not MVP exposure or release
+qualification; **Target** describes further platform scope, not execution
+authority; **Controlled** means sensitive or separation-dependent. Phase and
+Product Owner acceptance references retain their original evidence scope.
 
 | User group | Current capabilities | Target capabilities | Key restrictions |
 | --- | --- | --- | --- |
@@ -86,7 +103,7 @@ scheduled roadmap scope; **Controlled** means sensitive or separation-dependent.
 | Storekeeper | Warehouses, draft/post/reverse stock movements and balances; P8-S05–S11 reservations, bin/legacy-unlocated custody, risk-based lot/serial/expiry evidence, counts, two-sided transfer acceptance and reconciliation where explicitly permitted | Barcode/QR capture, notifications and later valuation evidence | Dedicated view/prepare/release, traceability, count maker-checker, transfer dispatch/independent acceptance and reconciliation permissions; Tenant/warehouse/project scope |
 | Equipment Manager | Equipment operations through accepted P8-S23; P8-S24 adds versioned internal cost-rate and conserved allocation proposals plus reviewed Project Cost proposal envelopes | Later consumer activation | Project/site scope; operational equipment is not the asset ledger; legacy maintenance cost and allocation proposals are not actuals |
 | Fixed Asset Specialist | P8-S25–S27 source-backed candidates/register, class/book policies, capitalization, one-book straight-line depreciation, impairment/transfer/disposal and proposal/reconciliation evidence | Later downstream consumer contracts and production activation | Dedicated default-deny finance permissions and maker-checker; Fixed Assets cannot post journals, recognize Project Cost actuals or move cash |
-| Workforce/HR | Employees, departments, positions, teams, effective assignments, skills, qualifications, training evidence, reference labor-rate history, Tenant calendars and permissioned time/attendance workbench | Payroll-connected labor costing and any workforce financial consumer | Personal/compensation privacy, effective dates, explicit permissions and project/site scope; Workforce access never grants Payroll access |
+| Workforce/HR | Employees, departments, positions, teams, effective assignments, skills, qualifications, training evidence, reference labor-rate history, Tenant calendars and permissioned time/attendance workbench | MVP simplified field-worker UI reuses Workforce/Timekeeping for identity/basic personnel data, role/skill, crew, project/site assignment, active state, attendance and work time; non-login `national_id` remains an additive MVP gap. Payroll-connected labor costing is outside MVP exposure. | No parallel Worker model; Attendance, Timesheet and Overtime remain distinct; Full HR/ESS and Payroll UI-hidden. Personal/compensation privacy, effective dates, explicit permissions and project/site scope apply; Workforce access never grants Payroll access. |
 | Payroll Specialist | Effective pay configuration/components/rules, Core/statutory calculation, review/finalization, restricted results, and separately granted preparation/review of accepted liability, Accounting-source, payment and Project Cost proposals plus reconciliation | Downstream recognition/execution and live filing | Core, statutory and each handoff family use independent default-denied permissions. Core/statutory audit views are separated; handoff lists/details expose only authorized families; payslip/statutory export requires explicit permission and audit evidence. One user may hold multiple duties only through explicit grants; downstream protected-operation separation remains unchanged. P7-S01–S36 is Product Owner accepted; P8-S01–S04 design creates no Payroll consumer, actual cost or production authority. |
 | Accountant | Expenses/payments/allocations and financial read models where granted | COA/journals, AP/AR, periods/statements, tax output and close/reconciliation | Strict SoD, immutable posting, reversal and project/object scope |
 | Treasurer | Legacy posted cash/payment records where granted | Bank/cash/cheque/transfer, proposals, statement matching and reconciliation | Maker-checker, bank sensitivity, no journal editing |
@@ -101,16 +118,26 @@ scheduled roadmap scope; **Controlled** means sensitive or separation-dependent.
 
 ## 5. External and self-service participants
 
+These are platform capabilities and targets, not automatic MVP portal/self-service
+exposure. Full ESS is MVP UI-hidden; the simplified field-worker UI neither
+requires a login account for every worker nor creates a second identity domain.
+
 | Participant | Scheduled capability | Access model |
 | --- | --- | --- |
 | Supplier | Invite-scoped issued-RFQ read and versioned quote submission/correction are implemented; qualification, invoice/evidence submission and broader status remain scheduled | Private Tenant invitation bound to one unambiguous active account/email and no internal membership; least privilege; no competitor/internal-note visibility |
 | Subcontractor | Profile/qualification, tender/quote, claim/progress/evidence submission and status | Bilateral portal; contract/project-limited; no ordinary tenant membership by default |
 | Consultant/Client reviewer | Selected transmittal/RFI/submittal/drawing/claim review when approved | Explicit record/workflow assignment and expiring external scope |
-| Employee self-service | Optional payslip, personal profile/certificate/leave/time interactions | Product Owner decision; employee-to-user link, privacy and dedicated permission |
+| Employee self-service | Optional payslip, personal profile/certificate/leave/time interactions; MVP UI-hidden | Governed tenant `User` → `Person` → `WorkRelationship` identity links and legacy Employee compatibility, privacy and dedicated permission; never inferred identity |
 | Auditor | Time-bounded read/export of evidence, journals/reconciliations and audit trail | Explicit scope, purpose and audit; no mutation |
 | Network participant | Future discovery/shared qualification/marketplace/intelligence | Deferred opt-in platform consent; separate from tenant portal and private data |
 
 ## 6. Capability map by product area
+
+The last column retains P-phase planning/acceptance lineage, not a live queue or
+MVP release state. In mixed rows such as Procurement/AP, Time/Payroll,
+Inventory/Assets, Documents/Knowledge and Reporting/Reconciliation, apply D2 at
+capability level. Operational MVP reports and appropriate Audit visibility do
+not expose technical financial reconciliation or unrestricted audit data.
 
 | Capability family | Primary actors | Review/approval actors | Read/assurance actors | Roadmap disposition |
 | --- | --- | --- | --- | --- |
@@ -154,6 +181,9 @@ explanations for consequential calculation/action.
 
 Delivered screens are remediated through P0.4 by value and risk; this map does
 not authorize cosmetic redesign or backend changes hidden as UI work.
+Visible MVP screens require enterprise quality and zero critical technical
+leakage. XLSX/print requirements and the three browser-verified release journeys
+remain requirements until separately implemented and qualified.
 
 ## 9. AI capability boundary
 
@@ -172,3 +202,8 @@ A new user-facing capability is complete only when its owner, permission code,
 default-role decision, project/site scope, lifecycle, workflow responsibility,
 SoD, UI states, audit/evidence, tenant-isolation tests and roadmap disposition are
 explicit. Menu visibility or a role label alone is never acceptance evidence.
+Customer exposure additionally requires the strategy's maturity criteria:
+usable UI, browser verification, authorization/tenant isolation, applicable
+outputs/integrations, no release blockers and Human UAT. Preserve `MVP` release
+and `FULL_ERP` internal regression evidence without treating those profile names
+as implemented runtime switches or deleting hidden-capability UAT scenarios.

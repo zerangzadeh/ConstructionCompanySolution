@@ -1,23 +1,30 @@
-# Construction ERP
+# بنیرا / BONIRA
 
-Construction ERP is a multi-tenant SaaS platform for construction
+BONIRA is a multi-tenant SaaS platform for construction
 contractor companies. Each company is represented by an `Organization`
 (tenant), and business data must remain isolated between organizations.
 
-This repository is developed as a complete, production-oriented construction
-ERP product. It is no longer scoped or managed as a minimum viable product.
-Delivery remains incremental: implemented capabilities are usable product
-domains, while incomplete domains and operational-readiness work stay visible
-in `ROADMAP.md` until they meet their acceptance criteria.
+**Current commercial positioning:** سامانه مدیریت عملیات پیمانکاری و کارگاهی
+**Canonical tagline:** «سامانه مدیریت یکپارچه کارگاه، پیمان و تدارکات عمرانی»
+
+The long-term vision is Full BONIRA Construction ERP. The current commercial
+release strategy is a capability-level MVP surface over the existing full
+platform. Hidden capabilities remain backend-active within their governed
+boundaries; UI hiding does not remove domains, models, migrations or required
+handoffs. The frozen D1–D7 decisions, approved exposure families and release
+requirements are defined once in the
+[Product Vision and MVP Release Strategy](docs/architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md).
 
 ## Current status
 
-**Product maturity:** Active full-product development. This describes the
-approved product direction and does not claim that every roadmap phase is
-already complete or that production readiness has been certified.
+**Release direction:** MVP-focused commercial exposure; full ERP architecture
+and future capability maturation remain intact. This direction does not claim
+that centralized gating, runtime surface profiles, required XLSX/print outputs
+or complete browser journey coverage have been delivered or qualified.
 
-The repository currently implements the ERP foundation and the following
-domain capabilities on PostgreSQL 18.6:
+The repository's backend baseline includes the ERP foundation and the following
+domain capabilities on PostgreSQL 18.6. This inventory does not define MVP UI
+exposure or production readiness:
 
 - Custom username-based authentication (`email` is optional).
 - Tenant lifecycle, settings, memberships, invitations, active-organization
@@ -45,13 +52,12 @@ schema source of truth.
 Tenant Workflow & Work Management and the receivable Billing & Progress Claims
 baseline are implemented; their architecture records are in
 `docs/architecture/TENANT_WORKFLOW_AND_WORK_MANAGEMENT.md` and
-`docs/architecture/BILLING_AND_PROGRESS_CLAIMS.md`. The repository-wide
-current/target assessment, pre-production correction register, regulatory and
-competitor research, and release gates are in
-`docs/architecture/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md`. Remaining product
-capabilities and production-readiness work are dependency-ordered in
-`ROADMAP.md`; a planned item records direction and still requires explicit
-implementation approval.
+`docs/architecture/BILLING_AND_PROGRESS_CLAIMS.md`. The earlier repository-wide
+assessment and research remain in the
+[historical capability audit](docs/architecture/history/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md);
+they do not override current strategy, implementation or live gates. `ROADMAP.md`
+owns delivery direction and `CEP_EXECUTION_REGISTRY.yaml` owns live CEP/gate
+state. A planned item alone grants no implementation or production authority.
 
 ## Technology stack
 

@@ -1,6 +1,6 @@
 # BONIRA CEP Delivery Roadmap
 
-**Program stage:** pre-production. **Planning reconciliation:** 2026-10-16.
+**Program stage:** pre-production. **Product-surface reconciliation:** 2026-10-28.
 
 ## 1. Purpose and authority boundary
 
@@ -15,8 +15,16 @@ define implementation reality.
 
 ## 2. Current product stage
 
-BONIRA is a Persian-first, multi-tenant construction ERP in pre-production.
-Implemented development capability and production readiness are separate claims.
+BONIRA (بنیرا) is a Persian-first, multi-tenant platform with a Full Construction
+ERP vision and a current capability-level MVP commercial release strategy.
+The [frozen D1–D7 strategy](docs/architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md)
+owns positioning, intended MVP exposure and progressive future exposure. The MVP
+retains the full backend and required handoffs; hidden UI is not domain removal
+or backend deactivation. Inclusion in the MVP is a requirement, not proof that
+its UI gating or release outputs already exist.
+
+Implemented development capability, commercial exposure and production readiness
+are separate claims.
 Unresolved decisions, integrations, acceptance evidence, and production controls
 remain gated where their source contracts require them. No roadmap label grants
 production activation, Human Sign-off, or Production Certification.
@@ -99,6 +107,24 @@ under standing authority as defined by the Execution Policy. This Roadmap
 deliberately maintains no second live CEP queue or per-CEP completion ledger.
 
 ## 10. Remaining dependency-ordered delivery model
+
+### MVP release direction
+
+Prioritize the three core journeys and output priorities in the
+[MVP strategy](docs/architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md#6-d6--quality-journeys-and-release-criteria).
+Approved requirements include centralized capability exposure (mechanism not yet
+frozen), simplified field-worker workflows reusing Workforce/Timekeeping,
+additive non-login field-worker `national_id` design, shared XLSX exports and
+required print outputs. These are not implementation-completion claims or new
+CEP packages/dependency edges. P0 Excel delivery is Billing, Procurement,
+Inventory and Expenses; P1 priorities remain in the strategy.
+
+MVP release requires browser journey verification, tenant/permission isolation,
+P0 Excel, critical print outputs, no blocking MVP defect and Human UAT. Retain
+`MVP` release evidence and `FULL_ERP` internal regression evidence without
+deleting historical coverage or implying runtime profiles already exist.
+MVP UI-hidden capabilities mature toward progressive exposure after initial
+customers and feedback; backend existence alone never authorizes exposure.
 
 Residual work proceeds only through the applicable canonical CEPs under standing
 or specific authority. The remaining direction includes administration surface

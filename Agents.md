@@ -2,8 +2,9 @@
 
 ## 1. Purpose and responsibility
 
-BONIRA is a complete-product, multi-tenant SaaS platform for construction
-contractors. Each `Organization` is a tenant. Correctness, tenant isolation,
+BONIRA (بنیرا) is a multi-tenant SaaS platform for construction contractors with
+a Full Construction ERP vision and a capability-level MVP commercial surface.
+Each `Organization` is a tenant. Correctness, tenant isolation,
 financial integrity, security, auditability, and domain-authority integrity are
 non-negotiable.
 
@@ -48,7 +49,8 @@ production action.
 
 Relevant architecture authorities include:
 
-- `docs/architecture/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md`
+- `docs/architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md` — frozen D1–D7
+  positioning, capability exposure and release direction; not implementation authority.
 - `docs/architecture/DOMAIN_MODEL.md`
 - `docs/architecture/DATA_MODEL.md`
 - `docs/architecture/BUSINESS_MODEL.md`
@@ -61,11 +63,23 @@ Relevant architecture authorities include:
 - `docs/architecture/web_stack_specification.md`
 - `docs/ui-guidelines.md`
 
+The earlier capability/readiness audit is retained at
+`docs/architecture/history/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md` as historical
+evidence, not current exposure or live readiness authority.
+
 Read references progressively and only to the depth required by the task and its
 material risks.
 
 ## 3. Product and repository architecture
 
+- Apply the canonical D1–D7 strategy at capability level. MVP UI-hidden domains
+  remain backend-active within existing contracts; do not remove apps, models,
+  FKs, migrations, relationships, handoffs, workflows, resolvers or services for
+  UI hiding. Additive MVP-gap design requires separate bounded implementation authority.
+- Future UI exposure must follow one centralized Product Surface Exposure
+  authority, including direct user-facing URLs and shared entry points. Its
+  mechanism is not frozen. Gating never replaces authentication, authorization,
+  tenant isolation, business permissions or object/project/site scope.
 - Use a Python/Django modular monolith with lightweight Clean Architecture,
   PostgreSQL through Django's PostgreSQL backend and Psycopg 3, Django templates,
   Tailwind CSS, and HTMX only for useful small interactions.
@@ -146,6 +160,9 @@ material risks.
 
 ## 6. Workforce identity boundary
 
+- MVP field-worker UI reuses `workforce` and `timekeeping`; no parallel `Worker`
+  model/domain. Non-login field-worker `national_id` is an approved additive MVP
+  gap, not a delivered migration. Attendance, Timesheet and Overtime remain distinct.
 - `User` is authentication identity.
 - `Person` is tenant-owned human identity.
 - `WorkRelationship` is the tenant-scoped, effective-dated work relationship.
@@ -256,6 +273,11 @@ where required.
 
 ## 11. Frontend invariants
 
+- MVP screens retain enterprise quality and zero critical technical leakage.
+  The strategy's navigation/output targets and `MVP` / `FULL_ERP` verification
+  profiles are requirements, not claims of runtime implementation. Preserve
+  hidden-capability regression/UAT evidence; future exposure requires maturity,
+  browser verification, isolation, applicable outputs and Human UAT.
 - Follow `docs/ui-guidelines.md`. The product is Persian-first and RTL, with the
   approved design system shared by ERP UI and Django Admin.
 - Use Tailwind utilities, reusable components, responsive mobile-first layouts,
@@ -330,8 +352,11 @@ required package semantics cannot be established.
   overhead, operational complexity, change blast radius, and unnecessary churn.
 - Use the smallest sufficient evidence; never weaken a required PASS or material
   safety control for efficiency.
-- Prefer mature existing capability for commodity infrastructure while retaining
-  BONIRA-owned strategic construction-ERP business logic.
+- Prefer mature existing capability for commodity infrastructure and focused,
+  license-compatible libraries for commodity UI when they materially improve
+  usability or maintainability. Avoid unnecessary dependencies; preserve Django
+  Templates + Tailwind + HTMX and BONIRA-owned strategic ERP business logic.
+  `docs/ui-guidelines.md` owns the practical frontend selection policy.
 - Do not add a dependency without clear purpose and appropriate authorization.
   Never custom-build cryptographic, password, OAuth/OIDC/SAML, or similar security
   primitives when trusted implementations exist.

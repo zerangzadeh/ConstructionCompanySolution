@@ -4,11 +4,14 @@
 
 This document defines the approved UI/UX standard for the Persian RTL ERP application.
 
-The interface is designed for the complete Construction ERP product, with a
-production-oriented standard rather than an MVP or temporary prototype. This is
-a product-quality target applied incrementally to implemented and future
-domains; it does not authorize UI work to invent backend capabilities that are
-absent from the roadmap or schema.
+The interface serves BONIRA's capability-level MVP commercial surface and its
+future Full Construction ERP vision with the same enterprise-quality standard.
+MVP does not mean prototype-quality UI: visible screens must be Persian-first,
+true RTL, responsive, business-user-friendly and free of critical technical
+leakage. This quality target does not authorize invented backend capabilities.
+The [frozen D1–D7 strategy](architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md)
+owns product positioning, capability exposure, outputs and release requirements;
+this document owns UI patterns, not proof that those targets are implemented.
 
 It is the authoritative reference for all future UI work across:
 
@@ -161,12 +164,14 @@ write-off proposals are `پیشنهاد حذف حسابداری مانده`, wit
 that this does not delete history. Unimplemented approval/posting paths remain
 described as unavailable, without exposing internal decision codes.
 
-Financial navigation orders Accounting, Treasury, receivables/payables, expenses,
-claims, legacy receipts/payments and project financial reports. The existing
-Payment route is labelled `دریافت و پرداخت (سامانه قبلی)` and the existing
-financial projection `گزارش مالی پروژه‌ها`. These labels do not switch sources,
-retire Payment, or turn project reports into Accounting statements. Existing
-permission checks and routes apply identically on desktop and mobile.
+The Treasury, subledger and accounting terminology here governs retained
+internal/`FULL_ERP` financial surfaces, which are MVP UI-hidden. It does not
+define MVP navigation. Legacy labels such as `دریافت و پرداخت (سامانه قبلی)`
+and `گزارش مالی پروژه‌ها` never switch source authority or establish a current
+settlement path; current domain code and the separately governed Payment
+retirement decision remain authoritative. Visible MVP expense and Billing
+capabilities use the navigation groups below, with the same desktop/mobile
+permission and scope enforcement.
 
 ### Supplier portal and invoice-match review
 
@@ -346,6 +351,32 @@ Do not implement new financial calculations in templates.
 
 ## 9. Application Shell
 
+### Approved MVP navigation and exposure target
+
+Use these five groups for the intended MVP surface:
+
+| Group | Persian label |
+| --- | --- |
+| `PROJECT & SITE OPERATIONS` | عملیات پروژه و کارگاه |
+| `CONTRACT & CLAIMS` | پیمان، متره و صورت‌وضعیت |
+| `PROCUREMENT & MATERIALS` | تدارکات، مصالح و انبار |
+| `SHARED BUSINESS SERVICES` | کارتابل، اسناد و گزارش‌ها |
+| `PLATFORM FOUNDATION` | تنظیمات و مدیریت دسترسی |
+
+Capability membership is defined once in D2 of the canonical strategy. Exposure
+should eventually follow one centralized Product Surface Exposure authority;
+the implementation mechanism is not frozen. Apply it to navigation, dashboards,
+search, quick actions, cross-module links, breadcrumbs, shortcuts and direct
+user-facing URLs. Avoid scattered ad-hoc hiding conditions. Gating supplements
+Authentication, Authorization, Tenant Isolation, Business Permissions and
+Object/Project/Site Scope; it never replaces them.
+
+Customer-facing Organization/user/access administration remains in the MVP;
+technical/platform administration, including technical Admin surfaces, remains
+hidden. UI hiding preserves backend domains and required handoffs. A visible
+journey must not require the user to browse a hidden workspace. These are
+approved targets, not claims about the currently rendered shell or routes.
+
 The approved desktop shell uses:
 
 - dark navy/slate right sidebar
@@ -448,6 +479,9 @@ Not every card should have equal visual weight.
 Use only existing reliable data.
 
 Do not create fake metrics or placeholder charts.
+For the MVP, financial summaries are limited to included operational capabilities
+such as expenses and Billing; hidden financial/reconciliation workspaces must not
+leak through cards, drill-through or quick actions.
 
 ---
 
@@ -717,6 +751,8 @@ Preserve native Django accessibility behavior.
 ## 22. Django Admin Visual Standard
 
 Django Admin must visually belong to the ERP while preserving native Admin workflows.
+This shared design standard does not make technical Admin customer-visible in
+the MVP. The rules below apply within separately authorized internal Admin use.
 
 Principle:
 
@@ -813,7 +849,8 @@ Do not accidentally hide:
 - object tools
 - submit rows
 
-If the logged-in user has permission, standard Add/Create actions must remain visible.
+Within an authorized internal Admin surface, preserve standard Add/Create actions
+when the logged-in user has permission. Permission alone does not grant MVP exposure.
 
 Never bypass permission logic.
 
@@ -897,6 +934,62 @@ Avoid:
 - arbitrary values everywhere
 - new frontend frameworks
 - unnecessary dependencies
+
+### Frontend Build-vs-Reuse and Preferred Toolbox
+
+This section is the main practical authority for frontend utility selection.
+Keep simple UI simple. Prefer mature, focused, commercially usable libraries
+over custom reimplementation only when they materially improve usability,
+maintainability or implementation quality. Follow this decision hierarchy:
+
+1. Native HTML / CSS.
+2. Django Templates + Tailwind.
+3. HTMX / small Vanilla JS.
+4. An approved focused utility library when the preceding options are insufficient.
+5. A custom component only when justified by the requirement and available alternatives.
+
+The following are **optional, use-case-driven preferred defaults**, not globally
+mandatory dependencies. This policy records selection direction; it does not
+claim that any listed library is installed, integrated or qualified in BONIRA.
+
+| Capability | Preferred default | Use when needed | Keep the simpler approach when |
+| --- | --- | --- | --- |
+| Advanced selects | Tom Select | Large option sets, searchable/multi-select, autocomplete or remote/AJAX lookup for project, site, party, employee, material, contract and similar masters | A short native dropdown is sufficient. Select2 is not the default; do not introduce jQuery solely for a select widget when a strong dependency-free alternative exists. |
+| Confirmations and focused dialogs | SweetAlert2 | Important delete, void/cancel, irreversible or submit/approve/reject confirmations, or short success/error interactions that justify a modal under section 47 | Ordinary Django messages, inline validation, simple toast/status feedback or routine reversible actions suffice. Do not turn every message or workflow action into a modal. |
+| Advanced data grids | Tabulator | A business table genuinely needs large-dataset handling, advanced filters/sort, grouping, frozen columns, remote pagination or interactive row operations, such as complex inventory/cardex, procurement or reporting views | A normal Django/Tailwind table with server-side sorting/filtering/pagination meets the need. Do not convert simple CRUD lists into grids. |
+| Charts | Chart.js | A chart improves a business decision: project progress, expense trends, procurement status, workforce/equipment utilization, safety/quality trends or inventory movements | KPI cards, tables or text communicate the result adequately. Never invent data or placeholder metrics to justify a chart. |
+| Jalali date/time input | JalaliDatePicker (`@majidh1/jalalidatepicker`), or a currently verified compatible equivalent when repository constraints justify it | Persian/Jalali input requires more than browser-native Gregorian controls | An existing verified shared solution already meets the requirement. Preserve section 32's `erp_jalali` / `JalaliDateMixin` contract; this preference neither orders replacement nor certifies the current helper as an equivalent library. |
+
+If a future requirement exceeds Tabulator's practical capabilities, evaluate
+AG Grid separately. AG Grid Enterprise and any other paid or Enterprise-only
+capabilities require an explicit licensing decision before adoption; this
+toolbox does not approve them implicitly.
+
+For any later authorized introduction, verify maturity and active maintenance,
+commercial-use suitability and license compatibility with BONIRA distribution,
+relevant Persian/RTL and accessible keyboard support, Django Templates/HTMX
+compatibility, and reasonable bundle/runtime cost. Avoid unnecessary framework
+or runtime dependencies and overlapping libraries for the same responsibility.
+Pin the selected version when implementation is authorized. An explicit approved
+exception is required if a selection criterion cannot be satisfied; listing a
+library here does not establish its current license, maintenance or accessibility.
+
+Enhance server-rendered pages progressively. Preserve baseline links, readable
+results, native form values/submission and server-rendered errors when an
+enhancement is unavailable; do not make the application SPA-first. Initialize
+widgets safely after relevant HTMX swaps and clean up replaced instances without
+duplicate controls, event handlers or submissions. Load utilities only on
+surfaces that need them; Tailwind and the canonical BONIRA tokens remain the
+primary styling authority. Do not introduce React, Vue, Alpine or jQuery merely
+to implement this policy, or create a frontend framework/plugin registry.
+
+Verify the chosen configuration in Persian, true RTL, mixed-direction data,
+responsive layouts, keyboard/focus and screen-reader use, following section 49.
+Preserve server-side validation, business rules, authorization, tenant and object
+scope, CSRF and D1–D7 surface gating. Remote lookups/grids never broaden access;
+client sorting, edits, totals, confirmations and date widgets never become domain
+authority. A Jalali widget must preserve canonical server model values and the
+existing Gregorian/ISO conversion boundary.
 
 ---
 
@@ -1104,7 +1197,10 @@ Before adding a dependency:
 3. do not introduce duplicate date libraries
 4. do not introduce a new frontend framework only for date selection
 
-Any added UI dependency must remain compatible with the existing Django Templates + Tailwind architecture.
+Apply section 28's toolbox and selection criteria without duplicating or
+bypassing this shared date-input contract. Any later UI dependency must remain
+compatible with Django Templates + Tailwind + HTMX; its adoption needs separate
+implementation authority and does not change canonical server-side dates.
 
 ### Django Admin
 
@@ -1300,9 +1396,9 @@ error-prone.
   flow with clear return behavior.
 - Preserve selected historical items even if they become inactive, but prevent
   new use when business rules disallow it.
-- Do not invent a bespoke JavaScript combobox without full keyboard, focus,
-  screen-reader, and RTL validation. Evaluate a maintained accessible component
-  before custom implementation and keep dependencies deliberate.
+- Apply section 28's optional Tom Select preference when native controls are
+  insufficient. A bespoke combobox requires a documented reason plus full
+  keyboard, focus, screen-reader and RTL validation; keep dependencies deliberate.
 
 ## 40. Inline Item Grids and Transaction Forms
 
@@ -1420,6 +1516,13 @@ copy of Notifications or Audit.
   replacement actions—not editable fields.
 
 ## 45. Attachments, Documents, Imports, and Exports
+
+MVP requires `.xlsx` outputs through a future shared export foundation and the
+print targets/priorities in [D5](architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md#5-d5--excel-operational-reporting-print-and-finance-handoff).
+Represent only actual source-domain fields and explicitly approved/implemented
+gaps; do not invent rates, calculations or financial-system integration. Structured
+Excel handoff to finance is the MVP boundary. Required output formats and layouts
+are not claimed delivered by this guideline.
 
 - File controls state accepted type, maximum size, confidentiality, and whether
   scanning/processing is pending. Client checks improve feedback; server checks
@@ -1554,6 +1657,13 @@ creates a linked draft through the Accounting service; it never edits the source
   dedicated permission. Audit evidence is not editable.
 
 ## 51. Pattern Acceptance Checklist
+
+For MVP release, apply the strategy's browser journey verification,
+tenant/permission isolation, P0 Excel, critical print, no-blocking-defect and
+Human UAT criteria. Recognize `MVP` release and `FULL_ERP` internal verification
+profiles without assuming runtime switches exist. Preserve historical
+hidden-capability UAT as regression evidence; backend presence or prior finding
+closure is not customer-exposure acceptance.
 
 Before a new or materially changed screen is accepted, verify:
 

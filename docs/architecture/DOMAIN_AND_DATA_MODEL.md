@@ -2,15 +2,18 @@
 
 This document describes the currently implemented logical domains and data model, followed by the approved future product direction. It is an architectural guide, not a schema specification. Django models and migrations are the schema source of truth; application services define authorization, lifecycle transitions, and cross-model business rules.
 
-Construction ERP is designed and governed as a complete construction-management
-product rather than an MVP. The tables below deliberately distinguish the
-implemented model from deferred product direction: complete-product scope does
-not make an unimplemented entity part of the current schema and does not bypass
-the approval sequence in `ROADMAP.md`.
+BONIRA preserves a full Construction ERP architecture with a capability-level
+MVP commercial surface. The [frozen D1–D7 strategy](PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md)
+defines approved exposure; the tables below describe backend domains and future
+direction, not MVP navigation or release readiness. UI-hidden capabilities remain
+backend-active within their existing contracts. No app, model, FK, migration,
+relationship, required handoff, workflow, resolver or service is removed for UI
+hiding. Neither target scope nor MVP inclusion makes an unimplemented entity part
+of the current schema or bypasses execution authority.
 
-The repository-wide current/target capability assessment, data-ownership map,
-pre-production correction register, and production gates are maintained in
-`docs/architecture/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md`. This document
+The earlier capability assessment and correction register are retained in the
+[historical audit](history/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md); current
+delivery direction and live gates belong to the Roadmap and Registry. This document
 stays intentionally focused on implemented domain boundaries and invariants.
 The target domain boundaries and conceptual data/source-of-truth rules are in
 `DOMAIN_MODEL.md` and `DATA_MODEL.md`; they do not override current schema.
@@ -368,6 +371,12 @@ erDiagram
 | Quality issue | reported -> under review -> assigned -> corrective action in progress -> awaiting verification -> verified -> closed. Assignment requires a responsible user, employee, or party and due date; verification and closure require recorded actors, timestamps, and summaries. Closed issues are terminal and immutable. |
 
 ## Workforce workflow integration target
+
+The MVP field-worker UI must reuse Workforce and Timekeeping without a parallel
+`Worker` model. Non-login `national_id` is an approved future additive gap, not
+covered merely by login-user national ID. A simplified operator workflow must
+preserve separate Attendance, Timesheet and Overtime backend semantics; Full
+HR/ESS and Payroll remain UI-hidden. This direction authorizes no schema change.
 
 P7-S06–S12 time entry is implemented without daily-report, Payroll or Project
 Cost integration. Any later integration must preserve tenant scope and keep

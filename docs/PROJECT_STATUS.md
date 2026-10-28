@@ -8,6 +8,11 @@ state; `ROADMAP.md` is authoritative for current delivery direction, sequencing,
 and phase disposition; Django models and migrations are authoritative for the
 schema; current test runs are authoritative for validation.
 
+Current product positioning and approved MVP capability exposure are defined in
+the [frozen D1–D7 strategy](architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md).
+The dated snapshots below retain their original terminology and validation scope;
+their full-product language does not define today's commercial surface.
+
 ## Documentation audit snapshot — 2026-09-24
 
 The repository-first product/domain/architecture audit reconciled active

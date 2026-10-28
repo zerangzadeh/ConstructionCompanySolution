@@ -4,10 +4,17 @@
 
 ## 1. Product thesis
 
-Construction ERP is a Persian-first, multi-tenant operating and financial-control
-platform for Iranian construction and contracting companies. Its value is the
-traceable flow from field evidence and commercial documents to approvals, project
-cost, claims, cash, accounting, compliance and management decisions.
+بنیرا / BONIRA is a Persian-first, multi-tenant platform for construction and
+contracting companies. Its long-term vision is Full Construction ERP, connecting
+field evidence and commercial documents to approvals, project cost, claims, cash,
+accounting, compliance and management decisions.
+
+Its current commercial positioning is **سامانه مدیریت عملیات پیمانکاری و کارگاهی**,
+with the canonical tagline **«سامانه مدیریت یکپارچه کارگاه، پیمان و تدارکات عمرانی»**.
+The [frozen D1–D7 strategy](PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md) defines
+the capability-level MVP surface over the full backend, its exposure families,
+release requirements and progressive evolution. MVP is the current commercial
+release strategy; it does not abandon the ERP architecture or certify delivery.
 
 The product is not positioned as a generic accounting application, CRM, BPMN
 platform, BIM authoring suite or scheduler replacement. It owns construction ERP
@@ -24,6 +31,8 @@ business logic and integrates with specialist systems where justified.
 
 One core model supports these segments. Enterprise structures remain optional so
 small customers do not inherit unnecessary setup or UI complexity.
+The responses above describe the full product vision; financial, payroll and
+other hidden capabilities are not current MVP customer-exposure promises.
 
 **Initial focus accepted (2026-09-24, P0-D01):** growing multi-project contractors
 lead onboarding and validation; the shared model and small-contractor usability
@@ -43,10 +52,19 @@ remain. Pilot customers and representative workload sizes are still open. See
 - Assurance stakeholders: auditors, legal/accounting reviewers, support/security
   operators and statutory authorities through controlled evidence/exports.
 
+These are full-platform stakeholders. MVP daily use focuses on project/site,
+commercial, procurement/materials and shared operational services; finance teams
+receive structured Excel handoff. Full HR/ESS, Payroll and technical/platform
+administration remain outside the MVP user surface as defined by D2.
+
 `USER_CAPABILITY_MAP.md` defines user goals and capability access. Exact
 authorization remains code/permission-registry owned.
 
 ## 4. Customer value propositions
+
+The following describe long-term platform value. Current MVP delivery focuses on
+operational traceability and contractor workflows, with required XLSX/print
+outputs; native financial and statutory capabilities are not MVP UI promises.
 
 1. **One traceable operating record:** enter facts once at their source and reuse
    them across workflow, cost, claims, payroll, finance and reporting.
@@ -64,6 +82,11 @@ authorization remains code/permission-registry owned.
 7. **Decision trust:** governed KPIs and explanations tied to source transactions.
 
 ## 5. Product capability layers
+
+These architectural layers preserve the full ERP vision. They are not release
+packages or an app-level exposure matrix. D2 owns capability-level inclusion:
+hidden UI leaves backend services, models and required handoffs intact while
+capabilities mature for future exposure.
 
 | Layer | Capabilities | Business role |
 | --- | --- | --- |
@@ -109,15 +132,17 @@ core recovery baseline. Provider/residency, named operational owners and quantif
 recovery commitments remain open. Approval evidence is in the S03 record linked
 above; implementation, detailed ADRs and production certification are separate.
 
-Implementation should progress by integrated value stream rather than isolated
-module count:
+This accepted native financial architecture remains intact behind the MVP
+surface. The current MVP financial-system boundary is structured Excel handoff
+to finance/accounting teams; direct Sepidar or Hamkaran System API integration
+is not claimed or authorized by this strategy.
 
-1. tenant/security/operations and data foundations;
-2. Accounting/Treasury and Project Cost authority;
-3. source-to-pay, commercial claims and payroll integrations;
-4. inventory/equipment/assets and field/HSE/QA depth;
-5. knowledge, partner portal, support and governed analytics;
-6. production certification for the selected customer scope.
+Current adoption follows the three integrated MVP journeys in
+[D6](PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md#6-d6--quality-journeys-and-release-criteria),
+then initial customers, feedback, revenue, team expansion, capability maturation
+and progressive exposure toward Full BONIRA Construction ERP. Existing backend
+availability alone is insufficient for customer exposure. The Roadmap and
+canonical contracts retain technical dependency and execution authority.
 
 Onboarding requires organization settings, role/scope design, master-data import,
 project structures, numbering/rules, workflow templates, opening financial facts
@@ -125,6 +150,10 @@ where applicable, training and reconciliation. Imports are previewed and audited
 the product must not turn spreadsheet inconsistency into authoritative data.
 
 ## 8. Service and support model
+
+This is the full-platform operating model. Support capability screens and
+technical administration remain MVP UI-hidden; this does not remove the
+operator's support, incident or recovery responsibilities.
 
 - Product support uses cases, known issues, feature requests, release linkage,
   safe diagnostics and SLA analytics.
@@ -201,7 +230,7 @@ without a demonstrated customer outcome.
 | Hard-coded changing Iranian rules | Effective versions, source/reviewer and «نیازمند بررسی قانونی» until verified |
 | Over-complexity for small tenants | Optional structures and starter workflows |
 | Weak project/object isolation | Complete P1.1 before sensitive/multi-project launch |
-| Half-ledger ambiguity | Product Owner chooses native vs integrated Accounting boundary |
+| Confusing MVP finance handoff with ledger ownership | Retain native financial authorities and use structured Excel handoff; no invented direct accounting-system integration |
 | Unsafe external/AI access | Least privilege, scoped portal/support, consent and human confirmation |
 | Premature network/marketplace | Keep deferred until governance and density triggers |
 | Dependency proliferation | Apply Build-vs-Reuse and dependency review policy |

@@ -132,10 +132,14 @@ spacing:
 
 These design documents define visual presentation only.
 
-The visual system targets the complete Construction ERP product and its
-production-oriented quality standard; it is not an MVP design. Coverage may
-expand incrementally with the roadmap, but every implemented surface must follow
-the same enterprise-quality standard.
+The visual system serves BONIRA's capability-level MVP commercial surface and
+future Full Construction ERP with the same enterprise-quality standard. MVP is
+a release strategy, not prototype-quality design. The
+[frozen D1–D7 strategy](../docs/architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md)
+owns positioning and exposure; [UI guidelines](../docs/ui-guidelines.md) own
+navigation/presentation patterns. Hidden capabilities retain their backend
+contracts. This visual reference neither authorizes exposure nor claims that
+centralized gating, runtime profiles or new output/UI targets are implemented.
 
 The existing ERP application remains authoritative for:
 - models
