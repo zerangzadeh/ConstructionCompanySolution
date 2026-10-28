@@ -129,7 +129,7 @@ class HomeTests(TestCase):
             )
         self.assertEqual(workspaces, ())
         self.assertEqual(assigned_work.route, "workflows:workbench")
-        self.assertEqual(alerts.route, "support:notifications")
+        self.assertIsNone(alerts)  # Support remains backend-active and MVP-hidden.
 
     def test_no_authorized_workspace_state(self) -> None:
         with patch("core.views.authorized_home_links", return_value=((), None, None)):

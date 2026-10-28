@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load product_surface %}
 {% block title %}شرکت‌ها | سامانه مدیریت ساخت{% endblock %}
 {% block content %}
 {% if pending_connection_count %}
@@ -15,7 +15,7 @@
     </div>
     <div class="flex items-center gap-3">
         <a class="h-10 rounded-lg border border-blue-200 px-4 text-sm font-semibold leading-10 text-blue-700 hover:bg-blue-50" href="{% url 'accounts:connection_requests' %}">درخواست‌های اتصال</a>
-        {% if is_platform_admin %}<a class="h-10 rounded-lg border border-blue-200 px-4 text-sm font-semibold leading-10 text-blue-700" href="{% url 'organizations:platform_role_catalog' %}">نقش‌های پلتفرم</a><a class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold leading-10 text-white" href="{% url 'organizations:create' %}">شرکت جدید</a>{% endif %}
+        {% if is_platform_admin %}{% if "organizations:platform_role_catalog"|surface_exposed %}<a class="h-10 rounded-lg border border-blue-200 px-4 text-sm font-semibold leading-10 text-blue-700" href="{% url 'organizations:platform_role_catalog' %}">نقش‌های پلتفرم</a>{% endif %}{% if "organizations:create"|surface_exposed %}<a class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold leading-10 text-white" href="{% url 'organizations:create' %}">شرکت جدید</a>{% endif %}{% endif %}
     </div>
 </div>
 {% if memberships %}

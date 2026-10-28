@@ -8,6 +8,7 @@ from apps.organizations.authorization import (
     membership_permission_codes,
     permission_supports_object_scope,
 )
+from core.product_surface import route_exposed
 
 
 @dataclass(frozen=True)
@@ -64,4 +65,5 @@ def authorized_financial_authorities(*, user, organization):
             membership,
             allow_any_scope=permission_supports_object_scope(link.permission),
         )
+        and route_exposed(link.route)
     )

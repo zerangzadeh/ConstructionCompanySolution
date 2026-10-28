@@ -110,10 +110,29 @@ deliberately maintains no second live CEP queue or per-CEP completion ledger.
 
 ### MVP release direction
 
+The Product Owner approved this corrected eight-package **current MVP delivery
+plan** on 2026-10-29. These are bounded MVP implementation packages, not CEPs;
+they do not reopen completed CEPs or change the formal CEP dependency graph.
+The current instruction authorizes MVP-01 only. Later packages require their own
+bounded authorization; this sequence is not execution authority.
+
+| Order | MVP package | Delivery scope |
+| --- | --- | --- |
+| 1 | MVP-01 | Product Surface Exposure & Navigation |
+| 2 | MVP-02 | Field Workforce MVP |
+| 3 | MVP-03 | Contract & Billing Customer Journey |
+| 4 | MVP-04 | Procurement & Inventory Customer Journey |
+| 5 | MVP-05 | Shared XLSX Foundation + P0 Exports |
+| 6 | MVP-06 | Critical MVP Print Outputs |
+| 7 | MVP-07 | P1 Outputs & Non-blocking Usability |
+| 8 | MVP-08 | Demo States, MVP Verification & Human UAT |
+
 Prioritize the three core journeys and output priorities in the
 [MVP strategy](docs/architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md#6-d6--quality-journeys-and-release-criteria).
-Approved requirements include centralized capability exposure (mechanism not yet
-frozen), simplified field-worker workflows reusing Workforce/Timekeeping,
+The bounded centralized exposure foundation is implemented in MVP-01;
+[its completion report](docs/governance/mvp/MVP-01_COMPLETION_REPORT.md) records
+current Development evidence and limitations. Remaining requirements include
+simplified field-worker workflows reusing Workforce/Timekeeping,
 additive non-login field-worker `national_id` design, shared XLSX exports and
 required print outputs. These are not implementation-completion claims or new
 CEP packages/dependency edges. P0 Excel delivery is Billing, Procurement,
@@ -121,8 +140,8 @@ Inventory and Expenses; P1 priorities remain in the strategy.
 
 MVP release requires browser journey verification, tenant/permission isolation,
 P0 Excel, critical print outputs, no blocking MVP defect and Human UAT. Retain
-`MVP` release evidence and `FULL_ERP` internal regression evidence without
-deleting historical coverage or implying runtime profiles already exist.
+`MVP` release evidence and explicitly scoped `FULL_ERP` internal regression
+evidence without deleting historical coverage or implying release readiness.
 MVP UI-hidden capabilities mature toward progressive exposure after initial
 customers and feedback; backend existence alone never authorizes exposure.
 

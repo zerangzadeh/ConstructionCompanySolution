@@ -17,6 +17,7 @@ from apps.workflows.personal_workspaces import (
     my_requests_available,
 )
 from apps.workforce.ess_services import has_ess_subject
+from core.product_surface import navigation_groups, route_exposed
 
 SITE_CONTEXT_NAMESPACES = frozenset(
     {
@@ -77,6 +78,7 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
                 BusinessPermissionCode.COMPLIANCE_VIEW
                 in membership_permission_codes(membership)
                 and membership_has_scope(membership, allow_any_scope=True)
+                and route_exposed("compliance:workbench")
             )
             context_projects = scoped_context_projects(
                 user=request.user, organization=organization
@@ -101,14 +103,29 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
     namespace = resolver_match.namespace if resolver_match else None
     view_name = resolver_match.view_name if resolver_match else None
 
+    groups = (
+        navigation_groups(
+            permission_codes,
+            {
+                "my_requests_workspace_available": my_requests_workspace_available,
+                "manager_workspace_available": manager_workspace_entry_available,
+            },
+        )
+        if organization is not None and permission_codes
+        else ()
+    )
+
     return {
+        "product_navigation_groups": groups,
         "business_permission_codes": permission_codes,
         "compliance_workspace_available": compliance_workspace_available,
         "party_governance_available": BusinessPermissionCode.PARTIES_VIEW
         in permission_codes
         and bool(permission_codes & GOVERNANCE_PERMISSIONS),
         "platform_navigation_access": bool(
-            request.user.is_authenticated and is_platform_admin(request.user)
+            request.user.is_authenticated
+            and is_platform_admin(request.user)
+            and route_exposed("organizations:platform_role_catalog")
         ),
         "reference_persona_catalogue_enabled": reference_catalogue_enabled(),
         "can_view_contracts": BusinessPermissionCode.CONTRACTS_VIEW in permission_codes,

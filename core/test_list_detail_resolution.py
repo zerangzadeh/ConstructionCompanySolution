@@ -3,7 +3,7 @@
 from datetime import date, datetime, timedelta, timezone
 from uuid import uuid4
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.accounts.models import User
@@ -264,6 +264,7 @@ class ReadOnlyDetailBoundaryTests(TestCase):
             ],
         ]
 
+    @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_resolution_details_are_get_only_read_views(self):
         self.login(self.owner)
         for url in self.urls():
@@ -281,6 +282,7 @@ class ReadOnlyDetailBoundaryTests(TestCase):
                 self.assertNotIn("<form", main)
                 self.assertEqual(self.client.post(url, {}).status_code, 405)
 
+    @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_resolution_financial_partner_details_read_only_and_tenant_scoped(self):
         self.login(self.owner)
         for organization, project in (
@@ -476,6 +478,7 @@ class ReadOnlyDetailBoundaryTests(TestCase):
         for url in self.urls():
             self.assertIn(self.client.get(url).status_code, (302, 403, 404))
 
+    @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_resolution_financial_partner_and_unknown_kind_routes_fail_closed(self):
         self.login(self.owner)
         for url in (

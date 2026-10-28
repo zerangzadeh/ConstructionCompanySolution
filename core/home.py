@@ -10,7 +10,11 @@ from apps.organizations.authorization import (
     permission_supports_object_scope,
 )
 from apps.organizations.models import Organization
-from core.financial_navigation import FINANCIAL_AUTHORITIES
+from apps.workflows.personal_workspaces import (
+    manager_workspace_available,
+    my_requests_available,
+)
+from core.product_surface import navigation_groups, route_exposed
 
 
 @dataclass(frozen=True)
@@ -20,20 +24,6 @@ class HomeLink:
     permission: str
 
 
-WORKSPACE_LINKS = (
-    HomeLink("پروژه‌ها", "projects:list", "projects.view"),
-    HomeLink("اسناد", "documents:list", "documents.view"),
-    HomeLink("قراردادها", "contracts:list", "contracts.view"),
-    HomeLink("تدارکات", "procurement:request_list", "purchase_requests.view"),
-    HomeLink(
-        "تجهیزات عملیاتی", "equipment:operations_workbench", "equipment_operations.view"
-    ),
-    HomeLink("فهرست تجهیزات", "equipment:list", "equipment.view"),
-    *(
-        HomeLink(link.label, link.route, link.permission)
-        for link in FINANCIAL_AUTHORITIES
-    ),
-)
 ASSIGNED_WORK = HomeLink("کارهای ارجاع‌شده", "workflows:workbench", "work_items.view")
 ALERTS = HomeLink("اعلان‌ها", "support:notifications", "support.notifications_view")
 
@@ -52,17 +42,34 @@ def authorized_home_links(
             allow_any_scope=permission_supports_object_scope(code),
         )
     }
+    groups = navigation_groups(
+        effective_codes,
+        {
+            "my_requests_workspace_available": my_requests_available(
+                actor=user,
+                organization=organization,
+            ),
+            "manager_workspace_available": manager_workspace_available(
+                actor=user,
+                organization=organization,
+            ),
+        },
+    )
     workspaces = tuple(
-        link
-        for link in WORKSPACE_LINKS
-        if link.permission in effective_codes
-        and not (
-            link.route == "equipment:list"
-            and "equipment_operations.view" in effective_codes
-        )
+        HomeLink(link.label, link.route, link.permission)
+        for group in groups
+        for link in group.links
+        if (link.permission or link.availability) and link.route != ASSIGNED_WORK.route
     )
     assigned_work = (
-        ASSIGNED_WORK if ASSIGNED_WORK.permission in effective_codes else None
+        ASSIGNED_WORK
+        if ASSIGNED_WORK.permission in effective_codes
+        and route_exposed(ASSIGNED_WORK.route)
+        else None
     )
-    alerts = ALERTS if ALERTS.permission in effective_codes else None
+    alerts = (
+        ALERTS
+        if ALERTS.permission in effective_codes and route_exposed(ALERTS.route)
+        else None
+    )
     return workspaces, assigned_work, alerts

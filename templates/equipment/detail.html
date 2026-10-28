@@ -1,4 +1,4 @@
-{% extends "base.html" %}{% load erp_format %}
+{% extends "base.html" %}{% load product_surface %}{% load erp_format %}
 {% block title %}{{ equipment.name }} | تجهیزات{% endblock %}
 {% block content %}
 <div data-workspace-id="WS-15A">
@@ -15,6 +15,6 @@
   </section>
 </div>
 
-{% if financial_asset_links %}<section class="erp-surface mt-5 rounded-xl p-5" aria-label="پیوندهای مالی ثبت‌شده"><h2 class="font-bold">پیوندهای ثبت‌شده با دارایی‌های ثابت مالی</h2>{% for link in financial_asset_links %}<div class="mt-3 border-t pt-3"><a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:asset_detail' link.asset_id %}">{{ link.asset.name }}</a><p class="mt-2 text-xs text-slate-500">از {{ link.effective_from|jalali_date }}{% if link.effective_to %} تا {{ link.effective_to|jalali_date }}{% endif %}</p></div>{% endfor %}</section>{% endif %}
+{% if financial_asset_links %}<section class="erp-surface mt-5 rounded-xl p-5" aria-label="پیوندهای مالی ثبت‌شده"><h2 class="font-bold">پیوندهای ثبت‌شده با دارایی‌های ثابت مالی</h2>{% for link in financial_asset_links %}<div class="mt-3 border-t pt-3">{% if "fixed_assets:asset_detail"|surface_exposed %}<a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:asset_detail' link.asset_id %}">{{ link.asset.name }}</a>{% endif %}<p class="mt-2 text-xs text-slate-500">از {{ link.effective_from|jalali_date }}{% if link.effective_to %} تا {{ link.effective_to|jalali_date }}{% endif %}</p></div>{% endfor %}</section>{% endif %}
 </div>
 {% endblock %}

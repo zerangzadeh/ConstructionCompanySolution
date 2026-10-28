@@ -193,12 +193,19 @@ neither backend existence nor UI hiding changes domain authority.
 
 ## 8. Implementation and evidence boundary
 
-This reconciliation approves no implementation and certifies none of the
-following: centralized Product Surface Gating, `MVP`/`FULL_ERP` runtime profiles,
-new Workers UI, non-login workforce national-ID migration, shared XLSX framework,
-required print layouts or complete browser E2E coverage. They remain requirements
-needing separately authorized implementation or qualification against current
-code. Existing screens, exports and tests retain only their verified scope.
+This reconciliation itself grants no implementation authority. Under the separate
+2026-10-29 MVP-01 instruction, the bounded Development exposure foundation is now
+implemented in `core/product_surface.py`: default `MVP`, an explicit server-owned
+`FULL_ERP` internal verification setting, shared navigation/Home/shortcut filtering,
+and direct HTTP denial for hidden capabilities. There is no customer profile switch.
+[MVP-01 evidence](../governance/mvp/MVP-01_COMPLETION_REPORT.md) records the bounded
+browser, authorization and backend-preservation verification and baseline findings.
+
+New Workers UI, non-login workforce national-ID migration, shared XLSX framework,
+required print layouts and complete browser E2E coverage remain requirements for
+separately authorized work. Existing screens, exports and tests retain only their
+verified scope. This implementation issues no commercial-readiness claim, Human
+Sign-off or Production Certification.
 
 Code, migrations, tests and configured environment behavior remain implementation
 reality. The [current model guide](DOMAIN_AND_DATA_MODEL.md) describes backend

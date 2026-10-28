@@ -12,6 +12,7 @@ from django.views.decorators.http import require_GET
 from apps.organizations.decorators import active_organization_required
 from apps.organizations.services import get_valid_memberships
 from core.home import authorized_home_links
+from core.product_surface import NAVIGATION_GROUPS, NavigationGroup
 from core.search import search_active_organization
 
 logger = logging.getLogger(__name__)
@@ -44,6 +45,18 @@ def home(request: HttpRequest) -> HttpResponse:
         return render(request, "home.html", {"home_state": "error"}, status=503)
 
     state = "normal" if workspaces or assigned_work or alerts else "no_workspace"
+    routes = {link.route for link in workspaces}
+    if assigned_work:
+        routes.add(assigned_work.route)
+    groups = tuple(
+        NavigationGroup(
+            group.key,
+            group.label,
+            tuple(link for link in group.links if link.route in routes),
+        )
+        for group in NAVIGATION_GROUPS
+        if any(link.route in routes for link in group.links)
+    )
     return render(
         request,
         "home.html",
@@ -53,6 +66,7 @@ def home(request: HttpRequest) -> HttpResponse:
             "home_workspaces": workspaces,
             "home_assigned_work": assigned_work,
             "home_alerts": alerts,
+            "home_groups": groups,
         },
     )
 

@@ -1,0 +1,500 @@
+{
+  "package": "MVP-01",
+  "status": "COMPLETE",
+  "date": "2026-10-29",
+  "scope": "Development/non-production only",
+  "authorization": {
+    "source": "Explicit Human MVP-01 instruction supplied in this session",
+    "request_sha256": "00e01c5e40a4f96c4a863e6c4485d721d37e4b2b9106bc40bad4fcc1f5385878",
+    "no_later_mvp_authority": true
+  },
+  "repository": {
+    "branch": "main",
+    "start_head": "ccce8f43e15f1ca7e024a4fc3fa99335e4a1839b",
+    "end_head": "ccce8f43e15f1ca7e024a4fc3fa99335e4a1839b",
+    "start_upstream": "origin/main",
+    "start_ahead": 0,
+    "start_behind": 0,
+    "start_tree": "CLEAN",
+    "end_tree": "MVP-01 changes uncommitted",
+    "git_writes": false
+  },
+  "database": {
+    "vendor": "PostgreSQL",
+    "server_version": "18.6",
+    "business_schema_migrations_required": false,
+    "business_migration_executed": false,
+    "configured_migrate_check": "PASS",
+    "makemigrations_check_dry_run": "No changes detected"
+  },
+  "validation": {
+    "initial_focused_with_browser": {
+      "passed": 36,
+      "failed": 0,
+      "subtests_passed": 16,
+      "log": "output/mvp01-validation-run.log"
+    },
+    "final_affected_regression": {
+      "passed": 88,
+      "failed_pre_existing": 1,
+      "deselected_known_pre_existing_query_cases": 2,
+      "subtests_passed": 57,
+      "log": "output/mvp01-final-regression.log"
+    },
+    "unique_passing_test_methods": 91,
+    "browser": {
+      "passed": true,
+      "scenario_navigation_count": 17,
+      "scenarios": [
+        {
+          "scenario": "A-C-home-desktop",
+          "http_status": 200,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "A-C-home-mobile",
+          "http_status": 200,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "D-hidden-cash",
+          "http_status": 403,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "E-visible-projects",
+          "http_status": 200,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "F-expenses",
+          "http_status": 200,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "F-expense-draft",
+          "http_status": 200,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "G-workforce",
+          "http_status": 200,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "G-timekeeping",
+          "http_status": 200,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "G-hidden-ess",
+          "http_status": 403,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "G-own-timekeeping-status",
+          "http_status": 200,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "G-hidden-hr-status",
+          "http_status": 403,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "reports",
+          "http_status": 200,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "safety",
+          "http_status": 200,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "quality",
+          "http_status": 200,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "claims",
+            "materials",
+            "shared",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "B-ordinary-home",
+          "http_status": 200,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "B-visible-without-permission",
+          "http_status": 403,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "foundation"
+          ]
+        },
+        {
+          "scenario": "B-exposed-authorized",
+          "http_status": 200,
+          "lang": "fa",
+          "dir": "rtl",
+          "desktop_groups": [
+            "operations",
+            "foundation"
+          ],
+          "mobile_groups": [
+            "operations",
+            "foundation"
+          ]
+        }
+      ],
+      "screenshots_visually_reviewed": [
+        "mvp01-browser-admin-A-C-home-desktop.png",
+        "mvp01-browser-admin-A-C-home-mobile.png"
+      ]
+    },
+    "django_check": "PASS",
+    "ruff_check": "PASS (21 changed Python files)",
+    "ruff_format_check": "PASS (21 changed Python files)",
+    "template_compile": "19/19 PASS",
+    "shared_static_discovery": "6/6 PASS",
+    "node_syntax_check": "PASS",
+    "git_diff_check": "PASS",
+    "final_focused_with_browser": {
+      "passed": 38,
+      "failed": 0,
+      "subtests_passed": 16,
+      "log": "output/mvp01-final-focused-browser.log"
+    },
+    "documentation_link_check": "PASS"
+  },
+  "acceptance_criteria": {
+    "AC-01": "PASS",
+    "AC-02": "PASS",
+    "AC-03": "PASS",
+    "AC-04": "PASS",
+    "AC-05": "PASS",
+    "AC-06": "PASS",
+    "AC-07": "PASS",
+    "AC-08": "PASS",
+    "AC-09": "PASS",
+    "AC-10": "PASS",
+    "AC-11": "PASS",
+    "AC-12": "PASS",
+    "AC-13": "PASS",
+    "AC-14": "PASS"
+  },
+  "regressions": {
+    "attributable_remaining": 0,
+    "stale_surface_expectations": "Updated active Home/navigation/hidden-detail assertions; FULL_ERP applied only to specific internal regression methods. Original evidence retained.",
+    "pre_existing": [
+      {
+        "finding": "Two workbench query ceilings",
+        "current": 81,
+        "head_baseline": 81,
+        "ceiling": 45,
+        "baseline_log": "output/mvp01-head-baseline.log",
+        "classification": "PRE_EXISTING / OUT_OF_SCOPE"
+      },
+      {
+        "finding": "15 legacy ExpenseServiceTests fail in shared setUp: unbootstrapped membership cannot create_project",
+        "head_baseline_representative": "Same PermissionDenied at apps/projects/services.py:169 before any changed HTTP/presentation code",
+        "baseline_log": "output/mvp01-head-baseline.log",
+        "classification": "PRE_EXISTING / OUT_OF_SCOPE"
+      },
+      {
+        "finding": "Timekeeping test expects removed preview wording",
+        "head_baseline": "Same missing Persian phrase on unchanged HEAD templates and code",
+        "baseline_log": "output/mvp01-timekeeping-baseline.log",
+        "classification": "PRE_EXISTING / OUT_OF_SCOPE"
+      }
+    ]
+  },
+  "baseline_method": {
+    "script": "scripts/verification/mvp01_head_baseline.py",
+    "head": "ccce8f43e15f1ca7e024a4fc3fa99335e4a1839b",
+    "original_python_modules_loaded": 8,
+    "original_templates_loaded": 17,
+    "working_tree_modified_by_baseline": false,
+    "note": "Original changed Python modules and templates loaded via read-only git show into an isolated pytest process; exposure middleware omitted. Existing tests and domain services unchanged."
+  },
+  "files_changed": [
+    "ROADMAP.md",
+    "apps/organizations/context_processors.py",
+    "apps/reporting/templates/reporting/_read_model_card.html",
+    "apps/reporting/views.py",
+    "apps/workflows/views.py",
+    "apps/workflows/workbench.py",
+    "config/settings/base.py",
+    "core/financial_navigation.py",
+    "core/home.py",
+    "core/product_surface.py",
+    "core/product_surface_middleware.py",
+    "core/search.py",
+    "core/templatetags/product_surface.py",
+    "core/test_cep014_administration.py",
+    "core/test_cep017_navigation.py",
+    "core/test_home.py",
+    "core/test_home_browser.py",
+    "core/test_list_detail_navigation.py",
+    "core/test_list_detail_resolution.py",
+    "core/test_product_surface.py",
+    "core/test_product_surface_browser.py",
+    "core/views.py",
+    "docs/architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md",
+    "docs/governance/mvp/MVP-01_COMPLETION_REPORT.md",
+    "output/mvp-01/VALIDATION.json",
+    "output/mvp-01/browser/mvp01-browser-admin-A-C-home-desktop.png",
+    "output/mvp-01/browser/mvp01-browser-admin-A-C-home-mobile.png",
+    "output/mvp-01/browser/mvp01-browser-admin-F-expenses.png",
+    "output/mvp-01/browser/mvp01-browser-admin-G-workforce.png",
+    "output/mvp-01/browser/mvp01-browser-admin-results.json",
+    "output/mvp-01/browser/mvp01-browser-reader-B-ordinary-home.png",
+    "output/mvp-01/browser/mvp01-browser-reader-results.json",
+    "scripts/verification/mvp01_browser.mjs",
+    "scripts/verification/mvp01_head_baseline.py",
+    "templates/base.html",
+    "templates/components/empty_state.html",
+    "templates/components/navigation_links.html",
+    "templates/components/page_header.html",
+    "templates/components/record_detail_link.html",
+    "templates/equipment/detail.html",
+    "templates/home.html",
+    "templates/organizations/select.html",
+    "templates/organizations/settings.html",
+    "templates/projects/controls.html",
+    "templates/reporting/dashboard.html",
+    "templates/workflows/_work_item_row.html",
+    "templates/workflows/manager_workspace.html",
+    "templates/workflows/my_requests.html",
+    "templates/workforce/_ess_navigation.html",
+    "templates/workforce/_tabs.html",
+    "templates/workforce/employee_detail.html",
+    "templates/workforce/personal_change_status.html"
+  ],
+  "production_action": false,
+  "human_signoff": false,
+  "production_certification": false,
+  "next_package": "MVP-02 NOT STARTED; MVP-02 through MVP-08 deferred to separate authorization"
+}

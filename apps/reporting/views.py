@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from dataclasses import replace
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
@@ -45,6 +46,7 @@ from apps.reporting.services import (
     export_dashboard_csv,
     refresh_metric,
 )
+from core.product_surface import metric_exposed, route_exposed
 
 
 def _private(response: HttpResponse) -> HttpResponse:
@@ -58,8 +60,28 @@ def _private(response: HttpResponse) -> HttpResponse:
 @active_organization_required
 def dashboard(request: HttpRequest) -> HttpResponse:
     model = reporting_layers(organization=request.organization, actor=request.user)
+    # Projection only, after existing source permission and scope checks.
+    model = replace(
+        model,
+        layers=tuple(
+            replace(
+                layer,
+                cards=tuple(
+                    replace(
+                        card,
+                        can_drillthrough=card.can_drillthrough
+                        and route_exposed("reporting:drillthrough"),
+                    )
+                    for card in layer.cards
+                    if metric_exposed(card.result.metric_code)
+                ),
+            )
+            for layer in model.layers
+            if layer.code == "operational" or route_exposed("reporting:drillthrough")
+        ),
+    )
     definitions = MetricDefinition.objects.filter(
-        is_active=True, code__in=METRIC_SPECS
+        is_active=True, code__in=[code for code in METRIC_SPECS if metric_exposed(code)]
     ).order_by("code")
     return _private(
         render(

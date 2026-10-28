@@ -8,6 +8,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Approved reference-persona discovery is limited to Development/UAT.
 REFERENCE_PERSONA_CATALOGUE_ENABLED = False
 
+# Server-owned surface selection. FULL_ERP is for explicit internal verification;
+# no user, membership, request or environment-variable switch grants exposure.
+PRODUCT_SURFACE_PROFILE = "MVP"
+
 # Local dotenv loading belongs exclusively to development.py. Production imports
 # must never populate missing process secrets from a checkout-local file.
 
@@ -68,6 +72,7 @@ MIDDLEWARE: list[str] = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "apps.accounts.middleware.ForcePasswordChangeMiddleware",
     "apps.organizations.middleware.OrganizationMiddleware",
+    "core.product_surface_middleware.ProductSurfaceMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -118,6 +123,7 @@ TEMPLATES = [
             "builtins": ["apps.accounts.templatetags.erp_format"],
             "libraries": {
                 "form_accessibility": "core.templatetags.form_accessibility",
+                "product_surface": "core.templatetags.product_surface",
             },
         },
     },

@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from django.conf import settings
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
 from apps.accounts.models import User
@@ -35,17 +35,12 @@ class Cep014AdministrationTemplateTests(SimpleTestCase):
     def test_tenant_administration_remains_in_the_shared_company_navigation(
         self,
     ) -> None:
-        navigation = (
-            Path(settings.BASE_DIR)
-            / "templates"
-            / "components"
-            / "navigation_links.html"
-        ).read_text(encoding="utf-8")
+        from core.product_surface import navigation_groups
 
-        self.assertIn('data-nav-id="NAV-038"', navigation)
-        self.assertIn('data-nav-id="NAV-040"', navigation)
+        groups = navigation_groups({"company.settings.view"})
+        self.assertEqual([g.key for g in groups], ["foundation"])
         self.assertIn(
-            '"company.settings.view" in business_permission_codes', navigation
+            "organizations:settings", {link.route for link in groups[0].links}
         )
 
 
@@ -91,6 +86,7 @@ class Cep014AdministrationRouteTests(TestCase):
             403,
         )
 
+    @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_platform_admin_can_use_platform_catalogue_but_has_no_implicit_tenant_access(
         self,
     ) -> None:
@@ -110,3 +106,13 @@ class Cep014AdministrationRouteTests(TestCase):
         response = self.client.get(reverse("organizations:settings"))
         self.assertEqual(response.status_code, 302)
         self.assertNotIn(str(self.organization.pk), response.content.decode())
+
+    def test_mvp_platform_role_does_not_expose_technical_administration(self) -> None:
+        self.client.force_login(self.platform_admin)
+        self.assertEqual(
+            self.client.get(reverse("organizations:platform_role_catalog")).status_code,
+            403,
+        )
+        self.assertNotContains(
+            self.client.get(reverse("home")), 'href="/organizations/platform/roles/"'
+        )

@@ -4,6 +4,7 @@ import json
 import os
 import subprocess
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -27,20 +28,21 @@ class HomeBrowserTests(StaticLiveServerTestCase):
         root = Path(__file__).resolve().parent.parent
         env = os.environ.copy()
         env["CEP002_TEST_SESSION"] = self.client.cookies["sessionid"].value
-        result = subprocess.run(
-            [
-                "node",
-                str(root / "output" / "cep-002" / "browser_probe.mjs"),
-                f"{self.live_server_url}/",
-                state,
-                str(root / "output" / "cep-002" / "browser"),
-            ],
-            env=env,
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=90,
-        )
+        with TemporaryDirectory(prefix="bonira-home-browser-") as probe_dir:
+            result = subprocess.run(
+                [
+                    "node",
+                    str(root / "output" / "cep-002" / "browser_probe.mjs"),
+                    f"{self.live_server_url}/",
+                    state,
+                    probe_dir,
+                ],
+                env=env,
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=90,
+            )
         self.assertEqual(result.returncode, 0, result.stderr[-2000:])
         for size in json.loads(result.stdout):
             self.assertEqual(size["state"], state)

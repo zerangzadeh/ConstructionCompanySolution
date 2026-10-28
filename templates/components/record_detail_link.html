@@ -1,1 +1,2 @@
-{% if detail_url %}<a class="erp-btn erp-btn--secondary whitespace-nowrap text-xs" href="{{ detail_url }}" aria-label="مشاهده جزئیات {{ record_label }}">مشاهده جزئیات</a>{% endif %}
+{% load product_surface %}
+{% if detail_url and detail_url|surface_url_exposed %}<a class="erp-btn erp-btn--secondary whitespace-nowrap text-xs" href="{{ detail_url }}" aria-label="مشاهده جزئیات {{ record_label }}">مشاهده جزئیات</a>{% endif %}

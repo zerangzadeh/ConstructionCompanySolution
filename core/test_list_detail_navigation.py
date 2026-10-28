@@ -8,7 +8,7 @@ from uuid import UUID
 
 from django.conf import settings
 from django.template.loader import render_to_string
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 from django.urls import resolve, reverse
 
 
@@ -60,11 +60,12 @@ class ListDetailNavigationTests(SimpleTestCase):
         self.assertEqual(self.links("components/record_detail_link.html"), [])
         html = render_to_string(
             "components/record_detail_link.html",
-            {"detail_url": "/documents/example/", "record_label": '<img src="x">'},
+            {"detail_url": reverse("documents:list"), "record_label": '<img src="x">'},
         )
         self.assertNotIn('<img src="x">', html)
         self.assertIn("&lt;img", html)
 
+    @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_list_primary_identity_and_action_share_the_canonical_destination(self):
         fixtures = [
             (
@@ -138,6 +139,7 @@ class ListDetailNavigationTests(SimpleTestCase):
                 any(link.get("href") == preview for link in links), can_download
             )
 
+    @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_every_compliance_table_kind_keeps_its_registered_record_detail(self):
         for kind in ("inspection", "permit", "test", "finding", "ncr", "capa"):
             with self.subTest(kind=kind):
@@ -148,6 +150,7 @@ class ListDetailNavigationTests(SimpleTestCase):
                 url = reverse("compliance:detail", args=[kind, row.pk])
                 self.assert_detail(links, url, "REC-1")
 
+    @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_reporting_drillthrough_retains_the_existing_per_result_guard(self):
         result = self.row(
             run=Row(metric_version=Row(definition=Row(persian_name="شاخص")))
@@ -163,6 +166,7 @@ class ListDetailNavigationTests(SimpleTestCase):
             else:
                 self.assertFalse(any(link.get("href") == url for link in links))
 
+    @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_treasury_rows_reuse_the_existing_resource_detail_url(self):
         url = reverse("treasury:operational_detail", args=["account", self.identifier])
         links = self.links(
@@ -205,6 +209,7 @@ class ListDetailNavigationTests(SimpleTestCase):
                     [link["text"] for link in matching], ["رفتن به ردیف منبع"]
                 )
 
+    @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_explicit_ess_source_details_and_unavailable_sources_stay_distinct(self):
         url = reverse("workforce:personal_change_detail", args=[self.identifier])
         for template, context in (
@@ -305,6 +310,7 @@ class ListDetailNavigationTests(SimpleTestCase):
             )
             self.assertEqual(any(link.get("href") == url for link in links), allowed)
 
+    @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_own_timekeeping_rows_keep_the_own_identity_route(self):
         row = self.row(created_at=datetime(2026, 10, 26, tzinfo=timezone.utc))
         for kind in (

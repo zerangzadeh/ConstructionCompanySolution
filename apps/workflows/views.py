@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import replace
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -17,8 +18,10 @@ from apps.organizations.decorators import (
 from apps.organizations.models import BusinessPermissionCode
 from apps.workflows.models import WorkItem
 from core.list_filters import table_pagination_query
+from core.product_surface import personal_source_exposed, workflow_subject_exposed
 
 from .personal_workspaces import build_manager_workspace, build_my_requests
+from .registry import registry
 from .runtime import (
     WorkflowConflict,
     claim_work_item,
@@ -32,6 +35,7 @@ from .workbench import build_workbench, decorate_work_items, get_workbench_item
 @require_GET
 def my_requests(request: HttpRequest) -> HttpResponse:
     rows = build_my_requests(actor=request.user, organization=request.organization)
+    rows = tuple(row for row in rows if personal_source_exposed(row.source_type))
     return render(request, "workflows/my_requests.html", {"request_rows": rows})
 
 
@@ -41,6 +45,16 @@ def manager_workspace(request: HttpRequest) -> HttpResponse:
     data = build_manager_workspace(
         actor=request.user, organization=request.organization
     )
+    rows = tuple(row for row in data.rows if personal_source_exposed(row.source_type))
+    data = replace(
+        data,
+        rows=rows,
+        status_counts=tuple(
+            (status, label, sum(row.status == status for row in rows))
+            for status, label, _ in data.status_counts
+            if any(row.status == status for row in rows)
+        ),
+    )
     return render(request, "workflows/manager_workspace.html", {"manager": data})
 
 
@@ -48,7 +62,14 @@ def manager_workspace(request: HttpRequest) -> HttpResponse:
 def workbench(request: HttpRequest) -> HttpResponse:
     require_organization_permission(request, BusinessPermissionCode.WORK_ITEMS_VIEW)
     data = build_workbench(
-        actor=request.user, organization=request.organization, params=request.GET
+        actor=request.user,
+        organization=request.organization,
+        params=request.GET,
+        exposed_subject_types=frozenset(
+            adapter.subject_type
+            for adapter in registry.subject_adapters.values()
+            if workflow_subject_exposed(adapter.subject_type, adapter.detail_url_name)
+        ),
     )
     paginator = Paginator(data.queryset, 25)
     page = paginator.get_page(request.GET.get("page"))
@@ -108,6 +129,31 @@ def _operation_key(request: HttpRequest) -> str:
     return value
 
 
+def _require_work_item_surface(request: HttpRequest, work_item_id: object) -> None:
+    # Read only tenant-scoped classification. Original runtime authorization,
+    # object scope and candidacy checks still govern the mutation transaction;
+    # exposure does not add a second permission requirement for visible work.
+    item = (
+        WorkItem.objects.filter(pk=work_item_id, organization=request.organization)
+        .select_related("instance")
+        .first()
+    )
+    if item is None:
+        raise PermissionDenied("این صفحه در دسترس نیست.")
+    adapter = next(
+        (
+            value
+            for value in registry.subject_adapters.values()
+            if value.subject_type == item.instance.subject_type
+        ),
+        None,
+    )
+    if adapter is None or not workflow_subject_exposed(
+        adapter.subject_type, adapter.detail_url_name
+    ):
+        raise PermissionDenied("این صفحه در دسترس نیست.")
+
+
 def _action_response(
     request: HttpRequest,
     work_item_id: object,
@@ -155,6 +201,7 @@ def work_item_claim(request: HttpRequest, work_item_id: object) -> HttpResponse:
         require_organization_permission(
             request, BusinessPermissionCode.WORK_ITEMS_CLAIM
         )
+        _require_work_item_surface(request, work_item_id)
         return claim_work_item(
             actor=request.user,
             organization=request.organization,
@@ -174,6 +221,7 @@ def work_item_release(request: HttpRequest, work_item_id: object) -> HttpRespons
         require_organization_permission(
             request, BusinessPermissionCode.WORK_ITEMS_CLAIM
         )
+        _require_work_item_surface(request, work_item_id)
         return release_work_item(
             actor=request.user,
             organization=request.organization,
@@ -192,6 +240,7 @@ def work_item_release(request: HttpRequest, work_item_id: object) -> HttpRespons
 def work_item_action(request: HttpRequest, work_item_id: object) -> HttpResponse:
     def operation() -> object:
         require_organization_permission(request, BusinessPermissionCode.WORK_ITEMS_ACT)
+        _require_work_item_surface(request, work_item_id)
         if WorkItem.objects.filter(
             pk=work_item_id,
             organization=request.organization,

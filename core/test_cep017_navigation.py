@@ -9,62 +9,60 @@ from django.test import SimpleTestCase
 
 class Cep017NavigationTemplateTests(SimpleTestCase):
     def test_canonical_navigation_register_is_complete_and_persian_first(self) -> None:
-        navigation = (
-            Path(settings.BASE_DIR)
-            / "templates"
-            / "components"
-            / "navigation_links.html"
-        ).read_text(encoding="utf-8")
-        expected_ids = {f"NAV-{number:03d}" for number in range(1, 44) if number != 42}
-        rendered_ids = {
-            token.split('"')[1]
-            for token in navigation.split()
-            if token.startswith("data-nav-id=")
-        }
-        self.assertEqual(rendered_ids, expected_ids)
-        self.assertIn('data-canonical-navigation="43"', navigation)
-        self.assertIn("صورت‌وضعیت و صورتحساب", navigation)
-        self.assertIn("حاکمیت طرف‌های تجاری", navigation)
-        base = (Path(settings.BASE_DIR) / "templates" / "base.html").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn('data-nav-id="NAV-042"', base)
-        self.assertIn("مدیریت پلتفرم", base)
+        from core.product_surface import NAVIGATION_GROUPS, navigation_groups
 
-    def test_unimplemented_targets_are_not_links_or_new_actions(self) -> None:
-        navigation = (
-            Path(settings.BASE_DIR)
-            / "templates"
-            / "components"
-            / "navigation_links.html"
-        ).read_text(encoding="utf-8")
-        for node_id in (
-            "NAV-009",
-            "NAV-013",
-            "NAV-015",
-        ):
-            marker = f'data-nav-id="{node_id}"'
-            fragment = navigation[
-                navigation.index(marker) : navigation.index(marker) + 220
-            ]
-            self.assertIn('aria-disabled="true"', fragment)
-            self.assertNotIn("href=", fragment)
+        codes = {
+            link.permission
+            for group in NAVIGATION_GROUPS
+            for link in group.links
+            if link.permission
+        }
+        groups = navigation_groups(codes)
+        rendered = Template('{% include "components/navigation_links.html" %}').render(
+            Context(
+                {
+                    "navigation_is_authenticated": True,
+                    "product_navigation_groups": groups,
+                }
+            )
+        )
+        self.assertEqual(rendered.count("data-surface-group="), 5)
+        for group in groups:
+            self.assertIn(group.label, rendered)
+        self.assertNotIn('href="/treasury/"', rendered)
+        self.assertNotIn('href="/workforce/ess/"', rendered)
+
+    def test_empty_groups_and_hidden_targets_are_not_placeholders(self) -> None:
+        from core.product_surface import navigation_groups
+
+        rendered = Template('{% include "components/navigation_links.html" %}').render(
+            Context(
+                {
+                    "navigation_is_authenticated": True,
+                    "product_navigation_groups": navigation_groups({"accounting.view"}),
+                }
+            )
+        )
+        self.assertNotIn('data-surface-group="operations"', rendered)
+        self.assertNotIn('aria-disabled="true"', rendered)
+        self.assertNotIn('href="/accounting/"', rendered)
 
     def test_rfq_navigation_renders_one_state_for_each_permission_variant(self) -> None:
+        from core.product_surface import navigation_groups
+
         template = Template('{% include "components/navigation_links.html" %}')
-        for permissions in ([], ["rfqs.view"]):
+        for permissions in (set(), {"rfqs.view"}):
             with self.subTest(permissions=permissions):
                 rendered = template.render(
                     Context(
                         {
                             "navigation_is_authenticated": True,
-                            "business_permission_codes": permissions,
+                            "product_navigation_groups": navigation_groups(permissions),
                         }
                     )
                 )
-                self.assertEqual(rendered.count('data-nav-id="NAV-019"'), 1)
                 self.assertEqual(
-                    'href="/procurement/rfqs/"' in rendered, bool(permissions)
+                    rendered.count('href="/procurement/rfqs/"'), int(bool(permissions))
                 )
 
     def test_shared_breadcrumb_and_mobile_close_contract_are_present(self) -> None:

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load product_surface %}
 
 {% block title %}کنترل پروژه | سامانه مدیریت ساخت{% endblock %}
 
@@ -16,7 +16,7 @@
             {% if "project_controls.compare" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'projects:controls_comparison' project.pk %}">مقایسه بودجه و هزینه</a>{% endif %}
             {% if "project_controls.exceptions_view" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'projects:controls_exceptions' project.pk %}">مشاهده انحرافات بودجه‌ای</a>{% endif %}
             {% if "project_controls.export" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'projects:controls_export' project.pk %}">دریافت خروجی CSV</a>{% endif %}
-            {% if "project_cost.reconciliations_view" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'projects:cost_reconciliation' project.pk %}">تطبیق منابع هزینه</a>{% endif %}
+            {% if "project_cost.reconciliations_view" in business_permission_codes %}{% if "projects:cost_reconciliation"|surface_exposed %}<a class="erp-btn erp-btn--secondary" href="{% url 'projects:cost_reconciliation' project.pk %}">تطبیق منابع هزینه</a>{% endif %}{% endif %}
         </div>
         {% if "project_controls.compare" not in business_permission_codes and "project_controls.exceptions_view" not in business_permission_codes and "project_controls.export" not in business_permission_codes and "project_cost.reconciliations_view" not in business_permission_codes %}
         <p class="mt-3 text-sm text-slate-500">در صورت نیاز به گزارش مقایسه، انحرافات یا تطبیق هزینه، دسترسی مربوط را از مدیر شرکت درخواست کنید.</p>

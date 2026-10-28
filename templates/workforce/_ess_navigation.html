@@ -1,3 +1,5 @@
+{% load product_surface %}
+{% if "workforce:ess_dashboard"|surface_exposed %}
 <nav class="erp-surface mb-5 rounded-xl p-4 text-sm" aria-label="خدمات شخصی کارکنان">
     <a class="text-blue-700" href="{% url 'workforce:ess_dashboard' %}"{% if request.resolver_match.url_name == 'ess_dashboard' %} aria-current="page"{% endif %}>داشبورد من</a>
   <div class="mt-3 grid gap-4 sm:grid-cols-3">
@@ -12,3 +14,6 @@
   {% if "hr_certificates.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:certificate_index' %}">گواهی‌های من</a>{% endif %}</div></section>
   </div>
 </nav>
+{% elif my_requests_workspace_available %}
+<a class="erp-btn erp-btn--secondary mb-5" href="{% url 'workflows:my_requests' %}">درخواست‌های من</a>
+{% endif %}

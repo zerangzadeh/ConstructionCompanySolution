@@ -12,6 +12,7 @@ from apps.materials.services import search_organization_materials
 from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import BusinessPermissionCode, Organization
 from apps.projects.services import get_organization_projects
+from core.product_surface import route_exposed
 
 MINIMUM_QUERY_LENGTH = 2
 MAXIMUM_QUERY_LENGTH = 100
@@ -66,7 +67,7 @@ def search_active_organization(
         organization=organization,
         permission=BusinessPermissionCode.PROJECTS_VIEW,
         allow_any_scope=True,
-    ):
+    ) and route_exposed("projects:detail"):
         projects = get_organization_projects(user=actor, organization=organization)
         projects = projects.filter(code__icontains=normalized) | projects.filter(
             name__icontains=normalized
@@ -88,7 +89,7 @@ def search_active_organization(
         user=actor,
         organization=organization,
         permission=BusinessPermissionCode.MATERIALS_VIEW,
-    ):
+    ) and route_exposed("materials:material_detail"):
         try:
             materials = search_organization_materials(
                 user=actor, organization=organization, term=normalized

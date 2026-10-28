@@ -444,13 +444,21 @@ def _filter_choices(
 
 
 def build_workbench(
-    *, actor: User, organization: Organization, params: Mapping[str, Any]
+    *,
+    actor: User,
+    organization: Organization,
+    params: Mapping[str, Any],
+    exposed_subject_types: frozenset[str] | None = None,
 ) -> WorkbenchData:
     membership, permission_codes = _authorized_membership(
         actor=actor, organization=organization
     )
     adapters = _authorized_adapters(permission_codes)
     subject_types = tuple(adapters)
+    if exposed_subject_types is not None:
+        subject_types = tuple(
+            value for value in subject_types if value in exposed_subject_types
+        )
     base = _base_queryset(
         organization=organization,
         membership=membership,

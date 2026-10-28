@@ -1,6 +1,7 @@
+{% load product_surface %}
 <tr id="work-item-{{ item.pk }}" class="align-top even:bg-slate-100 hover:bg-slate-200/70">
     <td class="break-words px-3 py-3.5 sm:px-4">
-        {% if item.source_url %}<a class="font-semibold text-slate-900 hover:text-blue-700" href="{{ item.source_url }}">{{ item.subject_title }}</a>{% else %}<span class="font-semibold text-slate-900">{{ item.subject_title }}</span>{% endif %}
+        {% if item.source_url and item.source_url|surface_url_exposed %}<a class="font-semibold text-slate-900 hover:text-blue-700" href="{{ item.source_url }}">{{ item.subject_title }}</a>{% else %}<span class="font-semibold text-slate-900">{{ item.subject_title }}</span>{% endif %}
         <p class="mt-1 text-[11px] text-slate-500">{{ item.instance.definition.workflow_type.name }} · {{ item.step_instance.step_definition.name }}</p>
         {% if item.safety_responsible %}<p class="mt-1 text-[11px] text-slate-600">مسئول اقدام: {{ item.safety_responsible }}</p>{% endif %}
         <p class="mt-1 text-[11px] text-slate-500 lg:hidden"><span class="font-semibold">دلیل دریافت:</span> {% for reason in item.workbench_reasons %}{{ reason }}{% if not forloop.last %}، {% endif %}{% endfor %}</p>
