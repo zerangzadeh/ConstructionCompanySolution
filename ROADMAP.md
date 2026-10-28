@@ -113,10 +113,11 @@ deliberately maintains no second live CEP queue or per-CEP completion ledger.
 The Product Owner approved this corrected eight-package **current MVP delivery
 plan** on 2026-10-29. These are bounded MVP implementation packages, not CEPs;
 they do not reopen completed CEPs or change the formal CEP dependency graph.
-The current instruction authorizes MVP-01 only. Later packages require their own
-bounded authorization; this sequence is not execution authority.
+MVP-01 was separately authorized and is complete. Remaining packages require
+their own bounded authorization. Plan numbering does not impose hard serial
+dependencies among MVP-02 through MVP-06 or authorize execution/parallel work.
 
-| Order | MVP package | Delivery scope |
+| Plan position | MVP package | Delivery scope |
 | --- | --- | --- |
 | 1 | MVP-01 | Product Surface Exposure & Navigation |
 | 2 | MVP-02 | Field Workforce MVP |
@@ -129,14 +130,59 @@ bounded authorization; this sequence is not execution authority.
 
 Prioritize the three core journeys and output priorities in the
 [MVP strategy](docs/architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md#6-d6--quality-journeys-and-release-criteria).
-The bounded centralized exposure foundation is implemented in MVP-01;
+**MVP-01 is COMPLETE:** the centralized capability-level exposure foundation,
+mixed-domain route control, five navigation groups and hidden direct-URL boundary
+are implemented, preserving Expenses/Treasury and Workforce/Timekeeping behavior;
 [its completion report](docs/governance/mvp/MVP-01_COMPLETION_REPORT.md) records
-current Development evidence and limitations. Remaining requirements include
+current Development evidence and limitations. MVP-GAP-001 and MVP-GAP-002 are not
+remaining exposure/navigation work; do not reopen MVP-01. Remaining requirements include
 simplified field-worker workflows reusing Workforce/Timekeeping,
 additive non-login field-worker `national_id` design, shared XLSX exports and
 required print outputs. These are not implementation-completion claims or new
 CEP packages/dependency edges. P0 Excel delivery is Billing, Procurement,
 Inventory and Expenses; P1 priorities remain in the strategy.
+
+The approved delivery clarifications for the remaining packages are:
+
+- **Visible-surface technical leakage:** D6's zero-critical-leakage requirement
+  applies to MVP-visible customer workflows and shared components used by them.
+  Remediation includes technical UUID/idempotency-key entry, internal codes in
+  place of business labels, and backend/domain implementation terminology exposed
+  to business users. Correct shared widgets when they cause such leakage across
+  visible pages; this does not expand into cleanup of hidden Full ERP screens.
+- **Demo/UAT starting states:** realistic, repeatable starting states are **P0
+  release-enabling work**, required before final MVP Browser E2E and Human UAT.
+  Prepare them incrementally as MVP-02, MVP-03 and MVP-04 are completed, without
+  waiting for MVP-08. Journey 2 needs legitimately configured contract terms and
+  approved baseline/progress/workflow state where existing domain rules require
+  them; do not invent rates, statutory values, policies or approvals for demos.
+  MVP-08 retains final verification/Human UAT ownership.
+- **Independent P0 print:** MVP-06 is a P0 release package independent of P1 XLSX
+  completion and the XLSX writer. Its targets remain Progress Claim / Billing,
+  Purchase Order, GRN, Daily Report, and Expense / Petty Cash Summary. MVP-07 owns
+  P1 XLSX outputs and non-blocking usability; do not recombine those dependencies.
+- **Genuine XLSX:** MVP-05 and MVP-07 must generate standard Excel/OpenXML `.xlsx`
+  workbooks, with appropriate RTL worksheet presentation for Persian outputs.
+  Renamed CSV, HTML with an `.xlsx` extension, JSON, uploaded spreadsheet evidence
+  and export manifests do not satisfy this requirement. Prefer a mature,
+  license-compatible library over a hand-built XLSX writer; the Python library
+  remains an engineering choice, not frozen or selected here.
+- **Field-worker national ID:** MVP-02 retains the approved additive gap. Inspect
+  `User`, tenant-owned `Person`, `WorkRelationship` and legacy `Employee` before
+  designing storage; no physical field location is prescribed here. A non-login
+  field worker must support a national ID without requiring a `User`. Preserve
+  tenant ownership/isolation, prevent duplicate/conflicting workforce identities
+  according to the current identity model, and do not silently permit contradictory
+  national IDs when a workforce identity is legitimately linked to a `User`.
+  Introduce no parallel `Worker` domain/model.
+- **Package independence and integration:** MVP-02, MVP-03 and MVP-04 are separate
+  journey/domain packages; the MVP-05 shared XLSX foundation can proceed largely
+  independently, and MVP-06 Print is independent of the XLSX writer. Integration
+  and acceptance still use MVP-01's centralized Product Surface policy. MVP-08
+  requires the necessary implementation packages to be complete enough for final
+  verification and Human UAT, with the P0 starting states ready beforehand. These
+  planning relationships do not change the formal CEP dependency graph or waive
+  bounded execution authorization and repository-safety requirements.
 
 MVP release requires browser journey verification, tenant/permission isolation,
 P0 Excel, critical print outputs, no blocking MVP defect and Human UAT. Retain
