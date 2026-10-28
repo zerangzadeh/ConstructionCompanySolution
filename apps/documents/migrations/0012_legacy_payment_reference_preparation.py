@@ -11,12 +11,6 @@ def preserve_excluded_sources(apps, schema_editor):
     import hashlib
     import json
 
-    from django.conf import settings
-
-    if settings.SETTINGS_MODULE != "config.settings.development":
-        raise RuntimeError(
-            "Legacy Payment disposition is authorized for Development only"
-        )
     alias = schema_editor.connection.alias
     Payment = apps.get_model("payments", "Payment")
     Evidence = apps.get_model("documents", "RetiredPaymentEvidence")
@@ -25,7 +19,7 @@ def preserve_excluded_sources(apps, schema_editor):
     Link = apps.get_model("payments", "PaymentDocumentLink")
     Generic = apps.get_model("documents", "DocumentLink")
     Audit = apps.get_model("audit", "AuditEvent")
-    authority = "docs/governance/cep/supporting/LEGACY_PAYMENT_RETIREMENT_AUTHORIZATION_20261019.md"
+    authority = "docs/governance/production/LEGACY_PAYMENT_RETIRED_DECISION_20261028.md"
     for payment in Payment.objects.using(alias).order_by("pk"):
         allocations = list(
             Allocation.objects.using(alias)
@@ -56,7 +50,7 @@ def preserve_excluded_sources(apps, schema_editor):
             raise RuntimeError("Cross-tenant retained source reference")
         payload = {
             "source_model": "payments.Payment",
-            "disposition": "excluded_demo_test",
+            "disposition": "RETIRED_LEGACY_DATA",
             "payment": Payment.objects.using(alias)
             .filter(pk=payment.pk)
             .values()
@@ -92,7 +86,19 @@ def preserve_excluded_sources(apps, schema_editor):
             },
         )
         if not created and evidence.source_sha256 != digest:
-            raise RuntimeError("Conflicting retained source snapshot")
+            # Keep accepted historical snapshots immutable; compare every source
+            # field, allowing only the superseded historical disposition label.
+            previous = evidence.source_snapshot
+            previous_digest = hashlib.sha256(
+                json.dumps(previous, sort_keys=True, separators=(",", ":")).encode()
+            ).hexdigest()
+            comparable = dict(previous, disposition="RETIRED_LEGACY_DATA")
+            if (
+                previous_digest != evidence.source_sha256
+                or previous.get("disposition") != "excluded_demo_test"
+                or comparable != snapshot
+            ):
+                raise RuntimeError("Conflicting retained source snapshot")
 
 
 def preserve_typed_links(apps, schema_editor):

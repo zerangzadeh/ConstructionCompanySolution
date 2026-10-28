@@ -1,0 +1,39 @@
+Found 22 test(s).
+Using existing test database for alias 'default' ('test_pe_legacy_20261028_regression')...
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+test_legacy_orm_and_permissions_absent_but_treasury_remains (apps.treasury.test_retirement_contract.RetiredRuntimeContractTests.test_legacy_orm_and_permissions_absent_but_treasury_remains) ... ok
+test_demo_requests_are_pending_idempotent_and_do_not_fabricate_cash (apps.treasury.test_payment_retirement.TreasuryPaymentReplacementTests.test_demo_requests_are_pending_idempotent_and_do_not_fabricate_cash) ... ok
+test_dms_links_current_treasury_without_legacy_reference (apps.treasury.test_payment_retirement.TreasuryPaymentReplacementTests.test_dms_links_current_treasury_without_legacy_reference) ... ok
+test_financial_projection_requires_treasury_source_permission (apps.treasury.test_payment_retirement.TreasuryPaymentReplacementTests.test_financial_projection_requires_treasury_source_permission) ... ok
+test_projection_counts_one_cash_event_and_excludes_drafts_and_reversals (apps.treasury.test_payment_retirement.TreasuryPaymentReplacementTests.test_projection_counts_one_cash_event_and_excludes_drafts_and_reversals) ... ok
+test_retained_source_snapshot_is_interpretable_and_immutable (apps.treasury.test_payment_retirement.TreasuryPaymentReplacementTests.test_retained_source_snapshot_is_interpretable_and_immutable) ... ok
+test_retired_runtime_has_no_models_or_service_module (apps.treasury.test_payment_retirement.TreasuryPaymentReplacementTests.test_retired_runtime_has_no_models_or_service_module) ... ok
+test_ui_create_submit_post_and_reverse_preserve_treasury_history (apps.treasury.test_payment_retirement.TreasuryPaymentReplacementTests.test_ui_create_submit_post_and_reverse_preserve_treasury_history) ... ok
+test_ui_csrf_and_cross_tenant_targets_fail_closed (apps.treasury.test_payment_retirement.TreasuryPaymentReplacementTests.test_ui_csrf_and_cross_tenant_targets_fail_closed) ... ok
+test_active_subledger_allocation_blocks_claim_correction (apps.billing.test_payment_retirement.TreasuryClaimSettlementTransitionTests.test_active_subledger_allocation_blocks_claim_correction) ... ok
+test_claim_endpoint_uses_posted_treasury_receipt_with_csrf (apps.billing.test_payment_retirement.TreasuryClaimSettlementTransitionTests.test_claim_endpoint_uses_posted_treasury_receipt_with_csrf) ... ok
+test_draft_disbursement_and_wrong_project_receipts_are_not_settlement_sources (apps.billing.test_payment_retirement.TreasuryClaimSettlementTransitionTests.test_draft_disbursement_and_wrong_project_receipts_are_not_settlement_sources) ... ok
+test_partial_settlement_retry_and_caps_use_one_subledger_authority (apps.billing.test_payment_retirement.TreasuryClaimSettlementTransitionTests.test_partial_settlement_retry_and_caps_use_one_subledger_authority) ... ok
+test_reversal_retains_history_reopens_capacity_and_blocks_cash_reversal_until_clear (apps.billing.test_payment_retirement.TreasuryClaimSettlementTransitionTests.test_reversal_retains_history_reopens_capacity_and_blocks_cash_reversal_until_clear) ... ok
+test_tenant_permission_state_and_receipt_context_fail_closed (apps.billing.test_payment_retirement.TreasuryClaimSettlementTransitionTests.test_tenant_permission_state_and_receipt_context_fail_closed) ... ok
+test_settlement_does_not_implicitly_recognize_ar (apps.billing.test_payment_retirement.UnrecognizedClaimSettlementTests.test_settlement_does_not_implicitly_recognize_ar) ... ok
+test_partial_settlement_counts_allocation_once_not_receipt (apps.reporting.test_payment_retirement.ClaimSettlementReportingTests.test_partial_settlement_counts_allocation_once_not_receipt) ... ok
+test_reversal_changes_current_but_preserves_pre_reversal_cutoff (apps.reporting.test_payment_retirement.ClaimSettlementReportingTests.test_reversal_changes_current_but_preserves_pre_reversal_cutoff) ... ok
+test_tenant_and_project_scope_do_not_leak (apps.reporting.test_payment_retirement.ClaimSettlementReportingTests.test_tenant_and_project_scope_do_not_leak) ... ok
+test_wrong_source_version_direction_and_context_are_excluded (apps.reporting.test_payment_retirement.ClaimSettlementReportingTests.test_wrong_source_version_direction_and_context_are_excluded) ... ok
+test_production_and_remote_targets_preserve_without_population_gate (apps.treasury.test_retirement_contract.RetirementContractGuardTests.test_production_and_remote_targets_preserve_without_population_gate) ... ok
+test_state_retirement_never_drops_original_records (apps.treasury.test_retirement_contract.RetirementContractGuardTests.test_state_retirement_never_drops_original_records) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 256.403s
+
+OK
+Preserving test database for alias 'default' ('test_pe_legacy_20261028_regression')...

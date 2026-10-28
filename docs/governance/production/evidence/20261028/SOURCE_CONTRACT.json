@@ -1,0 +1,109 @@
+{
+  "recovery_basis": "Required upstream Gate/specification/PD sources unavailable as local canonical files; approved recovery archives verified against retained entry identities; local CEP prompts take precedence",
+  "archives": {
+    "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip": {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip",
+      "sha256": "cf45d1f6db5821084205e3cdf0553cd68c036855cd4c1d5bbe1ee28c7e6693be",
+      "members": {
+        "BONIRA_OPERATING_SPECIFICATION.md": {
+          "sha256": "d144b3cfa3266564d2467b659d70597fe9d0b1923814a4db59c97ac5c7e48633"
+        },
+        "BONIRA_PRODUCTION_DEPLOYMENT_SPECIFICATION.md": {
+          "sha256": "437f4515abf52524421a5ad27286f06a7b774f52719069f5054d52f40b4dc0bc"
+        },
+        "BONIRA_RECOVERY_POLICY_MATRIX.csv": {
+          "sha256": "579ac8da6323078508b486410880b9affcee4842aea5e8fb57b2ea2e219a7494"
+        }
+      }
+    },
+    "BONIRA_PRODUCT_DECISION_FREEZE_CONSOLIDATED_LATEST.zip": {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_PRODUCT_DECISION_FREEZE_CONSOLIDATED_LATEST.zip",
+      "sha256": "1c11429f2e0cc16c61b585832537e5035d19d008bccefc4e94f6d18839047599",
+      "members": {
+        "BONIRA_FINAL_PRODUCT_DECISION_REGISTER.md": {
+          "sha256": "bbd1068b60162cb6b027eb66f1aae2cb3f23ad65e8f2bc9b82f1acce8fe20eda"
+        }
+      }
+    },
+    "BONIRA_IMPLEMENTATION_ROADMAP_CONSOLIDATED_LATEST.zip": {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_IMPLEMENTATION_ROADMAP_CONSOLIDATED_LATEST.zip",
+      "sha256": "54082de6f32d9a26805aaa3050f24a9863d73f840d827274f0cd3145988b6784",
+      "members": {
+        "BONIRA_IMPLEMENTATION_GATE_REGISTER.csv": {
+          "sha256": "4eca43cb04f5f32afdc2ec177c2c4c8ec1963115d3e23f91e3b07c8b5579358d",
+          "rows": [
+            {
+              "Gate ID": "GATE-08",
+              "Gate Name": "Runtime Verification",
+              "Gate Type": "RUNTIME VERIFICATION GATE",
+              "Purpose": "Record environment-specific verification only after implementation availability.",
+              "Required IMB IDs": "IMB-0103; IMB-0104; IMB-0105; IMB-0106; IMB-0107; IMB-0108; IMB-0109",
+              "Required External Dependencies": "EXT-0020; EXT-0021; EXT-0022; EXT-0023; EXT-0024 as applicable",
+              "Evidence Required": "Executed runtime scenarios, environment/build identity, logs/results, explicit PASS/FAIL per verification item.",
+              "Pass Condition": "Required verification items have executed evidence; no static evidence is promoted to runtime PASS.",
+              "Failure Consequence": "Affected production/UAT/certification decisions remain blocked or UTV.",
+              "Downstream Work Unlocked": "UAT convergence and Production Certification evidence",
+              "UTV?": "YES until executed",
+              "Human Sign-off?": "NO",
+              "Notes": "Not every feature requires every verification item."
+            },
+            {
+              "Gate ID": "GATE-10",
+              "Gate Name": "Representative UAT Completion",
+              "Gate Type": "UAT COMPLETION GATE",
+              "Purpose": "Record completion of the approved representative UAT execution without conflating UAT with Production Certification or Human Sign-off.",
+              "Required IMB IDs": "IMB-0110",
+              "Required External Dependencies": "EXT-0025",
+              "Evidence Required": "Scenario-by-scenario runtime results for all 44 approved representative cases with build/environment identity.",
+              "Pass Condition": "All 44 approved representative UAT scenarios are executed as applicable; required evidence is captured; unresolved failures are explicitly dispositioned; no exhaustive-UAT claim is made. Passing GATE-10 does not constitute Human Sign-off.",
+              "Failure Consequence": "Production acceptance/human sign-off cannot claim UAT completion.",
+              "Downstream Work Unlocked": "GATE-11 — Production Certification review",
+              "UTV?": "YES until executed",
+              "Human Sign-off?": "NO",
+              "Notes": "REPRESENTATIVE UAT COMPLETE ≠ PRODUCTION CERTIFICATION COMPLETE ≠ HUMAN SIGN-OFF. HUMAN SIGN-OFF: NOT EXECUTED."
+            },
+            {
+              "Gate ID": "GATE-11",
+              "Gate Name": "Production Certification",
+              "Gate Type": "PRODUCTION CERTIFICATION GATE",
+              "Purpose": "Certify production/system-operational readiness only after GATE-10 Representative UAT Completion and all existing production readiness controls/evidence are satisfied.",
+              "Required IMB IDs": "IMB-0083; IMB-0098; IMB-0099; IMB-0100; IMB-0101; IMB-0104; IMB-0105; IMB-0106; IMB-0107",
+              "Required External Dependencies": "EXT-0018; EXT-0020; EXT-0021; EXT-0022",
+              "Evidence Required": "Activated official statutory package where applicable; backup/restore evidence; deployment drill; observability/incident drill; supply-chain re-verification; approved topology/recovery/operating evidence.",
+              "Pass Condition": "GATE-10 Representative UAT Completion has PASSED; all required Production Certification IMB items are complete; required runtime/production evidence is available; required external production evidence is available; and no unresolved production-certification blocker remains.",
+              "Failure Consequence": "Production certification remains NOT COMPLETE regardless of feature/UAT state.",
+              "Downstream Work Unlocked": "Future production release decision and Human Sign-off review",
+              "UTV?": "YES until production-equivalent evidence exists",
+              "Human Sign-off?": "NO",
+              "Notes": "GATE-10 → GATE-11 is mandatory. PRODUCTION CERTIFICATION ≠ HUMAN SIGN-OFF. GATE-11 is not currently passed."
+            },
+            {
+              "Gate ID": "GATE-12",
+              "Gate Name": "Human Business Sign-off",
+              "Gate Type": "HUMAN SIGN-OFF GATE",
+              "Purpose": "Record final explicit human/business acceptance only after Representative UAT Completion and Production Certification.",
+              "Required IMB IDs": "IMB-0110 (evidence input)",
+              "Required External Dependencies": "EXT-0026",
+              "Evidence Required": "Explicit authorized human sign-off linked to reviewed build and evidence set.",
+              "Pass Condition": "GATE-10 Representative UAT Completion has PASSED AND GATE-11 Production Certification has PASSED AND EXT-0026 contains an explicit authorized Human Business Sign-off record.",
+              "Failure Consequence": "HUMAN SIGN-OFF remains NOT EXECUTED; documentation/product decisions do not substitute.",
+              "Downstream Work Unlocked": "Future human-accepted release state",
+              "UTV?": "YES",
+              "Human Sign-off?": "YES — FUTURE / NOT EXECUTED",
+              "Notes": "GATE-10 → GATE-11 → GATE-12. EXT-0026 applies only to GATE-12. HUMAN SIGN-OFF: NOT EXECUTED."
+            }
+          ]
+        }
+      }
+    },
+    "BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip": {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip",
+      "sha256": "15f8d71a3f3e14feed9e7162b81f74ad39b546df9aff3ec5b01e1a676deaf429",
+      "members": {
+        "BONIRA_CEP_EXTERNAL_DEPENDENCY_REGISTER.csv": {
+          "sha256": "e1dae585c60060459c75ac8676b0c5aeb2cbaaaeb1d5422f7a8d23bd3b23c2af"
+        }
+      }
+    }
+  }
+}

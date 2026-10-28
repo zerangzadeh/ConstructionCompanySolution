@@ -1,0 +1,42 @@
+Found 21 test(s).
+Using existing test database for alias 'default' ('test_pe_readiness_qualified_20261028')...
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+test_profit_loss_zero_and_balanced_permanent_carry (apps.accounting.test_fiscal_year_closing.FiscalYearClosingTests.test_profit_loss_zero_and_balanced_permanent_carry) ... ok
+test_idempotency_for_prepare_close_and_opening (apps.accounting.test_fiscal_year_closing.FiscalYearClosingTests.test_idempotency_for_prepare_close_and_opening) ... ok
+test_roll_reversal_reclose_and_new_version (apps.accounting.test_fiscal_year_closing.FiscalYearClosingTests.test_roll_reversal_reclose_and_new_version) ... ok
+test_self_approval_and_self_acceptance_denied (apps.accounting.test_fiscal_year_closing.FiscalYearClosingTests.test_self_approval_and_self_acceptance_denied) ... accounting.year_end_failed stage=approve_year_end
+accounting.year_end_failed stage=roll_forward_year_end
+ok
+test_cross_tenant_pair_and_configuration_are_denied (apps.accounting.test_fiscal_year_closing.FiscalYearClosingTests.test_cross_tenant_pair_and_configuration_are_denied) ... accounting.year_end_failed stage=prepare_year_end
+accounting.year_end_failed stage=configure_year_end
+ok
+test_annual_ytd_subtracts_prior_withholding (apps.payroll.test_cep069.AdoptedStatutoryTests.test_annual_ytd_subtracts_prior_withholding) ... ok
+test_unmapped_and_conditional_components_reject (apps.payroll.test_cep069.AdoptedStatutoryTests.test_unmapped_and_conditional_components_reject) ... ok
+test_context_tenant_permission_immutability (apps.payroll.test_cep069.AdoptedStatutoryTests.test_context_tenant_permission_immutability) ... ok
+test_governance_rejects_missing_source_dates_and_production (apps.payroll.test_cep069.AdoptedStatutoryTests.test_governance_rejects_missing_source_dates_and_production) ... ok
+test_explicit_source_linked_activation_and_calculation_snapshot (apps.payroll.test_cep069.AdoptedStatutoryTests.test_explicit_source_linked_activation_and_calculation_snapshot) ... ok
+test_populated_ledger_survives_schema_rollback_and_reapply (apps.accounting.test_fiscal_year_closing.FiscalYearClosingMigrationTests.test_populated_ledger_survives_schema_rollback_and_reapply) ... ok
+test_concurrent_prepare_close_and_opening_create_one_execution (apps.accounting.test_fiscal_year_closing.FiscalYearClosingConcurrencyTests.test_concurrent_prepare_close_and_opening_create_one_execution) ... ok
+test_cache_probe_only_reads_a_fresh_namespaced_key (tests.test_operations.OperationsTests.test_cache_probe_only_reads_a_fresh_namespaced_key) ... ok
+test_correlated_http_alert_has_no_payload_and_delivery_failure_propagates (tests.test_operations.OperationsTests.test_correlated_http_alert_has_no_payload_and_delivery_failure_propagates) ... ok
+test_database_probe_is_read_only_and_result_checked (tests.test_operations.OperationsTests.test_database_probe_is_read_only_and_result_checked) ... ok
+test_dependency_failure_is_sanitized_and_other_probe_runs (tests.test_operations.OperationsTests.test_dependency_failure_is_sanitized_and_other_probe_runs) ... ok
+test_durable_local_receipt_survives_restart_with_thirty_day_retention (tests.test_operations.OperationsTests.test_durable_local_receipt_survives_restart_with_thirty_day_retention) ... ok
+test_health_command_exit_and_json_never_certify_readiness (tests.test_operations.OperationsTests.test_health_command_exit_and_json_never_certify_readiness) ... ok
+test_local_failure_alert_delivery_and_no_payload_copy (tests.test_operations.OperationsTests.test_local_failure_alert_delivery_and_no_payload_copy) ... ok
+test_request_alert_rules_do_not_invent_thresholds (tests.test_operations.OperationsTests.test_request_alert_rules_do_not_invent_thresholds) ... ok
+test_retention_plans_then_removes_only_owned_old_diagnostics (tests.test_operations.OperationsTests.test_retention_plans_then_removes_only_owned_old_diagnostics) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 174.643s
+
+OK
+Preserving test database for alias 'default' ('test_pe_readiness_qualified_20261028')...

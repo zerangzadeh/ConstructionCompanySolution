@@ -1,0 +1,92 @@
+{
+  "at": "2026-10-28T00:22:08.498276+00:00",
+  "result": "PASS",
+  "profile": "BONIRA-PE-NP-01",
+  "head": "c9fe1d7e7ed586ef96a2ee453a3490369d25e6a3",
+  "migration_count": 6,
+  "web": [
+    {
+      "phase": "PREVIOUS",
+      "identity": {
+        "at": "2026-10-28T00:21:11.649248+00:00",
+        "release": "readiness-previous",
+        "image_pid_started_uid": "sha256:d2f481516c0eb5229ba4224041880abf63ab96fceb5a8a7e11f0f7b85b9b5f27|3313|2026-10-28T00:21:08.954921575Z|10001:33",
+        "source_head": "de6e20863896e7587e58bf917f807cea75f95b7a"
+      },
+      "http_cases": 14,
+      "health": {
+        "at": "2026-10-28T00:21:22.281601+00:00",
+        "exit_code": 0,
+        "signals": [
+          "database.reachable",
+          "cache.reachable"
+        ],
+        "production_readiness": "NOT_VALIDATED",
+        "scope": "database-and-cache-reachability-only"
+      }
+    },
+    {
+      "phase": "CURRENT",
+      "identity": {
+        "at": "2026-10-28T00:21:26.797477+00:00",
+        "release": "readiness-current",
+        "image_pid_started_uid": "sha256:d2f481516c0eb5229ba4224041880abf63ab96fceb5a8a7e11f0f7b85b9b5f27|3687|2026-10-28T00:21:23.894100715Z|10001:33",
+        "source_head": "c9fe1d7e7ed586ef96a2ee453a3490369d25e6a3"
+      },
+      "http_cases": 14,
+      "health": {
+        "at": "2026-10-28T00:21:37.075206+00:00",
+        "exit_code": 0,
+        "signals": [
+          "database.reachable",
+          "cache.reachable"
+        ],
+        "production_readiness": "NOT_VALIDATED",
+        "scope": "database-and-cache-reachability-only"
+      }
+    },
+    {
+      "phase": "ROLLBACK",
+      "identity": {
+        "at": "2026-10-28T00:21:41.825649+00:00",
+        "release": "readiness-previous",
+        "image_pid_started_uid": "sha256:d2f481516c0eb5229ba4224041880abf63ab96fceb5a8a7e11f0f7b85b9b5f27|4060|2026-10-28T00:21:38.950848932Z|10001:33",
+        "source_head": "de6e20863896e7587e58bf917f807cea75f95b7a"
+      },
+      "http_cases": 14,
+      "health": {
+        "at": "2026-10-28T00:21:51.801536+00:00",
+        "exit_code": 0,
+        "signals": [
+          "database.reachable",
+          "cache.reachable"
+        ],
+        "production_readiness": "NOT_VALIDATED",
+        "scope": "database-and-cache-reachability-only"
+      }
+    },
+    {
+      "phase": "RETURN",
+      "identity": {
+        "at": "2026-10-28T00:21:56.683649+00:00",
+        "release": "readiness-current",
+        "image_pid_started_uid": "sha256:d2f481516c0eb5229ba4224041880abf63ab96fceb5a8a7e11f0f7b85b9b5f27|4442|2026-10-28T00:21:53.625566535Z|10001:33",
+        "source_head": "c9fe1d7e7ed586ef96a2ee453a3490369d25e6a3"
+      },
+      "http_cases": 14,
+      "health": {
+        "at": "2026-10-28T00:22:07.180526+00:00",
+        "exit_code": 0,
+        "signals": [
+          "database.reachable",
+          "cache.reachable"
+        ],
+        "production_readiness": "NOT_VALIDATED",
+        "scope": "database-and-cache-reachability-only"
+      }
+    }
+  ],
+  "rollback": "Actual previous-code/schema database binding restored, then current code/schema binding returned; retained database never downgraded",
+  "production": false,
+  "certification": "NOT_EXECUTED"
+}

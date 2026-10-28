@@ -1,0 +1,39 @@
+{
+  "result": "PASS",
+  "https_cases": 28,
+  "service_identities": [
+    {
+      "at": "2026-10-28T12:21:44.504129+00:00",
+      "release": "production-disposition-current",
+      "image_pid_started_uid": "sha256:d2f481516c0eb5229ba4224041880abf63ab96fceb5a8a7e11f0f7b85b9b5f27|15640|2026-10-28T12:21:35.061727446Z|10001:33",
+      "source_head": "de6e20863896e7587e58bf917f807cea75f95b7a"
+    },
+    {
+      "at": "2026-10-28T12:22:38.337335+00:00",
+      "release": "production-disposition-current",
+      "image_pid_started_uid": "sha256:d2f481516c0eb5229ba4224041880abf63ab96fceb5a8a7e11f0f7b85b9b5f27|16823|2026-10-28T12:22:27.242352962Z|10001:33",
+      "source_head": "de6e20863896e7587e58bf917f807cea75f95b7a"
+    }
+  ],
+  "production_settings": true,
+  "gunicorn": "sync/private Unix socket/unprivileged",
+  "db_tls": "verify-full/SCRAM",
+  "sink_private": true,
+  "sink_actual_receipts": 36,
+  "signals": [
+    "authentication.failed",
+    "authorization.denied",
+    "cache.reachable",
+    "database.unreachable",
+    "deployment.failed",
+    "document.delivery_failed",
+    "migration.failed",
+    "operational.not_ready"
+  ],
+  "failed_login_behavior_preserved": true,
+  "sink_outage_response_preserved": true,
+  "failed_bootstrap_and_migration_probes": true,
+  "receipt_survives_worker_restart": true,
+  "health_not_promoted_to_readiness": true,
+  "production": false
+}

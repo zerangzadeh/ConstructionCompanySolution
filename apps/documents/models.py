@@ -1077,7 +1077,7 @@ class RetainedEvidenceQuerySet(models.QuerySet):
 
 
 class RetiredPaymentEvidence(UUIDModel, CreatedAtModel):
-    """Immutable interpretation of excluded demo history; never a cash authority."""
+    """Immutable retired legacy interpretation; never a cash authority."""
 
     organization = models.ForeignKey(
         "organizations.Organization", on_delete=models.PROTECT
@@ -1090,7 +1090,7 @@ class RetiredPaymentEvidence(UUIDModel, CreatedAtModel):
     objects = RetainedEvidenceQuerySet.as_manager()
 
     def __str__(self):
-        return f"Retired demo Payment {self.payment_number} ({self.pk})"
+        return f"Retired legacy Payment {self.payment_number} ({self.pk})"
 
     def save(self, *args, **kwargs):
         if not self._state.adding:

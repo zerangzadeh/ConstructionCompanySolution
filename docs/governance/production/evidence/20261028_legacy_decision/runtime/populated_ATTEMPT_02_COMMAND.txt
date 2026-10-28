@@ -1,0 +1,63 @@
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.CheckViolation: new row for relation "accounting_journalentry" violates check constraint "journal_posting_state_consistent"
+DETAIL:  Failing row contains (97575c36-2fd9-4c7b-9485-908745e0d5fb, 2026-10-28 02:33:48.751+00, 2026-10-28 02:33:48.751009+00, manual, draft, 1, 2026-01-01, 2026-01-01, IRR, synthetic-21, synthetic-21, , , null, null, null, b72f1a18-2775-4969-91b3-d67d98ff9f22, 767e8c99-cb4a-4e2a-91b5-8263b0d93d55, null, null, ef509ec5-6ba0-4c9f-b2ca-b1f042e7ae04, null, null, manual_entry, 00b6ed85-0d28-4efb-b7fd-d8b4ef62eabe, , , null, null, null, manual, 9de9c96b-3cb2-4101-b4c9-f558e5227e58, 1, , null).
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/tools/bootstrap_legacy_probe.py", line 388, in <module>
+    main()
+  File "/tools/bootstrap_legacy_probe.py", line 259, in main
+    populate(executor.loader.project_state(PRE).apps)
+  File "/tools/bootstrap_legacy_probe.py", line 215, in populate
+    journal = create(
+              ^^^^^^^
+  File "/tools/bootstrap_legacy_probe.py", line 119, in create
+    obj = model.objects.create(**values)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/base.py", line 1008, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/base.py", line 1169, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/base.py", line 1210, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/query.py", line 1873, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/models/sql/compiler.py", line 1882, in execute_sql
+    cursor.execute(sql, params)
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/usr/local/lib/python3.11/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/usr/local/lib/python3.11/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/psycopg/cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+django.db.utils.IntegrityError: new row for relation "accounting_journalentry" violates check constraint "journal_posting_state_consistent"
+DETAIL:  Failing row contains (97575c36-2fd9-4c7b-9485-908745e0d5fb, 2026-10-28 02:33:48.751+00, 2026-10-28 02:33:48.751009+00, manual, draft, 1, 2026-01-01, 2026-01-01, IRR, synthetic-21, synthetic-21, , , null, null, null, b72f1a18-2775-4969-91b3-d67d98ff9f22, 767e8c99-cb4a-4e2a-91b5-8263b0d93d55, null, null, ef509ec5-6ba0-4c9f-b2ca-b1f042e7ae04, null, null, manual_entry, 00b6ed85-0d28-4efb-b7fd-d8b4ef62eabe, , , null, null, null, manual, 9de9c96b-3cb2-4101-b4c9-f558e5227e58, 1, , null).

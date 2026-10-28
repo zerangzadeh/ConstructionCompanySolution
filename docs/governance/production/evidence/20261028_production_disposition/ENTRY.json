@@ -1,0 +1,23 @@
+{
+  "at": "2026-10-28T11:58:25.194372+00:00",
+  "authority": "docs/governance/production/PRODUCTION_SCOPED_DISPOSITIONS_20261028.md",
+  "authority_sha256": "d25aa2538a8fbb6a8e77ed1f3b7c8f80f82b89e5eaf6f95ba197ac5a92133bbe",
+  "head": "c9fe1d7e7ed586ef96a2ee453a3490369d25e6a3",
+  "branch": "main",
+  "upstream": "c9fe1d7e7ed586ef96a2ee453a3490369d25e6a3",
+  "dirty": "M CEP_EXECUTION_REGISTRY.yaml\n M apps/billing/migrations/0018_retire_legacy_claim_settlements.py\n M apps/documents/migrations/0012_legacy_payment_reference_preparation.py\n M apps/documents/models.py\n M apps/treasury/test_retirement_contract.py\n M core/retired_payments/migrations/0007_retire_legacy_payment.py\n M scripts/verify_legacy_payment_retention.py\n?? docs/governance/production/",
+  "diff_stat": "CEP_EXECUTION_REGISTRY.yaml                        |  63 ++++++++---\n .../0018_retire_legacy_claim_settlements.py        |  67 ++----------\n .../0012_legacy_payment_reference_preparation.py   |  24 +++--\n apps/documents/models.py                           |   4 +-\n apps/treasury/test_retirement_contract.py          | 115 +++++++++------------\n .../migrations/0007_retire_legacy_payment.py       |  13 ++-\n scripts/verify_legacy_payment_retention.py         |  19 ++--\n 7 files changed, 145 insertions(+), 160 deletions(-)",
+  "ceps_sha256": "f2d230806d9cfecefd06cd9def88a36484fa62bf46f96de424c9dc9c47fda94d",
+  "touch_set": [
+    "apps/payroll/statutory_governance.py",
+    "apps/payroll/test_production_governance.py",
+    "scripts/production_recovery.py",
+    "tests/test_production_recovery.py",
+    "docs/governance/production/",
+    "CEP_EXECUTION_REGISTRY.yaml:GATE11/repository metadata only"
+  ],
+  "migration": "NONE",
+  "prior_work": "Preserve all prior Legacy Payment changes and qualification; no CEP reopening",
+  "production_action": false,
+  "git_write_authorized": false
+}

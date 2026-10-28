@@ -1,0 +1,71 @@
+{
+  "schema": "bonira.production-readiness.v1",
+  "authority": "docs/governance/production/PRODUCTION_SCOPED_DISPOSITIONS_20261028.md",
+  "recovery": {
+    "rpo_seconds": 900,
+    "rto_seconds": 3600,
+    "maximum_capture_interval_seconds": 900,
+    "minimum_retention_days": 30,
+    "restore_acceptance_interval_days": 30,
+    "pitr_required": true,
+    "classes": [
+      "PostgreSQL",
+      "document_media",
+      "configuration_metadata",
+      "audit_operational"
+    ],
+    "custody": "Isolated protected second filesystem; authenticated encrypted payload; independent private-key boundary; actual provider/path is a cutover input",
+    "qualification_archive_timeout_seconds": 60,
+    "accountable_acceptance_authority": "Human Decision Authority"
+  },
+  "statutory": {
+    "scope": "PRODUCTION_REVIEWED",
+    "parameters": "PRODUCTION_STATUTORY_ENVELOPES.json",
+    "population": "IR_LABOUR_ORDINARY_COMPULSORY",
+    "insurance_profile": "IR_SSO_ORDINARY_EMPLOYEE_1405",
+    "activation": "Synthetic non-production qualification permitted; actual Production activation is a cutover action"
+  },
+  "target": {
+    "reference": "BONIRA-PE-NP-01 design adopted for initial Production",
+    "topology": "single application host plus isolated PostgreSQL service/network",
+    "versions": {
+      "debian": "12",
+      "cpython": "3.11.17",
+      "django": "5.2.17",
+      "psycopg": "3.3.5",
+      "postgresql": "18.6"
+    },
+    "database": "SCRAM/TLS verify-full",
+    "application": "Nginx HTTPS + unprivileged sync Gunicorn/private Unix socket, Production settings",
+    "storage": "protected private persistence; release-specific static; single-host shared file cache",
+    "provider_hostname_dns_certificate_identity_paths": "CUTOVER_INPUT"
+  },
+  "operations": {
+    "accountable_authority": "Human Decision Authority",
+    "roles": [
+      "Release/Deployment",
+      "Operations",
+      "Incident/Escalation",
+      "Security",
+      "Backup/Recovery Acceptance",
+      "Support/Access-Revocation",
+      "Runbook/Change",
+      "Activation/Go-No-Go"
+    ],
+    "runbooks": "Reuse OP-01..04",
+    "sink": "Restricted durable production-equivalent sink with actual receipt; final enterprise destination is cutover binding",
+    "diagnostic_minimum_retention_days": 30,
+    "incident_release_recovery_evidence": "Hold under governance/audit lifecycle until separately approved disposal",
+    "business_audit_retention": "Existing domain rules unchanged",
+    "access": "Named/scoped independent approval, least privilege, expiry/revocation, traceable usage; no implicit business authority"
+  },
+  "secrets_tls": {
+    "source": "Environment scoped, private, outside source and evidence",
+    "credentials": "Separate DB/app/backup credentials; separate private recovery-key custody",
+    "qualification": "Synthetic secrets/certificates only",
+    "activation": "Distinct real keys/certificates and named renewal ownership before actual activation"
+  },
+  "production_deployment_authorized": false,
+  "gate12_signoff": "NOT_EXECUTED",
+  "disposal_authorized": false
+}

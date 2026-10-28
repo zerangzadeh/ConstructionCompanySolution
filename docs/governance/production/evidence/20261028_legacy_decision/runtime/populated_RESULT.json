@@ -1,0 +1,38 @@
+{
+  "result": "PASS",
+  "settings": "config.settings.production",
+  "debug": false,
+  "phase": "populated",
+  "database": "pe_legacy_20261028_populated_retry1",
+  "legacy_rows": 8,
+  "retired_tables": {
+    "billing_claimsettlementallocation": {
+      "rows": 2,
+      "sha256": "12e7e49d297592da723853ef0a0d21c80e786caea653e5b5ea4f1eb4ad7b5b98"
+    },
+    "payments_payment": {
+      "rows": 2,
+      "sha256": "68c4d9ffd796f0562a2b153fb47bedede7275ce171b5115e7c6187c9f0b63a37"
+    },
+    "payments_paymentallocation": {
+      "rows": 2,
+      "sha256": "603f511e9b7e10657d8bfa9993855384eafabee6cadee068db82938882215329"
+    },
+    "payments_paymentdocumentlink": {
+      "rows": 2,
+      "sha256": "2d326d5a843ee3fc9534cd93e8f209d2bfe21dff6ceb680bf865a4afa75893b6"
+    }
+  },
+  "original_rows_preserved_exactly": true,
+  "active_financial_records_preserved": true,
+  "financial_targets_created": 0,
+  "evidence_records": 2,
+  "disposition": "RETIRED_LEGACY_DATA",
+  "typed_and_generic_links_preserved": 4,
+  "idempotent_preservation": true,
+  "legacy_orm_and_permissions": "ABSENT",
+  "previously_accepted_snapshot_preserved": true,
+  "migration_nodes": 443,
+  "drift_and_deploy_checks": "PASS",
+  "production_action": false
+}

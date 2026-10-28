@@ -1,0 +1,98 @@
+[
+  {
+    "External Dependency ID": "EXT-0018",
+    "CEP ID": "CEP-052",
+    "Dependency Phase": "ACTIVATION",
+    "Blocks Build?": "NO",
+    "Blocks Activation?": "YES",
+    "Blocks Verification?": "NO",
+    "Blocks Production?": "NO",
+    "Required Gate": "GATE-03 (activation only)",
+    "Fail-Closed Behavior": "Build framework may proceed only where canonical IMB permits fail-closed construction; CURRENT VALUES/EVIDENCE UTV",
+    "Notes": "Current official Iranian Payroll statutory source package — Effective-dated official Tax/Labor/Social Security evidence, reviewed package/version and activation record"
+  },
+  {
+    "External Dependency ID": "EXT-0018",
+    "CEP ID": "CEP-069",
+    "Dependency Phase": "PRODUCTION",
+    "Blocks Build?": "NO",
+    "Blocks Activation?": "NO",
+    "Blocks Verification?": "NO",
+    "Blocks Production?": "YES",
+    "Required Gate": "GATE-11",
+    "Fail-Closed Behavior": "CURRENT VALUES/EVIDENCE UTV",
+    "Notes": "Current official Iranian Payroll statutory source package — Effective-dated official Tax/Labor/Social Security evidence, reviewed package/version and activation record"
+  },
+  {
+    "External Dependency ID": "EXT-0020",
+    "CEP ID": "CEP-070",
+    "Dependency Phase": "PRODUCTION",
+    "Blocks Build?": "NO",
+    "Blocks Activation?": "NO",
+    "Blocks Verification?": "NO",
+    "Blocks Production?": "YES",
+    "Required Gate": "GATE-11",
+    "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-CERTIFIED",
+    "Notes": "Approved recovery objectives — Approved numeric RPO/RTO/PITR/retention/test objectives and acceptance authority"
+  },
+  {
+    "External Dependency ID": "EXT-0020",
+    "CEP ID": "CEP-074",
+    "Dependency Phase": "VERIFICATION",
+    "Blocks Build?": "NO",
+    "Blocks Activation?": "NO",
+    "Blocks Verification?": "YES",
+    "Blocks Production?": "NO",
+    "Required Gate": "Relevant implementation gate + external verification dependency",
+    "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-CERTIFIED",
+    "Notes": "Approved recovery objectives — Approved numeric RPO/RTO/PITR/retention/test objectives and acceptance authority"
+  },
+  {
+    "External Dependency ID": "EXT-0021",
+    "CEP ID": "CEP-071",
+    "Dependency Phase": "PRODUCTION",
+    "Blocks Build?": "NO",
+    "Blocks Activation?": "NO",
+    "Blocks Verification?": "NO",
+    "Blocks Production?": "YES",
+    "Required Gate": "GATE-11",
+    "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-VALIDATED",
+    "Notes": "Approved production topology and environment configuration — Selected topology, environment schema, secrets/static/media/process configuration and deployment target evidence"
+  },
+  {
+    "External Dependency ID": "EXT-0021",
+    "CEP ID": "CEP-075",
+    "Dependency Phase": "VERIFICATION",
+    "Blocks Build?": "NO",
+    "Blocks Activation?": "NO",
+    "Blocks Verification?": "YES",
+    "Blocks Production?": "NO",
+    "Required Gate": "Relevant implementation gate + external verification dependency",
+    "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-VALIDATED",
+    "Notes": "Approved production topology and environment configuration — Selected topology, environment schema, secrets/static/media/process configuration and deployment target evidence"
+  },
+  {
+    "External Dependency ID": "EXT-0022",
+    "CEP ID": "CEP-072",
+    "Dependency Phase": "PRODUCTION",
+    "Blocks Build?": "NO",
+    "Blocks Activation?": "NO",
+    "Blocks Verification?": "NO",
+    "Blocks Production?": "YES",
+    "Required Gate": "GATE-11",
+    "Fail-Closed Behavior": "NOT YET PROVEN",
+    "Notes": "Named operating responsibilities and approved runbook ownership — Named release/incident/activation/access responsibilities and approved runbook/access evidence"
+  },
+  {
+    "External Dependency ID": "EXT-0022",
+    "CEP ID": "CEP-076",
+    "Dependency Phase": "VERIFICATION",
+    "Blocks Build?": "NO",
+    "Blocks Activation?": "NO",
+    "Blocks Verification?": "YES",
+    "Blocks Production?": "NO",
+    "Required Gate": "Relevant implementation gate + external verification dependency",
+    "Fail-Closed Behavior": "NOT YET PROVEN",
+    "Notes": "Named operating responsibilities and approved runbook ownership — Named release/incident/activation/access responsibilities and approved runbook/access evidence"
+  }
+]

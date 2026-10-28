@@ -1,0 +1,35 @@
+{
+  "result": "PASS",
+  "source": {
+    "at": "2026-10-28T12:38:47.817355+00:00",
+    "release": "production-disposition-current",
+    "image_pid_started_uid": "sha256:d2f481516c0eb5229ba4224041880abf63ab96fceb5a8a7e11f0f7b85b9b5f27|32153|2026-10-28T12:38:37.051206106Z|10001:33",
+    "head": "c9fe1d7e7ed586ef96a2ee453a3490369d25e6a3",
+    "working_tree": "bounded uncommitted Production-disposition changes",
+    "source_files": 1611,
+    "source_manifest_sha256": "bbc6a24e9b0bc989921395e5d78cf0c1dceb8f739f47bdbc959f52edde422ffc"
+  },
+  "actual_mount_verified": true,
+  "corrected_driver_metadata": {
+    "erroneous_source": "/srv/bonira/source/BUILD.json",
+    "old_reported_head": "de6e20863896e7587e58bf917f807cea75f95b7a",
+    "actual_release_matches_source_manifest": true
+  },
+  "release_delta_since_first_http": [
+    "scripts/production_recovery.py"
+  ],
+  "delta_qualified_by": "PITR_RESULT.json; no HTTP/domain/configuration delta",
+  "https_cases": 14,
+  "health": {
+    "at": "2026-10-28T12:39:21.242923+00:00",
+    "exit_code": 0,
+    "signals": [
+      "database.reachable",
+      "cache.reachable"
+    ],
+    "production_readiness": "NOT_VALIDATED",
+    "scope": "database-and-cache-reachability-only"
+  },
+  "prior_https_cases": 28,
+  "production": false
+}

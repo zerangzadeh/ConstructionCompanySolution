@@ -1,0 +1,160 @@
+{
+  "at": "2026-10-28T00:23:42.818991+00:00",
+  "client_date": "2026-10-28",
+  "candidate_head": "c9fe1d7e7ed586ef96a2ee453a3490369d25e6a3",
+  "branch": "main",
+  "overall_readiness": "NONPRODUCTION_RELEASE_QUALIFIED_PRODUCTION_CONTRACT_AND_BOOTSTRAP_AUTHORITY_REQUIRED",
+  "gate": "GATE-11",
+  "status": "NOT_PASSED",
+  "canonical_source": "evidence/20261028/SOURCE_CONTRACT.json; exact GATE11 row, archive/member SHA identities verified",
+  "requirements_satisfied": 2,
+  "requirements_total": 5,
+  "requirement_count_semantics": "Five exact conjuncts of canonical Pass Condition; scoped IMB completion is distinct from actual Production certification",
+  "clauses": [
+    {
+      "id": "C1",
+      "requirement": "GATE-10 Representative UAT Completion has PASSED",
+      "status": "SATISFIED",
+      "evidence": "Retained canonical GATE10 PASS; 44/44 cases, 48 mappings; no reassessment"
+    },
+    {
+      "id": "C2",
+      "requirement": "all required Production Certification IMB items are complete",
+      "status": "SATISFIED_RECORDED_APPROVED_EXECUTION_SCOPE",
+      "evidence": "All nine required IMBs have completed scoped contributors; no actual Production certification inferred"
+    },
+    {
+      "id": "C3",
+      "requirement": "required runtime/production evidence is available",
+      "status": "PARTIAL_HUMAN_DECISION_REQUIRED",
+      "evidence": "Retained qualifications and current Linux upgrade/runtime/rollback PASS; empty production-settings bootstrap blocked by explicit historical Development-only disposition. Production statutory activation scope also absent; no guard bypass"
+    },
+    {
+      "id": "C4",
+      "requirement": "required external production evidence is available",
+      "status": "HUMAN_DECISION_REQUIRED",
+      "evidence": "EXT0018/0020/0021/0022 approvals explicitly non-production; actual Production applicability/migration/recovery/target/operating evidence absent"
+    },
+    {
+      "id": "C5",
+      "requirement": "no unresolved production-certification blocker remains",
+      "status": "HUMAN_DECISION_REQUIRED",
+      "evidence": "Unresolved Production contract/authority and resulting bootstrap/activation evidence boundary; actual deployment and GATE12 Sign-off not invented prerequisites"
+    }
+  ],
+  "required_imb_contributors": {
+    "IMB-0083": "CEP-069",
+    "IMB-0098": "CEP-070",
+    "IMB-0099": "CEP-071",
+    "IMB-0100": "CEP-072",
+    "IMB-0101": "CEP-072",
+    "IMB-0104": "CEP-074",
+    "IMB-0105": "CEP-075",
+    "IMB-0106": "CEP-076",
+    "IMB-0107": "CEP-077"
+  },
+  "completed_required_imb_execution_contributions": 9,
+  "external_production_phase_rows": [
+    {
+      "External Dependency ID": "EXT-0018",
+      "CEP ID": "CEP-069",
+      "Dependency Phase": "PRODUCTION",
+      "Blocks Build?": "NO",
+      "Blocks Activation?": "NO",
+      "Blocks Verification?": "NO",
+      "Blocks Production?": "YES",
+      "Required Gate": "GATE-11",
+      "Fail-Closed Behavior": "CURRENT VALUES/EVIDENCE UTV",
+      "Notes": "Current official Iranian Payroll statutory source package — Effective-dated official Tax/Labor/Social Security evidence, reviewed package/version and activation record"
+    },
+    {
+      "External Dependency ID": "EXT-0020",
+      "CEP ID": "CEP-070",
+      "Dependency Phase": "PRODUCTION",
+      "Blocks Build?": "NO",
+      "Blocks Activation?": "NO",
+      "Blocks Verification?": "NO",
+      "Blocks Production?": "YES",
+      "Required Gate": "GATE-11",
+      "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-CERTIFIED",
+      "Notes": "Approved recovery objectives — Approved numeric RPO/RTO/PITR/retention/test objectives and acceptance authority"
+    },
+    {
+      "External Dependency ID": "EXT-0021",
+      "CEP ID": "CEP-071",
+      "Dependency Phase": "PRODUCTION",
+      "Blocks Build?": "NO",
+      "Blocks Activation?": "NO",
+      "Blocks Verification?": "NO",
+      "Blocks Production?": "YES",
+      "Required Gate": "GATE-11",
+      "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-VALIDATED",
+      "Notes": "Approved production topology and environment configuration — Selected topology, environment schema, secrets/static/media/process configuration and deployment target evidence"
+    },
+    {
+      "External Dependency ID": "EXT-0022",
+      "CEP ID": "CEP-072",
+      "Dependency Phase": "PRODUCTION",
+      "Blocks Build?": "NO",
+      "Blocks Activation?": "NO",
+      "Blocks Verification?": "NO",
+      "Blocks Production?": "YES",
+      "Required Gate": "GATE-11",
+      "Fail-Closed Behavior": "NOT YET PROVEN",
+      "Notes": "Named operating responsibilities and approved runbook ownership — Named release/incident/activation/access responsibilities and approved runbook/access evidence"
+    }
+  ],
+  "root_boundary": "Production-scoped release/migration/statutory/recovery/operating authority and evidence are absent; non-production-only approvals cannot be broadened by Codex",
+  "specific_executable_blocker": {
+    "result": "BLOCKED_BY_EXPLICIT_MIGRATION_AUTHORITY",
+    "execution": "Actual Linux production-settings Django test database bootstrap; new empty test_pe_readiness_20261028",
+    "failure": "RuntimeError: Legacy Payment disposition is authorized for Development only",
+    "failed_source": "apps/documents/migrations/0012_legacy_payment_reference_preparation.py:16",
+    "downstream_guard": "apps/billing/migrations/0018_retire_legacy_claim_settlements.py:24; requires Development settings and loopback database",
+    "existing_contract_tests": "apps.treasury.test_retirement_contract.RetirementContractGuardTests; production/remote rejection before DB access",
+    "authority": "docs/governance/cep/supporting/LEGACY_PAYMENT_RETIREMENT_AUTHORIZATION_20261019.md; bounded Development only",
+    "record": "runtime/ATTEMPT_03_FAILED.json; private original traceback retained in owned guest",
+    "classification": "HUMAN_DECISION_REQUIRED_MIGRATION_SEMANTICS_NOT_TOOLING",
+    "proposed_minimum": "Authorize preparation/qualification of empty-target-only path, prove zero legacy and dependent population, preserve fail-closed populated-target handling; no real Production mutation",
+    "not_claimed": [
+      "fresh production-settings migration PASS",
+      "production authorization",
+      "production migration",
+      "guard bypass"
+    ],
+    "remaining_safe_work": "Complete current-release runtime/financial/concurrency tests on clean migrated synthetic fixture; compatible HTTPS release/schema rollback; no complete CEP rerun"
+  },
+  "qualification": {
+    "current_linux_tests": 21,
+    "failed": 0,
+    "configuration_guard_tests": 6,
+    "bootstrap_authority_guard_tests": 2,
+    "https_cases": 56,
+    "new_migrations": 6,
+    "schema_and_deploy": "PASS_UPGRADE_ON_ISOLATED_CLONE",
+    "empty_production_settings_bootstrap": "BLOCKED_NOT_PASS",
+    "preservation": "runtime/MIGRATION_PRESERVATION.json and CATALOG_DELTA.json",
+    "source_build_template_reuse": "evidence/20261028/REUSE_AND_BUILD_CHECKS.json",
+    "limits": "Changed-boundary tests use a fresh migrated/flush fixture; statutory test-only Development override is retained; no capacity, global full-suite, actual Production install or cold image rebuild claim"
+  },
+  "remaining_safe_executable_prerequisites_before_human_policy": [],
+  "safe_alternatives_exhausted": [
+    "Reused and resumed approved isolated Linux runtime; six-migration upgrade/preservation and current release runtime/HTTPS rollback executed",
+    "Actually attempted empty production-settings bootstrap; retained explicit authority failure, inspected downstream local-Development guard and existing guard tests",
+    "Completed unaffected qualification using clean migrated synthetic fixture; this is expressly not Production bootstrap proof",
+    "Reused adopted statutory/recovery/deployment/operating decisions and measured evidence within exact scopes; prepared consolidated Production extension and narrow empty-target-only policy recommendation",
+    "Did not change DEBUG, fake migration history, reinterpret demo-data authorization or invent Production custody/owners to force acceptance"
+  ],
+  "next_action": "Human Decision Authority dispositions the four Production-phase extensions, including explicit empty-target retirement/bootstrap semantics; then implement/qualify only the authorized bootstrap/statutory envelope in isolated non-production and recompute this exact Gate",
+  "production_only_later": [
+    "Selected actual private credentials/certificates/network/storage bindings",
+    "Separately authorized deployment/migration/activation/cutover",
+    "Actual operational delivery/restore/continuing-operation evidence where selected",
+    "Later final Production Certification/Human Business Sign-off under applicable authority"
+  ],
+  "production_action": false,
+  "human_signoff": "NOT_EXECUTED",
+  "final_production_certification": "NOT_EXECUTED",
+  "git_writes": false,
+  "report": "docs/governance/production/PRODUCTION_READINESS_ASSESSMENT.md"
+}

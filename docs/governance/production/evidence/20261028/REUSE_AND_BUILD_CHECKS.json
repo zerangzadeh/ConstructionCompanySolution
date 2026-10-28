@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-28T00:24:32.147814+00:00",
+  "result": "PASS",
+  "retained_recorded_hashes": 86,
+  "unchanged_recorded_hashes_after_closeout": 85,
+  "expected_live_metadata_reconciliation": [
+    "CEP_EXECUTION_REGISTRY.yaml"
+  ],
+  "unchanged_operational_recovery_config_dependency_controls": true,
+  "offline_linux_wheel_hashes": "PASS",
+  "new_advisory_scan": "NOT_RUN; retained dated CEP077 result, exact unchanged lock/input scope; refresh for selected future release where applicable",
+  "source_files": 1603,
+  "reproducible_payload": {
+    "sha256": "f1e07ca5bc377f9a09a7d27e15768ea2b0e7f978cf0ae1e2571398c63ef8934f",
+    "bytes": 4788946,
+    "independent_assemblies_equal": true,
+    "scope": "Canonical source file bytes/ordering/metadata; qualified immutable runtime reused, no cold base-image rebuild claim"
+  },
+  "production_template": {
+    "sha256": "f0ab1b695ee2745250d7337a99052271deccb4c11c890ca29306cf9c92fbfe7a",
+    "variables": 32,
+    "values": "synthetic test-only replacements; no credentials retained",
+    "wsgi_import": "PASS",
+    "asgi_import": "PASS",
+    "database_or_network": "NONE",
+    "dotenv": "NOT_LOADED"
+  },
+  "configuration_guards": {
+    "command": ".venv-2/Scripts/python.exe -m unittest tests.test_production_configuration -v",
+    "tests": 6,
+    "result": "PASS",
+    "seconds": 21.958,
+    "coverage": "Positive load plus required secrets, TLS, hosts, cookies, redirects, cache and absolute disjoint storage negative cases; no network/DB/dotenv"
+  }
+}

@@ -1,4 +1,4 @@
-"""Read-only Development verification of the excluded-source retention boundary."""
+"""Read-only verification of retained legacy source and document/audit identities."""
 
 import hashlib
 import json
@@ -110,7 +110,7 @@ def verify():
             raise RuntimeError("Retained typed document identity changed")
     return {
         "status": "PASS",
-        "excluded_sources_verified": count,
+        "retired_legacy_sources_verified": count,
         "retained_evidence_count": RetiredPaymentEvidence.objects.count(),
         "typed_document_identities_verified": PaymentDocumentLink.objects.count(),
         "generic_document_references_verified": DocumentLink.objects.filter(
@@ -119,6 +119,7 @@ def verify():
         "source_and_dependent_values_unchanged": True,
         "audit_identities_verified": audit_ids_verified,
         "destructive_retirement_executed": False,
+        "retired_legacy_tables_preserved": True,
     }
 
 
@@ -157,13 +158,12 @@ def verify_retired():
             ):
                 raise RuntimeError("Retained generic identity mismatch")
     tables = set(connection.introspection.table_names())
-    if tables & {
+    retained_tables = tables & {
         "payments_payment",
         "payments_paymentallocation",
         "payments_paymentdocumentlink",
         "billing_claimsettlementallocation",
-    }:
-        raise RuntimeError("Legacy table remains")
+    }
     return {
         "status": "PASS",
         "retained_evidence_count": RetiredPaymentEvidence.objects.count(),
@@ -172,14 +172,15 @@ def verify_retired():
             payment__isnull=False
         ).count(),
         "audit_identities_verified": audit_ids_verified,
-        "destructive_retirement_executed": True,
+        "retired_legacy_tables": sorted(retained_tables),
+        "physical_deletion_executed": False,
     }
 
 
 if __name__ == "__main__":
     result = verify()
     if "--no-write" not in sys.argv:
-        (ROOT / "docs/governance/cep/evidence/CEP-064_REFERENCE_RETENTION.json").write_text(
-            json.dumps(result, indent=2) + "\n", encoding="utf-8"
-        )
+        (
+            ROOT / "docs/governance/cep/evidence/CEP-064_REFERENCE_RETENTION.json"
+        ).write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(result))

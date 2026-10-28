@@ -1,10 +1,12 @@
-"""Explicit EXT-0018 non-production rules and reviewed employee opening facts.
+"""Explicit EXT-0018 approved scopes and reviewed employee opening facts.
 
 Statutory values belong to source-linked policy versions, never this module.
 """
 
 from __future__ import annotations
 
+import hashlib
+import json
 from datetime import date
 from decimal import Decimal, localcontext
 from typing import TYPE_CHECKING, Any
@@ -26,6 +28,26 @@ if TYPE_CHECKING:
 
 POPULATION = "IR_LABOUR_ORDINARY_COMPULSORY"
 PROFILE = "IR_SSO_ORDINARY_EMPLOYEE_1405"
+PRODUCTION_AUTHORIZATION = {
+    "reference": "docs/governance/production/PRODUCTION_SCOPED_DISPOSITIONS_20261028.md",
+    "sha256": "d25aa2538a8fbb6a8e77ed1f3b7c8f80f82b89e5eaf6f95ba197ac5a92133bbe",
+}
+# Digests bind the four previously reviewed parameter versions to the new Human
+# authorization. They confer no authority on new sources, values or populations.
+PRODUCTION_PARAMETER_DIGESTS = {
+    "payroll-tax-regulatory": frozenset(
+        {
+            "f3365039f788580f97df0315d3c0b4b59814a376b54cb2bd7b02f31857056e92",
+            "1759659dd3f1ee85a032529225b3cad3f26a2c142df377750d62b913da5a9482",
+        }
+    ),
+    "employee-insurance-regulatory": frozenset(
+        {
+            "74512d6ca4d1f96b5a2f9c2da72e8339cb2cf95efc738e8a49207794f01449c2",
+            "5980aa3c5301b89359fcadae4e5b4d86bab5745e41375a6a56b2c80d2bba1009",
+        }
+    ),
+}
 
 
 def _hash(value: object) -> bool:
@@ -50,14 +72,37 @@ def validate_governance(parameters: dict[str, Any], *, policy_code: str) -> None
         "sources",
         "parameter_sources",
     }
-    if not isinstance(g, dict) or set(g) != required:
+    if not isinstance(g, dict):
         raise ValidationError("Explicit statutory governance envelope required.")
-    if not settings.DEBUG or settings.SETTINGS_MODULE != "config.settings.development":
+    production = g.get("scope") == "PRODUCTION_REVIEWED"
+    if set(g) != required | ({"production_authorization"} if production else set()):
+        raise ValidationError("Explicit statutory governance envelope required.")
+    if production:
+        if settings.DEBUG or settings.SETTINGS_MODULE != "config.settings.production":
+            raise ValidationError(
+                "Production envelope requires secure Production settings."
+            )
+        if g["production_authorization"] != PRODUCTION_AUTHORIZATION:
+            raise ValidationError("Production statutory authorization mismatch.")
+        digest = hashlib.sha256(
+            json.dumps(
+                parameters,
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=False,
+                allow_nan=False,
+            ).encode()
+        ).hexdigest()
+        if digest not in PRODUCTION_PARAMETER_DIGESTS.get(policy_code, frozenset()):
+            raise ValidationError("Parameters exceed the approved Production review.")
+    elif (
+        not settings.DEBUG or settings.SETTINGS_MODULE != "config.settings.development"
+    ):
         raise ValidationError(
             "EXT-0018 qualification is authorized only in Development."
         )
     if (
-        g["scope"] != "NON_PRODUCTION_QUALIFICATION"
+        g["scope"] not in {"NON_PRODUCTION_QUALIFICATION", "PRODUCTION_REVIEWED"}
         or g["population"] != POPULATION
         or g["insurance_profile"] != PROFILE
         or not g["review_reference"]

@@ -1,0 +1,66 @@
+System check identified no issues (0 silenced).
+Found 48 test(s).
+Using existing test database for alias 'default' ('test_pe_gate11_20261028_tests')...
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+test_production_tax_and_insurance_import_activate_and_calculate (apps.payroll.test_production_governance.ProductionStatutoryTests.test_production_tax_and_insurance_import_activate_and_calculate) ... ok
+test_activation_rolls_back_policy_publication_when_audit_fails (apps.payroll.test_cep069.AdoptedStatutoryTests.test_activation_rolls_back_policy_publication_when_audit_fails) ... ok
+test_annual_ytd_subtracts_prior_withholding (apps.payroll.test_cep069.AdoptedStatutoryTests.test_annual_ytd_subtracts_prior_withholding) ... ok
+test_append_only_model_and_unique_policy_version (apps.payroll.test_cep069.AdoptedStatutoryTests.test_append_only_model_and_unique_policy_version) ... ok
+test_calculation_pins_schema_rounding_and_source_hooks (apps.payroll.test_cep069.AdoptedStatutoryTests.test_calculation_pins_schema_rounding_and_source_hooks) ... ok
+test_content_digest_is_validated_at_the_model_boundary (apps.payroll.test_cep069.AdoptedStatutoryTests.test_content_digest_is_validated_at_the_model_boundary) ... ok
+test_context_tenant_permission_immutability (apps.payroll.test_cep069.AdoptedStatutoryTests.test_context_tenant_permission_immutability) ... ok
+test_explicit_source_linked_activation_and_calculation_snapshot (apps.payroll.test_cep069.AdoptedStatutoryTests.test_explicit_source_linked_activation_and_calculation_snapshot) ... ok
+test_explicit_zero_opening_is_permitted (apps.payroll.test_cep069.AdoptedStatutoryTests.test_explicit_zero_opening_is_permitted) ... ok
+test_external_income_is_included (apps.payroll.test_cep069.AdoptedStatutoryTests.test_external_income_is_included) ... ok
+test_final_rounding_does_not_round_bracket_slices (apps.payroll.test_cep069.AdoptedStatutoryTests.test_final_rounding_does_not_round_bracket_slices) ... ok
+test_governance_rejects_missing_source_dates_and_production (apps.payroll.test_cep069.AdoptedStatutoryTests.test_governance_rejects_missing_source_dates_and_production) ... ok
+test_human_conditional_approval_alone_cannot_import (apps.payroll.test_cep069.AdoptedStatutoryTests.test_human_conditional_approval_alone_cannot_import) ... ok
+test_import_publication_effective_date_history_and_audit (apps.payroll.test_cep069.AdoptedStatutoryTests.test_import_publication_effective_date_history_and_audit) ... ok
+test_missing_authority_and_incomplete_component_mapping_fail_closed (apps.payroll.test_cep069.AdoptedStatutoryTests.test_missing_authority_and_incomplete_component_mapping_fail_closed) ... ok
+test_missing_external_source_or_review_rejects_import (apps.payroll.test_cep069.AdoptedStatutoryTests.test_missing_external_source_or_review_rejects_import) ... ok
+test_missing_metadata_unknown_schema_and_untraced_evidence_fail_closed (apps.payroll.test_cep069.AdoptedStatutoryTests.test_missing_metadata_unknown_schema_and_untraced_evidence_fail_closed) ... ok
+test_missing_opening_rejects_even_when_current_pay_is_small (apps.payroll.test_cep069.AdoptedStatutoryTests.test_missing_opening_rejects_even_when_current_pay_is_small) ... ok
+test_negative_withholding_requires_governed_correction (apps.payroll.test_cep069.AdoptedStatutoryTests.test_negative_withholding_requires_governed_correction) ... ok
+test_ordinary_profile_separates_government_and_employer_unemployment (apps.payroll.test_cep069.AdoptedStatutoryTests.test_ordinary_profile_separates_government_and_employer_unemployment) ... ok
+test_permission_tenant_isolation_and_rtl_ui (apps.payroll.test_cep069.AdoptedStatutoryTests.test_permission_tenant_isolation_and_rtl_ui) ... ok
+test_platform_authority_is_required (apps.payroll.test_cep069.AdoptedStatutoryTests.test_platform_authority_is_required) ... ok
+test_policy_drift_and_conflicting_reimport_do_not_activate (apps.payroll.test_cep069.AdoptedStatutoryTests.test_policy_drift_and_conflicting_reimport_do_not_activate) ... ok
+test_prior_local_payroll_without_statutory_reconciliation_rejects (apps.payroll.test_cep069.AdoptedStatutoryTests.test_prior_local_payroll_without_statutory_reconciliation_rejects) ... ok
+test_published_policy_without_package_cannot_be_consumed (apps.payroll.test_cep069.AdoptedStatutoryTests.test_published_policy_without_package_cannot_be_consumed) ... ok
+test_published_policy_without_source_and_review_fails_closed (apps.payroll.test_cep069.AdoptedStatutoryTests.test_published_policy_without_source_and_review_fails_closed) ... ok
+test_schema_output_export_idempotency_reconciliation_and_immutability (apps.payroll.test_cep069.AdoptedStatutoryTests.test_schema_output_export_idempotency_reconciliation_and_immutability) ... ok
+test_tax_and_employee_insurance_are_decimal_version_pinned_and_independent (apps.payroll.test_cep069.AdoptedStatutoryTests.test_tax_and_employee_insurance_are_decimal_version_pinned_and_independent) ... ok
+test_tax_and_insurance_classifications_are_independent (apps.payroll.test_cep069.AdoptedStatutoryTests.test_tax_and_insurance_classifications_are_independent) ... ok
+test_tenant_cannot_select_or_override_national_policy (apps.payroll.test_cep069.AdoptedStatutoryTests.test_tenant_cannot_select_or_override_national_policy) ... ok
+test_unemployment_exclusion_is_explicit (apps.payroll.test_cep069.AdoptedStatutoryTests.test_unemployment_exclusion_is_explicit) ... ok
+test_unmapped_and_conditional_components_reject (apps.payroll.test_cep069.AdoptedStatutoryTests.test_unmapped_and_conditional_components_reject) ... ok
+test_unsupported_population_and_profile_reject (apps.payroll.test_cep069.AdoptedStatutoryTests.test_unsupported_population_and_profile_reject) ... ok
+test_workday_floor_29_30_and_ceiling (apps.payroll.test_cep069.AdoptedStatutoryTests.test_workday_floor_29_30_and_ceiling) ... ok
+test_debug_wrong_settings_and_nonproduction_envelope_rejected (apps.payroll.test_production_governance.ProductionEnvelopeTests.test_debug_wrong_settings_and_nonproduction_envelope_rejected) ... ok
+test_four_approved_versions_and_traceable_authority (apps.payroll.test_production_governance.ProductionEnvelopeTests.test_four_approved_versions_and_traceable_authority) ... ok
+test_unapproved_values_sources_scope_and_population_fail_closed (apps.payroll.test_production_governance.ProductionEnvelopeTests.test_unapproved_values_sources_scope_and_population_fail_closed) ... ok
+test_private_durable_receipt_and_explicit_retention (tests.test_production_operations.ProductionOperationsTests.test_private_durable_receipt_and_explicit_retention) ... ok
+test_security_http_correlation_and_no_message_leak (tests.test_production_operations.ProductionOperationsTests.test_security_http_correlation_and_no_message_leak) ... ok
+test_cache_probe_only_reads_a_fresh_namespaced_key (tests.test_operations.OperationsTests.test_cache_probe_only_reads_a_fresh_namespaced_key) ... ok
+test_correlated_http_alert_has_no_payload_and_delivery_failure_propagates (tests.test_operations.OperationsTests.test_correlated_http_alert_has_no_payload_and_delivery_failure_propagates) ... ok
+test_database_probe_is_read_only_and_result_checked (tests.test_operations.OperationsTests.test_database_probe_is_read_only_and_result_checked) ... ok
+test_dependency_failure_is_sanitized_and_other_probe_runs (tests.test_operations.OperationsTests.test_dependency_failure_is_sanitized_and_other_probe_runs) ... ok
+test_durable_local_receipt_survives_restart_with_thirty_day_retention (tests.test_operations.OperationsTests.test_durable_local_receipt_survives_restart_with_thirty_day_retention) ... ok
+test_health_command_exit_and_json_never_certify_readiness (tests.test_operations.OperationsTests.test_health_command_exit_and_json_never_certify_readiness) ... ok
+test_local_failure_alert_delivery_and_no_payload_copy (tests.test_operations.OperationsTests.test_local_failure_alert_delivery_and_no_payload_copy) ... ok
+test_request_alert_rules_do_not_invent_thresholds (tests.test_operations.OperationsTests.test_request_alert_rules_do_not_invent_thresholds) ... ok
+test_retention_plans_then_removes_only_owned_old_diagnostics (tests.test_operations.OperationsTests.test_retention_plans_then_removes_only_owned_old_diagnostics) ... ok
+
+----------------------------------------------------------------------
+Ran 48 tests in 30.897s
+
+OK
+Preserving test database for alias 'default' ('test_pe_gate11_20261028_tests')...

@@ -1,0 +1,40 @@
+{
+  "result": "PASS",
+  "existing_tables": 525,
+  "existing_business_rows_preserved_exactly": true,
+  "existing_catalog_rows_preserved_except_verified_updated_at": true,
+  "catalog_detail": "CATALOG_DELTA.json",
+  "changed_existing_catalogs": {
+    "auth_permission": {
+      "before": 2080,
+      "after": 2096
+    },
+    "django_content_type": {
+      "before": 520,
+      "after": 524
+    },
+    "django_migrations": {
+      "before": 437,
+      "after": 443
+    },
+    "organizations_businesspermission": {
+      "before": 663,
+      "after": 668
+    },
+    "organizations_organizationrole": {
+      "before": 28,
+      "after": 28
+    },
+    "organizations_organizationrole_permissions": {
+      "before": 3904,
+      "after": 3929
+    }
+  },
+  "new_tables": [
+    "accounting_fiscalclosingconfiguration",
+    "accounting_fiscalyearclosing",
+    "accounting_fiscalyearclosingevent",
+    "payroll_statutorypayrollcontext"
+  ],
+  "scope": "Retained synthetic dataset cloned before applying six new migrations; full populated-ledger rollback/reapply separately tested; no Production mutation"
+}

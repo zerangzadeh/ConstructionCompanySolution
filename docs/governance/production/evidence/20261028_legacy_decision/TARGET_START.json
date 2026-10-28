@@ -1,0 +1,27 @@
+{
+  "owned_pid": 17048,
+  "arguments": [
+    "E:\\BONIRA_Operations\\ApprovedLinux\\6e55fd45b4c04ce0\\qemu\\qemu-system-x86_64.exe",
+    "-machine",
+    "q35,accel=whpx,kernel-irqchip=off",
+    "-smp",
+    "2",
+    "-m",
+    "4096",
+    "-drive",
+    "file=E:\\BONIRA_Operations\\ApprovedLinux\\6e55fd45b4c04ce0\\target.qcow2,if=virtio",
+    "-netdev",
+    "user,id=n0,hostfwd=tcp:127.0.0.1:22270-:22,hostfwd=tcp:127.0.0.1:24470-:8443",
+    "-device",
+    "virtio-net-pci,netdev=n0",
+    "-display",
+    "none",
+    "-serial",
+    "file:E:/BONIRA_Operations/ApprovedLinux/6e55fd45b4c04ce0/serial-legacy-decision.log",
+    "-monitor",
+    "none",
+    "-no-reboot"
+  ],
+  "profile": "BONIRA-PE-NP-01",
+  "authority": "Legacy Payment retired Human Product Decision; non-production only"
+}

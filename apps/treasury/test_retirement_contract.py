@@ -1,14 +1,11 @@
 """Destructive contract boundaries and migration-only compatibility."""
 
-import json
 from importlib import import_module
-from pathlib import Path
-from tempfile import TemporaryDirectory
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from django.apps import apps
-from django.db import connection
+from django.db import connection, migrations
 from django.test import SimpleTestCase, TestCase, override_settings
 
 from apps.organizations.models import BusinessPermission, BusinessPermissionCode
@@ -18,75 +15,61 @@ contract = import_module("apps.billing.migrations.0018_retire_legacy_claim_settl
 
 class RetirementContractGuardTests(SimpleTestCase):
     @override_settings(SETTINGS_MODULE="config.settings.production")
-    def test_production_rejected_before_any_database_access(self):
-        editor = SimpleNamespace(
-            connection=SimpleNamespace(settings_dict={"HOST": "localhost"})
-        )
-        with self.assertRaisesMessage(RuntimeError, "Development only"):
-            contract.verify_retirement(None, editor)
-
-    def test_remote_database_rejected_before_any_database_access(self):
-        editor = SimpleNamespace(
-            connection=SimpleNamespace(settings_dict={"HOST": "remote.invalid"})
-        )
-        with self.assertRaisesMessage(RuntimeError, "Development only"):
-            contract.verify_retirement(None, editor)
-
-    def test_existing_tenant_requires_all_twelve_and_exact_candidate(self):
-        editor = SimpleNamespace(
-            connection=SimpleNamespace(
-                settings_dict={"HOST": "localhost", "NAME": "configured-development"},
-                alias="default",
-            )
-        )
-        historical = Mock()
-        historical.get_model.return_value.objects.using.return_value.exists.return_value = True
-        with (
-            TemporaryDirectory() as tmp,
-            override_settings(
-                BASE_DIR=Path(tmp), SETTINGS_MODULE="config.settings.development"
-            ),
-        ):
-            path = (
-                Path(tmp)
-                / "docs/governance/cep/evidence/CEP-064_RETIREMENT_READINESS.json"
-            )
-            path.parent.mkdir(parents=True)
-            for conditions, digest in (
-                (
-                    [
-                        {"number": n, "status": "FAIL" if n == 11 else "PASS"}
-                        for n in range(1, 13)
-                    ],
-                    "stale",
-                ),
-                ([{"number": n, "status": "PASS"} for n in range(1, 13)], "stale"),
-            ):
-                path.write_text(
-                    json.dumps(
-                        {
-                            "conditions": conditions,
-                            "LEGACY_PAYMENT_RETIREMENT_READINESS": "PASS",
-                            "candidate_digest": digest,
-                        }
+    def test_production_and_remote_targets_preserve_without_population_gate(self):
+        for host in ("localhost", "db", "remote.invalid"):
+            with self.subTest(host=host):
+                editor = SimpleNamespace(
+                    connection=SimpleNamespace(
+                        settings_dict={"HOST": host, "NAME": "isolated"},
+                        alias="default",
                     )
                 )
-                with self.assertRaisesMessage(RuntimeError, "twelve-condition"):
+                historical = Mock()
+                historical.get_model.return_value.objects.using.return_value.all.return_value = []
+                preparation = import_module(
+                    "apps.documents.migrations.0012_legacy_payment_reference_preparation"
+                )
+                with (
+                    patch.object(preparation, "preserve_excluded_sources") as preserve,
+                    patch.object(preparation, "preserve_typed_links") as links,
+                    patch(
+                        "pathlib.Path.read_text",
+                        side_effect=AssertionError("No readiness-file gate"),
+                    ),
+                ):
                     contract.verify_retirement(historical, editor)
+                preserve.assert_called_once_with(historical, editor)
+                links.assert_called_once_with(historical, editor)
+
+    def test_state_retirement_never_drops_original_records(self):
+        payment_contract = import_module(
+            "core.retired_payments.migrations.0007_retire_legacy_payment"
+        )
+        for module in (contract, payment_contract):
+            operations = module.Migration.operations
+            self.assertFalse(
+                any(isinstance(op, migrations.DeleteModel) for op in operations)
+            )
+            retained = [
+                op
+                for op in operations
+                if isinstance(op, migrations.SeparateDatabaseAndState)
+            ]
+            self.assertEqual(len(retained), 1)
+            self.assertEqual(retained[0].database_operations, [])
+            self.assertTrue(
+                all(
+                    isinstance(op, migrations.DeleteModel)
+                    for op in retained[0].state_operations
+                )
+            )
 
 
 class RetiredRuntimeContractTests(TestCase):
-    def test_legacy_schema_and_permissions_absent_but_treasury_remains(self):
+    def test_legacy_orm_and_permissions_absent_but_treasury_remains(self):
         tables = set(connection.introspection.table_names())
-        self.assertFalse(
-            tables
-            & {
-                "payments_payment",
-                "payments_paymentallocation",
-                "payments_paymentdocumentlink",
-                "billing_claimsettlementallocation",
-            }
-        )
+        # Retained raw tables are intentional. Earlier applied Development table
+        # removal is not replayed, and removed history is never reconstructed.
         self.assertTrue(
             {
                 "treasury_paymentrequest",

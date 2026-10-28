@@ -1,0 +1,476 @@
+[
+  {
+    "policy_code": "payroll-tax-regulatory",
+    "effective_from": "2026-03-21",
+    "parameters": {
+      "brackets": [
+        {
+          "rate": "10",
+          "lower": "0",
+          "upper": "4800000000"
+        },
+        {
+          "rate": "15",
+          "lower": "4800000000",
+          "upper": "7200000000"
+        },
+        {
+          "rate": "20",
+          "lower": "7200000000",
+          "upper": "9600000000"
+        },
+        {
+          "rate": "25",
+          "lower": "9600000000",
+          "upper": "12000000000"
+        },
+        {
+          "rate": "30",
+          "lower": "12000000000",
+          "upper": null
+        }
+      ],
+      "rounding": {
+        "scale": 0,
+        "stage": "FINAL_LIABILITY",
+        "method": "ROUND_HALF_UP",
+        "authority_type": "HUMAN_POLICY_WHERE_STATUTE_SILENT"
+      },
+      "exemptions": [
+        {
+          "code": "ANNUAL-1405",
+          "amount": "4800000000"
+        }
+      ],
+      "thresholds": {
+        "floor": null,
+        "ceiling": null
+      },
+      "correction_mode": "source_version_governed",
+      "calculation_basis": "CUMULATIVE_YTD",
+      "component_mappings": [
+        {
+          "basis_factor": "1",
+          "classification": "taxable",
+          "component_code": "BASE"
+        }
+      ],
+      "statutory_governance": {
+        "scope": "PRODUCTION_REVIEWED",
+        "sources": [
+          {
+            "sha256": "00fa07d469c00e3d8cf03496571808d0d7e9ec97ab102d060cd0356c51016711",
+            "issued_on": "2026-04-20",
+            "reference": "INTA-200-1005-S-1405",
+            "treatment": "RETROACTIVE",
+            "supersedes": null,
+            "effective_on": "2026-03-21",
+            "published_on": "2026-04-22",
+            "correction_requirement": "Reconcile affected processed periods through governed replacement/delta; never overwrite."
+          }
+        ],
+        "population": "IR_LABOUR_ORDINARY_COMPULSORY",
+        "tax_year_end": "2027-03-20",
+        "review_sha256": "6ea702db3548464d9d0f4ded1f08005d808402017a694af4d6b04be9e7d019fc",
+        "tax_year_start": "2026-03-21",
+        "review_reference": "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "insurance_profile": "IR_SSO_ORDINARY_EMPLOYEE_1405",
+        "parameter_sources": {
+          "brackets": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ],
+          "rounding": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ],
+          "exemptions": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ],
+          "thresholds": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ],
+          "correction_mode": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ],
+          "calculation_basis": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ],
+          "component_mappings": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ]
+        },
+        "production_authorization": {
+          "reference": "docs/governance/production/PRODUCTION_SCOPED_DISPOSITIONS_20261028.md",
+          "sha256": "d25aa2538a8fbb6a8e77ed1f3b7c8f80f82b89e5eaf6f95ba197ac5a92133bbe"
+        }
+      }
+    },
+    "parameter_digest": "f3365039f788580f97df0315d3c0b4b59814a376b54cb2bd7b02f31857056e92",
+    "reviewed_package_digest": "ff1ef125abcac63c47fdd0b1cf991f36e8e0de7513937f2d4881a4de270300bd"
+  },
+  {
+    "policy_code": "payroll-tax-regulatory",
+    "effective_from": "2026-10-19",
+    "parameters": {
+      "brackets": [
+        {
+          "rate": "10",
+          "lower": "0",
+          "upper": "4800000000"
+        },
+        {
+          "rate": "15",
+          "lower": "4800000000",
+          "upper": "7200000000"
+        },
+        {
+          "rate": "20",
+          "lower": "7200000000",
+          "upper": "9600000000"
+        },
+        {
+          "rate": "25",
+          "lower": "9600000000",
+          "upper": "12000000000"
+        },
+        {
+          "rate": "30",
+          "lower": "12000000000",
+          "upper": null
+        }
+      ],
+      "rounding": {
+        "scale": 0,
+        "stage": "FINAL_LIABILITY",
+        "method": "ROUND_HALF_UP",
+        "authority_type": "HUMAN_POLICY_WHERE_STATUTE_SILENT"
+      },
+      "exemptions": [
+        {
+          "code": "ANNUAL-1405",
+          "amount": "4800000000"
+        }
+      ],
+      "thresholds": {
+        "floor": null,
+        "ceiling": null
+      },
+      "correction_mode": "source_version_governed",
+      "calculation_basis": "CUMULATIVE_YTD",
+      "component_mappings": [
+        {
+          "basis_factor": "1",
+          "classification": "taxable",
+          "component_code": "BASE"
+        }
+      ],
+      "statutory_governance": {
+        "scope": "PRODUCTION_REVIEWED",
+        "sources": [
+          {
+            "sha256": "00fa07d469c00e3d8cf03496571808d0d7e9ec97ab102d060cd0356c51016711",
+            "issued_on": "2026-04-20",
+            "reference": "INTA-200-1005-S-1405",
+            "treatment": "RETROACTIVE",
+            "supersedes": null,
+            "effective_on": "2026-03-21",
+            "published_on": "2026-04-22",
+            "correction_requirement": "Reconcile affected processed periods through governed replacement/delta; never overwrite."
+          },
+          {
+            "sha256": "876e19dea956c83692f67f34b7a765dfcfb07b2cdbaeacecfa4bd5420af903a8",
+            "issued_on": "2026-10-19",
+            "reference": "INTA-200-1405-59",
+            "treatment": "PROSPECTIVE",
+            "supersedes": "INTA-200-1403-39",
+            "effective_on": "2026-10-19",
+            "published_on": "2026-10-21",
+            "correction_requirement": "Preserve finalized earlier periods; unresolved benefit conditions fail closed."
+          }
+        ],
+        "population": "IR_LABOUR_ORDINARY_COMPULSORY",
+        "tax_year_end": "2027-03-20",
+        "review_sha256": "6ea702db3548464d9d0f4ded1f08005d808402017a694af4d6b04be9e7d019fc",
+        "tax_year_start": "2026-03-21",
+        "review_reference": "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "insurance_profile": "IR_SSO_ORDINARY_EMPLOYEE_1405",
+        "parameter_sources": {
+          "brackets": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ],
+          "rounding": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ],
+          "exemptions": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ],
+          "thresholds": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ],
+          "correction_mode": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ],
+          "calculation_basis": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ],
+          "component_mappings": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "INTA-200-1005-S-1405"
+          ]
+        },
+        "production_authorization": {
+          "reference": "docs/governance/production/PRODUCTION_SCOPED_DISPOSITIONS_20261028.md",
+          "sha256": "d25aa2538a8fbb6a8e77ed1f3b7c8f80f82b89e5eaf6f95ba197ac5a92133bbe"
+        }
+      }
+    },
+    "parameter_digest": "1759659dd3f1ee85a032529225b3cad3f26a2c142df377750d62b913da5a9482",
+    "reviewed_package_digest": "dfb26fb440592c5e28605923c84d56216bcd25cc3aeee7a094ca038aeec0373d"
+  },
+  {
+    "policy_code": "employee-insurance-regulatory",
+    "effective_from": "2026-03-21",
+    "parameters": {
+      "rounding": {
+        "scale": 0,
+        "stage": "FINAL_LIABILITY",
+        "method": "ROUND_HALF_UP",
+        "authority_type": "HUMAN_POLICY_WHERE_STATUTE_SILENT"
+      },
+      "basis_mode": "insured_remuneration_and_days",
+      "exemptions": [],
+      "thresholds": {
+        "floor": null,
+        "ceiling": null,
+        "daily_maximum": "38792950",
+        "daily_minimum": "5541850"
+      },
+      "correction_mode": "source_version_governed",
+      "component_mappings": [
+        {
+          "basis_factor": "1",
+          "classification": "insurable",
+          "component_code": "BASE"
+        },
+        {
+          "basis_factor": "1",
+          "classification": "insurable",
+          "component_code": "HOUSING"
+        }
+      ],
+      "statutory_governance": {
+        "scope": "PRODUCTION_REVIEWED",
+        "sources": [
+          {
+            "sha256": "12ab9ca986eb4f2c920695b648c958ab40927909bf06095541463c9ab70eb358",
+            "issued_on": "2026-04-27",
+            "reference": "SSO-1000-1405-493",
+            "treatment": "RETROACTIVE",
+            "supersedes": null,
+            "effective_on": "2026-03-21",
+            "published_on": "2026-05-04",
+            "correction_requirement": "Reconcile affected processed periods through governed replacement/delta; never overwrite."
+          }
+        ],
+        "population": "IR_LABOUR_ORDINARY_COMPULSORY",
+        "tax_year_end": "2027-03-20",
+        "review_sha256": "6ea702db3548464d9d0f4ded1f08005d808402017a694af4d6b04be9e7d019fc",
+        "tax_year_start": "2026-03-21",
+        "review_reference": "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "insurance_profile": "IR_SSO_ORDINARY_EMPLOYEE_1405",
+        "parameter_sources": {
+          "rounding": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ],
+          "basis_mode": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ],
+          "exemptions": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ],
+          "thresholds": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ],
+          "correction_mode": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ],
+          "component_mappings": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ],
+          "contribution_categories": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ]
+        },
+        "production_authorization": {
+          "reference": "docs/governance/production/PRODUCTION_SCOPED_DISPOSITIONS_20261028.md",
+          "sha256": "d25aa2538a8fbb6a8e77ed1f3b7c8f80f82b89e5eaf6f95ba197ac5a92133bbe"
+        }
+      },
+      "contribution_categories": [
+        {
+          "code": "SSO_EMPLOYEE",
+          "rate": "7",
+          "payer": "employee"
+        },
+        {
+          "code": "SSO_EMPLOYER",
+          "rate": "20",
+          "payer": "employer"
+        },
+        {
+          "code": "SSO_GOVERNMENT",
+          "rate": "3",
+          "payer": "other"
+        },
+        {
+          "code": "UNEMPLOYMENT",
+          "rate": "3",
+          "payer": "employer"
+        }
+      ]
+    },
+    "parameter_digest": "74512d6ca4d1f96b5a2f9c2da72e8339cb2cf95efc738e8a49207794f01449c2",
+    "reviewed_package_digest": "e734409b94295541baf42a55065909e4f942965413698dbe2e8d051d7a23568e"
+  },
+  {
+    "policy_code": "employee-insurance-regulatory",
+    "effective_from": "2026-03-21",
+    "parameters": {
+      "rounding": {
+        "scale": 0,
+        "stage": "FINAL_LIABILITY",
+        "method": "ROUND_HALF_UP",
+        "authority_type": "HUMAN_POLICY_WHERE_STATUTE_SILENT"
+      },
+      "basis_mode": "insured_remuneration_and_days",
+      "exemptions": [],
+      "thresholds": {
+        "floor": null,
+        "ceiling": null,
+        "daily_maximum": "38792950",
+        "daily_minimum": "5541850"
+      },
+      "correction_mode": "source_version_governed",
+      "component_mappings": [
+        {
+          "basis_factor": "1",
+          "classification": "insurable",
+          "component_code": "BASE"
+        },
+        {
+          "basis_factor": "1",
+          "classification": "insurable",
+          "component_code": "HOUSING"
+        }
+      ],
+      "statutory_governance": {
+        "scope": "PRODUCTION_REVIEWED",
+        "sources": [
+          {
+            "sha256": "12ab9ca986eb4f2c920695b648c958ab40927909bf06095541463c9ab70eb358",
+            "issued_on": "2026-04-27",
+            "reference": "SSO-1000-1405-493",
+            "treatment": "RETROACTIVE",
+            "supersedes": null,
+            "effective_on": "2026-03-21",
+            "published_on": "2026-05-04",
+            "correction_requirement": "Reconcile affected processed periods through governed replacement/delta; never overwrite."
+          },
+          {
+            "sha256": "89ac46623077ecda00970d7e0c7ab4cd6b04d526b3626eef854f8f40bf0f1929",
+            "issued_on": "2026-05-05",
+            "reference": "HOUSING-9234-T65481-1405",
+            "treatment": "RETROACTIVE",
+            "supersedes": "SSO-1000-1405-493:paragraph4:9000000-IRR-observation",
+            "effective_on": "2026-03-21",
+            "published_on": "2026-05-07",
+            "correction_requirement": "Housing entitlement 30000000 IRR monthly from 1405/01/01; retain 9000000 observation. Payroll owns replacement inputs; statutory engine never silently rewrites wages."
+          }
+        ],
+        "population": "IR_LABOUR_ORDINARY_COMPULSORY",
+        "tax_year_end": "2027-03-20",
+        "review_sha256": "6ea702db3548464d9d0f4ded1f08005d808402017a694af4d6b04be9e7d019fc",
+        "tax_year_start": "2026-03-21",
+        "review_reference": "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+        "insurance_profile": "IR_SSO_ORDINARY_EMPLOYEE_1405",
+        "parameter_sources": {
+          "rounding": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ],
+          "basis_mode": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ],
+          "exemptions": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ],
+          "thresholds": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ],
+          "correction_mode": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ],
+          "component_mappings": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ],
+          "contribution_categories": [
+            "docs/governance/cep/evidence/CEP-069_EXT0018_20261027/ADOPTED_EXPERT_REVIEW.md",
+            "SSO-1000-1405-493"
+          ]
+        },
+        "production_authorization": {
+          "reference": "docs/governance/production/PRODUCTION_SCOPED_DISPOSITIONS_20261028.md",
+          "sha256": "d25aa2538a8fbb6a8e77ed1f3b7c8f80f82b89e5eaf6f95ba197ac5a92133bbe"
+        }
+      },
+      "contribution_categories": [
+        {
+          "code": "SSO_EMPLOYEE",
+          "rate": "7",
+          "payer": "employee"
+        },
+        {
+          "code": "SSO_EMPLOYER",
+          "rate": "20",
+          "payer": "employer"
+        },
+        {
+          "code": "SSO_GOVERNMENT",
+          "rate": "3",
+          "payer": "other"
+        },
+        {
+          "code": "UNEMPLOYMENT",
+          "rate": "3",
+          "payer": "employer"
+        }
+      ]
+    },
+    "parameter_digest": "5980aa3c5301b89359fcadae4e5b4d86bab5745e41375a6a56b2c80d2bba1009",
+    "reviewed_package_digest": "28fcfc3af234338c8d5239de3ec7d224ef4b175a55add70b59ee2068729f3a6e"
+  }
+]

@@ -1,4 +1,4 @@
-"""Retain only the historical migration label; remove obsolete runtime schema."""
+"""Remove obsolete runtime models while preserving original legacy records."""
 
 from django.db import migrations
 
@@ -22,8 +22,13 @@ class Migration(migrations.Migration):
         ("organizations", "0122_cep023_leave_permissions"),
     ]
     operations = [
-        migrations.DeleteModel(name="PaymentDocumentLink"),
-        migrations.DeleteModel(name="PaymentAllocation"),
-        migrations.DeleteModel(name="Payment"),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                migrations.DeleteModel(name="PaymentDocumentLink"),
+                migrations.DeleteModel(name="PaymentAllocation"),
+                migrations.DeleteModel(name="Payment"),
+            ],
+        ),
         migrations.RunPython(retire_permissions),
     ]

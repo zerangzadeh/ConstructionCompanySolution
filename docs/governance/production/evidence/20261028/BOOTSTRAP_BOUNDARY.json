@@ -1,0 +1,19 @@
+{
+  "result": "BLOCKED_BY_EXPLICIT_MIGRATION_AUTHORITY",
+  "execution": "Actual Linux production-settings Django test database bootstrap; new empty test_pe_readiness_20261028",
+  "failure": "RuntimeError: Legacy Payment disposition is authorized for Development only",
+  "failed_source": "apps/documents/migrations/0012_legacy_payment_reference_preparation.py:16",
+  "downstream_guard": "apps/billing/migrations/0018_retire_legacy_claim_settlements.py:24; requires Development settings and loopback database",
+  "existing_contract_tests": "apps.treasury.test_retirement_contract.RetirementContractGuardTests; production/remote rejection before DB access",
+  "authority": "docs/governance/cep/supporting/LEGACY_PAYMENT_RETIREMENT_AUTHORIZATION_20261019.md; bounded Development only",
+  "record": "runtime/ATTEMPT_03_FAILED.json; private original traceback retained in owned guest",
+  "classification": "HUMAN_DECISION_REQUIRED_MIGRATION_SEMANTICS_NOT_TOOLING",
+  "proposed_minimum": "Authorize preparation/qualification of empty-target-only path, prove zero legacy and dependent population, preserve fail-closed populated-target handling; no real Production mutation",
+  "not_claimed": [
+    "fresh production-settings migration PASS",
+    "production authorization",
+    "production migration",
+    "guard bypass"
+  ],
+  "remaining_safe_work": "Complete current-release runtime/financial/concurrency tests on clean migrated synthetic fixture; compatible HTTPS release/schema rollback; no complete CEP rerun"
+}

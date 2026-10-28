@@ -1,0 +1,175 @@
+{
+  "at": "2026-10-28T12:47:13.355020+00:00",
+  "client_date": "2026-10-28",
+  "candidate_head": "c9fe1d7e7ed586ef96a2ee453a3490369d25e6a3",
+  "branch": "main",
+  "overall_readiness": "PRODUCTION_READINESS_GATE_QUALIFIED_NO_ACTUAL_DEPLOYMENT",
+  "gate": "GATE-11",
+  "status": "PASS",
+  "canonical_source": "evidence/20261028/SOURCE_CONTRACT.json; exact GATE11 row, archive/member SHA identities verified",
+  "requirements_satisfied": 5,
+  "requirements_total": 5,
+  "requirement_count_semantics": "Five exact conjuncts of canonical Pass Condition; scoped IMB completion is distinct from actual Production certification",
+  "clauses": [
+    {
+      "id": "C1",
+      "requirement": "GATE-10 Representative UAT Completion has PASSED",
+      "status": "SATISFIED",
+      "evidence": "GATE10 PASS retained: all 44 approved representative cases/48 mappings. No CEP or UAT reopening."
+    },
+    {
+      "id": "C2",
+      "requirement": "all required Production Certification IMB items are complete",
+      "status": "SATISFIED",
+      "evidence": "Nine required IMB contributors remain completed in their recorded scopes; current Production dispositions and technical deltas supplement retained evidence without rewriting CEPs."
+    },
+    {
+      "id": "C3",
+      "requirement": "required runtime/production evidence is available",
+      "status": "SATISFIED",
+      "evidence": "Current source verified; 52 affected Linux cases, Production envelope activation/calculation, final selected WSGI/HTTPS and actual complete native PITR/four-class recovery evidence available."
+    },
+    {
+      "id": "C4",
+      "requirement": "required external production evidence is available",
+      "status": "SATISFIED",
+      "evidence": "Direct Human Production-scoped EXT0018/0020/0021/0022 dispositions recorded; all reproducible statutory, PITR/custody/cadence, target and operational/access qualifications PASS. Actual provider/endpoint/credential values are authorized cutover inputs."
+    },
+    {
+      "id": "C5",
+      "requirement": "no unresolved production-certification blocker remains",
+      "status": "SATISFIED",
+      "evidence": "No unresolved in-scope readiness/certification blocker remains. All attributable failures repaired and affected checks passed; actual Production events and GATE12 sign-off are separate later actions."
+    }
+  ],
+  "required_imb_contributors": {
+    "IMB-0083": "CEP-069",
+    "IMB-0098": "CEP-070",
+    "IMB-0099": "CEP-071",
+    "IMB-0100": "CEP-072",
+    "IMB-0101": "CEP-072",
+    "IMB-0104": "CEP-074",
+    "IMB-0105": "CEP-075",
+    "IMB-0106": "CEP-076",
+    "IMB-0107": "CEP-077"
+  },
+  "completed_required_imb_execution_contributions": 9,
+  "external_production_phase_rows": [
+    {
+      "External Dependency ID": "EXT-0018",
+      "CEP ID": "CEP-069",
+      "Dependency Phase": "PRODUCTION",
+      "Blocks Build?": "NO",
+      "Blocks Activation?": "NO",
+      "Blocks Verification?": "NO",
+      "Blocks Production?": "YES",
+      "Required Gate": "GATE-11",
+      "Fail-Closed Behavior": "CURRENT VALUES/EVIDENCE UTV",
+      "Notes": "Current official Iranian Payroll statutory source package â€” Effective-dated official Tax/Labor/Social Security evidence, reviewed package/version and activation record"
+    },
+    {
+      "External Dependency ID": "EXT-0020",
+      "CEP ID": "CEP-070",
+      "Dependency Phase": "PRODUCTION",
+      "Blocks Build?": "NO",
+      "Blocks Activation?": "NO",
+      "Blocks Verification?": "NO",
+      "Blocks Production?": "YES",
+      "Required Gate": "GATE-11",
+      "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-CERTIFIED",
+      "Notes": "Approved recovery objectives â€” Approved numeric RPO/RTO/PITR/retention/test objectives and acceptance authority"
+    },
+    {
+      "External Dependency ID": "EXT-0021",
+      "CEP ID": "CEP-071",
+      "Dependency Phase": "PRODUCTION",
+      "Blocks Build?": "NO",
+      "Blocks Activation?": "NO",
+      "Blocks Verification?": "NO",
+      "Blocks Production?": "YES",
+      "Required Gate": "GATE-11",
+      "Fail-Closed Behavior": "UNSPECIFIED / NOT PRODUCTION-VALIDATED",
+      "Notes": "Approved production topology and environment configuration â€” Selected topology, environment schema, secrets/static/media/process configuration and deployment target evidence"
+    },
+    {
+      "External Dependency ID": "EXT-0022",
+      "CEP ID": "CEP-072",
+      "Dependency Phase": "PRODUCTION",
+      "Blocks Build?": "NO",
+      "Blocks Activation?": "NO",
+      "Blocks Verification?": "NO",
+      "Blocks Production?": "YES",
+      "Required Gate": "GATE-11",
+      "Fail-Closed Behavior": "NOT YET PROVEN",
+      "Notes": "Named operating responsibilities and approved runbook ownership â€” Named release/incident/activation/access responsibilities and approved runbook/access evidence"
+    }
+  ],
+  "root_boundary": "NONE_FOR_GATE11; real activation/cutover and GATE12 Human Business Sign-off remain separate.",
+  "qualification": {
+    "current_linux_tests": 21,
+    "failed": 0,
+    "configuration_guard_tests": 6,
+    "bootstrap_authority_guard_tests": "Prior rejection tests superseded by Human Product Decision; new production/remote preservation and no-drop contract tests PASS",
+    "https_cases": 56,
+    "new_migrations": 6,
+    "schema_and_deploy": "PASS_UPGRADE_ON_ISOLATED_CLONE",
+    "empty_production_settings_bootstrap": "PASS_ISOLATED_LINUX_NONPRODUCTION",
+    "preservation": "runtime/MIGRATION_PRESERVATION.json and CATALOG_DELTA.json",
+    "source_build_template_reuse": "evidence/20261028/REUSE_AND_BUILD_CHECKS.json",
+    "limits": "Changed-boundary tests use a fresh migrated/flush fixture; statutory test-only Development override is retained; no capacity, global full-suite, actual Production install or cold image rebuild claim",
+    "populated_production_settings_migration": "PASS_RETIRED_LEGACY_DATA_PRESERVED",
+    "retirement_regression_tests": 22,
+    "retirement_contract_tests_local": 2,
+    "retirement_recovery": "docs/governance/production/evidence/20261028_legacy_decision/runtime/RECOVERY_RESULT.json",
+    "production_scoped_affected_tests": 52,
+    "final_https_cases": 14,
+    "production_diagnostics_https_cases": 28,
+    "pitr_recovery_seconds": 326.9807383689997,
+    "pitr_rpo_protection_lags_seconds": [
+      32.548351,
+      33.453211
+    ]
+  },
+  "remaining_safe_executable_prerequisites_before_human_policy": [],
+  "safe_alternatives_exhausted": [
+    "All required bounded technical deltas executed; no prerequisite left unexecuted. Prior qualified controls reused with source/environment limits."
+  ],
+  "next_action": "Human reviews the qualified release/evidence and supplies separate actual Production cutover or GATE12 EXT0026 sign-off authority when desired. No new EXT0018/0020/0021/0022 disposition is requested.",
+  "production_only_later": [
+    "Selected actual private credentials/certificates/network/storage bindings",
+    "Separately authorized deployment/migration/activation/cutover",
+    "Actual operational delivery/restore/continuing-operation evidence where selected",
+    "Later final Production Certification/Human Business Sign-off under applicable authority"
+  ],
+  "production_action": false,
+  "human_signoff": "NOT_EXECUTED",
+  "final_production_certification": "NOT_EXECUTED",
+  "git_writes": false,
+  "report": "docs/governance/production/PRODUCTION_READINESS_ASSESSMENT.md",
+  "legacy_payment_bootstrap": {
+    "status": "RESOLVED_QUALIFIED_ANY_POPULATION",
+    "authority": "docs/governance/production/LEGACY_PAYMENT_RETIRED_DECISION_20261028.md",
+    "empty": "docs/governance/production/evidence/20261028_legacy_decision/runtime/empty_RESULT.json",
+    "populated": "docs/governance/production/evidence/20261028_legacy_decision/runtime/populated_RESULT.json",
+    "recovery": "docs/governance/production/evidence/20261028_legacy_decision/runtime/RECOVERY_RESULT.json",
+    "regression": "docs/governance/production/evidence/20261028_legacy_decision/runtime/REGRESSION.json",
+    "raw_retired_rows_preserved": 8,
+    "physical_table_drops": 0,
+    "financial_targets_created": 0,
+    "applied_migrations_replayed": false,
+    "production_action": false
+  },
+  "remaining_blockers": [],
+  "production_dispositions": "docs/governance/production/PRODUCTION_SCOPED_DISPOSITIONS_20261028.md",
+  "production_contract": "docs/governance/production/PRODUCTION_RUNTIME_CONTRACT.json",
+  "production_scoped_qualification": {
+    "PITR_RESULT": "docs/governance/production/evidence/20261028_production_disposition/runtime/PITR_RESULT.json",
+    "CADENCE_CUSTODY_RESULT": "docs/governance/production/evidence/20261028_production_disposition/runtime/CADENCE_CUSTODY_RESULT.json",
+    "WEB_OPERATIONS_RESULT": "docs/governance/production/evidence/20261028_production_disposition/runtime/WEB_OPERATIONS_RESULT.json",
+    "FINAL_RELEASE_IDENTITY": "docs/governance/production/evidence/20261028_production_disposition/runtime/FINAL_RELEASE_IDENTITY.json",
+    "CURRENT_AUDIT_RECOVERY": "docs/governance/production/evidence/20261028_production_disposition/runtime/CURRENT_AUDIT_RECOVERY.json"
+  },
+  "production_statutory_envelopes": "docs/governance/production/PRODUCTION_STATUTORY_ENVELOPES.json",
+  "gate12": "NOT_PASSED_EXT0026_HUMAN_BUSINESS_SIGNOFF_NOT_EXECUTED",
+  "final_human_production_certification": "NOT_EXECUTED"
+}
