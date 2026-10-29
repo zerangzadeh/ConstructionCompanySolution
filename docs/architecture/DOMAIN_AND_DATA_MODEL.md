@@ -372,11 +372,27 @@ erDiagram
 
 ## Workforce workflow integration target
 
-The MVP field-worker UI must reuse Workforce and Timekeeping without a parallel
-`Worker` model. Non-login `national_id` is an approved future additive gap, not
-covered merely by login-user national ID. A simplified operator workflow must
-preserve separate Attendance, Timesheet and Overtime backend semantics; Full
-HR/ESS and Payroll remain UI-hidden. This direction authorizes no schema change.
+The MVP field-worker UI reuses Workforce and Timekeeping without a parallel
+`Worker` model. Under the separate 2026-10-29 MVP-02 authorization, optional
+`Person.national_id` stores non-login workforce identity with normalized digits,
+the existing Iranian checksum validator, and tenant-scoped non-null uniqueness.
+No inferred national-ID backfill or Employee cutover occurs. `User` retains its
+existing authentication national-ID rules. Explicit Person/User and
+WorkRelationship/legacy Employee links reject conflicting non-empty national IDs
+and competing effective identities; optional absence of a login remains valid.
+Identity changes serialize transactionally across those existing tables.
+
+Employee remains the operational compatibility source for assignments, skills,
+qualifications and time entry. The focused Field Workforce projection adds
+basic identity editing, crew and assignment context, and separately permissioned
+operational history. Explicit `employees.view` plus current membership scope is
+required; site/project readers see only workers with matching assignment evidence.
+Assignment or position alone grants no permission. Organization authority remains
+required for identity editing and governed account linking. Attendance, Timesheet
+and Overtime remain separate; Daily Report aggregates generate none of them.
+Full HR/ESS and Payroll remain UI-hidden under the central Product Surface policy.
+See [MVP-02 evidence](../governance/mvp/MVP-02_COMPLETION_REPORT.md) for validation
+and limitations; this description grants no further implementation authority.
 
 P7-S06–S12 time entry is implemented without daily-report, Payroll or Project
 Cost integration. Any later integration must preserve tenant scope and keep

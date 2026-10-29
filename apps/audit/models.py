@@ -1036,6 +1036,10 @@ class AuditAction(models.TextChoices):
     WORK_TEAM_CREATED = "work_team.created", "گروه کاری ایجاد شد"
     WORK_TEAM_ARCHIVED = "work_team.archived", "گروه کاری بایگانی شد"
     EMPLOYEE_CREATED = "employee.created", "کارمند ایجاد شد"
+    EMPLOYEE_OPERATIONAL_UPDATED = (
+        "employee.operational_updated",
+        "اطلاعات عملیاتی نیروی کار ویرایش شد",
+    )
     EMPLOYEE_POSITION_ASSIGNED = (
         "employee_position_assignment.created",
         "سمت شغلی به کارمند تخصیص یافت",

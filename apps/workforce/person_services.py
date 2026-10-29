@@ -17,6 +17,8 @@ from apps.workforce.models import (
 )
 from core.identifiers import canonicalize_upper_identifier
 
+from .identity_integrity import identity_write_lock
+
 
 def _require_access(
     *, organization: Organization, actor: User, permission: BusinessPermissionCode
@@ -74,6 +76,7 @@ def create_person(
     return person
 
 
+@identity_write_lock()
 @transaction.atomic
 def create_work_relationship(
     *,

@@ -4,7 +4,7 @@ from datetime import timedelta
 from html.parser import HTMLParser
 
 from django.core.exceptions import PermissionDenied
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -36,17 +36,28 @@ class _NavigationParser(HTMLParser):
     def __init__(self, content: bytes) -> None:
         super().__init__()
         self.entries = []
+        self.in_navigation = False
         self.feed(content.decode())
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
-        if "data-nav-id" in attributes:
+        if tag == "nav":
+            self.in_navigation = "data-product-navigation" in attributes
+        if self.in_navigation and tag == "a" and "href" in attributes:
             self.entries.append((tag, attributes))
 
+    def handle_endtag(self, tag):
+        if tag == "nav":
+            self.in_navigation = False
+
     def links(self, nav_id):
-        return [attrs for tag, attrs in self.entries if attrs["data-nav-id"] == nav_id]
+        return [attrs for tag, attrs in self.entries if attrs.get("data-nav-id") == nav_id]
+
+    def links_to(self, url):
+        return [attrs for tag, attrs in self.entries if attrs.get("href") == url]
 
 
+@override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
 class ESSOwnDataPrivacyTests(TestCase):
     def setUp(self) -> None:
         self.owner = User.objects.create_user(username="cep026-owner")
@@ -195,7 +206,7 @@ class ESSOwnDataPrivacyTests(TestCase):
         self.assertNotContains(other_response, "Sara", status_code=403)
         self.assertNotContains(other_response, "E-027", status_code=403)
 
-    def test_navigation_visibility_follows_identity_but_does_not_grant_access(self):
+    def test_internal_profile_identity_gate_survives_current_navigation(self):
         self._login(self.employee_user)
         self.assertTrue(
             has_ess_subject(user=self.employee_user, organization=self.organization)
@@ -203,19 +214,14 @@ class ESSOwnDataPrivacyTests(TestCase):
         response = self.client.get(reverse("home"))
         self.assertTrue(response.context["ess_subject_available"])
         navigation = _NavigationParser(response.content)
-        entries = navigation.links("NAV-006")
-        self.assertEqual(len(entries), 2)  # Desktop sidebar and mobile drawer.
-        self.assertEqual(reverse("workforce:ess_dashboard"), "/workforce/ess/")
-        for entry in entries:
-            self.assertEqual(entry["href"], reverse("workforce:ess_dashboard"))
-            self.assertNotIn("aria-disabled", entry)
-            self.assertNotIn("is-unavailable", entry["class"])
-            dashboard = self.client.get(entry["href"])
-            self.assertContains(dashboard, "داشبورد خدمات من")
-            self.assertEqual(
-                dashboard.context["dashboard"].profile.person.pk, self.person.pk
-            )
-            self.assertNotContains(dashboard, self.other_relationship.employee_number)
+        # MVP-01 replaced the retired NAV-006 menu even in internal verification.
+        self.assertEqual(navigation.links_to(reverse("workforce:ess_dashboard")), [])
+        dashboard = self.client.get(reverse("workforce:ess_dashboard"))
+        self.assertContains(dashboard, "داشبورد خدمات من")
+        self.assertEqual(
+            dashboard.context["dashboard"].profile.person.pk, self.person.pk
+        )
+        self.assertNotContains(dashboard, self.other_relationship.employee_number)
 
         self._login(self.unlinked_user)
         response = self.client.get(reverse("home"))
@@ -248,13 +254,15 @@ class ESSOwnDataPrivacyTests(TestCase):
         self._login(self.employee_user)
         response = self.client.get(reverse("home"))
         entries = _NavigationParser(response.content)
-        self.assertEqual(len(entries.links("NAV-006")), 2)
-        self.assertEqual(len(entries.links("NAV-008")), 2)
-        self.assertEqual(len(entries.links("NAV-027")), 2)
-        for nav_id in ("NAV-006", "NAV-008", "NAV-027"):
-            self.assertEqual(
-                self.client.get(entries.links(nav_id)[0]["href"]).status_code, 200
-            )
+        self.assertTrue(response.context["ess_subject_available"])
+        self.assertEqual(entries.links_to(reverse("workforce:ess_dashboard")), [])
+        for route in ("projects:list", "expenses:list"):
+            url = reverse(route)
+            self.assertEqual(len(entries.links_to(url)), 2)  # Desktop and mobile.
+            self.assertEqual(self.client.get(url).status_code, 200)
+        self.assertEqual(
+            self.client.get(reverse("workforce:ess_dashboard")).status_code, 200
+        )
 
     def _assert_ess_navigation_and_direct_url_denied(self):
         self._login(self.employee_user)

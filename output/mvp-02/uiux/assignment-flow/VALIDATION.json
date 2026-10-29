@@ -1,0 +1,98 @@
+{
+  "status": "PARTIAL_PENDING_END_DATE_DECISION",
+  "product_owner_visual_acceptance": "PENDING",
+  "date": "2026-10-29T07:10:49.711843+03:30",
+  "completed": [
+    "Both assignment-create breadcrumb chains",
+    "Business names primary; codes secondary in assignment controls",
+    "Existing Project-Site cascading preserved; stale own URL parameter removed from lookup",
+    "Responsibility confirmed assignment-specific CharField; retained free text",
+    "Business-flow field order for existing fields; contextual notes use existing model/service"
+  ],
+  "pending": {
+    "optional_end_date": "Existing active assignment rejects end_date. Human asked to distinguish planned end (requires narrow model-rule change) versus already-ended creation through existing completion lifecycle; no interpretation inferred.",
+    "edit_flow": "No existing assignment edit route/update service; new edit lifecycle not introduced."
+  },
+  "automated": {
+    "tests_passed": 22,
+    "subtests_passed": 28,
+    "logs": [
+      "final-validation.log",
+      "selector-regression.log"
+    ],
+    "final_failures": 0
+  },
+  "browser": {
+    "scenarios_passed": 14,
+    "assignment_scenarios": 4,
+    "shared_selector_regression_scenarios": 10,
+    "assignment_viewports": [
+      1440,
+      390
+    ],
+    "screenshots_visually_inspected": true,
+    "results": [
+      "browser/mvp02-assignment-owner-results.json",
+      "selector-regression/mvp02-uiux-owner-results.json"
+    ],
+    "scenarios": [
+      "ASSIGN-create-desktop",
+      "ASSIGN-worker-desktop",
+      "ASSIGN-create-mobile",
+      "ASSIGN-worker-mobile",
+      "UX-project-site-worker-cascade",
+      "UX-selected-validation-error",
+      "UX-no-javascript",
+      "UX-native-complete-catalogue",
+      "UX-htmx-lifecycle",
+      "UX-lookup-error",
+      "UX-lookup-retry",
+      "UX-scroll-catalogue",
+      "UX-clear-context-filter",
+      "UX-filter-integrated-search"
+    ]
+  },
+  "static_checks": [
+    "Ruff PASS: six focused Python modules",
+    "AST PASS: legacy forms.py",
+    "Node syntax PASS: field_choices.js"
+  ],
+  "failed_attempts": {
+    "focused.log": "Test assertion searched global navigation instead of page header; corrected narrowly.",
+    "validation.log": "Worker-specific Site lookup retained stale own Site URL context; fixed adapter and verified all final scenarios."
+  },
+  "source_files": {
+    "apps/workforce/forms.py": "b2c6753cb16b1d3ee827f6b725428b22b33ad57ea1a32f862037fddbf038bb4e",
+    "apps/workforce/field_forms.py": "eb6e07a8e22ef826aa09f18eb202319970be2484890cb1cce405bfc0fe7ca0b9",
+    "apps/workforce/field_views.py": "9ef6590d911baad3b5b1ef5402503099081945027bff349a36153a9d8db72805",
+    "apps/workforce/field_services.py": "9e7046dc803f2b3a45fea2d80f1b4ed6319658e799ea9c523bd82f7c6bf2001b",
+    "apps/workforce/templatetags/field_journey.py": "5731b4040dd63f630ac864d4e5d21ce05f40cade41a968e6cc26ea31cbbb43ec",
+    "templates/workforce/assignment_form.html": "6bd6b876f1f1de492029c81b010e20bdc9e7b72fc58cda1e8e9d025deed9ea78",
+    "apps/workforce/templates/workforce/field_form.html": "30a9c00c58ce99feed472a0ee08984a08f0b6e9ca04e1d38d90c7adbe7590584",
+    "apps/workforce/static/workforce/field_choices.js": "d8c7b3b81729b58627bb76bf086437a07028ada5138c34a0dbf7f2c79abcafe3",
+    "apps/workforce/static/workforce/field_choices.css": "7bcbd3a004306c932e0b036cb934f477e15644ca86e18091492065c84609437e",
+    "apps/workforce/test_mvp02_uiux.py": "dfa525cce474914e49a3aab461cbe63d10bbbeb2c92d7d4067d22c1b743171ec",
+    "apps/workforce/test_mvp02_browser.py": "a383ed218f048321437bc98e5860d11ecae01fd5c196480f5a0d751d0bcdf2d7",
+    "docs/governance/mvp/MVP-02_UIUX_REMEDIATION_REPORT.md": "f09741b39601abf7bcfa8d8085f8aaae19a294473b36a467f1bfef3bcc3e3b38"
+  },
+  "source_boundaries": {
+    "protected_unchanged": 608,
+    "declared_deltas": [
+      "apps/workforce/field_services.py",
+      "apps/workforce/field_views.py",
+      "apps/workforce/views.py"
+    ],
+    "this_turn_field_service_change": "Forward optional notes to existing assignment notes contract. No status/date/permission change.",
+    "models_and_canonical_assignment_services_unchanged": true,
+    "unexpected_prior_source_changes": []
+  },
+  "git": {
+    "head": "13e0b1d85f766336eca8286a904e3080b4597f9c",
+    "branch": "main",
+    "ahead_behind": "0\t0",
+    "writes": "NONE"
+  },
+  "new_migrations": false,
+  "new_dependencies": false,
+  "mvp03_started": false
+}

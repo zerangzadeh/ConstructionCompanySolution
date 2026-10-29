@@ -916,16 +916,17 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
     PermissionResource(
         "employees",
         "کارکنان",
-        ("workforce.Employee",),
+        ("workforce.Employee", "workforce.Person", "workforce.WorkRelationship"),
         (
             P.EMPLOYEES_VIEW,
             P.EMPLOYEES_CREATE,
+            P.EMPLOYEES_CHANGE_OPERATIONAL,
             P.EMPLOYEES_CHANGE_PROFILE_IMAGE,
             P.EMPLOYEES_CHANGE_STATUS,
             P.EMPLOYEES_ARCHIVE,
             P.EMPLOYEES_LINK_ACCOUNT,
         ),
-        ("apps.workforce.services",),
+        ("apps.workforce.services", "apps.workforce.field_services"),
     ),
     PermissionResource(
         "employee_positions",

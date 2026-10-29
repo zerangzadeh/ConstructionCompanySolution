@@ -1,0 +1,15 @@
+.erp-business-choice { min-width: 0; }
+.erp-business-choice .ts-wrapper { width: 100%; min-width: 0; font: inherit; }
+.erp-business-choice .ts-wrapper.single .ts-control { min-height: 44px; padding: .6rem .75rem; padding-inline-end: 2rem; border: 1px solid var(--erp-border-strong); border-radius: var(--erp-radius-control); background: var(--erp-surface); background-image: none; box-shadow: none; flex-wrap: nowrap; color: var(--erp-text); font: inherit; font-size: .875rem; text-align: start; }
+.erp-business-choice .ts-wrapper.single .ts-control::after { content: '⌄'; position: absolute; inset-inline-end: .75rem; top: .5rem; color: var(--erp-text-muted); border: 0; margin: 0; width: auto; height: auto; }
+.erp-business-choice .ts-control > input { font: inherit; min-width: 0; flex: 1 1 1px; }
+.erp-business-choice .ts-control > .item { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; }
+.erp-business-choice .ts-wrapper.focus .ts-control { border-color: var(--erp-primary); outline: 2px solid var(--erp-primary); outline-offset: 1px; }
+.erp-business-choice .ts-dropdown { z-index: 40; border-color: var(--erp-border-strong); border-radius: var(--erp-radius-control); background: var(--erp-surface); color: var(--erp-text); font: inherit; font-size: .875rem; text-align: start; box-shadow: 0 8px 20px rgb(15 23 42 / .12); }
+.erp-business-choice .ts-dropdown .option { padding: .65rem .75rem; overflow-wrap: anywhere; }
+.erp-business-choice .ts-dropdown .active { background: var(--erp-surface-subtle); color: var(--erp-primary); }
+.erp-business-choice .ts-wrapper.disabled .ts-control { background: var(--erp-surface-subtle); color: var(--erp-text-muted); opacity: 1; }
+.erp-business-choice .ts-control.invalid, .erp-form-field--invalid .ts-control { border-color: var(--color-danger, #B91C1C); }
+.erp-business-choice [data-choice-retry] { color: var(--erp-primary); text-decoration: underline; }
+.erp-business-choice .business-choice-name { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.erp-business-choice .business-choice-code { display: block; font-size: .75rem; color: var(--erp-text-muted); text-align: start; }

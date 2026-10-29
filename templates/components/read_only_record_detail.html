@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% load erp_format %}
+{% load erp_format field_journey %}
 {% block title %}{{ detail_title }} | بنیرا{% endblock %}
 {% block content %}
 {% include "components/page_header.html" with page_title=detail_title page_breadcrumb_label="بازگشت به فهرست" page_breadcrumb_url=back_url only %}
+{% if field_project %}{% field_journey field_project field_site %}{% endif %}
 <section class="erp-surface mt-5 min-w-0 rounded-xl p-5" aria-label="مشخصات رکورد">
   <dl class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
     {% for label, value, kind in detail_rows %}

@@ -1,0 +1,649 @@
+{
+  "package": "MVP-02 — Field Workforce MVP",
+  "status": "COMPLETE",
+  "scope": "Development/non-production",
+  "generated_utc": "2026-10-28T23:18:24.707995+00:00",
+  "authorization": {
+    "source": "Human-supplied Pasted text.txt attachment, 2026-10-29 Asia/Tehran",
+    "sha256": "c25430e7b3d3dd1e618c2b4adea3962066c788513387c72bd2fce42563cf753b"
+  },
+  "git": {
+    "branch": "main",
+    "head": "13e0b1d85f766336eca8286a904e3080b4597f9c",
+    "starting_head": "13e0b1d85f766336eca8286a904e3080b4597f9c",
+    "local_upstream_ahead_behind": "0\t0",
+    "starting_working_tree": "clean",
+    "ending_working_tree": "bounded uncommitted source/docs/tests/evidence",
+    "git_writes": false
+  },
+  "automated_tests": {
+    "passed": 181,
+    "failed": 0,
+    "subtests_passed": 61,
+    "deselected_pre_existing": 5,
+    "argv": [
+      ".venv/Scripts/python.exe",
+      "-m",
+      "pytest",
+      "apps/workforce/test_mvp02.py",
+      "apps/workforce/test_mvp02_concurrency.py",
+      "apps/workforce/test_mvp02_migration.py",
+      "apps/workforce/test_mvp02_browser.py",
+      "apps/timekeeping/test_mvp02.py",
+      "apps/workforce/test_cep010_person_workrelationship.py",
+      "apps/timekeeping/test_cep024_scope.py",
+      "apps/workforce/test_p7_s01_s05_workforce_foundation.py",
+      "apps/workforce/test_cep029.py",
+      "apps/workforce/test_cep026_ess_privacy.py",
+      "apps/timekeeping/test_p7_s06_s12_timekeeping.py",
+      "apps/timekeeping/test_cep022_roster.py",
+      "apps/timekeeping/test_cep062.py",
+      "core/test_product_surface.py",
+      "core/test_home.py",
+      "core/test_cep017_navigation.py",
+      "apps/accounts/tests.py::UserModelTests",
+      "apps/accounts/test_admin.py::NationalIdValidationTests",
+      "apps/organizations/test_permission_registry.py",
+      "apps/organizations/test_permission_decorators.py",
+      "apps/organizations/test_p1_1_authorization.py",
+      "--deselect",
+      "apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_every_managed_business_model_is_registered_exactly_once",
+      "--deselect",
+      "apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_every_registered_permission_is_referenced_by_its_enforcement_module",
+      "--deselect",
+      "apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_resource_keys_are_unique_and_match_permission_namespaces",
+      "--deselect",
+      "apps/organizations/test_p1_1_authorization.py::P11RoleCatalogCloseoutTests::test_platform_navigation_exposes_all_approved_platform_controls",
+      "--deselect",
+      "apps/organizations/test_p1_1_authorization.py::P11RoleCatalogCloseoutTests::test_role_catalog_routes_enforce_platform_and_tenant_boundaries",
+      "-q",
+      "--reuse-db",
+      "--disable-warnings",
+      "--tb=short"
+    ],
+    "log": "logs/final-tests.log"
+  },
+  "baseline_probe": {
+    "result": "5 pre-existing failures reproduced with recorded HEAD Product Surface/registry sources in isolated process",
+    "argv": [
+      ".venv/Scripts/python.exe",
+      "output/mvp-02/baseline_probe.py",
+      "apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_every_managed_business_model_is_registered_exactly_once",
+      "apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_every_registered_permission_is_referenced_by_its_enforcement_module",
+      "apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_resource_keys_are_unique_and_match_permission_namespaces",
+      "apps/organizations/test_p1_1_authorization.py::P11RoleCatalogCloseoutTests::test_platform_navigation_exposes_all_approved_platform_controls",
+      "apps/organizations/test_p1_1_authorization.py::P11RoleCatalogCloseoutTests::test_role_catalog_routes_enforce_platform_and_tenant_boundaries",
+      "-q",
+      "--reuse-db",
+      "--disable-warnings",
+      "--tb=line"
+    ],
+    "log": "logs/baseline-probe.log",
+    "findings": "baseline-findings.json"
+  },
+  "browser": {
+    "checks_passed": 18,
+    "checks_failed": 0,
+    "scenarios": "A–H",
+    "real_runtime": "Headless Chrome/CDP + isolated PostgreSQL StaticLiveServerTestCase",
+    "screenshots": 9,
+    "representative_visual_review": [
+      "A-worker-without-login",
+      "B-project-site-workers",
+      "H-form-mobile",
+      "H-history-mobile"
+    ],
+    "results": [
+      {
+        "name": "F-foreign-worker",
+        "status": 404,
+        "dir": "rtl",
+        "viewport": 1440,
+        "scroll_width": 1440
+      },
+      {
+        "name": "F-foreign-context",
+        "status": 404,
+        "dir": "rtl",
+        "viewport": 1440,
+        "scroll_width": 1440
+      },
+      {
+        "name": "A-create-non-login-worker",
+        "status": 200,
+        "dir": "rtl",
+        "viewport": 1425,
+        "scroll_width": 1425
+      },
+      {
+        "name": "A-worker-without-login",
+        "status": 200,
+        "dir": "rtl",
+        "viewport": 1425,
+        "scroll_width": 1425
+      },
+      {
+        "name": "B-project-site-workers",
+        "status": 200,
+        "dir": "rtl",
+        "viewport": 1440,
+        "scroll_width": 1440
+      },
+      {
+        "name": "C-report-timekeeping",
+        "status": 200,
+        "dir": "rtl",
+        "viewport": 1425,
+        "scroll_width": 1425
+      },
+      {
+        "name": "D-attendance",
+        "status": 200,
+        "dir": "rtl",
+        "viewport": 1425,
+        "scroll_width": 1425
+      },
+      {
+        "name": "D-overtime",
+        "status": 200,
+        "dir": "rtl",
+        "viewport": 1425,
+        "scroll_width": 1425
+      },
+      {
+        "name": "D-timesheet",
+        "status": 200,
+        "dir": "rtl",
+        "viewport": 1425,
+        "scroll_width": 1425
+      },
+      {
+        "name": "G-surface-home",
+        "status": 200,
+        "dir": "rtl",
+        "viewport": 1425,
+        "scroll_width": 1425
+      },
+      {
+        "name": "G-hidden-ess",
+        "status": 403,
+        "dir": "rtl",
+        "viewport": 1440,
+        "scroll_width": 1440
+      },
+      {
+        "name": "G-hidden-hr",
+        "status": 403,
+        "dir": "rtl",
+        "viewport": 1440,
+        "scroll_width": 1440
+      },
+      {
+        "name": "H-list-mobile",
+        "status": 200,
+        "dir": "rtl",
+        "viewport": 390,
+        "scroll_width": 390
+      },
+      {
+        "name": "H-worker-mobile",
+        "status": 200,
+        "dir": "rtl",
+        "viewport": 390,
+        "scroll_width": 390
+      },
+      {
+        "name": "H-form-mobile",
+        "status": 200,
+        "dir": "rtl",
+        "viewport": 390,
+        "scroll_width": 390
+      },
+      {
+        "name": "H-history-mobile",
+        "status": 200,
+        "dir": "rtl",
+        "viewport": 390,
+        "scroll_width": 390
+      },
+      {
+        "name": "E-no-workforce-authority",
+        "status": 403,
+        "dir": "rtl",
+        "viewport": 1440,
+        "scroll_width": 1440
+      },
+      {
+        "name": "E-no-timekeeping-authority",
+        "status": 403,
+        "dir": "rtl",
+        "viewport": 1440,
+        "scroll_width": 1440
+      }
+    ]
+  },
+  "checks": {
+    "django_system_check": "PASS (0 issues)",
+    "template_compilation": "PASS, 13 templates; static-validation.json",
+    "static_resolution": "PASS",
+    "javascript_syntax": "PASS, node --check both changed JavaScript files",
+    "ruff": "PASS all changed Python including migrations/evidence helper",
+    "format": "PASS 16 new Python files; existing changed ranges formatted",
+    "makemigrations_check": "PASS, no changes",
+    "package_migrate_check": "PASS, exit 0",
+    "global_migrate_check": "PRE_EXISTING FAIL, exit 1: payroll.0010 remains pending",
+    "git_diff_check": "PASS",
+    "frozen_D1_D7": "Unchanged, pre-section-8 bytes equal HEAD",
+    "CEP_registry_and_historical_traces": "Unchanged",
+    "mvp02_catalog_enforcement_and_default_roles": "PASS; catalog-scope.json"
+  },
+  "migration_commands": [
+    [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "makemigrations",
+      "--check",
+      "--dry-run"
+    ],
+    [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "migrate",
+      "workforce",
+      "0016",
+      "--noinput"
+    ],
+    [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "migrate",
+      "workforce",
+      "0016",
+      "--check"
+    ],
+    [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "migrate",
+      "--check"
+    ],
+    [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "showmigrations",
+      "workforce",
+      "organizations",
+      "payroll",
+      "--plan"
+    ]
+  ],
+  "migrations": [
+    "apps/organizations/migrations/0125_mvp02_field_workforce_permission.py",
+    "apps/workforce/migrations/0016_mvp02_person_national_id.py"
+  ],
+  "acceptance_criteria": {
+    "AC-01": "PASS",
+    "AC-02": "PASS",
+    "AC-03": "PASS",
+    "AC-04": "PASS",
+    "AC-05": "PASS",
+    "AC-06": "PASS",
+    "AC-07": "PASS",
+    "AC-08": "PASS",
+    "AC-09": "PASS",
+    "AC-10": "PASS",
+    "AC-11": "PASS",
+    "AC-12": "PASS",
+    "AC-13": "PASS",
+    "AC-14": "PASS",
+    "AC-15": "PASS",
+    "AC-16": "PASS",
+    "AC-17": "PASS"
+  },
+  "cleanup": {
+    "historical_traces": "3 restored to canonical HEAD content with Windows checkout line endings; no Git diff",
+    "synthetic_test_documents": "5 verified fixture directories preserved by reversible move to test-generated-documents after recursive deletion was blocked by automatic approval review",
+    "human_documents_deleted": false
+  },
+  "changed_source_docs_tests_count": 51,
+  "changed_source_docs_tests": [
+    {
+      "path": "Agents.md",
+      "sha256": "abe7a836b65148064fb11b95195cd3e103d03a7691cd27ea7fb154562eac54c9"
+    },
+    {
+      "path": "ROADMAP.md",
+      "sha256": "a95135df87fc38547542f9f87d9340365b8b440321e48eb6d48038ffff74e59d"
+    },
+    {
+      "path": "apps/accounts/models.py",
+      "sha256": "aaf40a11399f3a506d2b65e3cfe22ef7a881b5188377a13c8c860f41a3b0fa23"
+    },
+    {
+      "path": "apps/audit/models.py",
+      "sha256": "9a4807bf30cd863dab204c94ade719e5471427e5e43e7b24831d2f2b00ef62f4"
+    },
+    {
+      "path": "apps/organizations/authorization.py",
+      "sha256": "6e261c33a812425d19675b293f09be0e5e48c4f19c4d56fe0aaa9b5354608780"
+    },
+    {
+      "path": "apps/organizations/migrations/0125_mvp02_field_workforce_permission.py",
+      "sha256": "eb26b9a47bfa1588ab8a29acb64e295a91910d7c04721c5ab83e0cab9db6c9b5"
+    },
+    {
+      "path": "apps/organizations/models.py",
+      "sha256": "8bc266bc20205160a1b53006e80c5b64a290841a33caa44d8e81302f339f1e55"
+    },
+    {
+      "path": "apps/organizations/permission_registry.py",
+      "sha256": "bc892beba51a18c73728f5a92948b24070ad54d4e97035c8e896fe4750f80832"
+    },
+    {
+      "path": "apps/projects/views.py",
+      "sha256": "3b8f06ce87a1b984f97e0f92046db2b62721c2681f49b7c978804919507748c6"
+    },
+    {
+      "path": "apps/timekeeping/field_history.py",
+      "sha256": "6b660597b1b3f74d7bbc64594953a36823d6f01e73496c01510ef8d32dc67746"
+    },
+    {
+      "path": "apps/timekeeping/forms.py",
+      "sha256": "932d9ec453fc2c790d8f37058a92cecdc4cf7f71063d69170f5b7e8901a4b738"
+    },
+    {
+      "path": "apps/timekeeping/templates/timekeeping/_history_pagination.html",
+      "sha256": "7f24f952f61d2982f66b06ddaad753745d3efce4b0d9a59275e9ff23cc3cd100"
+    },
+    {
+      "path": "apps/timekeeping/test_mvp02.py",
+      "sha256": "a2e8ac6be03060e49623eef96d41da67e1c61ba3410197128bf7f7e307c8d3f8"
+    },
+    {
+      "path": "apps/timekeeping/test_p7_s06_s12_timekeeping.py",
+      "sha256": "5fc6fc10f3d652b4080149438b8ee84d9d308c45de407915f88e88cd5478bbf7"
+    },
+    {
+      "path": "apps/timekeeping/views.py",
+      "sha256": "95aa5e3f021be48e904e94bd5d11aaea539a091e16c6b4c07a2531bd5bb816b0"
+    },
+    {
+      "path": "apps/workforce/field_forms.py",
+      "sha256": "9b26be44338f8ae8f4bd825bc7b0c1b51dab745dd8a32caae5c8a68c108a3b1b"
+    },
+    {
+      "path": "apps/workforce/field_selectors.py",
+      "sha256": "852c88feec007c444b05e9baf9cff4d5ea1f18bd93f35482197e609e0f5b1841"
+    },
+    {
+      "path": "apps/workforce/field_services.py",
+      "sha256": "a2fc448875b26542d62516b01b0c7f2fcbe513f1b376965356733b079150a3fa"
+    },
+    {
+      "path": "apps/workforce/field_views.py",
+      "sha256": "924e3506b6f4bb486cf6d482a7a88814026031f39f6ea522d573c94511cd96c4"
+    },
+    {
+      "path": "apps/workforce/identity_integrity.py",
+      "sha256": "0317107125104b64434acf449260fe88b70507cc16768b1c907ec604f2f9ced1"
+    },
+    {
+      "path": "apps/workforce/migrations/0016_mvp02_person_national_id.py",
+      "sha256": "3dd65d59eca68fdb258539eb65c1cf99617dfcced8925c02784cbc0b115bdb9b"
+    },
+    {
+      "path": "apps/workforce/models.py",
+      "sha256": "9b0ed932da5d6b653830f61ad34722f4e8c15062638117c3b17742ed3a32f93f"
+    },
+    {
+      "path": "apps/workforce/person_services.py",
+      "sha256": "64646f66f1a281aa6d6e56b4ced9c1aef0a1040e37df31449845a42b29c76237"
+    },
+    {
+      "path": "apps/workforce/services.py",
+      "sha256": "b4eed17b96aca1107fab8438792f3891db1e4123f1916513d3c2bc7acb4a0ba6"
+    },
+    {
+      "path": "apps/workforce/static/workforce/field_choices.js",
+      "sha256": "42cb5dad36b7145d6697b00bc2e20bcdd193b70d5c3a14999e124c4f31f4e4bf"
+    },
+    {
+      "path": "apps/workforce/templates/workforce/_field_context.html",
+      "sha256": "05dfc242966a0857298240b7bca556fe0da94179b6663022259fae4c950306ca"
+    },
+    {
+      "path": "apps/workforce/templates/workforce/_journey_links.html",
+      "sha256": "eaffd280ad7b47daffb563039076409f54e66fefd33f2188b1e278651fdaf498"
+    },
+    {
+      "path": "apps/workforce/templates/workforce/field_detail.html",
+      "sha256": "d8d3f51dab50f1c9c6bbdfc90967f1c3a071282609d9479166fdd417d2182cd3"
+    },
+    {
+      "path": "apps/workforce/templates/workforce/field_form.html",
+      "sha256": "813314f364c544814f14f97c7f527fe525a494c7773dca9fd531da074a997016"
+    },
+    {
+      "path": "apps/workforce/templates/workforce/field_list.html",
+      "sha256": "e18fbc6d87010b37fb8ac45f6fa54555e9b1358b85f694efabb7621e8bd15da4"
+    },
+    {
+      "path": "apps/workforce/templates/workforce/widgets/search_choice.html",
+      "sha256": "e7ceccab967ae6d681fcc6feb56c20b5bf1be403d413e5771fbfc4af4cdb3b1f"
+    },
+    {
+      "path": "apps/workforce/templatetags/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "apps/workforce/templatetags/field_journey.py",
+      "sha256": "429ecd81378c55a2ee60514ca2a29ab072a9b763a177d6df2e2fb18f8b9df790"
+    },
+    {
+      "path": "apps/workforce/test_cep026_ess_privacy.py",
+      "sha256": "a84dfad2cca7c555f0c8322b82a7e834ecba369e2d9b0baf1edc89150a68bc1c"
+    },
+    {
+      "path": "apps/workforce/test_mvp02.py",
+      "sha256": "f1f3de1f0d306d0e506c03f3ae80640e375e4370bb9613faa46cb233e9dac55c"
+    },
+    {
+      "path": "apps/workforce/test_mvp02_browser.py",
+      "sha256": "61c6fdd20dc774faf9a2afc8f36f429bd06037ccf3eb34478d063789141c9cf7"
+    },
+    {
+      "path": "apps/workforce/test_mvp02_concurrency.py",
+      "sha256": "dc39c6eb4729d8db40871811a14dc67fbb47a8058ebc4ca63c0ed6695debf6f7"
+    },
+    {
+      "path": "apps/workforce/test_mvp02_migration.py",
+      "sha256": "78564847c35c2cab71b983ad76e609c3206a4ef4306a1b113a84ee69ebbf979c"
+    },
+    {
+      "path": "apps/workforce/urls.py",
+      "sha256": "bfc77e902daa8f01984061ed8f969caca3c1ff345e726ae0ab371f382cf7259c"
+    },
+    {
+      "path": "apps/workforce/views.py",
+      "sha256": "8cb1ed2fecfd50ad2651165f1966c1049356cc20fa50eb4d092726c3e9ecc0e1"
+    },
+    {
+      "path": "core/product_surface.py",
+      "sha256": "2a6b0bb49fd648afce3ca1e1ef680e18f77947895e8e8dcb37c560da22d2b55f"
+    },
+    {
+      "path": "docs/architecture/DOMAIN_AND_DATA_MODEL.md",
+      "sha256": "2e26cfba9efc7d0c60c245c36a0f2adc9ed5e5d7fd70ae6ed890fd3b83041163"
+    },
+    {
+      "path": "docs/architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md",
+      "sha256": "38cfb1430eaa07fce79044ba877f5f82b5fd4fd708d37407bd9eee62708b1af4"
+    },
+    {
+      "path": "docs/governance/mvp/MVP-02_COMPLETION_REPORT.md",
+      "sha256": "c65ae2e17fc31816cf0183364276da65908da5f7e759dd22f1adecf8ebcc0b65"
+    },
+    {
+      "path": "scripts/verification/mvp02_browser.mjs",
+      "sha256": "a035e0b0f9f33701d8466bb3af97f3af1cb3130c1ee838a0de413d5c65d8faf6"
+    },
+    {
+      "path": "templates/components/read_only_record_detail.html",
+      "sha256": "f459076f1cbd7bb9c42bb9152f7ceba16784cc912dcfc3790fe4b80c8564457e"
+    },
+    {
+      "path": "templates/daily_reports/detail.html",
+      "sha256": "2125660884f09499b3b6e4cc6784ed4738b0d06c1d2f4abe649241558eb28f11"
+    },
+    {
+      "path": "templates/projects/detail.html",
+      "sha256": "58dcf523b6dcb2de19dacb119e7fefa5500384157cad6e0248c5cc20f2a7015c"
+    },
+    {
+      "path": "templates/timekeeping/form.html",
+      "sha256": "68509e6b82b7ba2bd6c53811a7bdc40738932432909f24a3408755497ad67312"
+    },
+    {
+      "path": "templates/timekeeping/timesheet_detail.html",
+      "sha256": "d4c6a7e078b6ea109e6366129be15c24f053e9f291a2ec862efdac4f0d58efbb"
+    },
+    {
+      "path": "templates/timekeeping/workbench.html",
+      "sha256": "f894c66f3fef0a139f6a82374e76fb4e1ead819ee0998b103e635fb3833efe18"
+    }
+  ],
+  "package_artifacts": [
+    {
+      "path": "output/mvp-02/baseline-findings.json",
+      "sha256": "4b8f8532f08f0293a0f1656b58bccfa41fa64f03b417788a046052d0f7086057"
+    },
+    {
+      "path": "output/mvp-02/baseline_probe.py",
+      "sha256": "e6e3cd0f35854184fe08fc124d43450a024995719f582c04a56c12ec29fab8d2"
+    },
+    {
+      "path": "output/mvp-02/browser/mvp02-browser-foreign-results.json",
+      "sha256": "0ce9f9944184c3802291f6965ef523760998535f861673c892347add87f1764a"
+    },
+    {
+      "path": "output/mvp-02/browser/mvp02-browser-owner-A-create-non-login-worker.png",
+      "sha256": "e5f6dd392c8507aa54339cb85ab2dad8fd95c91f624072e8822f49df1308968c"
+    },
+    {
+      "path": "output/mvp-02/browser/mvp02-browser-owner-A-worker-without-login.png",
+      "sha256": "01a21f082fff5bd9ad79ebd713a1c6c623235cfc8e7c82f2895d455eed242790"
+    },
+    {
+      "path": "output/mvp-02/browser/mvp02-browser-owner-B-project-site-workers.png",
+      "sha256": "0de8dfa20fdfd7b2c0c37bb135be114117be998f86607b82a401c0c7a0394815"
+    },
+    {
+      "path": "output/mvp-02/browser/mvp02-browser-owner-D-attendance.png",
+      "sha256": "a80aa61157606dff09ab66ada963679e392bc9fdcfe193d072055c7e3afdf655"
+    },
+    {
+      "path": "output/mvp-02/browser/mvp02-browser-owner-D-timesheet.png",
+      "sha256": "02d64de5902a4e4aa9b36c7e045c02495c94a3d5462ef6f1b123b5084dd47581"
+    },
+    {
+      "path": "output/mvp-02/browser/mvp02-browser-owner-H-form-mobile.png",
+      "sha256": "e37f750d9765d5786950fbe7e75c8b601659578702b0224f8997737105a3f4cc"
+    },
+    {
+      "path": "output/mvp-02/browser/mvp02-browser-owner-H-history-mobile.png",
+      "sha256": "b3f9a40b8a367ee06ee6a8339ce7f7d233013e3e0e8f351d60d242ac9540a202"
+    },
+    {
+      "path": "output/mvp-02/browser/mvp02-browser-owner-H-list-mobile.png",
+      "sha256": "a1adf64555d64713fbc8fb134fc292aeb41a827aee2d4320fbb1e613f47055d1"
+    },
+    {
+      "path": "output/mvp-02/browser/mvp02-browser-owner-H-worker-mobile.png",
+      "sha256": "8ceea1115ab5b3aabd01e74ad60804bdd38f6234ee5f8f92d905b5cb8100af05"
+    },
+    {
+      "path": "output/mvp-02/browser/mvp02-browser-owner-results.json",
+      "sha256": "8ed8b4db973b88cecdd4a7953e63b19b3461e9c79b9ed8f6e12d1869bf09f3f8"
+    },
+    {
+      "path": "output/mvp-02/browser/mvp02-browser-reader-results.json",
+      "sha256": "73007f22880358dab66c37c745e808e6305fecc02156b48d050f0580466b7f66"
+    },
+    {
+      "path": "output/mvp-02/catalog-scope.json",
+      "sha256": "1c969e42ccd4c7f9d7ef2f1bf7df8dff05d5f89506626066c249dd2d01c1ce95"
+    },
+    {
+      "path": "output/mvp-02/logs/baseline-probe.log",
+      "sha256": "b1770e63b5316f14a632a010aee070457ab0f82a3eb5dbb177114b582d401061"
+    },
+    {
+      "path": "output/mvp-02/logs/closeout-checks.log",
+      "sha256": "677356dbe9b6be51d1931a6faecb9a906272eba60827261bf7a5a5f96714b59c"
+    },
+    {
+      "path": "output/mvp-02/logs/development-after-state.log",
+      "sha256": "35284fe7d995129eb9484a01ce834bc04aa74ae675a50f4c3410c9cf5d0d20fd"
+    },
+    {
+      "path": "output/mvp-02/logs/development-apply.log",
+      "sha256": "ab456310591c1b09e934f0371e63bea36565d56dedbd2dc53e1f3254b86d01ba"
+    },
+    {
+      "path": "output/mvp-02/logs/development-before-plan.log",
+      "sha256": "7a975bcfdfd224641768f135966ad6e94947a066b19cb6e2b02cf95eda1732d4"
+    },
+    {
+      "path": "output/mvp-02/logs/final-tests.log",
+      "sha256": "7efb72b89a4478bcac2f1fea74d0058fb772254b563f8d2e42e24e2f2b4421ff"
+    },
+    {
+      "path": "output/mvp-02/logs/format.log",
+      "sha256": "ff48816299c0229eee091029455819afe09b19b5aa20c598a0be2a61d4635da3"
+    },
+    {
+      "path": "output/mvp-02/logs/ruff.log",
+      "sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0"
+    },
+    {
+      "path": "output/mvp-02/logs/schema-drift.log",
+      "sha256": "93e6e2d5be3c054add80c0f19101608803f7ca8a7df1fa41f76bbb9a1f570f4a"
+    },
+    {
+      "path": "output/mvp-02/static-validation.json",
+      "sha256": "7a7f584c944324321087bde05473452199b7bdb8e92f7e1400cb862da996e9be"
+    },
+    {
+      "path": "output/mvp-02/test-generated-documents/648acc2f-ba21-4045-8022-c72e734f6f0b/documents/aae5d33c-ae48-4c9e-a2bb-19e08df1d400/versions/8dd249b5-25ba-4704-ade9-eea2a5e00cd5.pdf",
+      "sha256": "f0b4cbb94c8e2a7e5b950ea0d058db511eac11ddbf2085540760541f7de89b5c"
+    },
+    {
+      "path": "output/mvp-02/test-generated-documents/93906761-1e58-4d8f-85b8-d783080b5e39/documents/885879d0-32e9-4022-bb42-3fdae5bc6256/versions/07895755-baed-45be-9e07-ca61f31f22e6.pdf",
+      "sha256": "f0b4cbb94c8e2a7e5b950ea0d058db511eac11ddbf2085540760541f7de89b5c"
+    },
+    {
+      "path": "output/mvp-02/test-generated-documents/9e21457c-17e2-4e99-85b0-70daf2881434/documents/e888160c-e2ed-419d-82c3-3cbdfc864fcd/versions/3adbe32f-8193-4add-9b6c-79b1fefbf6ce.pdf",
+      "sha256": "f0b4cbb94c8e2a7e5b950ea0d058db511eac11ddbf2085540760541f7de89b5c"
+    },
+    {
+      "path": "output/mvp-02/test-generated-documents/b90f4893-38d8-4b7f-8eb3-fb14f054252e/documents/981ef05b-a2bf-476e-9350-04b5f0390ddf/versions/4022a13f-b81a-4fe5-9807-713ef4dc8ac7.pdf",
+      "sha256": "f0b4cbb94c8e2a7e5b950ea0d058db511eac11ddbf2085540760541f7de89b5c"
+    },
+    {
+      "path": "output/mvp-02/test-generated-documents/eda57833-1e88-41f8-907b-cd7266d786c6/documents/6b93d3e5-b70e-4c08-9c73-3e44094bb02f/versions/1d52201e-e0d0-4369-bca1-6608b24c7ed0.pdf",
+      "sha256": "f0b4cbb94c8e2a7e5b950ea0d058db511eac11ddbf2085540760541f7de89b5c"
+    }
+  ],
+  "deferred": [
+    "MVP-03",
+    "MVP-04",
+    "MVP-05",
+    "MVP-06",
+    "MVP-07",
+    "MVP-08"
+  ],
+  "production_action": false,
+  "human_signoff_issued": false,
+  "evidence_file_count_including_manifest": 31,
+  "manifest_self_hash_omitted": true
+}

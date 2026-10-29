@@ -1,0 +1,45 @@
+{
+  "classification": "ATTRIBUTABLE verification infrastructure/probe; no failed attempt counted as PASS",
+  "attempts": [
+    {
+      "logs": [
+        "focused-tests.log",
+        "browser-tests.log"
+      ],
+      "cause": "Overlapping test processes caused a deadlock; browser process stopped; all later verification serial."
+    },
+    {
+      "logs": [
+        "final-tests.log",
+        "browser-final.log"
+      ],
+      "cause": "Reused database serialized leftover published workflow records; guards correctly rejected replay."
+    },
+    {
+      "logs": [
+        "browser-clean-db.log"
+      ],
+      "cause": "Fresh migration graph completed, then browser click race and retained legacy Payments tables prevented ordinary flush."
+    },
+    {
+      "operation": "Manual catalogue restore between fresh database and final-clean validation",
+      "cause": "Alias handling sent the first catalogue save to the default Development connection; its content-type FK rejected that first statement. No successful restore statement; approach discarded. Test-only flush had succeeded. No Development schema/data repair or guard change."
+    },
+    {
+      "logs": [
+        "final-clean-validation.log",
+        "browser-diagnostic.log",
+        "browser-stable-click.log"
+      ],
+      "cause": "Probe selected fallback matches while debounced popup layout changed, then an overly strict internal-cache wait. Diagnostic captures retained. Updated probe waits for stable matching results beyond throttle and stable click coordinates."
+    }
+  ],
+  "resolution": {
+    "logs": [
+      "browser-settled-popup.log",
+      "final-validation.log"
+    ],
+    "focused_final": "64 tests and 24 subtests PASS; final includes all 12 browser scenarios",
+    "test_cleanup": "Standard Django cascading flush confined to test_ database; existing serialized rollback post-migrate inhibition; no migrations, product guards or services modified."
+  }
+}

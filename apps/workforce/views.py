@@ -168,6 +168,12 @@ def _status_choices(
 @organization_permission_required(BusinessPermissionCode.EMPLOYEES_VIEW)
 @require_GET
 def employee_list(request: HttpRequest) -> HttpResponse:
+    from core.product_surface import surface_profile
+
+    if surface_profile() == "MVP":
+        from . import field_views
+
+        return field_views.index(request)
     employees = get_organization_employees(
         user=request.user, organization=request.organization
     )
@@ -227,6 +233,12 @@ def employee_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.EMPLOYEES_CREATE)
 def employee_create(request: HttpRequest) -> HttpResponse:
+    from core.product_surface import surface_profile
+
+    if surface_profile() == "MVP":
+        from . import field_views
+
+        return field_views.create(request)
     can_link_account = has_business_permission(
         user=request.user,
         organization=request.organization,
@@ -293,6 +305,12 @@ def employee_positions(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.EMPLOYEES_VIEW)
 @require_GET
 def employee_detail(request: HttpRequest, employee_id: str) -> HttpResponse:
+    from core.product_surface import surface_profile
+
+    if surface_profile() == "MVP":
+        from . import field_views
+
+        return field_views.detail(request, employee_id)
     employee = _employee(request, employee_id)
     if employee is None:
         return HttpResponseNotFound("کارمند یافت نشد.")
@@ -1243,7 +1261,11 @@ def work_team_list(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.WORK_TEAMS_CREATE)
 def work_team_create(request: HttpRequest) -> HttpResponse:
     form = WorkTeamForm(request.POST or None, organization=request.organization)
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and form.is_valid()
+    ):
         try:
             create_work_team(
                 organization=request.organization,
@@ -1261,6 +1283,7 @@ def work_team_create(request: HttpRequest) -> HttpResponse:
         {
             "form": form,
             "title": "ثبت گروه کاری",
+            "work_team_form": True,
             "back_url": "workforce:work_team_list",
         },
     )
@@ -1296,21 +1319,22 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
     assignments = get_organization_project_assignments(
         user=request.user, organization=request.organization
     )
-    assignments = apply_table_filters(
-        assignments,
-        request,
-        text_fields={
-            "employee": (
-                "employee__employee_number",
-                "employee__first_name",
-                "employee__last_name",
-            ),
-            "project": ("project__name", "site__name"),
-            "role": ("role_title",),
-        },
-        choice_fields={"status": ("status", AssignmentStatus.values)},
-        date_fields={"start_date": "start_date"},
-    )
+    from .field_forms import AssignmentFilterForm, page_filter_values
+
+    values = page_filter_values(request)
+    form = AssignmentFilterForm(values or None, organization=request.organization, user=request.user)
+    if values:
+        if form.is_valid():
+            for name in ("employee", "project", "site", "status"):
+                if form.cleaned_data.get(name):
+                    assignments = assignments.filter(**{name: form.cleaned_data[name]})
+            if form.cleaned_data.get("role"):
+                assignments = assignments.filter(role_title__icontains=form.cleaned_data["role"])
+            for name, lookup in (("start_date_from", "start_date__gte"), ("start_date_to", "start_date__lte")):
+                if form.cleaned_data.get(name):
+                    assignments = assignments.filter(**{lookup: form.cleaned_data[name]})
+        else:
+            assignments = assignments.none()
     page = paginate_table(
         assignments,
         request,
@@ -1330,22 +1354,7 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
             "assignments": page.object_list,
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
-            "filters": build_table_filters(
-                request,
-                [
-                    {"name": "employee", "kind": "text", "label": "کارمند"},
-                    {"name": "project", "kind": "text", "label": "پروژه و کارگاه"},
-                    {"name": "role", "kind": "text", "label": "مسئولیت"},
-                    {"name": "start_date", "kind": "date_range", "label": "شروع"},
-                    {
-                        "name": "status",
-                        "kind": "select",
-                        "label": "وضعیت",
-                        "choices": AssignmentStatus.choices,
-                    },
-                    None,
-                ],
-            ),
+            "form": form,
             "has_active_filters": has_active_table_filters(request),
         },
     )
@@ -1354,14 +1363,21 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.PROJECT_ASSIGNMENTS_CREATE)
 def assignment_create(request: HttpRequest) -> HttpResponse:
+    from .field_selectors import resolve_field_context
+    context = resolve_field_context(organization=request.organization, user=request.user, values=request.GET, include_employee=True)
     form = EmployeeAssignmentForm(
         request.POST or None,
+        initial={"project": context.project, "site": context.site, "employee": context.employee},
         organization=request.organization,
         membership=get_active_membership(
             user=request.user, organization=request.organization
         ),
     )
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and form.is_valid()
+    ):
         try:
             assign_employee_to_project(
                 organization=request.organization,
@@ -1373,7 +1389,7 @@ def assignment_create(request: HttpRequest) -> HttpResponse:
         else:
             messages.success(request, "کارمند به پروژه تخصیص یافت.")
             return redirect("workforce:assignment_list")
-    return render(request, "workforce/assignment_form.html", {"form": form})
+    return render(request, "workforce/assignment_form.html", {"form": form, "field_context": context})
 
 
 @active_organization_required

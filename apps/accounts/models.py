@@ -229,6 +229,10 @@ class User(AbstractUser):
         self.username = canonicalize_lower_identifier(self.username)
         self.national_id = self.national_id or None
 
+        from apps.workforce.identity_integrity import validate_user_national_id
+
+        validate_user_national_id(self)
+
     def save(self, *args: object, **kwargs: object) -> None:
         self.username = canonicalize_lower_identifier(self.username)
         self.national_id = self.national_id or None
@@ -237,7 +241,18 @@ class User(AbstractUser):
             update_fields = kwargs.get("update_fields")
             if update_fields is not None:
                 kwargs["update_fields"] = set(update_fields) | {"is_active"}
-        super().save(*args, **kwargs)
+        from apps.workforce.identity_integrity import (
+            identity_write_lock,
+            validate_user_national_id,
+        )
+
+        update_fields = kwargs.get("update_fields")
+        if update_fields is not None and "national_id" not in update_fields:
+            super().save(*args, **kwargs)
+            return
+        with identity_write_lock():
+            validate_user_national_id(self)
+            super().save(*args, **kwargs)
 
     @property
     def account_status(self) -> str:

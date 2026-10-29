@@ -3,6 +3,8 @@
 {% block title %}گزارش روزانه | سامانه مدیریت ساخت{% endblock %}
 
 {% block content %}
+{% load field_journey %}
+{% field_journey report.project report.site %}
     <div dir="rtl">
         <nav class="text-xs text-slate-400" aria-label="مسیر صفحه"><a class="hover:text-blue-700" href="{% url 'daily_reports:list' %}">گزارش‌های روزانه</a><span class="px-2 text-slate-400" aria-hidden="true">/</span><span class="text-slate-700" dir="ltr">{{ report.reporting_date }}</span></nav>
         <div class="mt-5 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">

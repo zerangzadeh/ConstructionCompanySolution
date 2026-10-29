@@ -1,0 +1,5 @@
+{% if links %}
+<nav class="mt-4 flex gap-2 overflow-x-auto" aria-label="بخش‌های نیروهای کار" data-workforce-navigation>
+  {% for link in links %}<a class="erp-btn erp-btn--secondary shrink-0 whitespace-nowrap{% if link.active %} erp-btn--active{% endif %}" href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>{{ link.label }}</a>{% endfor %}
+</nav>
+{% endif %}

@@ -497,4 +497,7 @@ class P7TimekeepingTests(TestCase):
         response = self.client.get(reverse("timekeeping:workbench"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "حضور، درخواست‌ها و کارکرد")
-        self.assertContains(response, "پیش‌نمایش فقط دقیقه‌ها")
+        self.assertContains(response, "حضور و موارد نیازمند بررسی")
+        self.assertContains(response, "کارکرد و توزیع زمان")
+        self.assertContains(response, "اضافه‌کاری")
+        self.assertNotContains(response, reverse("timekeeping:attendance_import"))

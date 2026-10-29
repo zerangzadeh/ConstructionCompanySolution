@@ -897,6 +897,8 @@ def project_site_detail(
         "components/read_only_record_detail.html",
         {
             "detail_title": site.name,
+            "field_project": site.project,
+            "field_site": site,
             "back_url": reverse("projects:site_list", args=[site.project_id]),
             "detail_rows": [
                 ("کد کارگاه", site.code, "text"),

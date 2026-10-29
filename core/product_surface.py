@@ -40,6 +40,12 @@ CAPABILITIES = (
         routes=tuple(
             f"workforce:{name}"
             for name in (
+                "field_list",
+                "field_create",
+                "field_detail",
+                "field_edit",
+                "field_assign",
+                "field_choices",
                 "employee_list",
                 "employee_create",
                 "employee_detail",
@@ -84,6 +90,7 @@ CAPABILITIES = (
                 "configuration_profiles",
             )
         )
+        + ("timekeeping:attendance_import",)
         + tuple(
             f"expenses:platform_group_{name}"
             for name in (
@@ -196,6 +203,10 @@ class NavigationLink:
     route: str
     permission: str = ""
     availability: str = ""
+    active_routes: tuple[str, ...] = ()
+
+    def is_active_for(self, view_name: str) -> bool:
+        return view_name == self.route or view_name in self.active_routes
 
 
 @dataclass(frozen=True)
@@ -218,14 +229,29 @@ NAVIGATION_GROUPS = (
                 "گزارش‌های روزانه", "daily_reports:list", "daily_reports.view"
             ),
             NavigationLink(
-                "نیروی کار پروژه", "workforce:employee_list", "employees.view"
+                "نیروهای کار",
+                "workforce:field_list",
+                "employees.view",
+                active_routes=tuple(
+                    f"workforce:{name}"
+                    for name in (
+                        "field_create",
+                        "field_detail",
+                        "field_edit",
+                        "field_assign",
+                        "employee_list",
+                        "employee_detail",
+                        "employee_create",
+                        "assignment_list",
+                        "assignment_create",
+                        "assignment_status_change",
+                        "work_team_list",
+                        "work_team_create",
+                        "work_team_archive",
+                    )
+                ),
             ),
-            NavigationLink(
-                "تخصیص نیروی پروژه",
-                "workforce:assignment_list",
-                "project_assignments.view",
-            ),
-            NavigationLink("حضور و زمان", "timekeeping:workbench", "attendance.view"),
+            NavigationLink("حضور و کارکرد", "timekeeping:workbench", "attendance.view"),
             NavigationLink(
                 "تجهیزات عملیاتی",
                 "equipment:operations_workbench",

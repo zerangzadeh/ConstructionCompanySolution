@@ -1,4 +1,4 @@
-{% if navigation_is_authenticated %}
+{% load product_surface %}{% if navigation_is_authenticated %}
 <nav class="erp-nav" aria-label="ناوبری اصلی" data-product-navigation="MVP-01">
     <a data-nav-id="NAV-001" class="erp-nav-link{% if current_url_name == 'home' %} is-active{% endif %}" href="{% url 'home' %}">خانه</a>
     {% for group in product_navigation_groups %}
@@ -6,7 +6,7 @@
         <summary><span>{{ group.label }}</span><span aria-hidden="true">⌄</span></summary>
         <div class="erp-nav-group__items">
             {% for link in group.links %}
-            <a class="erp-nav-link{% if current_view_name == link.route %} is-active{% endif %}" href="{% url link.route %}">{{ link.label }}</a>
+            <a class="erp-nav-link{% if link|surface_link_active:current_view_name %} is-active{% endif %}" href="{% url link.route %}">{{ link.label }}</a>
             {% endfor %}
         </div>
     </details>

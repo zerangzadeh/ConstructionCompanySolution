@@ -1127,6 +1127,10 @@ class BusinessPermissionCode(models.TextChoices):
     PERSONAL_DATA_CONFIGURE = "personal_data.configure", "پیکربندی ثبت تغییر اطلاعات"
     EMPLOYEES_VIEW = "employees.view", "مشاهده کارکنان"
     EMPLOYEES_CREATE = "employees.create", "ایجاد پرونده کارمند"
+    EMPLOYEES_CHANGE_OPERATIONAL = (
+        "employees.change_operational",
+        "ویرایش اطلاعات عملیاتی نیروی کار",
+    )
     EMPLOYEES_CHANGE_PROFILE_IMAGE = (
         "employees.change_profile_image",
         "تغییر عکس پرسنلی کارمند",

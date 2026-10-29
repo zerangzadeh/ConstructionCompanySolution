@@ -201,11 +201,18 @@ and direct HTTP denial for hidden capabilities. There is no customer profile swi
 [MVP-01 evidence](../governance/mvp/MVP-01_COMPLETION_REPORT.md) records the bounded
 browser, authorization and backend-preservation verification and baseline findings.
 
-New Workers UI, non-login workforce national-ID migration, shared XLSX framework,
-required print layouts and complete browser E2E coverage remain requirements for
-separately authorized work. Existing screens, exports and tests retain only their
-verified scope. This implementation issues no commercial-readiness claim, Human
-Sign-off or Production Certification.
+Under the separate 2026-10-29 MVP-02 instruction, the bounded Field Workforce
+implementation now reuses Employee, Person and WorkRelationship, adds optional
+tenant-owned non-login national ID, and provides Project/Site/Daily Report entry
+into independent Attendance, Timesheet and Overtime operations. Histories have
+bounded pagination and scoped filters. The frozen D1–D7 decisions above remain
+unchanged; [MVP-02 evidence](../governance/mvp/MVP-02_COMPLETION_REPORT.md) owns
+the package's validation results and limits.
+
+Shared XLSX, required print layouts, complete three-journey demo states and final
+MVP-wide browser E2E/Human UAT remain separately authorized work. Existing screens,
+exports and tests retain only their verified scope. These implementations issue
+no commercial-readiness claim, Human Sign-off or Production Certification.
 
 Code, migrations, tests and configured environment behavior remain implementation
 reality. The [current model guide](DOMAIN_AND_DATA_MODEL.md) describes backend

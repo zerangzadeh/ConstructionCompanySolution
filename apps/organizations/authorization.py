@@ -92,7 +92,12 @@ OBJECT_SCOPED_PERMISSION_NAMESPACES = frozenset(
 
 
 def permission_supports_object_scope(permission: str | BusinessPermissionCode) -> bool:
-    return str(permission).partition(".")[0] in OBJECT_SCOPED_PERMISSION_NAMESPACES
+    # Field Workforce read projections intersect employees.view with explicit
+    # project/site assignments. Identity writes retain organization authority.
+    return (
+        str(permission) == BusinessPermissionCode.EMPLOYEES_VIEW
+        or str(permission).partition(".")[0] in OBJECT_SCOPED_PERMISSION_NAMESPACES
+    )
 
 
 def _validate_access_context(*, user: User, organization: Organization) -> None:

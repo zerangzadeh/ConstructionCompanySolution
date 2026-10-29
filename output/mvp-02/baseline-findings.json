@@ -1,0 +1,40 @@
+{
+  "baseline_head": "13e0b1d85f766336eca8286a904e3080b4597f9c",
+  "method": "Recorded HEAD registry and Product Surface modules loaded read-only in isolated test process; no checkout or Git metadata mutation. Tests are unchanged registry/platform tests.",
+  "source_hashes": {
+    "apps/organizations/permission_registry.py": "174c82138dd5d21c18c54140bb7700a40d1e9e99a1801f7d5299ac1fe2c8e4a5",
+    "core/product_surface.py": "8388c926495795d87184d2b7e3904e22936bef8ca6409a2c3924932762cd442a"
+  },
+  "result": {
+    "passed": 0,
+    "failed": 5
+  },
+  "classifications": [
+    {
+      "test": "PermissionRegistryArchitectureTests.test_every_managed_business_model_is_registered_exactly_once",
+      "classification": "PRE_EXISTING / OUT_OF_SCOPE",
+      "evidence": "Four duplicated Payroll model registrations reproduce."
+    },
+    {
+      "test": "PermissionRegistryArchitectureTests.test_every_registered_permission_is_referenced_by_its_enforcement_module",
+      "classification": "PRE_EXISTING / OUT_OF_SCOPE",
+      "evidence": "Existing enforcement reference gaps reproduce; employees.change_operational is enforced in its registered field_services module."
+    },
+    {
+      "test": "PermissionRegistryArchitectureTests.test_resource_keys_are_unique_and_match_permission_namespaces",
+      "classification": "PRE_EXISTING / OUT_OF_SCOPE",
+      "evidence": "77 existing namespace mismatches reproduce."
+    },
+    {
+      "test": "P11RoleCatalogCloseoutTests.test_platform_navigation_exposes_all_approved_platform_controls",
+      "classification": "PRE_EXISTING / OUT_OF_SCOPE",
+      "evidence": "Pre-MVP navigation expectation reproduces against recorded MVP-01 sources."
+    },
+    {
+      "test": "P11RoleCatalogCloseoutTests.test_role_catalog_routes_enforce_platform_and_tenant_boundaries",
+      "classification": "PRE_EXISTING / OUT_OF_SCOPE",
+      "evidence": "Default MVP denies the hidden platform route; original expectation reproduces."
+    }
+  ],
+  "configured_development_baseline": "payroll.0010_cep069_reviewed_statutory_context was already pending; no Payroll migration applied by MVP-02."
+}

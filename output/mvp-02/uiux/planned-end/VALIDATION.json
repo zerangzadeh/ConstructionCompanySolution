@@ -1,0 +1,137 @@
+{
+  "status": "READY_FOR_HUMAN_REVIEW",
+  "product_owner_visual_acceptance": "PENDING",
+  "date": "2026-10-29T09:22:31.784070+03:30",
+  "scope": "Human-authorized optional assignment-specific responsibility label and separate Planned End Date additive gap",
+  "resolved_prior_decision": "Planned date stays independent of actual end and active status; explicitly authorized by Human in this turn",
+  "schema": {
+    "equivalent_existing_field": false,
+    "new_field": "EmployeeProjectAssignment.planned_end_date",
+    "nullable": true,
+    "new_constraint": "assignment_planned_end_not_before_start",
+    "new_migration": "apps/workforce/migrations/0017_mvp02_assignment_planned_end.py",
+    "data_backfill": "NONE",
+    "actual_end_date_and_lifecycle_preserved": true,
+    "no_scheduler": true
+  },
+  "responsibility": {
+    "field": "role_title",
+    "label": "مسئولیت در این پروژه/کارگاه",
+    "optional": true,
+    "assignment_specific_free_text": true,
+    "canonical_position_unchanged": true
+  },
+  "automated": {
+    "distinct_tests_passed": 54,
+    "regression": {
+      "passed": 52,
+      "subtests_passed": 36,
+      "log": "final-regression.log"
+    },
+    "migration_preservation": {
+      "passed": 1,
+      "log": "validation.log",
+      "note": "27 non-browser tests passed including preservation; initial browser URL fixture separately failed and was corrected"
+    },
+    "browser_test": {
+      "passed": 1,
+      "log": "browser-validation.log"
+    },
+    "final_attributable_failures": 0
+  },
+  "browser": {
+    "scenarios_passed": 12,
+    "configured_viewports": [
+      1440,
+      390
+    ],
+    "paths": [
+      "assignment_create",
+      "field_assign"
+    ],
+    "covers": [
+      "Final optional labels and field order",
+      "Earlier-plan field validation and retained input",
+      "Successful date persistence with active status and null actual end",
+      "Project-Site selector flow",
+      "Global session context unchanged",
+      "RTL, responsive layout, no horizontal overflow"
+    ],
+    "results": "browser/mvp02-planned-owner-results.json",
+    "scenarios": [
+      "PLAN-form-create-desktop",
+      "PLAN-invalid-create-desktop",
+      "PLAN-save-create-desktop",
+      "PLAN-form-worker-desktop",
+      "PLAN-invalid-worker-desktop",
+      "PLAN-save-worker-desktop",
+      "PLAN-form-create-mobile",
+      "PLAN-invalid-create-mobile",
+      "PLAN-save-create-mobile",
+      "PLAN-form-worker-mobile",
+      "PLAN-invalid-worker-mobile",
+      "PLAN-save-worker-mobile"
+    ],
+    "visually_inspected": [
+      "browser/mvp02-planned-owner-PLAN-form-create-desktop.png",
+      "browser/mvp02-planned-owner-PLAN-form-create-mobile.png",
+      "browser/mvp02-planned-owner-PLAN-invalid-worker-mobile.png"
+    ]
+  },
+  "migration_execution": {
+    "environment": "Development only",
+    "receipt": "development-migration.json",
+    "existing_assignment_rows_preserved": 8,
+    "test_database_historical_rows_preserved": true,
+    "production": false
+  },
+  "static_checks": {
+    "django_check": "django-check.log",
+    "migration_consistency": "schema-check.log",
+    "ruff": "ruff.log",
+    "legacy_module_AST": "PASS: models.py, services.py, forms.py"
+  },
+  "initial_browser_failure": {
+    "classification": "TEST_FIXTURE_CONTEXT_ERROR",
+    "log": "validation.log",
+    "behavior": "Existing scope resolver rejects worker requested under unassigned new Project; final browser uses normal selection flow; no scope bypass"
+  },
+  "source_files": {
+    "apps/workforce/models.py": "8179b0e8085cdabc17477b2452f42f666765ad85978b545f8e9583a58ce319e6",
+    "apps/workforce/services.py": "7ccbab5e4bedb4c75f3244ba16425187706b05cdbed3479bd29cd2f678a7056f",
+    "apps/workforce/field_services.py": "58a6431f706d31e39fedcd88504ab7f63c1657ac4aa3551913ef59a674c5251d",
+    "apps/workforce/forms.py": "0e6a2e01b7b5ae45e5abeabfec66bf967cbe487129d624f439426267ba238931",
+    "apps/workforce/field_forms.py": "eb60b3648d2d17215902153ca09048c038d6ddc1a126b6a427d4f73e66ef312a",
+    "apps/workforce/test_mvp02_uiux.py": "ec0699830ee7050366c6d869b7a9a06eb61ca8466e1d502b678148c6c9647f3b",
+    "apps/workforce/test_mvp02_browser.py": "bc2ce7fc4aee15d47677d21086291da3f37cd8f72d87be3a34d4b25cc1279cf2",
+    "docs/governance/mvp/MVP-02_UIUX_REMEDIATION_REPORT.md": "cca2ad481ac39b82fd60b4804e64c41a9420b62fc53c132b1a0d96fb25bb459f",
+    "apps/workforce/migrations/0017_mvp02_assignment_planned_end.py": "ec2aaa3346c448576eb7bd48d37d422ea84954f00f5dfe0648c73ec463476408",
+    "apps/workforce/test_mvp02_planned_end.py": "f48d511a61a5e20d67f7ba026c7ae02adc50d8d63b0848c927e78bd8acbae2ae",
+    "apps/workforce/test_mvp02_planned_end_migration.py": "59da8fe6727bb8e4838e3f26417107d979d92f7690270a42b39b937d874e581e"
+  },
+  "source_boundaries": {
+    "entry_protected_count": 576,
+    "entry_protected_unchanged": 573,
+    "authorized_domain_deltas": [
+      "apps/workforce/field_services.py",
+      "apps/workforce/models.py",
+      "apps/workforce/services.py"
+    ],
+    "new_migrations": [
+      "apps/workforce/migrations/0017_mvp02_assignment_planned_end.py"
+    ],
+    "unexpected_prior_source_changes": []
+  },
+  "limitations": [
+    "No assignment edit route or update service exists; both existing creation forms verified; no new edit lifecycle introduced",
+    "Prior application-wide no-JS Tailwind runtime finding remains outside this clarification; no broader no-JS styling claim"
+  ],
+  "git": {
+    "head": "13e0b1d85f766336eca8286a904e3080b4597f9c",
+    "branch": "main",
+    "ahead_behind": "0\t0",
+    "writes": "NONE"
+  },
+  "new_dependencies": false,
+  "mvp03_started": false
+}

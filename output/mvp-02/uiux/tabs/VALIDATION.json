@@ -1,0 +1,110 @@
+{
+  "status": "READY_FOR_HUMAN_REVIEW",
+  "product_owner_visual_acceptance": "PENDING",
+  "date": "2026-10-29T06:42:43.339215+03:30",
+  "files_changed": {
+    "apps/workforce/templates/workforce/_field_header.html": "7f81bbe5d40c8cd1ff393fa9cf5427ba6ceedc741823ab0cf1b5fc295bcdddc2",
+    "apps/workforce/templates/workforce/field_list.html": "6a7de404ea5b0e229a4284b8d9a0c07dfdc0313c8d34104d12a155843fec4232",
+    "apps/workforce/templates/workforce/field_detail.html": "6fe84692c38f5c35cf40bf704bf63ce8259ed08741d7db2cb05908cd9387e521",
+    "apps/workforce/templates/workforce/field_form.html": "84ce662a4666b907a106a6ca51d7b3228dc68f9fc9d6e9177107f8c738322e50",
+    "templates/workforce/assignment_list.html": "59dd4763729823209078f6ca94a2617a1fe57a7803166ef0b208c0740d2cd2a8",
+    "templates/workforce/assignment_form.html": "8e99c3fa9138149726f7f17fe73a51317aab61f768d656ee406277070e0c760a",
+    "templates/workforce/work_team_list.html": "62b98f99573058c29ca326cd207dfd906f56c60bcb4c50d7b42dfac542e95a10",
+    "templates/workforce/form.html": "c539c86c5a7bc61e3d66822a60edba624d281a1d4a658856cbb773f02783d6f2",
+    "apps/workforce/templatetags/field_journey.py": "8d4fb61f3936b16be9f05a241f1b045c8222e91db336723b5b2ea2bb2b46e0f4",
+    "apps/workforce/test_mvp02_uiux.py": "0b291730d3483254fd717a3a156090cb8c1884da7bad140332edf4594ef6eba3",
+    "apps/workforce/test_mvp02_browser.py": "d5888238158fbf05eaec4a9a5bd7b929a43ad21168138e558c546023bade32a6",
+    "docs/ui-guidelines.md": "0368637c794498c8969e59b3e60af12d2b16a9da11f37b7821f105ac743325ae",
+    "docs/governance/mvp/MVP-02_UIUX_REMEDIATION_REPORT.md": "f42464ee5a13832a37071d8a5f06bb3b275e1ac9c663be2ad126f2c53cd09153",
+    "apps/workforce/templates/workforce/_field_navigation.html": "c6879e979bbd30a96cb01f755334eeb71fd544ad8813e64e0f42d178d8df9136"
+  },
+  "layout": {
+    "shared_component": "workforce/_field_header.html",
+    "order": [
+      "page header including page-level primary actions",
+      "نیروها / تخصیص به پروژه و کارگاه / گروه‌های کاری",
+      "validated Project/Site context",
+      "page content"
+    ],
+    "primary_action_pattern": "Near-title header action area on list/detail pages; form submits remain with form; record actions remain with record",
+    "tabs": "One row; contained horizontal scrolling on narrower screens; ordered permission-filtered active links",
+    "pages": [
+      "field_list",
+      "field_create",
+      "field_detail",
+      "field_edit",
+      "field_assign",
+      "assignment_list",
+      "assignment_create",
+      "work_team_list",
+      "work_team_create"
+    ],
+    "legacy_aliases": [
+      "employee_list",
+      "employee_create",
+      "employee_detail"
+    ],
+    "FULL_ERP": "Team list/form legacy layout preserved and tested"
+  },
+  "automated": {
+    "combined_passed": 16,
+    "focused_tests": 15,
+    "browser_tests": 1,
+    "subtests_passed": 16,
+    "failed": 0,
+    "log": "final-validation.log"
+  },
+  "browser": {
+    "scenarios_passed": 22,
+    "viewports": [
+      1440,
+      390
+    ],
+    "results": "browser/mvp02-nav-owner-results.json",
+    "screenshot_sha256": {
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-NAV-assignment-desktop.png": "f07cbdca0cebc3342fd09a5297f7a7da4b6a62b845e42c82cd208e05818712a3",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-NAV-assignment-mobile.png": "8aa7b9320fb8bffa12c3dd55147ade81acca6d7abe6a6dc2fdf17e1085448fb1",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-NAV-cascade-assignments-desktop.png": "8237792e436db962983eba7060b85c68ec597426cad4bbcf0cb3e4e0c4e4e339",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-NAV-cascade-assignments-mobile.png": "94e49bb2262c4a48d7c2ccba97503984ffafe5e320b541f6b7ddbdb68ad1bc33",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-NAV-cascade-workforce-desktop.png": "ed0c9bc880607355b2ddbcd91738fe80162929164744438257f039919ba22bbb",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-NAV-cascade-workforce-mobile.png": "7cb055f3750b10f0fd70d7f3cc3e8a1272543934d6187d71e110dff0d07b0771",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-NAV-create-desktop.png": "2fe7130135f62b04a2c0a6b763fbe6ae116a10ff5f7626f4dd0d79b699fae029",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-NAV-create-mobile.png": "7bac21a290aa063caf8d2d888a4687c72cc3d8758c6e12787bdd8c8e889cc8a7",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-NAV-teams-desktop.png": "f4ad4df7954c5204d683694ffc6bd3ed40b769514a81659042c32d88ab29b692",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-NAV-teams-mobile.png": "7ef0c73842bf9b915737376c87dd2dd75620a713f66dee52c2cbba217334013a",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-NAV-workforce-desktop.png": "d5e78713e18d6389141dca4ead3ab53eae95aa1e45a2ce8d62c176600d7a4cc8",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-NAV-workforce-mobile.png": "be120dbfb4925d71240d05e4bf8fd5a6f4c631d453c3a082998f199d7ed93d01",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-TABS-team-create-desktop.png": "46ff45be7cafbdcf63076ba338317895a931ceb11cecf4d78741691cecb7255a",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-TABS-team-create-mobile.png": "c36e72a1c7409834b07a780b78628cd555d4ea14230d95a3214b0bd5d41fd500",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-TABS-worker-assign-desktop.png": "1a6b5e435e8ea738c0a6bcfcbb81c22cff9fb7060c1bd1d6f9eddd34c53a6446",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-TABS-worker-assign-mobile.png": "2e7443ec7a081ef118b6c0e8dcb93aa84515e192cdb1dcaf1aa55758866064a5",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-TABS-worker-create-desktop.png": "a86077b479e740325e8b423721e251fd77693dcb2fcb91f2807369f0ee3f3af9",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-TABS-worker-create-mobile.png": "84d8c3e059ca199c6e73fb8c1a395b91df562351584acbe5be8caffae3226088",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-TABS-worker-detail-desktop.png": "87934e2a358ae2d3e60289fe6582529e10cb631ac50398add883f24565d60693",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-TABS-worker-detail-mobile.png": "2073de6ceef76d3ff3a7d3f059f7538c43acdb9938d7307a365f61396431ab90",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-TABS-worker-edit-desktop.png": "e98e8e2eeab5af844a4e9590ce59b86ddfe0b62ff802e635cb54fd7c469f2adf",
+      "output/mvp-02/uiux/tabs/browser/mvp02-nav-owner-TABS-worker-edit-mobile.png": "9afeac432973dbeb6565fef139021c712969742f3fa1f4ef2a1eff3c88241340"
+    },
+    "header_contact_sheets": {
+      "output/mvp-02/uiux/tabs/browser/QA-tabs-desktop.png": "de5e44733f07f880b74a0b97ffd27e62d97c544489fd86d7b7c9cec9dc9541fa",
+      "output/mvp-02/uiux/tabs/browser/QA-tabs-mobile.png": "ef5d8c633cd5d8beeda7eea48f5861c5ab411412a4427d5ef4d5153812d53354"
+    },
+    "visual_review": "All nine page layouts reviewed at desktop and mobile using originals and header contact sheets."
+  },
+  "static_checks": "static-checks.json",
+  "failed_attempt": {
+    "log": "focused-tests.log",
+    "classification": "Test assertion counted CSS definitions; corrected to parse rendered anchors. Failure retained, not PASS evidence."
+  },
+  "protected_backend_security_sources_unchanged": 611,
+  "unexpected_prior_source_changes": [],
+  "git": {
+    "head": "13e0b1d85f766336eca8286a904e3080b4597f9c",
+    "writes": "NONE"
+  },
+  "backend_domain_reopened": false,
+  "new_migrations": 0,
+  "new_dependencies": 0,
+  "mvp03_started": false,
+  "regressions": "None observed in focused checks; full product suite not rerun."
+}

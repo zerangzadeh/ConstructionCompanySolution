@@ -7,7 +7,8 @@
     const navigateWithFilters = (form) => {
         const url = new URL(window.location.href);
         const controls = [...form.elements].filter((control) => control.name && !control.disabled);
-        const names = new Set(controls.map((control) => control.name));
+        // A disabled cascading master must also clear its previous URL value.
+        const names = new Set([...controls, ...[...form.elements].filter(control => control.name && control.matches("select[data-business-choice]"))].map(control => control.name));
         names.forEach((name) => url.searchParams.delete(name));
         controls.forEach((control) => {
             if ((control.type === "checkbox" || control.type === "radio") && !control.checked) return;
@@ -73,6 +74,9 @@
     document.addEventListener("input", (event) => {
         const form = event.target.form;
         if (form?.dataset.tableFilterBound !== "true") return;
+        if (form.dataset.filterSubmit === "explicit") return;
+        // Internal search inputs of enhanced selects are not submitted filters.
+        if (!event.target.name) return;
         if (event.target.matches("input[type='search'], input[type='text'], input:not([type]), input[data-jalali-date]")) {
             schedule(form, event.target);
         }
@@ -80,6 +84,7 @@
     document.addEventListener("change", (event) => {
         const form = event.target.form;
         if (form?.dataset.tableFilterBound !== "true") return;
+        if (form.dataset.filterSubmit === "explicit") return;
         if (event.target.matches("select")) schedule(form, event.target);
     });
 

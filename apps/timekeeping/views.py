@@ -7,7 +7,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
-from apps.organizations.authorization import get_active_membership, scope_queryset
+from apps.organizations.authorization import (
+    get_active_membership,
+    require_business_permission,
+    scope_queryset,
+)
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -44,13 +48,51 @@ def _error_message(exc: Exception) -> str:
     return str(exc)
 
 
+def _field_context(request):
+    from apps.workforce.field_selectors import resolve_field_context
+
+    return resolve_field_context(
+        organization=request.organization,
+        user=request.user,
+        values=request.GET,
+        include_employee=True,
+    )
+
+
+def _entry_form_kwargs(request):
+    context = _field_context(request)
+    return {
+        "initial": {
+            name: value
+            for name, value in (
+                ("project", context.project),
+                ("site", context.site),
+                ("employee", context.employee),
+            )
+            if value is not None
+        }
+    }
+
+
+def _workbench_url(request):
+    context = _field_context(request)
+    url = reverse("timekeeping:workbench")
+    return f"{url}?{context.query}" if context.query else url
+
+
 def _form_page(
     request: HttpRequest, *, form, title: str, description: str
 ) -> HttpResponse:
     return render(
         request,
         "timekeeping/form.html",
-        {"form": form, "title": title, "description": description},
+        {
+            "form": form,
+            "title": title,
+            "description": description,
+            "field_context": _field_context(request),
+            "back_url": _workbench_url(request),
+        },
     )
 
 
@@ -70,55 +112,21 @@ def _scoped(queryset, request: HttpRequest):
 @organization_permission_required(BusinessPermissionCode.ATTENDANCE_VIEW)
 @require_GET
 def workbench(request: HttpRequest) -> HttpResponse:
-    organization = request.organization
-    attendance = _scoped(
-        AttendanceRecord.objects.filter(organization=organization).select_related(
-            "employee", "project", "site"
-        ),
-        request,
-    )[:30]
-    leave_mission = _scoped(
-        LeaveMissionRequest.objects.filter(organization=organization).select_related(
-            "employee", "project", "site"
-        ),
-        request,
-    )[:20]
-    overtime = _scoped(
-        OvertimeRequest.objects.filter(organization=organization).select_related(
-            "employee", "project", "site"
-        ),
-        request,
-    )[:20]
-    membership = get_active_membership(user=request.user, organization=organization)
-    sheets = scope_queryset(
-        Timesheet.objects.filter(organization=organization)
-        .filter(entries__isnull=False)
-        .select_related("employee")
-        .distinct(),
-        membership=membership,
-        project_lookup="entries__project_id",
-        site_lookup="entries__site_id",
-    )[:20]
-    corrections = scope_queryset(
-        AttendanceCorrectionRequest.objects.filter(
-            organization=organization, status="pending"
-        ).select_related("attendance", "attendance__employee", "requested_by"),
-        membership=membership,
-        project_lookup="attendance__project_id",
-        site_lookup="attendance__site_id",
-    )[:20]
-    return render(
-        request,
-        "timekeeping/workbench.html",
-        {
-            "calendars": WorkCalendar.objects.filter(organization=organization)[:20],
-            "attendance_records": attendance,
-            "correction_requests": corrections,
-            "leave_mission_requests": leave_mission,
-            "overtime_requests": overtime,
-            "timesheets": sheets,
-        },
+    from apps.workforce.field_selectors import resolve_field_context
+
+    from .field_history import history_context
+
+    context = resolve_field_context(
+        organization=request.organization,
+        user=request.user,
+        values=request.GET,
+        include_employee=True,
     )
+    data = history_context(request, context)
+    data["calendars"] = WorkCalendar.objects.filter(
+        organization=request.organization
+    ).prefetch_related("shifts")[:20]
+    return render(request, "timekeeping/workbench.html", data)
 
 
 @active_organization_required
@@ -136,7 +144,7 @@ def calendar_create(request: HttpRequest) -> HttpResponse:
             form.add_error(None, _error_message(exc))
         else:
             messages.success(request, "تقویم کاری ثبت شد.")
-            return redirect("timekeeping:workbench")
+            return redirect(_workbench_url(request))
     return _form_page(
         request,
         form=form,
@@ -164,7 +172,7 @@ def shift_create(request: HttpRequest) -> HttpResponse:
                 request,
                 "شیفت کاری ثبت شد؛ دوره‌های استراحت باید از سرویس کنترل‌شده ثبت شوند.",
             )
-            return redirect("timekeeping:workbench")
+            return redirect(_workbench_url(request))
     return _form_page(
         request,
         form=form,
@@ -188,7 +196,7 @@ def holiday_create(request: HttpRequest) -> HttpResponse:
             form.add_error(None, _error_message(exc))
         else:
             messages.success(request, "روز تقویمی با منبع و دلیل ثبت شد.")
-            return redirect("timekeeping:workbench")
+            return redirect(_workbench_url(request))
     return _form_page(
         request,
         form=form,
@@ -212,7 +220,7 @@ def shift_break_create(request: HttpRequest) -> HttpResponse:
             form.add_error(None, _error_message(exc))
         else:
             messages.success(request, "بازه استراحت صریح ثبت شد.")
-            return redirect("timekeeping:workbench")
+            return redirect(_workbench_url(request))
     return _form_page(
         request,
         form=form,
@@ -225,9 +233,16 @@ def shift_break_create(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.ATTENDANCE_CAPTURE)
 def attendance_create(request: HttpRequest) -> HttpResponse:
     form = AttendanceForm(
-        request.POST or None, organization=request.organization, user=request.user
+        request.POST or None,
+        organization=request.organization,
+        user=request.user,
+        **_entry_form_kwargs(request),
     )
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and form.is_valid()
+    ):
         try:
             services.capture_attendance(
                 organization=request.organization,
@@ -238,7 +253,7 @@ def attendance_create(request: HttpRequest) -> HttpResponse:
             form.add_error(None, _error_message(exc))
         else:
             messages.success(request, "حضور برای بررسی ثبت شد.")
-            return redirect("timekeeping:workbench")
+            return redirect(_workbench_url(request))
     return _form_page(
         request,
         form=form,
@@ -262,7 +277,7 @@ def attendance_import(request: HttpRequest) -> HttpResponse:
             form.add_error(None, _error_message(exc))
         else:
             messages.success(request, f"ورودی نگهداری شد: {batch.get_state_display()}")
-            return redirect("timekeeping:workbench")
+            return redirect(_workbench_url(request))
     return _form_page(
         request,
         form=form,
@@ -288,7 +303,7 @@ def attendance_finalize(request: HttpRequest, record_id) -> HttpResponse:
         messages.success(request, "حضور قطعی شد.")
     except (ValidationError, PermissionDenied) as exc:
         messages.error(request, _error_message(exc))
-    return redirect("timekeeping:workbench")
+    return redirect(_workbench_url(request))
 
 
 @active_organization_required
@@ -320,7 +335,7 @@ def attendance_correction_create(request: HttpRequest, record_id) -> HttpRespons
             form.add_error(None, _error_message(exc))
         else:
             messages.success(request, "درخواست اصلاح برای بررسی مستقل ثبت شد.")
-            return redirect("timekeeping:workbench")
+            return redirect(_workbench_url(request))
     return _form_page(
         request,
         form=form,
@@ -349,16 +364,23 @@ def attendance_correction_review(request: HttpRequest, correction_id) -> HttpRes
         messages.success(request, "درخواست اصلاح تعیین تکلیف شد.")
     except (ValidationError, PermissionDenied) as exc:
         messages.error(request, _error_message(exc))
-    return redirect("timekeeping:workbench")
+    return redirect(_workbench_url(request))
 
 
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.LEAVE_MISSION_REQUEST)
 def leave_mission_create(request: HttpRequest) -> HttpResponse:
     form = LeaveMissionForm(
-        request.POST or None, organization=request.organization, user=request.user
+        request.POST or None,
+        organization=request.organization,
+        user=request.user,
+        **_entry_form_kwargs(request),
     )
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and form.is_valid()
+    ):
         try:
             services.create_leave_mission_request(
                 organization=request.organization,
@@ -369,12 +391,12 @@ def leave_mission_create(request: HttpRequest) -> HttpResponse:
             form.add_error(None, _error_message(exc))
         else:
             messages.success(request, "پیش‌نویس درخواست ثبت شد.")
-            return redirect("timekeeping:workbench")
+            return redirect(_workbench_url(request))
     return _form_page(
         request,
         form=form,
         title="درخواست مرخصی یا مأموریت",
-        description="سامانه entitlement، ذخیره مرخصی یا حکم قانونی را استنباط نمی‌کند؛ تأیید به مرجع سیاست مصوب نیاز دارد.",
+        description="تأیید درخواست به سیاست مصوب نیاز دارد؛ مانده یا استحقاق مرخصی به‌صورت خودکار محاسبه نمی‌شود.",
     )
 
 
@@ -392,7 +414,7 @@ def leave_mission_submit(request: HttpRequest, request_id) -> HttpResponse:
         messages.success(request, "درخواست ارسال شد.")
     except (ValidationError, PermissionDenied) as exc:
         messages.error(request, _error_message(exc))
-    return redirect("timekeeping:workbench")
+    return redirect(_workbench_url(request))
 
 
 @active_organization_required
@@ -413,16 +435,23 @@ def leave_mission_review(request: HttpRequest, request_id) -> HttpResponse:
         messages.success(request, "درخواست تعیین تکلیف شد.")
     except (ValidationError, PermissionDenied) as exc:
         messages.error(request, _error_message(exc))
-    return redirect("timekeeping:workbench")
+    return redirect(_workbench_url(request))
 
 
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.OVERTIME_REQUEST)
 def overtime_create(request: HttpRequest) -> HttpResponse:
     form = OvertimeForm(
-        request.POST or None, organization=request.organization, user=request.user
+        request.POST or None,
+        organization=request.organization,
+        user=request.user,
+        **_entry_form_kwargs(request),
     )
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and form.is_valid()
+    ):
         try:
             services.create_overtime_request(
                 organization=request.organization,
@@ -433,7 +462,7 @@ def overtime_create(request: HttpRequest) -> HttpResponse:
             form.add_error(None, _error_message(exc))
         else:
             messages.success(request, "پیش‌نویس اضافه‌کاری ثبت شد.")
-            return redirect("timekeeping:workbench")
+            return redirect(_workbench_url(request))
     return _form_page(
         request,
         form=form,
@@ -456,7 +485,7 @@ def overtime_submit(request: HttpRequest, request_id) -> HttpResponse:
         messages.success(request, "درخواست ارسال شد.")
     except (ValidationError, PermissionDenied) as exc:
         messages.error(request, _error_message(exc))
-    return redirect("timekeeping:workbench")
+    return redirect(_workbench_url(request))
 
 
 @active_organization_required
@@ -477,14 +506,23 @@ def overtime_review(request: HttpRequest, request_id) -> HttpResponse:
         messages.success(request, "درخواست تعیین تکلیف شد.")
     except (ValidationError, PermissionDenied) as exc:
         messages.error(request, _error_message(exc))
-    return redirect("timekeeping:workbench")
+    return redirect(_workbench_url(request))
 
 
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.TIMESHEETS_PREPARE)
 def timesheet_create(request: HttpRequest) -> HttpResponse:
-    form = TimesheetForm(request.POST or None, organization=request.organization)
-    if request.method == "POST" and form.is_valid():
+    form = TimesheetForm(
+        request.POST or None,
+        organization=request.organization,
+        user=request.user,
+        **_entry_form_kwargs(request),
+    )
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and form.is_valid()
+    ):
         try:
             sheet = services.create_timesheet(
                 organization=request.organization,
@@ -494,7 +532,14 @@ def timesheet_create(request: HttpRequest) -> HttpResponse:
         except (ValidationError, PermissionDenied) as exc:
             form.add_error(None, _error_message(exc))
         else:
-            return redirect("timekeeping:timesheet_detail", timesheet_id=sheet.pk)
+            return redirect(
+                reverse("timekeeping:timesheet_detail", args=[sheet.pk])
+                + (
+                    f"?{_field_context(request).query}"
+                    if _field_context(request).query
+                    else ""
+                )
+            )
     return _form_page(
         request,
         form=form,
@@ -506,6 +551,8 @@ def timesheet_create(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.TIMESHEETS_VIEW)
 def timesheet_detail(request: HttpRequest, timesheet_id) -> HttpResponse:
+    from .field_history import fully_scoped_timesheets
+
     membership = get_active_membership(
         user=request.user, organization=request.organization
     )
@@ -517,7 +564,7 @@ def timesheet_detail(request: HttpRequest, timesheet_id) -> HttpResponse:
         project_lookup="entries__project_id",
         site_lookup="entries__site_id",
     ).distinct()
-    sheet = scoped.filter(pk=timesheet_id).first()
+    sheet = fully_scoped_timesheets(scoped, membership).filter(pk=timesheet_id).first()
     if sheet is None:
         sheet = get_object_or_404(
             Timesheet,
@@ -531,8 +578,13 @@ def timesheet_detail(request: HttpRequest, timesheet_id) -> HttpResponse:
         request.POST or None,
         organization=request.organization,
         user=request.user,
+        **_entry_form_kwargs(request),
     )
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and form.is_valid()
+    ):
         try:
             services.add_timesheet_entry(
                 organization=request.organization,
@@ -544,7 +596,14 @@ def timesheet_detail(request: HttpRequest, timesheet_id) -> HttpResponse:
             form.add_error(None, _error_message(exc))
         else:
             messages.success(request, "ردیف تخصیص زمان ثبت شد.")
-            return redirect("timekeeping:timesheet_detail", timesheet_id=sheet.pk)
+            return redirect(
+                reverse("timekeeping:timesheet_detail", args=[sheet.pk])
+                + (
+                    f"?{_field_context(request).query}"
+                    if _field_context(request).query
+                    else ""
+                )
+            )
     return render(
         request,
         "timekeeping/timesheet_detail.html",
@@ -552,6 +611,7 @@ def timesheet_detail(request: HttpRequest, timesheet_id) -> HttpResponse:
             "timesheet": sheet,
             "entries": sheet.entries.select_related("project", "site", "activity"),
             "form": form,
+            "field_context": _field_context(request),
         },
     )
 
@@ -570,7 +630,10 @@ def timesheet_submit(request: HttpRequest, timesheet_id) -> HttpResponse:
         messages.success(request, "کارکرد با تاریخچه تغییرناپذیر ارسال شد.")
     except (ValidationError, PermissionDenied) as exc:
         messages.error(request, _error_message(exc))
-    return redirect("timekeeping:timesheet_detail", timesheet_id=sheet.pk)
+    return redirect(
+        reverse("timekeeping:timesheet_detail", args=[sheet.pk])
+        + (f"?{_field_context(request).query}" if _field_context(request).query else "")
+    )
 
 
 @active_organization_required
@@ -591,7 +654,10 @@ def timesheet_review(request: HttpRequest, timesheet_id) -> HttpResponse:
         messages.success(request, "کارکرد بررسی شد.")
     except (ValidationError, PermissionDenied) as exc:
         messages.error(request, _error_message(exc))
-    return redirect("timekeeping:timesheet_detail", timesheet_id=sheet.pk)
+    return redirect(
+        reverse("timekeeping:timesheet_detail", args=[sheet.pk])
+        + (f"?{_field_context(request).query}" if _field_context(request).query else "")
+    )
 
 
 @active_organization_required
@@ -610,7 +676,10 @@ def timesheet_preview(request: HttpRequest, timesheet_id) -> HttpResponse:
         )
     except (ValidationError, PermissionDenied) as exc:
         messages.error(request, _error_message(exc))
-    return redirect("timekeeping:timesheet_detail", timesheet_id=sheet.pk)
+    return redirect(
+        reverse("timekeeping:timesheet_detail", args=[sheet.pk])
+        + (f"?{_field_context(request).query}" if _field_context(request).query else "")
+    )
 
 
 @active_organization_required
@@ -640,6 +709,20 @@ def record_detail(request: HttpRequest, kind: str, record_id: str) -> HttpRespon
     else:
         records = _scoped(records, request)
     record = get_object_or_404(records, pk=record_id)
+    if kind in ("leave", "overtime", "correction"):
+        source = record.attendance if kind == "correction" else record
+        require_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission={
+                "leave": BusinessPermissionCode.LEAVE_MISSION_VIEW,
+                "overtime": BusinessPermissionCode.OVERTIME_VIEW,
+                "correction": BusinessPermissionCode.ATTENDANCE_CORRECT,
+            }[kind],
+            project=source.project,
+            site=source.site,
+            message="مجوز مشاهده این سابقه را ندارید.",
+        )
     if kind == "attendance":
         title = "سابقه حضور"
         rows = [
@@ -681,6 +764,6 @@ def record_detail(request: HttpRequest, kind: str, record_id: str) -> HttpRespon
         {
             "detail_title": title,
             "detail_rows": rows,
-            "back_url": reverse("timekeeping:workbench"),
+            "back_url": _workbench_url(request),
         },
     )

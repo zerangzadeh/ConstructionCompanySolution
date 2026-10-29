@@ -118,13 +118,15 @@ class WorkTeamForm(_StyledForm):
     code = forms.CharField(label="کد گروه کاری", max_length=50)
     name = forms.CharField(label="نام گروه کاری", max_length=255)
     department = forms.ModelChoiceField(
-        label="واحد سازمانی", queryset=Department.objects.none(), required=False
+        label="واحد سازمانی", queryset=Department.objects.none(), required=False,
+        empty_label="انتخاب واحد سازمانی",
     )
     lead = forms.ModelChoiceField(
-        label="سرپرست گروه", queryset=Employee.objects.none(), required=False
+        label="سرپرست گروه", queryset=Employee.objects.none(), required=False,
+        empty_label="انتخاب سرپرست گروه",
     )
     description = forms.CharField(
-        label="شرح", required=False, widget=forms.Textarea(attrs={"rows": 3})
+        label="شرح", required=False, widget=forms.Textarea(attrs={"rows": 2})
     )
 
     def __init__(
@@ -137,6 +139,11 @@ class WorkTeamForm(_StyledForm):
         self.fields["lead"].queryset = Employee.objects.filter(
             organization=organization, archived_at__isnull=True, status="active"
         )
+        from .field_forms import searchable_choices
+
+        for name, kind in (("department", "department"), ("lead", "team_lead")):
+            searchable_choices(self, name, kind, business_names_primary=True)
+            self.fields[name].widget.attrs["data-placeholder"] = self.fields[name].empty_label
 
     def clean_code(self) -> str:
         return canonicalize_upper_identifier(self.cleaned_data["code"])
@@ -450,16 +457,21 @@ class EmployeeProfileImageForm(forms.ModelForm):
 
 
 class EmployeeAssignmentForm(_StyledForm):
-    employee = forms.ModelChoiceField(label="کارمند", queryset=Employee.objects.none())
+    employee = forms.ModelChoiceField(label="نیروی کار", queryset=Employee.objects.none())
     project = forms.ModelChoiceField(label="پروژه", queryset=Project.objects.none())
     site = forms.ModelChoiceField(
         label="کارگاه", queryset=ProjectSite.objects.none(), required=False
     )
     role_title = forms.CharField(
-        label="مسئولیت در پروژه", max_length=255, required=False
+        label="مسئولیت در این پروژه/کارگاه", max_length=255, required=False,
+        help_text="اختیاری؛ مسئولیت این تخصیص، مستقل از سمت یا حرفه نیروی کار است.",
     )
     start_date = forms.DateField(
-        label="تاریخ شروع تخصیص", widget=forms.DateInput(attrs={"type": "date"})
+        label="تاریخ شروع", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    planned_end_date = forms.DateField(
+        label="تاریخ پایان برنامه‌ریزی‌شده", required=False,
+        help_text="اختیاری؛ تخصیص را پایان نمی‌دهد. پایان واقعی با «پایان تخصیص» ثبت می‌شود.",
     )
     notes = forms.CharField(
         label="یادداشت", required=False, widget=forms.Textarea(attrs={"rows": 3})
@@ -497,7 +509,29 @@ class EmployeeAssignmentForm(_StyledForm):
             site_lookup="pk",
             project=project,
         )
-        self.fields["site"].widget.attrs["disabled"] = project is None
+        from .field_forms import dependent_choices, searchable_choices
+        from .field_selectors import scoped_employees
+
+        self.fields["employee"].queryset = scoped_employees(organization=organization, user=membership.user).filter(status="active")
+        # Validated journey context is supplied by the view on first render.
+        if not self.is_bound and self.initial.get("project"):
+            self.fields["site"].queryset = scope_project_related_choices(
+                ProjectSite.objects.filter(organization=organization, is_active=True),
+                membership=membership, project_lookup="project_id", site_lookup="pk",
+                project=self.initial["project"],
+            )
+        dependent_choices(self)
+        self.order_fields(["employee", "project", "site", "role_title", "start_date", "planned_end_date", "notes"])
+        self.fields["employee"].widget.attrs["data-choice-purpose"] = "assignment"
+        for name in ("employee", "project", "site"):
+            searchable_choices(self, name, name, business_names_primary=True)
+
+    def clean(self):
+        cleaned = super().clean()
+        start, planned = cleaned.get("start_date"), cleaned.get("planned_end_date")
+        if start and planned and planned < start:
+            self.add_error("planned_end_date", "تاریخ پایان برنامه‌ریزی‌شده نمی‌تواند پیش از تاریخ شروع باشد.")
+        return cleaned
 
 
 class EmployeePositionAssignmentForm(_StyledForm):

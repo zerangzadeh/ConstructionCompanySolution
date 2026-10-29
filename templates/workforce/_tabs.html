@@ -1,3 +1,5 @@
+{% load field_journey %}{% workforce_mvp as workforce_is_mvp %}
+{% if workforce_is_mvp %}{% field_navigation %}{% else %}
 {% load product_surface %}
 {% with current_url_name=request.resolver_match.url_name %}
 <nav class="mt-5 flex flex-wrap gap-2" aria-label="بخش‌های منابع انسانی">
@@ -9,3 +11,5 @@
     {% if "work_teams.view" in business_permission_codes %}<a class="erp-btn erp-btn--secondary{% if current_url_name in 'work_team_list work_team_create work_team_archive' %} erp-btn--active{% endif %}" href="{% url 'workforce:work_team_list' %}"{% if current_url_name in 'work_team_list work_team_create work_team_archive' %} aria-current="page"{% endif %}>گروه‌های کاری</a>{% endif %}
 </nav>
 {% endwith %}
+
+{% endif %}

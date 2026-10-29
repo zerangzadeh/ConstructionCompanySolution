@@ -5,16 +5,31 @@ from django.core.exceptions import ValidationError
 
 from apps.organizations.authorization import get_active_membership, scope_queryset
 from apps.projects.models import Activity, Project, ProjectSite
+from apps.workforce.field_forms import (
+    business_label,
+    choice_value,
+    dependent_choices,
+    searchable_choices,
+)
+from apps.workforce.field_selectors import (
+    FieldContext,
+    context_employees,
+    scoped_employees,
+)
 from apps.workforce.models import Employee
-from core.forms import attach_parent_choice_ui
+from core.forms import JalaliDateMixin
 
 from .models import ShiftDefinition, WorkCalendar
 
 
-class StyledForm(forms.Form):
+class StyledForm(JalaliDateMixin, forms.Form):
     def __init__(self, *args, organization=None, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.organization = organization
+        self.user = user
+        for field in self.fields.values():
+            if isinstance(field, forms.ModelChoiceField):
+                field.label_from_instance = business_label
         for field in self.fields.values():
             field.widget.attrs.setdefault(
                 "class",
@@ -137,8 +152,12 @@ class ScopedForm(StyledForm):
 
     def __init__(self, *args, organization=None, user=None, **kwargs):
         super().__init__(*args, organization=organization, **kwargs)
-        self.fields["employee"].queryset = Employee.objects.filter(
-            organization=organization, archived_at__isnull=True
+        self.fields["employee"].queryset = (
+            scoped_employees(organization=organization, user=user)
+            if user is not None
+            else Employee.objects.filter(
+                organization=organization, archived_at__isnull=True
+            )
         )
         self.fields["project"].queryset = Project.objects.filter(
             organization=organization, deleted_at__isnull=True
@@ -160,7 +179,10 @@ class ScopedForm(StyledForm):
                 project_lookup="project_id",
                 site_lookup="id",
             )
-        attach_parent_choice_ui(self, "site", "project", "project_id")
+        dependent_choices(self, workers=True)
+        self.order_fields(["project", "site", "employee"])
+        for name in ("employee", "project", "site"):
+            searchable_choices(self, name, name)
 
     def clean(self):
         cleaned = super().clean()
@@ -198,6 +220,18 @@ class AttendanceForm(ScopedForm):
         self.fields["shift"].queryset = ShiftDefinition.objects.filter(
             organization=organization, is_active=True
         )
+        calendar = choice_value(self, "calendar")
+        try:
+            self.fields["shift"].queryset = (
+                self.fields["shift"].queryset.filter(calendar_id=calendar)
+                if calendar
+                else self.fields["shift"].queryset.none()
+            )
+        except (ValueError, ValidationError):
+            self.fields["shift"].queryset = self.fields["shift"].queryset.none()
+        self.fields["shift"].widget.attrs["data-depends-on"] = "calendar"
+        for name in ("calendar", "shift"):
+            searchable_choices(self, name, name)
 
 
 class TimeRequestForm(ScopedForm):
@@ -238,9 +272,21 @@ class TimesheetForm(StyledForm):
 
     def __init__(self, *args, organization=None, user=None, **kwargs):
         super().__init__(*args, organization=organization, **kwargs)
-        self.fields["employee"].queryset = Employee.objects.filter(
-            organization=organization, archived_at__isnull=True
+        self.fields["employee"].queryset = (
+            scoped_employees(organization=organization, user=user)
+            if user is not None
+            else Employee.objects.filter(
+                organization=organization, archived_at__isnull=True
+            )
         )
+
+        context = FieldContext(
+            project=self.initial.get("project"), site=self.initial.get("site")
+        )
+        self.fields["employee"].queryset = context_employees(
+            self.fields["employee"].queryset, context
+        )
+        searchable_choices(self, "employee", "employee", query=context.query)
 
 
 class TimesheetEntryForm(StyledForm):
@@ -288,6 +334,22 @@ class TimesheetEntryForm(StyledForm):
                 project_lookup="project_id",
                 site_lookup="site_id",
             )
+
+        dependent_choices(self)
+        project, site = choice_value(self, "project"), choice_value(self, "site")
+        try:
+            self.fields["activity"].queryset = (
+                self.fields["activity"].queryset.filter(
+                    project_id=project, site_id=site or None
+                )
+                if project
+                else self.fields["activity"].queryset.none()
+            )
+        except (ValueError, ValidationError):
+            self.fields["activity"].queryset = self.fields["activity"].queryset.none()
+        self.fields["activity"].widget.attrs["data-depends-on"] = "project site"
+        for name in ("project", "site", "activity"):
+            searchable_choices(self, name, name)
 
     def clean(self):
         cleaned = super().clean()

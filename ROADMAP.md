@@ -113,7 +113,10 @@ deliberately maintains no second live CEP queue or per-CEP completion ledger.
 The Product Owner approved this corrected eight-package **current MVP delivery
 plan** on 2026-10-29. These are bounded MVP implementation packages, not CEPs;
 they do not reopen completed CEPs or change the formal CEP dependency graph.
-MVP-01 was separately authorized and is complete. Remaining packages require
+MVP-01 was separately authorized and is complete. MVP-02 functional implementation is complete under its
+separate bounded 2026-10-29 authorization. Product Owner visual acceptance is
+PENDING following visual rejection; bounded UI/UX remediation is separately
+recorded below. Other packages require
 their own bounded authorization. Plan numbering does not impose hard serial
 dependencies among MVP-02 through MVP-06 or authorize execution/parallel work.
 
@@ -135,10 +138,17 @@ mixed-domain route control, five navigation groups and hidden direct-URL boundar
 are implemented, preserving Expenses/Treasury and Workforce/Timekeeping behavior;
 [its completion report](docs/governance/mvp/MVP-01_COMPLETION_REPORT.md) records
 current Development evidence and limitations. MVP-GAP-001 and MVP-GAP-002 are not
-remaining exposure/navigation work; do not reopen MVP-01. Remaining requirements include
-simplified field-worker workflows reusing Workforce/Timekeeping,
-additive non-login field-worker `national_id` design, shared XLSX exports and
-required print outputs. These are not implementation-completion claims or new
+remaining exposure/navigation work; do not reopen MVP-01. **MVP-02 functional implementation is COMPLETE; Product Owner visual acceptance is PENDING:**
+it implements
+the focused Field Workforce surface using existing Workforce/Timekeeping identity,
+optional tenant-owned `Person.national_id`, bounded source-separated histories,
+and Project/Site/Daily Report context. Its
+[completion report](docs/governance/mvp/MVP-02_COMPLETION_REPORT.md) records package
+status, Development/browser evidence, and baseline limitations. Its
+[UI/UX remediation report](docs/governance/mvp/MVP-02_UIUX_REMEDIATION_REPORT.md)
+records the shared selector correction and separate functional, interaction and
+Human visual acceptance status. No Git checkpoint or MVP-03 execution is implied. Shared XLSX exports,
+required print outputs and final cross-journey verification remain. These are not new
 CEP packages/dependency edges. P0 Excel delivery is Billing, Procurement,
 Inventory and Expenses; P1 priorities remain in the strategy.
 
@@ -160,21 +170,21 @@ The approved delivery clarifications for the remaining packages are:
 - **Independent P0 print:** MVP-06 is a P0 release package independent of P1 XLSX
   completion and the XLSX writer. Its targets remain Progress Claim / Billing,
   Purchase Order, GRN, Daily Report, and Expense / Petty Cash Summary. MVP-07 owns
-  P1 XLSX outputs and non-blocking usability; do not recombine those dependencies.
+  P1 XLSX outputs and non-blocking usability, including broader MVP-visible Form /
+  Master-Data Selection Delta Remediation for surfaces not covered by individual
+  packages. Preserve coherent selectors, business language, cascading masters and
+  Human visual acceptance; do not recombine the output dependencies.
 - **Genuine XLSX:** MVP-05 and MVP-07 must generate standard Excel/OpenXML `.xlsx`
   workbooks, with appropriate RTL worksheet presentation for Persian outputs.
   Renamed CSV, HTML with an `.xlsx` extension, JSON, uploaded spreadsheet evidence
   and export manifests do not satisfy this requirement. Prefer a mature,
   license-compatible library over a hand-built XLSX writer; the Python library
   remains an engineering choice, not frozen or selected here.
-- **Field-worker national ID:** MVP-02 retains the approved additive gap. Inspect
-  `User`, tenant-owned `Person`, `WorkRelationship` and legacy `Employee` before
-  designing storage; no physical field location is prescribed here. A non-login
-  field worker must support a national ID without requiring a `User`. Preserve
-  tenant ownership/isolation, prevent duplicate/conflicting workforce identities
-  according to the current identity model, and do not silently permit contradictory
-  national IDs when a workforce identity is legitimately linked to a `User`.
-  Introduce no parallel `Worker` domain/model.
+- **Field-worker national ID:** MVP-02 implements the approved additive gap on
+  tenant-owned `Person`, preserving optional login, tenant-scoped uniqueness,
+  explicit identity-link consistency and legacy Employee compatibility. The
+  additive migration performs no inferred backfill. No parallel `Worker` domain
+  or identity cutover is introduced. Preserve those boundaries in later packages.
 - **Package independence and integration:** MVP-02, MVP-03 and MVP-04 are separate
   journey/domain packages; the MVP-05 shared XLSX foundation can proceed largely
   independently, and MVP-06 Print is independent of the XLSX writer. Integration

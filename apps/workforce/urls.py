@@ -1,14 +1,20 @@
 from django.urls import path
 
 from apps.workforce import certificate_views as certificates
-from apps.workforce import personal_change_views as personal
-from apps.workforce import views
 from apps.workforce import ess_timekeeping_views as own_time
+from apps.workforce import field_views, views
+from apps.workforce import personal_change_views as personal
 from apps.workforce.employment_views import employment_history, employment_manage
 
 app_name = "workforce"
 
 urlpatterns = [
+    path("field/", field_views.index, name="field_list"),
+    path("field/new/", field_views.create, name="field_create"),
+    path("field/choices/<str:kind>/", field_views.choices, name="field_choices"),
+    path("field/<uuid:employee_id>/", field_views.detail, name="field_detail"),
+    path("field/<uuid:employee_id>/edit/", field_views.edit, name="field_edit"),
+    path("field/<uuid:employee_id>/assign/", field_views.assign, name="field_assign"),
     path("employment/", employment_manage, name="employment_manage"),
     path("ess/timekeeping/",own_time.index,name="ess_timekeeping"),
     path("ess/timekeeping/<str:kind>/new/",own_time.create,name="ess_timekeeping_create"),

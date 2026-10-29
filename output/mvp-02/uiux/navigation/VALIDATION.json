@@ -1,0 +1,91 @@
+{
+  "status": "READY_FOR_HUMAN_REVIEW",
+  "product_owner_visual_acceptance": "PENDING",
+  "date": "2026-10-29T06:21:09.593268+03:30",
+  "scope": "MVP-02 UI/UX Remediation Product Owner navigation/IA follow-up",
+  "files_changed": {
+    "core/product_surface.py": "bd0096a9dd2628a025366fd402465a94539df144f555304908b8551f12d34c56",
+    "core/templatetags/product_surface.py": "7aae2cda6586232120e50269e04b7c94767080277795cb83e8001cb20804272a",
+    "templates/components/navigation_links.html": "b3d4d4d3f942a5f2e3f4a678c266a62df597cf4f24f774f4ddd4cb5f851fc668",
+    "templates/components/page_header.html": "0a83124546edf96ca320793e00c27f7484d2fd3985c431651bcc44d8802cf23e",
+    "apps/workforce/field_forms.py": "2343f4aad1c97933e19924c4df0ce88466bda8f4c442571b046013e48518d5ac",
+    "apps/workforce/templatetags/field_journey.py": "1af2c21f9e6d36e7325f0be19989cbd7c9fd93683ad431fccdd93a261aa436f8",
+    "apps/workforce/templates/workforce/_field_navigation.html": "83c0c7b709debd06588903716e91f17e94cc6efdcc2493ede5b7822dc9f675c3",
+    "apps/workforce/templates/workforce/field_list.html": "7bf10e31f71feb853c0ad7738b35b17bb531ed011b3fd8bbc527bdf00ef8dc02",
+    "templates/workforce/assignment_list.html": "163c2fd3010bbbf6c6cc60a3c6a7734bce040cd197a01ae7941dd42f4ba346ec",
+    "templates/workforce/_tabs.html": "537360c87281a823d57f36ae9c6ce5e26e89fa0db6b1b3ea70e0c1769327cd3b",
+    "apps/workforce/templates/workforce/field_form.html": "b341ae4c9ed0f557c8c2e10d9772330d4f93fa61ca457fbb75af9507bbc3ad84",
+    "apps/workforce/templates/workforce/field_detail.html": "f3cec318475852d57bc55a6e1a5264c7f6c79cadc86e71ccfec55c08199733b7",
+    "templates/workforce/assignment_form.html": "ccfb29552e33d5856d9371aa84ec858462c41c6f653e994b7dc6f2d993418daf",
+    "docs/ui-guidelines.md": "c98969f3be38e34ed78f5e6765de1a3d34ea33962d88f48cb266c5b57c7ae45f",
+    "docs/governance/mvp/MVP-02_UIUX_REMEDIATION_REPORT.md": "6d94181bc7a48b8dde1b4dd8fa451f3399307314841f20dd08cff6d407db294d",
+    "apps/workforce/test_mvp02_uiux.py": "cd78f881722a5fba7903941ca7729d6e774cc2dd74bb466182a363cac6a7d230",
+    "apps/workforce/test_mvp02_browser.py": "92a67a4b850bc8092031cde0a8a5a6b046479830e7e83134629869d1ce61b56f",
+    "scripts/verification/mvp02_browser.mjs": "d5a8109e6b2e00c64894fcf110e1f80d105cb9330e4bff97c3071fdda82f9c0d"
+  },
+  "navigation": {
+    "primary": "Ù†ÛŒØ±ÙˆÙ‡Ø§ÛŒ Ú©Ø§Ø±",
+    "assignment_primary_entry_removed": true,
+    "internal": [
+      "Ù†ÛŒØ±ÙˆÙ‡Ø§",
+      "ØªØ®ØµÛŒØµ Ø¨Ù‡ Ù¾Ø±ÙˆÚ˜Ù‡ Ùˆ Ú©Ø§Ø±Ú¯Ø§Ù‡",
+      "Ú¯Ø±ÙˆÙ‡â€ŒÙ‡Ø§ÛŒ Ú©Ø§Ø±ÛŒ"
+    ],
+    "assignment_capability_routes_permissions_preserved": true,
+    "validated_context_preserved_in_navigation_and_new_assignment": true
+  },
+  "responsibility": "EmployeeProjectAssignment.role_title: optional CharField(max_length=255), assignment-specific descriptive text; text input retained.",
+  "automated": {
+    "passed": 64,
+    "subtests_passed": 24,
+    "failed": 0,
+    "log": "final-validation.log",
+    "includes_browser_test": true
+  },
+  "browser": {
+    "scenarios_passed": 12,
+    "failed": 0,
+    "widths": [
+      1440,
+      390
+    ],
+    "results": "browser/mvp02-nav-owner-results.json",
+    "screenshot_sha256": {
+      "output/mvp-02/uiux/navigation/browser/mvp02-nav-owner-NAV-assignment-desktop.png": "3deddec48463ef474e049c8c9d4071e567a1d18c204596f68a037c0b52e1cf88",
+      "output/mvp-02/uiux/navigation/browser/mvp02-nav-owner-NAV-assignment-mobile.png": "7e0a43bc1bf39781b3636c12d549a9b988c5c57238361ca2107a8a0d81962658",
+      "output/mvp-02/uiux/navigation/browser/mvp02-nav-owner-NAV-cascade-assignments-desktop.png": "cd62b6585ba68f52c76420ea6ef75bab730e1118bc6b112355dd97d235892f47",
+      "output/mvp-02/uiux/navigation/browser/mvp02-nav-owner-NAV-cascade-assignments-mobile.png": "fd842163c651c160f375c7e060ede82275c65e9f505297f76b78f052c54dcea8",
+      "output/mvp-02/uiux/navigation/browser/mvp02-nav-owner-NAV-cascade-workforce-desktop.png": "17bedf8fed927ef987522bae0f47bb94dee1b28c556135a5c6adf018e66bdd6a",
+      "output/mvp-02/uiux/navigation/browser/mvp02-nav-owner-NAV-cascade-workforce-mobile.png": "587da632d2b14d948279982aca3c7c8c483b7aa115cfc334f067179ab3bc1ca7",
+      "output/mvp-02/uiux/navigation/browser/mvp02-nav-owner-NAV-create-desktop.png": "b6fc8bf05a562928a2b64b39edc77116f23a43f7934b3b5069eb625f719da5a6",
+      "output/mvp-02/uiux/navigation/browser/mvp02-nav-owner-NAV-create-mobile.png": "86f79e949b8ab9d4ea14df78027b874be92441f481bc5345c66fbd6cec6646ac",
+      "output/mvp-02/uiux/navigation/browser/mvp02-nav-owner-NAV-teams-desktop.png": "407d78b9129e6f50e21e883bd666b2f1d2d217e80e375f6db368a9ba4ceab579",
+      "output/mvp-02/uiux/navigation/browser/mvp02-nav-owner-NAV-teams-mobile.png": "c3a2c38e5fbfd2c2213a3e7c1961c3449833302f73ea272904a0af95bfa05ab8",
+      "output/mvp-02/uiux/navigation/browser/mvp02-nav-owner-NAV-workforce-desktop.png": "8bfc7ffd010d1c3b30b2d19c9fee8fd09e87be612c26f4cbb734a032bed7feb4",
+      "output/mvp-02/uiux/navigation/browser/mvp02-nav-owner-NAV-workforce-mobile.png": "5bef33f5f9c28b88c8ae8da32589a0dd593b415527a2c39626d356f613d7ddac"
+    },
+    "visual_QA": "All 12 layouts inspected; Persian RTL, action hierarchy, compact filters and internal navigation reviewed. No page horizontal overflow; tables retain contained scrolling."
+  },
+  "static_checks": "static-checks.json",
+  "failure_attribution": "failure-attribution.json",
+  "protected_sources": {
+    "entry_manifest": "entry.json",
+    "checked": 611,
+    "changed": [],
+    "prior_source_changes_outside_followup": [],
+    "selector_adapter_and_vendor_unchanged": true
+  },
+  "prior_revision_validation": "previous-validation.json",
+  "git": {
+    "branch": "main",
+    "head": "13e0b1d85f766336eca8286a904e3080b4597f9c",
+    "local_HEAD_origin_main_ahead_behind": "0\t0",
+    "writes": "NONE",
+    "status": " M Agents.md\n M ROADMAP.md\n M apps/accounts/models.py\n M apps/accounts/static/js/erp_table.js\n M apps/audit/models.py\n M apps/organizations/authorization.py\n M apps/organizations/models.py\n M apps/organizations/permission_registry.py\n M apps/projects/views.py\n M apps/timekeeping/forms.py\n M apps/timekeeping/test_p7_s06_s12_timekeeping.py\n M apps/timekeeping/views.py\n M apps/workforce/forms.py\n M apps/workforce/models.py\n M apps/workforce/person_services.py\n M apps/workforce/services.py\n M apps/workforce/test_cep026_ess_privacy.py\n M apps/workforce/urls.py\n M apps/workforce/views.py\n M core/product_surface.py\n M core/templatetags/product_surface.py\n M docs/architecture/DOMAIN_AND_DATA_MODEL.md\n M docs/architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md\n M docs/ui-guidelines.md\n M templates/components/navigation_links.html\n M templates/components/page_header.html\n M templates/components/read_only_record_detail.html\n M templates/daily_reports/detail.html\n M templates/projects/detail.html\n M templates/timekeeping/form.html\n M templates/timekeeping/timesheet_detail.html\n M templates/timekeeping/workbench.html\n M templates/workforce/_tabs.html\n M templates/workforce/assignment_form.html\n M templates/workforce/assignment_list.html\n?? apps/organizations/migrations/0125_mvp02_field_workforce_permission.py\n?? apps/timekeeping/field_history.py\n?? apps/timekeeping/templates/\n?? apps/timekeeping/test_mvp02.py\n?? apps/workforce/field_forms.py\n?? apps/workforce/field_selectors.py\n?? apps/workforce/field_services.py\n?? apps/workforce/field_views.py\n?? apps/workforce/identity_integrity.py\n?? apps/workforce/migrations/0016_mvp02_person_national_id.py\n?? apps/workforce/static/workforce/field_choices.css\n?? apps/workforce/static/workforce/field_choices.js\n?? apps/workforce/static/workforce/vendor/\n?? apps/workforce/templates/workforce/_field_context.html\n?? apps/workforce/templates/workforce/_field_navigation.html\n?? apps/workforce/templates/workforce/_journey_links.html\n?? apps/workforce/templates/workforce/_native_choices.html\n?? apps/workforce/templates/workforce/field_detail.html\n?? apps/workforce/templates/workforce/field_form.html\n?? apps/workforce/templates/workforce/field_list.html\n?? apps/workforce/templates/workforce/widgets/\n?? apps/workforce/templatetags/\n?? apps/workforce/test_mvp02.py\n?? apps/workforce/test_mvp02_browser.py\n?? apps/workforce/test_mvp02_concurrency.py\n?? apps/workforce/test_mvp02_migration.py\n?? apps/workforce/test_mvp02_uiux.py\n?? docs/governance/mvp/MVP-02_COMPLETION_REPORT.md\n?? docs/governance/mvp/MVP-02_UIUX_REMEDIATION_REPORT.md\n?? output/mvp-02/\n?? protected_documents/organizations/4c625f0d-bf59-4581-8caa-a2d613499da5/\n?? protected_documents/organizations/ad120bb9-2040-4db4-8d15-0ded961da95a/\n?? protected_documents/organizations/d9ff3cb5-bae7-4ae1-bffd-47ff29b90a6c/\n?? scripts/verification/mvp02_browser.mjs"
+  },
+  "new_migrations": 0,
+  "new_dependencies": 0,
+  "backend_domain_reopened": false,
+  "mvp03_started": false,
+  "regressions": "No product regression observed in focused checks. Historical unrelated failures remain documented in preceding evidence; broad suite not repeated."
+}

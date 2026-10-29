@@ -161,8 +161,9 @@ material risks.
 ## 6. Workforce identity boundary
 
 - MVP field-worker UI reuses `workforce` and `timekeeping`; no parallel `Worker`
-  model/domain. Non-login field-worker `national_id` is an approved additive MVP
-  gap, not a delivered migration. Attendance, Timesheet and Overtime remain distinct.
+  model/domain. MVP-02 delivers non-login field-worker `national_id` additively on
+  tenant-owned `Person`, preserving explicit identity links and legacy Employee
+  compatibility. Attendance, Timesheet and Overtime remain distinct.
 - `User` is authentication identity.
 - `Person` is tenant-owned human identity.
 - `WorkRelationship` is the tenant-scoped, effective-dated work relationship.

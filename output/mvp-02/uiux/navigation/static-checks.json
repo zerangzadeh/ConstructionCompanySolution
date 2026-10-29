@@ -1,0 +1,70 @@
+{
+  "commands": [
+    {
+      "command": [
+        ".venv/Scripts/ruff.exe",
+        "check",
+        "core/product_surface.py",
+        "core/templatetags/product_surface.py",
+        "apps/workforce/field_forms.py",
+        "apps/workforce/templatetags/field_journey.py",
+        "apps/workforce/test_mvp02_uiux.py",
+        "apps/workforce/test_mvp02_browser.py"
+      ],
+      "exit_code": 0,
+      "stdout": "All checks passed!\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        ".venv/Scripts/ruff.exe",
+        "format",
+        "--check",
+        "core/product_surface.py",
+        "core/templatetags/product_surface.py",
+        "apps/workforce/field_forms.py",
+        "apps/workforce/templatetags/field_journey.py",
+        "apps/workforce/test_mvp02_uiux.py",
+        "apps/workforce/test_mvp02_browser.py"
+      ],
+      "exit_code": 0,
+      "stdout": "6 files already formatted\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "--check",
+        "scripts/verification/mvp02_browser.mjs"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "warning: in the working copy of 'Agents.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/workforce/services.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/workforce/test_cep026_ess_privacy.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/templatetags/product_surface.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md', LF will be replaced by CRLF the next time Git touches it\n"
+    }
+  ],
+  "templates_compiled": [
+    "components/page_header.html",
+    "components/navigation_links.html",
+    "workforce/_field_navigation.html",
+    "workforce/_tabs.html",
+    "workforce/field_list.html",
+    "workforce/field_detail.html",
+    "workforce/field_form.html",
+    "workforce/assignment_list.html",
+    "workforce/assignment_form.html",
+    "workforce/work_team_list.html"
+  ],
+  "django_system_check_issues": [],
+  "protected_files_checked": 611,
+  "protected_files_changed": []
+}

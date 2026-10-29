@@ -1,0 +1,96 @@
+{
+  "status": "READY_FOR_HUMAN_REVIEW",
+  "product_owner_visual_acceptance": "PENDING",
+  "date": "2026-10-29T06:57:42.816367+03:30",
+  "files_changed": {
+    "apps/workforce/field_forms.py": "5331464d43a345e8ee0c3f010d6fed4c2462dc3ef999ba764e2913e405e31c1f",
+    "apps/workforce/field_views.py": "47b76fe7235b0e3689580c767c3ee0a24148e96d7517e74e220d52baa44e4322",
+    "apps/workforce/views.py": "b4ce6ec6a689857f55533750bf02455b6225b12c578d926a862c0fc463b7d502",
+    "apps/accounts/static/js/erp_table.js": "61eb5befd16c6ddab5eafa188fb3c7c871dec4b49e1637a463874a2e733089b8",
+    "apps/workforce/templates/workforce/_field_header.html": "8c1876cd5e36205273fff4fdd0f8312421d4c9acf4df410a2edc9c60ad671a4d",
+    "apps/workforce/templates/workforce/field_list.html": "85e7c5ec61396b507ff6bfe62b11a43f5989125ef81cfba561ed0c7066eeff74",
+    "templates/workforce/assignment_list.html": "4306553cdb60f300c21391e5bbf040df39f777ea308ff3ca47d6e36e3a50268b",
+    "templates/workforce/work_team_list.html": "a012bb39d2c6ee66b1936f18deb43eb3438cf19ac49d677f407b0f9e803876ae",
+    "templates/workforce/form.html": "c455e5cc31ee1f84a3a8a1eee756d8e88a4c010f78738c426baa65c4486a5a26",
+    "apps/workforce/templates/workforce/_team_filters.html": "2d209389ad93bdf216c87b6ac2d8fe2501b2491160cf17087aa197c0fbeec23c",
+    "apps/workforce/test_mvp02_uiux.py": "a742b5cebf3bc4133baa5927122a201cabade2463f2c0b30a0b9a79d4ee0c30f",
+    "apps/workforce/test_mvp02_browser.py": "e0da8da0707b63744fdad7a49b1f0143e48d5db065bd460e2be97adafa4cdf25",
+    "docs/ui-guidelines.md": "a0cfcf25df98a93f71a1d7119e2025eb5862b15c3cfae62a5f6c1ce9c329e16b",
+    "docs/governance/mvp/MVP-02_UIUX_REMEDIATION_REPORT.md": "3236df789a38183dabf3347999ad8d5a310f389697500c7b05730cc1d23db847",
+    "templates/base.html": "62546108d0562793ee1cdb3170b0d144c01b9532e04e410c2ff66cc3ff8b988b",
+    "scripts/verification/mvp02_browser.mjs": "9c70064555699df341d3a2b04131a5f3c592f5d63ce4182d381f69b0768ecccf"
+  },
+  "changes": {
+    "work_teams": "MVP Operations → Workforce → Work Teams hierarchy; no HR eyebrow; create action remains in normal header. Inline explicit filters/apply/clear; scoped opt-out from base auto-controls; compact RTL.",
+    "page_filters": "Middleware-resolved global defaults on initial list entry. Explicit GET overrides and clear marker remain local; global session context never written. Page-filter caption replaces duplicate context summary. Existing Project/Site validation and selector cascade preserved.",
+    "scope": "UI templates and read-list filter adapters only; domain ownership/models/services, mutation contracts, tenant/permission enforcement and global-context writers unchanged. FULL_ERP team layout preserved."
+  },
+  "automated": {
+    "passed": 18,
+    "focused_tests": 17,
+    "browser_tests": 1,
+    "subtests_passed": 26,
+    "failed": 0,
+    "log": "final-validation.log"
+  },
+  "browser": {
+    "scenarios_passed": 20,
+    "viewports": [
+      1440,
+      390
+    ],
+    "results": "browser/mvp02-context-owner-results.json",
+    "session_assertions": "Organization, Project and Site IDs unchanged after all browser interactions",
+    "covers": [
+      "Workforce defaults/cascade/clear",
+      "Assignment defaults/cascade/clear",
+      "Team hierarchy/layout",
+      "Team explicit apply/results/clear",
+      "Team creation without legacy HR wording"
+    ],
+    "screenshot_sha256": {
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-CTX-cascade-assignments-desktop.png": "71f4cc332660098f23a9843c7636c1f0b4c22b8577a535edbbd4144c2b7e019b",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-CTX-cascade-assignments-mobile.png": "3533df7af29381f023437ac89c8e60a23b74524ed8cee243fb58f5309c544f56",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-CTX-cascade-workers-desktop.png": "6cf71e7183037541f69bbd7f60f870367957c61881eccf086468c1031b1575a2",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-CTX-cascade-workers-mobile.png": "5a216d249890eb845e88eff1947d131adfb15bad72a81ecfb8156570c16487f2",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-CTX-clear-assignments-desktop.png": "10a4f450ce1ca8787e6404fecccc0eaffbe2dce8320c291f0ccce24c72d7a72c",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-CTX-clear-assignments-mobile.png": "b6f8dc5cc1d74f9bc24c7a73d28cf14fade23947f2e514b02f442a5669c76519",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-CTX-clear-workers-desktop.png": "b19d90326de03e8690efa7bdaf0703ac6cac2e4525982a3048554120af671dda",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-CTX-clear-workers-mobile.png": "08b2baa843a0611af4ecb61b18060a254f405d5f1fd40e942de605cef5cd18b0",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-CTX-default-assignments-desktop.png": "005ec6b3cea354239869569ea3e3f8f9cc85fdbf1d056e176d91b3239fb41ade",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-CTX-default-assignments-mobile.png": "8618da9bd93112bcf89a570adb8fc6c9affb6b8abe15f0987d01b1c5dd091a98",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-CTX-default-workers-desktop.png": "899a20fc522836ae1129682ab7bd50d1cca96f3e294157344bda94ecb934fa32",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-CTX-default-workers-mobile.png": "82355f78917dfff118556b9fb8ef1a27576a56084fe0255cbf6ae03cbc61ef40",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-TEAM-clear-desktop.png": "52b1e6b22dd56a30887b801edbb413061a2694f188c0a973b604f2877ebcb9d8",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-TEAM-clear-mobile.png": "c23a82c9fb1c8e9786401a27eb1bc859c42bbb60d62a9f2c16e693de625b3b37",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-TEAM-create-desktop.png": "91f703c68bb6c60619746ce4fa24bf98f76f578c6e2c356a0a237ab9d3166b27",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-TEAM-create-mobile.png": "d8198f61024d00748b7ebe722bf05abdd692523070d6ef052ac6a6eb65c356f9",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-TEAM-filter-desktop.png": "f6fe0c0b382526b597bd3c377d7191020251d0aba71d4cc9ea5352693257fafc",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-TEAM-filter-mobile.png": "7f885fc1c81dcac15114078255e76fc2d28735cd4f830699ed9c9436b0bab067",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-TEAM-layout-desktop.png": "52b1e6b22dd56a30887b801edbb413061a2694f188c0a973b604f2877ebcb9d8",
+      "output/mvp-02/uiux/context-filters/browser/mvp02-context-owner-TEAM-layout-mobile.png": "c23a82c9fb1c8e9786401a27eb1bc859c42bbb60d62a9f2c16e693de625b3b37"
+    },
+    "visual_review": "Representative desktop/mobile defaults, override, clear, team filters and creation captures inspected."
+  },
+  "static_checks": "static-checks.json",
+  "failed_attempt": {
+    "log": "focused-tests.log",
+    "cause": "Base layout automatically rendered detached table controls in addition to the new local block; scoped template override corrected this. Failed run is not PASS evidence."
+  },
+  "source_boundaries": {
+    "protected_unchanged": 609,
+    "declared_read_list_view_adapters": [
+      "apps/workforce/field_views.py",
+      "apps/workforce/views.py"
+    ],
+    "unexpected_prior_source_changes": []
+  },
+  "git": {
+    "head": "13e0b1d85f766336eca8286a904e3080b4597f9c",
+    "writes": "NONE"
+  },
+  "new_migrations": 0,
+  "new_dependencies": 0,
+  "mvp03_started": false,
+  "regressions": "No regression observed in focused checks; broad suite not repeated."
+}

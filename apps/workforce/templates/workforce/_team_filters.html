@@ -1,0 +1,5 @@
+<form id="work-team-filters" method="get" class="erp-surface mt-4 grid items-end gap-3 rounded-xl p-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="فیلترهای گروه‌های کاری" data-table-filter-form data-filter-submit="explicit" data-workforce-team-filters>
+  {% for filter in filters %}{% if filter %}<div><label class="mb-1.5 block text-sm font-medium text-slate-700" for="work-team-filter-{{ filter.name }}">{{ filter.label }}</label><input id="work-team-filter-{{ filter.name }}" type="search" name="{{ filter.name }}" value="{{ filter.value }}" class="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm" placeholder="جست‌وجو"></div>{% endif %}{% endfor %}
+  {% if request.GET.sort %}<input type="hidden" name="sort" value="{{ request.GET.sort }}">{% endif %}{% if request.GET.direction %}<input type="hidden" name="direction" value="{{ request.GET.direction }}">{% endif %}
+  <div class="flex flex-wrap gap-2"><button class="erp-btn erp-btn--primary" type="submit">اعمال فیلتر</button><a class="erp-btn erp-btn--secondary" href="{% url 'workforce:work_team_list' %}">پاک کردن</a></div>
+</form>

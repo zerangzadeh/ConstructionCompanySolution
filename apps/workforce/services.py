@@ -44,6 +44,8 @@ from apps.workforce.models import (
     WorkTeam,
 )
 
+from .identity_integrity import identity_write_lock
+
 _EMPLOYEE_STATUS_TRANSITIONS: dict[str, tuple[str, ...]] = {
     EmployeeStatus.ACTIVE: (EmployeeStatus.INACTIVE, EmployeeStatus.TERMINATED),
     EmployeeStatus.INACTIVE: (EmployeeStatus.ACTIVE, EmployeeStatus.TERMINATED),
@@ -592,6 +594,7 @@ def create_employee(
     return employee
 
 
+@identity_write_lock()
 @transaction.atomic
 def create_employee_from_member(
     *,
@@ -654,6 +657,7 @@ def create_employee_from_member(
     )
 
 
+@identity_write_lock()
 @transaction.atomic
 def link_employee_account(
     *, organization: Organization, actor: User, employee: Employee, user: User
@@ -691,6 +695,7 @@ def link_employee_account(
     return locked_employee
 
 
+@identity_write_lock()
 @transaction.atomic
 def unlink_employee_account(
     *, organization: Organization, actor: User, employee: Employee
@@ -1045,6 +1050,7 @@ def assign_employee_to_project(
     site: ProjectSite | None = None,
     role_title: str = "",
     notes: str = "",
+    planned_end_date: date | None = None,
 ) -> EmployeeProjectAssignment:
     _require_management_access(
         organization=organization,
@@ -1070,6 +1076,7 @@ def assign_employee_to_project(
         site=site,
         role_title=role_title.strip(),
         start_date=start_date,
+        planned_end_date=planned_end_date,
         notes=notes.strip(),
         created_by=actor,
         updated_by=actor,

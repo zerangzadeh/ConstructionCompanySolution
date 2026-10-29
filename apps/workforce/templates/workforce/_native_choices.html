@@ -1,0 +1,8 @@
+{% load field_journey %}{% has_business_choices choice_form as has_choices %}{% if has_choices %}
+<noscript><div class="sm:col-span-2 text-sm text-slate-600">
+{% if request.GET.native_choices == "1" %}
+  {% if request.method != "GET" or request.resolver_match.url_name != "field_list" and request.resolver_match.url_name != "workbench" and request.resolver_match.url_name != "assignment_list" %}<button type="submit" name="_refresh_choices" value="1" formnovalidate class="erp-btn erp-btn--secondary">به‌روزرسانی فهرست‌ها</button>{% endif %}
+{% else %}{% native_choices_url as native_url %}<a class="text-blue-700 underline" href="{{ native_url }}">نمایش فهرست‌های ساده</a>{% endif %}
+</div></noscript>
+
+{% endif %}

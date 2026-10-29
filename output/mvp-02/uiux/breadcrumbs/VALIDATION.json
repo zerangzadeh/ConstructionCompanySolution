@@ -1,0 +1,70 @@
+{
+  "status": "READY_FOR_HUMAN_REVIEW",
+  "product_owner_visual_acceptance": "PENDING",
+  "date": "2026-10-29T06:28:34.242192+03:30",
+  "files_changed": {
+    "templates/components/page_header.html": "ff124379cdd1ef07668366e19cb64422409fd0a15e6d2e380349102f52595a0a",
+    "apps/workforce/templatetags/field_journey.py": "53b80f0ed45ba88d5c3a528fdd803e3c08943c214f15da971d0abdb99a7fd1d2",
+    "apps/workforce/templates/workforce/field_list.html": "c43982d5b912eebf0527c987849bc83c6274aa90708acbb55857ad12172389c0",
+    "templates/workforce/assignment_list.html": "987ce7866a647b7630a6b83606263f6b0c67c610f141e906d852f3b5f091d267",
+    "apps/workforce/test_mvp02_uiux.py": "8857cd4bad7845e862a472f8adff38b76079921ce5eb169f3af2191e6b6e5393",
+    "apps/workforce/test_mvp02_browser.py": "38c63b42684f75db570bdad25298eae6d0ddf565420c4eaebbba08e1145a69b4",
+    "docs/ui-guidelines.md": "58f12ad7e918f1b62d06bc4d2decf9898bdf77b2d42e98e4c2bd76dc5f10b313",
+    "docs/governance/mvp/MVP-02_UIUX_REMEDIATION_REPORT.md": "d9be2decb26b1a908921e692ad81820f92ff13f75f73ea39a5c05a2de5bbc076"
+  },
+  "hierarchy": {
+    "workforce": [
+      "خانه",
+      "عملیات پروژه و کارگاه",
+      "نیروهای کار"
+    ],
+    "assignment": [
+      "خانه",
+      "عملیات پروژه و کارگاه",
+      "نیروهای کار",
+      "تخصیص نیرو به پروژه و کارگاه"
+    ]
+  },
+  "behavior": {
+    "home_section": "/#home-operations",
+    "parents": "Clickable when present in permission/exposure-filtered central navigation",
+    "workforce_parent": "Existing field list with validated Project/Site context",
+    "current_item": "Final non-clickable span; aria-current=page; supplied URL ignored",
+    "detached_section_eyebrow": false,
+    "mobile": "Wrapping chain; no page overflow"
+  },
+  "automated": {
+    "focused_tests_passed": 15,
+    "subtests_passed": 7,
+    "focused_log": "focused-tests.log",
+    "browser_test_passed": 1,
+    "browser_log": "browser-tests.log"
+  },
+  "browser": {
+    "scenarios_passed": 4,
+    "widths": [
+      1440,
+      390
+    ],
+    "results": "browser/mvp02-nav-owner-results.json",
+    "screenshot_sha256": {
+      "output/mvp-02/uiux/breadcrumbs/browser/mvp02-nav-owner-NAV-assignment-desktop.png": "62f14e0a17a36ead4cb0e540ed0cba22a9188fc17d2790bbd6e2d5111d2ce8d4",
+      "output/mvp-02/uiux/breadcrumbs/browser/mvp02-nav-owner-NAV-assignment-mobile.png": "6dc33e7f7b77237c4a1c3fdbed71b05c1a777b2cce090c0f57e458f61ffe4b0d",
+      "output/mvp-02/uiux/breadcrumbs/browser/mvp02-nav-owner-NAV-workforce-desktop.png": "56d67af7d5469b034328b14c73a76ed56bdadc03630983a190f281205fed905d",
+      "output/mvp-02/uiux/breadcrumbs/browser/mvp02-nav-owner-NAV-workforce-mobile.png": "e4c1f8a7fa946797c73f7882cb3029d490eaf90c0287c8110d944a4a31dab12c"
+    },
+    "all_four_screenshots_inspected": true
+  },
+  "static_checks": "static-checks.json",
+  "protected_backend_and_security_sources_unchanged": 611,
+  "unexpected_prior_source_changes": [],
+  "git": {
+    "head": "13e0b1d85f766336eca8286a904e3080b4597f9c",
+    "writes": "NONE"
+  },
+  "backend_domain_reopened": false,
+  "new_dependencies": 0,
+  "new_migrations": 0,
+  "mvp03_started": false,
+  "regressions": "None observed in focused checks; earlier evidence remains historical."
+}

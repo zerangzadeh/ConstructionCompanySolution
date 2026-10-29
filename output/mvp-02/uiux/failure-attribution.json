@@ -1,0 +1,53 @@
+{
+  "classification": "PRE_EXISTING",
+  "count": 16,
+  "tests": [
+    "apps/workforce/tests.py::WorkforceModelTests::test_position_parent_must_be_active_and_position_with_active_child_cannot_archive",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_archival_preserves_records_and_blocks_active_dependencies",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_create_workforce_structure_employee_and_assignment_are_audited",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_employee_account_link_rejects_a_foreign_tenant_user",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_employee_and_assignment_transitions_are_atomic_and_audited",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_employee_can_be_created_from_an_active_member_account",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_employee_can_hold_multiple_positions_and_change_primary",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_employee_profile_image_update_is_tenant_scoped_and_audited",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_ending_primary_position_promotes_remaining_active_position",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_job_position_does_not_grant_system_workflow_permission",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_owner_links_and_unlinks_only_an_active_tenant_member",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_position_assignment_service_rejects_cross_tenant_employee",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_reads_and_mutations_enforce_tenant_scope",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_single_holder_position_rejects_a_second_active_employee",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_small_tenant_can_create_employee_without_structure_or_user",
+    "apps/workforce/tests.py::WorkforceServiceTests::test_viewer_can_read_but_cannot_mutate_workforce"
+  ],
+  "evidence": "All fail at unchanged _require_management_access -> require_business_permission, before reaching changed forms/views/widget. Legacy fixtures create role-field memberships without explicit effective role/scope assignments. No security assertions or guards were loosened.",
+  "source_hashes_unchanged_since_remediation_entry": {
+    "apps/workforce/tests.py": true,
+    "apps/workforce/services.py": true,
+    "apps/workforce/models.py": true,
+    "apps/organizations/authorization.py": true,
+    "apps/organizations/models.py": true
+  },
+  "other_run_findings": [
+    {
+      "classification": "STALE_TEST_EXPECTATION",
+      "issue": "Calendar label now contains its canonical business code; expectation updated."
+    },
+    {
+      "classification": "ATTRIBUTABLE",
+      "issue": "Remote failure had no visible retry when cached choices matched. Repaired and browser-tested."
+    },
+    {
+      "classification": "ATTRIBUTABLE",
+      "issue": "Native catalogue option count included shell selects; restricted to the field. Initial browser fixture supplied non-existent actor fields; repaired. An overlapping test run flushed shared test catalogues; subsequent validation runs are serial.",
+      "area": "verification_only; corrected"
+    },
+    {
+      "classification": "ATTRIBUTABLE",
+      "issue": "History worker dependency metadata and outer filter handling of unnamed widget inputs corrected; browser context-clear and integrated-filter search reruns PASS."
+    },
+    {
+      "classification": "ATTRIBUTABLE",
+      "issue": "New assignment filter lookup restricted to workers represented in authorized assignment history. Default lookup is denied for assignment-history-only viewers; dedicated regression added."
+    }
+  ]
+}

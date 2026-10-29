@@ -1,0 +1,112 @@
+{
+  "status": "READY_FOR_HUMAN_REVIEW",
+  "scope": "Existing Work Team registration flow; normal enhanced desktop/mobile Chrome",
+  "product_owner_visual_acceptance": "PENDING",
+  "date": "2026-10-29T07:27:48.428572+03:30",
+  "domain_findings": {
+    "ownership": "Organization-level; optional Department and Employee lead; no Project/Site fields",
+    "code": "Required manually supplied company-unique identifier; existing normalization preserved; no generator/default",
+    "edit": "No existing edit route/update service; new edit lifecycle not introduced"
+  },
+  "changes": [
+    "Five-level breadcrumb with authorized parent links; current item non-clickable",
+    "No HR eyebrow on this form in MVP or FULL_ERP",
+    "Integrated searchable Unit/Supervisor controls with explicit empty placeholders and business-name-first display",
+    "Existing active company-owned choices and organization-scope create authority preserved by guarded read-only lookup kinds",
+    "Explicit company scope text; global Project/Site context unchanged",
+    "Compact grid/spacing/full-width description and bottom Save/Cancel actions",
+    "Native catalog refresh cannot create a team"
+  ],
+  "automated": {
+    "tests_passed": 23,
+    "subtests_passed": 31,
+    "failures": 0,
+    "log": "final-scope-validation.log",
+    "coverage": [
+      "Tenant and active-master validation",
+      "Organization-level lookup authority; project-only grants denied",
+      "No unrelated employee/project lookup grants",
+      "65-record department catalog, paging/search and selected-value retention",
+      "Native catalog completeness and non-mutating refresh",
+      "Manual code required/canonicalized; optional Unit/Supervisor",
+      "Existing Workforce UI/context/assignment regressions"
+    ]
+  },
+  "browser": {
+    "passed": 6,
+    "failed": 0,
+    "viewports": [
+      1440,
+      390
+    ],
+    "results": "browser/mvp02-team-form-owner-results.json",
+    "scenarios": [
+      "TEAMFORM-empty-desktop",
+      "TEAMFORM-validation-desktop",
+      "TEAMFORM-submit-desktop",
+      "TEAMFORM-empty-mobile",
+      "TEAMFORM-validation-mobile",
+      "TEAMFORM-submit-mobile"
+    ],
+    "global_session_unchanged": true,
+    "screenshots_visually_inspected": [
+      "browser/mvp02-team-form-owner-TEAMFORM-empty-desktop.png",
+      "browser/mvp02-team-form-owner-TEAMFORM-empty-mobile.png",
+      "browser/mvp02-team-form-owner-TEAMFORM-validation-mobile.png"
+    ]
+  },
+  "known_out_of_scope_findings": [
+    {
+      "classification": "OUT_OF_SCOPE_EXISTING_SHARED_LAYOUT",
+      "condition": "All JavaScript disabled; Tailwind CDN utility/preflight generation does not run",
+      "observed": "Application-wide unstyled navigation and content-box overflow; native catalog remains complete",
+      "sources": [
+        "templates/base.html",
+        "browser/mvp02-team-form-owner-overflow-diagnostic.json",
+        "browser/mvp02-team-form-owner-overflow-diagnostic.png"
+      ],
+      "evidence_logs": [
+        "browser-final.log",
+        "native-diagnostic.log"
+      ],
+      "scope_boundary": "No global styling/build remediation or full no-JS visual PASS claimed"
+    }
+  ],
+  "failed_attempts": {
+    "validation.log": "STALE_TEST_EXPECTATION: actual Persian required message differs from test expectation",
+    "final-validation.log": "TEST_DRIVER_ERROR: fill-only step awaited navigation; corrected to combined fill/submit",
+    "browser-final.log": "OUT_OF_SCOPE_EXISTING_SHARED_LAYOUT: no-JS Tailwind runtime absent",
+    "native-diagnostic.log": "Reproduced no-JS layout finding and captured geometry/screenshot"
+  },
+  "static_checks": [
+    "Ruff PASS: field_views.py, field_journey.py, test_mvp02_uiux.py, test_mvp02_browser.py",
+    "AST PASS: legacy forms.py and views.py",
+    "Node syntax PASS: browser verification script"
+  ],
+  "source_files": {
+    "apps/workforce/forms.py": "368c3b3dbf97c748ebf962207c774e736bfc340dd5e8bf91f5ba507d46655a9a",
+    "apps/workforce/views.py": "1c6dc2f0293722b903ac2db8cce60accf51f22d7b05d00d7f097455e25909f75",
+    "apps/workforce/field_views.py": "e6ac32964c0f83eb791b9c0cc4f213511c601eeeae65f9f1d73ebac573bff726",
+    "apps/workforce/templatetags/field_journey.py": "28a6c4f4fe689b0efa251c01a19d745e8d533695a81cf59136d43a7c7e67fc96",
+    "templates/workforce/form.html": "81610924b2695f94ce471d799ad6d3632c21f5d06f5848cc984859cdf62acaa5",
+    "apps/workforce/test_mvp02_uiux.py": "a736d8d6d09e35ff9beff810655c83385ace6b3196482ec6b2601fcf55018b4d",
+    "apps/workforce/test_mvp02_browser.py": "3d5d2245ccf3452911810875058f76cddcd43e697dd9b6816b9c5dd45a74d64a",
+    "docs/governance/mvp/MVP-02_UIUX_REMEDIATION_REPORT.md": "a912cb859c9714e4d15ca0e5bdea8b9b4d86398e1e0a2e5b6e45ab22fdc97875",
+    "scripts/verification/mvp02_browser.mjs": "8d83b6f87b411a878204ee02480a9b5a4474eaa2b9c9b2aa5112ec146d646e82"
+  },
+  "source_boundaries": {
+    "protected_unchanged": 576,
+    "protected_changed": [],
+    "unexpected_prior_source_changes": []
+  },
+  "git": {
+    "head": "13e0b1d85f766336eca8286a904e3080b4597f9c",
+    "branch": "main",
+    "ahead_behind": "0\t0",
+    "writes": "NONE"
+  },
+  "new_migrations": false,
+  "new_dependencies": false,
+  "mvp03_started": false,
+  "prior_pending_followup": "assignment-flow/VALIDATION.json: optional assignment end-date meaning still awaiting Human decision; not reopened"
+}

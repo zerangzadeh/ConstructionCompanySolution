@@ -1,0 +1,6 @@
+{% load field_journey %}
+<div data-workforce-header>
+{% include "components/page_header.html" with page_title=page_title page_description=page_description page_eyebrow=page_eyebrow page_breadcrumbs=page_breadcrumbs page_breadcrumb_label=page_breadcrumb_label page_breadcrumb_url=page_breadcrumb_url page_action_url=page_action_url page_action_label=page_action_label page_actions_near_title=True only %}
+{% field_navigation %}
+{% if not page_filters %}{% include "workforce/_field_context.html" %}{% endif %}
+</div>

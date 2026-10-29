@@ -420,6 +420,53 @@ For nested navigation:
 
 Do not render duplicate navigation systems.
 
+For the MVP Workforce surface, `نیروهای کار` is the primary navigation entry.
+Assignment management (`تخصیص نیرو به پروژه و کارگاه`) remains MVP-visible through
+one compact, permission-aware internal Workforce navigation alongside `نیروها`
+and `گروه‌های کاری`; do not repeat Assignment as a peer sidebar/Home/mobile
+primary destination. Keep the Workforce parent active on its assignment and team
+pages through the centralized navigation metadata. Preserve direct/contextual
+routes, capability exposure, and independent business permissions. Assignment
+history and the worker master/current-state projection remain distinct tasks.
+
+Use the shared Workforce header on every MVP list, detail and form page, including
+team creation and compatibility entry URLs. Render the three internal tabs in
+the same order, immediately after the page header, before Project/Site context
+or page content. Put page-level primary actions in the header action area with
+the shared near-title layout; do not create a separate primary toolbar above the
+tabs. Keep the tabs in one row, with contained horizontal scrolling when needed
+on narrow screens. Keep record-specific actions with their record and form submission controls
+with their form. Preserve permission-filtered tabs and the active destination.
+
+Workforce breadcrumbs follow `خانه → عملیات پروژه و کارگاه → نیروهای کار`;
+the assignment list appends `تخصیص نیرو به پروژه و کارگاه`. Keep the section
+inside this chain, without a separate section eyebrow. Home and available parent
+destinations are links; Operations links to its existing Home section. Respect
+the centralized navigation's permissions/exposure and preserve validated context
+on the Workforce parent link. The final current item is non-clickable and uses
+`aria-current="page"`. Allow the chain to wrap on mobile.
+
+On the assignment page, keep `تخصیص جدید` beside the title in the header action
+area, with a stacked layout on mobile. Use `تاریخ شروع از` / `تاریخ شروع تا` for
+its date filters, compact filter rows, and the existing neutral badge for
+`بدون تخصیص فعال` in the workforce projection.
+
+For MVP Work Teams, use the Operations → Workforce → Work Teams breadcrumb
+hierarchy without the legacy HR eyebrow. Keep create in the shared header action
+area. Render the team/department/lead filters, explicit apply and clear together
+in one compact RTL block below the tabs, including empty results; suppress the
+base layout's automatic duplicate controls through its scoped block override.
+
+Company/Project/Site in the global selector is active application context.
+Workforce/Assignment list Project/Site controls are page filters, with a visible
+page-filter caption. Default them from the middleware's validated global values
+only when no explicit page selection/clear exists. Page filter changes and clear
+must never write global session context. Preserve the explicit clear marker,
+Project → Site cascading and server validation. Do not repeat the page filter
+selection as an unlabelled context summary below the tabs. Mutation forms and
+domain source-of-truth behavior retain their existing contracts.
+
+
 ### Top Header
 
 Keep compact.
@@ -1386,6 +1433,23 @@ Native selects are acceptable for small stable sets. Use a searchable selector
 when option count, duplicate names, or remote filtering makes a native select
 error-prone.
 
+For MVP-visible forms, references to existing Master Data/business entities must
+use one coherent business-facing selector. Free-text canonical names, raw
+IDs/UUIDs, duplicate selector/name fields, and multi-control pseudo-selects
+(search input + search button + second select) are unacceptable without a
+demonstrated business reason. Search belongs inside the selection interaction.
+Technical search/result limits are not business UI; load or search further valid
+results within the same control. Related masters cascade according to section 38.
+
+MVP-02 uses the shared `SearchChoiceSelect` with locally pinned Tom Select 2.6.2
+(core plus virtual-scroll plugin), Persian labels, RTL, escaped business labels,
+debounced and paginated authorized lookups, selected-value retention, and the
+existing native form submission/validation boundary. Only consuming forms load
+its media. The opt-in simple-list fallback evaluates the already scoped queryset
+when JavaScript is unavailable; updating dependent lists must not write records.
+This implementation is qualified for the remediated MVP-02 surfaces, not an
+instruction to rewrite unrelated forms or an assertion of Product Owner approval.
+
 - Search by the identifiers users know: code/number, title/name, and approved
   alternate identifier. Show code plus name, not a name-only ambiguous list.
 - Debounce remote requests, enforce a minimum query length where appropriate,
@@ -1664,6 +1728,12 @@ Human UAT criteria. Recognize `MVP` release and `FULL_ERP` internal verification
 profiles without assuming runtime switches exist. Preserve historical
 hidden-capability UAT as regression evidence; backend presence or prior finding
 closure is not customer-exposure acceptance.
+
+Every UI package requires Human visual acceptance before Product Owner closure.
+Automated functional PASS and browser interaction PASS do not grant visual
+acceptance. Record remediation as `READY_FOR_HUMAN_REVIEW` only after its required
+checks/evidence pass; Product Owner visual acceptance remains `PENDING` until the
+Human Product Owner explicitly accepts it.
 
 Before a new or materially changed screen is accepted, verify:
 

@@ -8,7 +8,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 
-from apps.accounts.models import validate_profile_image
+from apps.accounts.models import validate_iranian_national_id, validate_profile_image
 from apps.documents.models import AbstractTypedDocumentLink
 from core.identifiers import canonicalize_upper_identifier
 from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
@@ -512,9 +512,26 @@ class Employee(UUIDModel, TimeStampedModel):
                 }
             )
 
+        from .identity_integrity import validate_employee_identity
+
+        validate_employee_identity(self)
+
     def save(self, *args: object, **kwargs: object) -> None:
-        self.full_clean(validate_constraints=False)
-        super().save(*args, **kwargs)
+        from .identity_integrity import identity_write_lock
+
+        update_fields = kwargs.get("update_fields")
+        if update_fields is not None and not {
+            "user",
+            "user_id",
+            "organization",
+            "organization_id",
+        }.intersection(update_fields):
+            self.full_clean(validate_constraints=False)
+            super().save(*args, **kwargs)
+            return
+        with identity_write_lock():
+            self.full_clean(validate_constraints=False)
+            super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.employee_number} - {self.first_name} {self.last_name}"
@@ -528,6 +545,13 @@ class Person(UUIDModel, TimeStampedModel):
     )
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
+    national_id = models.CharField(
+        "کد ملی",
+        max_length=10,
+        null=True,
+        blank=True,
+        validators=[validate_iranian_national_id],
+    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -542,6 +566,12 @@ class Person(UUIDModel, TimeStampedModel):
                 fields=["organization", "user"],
                 condition=Q(user__isnull=False),
                 name="unique_person_user_per_org",
+            ),
+            models.UniqueConstraint(
+                fields=["organization", "national_id"],
+                condition=Q(national_id__isnull=False),
+                name="unique_person_national_id_per_org",
+                violation_error_message="این کد ملی قبلاً برای نیروی دیگری در شرکت ثبت شده است.",
             ),
         ]
 
@@ -561,9 +591,17 @@ class Person(UUIDModel, TimeStampedModel):
                 {"user": "User must be an active organization member."}
             )
 
+        from .identity_integrity import validate_person_identity
+
+        validate_person_identity(self)
+
     def save(self, *args: object, **kwargs: object) -> None:
-        self.full_clean()
-        super().save(*args, **kwargs)
+        from .identity_integrity import identity_write_lock, normalize_national_id
+
+        self.national_id = normalize_national_id(self.national_id)
+        with identity_write_lock():
+            self.full_clean()
+            super().save(*args, **kwargs)
 
 
 class WorkRelationship(UUIDModel, TimeStampedModel):
@@ -641,15 +679,31 @@ class WorkRelationship(UUIDModel, TimeStampedModel):
                 raise ValidationError(
                     {"legacy_employee": "Legacy User link conflicts with Person."}
                 )
+            if (
+                self.legacy_employee.user_id
+                and self.person.national_id
+                and self.legacy_employee.user.national_id
+                and self.person.national_id != self.legacy_employee.user.national_id
+            ):
+                raise ValidationError(
+                    {"legacy_employee": "کد ملی هویت و حساب سازگار نیست."}
+                )
         validate_related_organizations(self, **relations)
 
     def save(self, *args: object, **kwargs: object) -> None:
-        self.full_clean()
-        if self._state.adding is False:
-            raise ValidationError(
-                "WorkRelationship changes require a versioned service."
-            )
-        super().save(*args, **kwargs)
+        from .identity_integrity import identity_write_lock
+
+        with identity_write_lock():
+            self.full_clean()
+            if self._state.adding is False:
+                raise ValidationError(
+                    "WorkRelationship changes require a versioned service."
+                )
+            super().save(*args, **kwargs)
+            from .identity_integrity import validate_person_identity
+
+            self.person.refresh_from_db()
+            validate_person_identity(self.person)
 
     def delete(self, *args: object, **kwargs: object) -> None:
         raise ValidationError("WorkRelationship history cannot be deleted.")
@@ -864,12 +918,14 @@ class EmployeeQualification(UUIDModel, TimeStampedModel):
 
     @property
     def validity_status(self) -> str:
-        if self.lifecycle_events.filter(
-            kind__in=[
+        if any(
+            event.kind
+            in (
                 QualificationLifecycleEventKind.REVOKED,
                 QualificationLifecycleEventKind.SUPERSEDED,
-            ]
-        ).exists():
+            )
+            for event in self.lifecycle_events.all()
+        ):
             return "revoked"
         if self.valid_until and self.valid_until < timezone.localdate():
             return "expired"
@@ -1267,6 +1323,9 @@ class EmployeeProjectAssignment(UUIDModel, TimeStampedModel):
     )
     role_title = models.CharField("مسئولیت در پروژه", max_length=255, blank=True)
     start_date = models.DateField("تاریخ شروع تخصیص")
+    planned_end_date = models.DateField(
+        "تاریخ پایان برنامه‌ریزی‌شده", null=True, blank=True
+    )
     end_date = models.DateField("تاریخ پایان تخصیص", null=True, blank=True)
     status = models.CharField(
         "وضعیت تخصیص",
@@ -1307,6 +1366,11 @@ class EmployeeProjectAssignment(UUIDModel, TimeStampedModel):
                 condition=Q(status=AssignmentStatus.ACTIVE, site__isnull=False),
                 name="unique_active_employee_site_assignment",
             ),
+            models.CheckConstraint(
+                condition=Q(planned_end_date__isnull=True)
+                | Q(planned_end_date__gte=models.F("start_date")),
+                name="assignment_planned_end_not_before_start",
+            ),
         ]
         indexes = [  # noqa: RUF012
             models.Index(
@@ -1326,6 +1390,14 @@ class EmployeeProjectAssignment(UUIDModel, TimeStampedModel):
         )
         if self.site_id and self.project_id and self.site.project_id != self.project_id:
             raise ValidationError({"site": "کارگاه باید متعلق به پروژه باشد."})
+        if (
+            self.planned_end_date
+            and self.start_date
+            and self.planned_end_date < self.start_date
+        ):
+            raise ValidationError(
+                {"planned_end_date": "تاریخ پایان برنامه‌ریزی‌شده نمی‌تواند پیش از تاریخ شروع باشد."}
+            )
         if self.end_date and self.end_date < self.start_date:
             raise ValidationError(
                 {"end_date": "تاریخ پایان نمی‌تواند پیش از تاریخ شروع باشد."}

@@ -1,0 +1,52 @@
+{
+  "commands": [
+    {
+      "command": [
+        ".venv/Scripts/ruff.exe",
+        "check",
+        "apps/workforce/templatetags/field_journey.py",
+        "apps/workforce/test_mvp02_uiux.py",
+        "apps/workforce/test_mvp02_browser.py"
+      ],
+      "exit_code": 0,
+      "stdout": "All checks passed!\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        ".venv/Scripts/ruff.exe",
+        "format",
+        "--check",
+        "apps/workforce/templatetags/field_journey.py",
+        "apps/workforce/test_mvp02_uiux.py",
+        "apps/workforce/test_mvp02_browser.py"
+      ],
+      "exit_code": 0,
+      "stdout": "3 files already formatted\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "warning: in the working copy of 'Agents.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/workforce/services.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/workforce/test_cep026_ess_privacy.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/templatetags/product_surface.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'docs/architecture/PRODUCT_VISION_AND_MVP_RELEASE_STRATEGY.md', LF will be replaced by CRLF the next time Git touches it\n"
+    }
+  ],
+  "templates_compiled": [
+    "workforce/_field_header.html",
+    "workforce/_field_navigation.html",
+    "workforce/field_list.html",
+    "workforce/field_detail.html",
+    "workforce/field_form.html",
+    "workforce/assignment_list.html",
+    "workforce/assignment_form.html",
+    "workforce/work_team_list.html",
+    "workforce/form.html"
+  ],
+  "django_check_issues": [],
+  "protected_sources_unchanged": 611
+}
