@@ -1,10 +1,21 @@
 from django.urls import path
 
-from . import views
+from . import journey_views, views
 
 app_name = "billing"
 
 urlpatterns = [
+    path(
+        "choices/<str:purpose>/<str:kind>/",
+        journey_views.choices,
+        name="journey_choices",
+    ),
+    path("claims/new/", journey_views.claim_create, name="claim_create"),
+    path(
+        "claims/<uuid:claim_id>/actions/<str:action>/",
+        journey_views.claim_action,
+        name="claim_action",
+    ),
     path(
         "statutory-operations/",
         views.statutory_operations_dashboard,

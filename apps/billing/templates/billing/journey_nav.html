@@ -1,0 +1,5 @@
+<nav class="mt-4 flex gap-2 overflow-x-auto border-b border-slate-200 pb-2 text-sm" aria-label="صورت‌وضعیت و اندازه‌گیری">
+{% if 'claims.view' in business_permission_codes %}<a class="erp-btn erp-btn--secondary shrink-0" href="{% url 'billing:claim_list' %}{% if request.GET.contract %}?contract={{ request.GET.contract }}{% endif %}" {% if request.resolver_match.url_name == 'claim_list' %}aria-current="page"{% endif %}>صورت‌وضعیت‌ها</a>{% endif %}
+{% if 'baselines.view' in business_permission_codes %}<a class="erp-btn erp-btn--secondary shrink-0" href="{% url 'billing:baseline_list' %}{% if request.GET.contract %}?contract={{ request.GET.contract }}{% endif %}" {% if request.resolver_match.url_name == 'baseline_list' %}aria-current="page"{% endif %}>مبناهای اندازه‌گیری</a>{% endif %}
+{% if 'progress.view' in business_permission_codes %}<a class="erp-btn erp-btn--secondary shrink-0" href="{% url 'billing:progress_list' %}{% if request.GET.contract %}?contract={{ request.GET.contract }}{% endif %}" {% if request.resolver_match.url_name == 'progress_list' %}aria-current="page"{% endif %}>پیشرفت کار</a>{% endif %}
+</nav>

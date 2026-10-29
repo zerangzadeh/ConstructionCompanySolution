@@ -10,7 +10,7 @@
     const url = new URL(select.dataset.optionsUrl, location.origin);
     url.searchParams.set('q', query);
     // Explicitly replace previous journey context, including values cleared by the user.
-    for (const name of ['project', 'site', 'calendar']) {
+    for (const name of new Set(['project', 'site', 'calendar', ...(select.dataset.choiceParents || '').split(' ').filter(Boolean)])) {
       const field = parent(select, name);
       if (field) {
         url.searchParams.delete(name);
@@ -101,14 +101,14 @@
         widget.loadedSearches = {};
         widget.setTextboxValue('');
         const first = select.dataset.dependsOn?.split(' ')[0];
-        const blocked = ['site', 'activity', 'shift'].includes(select.dataset.businessChoice) && first && !parent(select, first)?.value;
+        const blocked = (select.dataset.requiresParent === 'true' || ['site', 'activity', 'shift'].includes(select.dataset.businessChoice)) && first && !parent(select, first)?.value;
         blocked ? widget.disable() : widget.enable();
         message(blocked ? 'ابتدا گزینه بالادست را انتخاب کنید.' : 'فهرست به‌روز شد؛ دوباره انتخاب کنید.');
       };
       const dependencies = select.dataset.dependsOn?.split(' ').filter(Boolean) || [];
       for (const name of dependencies) parent(select, name)?.addEventListener('change', reset);
       const requiredParent = dependencies[0];
-      if (['site', 'activity', 'shift'].includes(select.dataset.businessChoice) && requiredParent && !parent(select, requiredParent)?.value) widget.disable();
+      if ((select.dataset.requiresParent === 'true' || ['site', 'activity', 'shift'].includes(select.dataset.businessChoice)) && requiredParent && !parent(select, requiredParent)?.value) widget.disable();
       select.closest('[data-field-search]').addEventListener('click', event => {
         if (event.target.closest('[data-choice-retry]')) {
           widget.loadedSearches = {};

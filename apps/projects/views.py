@@ -17,6 +17,7 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from apps.projects.business_hub import project_commercial_summary
 from apps.projects.forms import (
     ActivityForm,
     ProjectForm,
@@ -178,7 +179,11 @@ def project_detail(request: HttpRequest, project_id: str) -> HttpResponse:
     return render(
         request,
         "projects/detail.html",
-        {"project": project, "cost_projection": cost_projection},
+        {
+            "project": project,
+            "cost_projection": cost_projection,
+            "commercial_summary": project_commercial_summary(request, project),
+        },
     )
 
 
@@ -308,6 +313,8 @@ def project_photo_add(request: HttpRequest, project_id: str) -> HttpResponse:
         {"project": project, "form": form},
         status=400 if request.method == "POST" else 200,
     )
+
+
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.PROJECT_SITES_VIEW)
 @require_GET
@@ -669,7 +676,9 @@ def project_controls_comparison(request: HttpRequest, project_id: str) -> HttpRe
 
 
 @active_organization_required
-@organization_permission_required(BusinessPermissionCode.PROJECT_CONTROLS_EXCEPTIONS_VIEW)
+@organization_permission_required(
+    BusinessPermissionCode.PROJECT_CONTROLS_EXCEPTIONS_VIEW
+)
 @require_GET
 def project_controls_exceptions(request: HttpRequest, project_id: str) -> HttpResponse:
     project = get_organization_project(

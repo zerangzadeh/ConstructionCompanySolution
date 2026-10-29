@@ -3,6 +3,7 @@ import uuid
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from apps.contracts.commercial_review import get_commercial_review
@@ -38,6 +39,8 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from apps.projects.business_hub import filter_project_context
+from core.business_choices import contextual_url
 from core.list_filters import (
     apply_table_filters,
     build_table_filters,
@@ -50,10 +53,13 @@ from core.list_filters import (
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.CONTRACTS_VIEW)
 def contract_list(request: HttpRequest) -> HttpResponse:
+    from apps.billing.journey_views import journey_breadcrumbs
+
     contracts = get_organization_contracts(
         user=request.user,
         organization=request.organization,
     )
+    contracts, selected_project = filter_project_context(request, contracts)
     contracts = apply_table_filters(
         contracts,
         request,
@@ -81,6 +87,13 @@ def contract_list(request: HttpRequest) -> HttpResponse:
         "contracts/list.html",
         {
             "contracts": page.object_list,
+            "selected_project": selected_project,
+            "create_url": contextual_url(
+                "contracts:create", project=selected_project.pk
+            )
+            if selected_project
+            else reverse("contracts:create"),
+            "page_breadcrumbs": journey_breadcrumbs("قراردادها"),
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
             "can_manage_contracts": can_manage_contracts(
@@ -115,17 +128,25 @@ def contract_create(request: HttpRequest) -> HttpResponse:
         membership=get_active_membership(
             user=request.user, organization=request.organization
         ),
+        initial={
+            "project": request.GET.get("project")
+            or getattr(request.active_project, "pk", None)
+        },
     )
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and form.is_valid()
+    ):
         data = form.cleaned_data
         try:
-            create_contract(
+            contract = create_contract(
                 organization=request.organization,
                 project=data["project"],
                 actor=request.user,
                 contract_number=data["contract_number"],
                 title=data["title"],
-                counterparty_name=data["counterparty_name"],
+                counterparty_name=data["party"].display_name,
                 party=data["party"],
                 direction=data["direction"] or None,
                 contract_type=data["contract_type"] or None,
@@ -139,8 +160,19 @@ def contract_create(request: HttpRequest) -> HttpResponse:
         except (PermissionDenied, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
-            return redirect("contracts:list")
-    return render(request, "contracts/create.html", {"form": form})
+            return redirect("contracts:detail", contract_id=contract.pk)
+    from apps.billing.journey_views import journey_breadcrumbs
+
+    return render(
+        request,
+        "contracts/create.html",
+        {
+            "form": form,
+            "page_breadcrumbs": journey_breadcrumbs(
+                "قرارداد جدید", collection=("قراردادها", "contracts:list")
+            ),
+        },
+    )
 
 
 @active_organization_required
@@ -171,11 +203,62 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
             term.insurance_form = ContractInsuranceClassificationForm(
                 on_date=term.effective_from, prefix=str(term.pk)
             )
+    from apps.billing.journey_views import claim_create_allowed, journey_breadcrumbs
+    from apps.billing.services import get_progress_claims, get_project_baselines
+    from apps.estimates.services import get_organization_estimates
+
+    def permitted(permission):
+        return has_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission=permission,
+            project=contract.project,
+        )
+
+    related_estimates = (
+        get_organization_estimates(
+            user=request.user, organization=request.organization
+        ).filter(contract=contract)
+        if permitted(BusinessPermissionCode.ESTIMATES_VIEW)
+        else None
+    )
+    related_claims = (
+        get_progress_claims(
+            actor=request.user, organization=request.organization
+        ).filter(contract=contract)
+        if permitted(BusinessPermissionCode.CLAIMS_VIEW)
+        else None
+    )
+    related_baselines = (
+        get_project_baselines(
+            actor=request.user, organization=request.organization
+        ).filter(contract=contract)
+        if permitted(BusinessPermissionCode.BASELINES_VIEW)
+        else None
+    )
     return render(
         request,
         "contracts/detail.html",
         {
             "contract": contract,
+            "page_breadcrumbs": journey_breadcrumbs(
+                contract.title, collection=("قراردادها", "contracts:list")
+            ),
+            "related_estimates": related_estimates,
+            "related_claims": related_claims,
+            "related_baselines": related_baselines,
+            "estimate_list_url": contextual_url("estimates:list", contract=contract),
+            "baseline_list_url": contextual_url(
+                "billing:baseline_list", contract=contract
+            ),
+            "claim_list_url": contextual_url("billing:claim_list", contract=contract),
+            "claim_create_url": contextual_url(
+                "billing:claim_create", contract=contract
+            )
+            if contract.direction == "receivable"
+            and contract.status == "active"
+            and claim_create_allowed(request)
+            else "",
             "term_versions": terms,
             "can_review_commercial": has_business_permission(
                 user=request.user,

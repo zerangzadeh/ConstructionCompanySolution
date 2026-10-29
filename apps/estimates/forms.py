@@ -10,6 +10,7 @@ from apps.organizations.form_scoping import (
     selected_form_project,
 )
 from apps.projects.models import Project, ProjectPhase
+from core.business_choices import configure_business_choice
 from core.forms import JalaliDateMixin
 from core.identifiers import canonicalize_upper_identifier
 
@@ -64,10 +65,12 @@ class EstimateForm(JalaliDateMixin, forms.ModelForm):
         self.fields["project"].queryset = projects
         self.fields["project"].widget.attrs["data-cascade-project"] = ""
         selected_project = selected_form_project(
-            data=self.data if self.is_bound else None,
+            data=self.data if self.is_bound else self.initial,
             field_name=self.add_prefix("project"),
             projects=projects,
-            active_project=active_project,
+            active_project=None
+            if self.is_bound or "project" in self.initial
+            else active_project,
         )
         if not self.is_bound and selected_project is not None:
             self.initial.setdefault("project", selected_project.pk)
@@ -115,11 +118,13 @@ class EstimateForm(JalaliDateMixin, forms.ModelForm):
                 {
                     "data-cascade-field": field_name,
                     "data-cascade-source": "estimates",
-                    "data-options-url": reverse(
-                        "organizations:form_context_options"
-                    ),
+                    "data-options-url": reverse("organizations:form_context_options"),
                     "data-empty-label": empty_label,
                 }
+            )
+        for name in ("project", "contract", "phase"):
+            configure_business_choice(
+                self, name, "estimate", parent="project" if name != "project" else None
             )
 
     def clean(self):
@@ -154,6 +159,9 @@ class EstimateItemForm(JalaliDateMixin, forms.ModelForm):
         self.fields["unit_of_measure"].queryset = UnitOfMeasure.objects.filter(
             organization=organization, is_active=True, archived_at__isnull=True
         ).order_by("name")
+        self.fields.pop("unit")
+        self.fields["unit_of_measure"].required = True
+        configure_business_choice(self, "unit_of_measure", "estimate_item")
 
     class Meta:
         model = EstimateItem

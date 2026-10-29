@@ -286,9 +286,10 @@ For values that must be visually aligned for comparison, combine `ss01` with
 tabular figures (`tnum`) and use the shared numeric styles. Do not introduce a
 second font or page-specific numeral CSS.
 
-Keep technical identifiers such as project codes, contract numbers, SKUs, UUIDs,
-and account identifiers canonical and LTR/isolated. Their display formatting
-must not alter their stored value or their copy/paste behavior.
+Keep permitted business identifiers such as project codes, contract numbers and
+SKUs canonical and LTR/isolated. Their display formatting must not alter their
+stored value or copy/paste behavior. Section 7 governs whether an identifier may
+be shown at all.
 
 For editable money fields, use the shared `erp_money` behavior: show Persian
 digits and thousands grouping to the user, then normalize the value before the
@@ -301,7 +302,27 @@ Typography must be centralized globally.
 
 ## 7. Technical and LTR Values
 
+### Customer-facing MVP technical leakage
+
+Present approved business concepts, not implementation details. Customer-facing
+MVP pages, forms, filters, choices, messages and navigation must not expose:
+
+- framework terminology or backend model/app names;
+- UUIDs, internal database identifiers or idempotency/retry keys;
+- raw enum keys or database values in place of business labels;
+- technical pagination/option limits or search implementation details; or
+- implementation-specific workflow terminology instead of the user's business
+  task, state or action.
+
+Translate these into meaningful business labels and messages without changing
+stored values, workflow semantics or domain ownership. Useful business codes
+remain distinct from internal identifiers; section 39 governs their selector
+presentation. Internal technical/admin surfaces retain their authorized scope.
+
+### Direction and canonical representation
+
 Technical/business values must preserve their canonical representation.
+These formatting rules do not authorize exposing a technical value to customers.
 
 Use explicit LTR rendering for:
 
@@ -309,14 +330,14 @@ Use explicit LTR rendering for:
 - contract numbers
 - estimate numbers
 - payment numbers
-- UUIDs
+- UUIDs on authorized internal technical surfaces only
 - usernames where needed
 - emails
 - URLs
 - IP addresses
 - hashes
 - file names where appropriate
-- technical identifiers
+- technical identifiers on authorized internal technical surfaces only
 - monetary/numeric values when mixed-direction rendering is confusing
 
 Do not automatically convert technical identifiers to Persian digits.
@@ -377,6 +398,21 @@ hidden. UI hiding preserves backend domains and required handoffs. A visible
 journey must not require the user to browse a hidden workspace. These are
 approved targets, not claims about the currently rendered shell or routes.
 
+### Business navigation hierarchy
+
+Breadcrumbs, page titles, persistent tabs, sidebar navigation and contextual
+links must describe the same customer-facing Product Surface hierarchy. Derive
+their placement and labels from the approved capability hierarchy, not backend
+app/module ownership. HR, Django app names and internal architecture must not
+become customer-facing MVP hierarchy unless the concept itself is approved as
+part of the product. This presentation boundary does not change domain ownership.
+
+Keep meaningful, permitted breadcrumb parents clickable; render the current
+page as the final non-clickable item with `aria-current="page"`. Keep section
+levels inside the breadcrumb chain rather than as unrelated hierarchy labels.
+Respect exposure, permissions and validated contextual links, and allow the
+chain to wrap on mobile.
+
 The approved desktop shell uses:
 
 - dark navy/slate right sidebar
@@ -429,44 +465,6 @@ pages through the centralized navigation metadata. Preserve direct/contextual
 routes, capability exposure, and independent business permissions. Assignment
 history and the worker master/current-state projection remain distinct tasks.
 
-Use the shared Workforce header on every MVP list, detail and form page, including
-team creation and compatibility entry URLs. Render the three internal tabs in
-the same order, immediately after the page header, before Project/Site context
-or page content. Put page-level primary actions in the header action area with
-the shared near-title layout; do not create a separate primary toolbar above the
-tabs. Keep the tabs in one row, with contained horizontal scrolling when needed
-on narrow screens. Keep record-specific actions with their record and form submission controls
-with their form. Preserve permission-filtered tabs and the active destination.
-
-Workforce breadcrumbs follow `خانه → عملیات پروژه و کارگاه → نیروهای کار`;
-the assignment list appends `تخصیص نیرو به پروژه و کارگاه`. Keep the section
-inside this chain, without a separate section eyebrow. Home and available parent
-destinations are links; Operations links to its existing Home section. Respect
-the centralized navigation's permissions/exposure and preserve validated context
-on the Workforce parent link. The final current item is non-clickable and uses
-`aria-current="page"`. Allow the chain to wrap on mobile.
-
-On the assignment page, keep `تخصیص جدید` beside the title in the header action
-area, with a stacked layout on mobile. Use `تاریخ شروع از` / `تاریخ شروع تا` for
-its date filters, compact filter rows, and the existing neutral badge for
-`بدون تخصیص فعال` in the workforce projection.
-
-For MVP Work Teams, use the Operations → Workforce → Work Teams breadcrumb
-hierarchy without the legacy HR eyebrow. Keep create in the shared header action
-area. Render the team/department/lead filters, explicit apply and clear together
-in one compact RTL block below the tabs, including empty results; suppress the
-base layout's automatic duplicate controls through its scoped block override.
-
-Company/Project/Site in the global selector is active application context.
-Workforce/Assignment list Project/Site controls are page filters, with a visible
-page-filter caption. Default them from the middleware's validated global values
-only when no explicit page selection/clear exists. Page filter changes and clear
-must never write global session context. Preserve the explicit clear marker,
-Project → Site cascading and server validation. Do not repeat the page filter
-selection as an unlabelled context summary below the tabs. Mutation forms and
-domain source-of-truth behavior retain their existing contracts.
-
-
 ### Top Header
 
 Keep compact.
@@ -490,9 +488,10 @@ Standard page hierarchy:
 
 1. Breadcrumb
 2. Page header
-3. Optional KPI/summary area
-4. Main content
-5. Related sections/actions
+3. Persistent business sub-navigation/tabs, when applicable
+4. Optional KPI/summary or filter area
+5. Main content
+6. Related sections/actions
 
 Page header should contain:
 
@@ -502,6 +501,20 @@ Page header should contain:
 - primary action
 
 Prefer shared page-header components.
+
+### Sibling page header contract
+
+- Use the same header area for page title and short description across sibling
+  business pages, including list, detail, create/edit and compatibility URLs.
+- Keep the primary create action (`+ New ...`) in the same header-action
+  position. Responsive stacking may change its layout, not its ownership. Do not
+  move it into filters, tables or arbitrary page toolbars.
+- Render persistent internal navigation directly below the page header, in the
+  same location and order on sibling pages, before filters or primary content.
+  Preserve permission-filtered destinations and a clear active state. Keep one
+  tab row with contained horizontal scrolling where needed on narrow screens.
+- Keep record-specific actions with their record and submit/cancel controls
+  with their form; these do not replace the page-header create action.
 
 Shared template includes must use valid Django template syntax and must not be duplicated or rendered as literal text.
 
@@ -570,6 +583,10 @@ Desktop pattern:
 - results remain dominant
 
 Do not expose unsupported filters.
+
+Label page filters as query scope, following section 37. Keep explicit Apply and
+Clear controls inside the same compact filter block, including empty results;
+avoid detached or duplicate filter controls.
 
 ---
 
@@ -703,7 +720,7 @@ Approved detail-page structure:
 1. Breadcrumb
 2. Strong entity header
 3. Title
-4. LTR code/identifier
+4. Business code/number, with LTR isolation where needed
 5. Semantic status badge
 6. Primary/secondary actions
 7. Compact KPI summary where useful
@@ -712,6 +729,9 @@ Approved detail-page structure:
 10. Related-domain lists
 
 Project Detail remains the strongest operational reference.
+
+Record-section tabs do not replace the persistent sibling-page navigation
+defined in section 10.
 
 Prefer read-only information sections over disabled form inputs.
 
@@ -1275,6 +1295,8 @@ For future work:
 6. Keep changes incremental.
 7. Avoid repeated redesign cycles without real user feedback.
 
+For UI-impacting MVP work, apply the visual acceptance gate in section 51.
+
 Once a pattern is approved, treat it as stable.
 
 ---
@@ -1368,6 +1390,16 @@ orientation, not authorization.
 
 - Show the active organization in the shell. On project-owned pages, show the
   project and, when relevant, site/phase in the page header or context bar.
+- Global Company/Project/Site represents the active application context.
+  Page-level Project/Site controls are query/filter scope unless the workflow
+  explicitly defines otherwise; label this distinction and do not create a
+  second competing context mechanism.
+- Validated global Project/Site may initialize page filters when appropriate.
+  Preserve explicit page selections and clear intent. Changing or clearing a
+  page filter must not silently mutate global context or its session values.
+- Global Project/Site does not establish ownership of organization-level records.
+  Describe scope from the actual domain relationship; do not invent relationships
+  to make a form match the global header.
 - A context switch must be explicit, preserve only safe filters, and never infer
   access from a URL, hidden field, cookie, or previously selected project.
 - Do not render organization IDs as editable business fields. The server resolves
@@ -1387,7 +1419,8 @@ Application shell
   -> organization/project/site context
   -> breadcrumb
   -> page title, status, key actions
-  -> alerts/KPIs/tabs
+  -> persistent business tabs, when applicable
+  -> alerts/KPIs/filters
   -> primary content
 ```
 
@@ -1413,9 +1446,12 @@ Rules:
    errors, and derived values. Never submit an invisible stale identifier.
 4. Loading, empty, error, and retry states must be distinct. An empty authorized
    set is not a transport failure.
-5. Display only valid and authorized options for the current effective date and
-   lifecycle state. Archived items may appear only when required to render
-   historical selections, clearly marked as archived/read-only.
+5. Restrict child options to the selected parent and authorized scope, including
+   Project → Site. Never allow stale cross-project/cross-scope selections. Match
+   the UI dependency to server-side relationship and authorization checks for
+   the current effective date and lifecycle state. Archived items may appear
+   only when required to render historical selections, clearly marked as
+   archived/read-only.
 6. Preserve the selected label in validation responses. Never leave a raw UUID as
    the only visible value.
 7. For HTMX endpoints, apply the same login, CSRF, tenant, permission, object
@@ -1436,10 +1472,12 @@ error-prone.
 For MVP-visible forms, references to existing Master Data/business entities must
 use one coherent business-facing selector. Free-text canonical names, raw
 IDs/UUIDs, duplicate selector/name fields, and multi-control pseudo-selects
-(search input + search button + second select) are unacceptable without a
-demonstrated business reason. Search belongs inside the selection interaction.
+(search input + search button + second select) must not replace that selector.
+Search belongs inside the selection interaction when option volume requires it.
 Technical search/result limits are not business UI; load or search further valid
 results within the same control. Related masters cascade according to section 38.
+Intentionally record-specific free text is not a reference to Master Data;
+confirm the field's actual domain meaning before choosing its control.
 
 MVP-02 uses the shared `SearchChoiceSelect` with locally pinned Tom Select 2.6.2
 (core plus virtual-scroll plugin), Persian labels, RTL, escaped business labels,
@@ -1451,11 +1489,17 @@ This implementation is qualified for the remediated MVP-02 surfaces, not an
 instruction to rewrite unrelated forms or an assertion of Product Owner approval.
 
 - Search by the identifiers users know: code/number, title/name, and approved
-  alternate identifier. Show code plus name, not a name-only ambiguous list.
+  alternate identifier. Make the business name the primary visible label; show
+  codes only as useful secondary information, for example to distinguish duplicate
+  names. Apply section 7's technical-leakage boundary to all option labels.
+- Replace raw empty choices such as `----------` with a meaningful business
+  placeholder, such as `انتخاب پروژه` or `انتخاب سرپرست گروه`.
 - Debounce remote requests, enforce a minimum query length where appropriate,
   paginate results, and show total/remaining state without downloading an entire
   master table.
 - Scope results before search. Search never broadens tenant/project permission.
+  Preserve server-side tenant, permission, object-scope and relationship
+  validation on both lookup and submission, including native fallback paths.
 - Avoid implicit creation from a selector. “Create new” is a separate authorized
   flow with clear return behavior.
 - Preserve selected historical items even if they become inactive, but prevent
@@ -1526,8 +1570,9 @@ The list page is a work surface, not just a database dump.
 - Keep the overview light. Large related tables are paginated and permission
   checked independently.
 - Show source lineage as human labels and links: “generated from Goods Receipt
-  GR-…”, “posted by Journal …”, “based on Rule Version …”. Raw model names and
-  UUIDs are secondary diagnostic data, not the main UI.
+  GR-…”, “posted by Journal …”, “based on Rule Version …”. Apply section 7's
+  exposure boundary: raw model names and UUIDs belong only on authorized
+  internal technical surfaces, not customer-facing MVP pages.
 - Historical records retain the snapshot that was true at finalization. If the
   current master differs, distinguish “recorded value” from “current master”.
 - Activity/audit sections show actor, capacity where material, timestamp in tenant
@@ -1598,7 +1643,9 @@ are not claimed delivered by this guideline.
   signed access and is audited where the domain requires it.
 - Replacing a finalized file creates a version; it never overwrites evidence.
 - Imports use upload -> mapping/options -> validation preview -> explicit commit
-  -> result/report. Large imports expose job state and idempotency.
+  -> result/report. Large imports show business progress and duplicate-submission
+  handling; internal job states and idempotency keys follow section 7's
+  technical-leakage boundary.
 - Exports show scope, active filters, record count when known, sensitivity, format,
   generated-at, expiry, and audit status. Export permission is distinct from view
   permission where data sensitivity requires it.
@@ -1729,11 +1776,22 @@ profiles without assuming runtime switches exist. Preserve historical
 hidden-capability UAT as regression evidence; backend presence or prior finding
 closure is not customer-exposure acceptance.
 
-Every UI package requires Human visual acceptance before Product Owner closure.
-Automated functional PASS and browser interaction PASS do not grant visual
-acceptance. Record remediation as `READY_FOR_HUMAN_REVIEW` only after its required
-checks/evidence pass; Product Owner visual acceptance remains `PENDING` until the
-Human Product Owner explicitly accepts it.
+For UI-impacting MVP work, automated functional tests and browser interaction
+tests are necessary but not sufficient. Real-browser visual review of the
+rendered affected screens, with representative desktop/mobile captures, is
+required. Every UI package requires Human visual acceptance before Product
+Owner closure; successful interaction checks alone do not grant it.
+
+After the required checks and visual evidence pass, Codex may report:
+
+```text
+VISUAL UX REMEDIATION: READY_FOR_HUMAN_REVIEW
+PRODUCT OWNER VISUAL ACCEPTANCE: PENDING
+```
+
+Only the Product Owner may declare `PRODUCT OWNER VISUAL ACCEPTANCE: PASS`.
+Codex must not infer this acceptance from automated, browser or visual-review
+evidence.
 
 Before a new or materially changed screen is accepted, verify:
 

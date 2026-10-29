@@ -111,6 +111,7 @@ CAPABILITIES = (
             "financials",
             "fixed_assets",
         ),
+        ("billing:claim_settlement_allocate",),
     ),
     Capability("payroll", False, ("payroll",)),
     Capability("commercial", False, ("commercial",)),

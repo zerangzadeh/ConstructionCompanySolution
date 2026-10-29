@@ -12,6 +12,7 @@ from apps.organizations.models import InsuranceClassification, OrganizationMembe
 from apps.organizations.policy_services import available_insurance_classifications
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project
+from core.business_choices import configure_business_choice
 from core.forms import JalaliDateMixin
 from core.identifiers import canonicalize_upper_identifier
 
@@ -66,6 +67,17 @@ class ContractForm(JalaliDateMixin, forms.ModelForm):
         self.fields["party"].queryset = BusinessParty.objects.filter(
             organization=organization, archived_at__isnull=True
         ).order_by("display_name")
+        self.fields.pop("counterparty_name")
+        self.fields["party"].required = True
+        self.fields["party"].label = "طرف قرارداد"
+        self.fields["direction"].label = "جهت قرارداد"
+        for name in ("project", "party"):
+            configure_business_choice(self, name, "contract")
+
+    def clean_party(self):
+        party = self.cleaned_data["party"]
+        self.instance.counterparty_name = party.display_name
+        return party
 
     def clean_status(self) -> str:
         status = self.cleaned_data["status"]

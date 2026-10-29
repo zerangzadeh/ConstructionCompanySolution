@@ -1,0 +1,151 @@
+{
+  "package": "MVP-03",
+  "date": "2026-10-29",
+  "functional_validation": "PASS",
+  "browser_interaction_validation": "PASS",
+  "visual_ux_remediation": "READY_FOR_HUMAN_REVIEW",
+  "product_owner_visual_acceptance": "PENDING",
+  "commands": {
+    "focused": "python scripts/verification/mvp03_validate.py apps/billing/test_mvp03.py apps/projects/test_mvp03_business_hub.py --reuse-db -q",
+    "browser": "python scripts/verification/mvp03_validate.py apps/billing/test_mvp03_browser.py --reuse-db -q",
+    "regression": "python scripts/verification/mvp03_validate.py apps/contracts/tests.py apps/estimates/tests.py apps/workforce/test_mvp02_uiux.py core/test_product_surface.py apps/billing/test_cep079_read_scope.py apps/billing/tests.py::ProgressClaimCalculationTests::test_pinned_terms_and_rules_drive_rounding_and_adjustments apps/billing/tests.py::ProgressClaimCalculationTests::test_claim_creation_fails_closed_without_eligible_regulatory_rule apps/billing/tests.py::ProgressClaimApprovalWorkflowTests::test_submitted_snapshot_is_immutable_and_return_creates_linked_draft_revision apps/billing/tests.py::ProgressClaimApprovalWorkflowTests::test_submission_and_decision_retries_are_idempotent apps/billing/tests.py::ProgressClaimApprovalWorkflowTests::test_cross_tenant_and_audit_failure_roll_back_claim_and_work_item apps/billing/tests.py::ProgressClaimApprovalWorkflowTests::test_approved_claim_exposes_dormant_ar_and_posting_contracts apps/billing/tests.py::ProgressClaimApprovalWorkflowTests::test_submitter_is_excluded_when_another_approver_exists_and_allowed_only_as_last_resort --reuse-db -q",
+    "system_check": "python manage.py check",
+    "schema_drift": "python manage.py makemigrations --check --dry-run",
+    "javascript": "node --check apps/workforce/static/workforce/field_choices.js",
+    "diff": "git diff --check",
+    "combined": "python scripts/verification/mvp03_validate.py apps/projects/test_mvp03_business_hub.py apps/billing/test_mvp03.py apps/billing/test_mvp03_browser.py --reuse-db -q"
+  },
+  "focused": {
+    "passed": 20,
+    "passed_subtests": 6,
+    "failed": 0,
+    "included_in_final_combined_run": true
+  },
+  "affected_regression": {
+    "passed": 50,
+    "passed_subtests": 45,
+    "baseline_fixture_failures": 29,
+    "seconds": 103.21,
+    "global_regression_pass": false,
+    "failed_nodes": [
+      "apps/contracts/tests.py::ContractServiceTests::test_active_member_without_view_permission_cannot_see_contracts",
+      "apps/contracts/tests.py::ContractServiceTests::test_contract_create_view_creates_contract",
+      "apps/contracts/tests.py::ContractServiceTests::test_contract_create_view_exposes_only_active_tenant_projects",
+      "apps/contracts/tests.py::ContractServiceTests::test_contract_detail_returns_not_found_for_another_organization",
+      "apps/contracts/tests.py::ContractServiceTests::test_contract_list_filters_can_be_combined_and_cleared",
+      "apps/contracts/tests.py::ContractServiceTests::test_contract_list_links_to_tenant_scoped_detail",
+      "apps/contracts/tests.py::ContractServiceTests::test_contract_list_requires_active_organization",
+      "apps/contracts/tests.py::ContractServiceTests::test_contract_number_is_unique_per_organization",
+      "apps/contracts/tests.py::ContractServiceTests::test_contract_queryset_is_tenant_scoped",
+      "apps/contracts/tests.py::ContractServiceTests::test_contract_rejects_negative_value",
+      "apps/contracts/tests.py::ContractServiceTests::test_contract_rejects_project_from_other_organization",
+      "apps/contracts/tests.py::ContractServiceTests::test_create_contract_scopes_project_and_records_audit",
+      "apps/contracts/tests.py::ContractServiceTests::test_view_permission_allows_read_but_not_contract_management",
+      "apps/estimates/tests.py::EstimateServiceTests::test_approve_estimate_records_actor_and_locks_items",
+      "apps/estimates/tests.py::EstimateServiceTests::test_approve_view_changes_status",
+      "apps/estimates/tests.py::EstimateServiceTests::test_approve_view_rejects_manager",
+      "apps/estimates/tests.py::EstimateServiceTests::test_approved_estimate_detail_hides_item_form_and_reports_stale_post",
+      "apps/estimates/tests.py::EstimateServiceTests::test_create_estimate_and_add_decimal_items",
+      "apps/estimates/tests.py::EstimateServiceTests::test_estimate_can_be_assigned_to_a_project_phase",
+      "apps/estimates/tests.py::EstimateServiceTests::test_estimate_create_view_limits_project_choices",
+      "apps/estimates/tests.py::EstimateServiceTests::test_estimate_detail_adds_item",
+      "apps/estimates/tests.py::EstimateServiceTests::test_estimate_list_requires_active_organization",
+      "apps/estimates/tests.py::EstimateServiceTests::test_estimate_number_is_unique_per_organization",
+      "apps/estimates/tests.py::EstimateServiceTests::test_estimate_queryset_is_tenant_scoped",
+      "apps/estimates/tests.py::EstimateServiceTests::test_estimate_rejects_cross_tenant_project",
+      "apps/estimates/tests.py::EstimateServiceTests::test_estimate_rejects_invalid_item_values",
+      "apps/estimates/tests.py::EstimateServiceTests::test_estimate_rejects_phase_from_another_project",
+      "apps/estimates/tests.py::EstimateServiceTests::test_manager_cannot_approve_estimate",
+      "apps/estimates/tests.py::EstimateServiceTests::test_only_draft_estimates_can_be_approved"
+    ],
+    "attribution": "baseline-attribution.json"
+  },
+  "browser": {
+    "passed_tests": 2,
+    "passed_scenarios": [
+      "A-estimate-contract-handoff",
+      "B-contract-claim-context",
+      "C-selector-pagination-search",
+      "D-invalid-form",
+      "E-create-claim",
+      "F-mobile-claim-deductions",
+      "G-refresh-deductions",
+      "H-submit-for-approval",
+      "I-filter-empty-state",
+      "J-mobile-create-form",
+      "K-baseline-detail",
+      "L-progress-list",
+      "M-decision-required-reason",
+      "N-independent-approval",
+      "O-mobile-approved",
+      "P-project-hub-desktop",
+      "Q-project-hub-mobile",
+      "R-project-contracts-filter",
+      "S-project-estimates-filter",
+      "T-project-claims-handoff",
+      "U-project-contract-create-context",
+      "V-project-estimate-create-context"
+    ],
+    "screenshots": 22,
+    "desktop_width": 1440,
+    "mobile_width": 390,
+    "reviewed_representative_images": [
+      "f61-owner-A-estimate-contract-handoff.png",
+      "f61-owner-E-create-claim.png",
+      "f61-owner-J-mobile-create-form.png",
+      "f61-manager-O-mobile-approved.png",
+      "f61-owner-P-project-hub-desktop.png",
+      "f61-owner-Q-project-hub-mobile.png",
+      "f61-owner-R-project-contracts-filter.png",
+      "f61-owner-V-project-estimate-create-context.png"
+    ],
+    "included_in_final_combined_run": true
+  },
+  "static": {
+    "ruff_check": "PASS",
+    "ruff_format": "PASS",
+    "python_files": 17,
+    "template_compilation": "PASS",
+    "templates": 18,
+    "javascript_syntax": "PASS",
+    "django_check": "PASS",
+    "schema_drift": "NONE",
+    "diff_whitespace": "PASS",
+    "follow_up_log": "../mvp03-project-static.log"
+  },
+  "migrations": {
+    "application_migrations_created": [],
+    "development_migrations_applied": [],
+    "unchanged_development_pending": [
+      "payroll.0010_cep069_reviewed_statutory_context"
+    ],
+    "test_database": "test_bonira_mvp03_20261029",
+    "test_database_setup": "Full configured historical migrations; guarded normal test flush includes intentionally retained legacy Payment FK dependents. Code-owned auth and three workflow catalogs restored only in test DB."
+  },
+  "git_writes": false,
+  "production_actions": false,
+  "mvp04_started": false,
+  "deferred": [
+    "MVP-05 XLSX",
+    "MVP-06 Claim print",
+    "unrelated MVP-07 forms/outputs",
+    "MVP-08 global demo and final MVP E2E/Human UAT"
+  ],
+  "combined": {
+    "passed": 22,
+    "passed_subtests": 6,
+    "failed": 0,
+    "seconds": 137.1,
+    "log": "../mvp03-project-final.log"
+  },
+  "project_hub_follow_up": {
+    "authority": "Explicit Human instruction: Project is a contextual business hub; detailed Contract/Billing operations stay on dedicated pages.",
+    "projection": "Permission- and source-scoped counts, state count, one recent record per Estimate/Contract/Claim; no financial aggregation or commercial forms.",
+    "context": "Exact project_id list filters intersect source scope; project creation defaults are validated; global session context is unchanged.",
+    "claim_creation": "Project-filtered Claims links to project Contracts to select the existing contract before starting the dedicated claim form.",
+    "superseded_browser_finding": "Hidden project filter field now associates with the actual shared-layout filter form; real submissions passed.",
+    "new_focused_tests": 4,
+    "new_browser_scenarios": 7,
+    "owner_visual_acceptance": "PENDING"
+  }
+}

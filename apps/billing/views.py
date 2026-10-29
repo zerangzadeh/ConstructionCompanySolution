@@ -3,6 +3,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from apps.organizations.authorization import (
@@ -14,6 +15,13 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from core.business_choices import contextual_url
+from core.list_filters import (
+    apply_table_filters,
+    paginate_table,
+    table_pagination_query,
+)
+from core.product_surface import capability_exposed, route_exposed
 
 from .commercial_services import (
     commercial_exposure,
@@ -53,6 +61,8 @@ from .forms import (
     SubmissionResolutionForm,
     TaxpayerInvoiceForm,
 )
+from .journey_forms import ClaimCorrectionForm, ClaimDecisionForm
+from .journey_views import claim_create_allowed, journey_breadcrumbs
 from .models import (
     ContractComplianceEvidence,
     ContractGuarantee,
@@ -185,9 +195,13 @@ def baseline_list(request: HttpRequest) -> HttpResponse:
         request,
         "billing/baseline_list.html",
         {
-            "baselines": get_project_baselines(
-                actor=request.user, organization=request.organization
-            )
+            **journey_list_context(
+                request,
+                get_project_baselines(
+                    actor=request.user, organization=request.organization
+                ),
+                "baselines",
+            ),
         },
     )
 
@@ -204,6 +218,15 @@ def baseline_detail(request: HttpRequest, baseline_id: str) -> HttpResponse:
         "billing/baseline_detail.html",
         {
             "baseline": baseline,
+            "create_url": contextual_url(
+                "billing:claim_create", contract=baseline.contract, baseline=baseline
+            )
+            if baseline.status == "approved" and claim_create_allowed(request)
+            else "",
+            "page_breadcrumbs": journey_breadcrumbs(
+                "مبنای اندازه‌گیری",
+                collection=("مبناهای اندازه‌گیری", "billing:baseline_list"),
+            ),
             "baseline_items": baseline.items.select_related("activity", "wbs_node"),
         },
     )
@@ -217,11 +240,57 @@ def progress_list(request: HttpRequest) -> HttpResponse:
         request,
         "billing/progress_list.html",
         {
-            "progress_records": get_progress_records(
-                actor=request.user, organization=request.organization
+            **journey_list_context(
+                request,
+                get_progress_records(
+                    actor=request.user, organization=request.organization
+                ),
+                "progress_records",
+            ),
+        },
+    )
+
+
+def journey_list_context(request, records, key):
+    from apps.organizations.form_scoping import normalized_uuid
+
+    prefix = "baseline__" if key == "progress_records" else ""
+    if prefix:
+        records = records.select_related("baseline__contract", "baseline__project")
+    contract = request.GET.get("contract")
+    if contract:
+        value = normalized_uuid(contract)
+        records = (
+            records.filter(**{f"{prefix}contract_id": value})
+            if value
+            else records.none()
+        )
+    records = apply_table_filters(
+        records,
+        request,
+        text_fields={
+            "q": tuple(
+                f"{prefix}{field}"
+                for field in (
+                    "contract__title",
+                    "contract__contract_number",
+                    "project__name",
+                )
             )
         },
     )
+    page = paginate_table(
+        records, request, sort_fields={}, default_ordering=("-created_at", "pk")
+    )
+    return {
+        key: page.object_list,
+        "page_obj": page,
+        "pagination_query": table_pagination_query(request),
+        "pagination_rendered": True,
+        "page_breadcrumbs": journey_breadcrumbs(
+            "پیشرفت کار" if prefix else "مبناهای اندازه‌گیری"
+        ),
+    }
 
 
 @active_organization_required
@@ -231,7 +300,16 @@ def progress_detail(request: HttpRequest, record_id: str) -> HttpResponse:
     record = _record(request, record_id)
     if record is None:
         return HttpResponseNotFound("رکورد پیشرفت یافت نشد.")
-    return render(request, "billing/progress_detail.html", {"progress_record": record})
+    return render(
+        request,
+        "billing/progress_detail.html",
+        {
+            "progress_record": record,
+            "page_breadcrumbs": journey_breadcrumbs(
+                "جزئیات اندازه‌گیری", collection=("پیشرفت کار", "billing:progress_list")
+            ),
+        },
+    )
 
 
 @active_organization_required
@@ -292,13 +370,77 @@ def progress_reject(request: HttpRequest, record_id: str) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.CLAIMS_VIEW)
 @require_GET
 def claim_list(request: HttpRequest) -> HttpResponse:
+    from apps.projects.business_hub import filter_project_context
+
+    claims = get_progress_claims(actor=request.user, organization=request.organization)
+    claims, selected_project = filter_project_context(request, claims)
+    contract_filter = request.GET.get("contract")
+    if contract_filter:
+        from apps.organizations.form_scoping import normalized_uuid
+
+        contract_id = normalized_uuid(contract_filter)
+        claims = (
+            claims.filter(contract_id=contract_id) if contract_id else claims.none()
+        )
+    claims = apply_table_filters(
+        claims,
+        request,
+        text_fields={
+            "q": ("contract__title", "contract__contract_number", "project__name")
+        },
+        choice_fields={
+            "status": (
+                "status",
+                (
+                    "draft",
+                    "submitted",
+                    "approved",
+                    "returned",
+                    "superseded",
+                    "cancelled",
+                ),
+            )
+        },
+    )
+    page = paginate_table(
+        claims,
+        request,
+        sort_fields={
+            "number": "claim_number",
+            "period": "period_start",
+            "amount": "net_amount",
+        },
+        default_ordering=("-created_at", "pk"),
+    )
     return render(
         request,
         "billing/claim_list.html",
         {
-            "claims": get_progress_claims(
-                actor=request.user, organization=request.organization
+            "claims": page.object_list,
+            "selected_project": selected_project,
+            "project_contracts_url": contextual_url(
+                "contracts:list", project_id=selected_project.pk
             )
+            if selected_project
+            and claim_create_allowed(request)
+            and route_exposed("contracts:list")
+            and has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.CONTRACTS_VIEW,
+                project=selected_project,
+            )
+            else "",
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
+            "pagination_rendered": True,
+            "can_create_claim": not selected_project and claim_create_allowed(request),
+            "create_url": contextual_url(
+                "billing:claim_create", contract=contract_filter
+            )
+            if contract_filter
+            else reverse("billing:claim_create"),
+            "page_breadcrumbs": journey_breadcrumbs("صورت‌وضعیت‌ها"),
         },
     )
 
@@ -307,15 +449,21 @@ def claim_list(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.CLAIMS_VIEW)
 @require_GET
 def claim_detail(request: HttpRequest, claim_id: str) -> HttpResponse:
+    return render_claim_detail(request, claim_id)
+
+
+def render_claim_detail(request, claim_id, action_form=None):
     claim = _claim(request, claim_id)
     if claim is None:
         return HttpResponseNotFound("صورت‌وضعیت یافت نشد.")
-    can_view_settlements = has_business_permission(
+    can_view_settlements = capability_exposed("finance") and has_business_permission(
         user=request.user,
         organization=request.organization,
         permission=BusinessPermissionCode.CLAIM_SETTLEMENTS_VIEW,
     )
-    can_allocate_settlements = has_business_permission(
+    can_allocate_settlements = capability_exposed(
+        "finance"
+    ) and has_business_permission(
         user=request.user,
         organization=request.organization,
         permission=BusinessPermissionCode.CLAIM_SETTLEMENTS_ALLOCATE,
@@ -325,6 +473,14 @@ def claim_detail(request: HttpRequest, claim_id: str) -> HttpResponse:
         "billing/claim_detail.html",
         {
             "claim": claim,
+            **claim_journey_context(request, claim),
+            "decision_form": action_form
+            if isinstance(action_form, ClaimDecisionForm)
+            and not isinstance(action_form, ClaimCorrectionForm)
+            else ClaimDecisionForm(),
+            "correction_form": action_form
+            if isinstance(action_form, ClaimCorrectionForm)
+            else ClaimCorrectionForm(),
             "claim_items": claim.items.select_related("baseline_item"),
             "adjustments": claim.adjustments.all(),
             "correction_revisions": claim.correction_claims.order_by("revision_number"),
@@ -353,6 +509,77 @@ def claim_detail(request: HttpRequest, claim_id: str) -> HttpResponse:
             ),
         },
     )
+
+
+def claim_journey_context(request, claim):
+    from django.db.models import Q
+
+    from apps.contracts.services import get_organization_contracts
+    from apps.workflows.models import WorkItem, WorkItemStatus
+
+    def permitted(code, *, object_scope=False):
+        return has_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission=code,
+            project=claim.project if object_scope else None,
+        )
+
+    membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
+    decision_items = WorkItem.objects.filter(
+        organization=request.organization,
+        instance__subject_type="billing.progress_claim",
+        instance__subject_id=claim.pk,
+        instance__status="active",
+        status__in=(WorkItemStatus.OPEN, WorkItemStatus.CLAIMED),
+        candidates__membership=membership,
+        candidates__is_active=True,
+    ).filter(Q(current_assignee__isnull=True) | Q(current_assignee=membership))
+    if not permitted(BusinessPermissionCode.WORK_ITEMS_CLAIM):
+        decision_items = decision_items.filter(
+            status=WorkItemStatus.CLAIMED, current_assignee=membership
+        )
+    can_decide = (
+        claim.status == "submitted"
+        and all(
+            permitted(code)
+            for code in (
+                BusinessPermissionCode.CLAIMS_APPROVE,
+                BusinessPermissionCode.WORK_ITEMS_ACT,
+            )
+        )
+        and decision_items.exists()
+    )
+    contract_visible = (
+        permitted(BusinessPermissionCode.CONTRACTS_VIEW, object_scope=True)
+        and get_organization_contracts(
+            user=request.user, organization=request.organization
+        )
+        .filter(pk=claim.contract_id)
+        .exists()
+    )
+    return {
+        "page_breadcrumbs": journey_breadcrumbs(
+            f"صورت‌وضعیت {claim.claim_number}",
+            claim.contract if contract_visible else None,
+        ),
+        "contract_visible": contract_visible,
+        "baseline_visible": permitted(
+            BusinessPermissionCode.BASELINES_VIEW, object_scope=True
+        ),
+        "progress_visible": permitted(
+            BusinessPermissionCode.PROGRESS_VIEW, object_scope=True
+        ),
+        "can_recalculate": claim.status == "draft"
+        and permitted(BusinessPermissionCode.CLAIMS_REVISE),
+        "can_submit_claim": claim.status == "draft"
+        and permitted(BusinessPermissionCode.CLAIMS_SUBMIT),
+        "can_decide_claim": can_decide,
+        "can_correct_claim": claim.status == "approved"
+        and permitted(BusinessPermissionCode.CLAIMS_REVISE),
+    }
 
 
 @active_organization_required

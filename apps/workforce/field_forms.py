@@ -1,11 +1,10 @@
-from typing import ClassVar
-
 from django import forms
 from django.db.models import Q
 from django.urls import reverse
 
 from apps.accounts.models import validate_iranian_national_id
 from apps.projects.models import Project, ProjectSite
+from core.business_choices import SearchChoiceSelect
 
 from .forms import _StyledForm
 from .identity_integrity import normalize_national_id
@@ -38,23 +37,6 @@ def business_label(record) -> str:
     if getattr(record, "is_active", True) is False:
         return f"{label} (غیرفعال)"
     return label
-
-
-class SearchChoiceSelect(forms.Select):
-    template_name = "workforce/widgets/search_choice.html"
-
-    class Media:
-        css: ClassVar = {
-            "all": (
-                "workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
-                "workforce/field_choices.css",
-            )
-        }
-        js = (
-            "workforce/vendor/tom-select-2.6.2/tom-select.base.min.js",
-            "workforce/vendor/tom-select-2.6.2/virtual_scroll.js",
-            "workforce/field_choices.js",
-        )
 
 
 def choice_value(form, name):
@@ -135,7 +117,11 @@ def searchable_choices(
             "data-options-url": reverse("workforce:field_choices", args=[kind])
             + (f"?{query}" if query else ""),
             "data-business-choice": kind,
-            **({"data-business-names-primary": "true"} if business_names_primary else {}),
+            **(
+                {"data-business-names-primary": "true"}
+                if business_names_primary
+                else {}
+            ),
             "data-placeholder": f"جست‌وجو یا انتخاب {field.label}…",
             "dir": "rtl",
         }
@@ -207,12 +193,15 @@ class FieldAssignmentForm(_StyledForm):
         label="کارگاه", queryset=ProjectSite.objects.none(), required=False
     )
     role_title = forms.CharField(
-        label="مسئولیت در این پروژه/کارگاه", max_length=255, required=False,
+        label="مسئولیت در این پروژه/کارگاه",
+        max_length=255,
+        required=False,
         help_text="اختیاری؛ مسئولیت این تخصیص، مستقل از سمت یا حرفه نیروی کار است.",
     )
     start_date = forms.DateField(label="تاریخ شروع")
     planned_end_date = forms.DateField(
-        label="تاریخ پایان برنامه‌ریزی‌شده", required=False,
+        label="تاریخ پایان برنامه‌ریزی‌شده",
+        required=False,
         help_text="اختیاری؛ تخصیص را پایان نمی‌دهد. پایان واقعی با «پایان تخصیص» ثبت می‌شود.",
     )
     notes = forms.CharField(
@@ -253,7 +242,10 @@ class FieldAssignmentForm(_StyledForm):
             self.add_error("site", "کارگاه باید متعلق به پروژه انتخاب‌شده باشد.")
         start, planned = cleaned.get("start_date"), cleaned.get("planned_end_date")
         if start and planned and planned < start:
-            self.add_error("planned_end_date", "تاریخ پایان برنامه‌ریزی‌شده نمی‌تواند پیش از تاریخ شروع باشد.")
+            self.add_error(
+                "planned_end_date",
+                "تاریخ پایان برنامه‌ریزی‌شده نمی‌تواند پیش از تاریخ شروع باشد.",
+            )
         return cleaned
 
 

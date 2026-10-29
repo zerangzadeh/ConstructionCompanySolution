@@ -2,7 +2,9 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
+from apps.contracts.services import get_organization_contracts
 from apps.estimates.forms import EstimateForm, EstimateItemForm
 from apps.estimates.models import EstimateStatus
 from apps.estimates.services import (
@@ -11,13 +13,18 @@ from apps.estimates.services import (
     create_estimate,
     get_organization_estimates,
 )
-from apps.organizations.authorization import get_active_membership
+from apps.organizations.authorization import (
+    get_active_membership,
+    has_business_permission,
+)
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
     require_organization_permission,
 )
 from apps.organizations.models import BusinessPermissionCode
+from apps.projects.business_hub import filter_project_context
+from core.business_choices import contextual_url
 from core.list_filters import (
     apply_table_filters,
     build_table_filters,
@@ -30,10 +37,22 @@ from core.list_filters import (
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.ESTIMATES_VIEW)
 def estimate_list(request: HttpRequest) -> HttpResponse:
+    from apps.billing.journey_views import journey_breadcrumbs
+
     estimates = get_organization_estimates(
         user=request.user,
         organization=request.organization,
     )
+    estimates, selected_project = filter_project_context(request, estimates)
+    if request.GET.get("contract"):
+        from apps.organizations.form_scoping import normalized_uuid
+
+        contract_id = normalized_uuid(request.GET["contract"])
+        estimates = (
+            estimates.filter(contract_id=contract_id)
+            if contract_id
+            else estimates.none()
+        )
     estimates = apply_table_filters(
         estimates,
         request,
@@ -61,6 +80,13 @@ def estimate_list(request: HttpRequest) -> HttpResponse:
         "estimates/list.html",
         {
             "estimates": page.object_list,
+            "selected_project": selected_project,
+            "estimate_create_url": contextual_url(
+                "estimates:create", project=selected_project.pk
+            )
+            if selected_project
+            else reverse("estimates:create"),
+            "page_breadcrumbs": journey_breadcrumbs("برآوردها"),
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
             "pagination_rendered": True,
@@ -96,11 +122,20 @@ def estimate_create(request: HttpRequest) -> HttpResponse:
         organization=request.organization,
         membership=membership,
         active_project=request.active_project,
+        initial={
+            name: request.GET.get(name)
+            for name in ("project", "contract")
+            if request.GET.get(name)
+        },
     )
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and form.is_valid()
+    ):
         data = form.cleaned_data
         try:
-            create_estimate(
+            estimate = create_estimate(
                 organization=request.organization,
                 project=data["project"],
                 contract=data["contract"],
@@ -113,13 +148,26 @@ def estimate_create(request: HttpRequest) -> HttpResponse:
         except (PermissionDenied, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
-            return redirect("estimates:list")
-    return render(request, "estimates/create.html", {"form": form})
+            return redirect("estimates:detail", estimate_id=estimate.pk)
+    from apps.billing.journey_views import journey_breadcrumbs
+
+    return render(
+        request,
+        "estimates/create.html",
+        {
+            "form": form,
+            "page_breadcrumbs": journey_breadcrumbs(
+                "برآورد جدید", collection=("برآوردها", "estimates:list")
+            ),
+        },
+    )
 
 
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.ESTIMATES_VIEW)
 def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
+    from apps.billing.journey_views import journey_breadcrumbs
+
     if request.method == "POST":
         require_organization_permission(
             request,
@@ -140,7 +188,11 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
     item_form = EstimateItemForm(
         request.POST or None, organization=request.organization
     )
-    if request.method == "POST" and item_form.is_valid():
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and item_form.is_valid()
+    ):
         data = item_form.cleaned_data
         try:
             add_estimate_item(
@@ -148,7 +200,7 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
                 actor=request.user,
                 description=data["description"],
                 quantity=data["quantity"],
-                unit=data["unit"],
+                unit=data["unit_of_measure"].symbol,
                 unit_of_measure=data["unit_of_measure"],
                 unit_price=data["unit_price"],
                 sort_order=data["sort_order"],
@@ -164,7 +216,29 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
     return render(
         request,
         "estimates/detail.html",
-        {"estimate": estimate, "item_form": item_form},
+        {
+            "estimate": estimate,
+            "page_breadcrumbs": journey_breadcrumbs(
+                estimate.title, collection=("برآوردها", "estimates:list")
+            ),
+            "item_form": item_form,
+            "related_contract_url": (
+                reverse("contracts:detail", args=[estimate.contract_id])
+                if estimate.contract_id
+                and has_business_permission(
+                    user=request.user,
+                    organization=request.organization,
+                    permission=BusinessPermissionCode.CONTRACTS_VIEW,
+                    allow_any_scope=True,
+                )
+                and get_organization_contracts(
+                    user=request.user, organization=request.organization
+                )
+                .filter(pk=estimate.contract_id)
+                .exists()
+                else ""
+            ),
+        },
     )
 
 

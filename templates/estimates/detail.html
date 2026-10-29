@@ -2,16 +2,12 @@
 
 {% block title %}{{ estimate.title }} | سامانه مدیریت ساخت{% endblock %}
 
+{% block extra_head %}{% load field_journey %}{% prepare_native_choices item_form %}{{ item_form.media.css }}{% endblock %}
+{% block extra_scripts %}{{ item_form.media.js }}{% endblock %}
 {% block content %}
     <div dir="rtl">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-                <p class="text-xs font-semibold text-blue-600"><span dir="ltr" class="inline-block">{{ estimate.estimate_number }}</span></p>
-                <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">{{ estimate.title }}</h1>
-                <p class="mt-1 text-sm text-slate-500">{{ estimate.project.name }}{% if estimate.phase %} · {{ estimate.phase.name }}{% endif %} · {{ request.organization.name }}</p>
-            </div>
-            <a class="text-sm font-semibold text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="{% url 'estimates:list' %}">بازگشت به برآوردها</a>
-        </div>
+        {% include "components/page_header.html" with page_breadcrumbs=page_breadcrumbs page_breadcrumb_label="برآوردها" page_breadcrumb_url="/estimates/" page_eyebrow="پیمان، متره و صورت‌وضعیت" page_title=estimate.title page_description=estimate.project.name only %}
+        {% if related_contract_url %}<section class="erp-surface mt-4 rounded-xl p-4"><p class="text-xs text-slate-500">قرارداد مرتبط با این برآورد</p><a class="mt-2 inline-block font-semibold text-blue-700" href="{{ related_contract_url }}">{{ estimate.contract.title }} · {{ estimate.contract.contract_number }}</a></section>{% elif not estimate.contract_id %}<p class="mt-4 text-sm text-slate-500">این برآورد به قراردادی متصل نشده است.</p>{% endif %}
 
         <div class="mt-5 flex flex-wrap items-center gap-3">
             {% if estimate.status == "approved" %}<span class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">تأییدشده</span>
@@ -22,7 +18,7 @@
                 <form method="post" action="{% url 'estimates:approve' estimate.id %}">
                     {% csrf_token %}
                     <button class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" type="submit">تأیید برآورد</button>
-                </form>
+                {% include "workforce/_native_choices.html" with choice_form=item_form %}</form></details>
             {% elif estimate.status != "draft" %}
                 <p class="text-sm font-medium text-emerald-700">این برآورد تأیید شده و امکان افزودن یا ویرایش ردیف‌ها وجود ندارد.</p>
             {% endif %}
@@ -67,7 +63,7 @@
                             <tr class="hover:bg-slate-50">
                                 <td class="px-5 py-4 font-medium text-slate-900">{{ item.description }}</td>
                                 <td class="px-5 py-4 text-right text-slate-700" dir="ltr">{{ item.quantity }}</td>
-                                <td class="px-5 py-4 text-right text-slate-600">{{ item.unit }}</td>
+                                <td class="px-5 py-4 text-right text-slate-600">{{ item.unit_of_measure.name|default:item.unit }}</td>
                                 <td class="px-5 py-4 text-left text-slate-700" dir="ltr">{{ item.unit_price|erp_number }}</td>
                                 <td class="px-5 py-4 text-left font-semibold text-slate-900" dir="ltr">{{ item.line_total|erp_number }}</td>
                             </tr>
@@ -80,7 +76,7 @@
         </div>
 
         {% if estimate.status == "draft" and "estimate_items.add" in business_permission_codes %}
-            <form class="erp-surface mt-5 max-w-2xl space-y-5 rounded-xl p-5" method="post">
+            <details class="erp-surface mt-5 max-w-2xl rounded-xl p-5" {% if item_form.errors %}open{% endif %}><summary class="cursor-pointer font-semibold">افزودن ردیف برآورد</summary><form class="mt-4 space-y-5" method="post" novalidate>
                 {% csrf_token %}
                 <div>
                     <h2 class="font-semibold text-slate-900">افزودن ردیف</h2>
@@ -93,7 +89,7 @@
                 <div class="border-t border-slate-100 pt-5">
                     <button class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" type="submit">افزودن ردیف</button>
                 </div>
-            </form>
+            {% include "workforce/_native_choices.html" with choice_form=item_form %}</form></details>
         {% endif %}
     </div>
 {% endblock %}
