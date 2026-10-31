@@ -14,6 +14,79 @@ from django.utils.dateparse import parse_date
 from core.jalali import jalali_to_gregorian
 
 
+def build_filter_bar(
+    request: HttpRequest,
+    *,
+    form,
+    quick_fields: Sequence[str],
+    secondary_fields: Sequence[str] = (),
+    context: Mapping[str, str] | None = None,
+    result_count: int,
+    result_label: str = "رکورد",
+) -> dict[str, Any]:
+    """Presentation state only; callers authorize and filter before counting.
+
+    The form owns validation and widgets (including searchable masters/Jalali
+    dates). Parent context is supplied by the caller after server resolution.
+    Chip removal resets pagination and retains other filters and sorting.
+    """
+    from django import forms
+
+    context = dict(context or {})
+    preserved = {
+        name: request.GET[name]
+        for name in ("sort", "direction")
+        if request.GET.get(name)
+    }
+    base = request.GET.copy()
+    for name in list(base):
+        if name not in {*form.fields, *context, *preserved} or not base[name].strip():
+            base.pop(name)
+    for name, value in context.items():
+        base[name] = str(value)
+
+    def url(query):
+        encoded = query.urlencode()
+        return request.path + (f"?{encoded}" if encoded else "")
+
+    clear = base.copy()
+    for name in form.fields:
+        clear.pop(name, None)
+    chips = []
+    for name, field in form.fields.items():
+        value = form.cleaned_data.get(name)
+        if value in (None, ""):
+            continue
+        if isinstance(field, forms.ModelChoiceField):
+            label = field.label_from_instance(value)
+        elif isinstance(field, forms.ChoiceField):
+            label = dict(field.choices).get(value, "")
+        elif isinstance(field, forms.DateField):
+            label = field.widget.format_value(value)
+        else:
+            label = form[name].value()
+        query = base.copy()
+        query.pop(name, None)
+        chips.append(
+            {"name": name, "label": field.label, "value": label, "url": url(query)}
+        )
+    return {
+        "form": form,
+        "search": form["q"],
+        "quick_fields": [form[name] for name in quick_fields if name in form.fields],
+        "secondary_fields": [
+            form[name] for name in secondary_fields if name in form.fields
+        ],
+        "secondary_open": any(form[name].value() for name in secondary_fields),
+        "chips": chips,
+        "active_count": len(chips),
+        "clear_url": url(clear),
+        "hidden": {**preserved, **context},
+        "result_count": result_count,
+        "result_label": result_label,
+    }
+
+
 def contextual_list_filters(
     request: HttpRequest, *, keys: Sequence[str] = ("project_id", "contract")
 ) -> dict[str, Any]:

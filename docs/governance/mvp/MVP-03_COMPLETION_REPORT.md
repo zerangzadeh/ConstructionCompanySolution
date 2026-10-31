@@ -6,6 +6,147 @@ bounded Human request in the attached
 MVP-03 instruction is the execution contract; these MVP packages are not CEPs.
 No CEP is reopened and no Registry lifecycle change is implied.
 
+## Shared Filter Bar and Contract List UX — 2026-10-31
+
+Completed the explicit bounded Human UI/UX request on current `main`, HEAD and
+`origin/main` `1f4a07062d017e678dfc3eabf8075a642a24ffd5`. Earlier local remediation
+changes were preserved. No commit/push, branch/worktree, migration, MVP-04 or CEP
+lifecycle changes.
+
+Section 13 of `docs/ui-guidelines.md` now specifies the shared Filter Bar:
+prominent business search, compact quick filters, optional secondary disclosure,
+removable chips, clear-all, total count, inherited context, mobile disclosure and
+GET/URL state. `components/filter_bar.html` / `filter_bar_field.html` and
+`core.list_filters.build_filter_bar` supply reusable presentation state and markup.
+The small `erp_filter_bar.js` only controls responsive disclosure layout; the
+existing explicit-submit table script continues to navigate by GET. Existing Tom
+Select and Jalali widgets are reused without dependencies or a new UI framework.
+No HTMX partial-refresh behavior is introduced.
+
+Contract List is the only adopted list. Search covers Contract number/title,
+Project name and both retained/current counterparty names. Quick filters are
+Status, «سمت قرارداد» and optional searchable Project. The backend sides render
+as «با کارفرما» and «با پیمانکار / تأمین‌کننده». The `side` query parameter avoids
+colliding with the existing `direction` sort parameter. Existing number/title/
+counterparty bookmarks remain supported under «فیلترهای بیشتر». The business
+table and Create header placement are retained; Apply/Clear/count/chips belong to
+the Filter Bar rather than a detached column-filter toolbar.
+
+Inherited `project_id` is resolved through the existing Project context function,
+shown as context and retained through filtering, chip removal and clear-all,
+without a duplicate selector. The optional `project` filter remains transient and
+removable. Project options, validation and paginated remote lookup at the same
+Contract List route use only Projects from the existing tenant/object-scoped
+Contract read source under `contracts.view`; no Create permission is required and
+no role/permission behavior changes. Selected Projects beyond the initial 40
+options are pinned on reload. Invalid filter values return no results with field
+errors. Server scope and filtering remain authoritative; session context is not
+mutated. Chip removal resets the page, retains other filters and preserves sort;
+clear-all retains inherited context and sort.
+
+Validation: **24 functional tests / 13 subtests PASS**, plus **two real Chrome
+tests / 24 scenarios PASS** (17 new Filter Bar scenarios and seven existing
+Project hub/handoff scenarios). The final combined run contains 25 tests including
+the new browser test; the existing browser regression passed separately.
+Coverage includes general/scoped lists, all search sources, combined filters,
+business labels, chips/removal/clear, actual Back/Forward and refresh, desktop
+1440px/mobile 390px, no-JavaScript rendering, authorized remote Project search
+beyond the initial window, tenant/project isolation and explicit missing-read
+permission denial. RTL, enhanced selectors, visible technical-label checks and
+no horizontal page overflow passed. General/scoped desktop, secondary filters
+and mobile general/scoped renders were visually inspected.
+
+Ruff check/format (eight Python files), JavaScript syntax, Django system check and
+diff whitespace PASS. Existing shared list-filter tests passed. Initial failures
+were superseded test adaptations: preserving sort on clear, targeting list rather
+than header search, checking the existing numeric DOM representation, and using
+an explicit no-permission fixture instead of assuming a Member cannot read
+Contracts. There is no unresolved attributable failure; broader unrelated ERP
+regression and Human visual acceptance are not claimed.
+
+Product mutations are limited to UI guidelines, the shared helper/templates/layout
+script, Contract List form/read adapter and template. Models, migrations, domain
+services, permissions, Product Surface, calculations and workflows remain
+unchanged. Only isolated test database business data was written. The existing
+Project browser evidence was copied into this task's evidence directory and its
+previous artifacts restored after the regression run.
+
+Evidence: [validation](../../../output/mvp-03/contract-filter-bar/VALIDATION.json),
+[final test log](../../../output/mvp-03/contract-filter-bar/verified.log),
+[Chrome captures](../../../output/mvp-03/contract-filter-bar/browser/),
+[Project handoff regression](../../../output/mvp-03/contract-filter-bar/project-hub-regression.json),
+[grounding](../../../output/mvp-03/contract-filter-bar/grounding.json) and
+[source preservation](../../../output/mvp-03/contract-filter-bar/preservation.json).
+
+SHARED FILTER BAR FOUNDATION: PASS
+
+MVP-03 CONTRACT LIST FILTER UX: PASS
+
+PRODUCT OWNER VISUAL ACCEPTANCE: PENDING
+
+## Contract direction remediation — 2026-10-31
+
+Completed the explicit bounded Human request on current `main`. Entry HEAD and
+`origin/main` were `6e7e6d05ad862854c439731b8a67aeb97943f772`. During validation,
+an external Human checkpoint advanced both to
+`1f4a07062d017e678dfc3eabf8075a642a24ffd5`, including the product fixes. Codex did
+not run add, commit, push, merge, branch or worktree creation. Later test fixes and
+this report remain local. Existing unrelated changes were preserved.
+
+- Contract detail exposes the existing receivable Claim/baseline journey only for
+  receivable contracts. Payable contracts retain related Estimates and have no
+  receivable Claim or baseline links; no payable capability is newly exposed.
+- Contract detail and contextual Claim List now share a presentation-only Create
+  entry check against the existing permission/tenant-scoped Contract source:
+  active, receivable, with a non-deleted Project. Invalid, empty, ambiguous,
+  foreign, inaccessible and inactive references cannot create a CTA. Existing
+  server-side Create guards remain authoritative and unchanged.
+- Contract-scoped lists identify the authorized Contract, preserve it through
+  status filtering/clear links, omit irrelevant Contract/Project search and ignore
+  stale `q` values. Direct lists retain search and normal valid creation.
+- Eligibility means the existing Create-entry rules, without adding new business
+  rules: an active authorized receivable Contract without an approved baseline
+  still opens the existing prerequisite guidance. Submission/calculation retains
+  all existing baseline, term, regulatory, date and workflow validation.
+
+Validation: **11 focused functional tests / 12 subtests PASS**; **one real Chrome
+test / 15 scenarios PASS** in MVP, including actual contextual and general Claim
+creation, payable desktop/mobile absence of receivable actions, invalid/inactive
+contexts and real filter/clear submissions. All traversed document responses were
+200; favicon requests are outside the journey. Representative mobile scoped List,
+desktop payable Contract and successful Claim renders were inspected. Ruff check,
+format check (six Python files), Django system check and diff whitespace PASS.
+
+The initial broader affected run recorded 49 tests and 14 subtests passing, with
+five failures: two new fixture/assertion issues (corrected), one old Claim List
+search assertion updated to meaningful status filtering (now PASS), and two
+unrelated prior-path assertions. The latter are the broad `AR` substring check
+on unchanged Claim Detail and an Estimate approval-form lookup on unchanged
+Estimate UI. Evidence confirms Claim Detail functions are structurally unchanged
+and prior unrelated source bytes remain identical to entry. They are recorded as
+UNRELATED_FAILURE, not a global regression PASS. An initial browser assertion also
+matched the shared global search rather than the list filter; scoping that test
+to `main` produced the final 15-scenario PASS without another product change.
+
+Product touch set: `apps/billing/journey_views.py`, `apps/billing/views.py`,
+`apps/contracts/views.py`, `apps/billing/templates/billing/claim_list.html`,
+`templates/contracts/detail.html`. Tests add the two Contract direction modules
+and update one scoped-filter assertion. No model, migration, calculation,
+service/domain workflow, permission or Product Surface policy changed. No
+Development/production business data writes, MVP-04 work, CEP lifecycle change,
+production action or Human sign-off.
+
+Evidence: [grounding](../../../output/mvp-03/contract-direction-remediation/grounding.json),
+[validation](../../../output/mvp-03/contract-direction-remediation/VALIDATION.json),
+[focused results](../../../output/mvp-03/contract-direction-remediation/final.log),
+[final browser results](../../../output/mvp-03/contract-direction-remediation/browser.log),
+[browser captures](../../../output/mvp-03/contract-direction-remediation/browser/),
+[preservation/attribution](../../../output/mvp-03/contract-direction-remediation/preservation.json).
+
+MVP-03 CONTRACT DIRECTION REMEDIATION: PASS
+
+PRODUCT OWNER VISUAL ACCEPTANCE: PENDING
+
 ## Estimate → Contract UX remediation — 2026-10-31
 
 Completed the explicit bounded Human request on `main`, HEAD/local `origin/main`

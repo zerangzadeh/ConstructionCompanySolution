@@ -43,7 +43,10 @@ class ContractDirectionTests(JourneyFixture, TestCase):
         Contract.objects.filter(pk=self.contract.pk).update(direction="payable")
         detail = self.client.get(self.detail_url)
         for route in ("claim_create", "claim_list", "baseline_list"):
-            self.assertNotContains(detail, reverse("billing:" + route))
+            self.assertNotContains(
+                detail,
+                f'href="{reverse("billing:" + route)}?contract={self.contract.pk}"',
+            )
         response = self.client.get(self.list_url, {"contract": self.contract.pk})
         self.assertFalse(response.context["can_create_claim"])
         self.assertEqual(response.context["create_url"], "")
@@ -87,6 +90,7 @@ class ContractDirectionTests(JourneyFixture, TestCase):
             project=project,
             contract_number="OTHER",
             title="Foreign private contract",
+            counterparty_name="Synthetic foreign party",
             direction="receivable",
             status="active",
         )

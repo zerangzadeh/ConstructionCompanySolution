@@ -36,11 +36,13 @@ try {
   });
   let id = 0;
   let documentStatus;
+  const documentStatuses = new Map();
   const pending = new Map();
   socket.addEventListener('message', event => {
     const message = JSON.parse(event.data);
     if (message.method === 'Network.responseReceived' && message.params.type === 'Document') {
       documentStatus = message.params.response.status;
+      documentStatuses.set(message.params.response.url.split('#')[0], documentStatus);
     }
     if (!pending.has(message.id)) return;
     const { done, fail } = pending.get(message.id);
@@ -224,6 +226,11 @@ try {
         await new Promise(done=>setTimeout(done,600));
         continue;
       }
+      if (step.toggleSelector) {
+        await click(step.toggleSelector);
+        await new Promise(done=>setTimeout(done,100));
+        if (!step.inspect) continue;
+      }
       if(step.inspect) {
         if(step.waitMs) await new Promise(done=>setTimeout(done,step.waitMs));
         const passed=await evaluate(step.inspect);
@@ -231,7 +238,24 @@ try {
         continue;
       }
       documentStatus = undefined;
-      if (step.clickSelector) {
+      if (step.history) {
+        const history = await send('Page.getNavigationHistory');
+        const entry = history.entries[history.currentIndex + (step.history === 'back' ? -1 : 1)];
+        if (!entry) throw new Error('Missing browser history destination');
+        await send('Page.navigateToHistoryEntry', {entryId: entry.id});
+        for (let i=0;i<200;i++) {
+          await new Promise(done=>setTimeout(done,100));
+          if (await evaluate(`document.readyState==='complete' && location.href===${JSON.stringify(entry.url)}`)) break;
+          if (i===199) throw new Error('Browser history did not restore the requested URL');
+        }
+        // BFCache may restore a page without another HTTP response. Retain only
+        // its previously observed document status, never invent a success code.
+        documentStatus ??= documentStatuses.get(entry.url.split('#')[0]);
+        if (!documentStatus) throw new Error('History destination has no observed document response');
+        continue;
+      } else if (step.reload) {
+        await send('Page.reload');
+      } else if (step.clickSelector) {
         await click(step.clickSelector);
       } else if (step.clickHref) {
         const clicked = await evaluate(`(() => {const a=[...document.querySelectorAll('a[href]')].find(a=>a.getAttribute('href')===${JSON.stringify(step.clickHref)}); if(!a) return false; a.click(); return true;})()`);

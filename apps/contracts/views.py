@@ -2,7 +2,7 @@ import uuid
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -24,6 +24,7 @@ from apps.contracts.forms import (
     ContractualRevisionForm,
     ContractualWithdrawalForm,
 )
+from apps.contracts.list_filters import ContractListFilterForm
 from apps.contracts.models import (
     ContractDirection,
     ContractStatus,
@@ -46,12 +47,11 @@ from apps.organizations.decorators import (
 from apps.organizations.models import BusinessPermissionCode
 from apps.projects.business_hub import filter_project_context
 from apps.projects.services import get_organization_projects
-from core.business_choices import contextual_parent, contextual_url
+from core.business_choices import business_label, contextual_parent, contextual_url
 from core.list_filters import (
     apply_table_filters,
-    build_table_filters,
+    build_filter_bar,
     contextual_list_filters,
-    has_active_table_filters,
     paginate_table,
     table_pagination_query,
 )
@@ -66,18 +66,69 @@ def contract_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
+    if request.GET.get("filter_options") == "project":
+        from apps.projects.models import Project
+
+        projects = Project.objects.filter(pk__in=contracts.values("project_id"))
+        query = request.GET.get("q", "").strip()[:200]
+        if query:
+            from django.db.models import Q
+
+            projects = projects.filter(
+                Q(name__icontains=query) | Q(code__icontains=query)
+            )
+        try:
+            number = max(1, min(int(request.GET.get("page", 1)), 100000))
+        except (TypeError, ValueError):
+            number = 1
+        rows = list(
+            projects.order_by("name", "pk")[(number - 1) * 40 : number * 40 + 1]
+        )
+        params = request.GET.copy()
+        params["page"] = number + 1
+        response = JsonResponse(
+            {
+                "results": [
+                    {"value": str(row.pk), "label": business_label(row)}
+                    for row in rows[:40]
+                ],
+                "next": f"{request.path}?{params.urlencode()}"
+                if len(rows) > 40
+                else None,
+            }
+        )
+        response["Cache-Control"] = "private, no-store"
+        return response
     contracts, selected_project = filter_project_context(request, contracts)
     scoped_has_records = contracts.exists()
+    filter_form = ContractListFilterForm(
+        request.GET, contracts=contracts, project_scoped=selected_project is not None
+    )
+    valid_filters = filter_form.is_valid()
     contracts = apply_table_filters(
         contracts,
         request,
         text_fields={
+            "q": (
+                "contract_number",
+                "title",
+                "project__name",
+                "counterparty_name",
+                "party__display_name",
+            ),
             "number": ("contract_number",),
             "title": ("title", "project__name"),
             "counterparty": ("counterparty_name", "party__display_name"),
         },
-        choice_fields={"status": ("status", ContractStatus.values)},
+        choice_fields={
+            "status": ("status", ContractStatus.values),
+            "side": ("direction", ContractDirection.values),
+        },
     )
+    if not valid_filters:
+        contracts = contracts.none()
+    elif project := filter_form.cleaned_data.get("project"):
+        contracts = contracts.filter(project=project)
     page = paginate_table(
         contracts,
         request,
@@ -90,6 +141,15 @@ def contract_list(request: HttpRequest) -> HttpResponse:
         },
         default_ordering=("title", "pk"),
     )
+    filter_bar = build_filter_bar(
+        request,
+        form=filter_form,
+        quick_fields=("status", "side", "project"),
+        secondary_fields=("number", "title", "counterparty"),
+        context={"project_id": str(selected_project.pk)} if selected_project else {},
+        result_count=page.paginator.count,
+        result_label="قرارداد",
+    )
     return render(
         request,
         "contracts/list.html",
@@ -97,6 +157,8 @@ def contract_list(request: HttpRequest) -> HttpResponse:
             "contracts": page.object_list,
             "scoped_has_records": scoped_has_records,
             **contextual_list_filters(request, keys=("project_id",)),
+            "filter_bar": filter_bar,
+            "clear_filters_url": filter_bar["clear_url"],
             "selected_project": selected_project,
             "create_url": contextual_url(
                 "contracts:create", project=selected_project.pk
@@ -111,22 +173,6 @@ def contract_list(request: HttpRequest) -> HttpResponse:
             "can_manage_contracts": can_manage_contracts(
                 request.user, request.organization
             ),
-            "filters": build_table_filters(
-                request,
-                [
-                    {"name": "number", "kind": "text", "label": "شماره قرارداد"},
-                    {"name": "title", "kind": "text", "label": "عنوان و پروژه"},
-                    {"name": "counterparty", "kind": "text", "label": "طرف قرارداد"},
-                    {
-                        "name": "status",
-                        "kind": "select",
-                        "label": "وضعیت",
-                        "choices": ContractStatus.choices,
-                    },
-                    None,
-                ],
-            ),
-            "has_active_filters": has_active_table_filters(request),
         },
     )
 

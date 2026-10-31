@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-31",
+  "package": "MVP-03",
+  "scope": "Contract direction and contextual Claim List only",
+  "authorization": "Explicit bounded Human request",
+  "branch": "main",
+  "entry_head": "6e7e6d05ad862854c439731b8a67aeb97943f772",
+  "observed_external_checkpoint": "1f4a07062d017e678dfc3eabf8075a642a24ffd5",
+  "functional_tests_passed": 11,
+  "functional_subtests_passed": 12,
+  "browser_tests_passed": 1,
+  "browser_scenarios": [
+    {
+      "name": "DIR-01-receivable-entry",
+      "status": 200
+    },
+    {
+      "name": "DIR-02-contract-new-claim",
+      "status": 200
+    },
+    {
+      "name": "DIR-03-contextual-list-desktop",
+      "status": 200
+    },
+    {
+      "name": "DIR-04-contextual-list-mobile",
+      "status": 200
+    },
+    {
+      "name": "DIR-05-filter-retains-contract",
+      "status": 200
+    },
+    {
+      "name": "DIR-06-clear-retains-contract",
+      "status": 200
+    },
+    {
+      "name": "DIR-07-list-create-success",
+      "status": 200
+    },
+    {
+      "name": "DIR-08-payable-desktop",
+      "status": 200
+    },
+    {
+      "name": "DIR-09-payable-mobile",
+      "status": 200
+    },
+    {
+      "name": "DIR-10-payable-context-list",
+      "status": 200
+    },
+    {
+      "name": "DIR-11-invalid-context",
+      "status": 200
+    },
+    {
+      "name": "DIR-12-direct-list",
+      "status": 200
+    },
+    {
+      "name": "DIR-13-direct-create-success",
+      "status": 200
+    },
+    {
+      "name": "DIR-14-inactive-contract",
+      "status": 200
+    },
+    {
+      "name": "DIR-15-inactive-context-list",
+      "status": 200
+    }
+  ],
+  "browser_summary": ".                                                                        [100%]\n1 passed in 60.01s (0:01:00)",
+  "profile": "MVP",
+  "static_checks": {
+    "ruff": "PASS",
+    "ruff_format_6_files": "PASS",
+    "django_check": "PASS",
+    "diff_whitespace": "PASS"
+  },
+  "visual_inspection": [
+    "DIR-04-contextual-list-mobile",
+    "DIR-08-payable-desktop",
+    "DIR-07-list-create-success"
+  ],
+  "regression_limitations": "Two unrelated prior-path assertions in initial affected run; see preservation.json and completion report; global regression PASS not claimed",
+  "initial_failed_new_fixtures_and_browser_assertions": "Corrected and superseded by final focused/browser results",
+  "no_baseline_behavior": "Existing contextual Create guidance retained; no invented claim eligibility",
+  "model_or_migration_changes": false,
+  "domain_services_permissions_workflows_product_surface_changes": false,
+  "agent_git_writes": false,
+  "mvp04_started": false,
+  "product_owner_visual_acceptance": "PENDING",
+  "status": "MVP-03 CONTRACT DIRECTION REMEDIATION: PASS"
+}

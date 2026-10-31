@@ -10,15 +10,15 @@ from django.urls import reverse
 from apps.contracts.models import Contract
 from core.jalali import format_jalali
 
+from . import test_mvp03_browser as browser_fixture
 from .models import ProgressClaim
 from .test_mvp03 import JourneyFixture
-from .test_mvp03_browser import ContractBillingBrowserTests
 
 
 @override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
 class ContractDirectionBrowserTests(JourneyFixture, StaticLiveServerTestCase):
-    browser = ContractBillingBrowserTests.browser
-    _fixture_teardown = ContractBillingBrowserTests._fixture_teardown
+    browser = browser_fixture.ContractBillingBrowserTests.browser
+    _fixture_teardown = browser_fixture.ContractBillingBrowserTests._fixture_teardown
     browser_evidence_directory = (
         Path(__file__).resolve().parents[2]
         / "output/mvp-03/contract-direction-remediation/browser"
@@ -87,7 +87,7 @@ class ContractDirectionBrowserTests(JourneyFixture, StaticLiveServerTestCase):
                     "absentText": ["جست‌وجوی قرارداد یا پروژه"],
                     "steps": [
                         {
-                            "inspect": "!!document.querySelector('[name=status]') && !document.querySelector('[name=q]')",
+                            "inspect": "!!document.querySelector('main [name=status]') && !document.querySelector('main [name=q]')",
                             "description": "status retained; irrelevant search removed",
                         }
                     ],

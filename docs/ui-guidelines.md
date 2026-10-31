@@ -588,6 +588,33 @@ Label page filters as query scope, following section 37. Keep explicit Apply and
 Clear controls inside the same compact filter block, including empty results;
 avoid detached or duplicate filter controls.
 
+### Shared Filter Bar standard
+
+Use `components/filter_bar.html` and `build_filter_bar` for newly adopted lists.
+One prominent business search precedes compact quick filters. Put optional
+secondary controls in «فیلترهای بیشتر»; column-input rows are not the primary UX.
+Keep Apply, clear-all, removable active-filter chips and total result count in
+the same Filter Bar, including empty results. Keep primary Create in its shared
+page-header position. Chips remain visible when filter controls are collapsed.
+
+Desktop order is Search → quick filters → More Filters → Apply. Mobile keeps
+Search full-width and groups quick filters under «فیلترها (n)», with wrapping
+chips and no page overflow. Use explicit Apply, keyboard-accessible controls,
+labels and clear removal names. No JavaScript still yields a working GET form.
+
+URL parameters own search/filter/sort/page state; Back/Forward and refresh restore
+the server-rendered form. Removing a chip resets the page and preserves other
+filters; clearing preserves authorized parent/business context. Render known
+parents as context and hidden references, never duplicated selectors. A transient
+Project filter is distinct from inherited `project_id` context.
+
+Use existing Tom Select widgets for searchable master data, short native selects
+for stable choices, and the existing Jalali widgets for date filters. Any lookup
+must use the same authenticated tenant/object read scope as its list. Validate
+filters server-side; client widgets and chips confer no access. Optional HTMX
+must preserve GET fallback, URL history and the same server checks. Tailwind and
+small layout-only Vanilla JS suffice; adoption is incremental, not a mass rewrite.
+
 ---
 
 ## 14. Forms

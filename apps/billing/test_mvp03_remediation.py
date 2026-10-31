@@ -213,7 +213,7 @@ class JourneyRemediationTests(RemediationFixture, TestCase):
             ),
             (
                 "billing:claim_list",
-                {"q": "no-match"},
+                {"status": "approved"},
                 {"project_id": self.project.pk, "contract": self.contract.pk},
             ),
             (
@@ -242,10 +242,10 @@ class JourneyRemediationTests(RemediationFixture, TestCase):
                     )
                     for key, value in context.items():
                         self.assertContains(response, f'name="{key}" value="{value}"')
-                self.assertEqual(
-                    parse_qs(urlsplit(clear).query),
-                    {k: [str(v)] for k, v in context.items()},
-                )
+                expected = {k: [str(v)] for k, v in context.items()}
+                if route == "contracts:list":
+                    expected["sort"] = ["number"]
+                self.assertEqual(parse_qs(urlsplit(clear).query), expected)
                 if route in {"contracts:list", "estimates:list", "billing:claim_list"}:
                     self.assertContains(response, "با فیلترهای فعلی نتیجه‌ای یافت نشد.")
                     self.assertTrue(response.context["scoped_has_records"])

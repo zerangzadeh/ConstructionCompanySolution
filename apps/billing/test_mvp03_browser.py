@@ -91,7 +91,7 @@ class ContractBillingBrowserTests(JourneyFixture, StaticLiveServerTestCase):
                             "afterPath": reverse("contracts:list"),
                         },
                         {
-                            "clickSelector": "form[data-table-filter-form] button",
+                            "clickSelector": "[data-filter-apply]",
                             "afterPath": reverse("contracts:list"),
                         },
                         {
