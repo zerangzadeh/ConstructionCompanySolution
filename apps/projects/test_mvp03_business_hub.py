@@ -40,7 +40,9 @@ class ProjectCommercialHubTests(JourneyFixture, TestCase):
         self.assertEqual([card.total for card in cards], [1, 1, 1])
         self.assertEqual([card.state_count for card in cards], [1, 1, 0])
         self.assertEqual(
-            cards[0].recent_url, reverse("estimates:detail", args=[estimate.pk])
+            cards[0].recent_url,
+            reverse("estimates:detail", args=[estimate.pk])
+            + f"?project_id={self.project.pk}",
         )
         self.assertEqual(
             cards[2].recent_url, reverse("billing:claim_detail", args=[claim.pk])

@@ -114,7 +114,13 @@ CAPABILITIES = (
         ("billing:claim_settlement_allocate",),
     ),
     Capability("payroll", False, ("payroll",)),
-    Capability("commercial", False, ("commercial",)),
+    Capability(
+        "commercial",
+        False,
+        ("commercial",),
+        # P6 comparison/exception review shares Contracts' mixed namespace.
+        ("contracts:commercial_review",),
+    ),
     Capability("compliance", False, ("compliance", "partner_qualification")),
     Capability("support", False, ("support", "knowledge")),
 )

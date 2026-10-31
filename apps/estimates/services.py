@@ -5,7 +5,7 @@ from io import StringIO
 
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import QuerySet
+from django.db.models import Max, QuerySet
 from django.utils import timezone
 
 from apps.accounts.models import User
@@ -37,6 +37,8 @@ from apps.organizations.models import (
 )
 from apps.projects.models import Activity, Project, ProjectPhase
 from core.identifiers import canonicalize_upper_identifier
+
+EMPTY_ESTIMATE_APPROVAL_MESSAGE = "برای تأیید برآورد، حداقل یک ردیف برآورد ثبت کنید."
 
 
 def _has_estimate_permission(
@@ -183,7 +185,7 @@ def add_estimate_item(
     unit_price: Decimal,
     unit: str = "unit",
     unit_of_measure: UnitOfMeasure | None = None,
-    sort_order: int = 0,
+    sort_order: int | None = None,
 ) -> EstimateItem:
     """Add a positive-quantity, non-negative-price item to an estimate."""
 
@@ -207,6 +209,10 @@ def add_estimate_item(
         raise ValueError("مقدار ردیف باید مثبت باشد.")
     if unit_price < Decimal("0.00"):
         raise ValueError("قیمت واحد ردیف نمی‌تواند منفی باشد.")
+    if sort_order is None:
+        # The Estimate lock serializes appends, including concurrent UI requests.
+        last_order = revision.items.aggregate(last=Max("sort_order"))["last"]
+        sort_order = (last_order if last_order is not None else 0) + 1
     item = EstimateItem.objects.create(
         organization=locked_estimate.organization,
         estimate=locked_estimate,
@@ -274,6 +280,8 @@ def _approve_estimate_domain(
         locked_estimate.current_revision = revision
     if revision.status != EstimateRevisionStatus.DRAFT:
         raise ValueError("فقط بازنگری‌های پیش‌نویس برآورد قابل تأیید هستند.")
+    if not revision.items.exists():
+        raise ValueError(EMPTY_ESTIMATE_APPROVAL_MESSAGE)
     from .price_books import validate_item_mapping
 
     for mapped_item in revision.items.select_related("price_book_mapping"):

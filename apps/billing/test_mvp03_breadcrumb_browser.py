@@ -80,7 +80,7 @@ class BreadcrumbBrowserTests(JourneyFixture, StaticLiveServerTestCase):
             add(
                 "estimate-create-" + suffix,
                 reverse("estimates:create") + f"?project={self.project.pk}",
-                [project, reverse("estimates:list")],
+                [project, reverse("estimates:list") + f"?project_id={self.project.pk}"],
                 mobile,
             )
             add(
@@ -92,7 +92,7 @@ class BreadcrumbBrowserTests(JourneyFixture, StaticLiveServerTestCase):
             add(
                 "estimate-contract-" + suffix,
                 estimate_url,
-                [project, estimate_url, reverse("contracts:list")],
+                [project, estimate_url],
                 mobile,
                 [{"clickHref": contextual_contract, "afterPath": contract}],
             )
@@ -134,7 +134,7 @@ class BreadcrumbBrowserTests(JourneyFixture, StaticLiveServerTestCase):
         add(
             "estimate-error",
             reverse("estimates:create") + f"?project={self.project.pk}",
-            [project, reverse("estimates:list")],
+            [project, reverse("estimates:list") + f"?project_id={self.project.pk}"],
             True,
             [{"submit": True, "afterPath": reverse("estimates:create")}],
         )

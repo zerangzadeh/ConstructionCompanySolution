@@ -21,12 +21,12 @@
                     <tbody class="divide-y divide-slate-100">
                         {% for estimate in estimates %}
                             <tr>
-                                <td class="whitespace-nowrap px-4 py-3.5 font-medium text-slate-700" dir="ltr"><a class="font-semibold text-blue-700 hover:underline" href="{% url 'estimates:detail' estimate.id %}">{{ estimate.estimate_number }}</a></td>
-                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'estimates:detail' estimate.id %}">{{ estimate.title }}</a>{% if estimate.notes %}<p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500">{{ estimate.notes }}</p>{% endif %}</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 font-medium text-slate-700" dir="ltr"><a class="font-semibold text-blue-700 hover:underline" href="{% url 'estimates:detail' estimate.id %}{{ estimate_context_query }}">{{ estimate.estimate_number }}</a></td>
+                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'estimates:detail' estimate.id %}{{ estimate_context_query }}">{{ estimate.title }}</a>{% if estimate.notes %}<p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500">{{ estimate.notes }}</p>{% endif %}</td>
                                 <td class="px-4 py-3.5"><p class="font-medium text-slate-700">{{ estimate.project.name }}</p><p class="mt-0.5 text-[11px] text-slate-500">{% if estimate.phase %}{{ estimate.phase.name }}{% endif %}{% if estimate.contract %}{% if estimate.phase %} · {% endif %}<span dir="ltr">{{ estimate.contract.contract_number }}</span>{% endif %}</p></td>
                                 <td class="px-4 py-3.5">{% include "components/status_badge.html" with status=estimate.status label=estimate.status|status_fa only %}</td>
                                 <td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums text-slate-900" dir="ltr">{{ estimate.total_amount|erp_number }} <span class="font-normal text-slate-500" dir="rtl">{{ request.organization.currency }}</span></td>
-                                <td class="px-4 py-3.5 text-center">{% url 'estimates:detail' estimate.id as record_detail_url %}{% include "components/record_detail_link.html" with detail_url=record_detail_url record_label=estimate.title only %}</td>
+                                <td class="px-4 py-3.5 text-center">{% url 'estimates:detail' estimate.id as record_detail_url %}{% include "components/record_detail_link.html" with detail_url=record_detail_url|add:estimate_context_query record_label=estimate.title only %}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

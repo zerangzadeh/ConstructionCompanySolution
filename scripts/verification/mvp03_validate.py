@@ -21,6 +21,10 @@ raise SystemExit(
         sys.argv[1:]
         or [
             "apps/billing/test_mvp03.py",
+            "apps/contracts/test_review_navigation.py",
+            "apps/contracts/test_mvp03_estimate_contract_browser.py",
+            "apps/estimates/test_mvp03_estimate_ux.py",
+            "apps/estimates/test_mvp03_estimate_ux_browser.py",
             "apps/billing/test_mvp03_remediation.py",
             "apps/billing/test_mvp03_contextual_create.py",
             "apps/billing/test_mvp03_breadcrumbs.py",

@@ -6,6 +6,115 @@ bounded Human request in the attached
 MVP-03 instruction is the execution contract; these MVP packages are not CEPs.
 No CEP is reopened and no Registry lifecycle change is implied.
 
+## Estimate → Contract UX remediation — 2026-10-31
+
+Completed the explicit bounded Human request on `main`, HEAD/local `origin/main`
+`6e7e6d05ad862854c439731b8a67aeb97943f772`. Previous Estimate UX work and
+other existing changes are preserved. No commit/push, migration or MVP-04 work.
+
+The P6 read-only commercial timeline/comparison/exception workspace was inheriting
+MVP exposure from the mixed `contracts` namespace. Under D2's capability-level
+boundary and non-MVP Commercial exclusion, `contracts:commercial_review` now has
+an explicit route override in the existing centralized `commercial` capability.
+The Contract action uses the existing Product Surface template filter in addition
+to its unchanged permission check. MVP hides the action and denies direct HTTP
+access, including a forged `?profile=FULL_ERP`. Internal `FULL_ERP` verification
+still exposes it only with existing business permission and object scope.
+The route, permission catalog, models and backend read service are unchanged;
+the authorized backend service is explicitly tested as active in MVP.
+
+When an Estimate navigation reference resolves through the existing permitted,
+tenant/project-scoped related-Estimate source, the business breadcrumb suffix is
+**Project → Estimate → current Contract**. Project and Estimate remain real links
+where permitted; Contract remains the final non-link with `aria-current="page"`.
+The inserted Contracts collection is omitted only in that contextual case.
+General entry, inaccessible Estimate context and malformed/foreign/unrelated/
+ambiguous references retain the normal **Project → Contracts → current Contract**
+hierarchy. The existing Home/conceptual group prefix and shared renderer remain.
+No domain relationship, workflow, authorization or session behavior changed.
+
+Validation: **42 focused functional/surface/permission tests / 16 subtests PASS**.
+The five affected breadcrumb tests were rerun with exact contextual hierarchy,
+invalid-context fallback and independent parent-permission assertions; PASS.
+**Two real Chrome tests / 56 scenarios PASS**: 19 new scenarios across `MVP` and
+`FULL_ERP`, desktop 1440px/mobile 390px, plus 37 existing breadcrumb scenarios.
+They exercise Estimate → related Contract, actual breadcrumb returns to Estimate
+and Project, normal direct Contract entry, hidden MVP action/direct URL denial,
+permitted Full-ERP review opening and hiding/denial after permission removal.
+RTL/current-item/real-link and horizontal overflow assertions pass. Representative
+MVP mobile contextual/general and Full-ERP desktop captures were inspected.
+
+Focused Ruff, Django system check, migration drift (`No changes detected`) and
+`git diff --check` PASS. Fifteen backend/route/auth/shared sources match HEAD;
+thirteen prior dirty source/test files remain byte-identical to entry. Product
+mutations are limited to `core/product_surface.py`, Contract detail breadcrumb
+construction and Contract detail action rendering. Existing Full-ERP review tests
+now declare their verification profile explicitly. Only the isolated test DB was
+written. Full ERP regression and production validation are not claimed.
+
+Evidence: [validation](../../../output/mvp-03/estimate-contract-remediation/VALIDATION.json),
+[test results](../../../output/mvp-03/estimate-contract-remediation/test-results.json),
+[new browser captures](../../../output/mvp-03/estimate-contract-remediation/browser-index.json)
+and [source preservation](../../../output/mvp-03/estimate-contract-remediation/static-source-evidence.json).
+No CEP lifecycle/dependency/authorization records were changed. Human visual
+acceptance remains pending.
+
+`MVP-03 ESTIMATE-CONTRACT UX REMEDIATION: PASS`
+
+`PRODUCT OWNER VISUAL ACCEPTANCE: PENDING`
+
+## Estimate UX remediation — 2026-10-31
+
+Completed the explicit bounded Estimate request on initially clean `main`, HEAD
+`6e7e6d05ad862854c439731b8a67aeb97943f772`, equal to local `origin/main`.
+No branch, commit, push, migration, new model or MVP-04 work.
+
+| Requirement | Implementation and evidence |
+| --- | --- |
+| Preserve local Project context | Project hub Estimate create/recent links and all three Estimate list detail links retain validated `project_id`. Detail/create collection breadcrumbs return to the scoped Estimates list; validation, item submission, creation and approval redirects retain it. The existing explicit exit to global records remains available. Legacy `?project=` create entry remains supported and leads to the same scoped detail/list context. |
+| Preserve scope and session | Context is reloaded from existing tenant/permission-scoped Project sources. Invalid, ambiguous, foreign, conflicting or mismatched detail/create context fails closed. Forged create parents remain invalid. General entry remains global, including for an Estimate-only reader without Project-view permission. Tests retain a different active Project **and Site**, without changing either session selection. |
+| Remove technical item order | `sort_order` is absent from `EstimateItemForm`; forged form values are ignored. The existing transactional append service assigns the next current-revision sequence after acquiring its existing Estimate row lock. Explicit service order remains supported, stored fields and historical orders remain unchanged, and revision copies retain their order. Tests cover sequences 12→13→14, historical/current revision isolation, and real browser creation of rows 1→2. |
+| Reject empty approval | The shared authoritative approval service rejects a current revision with no items using `برای تأیید برآورد، حداقل یک ردیف برآورد ثبت کنید.` The draft UI hides approval and shows that message. Direct service calls, forged HTTP POSTs, legacy revision fallback and active workflow domain commands are covered. Failed workflow approval rolls back the claim/decision and leaves the work item open; valid items still complete the existing workflow. Historical items do not qualify an empty current revision. |
+| Minor form cleanup | Optional Contract/Phase labels are explicit. Existing Tailwind utilities pair fields on desktop, retain a mobile stack and reduce Notes to three rows. The existing searchable Unit of Measure selector is preserved and exercised through real search/selection. |
+
+Only the two requested Estimate service rules changed: automatic append order
+when omitted, and rejection of empty approval. Model/schema, Estimate workflow
+definition/runtime, price-book checks, authorization, Product Surface and other
+domain services remain unchanged. The shared breadcrumb renderer remains in use;
+current pages remain final non-links with `aria-current="page"`.
+
+Validation: **35 focused/affected functional tests PASS** (11 new, 24 existing),
+plus **5 live Chrome tests / 92 scenarios PASS** (14 new Estimate scenarios,
+34 contextual-create, 7 Project hub, 37 existing breadcrumb scenarios).
+Desktop 1440px and mobile 390px cover actual Project/list/detail/back clicks,
+inherited create/error/success, no item-order control, two automatic items,
+searchable units, nonempty workflow approval and unchanged Project/Site session.
+Ruff check/format, Django system check, three template compilations, migration
+drift and `git diff --check` PASS. Fourteen protected sources match HEAD.
+Only the isolated reusable test database was written; the pre-existing pending
+Development migration `payroll.0010_cep069_reviewed_statutory_context` was not run.
+
+Initial failures were test-fixture/assertion issues: missing Unit category,
+service-error redirect versus form error, breadcrumb direct-child markup,
+global versus explicitly scoped expected parent URLs, TomSelect-adjusted label
+targets, and uppercase identifier normalization. These were corrected and
+rerun without weakening application controls; all run summaries are retained.
+Representative desktop list/create/empty and mobile create captures were visually
+inspected. Full ERP regression and production validation are not claimed.
+
+Evidence: [validation](../../../output/mvp-03/estimate-ux-remediation/VALIDATION.json),
+[test attribution](../../../output/mvp-03/estimate-ux-remediation/test-results.json),
+[14 new browser captures](../../../output/mvp-03/estimate-ux-remediation/browser-index.json)
+and [affected browser regression](../../../output/mvp-03/estimate-ux-remediation/browser-regression-index.json).
+These paths are repository-root artifacts under `output/mvp-03/estimate-ux-remediation/`.
+
+Git add/commit/push/merge: **NOT EXECUTED**. CEP lifecycle/dependency/authorization
+records were not changed by this bounded MVP remediation.
+
+`MVP-03 ESTIMATE UX REMEDIATION: PASS`
+
+`PRODUCT OWNER VISUAL ACCEPTANCE: PENDING`
+
 ## Breadcrumb UX remediation — 2026-10-30/31
 
 Completed the explicit breadcrumb-only Human request on current `main`, still

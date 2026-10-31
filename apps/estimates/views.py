@@ -1,13 +1,14 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from apps.contracts.services import get_organization_contracts
 from apps.estimates.forms import EstimateForm, EstimateItemForm
-from apps.estimates.models import EstimateStatus
+from apps.estimates.models import Estimate, EstimateStatus
 from apps.estimates.services import (
+    EMPTY_ESTIMATE_APPROVAL_MESSAGE,
     add_estimate_item,
     approve_estimate,
     create_estimate,
@@ -24,6 +25,7 @@ from apps.organizations.decorators import (
 )
 from apps.organizations.models import BusinessPermissionCode
 from apps.projects.business_hub import filter_project_context
+from apps.projects.models import Project
 from apps.projects.services import get_organization_projects
 from core.business_choices import contextual_parent, contextual_url
 from core.list_filters import (
@@ -34,6 +36,49 @@ from core.list_filters import (
     paginate_table,
     table_pagination_query,
 )
+
+
+def _project_context(
+    request: HttpRequest, *, legacy_create: bool = False
+) -> Project | None:
+    if "project_id" not in request.GET and not (
+        legacy_create and "project" in request.GET
+    ):
+        return None
+    projects = get_organization_projects(
+        user=request.user, organization=request.organization
+    )
+    project = contextual_parent(request, "project_id", projects)
+    if legacy_create and "project" in request.GET:
+        legacy = contextual_parent(request, "project", projects)
+        if project is not None and project.pk != legacy.pk:
+            raise Http404
+        project = project or legacy
+    return project
+
+
+def _detail_url(estimate: Estimate, project: Project | None = None) -> str:
+    url = reverse("estimates:detail", args=[estimate.pk])
+    return url + (f"?project_id={project.pk}" if project else "")
+
+
+def _breadcrumbs(
+    request: HttpRequest,
+    title: str,
+    *,
+    project: Project | None = None,
+    context_project: Project | None = None,
+) -> list[dict[str, str]]:
+    from apps.billing.journey_views import journey_breadcrumbs
+
+    crumbs = journey_breadcrumbs(
+        request, title, collection=("برآوردها", "estimates:list"), project=project
+    )
+    if context_project and crumbs[-2]["url"]:
+        crumbs[-2]["url"] = contextual_url(
+            "estimates:list", project_id=context_project.pk
+        )
+    return crumbs
 
 
 @active_organization_required
@@ -87,10 +132,13 @@ def estimate_list(request: HttpRequest) -> HttpResponse:
             **contextual_list_filters(request),
             "selected_project": selected_project,
             "estimate_create_url": contextual_url(
-                "estimates:create", project=selected_project.pk
+                "estimates:create", project_id=selected_project.pk
             )
             if selected_project
             else reverse("estimates:create"),
+            "estimate_context_query": f"?project_id={selected_project.pk}"
+            if selected_project
+            else "",
             "page_breadcrumbs": journey_breadcrumbs(
                 request, "برآوردها", project=selected_project
             ),
@@ -121,17 +169,7 @@ def estimate_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.ESTIMATES_CREATE)
 def estimate_create(request: HttpRequest) -> HttpResponse:
-    context_project = (
-        contextual_parent(
-            request,
-            "project",
-            get_organization_projects(
-                user=request.user, organization=request.organization
-            ),
-        )
-        if "project" in request.GET
-        else None
-    )
+    context_project = _project_context(request, legacy_create=True)
     membership = get_active_membership(
         user=request.user, organization=request.organization
     )
@@ -167,8 +205,7 @@ def estimate_create(request: HttpRequest) -> HttpResponse:
         except (PermissionDenied, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
-            return redirect("estimates:detail", estimate_id=estimate.pk)
-    from apps.billing.journey_views import journey_breadcrumbs
+            return redirect(_detail_url(estimate, context_project))
 
     return render(
         request,
@@ -178,11 +215,11 @@ def estimate_create(request: HttpRequest) -> HttpResponse:
             "cancel_url": reverse("projects:detail", args=[context_project.pk])
             if context_project
             else reverse("estimates:list"),
-            "page_breadcrumbs": journey_breadcrumbs(
+            "page_breadcrumbs": _breadcrumbs(
                 request,
                 "برآورد جدید",
-                collection=("برآوردها", "estimates:list"),
                 project=context_project,
+                context_project=context_project,
             ),
         },
     )
@@ -191,8 +228,6 @@ def estimate_create(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.ESTIMATES_VIEW)
 def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
-    from apps.billing.journey_views import journey_breadcrumbs
-
     if request.method == "POST":
         require_organization_permission(
             request,
@@ -206,6 +241,10 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
         ),
         pk=estimate_id,
     )
+    context_project = _project_context(request)
+    if context_project and context_project.pk != estimate.project_id:
+        raise Http404
+    detail_url = _detail_url(estimate, context_project)
     if request.method == "POST" and estimate.status != EstimateStatus.DRAFT:
         messages.error(
             request,
@@ -213,7 +252,7 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
             if estimate.status == EstimateStatus.APPROVED
             else f"برآورد در وضعیت «{estimate.get_status_display()}» قابل تغییر نیست.",
         )
-        return redirect("estimates:detail", estimate_id=estimate.pk)
+        return redirect(detail_url)
 
     item_form = EstimateItemForm(
         request.POST or None, organization=request.organization
@@ -233,21 +272,24 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
                 unit=data["unit_of_measure"].symbol,
                 unit_of_measure=data["unit_of_measure"],
                 unit_price=data["unit_price"],
-                sort_order=data["sort_order"],
             )
         except (PermissionDenied, ValueError) as exc:
             messages.error(request, str(exc))
-            return redirect("estimates:detail", estimate_id=estimate.pk)
+            return redirect(detail_url)
         else:
-            return redirect(
-                "estimates:detail",
-                estimate_id=estimate.pk,
-            )
+            return redirect(detail_url)
     return render(
         request,
         "estimates/detail.html",
         {
             "estimate": estimate,
+            "has_current_items": bool(
+                estimate.current_revision_id
+                and estimate.current_revision.items.exists()
+            ),
+            "empty_approval_message": EMPTY_ESTIMATE_APPROVAL_MESSAGE,
+            "approve_url": reverse("estimates:approve", args=[estimate.pk])
+            + (f"?project_id={context_project.pk}" if context_project else ""),
             "project_detail_url": reverse("projects:detail", args=[estimate.project_id])
             if has_business_permission(
                 user=request.user,
@@ -256,11 +298,11 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
                 project=estimate.project,
             )
             else "",
-            "page_breadcrumbs": journey_breadcrumbs(
+            "page_breadcrumbs": _breadcrumbs(
                 request,
                 estimate.title,
-                collection=("برآوردها", "estimates:list"),
                 project=estimate.project,
+                context_project=context_project,
             ),
             "item_form": item_form,
             "related_contract_url": (
@@ -296,8 +338,11 @@ def estimate_approve(request: HttpRequest, estimate_id: str) -> HttpResponse:
         ),
         pk=estimate_id,
     )
+    context_project = _project_context(request)
+    if context_project and context_project.pk != estimate.project_id:
+        raise Http404
     try:
         approve_estimate(estimate=estimate, actor=request.user)
     except (PermissionDenied, ValueError) as exc:
         return HttpResponse(str(exc), status=403)
-    return redirect("estimates:detail", estimate_id=estimate.pk)
+    return redirect(_detail_url(estimate, context_project))

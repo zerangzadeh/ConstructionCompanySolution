@@ -66,6 +66,7 @@ from .journey_forms import ClaimCorrectionForm, ClaimDecisionForm
 from .journey_views import (
     breadcrumb_contract,
     claim_create_allowed,
+    contract_claim_create_allowed,
     journey_breadcrumbs,
 )
 from .models import (
@@ -388,20 +389,24 @@ def claim_list(request: HttpRequest) -> HttpResponse:
     claims = get_progress_claims(actor=request.user, organization=request.organization)
     claims, selected_project = filter_project_context(request, claims)
     contract_filter = request.GET.get("contract")
-    if contract_filter:
+    contract_scoped = "contract" in request.GET
+    selected_contract = breadcrumb_contract(request, project=selected_project)
+    if contract_scoped:
         from apps.organizations.form_scoping import normalized_uuid
 
         contract_id = normalized_uuid(contract_filter)
         claims = (
-            claims.filter(contract_id=contract_id) if contract_id else claims.none()
+            claims.filter(contract_id=contract_id)
+            if contract_id and len(request.GET.getlist("contract")) == 1
+            else claims.none()
         )
     scoped_has_records = claims.exists()
     claims = apply_table_filters(
         claims,
         request,
-        text_fields={
-            "q": ("contract__title", "contract__contract_number", "project__name")
-        },
+        text_fields={}
+        if contract_scoped
+        else {"q": ("contract__title", "contract__contract_number", "project__name")},
         choice_fields={
             "status": (
                 "status",
@@ -422,6 +427,11 @@ def claim_list(request: HttpRequest) -> HttpResponse:
         },
         default_ordering=("-created_at", "pk"),
     )
+    can_create_claim = route_exposed("billing:claim_create") and (
+        contract_claim_create_allowed(request, selected_contract)
+        if contract_scoped
+        else not selected_project and claim_create_allowed(request)
+    )
     return render(
         request,
         "billing/claim_list.html",
@@ -435,6 +445,7 @@ def claim_list(request: HttpRequest) -> HttpResponse:
                 "contracts:list", project_id=selected_project.pk
             )
             if selected_project
+            and not contract_scoped
             and claim_create_allowed(request)
             and route_exposed("contracts:list")
             and has_business_permission(
@@ -447,16 +458,20 @@ def claim_list(request: HttpRequest) -> HttpResponse:
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
             "pagination_rendered": True,
-            "can_create_claim": not selected_project and claim_create_allowed(request),
+            "contract_scoped": contract_scoped,
+            "selected_contract": selected_contract,
+            "can_create_claim": can_create_claim,
             "create_url": contextual_url(
                 "billing:claim_create", contract=contract_filter
             )
-            if contract_filter
-            else reverse("billing:claim_create"),
+            if can_create_claim and contract_scoped
+            else reverse("billing:claim_create")
+            if can_create_claim
+            else "",
             "page_breadcrumbs": journey_breadcrumbs(
                 request,
                 "صورت‌وضعیت‌ها",
-                breadcrumb_contract(request, project=selected_project),
+                selected_contract,
                 project=selected_project,
             ),
         },

@@ -109,7 +109,20 @@ class BusinessBreadcrumbTests(JourneyFixture, TestCase):
             reverse("contracts:detail", args=[self.contract.pk])
             + f"?estimate={estimate.pk}",
         )
-        self.assert_trail(target, [project, detail, reverse("contracts:list")])
+        page = self.assert_trail(target, [project, detail], [reverse("contracts:list")])
+        self.assertEqual(
+            page.context["page_breadcrumbs"][-3:],
+            [
+                {"label": self.project.name, "url": project},
+                {"label": estimate.title, "url": detail},
+                {"label": self.contract.title, "url": ""},
+            ],
+        )
+        self.assert_trail(
+            reverse("contracts:detail", args=[self.contract.pk]),
+            [project, reverse("contracts:list")],
+            [detail],
+        )
         self.assertEqual(self.client.get(detail).status_code, 200)
 
     def test_claim_baseline_progress_details_lists_and_create_have_real_parents(self):
@@ -162,15 +175,20 @@ class BusinessBreadcrumbTests(JourneyFixture, TestCase):
             title="برآورد نامرتبط",
         )
         detail = reverse("contracts:detail", args=[self.contract.pk])
-        for value in (private.pk, unrelated.pk, "invalid"):
+        for value in (private.pk, unrelated.pk, "invalid", ""):
             response = self.assert_trail(
                 detail + f"?estimate={value}",
+                parents=[reverse("contracts:list")],
                 absent=[
                     reverse("estimates:detail", args=[private.pk]),
                     reverse("estimates:detail", args=[unrelated.pk]),
                 ],
             )
             self.assertNotContains(response, private.title)
+        self.assert_trail(
+            detail + f"?estimate={unrelated.pk}&estimate={private.pk}",
+            [reverse("contracts:list")],
+        )
         for route in (
             "billing:baseline_list",
             "billing:progress_list",
@@ -219,6 +237,8 @@ class BusinessBreadcrumbTests(JourneyFixture, TestCase):
             + f"?estimate={estimate.pk}"
         )
         self.assert_trail(detail, [reverse("contracts:list")], [project, estimate_url])
+        role.permissions.add(BusinessPermission.objects.get(code="estimates.view"))
+        self.assert_trail(detail, [estimate_url], [project, reverse("contracts:list")])
         role.permissions.add(
             *BusinessPermission.objects.filter(
                 code__in=("projects.view", "estimates.view")

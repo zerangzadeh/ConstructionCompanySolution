@@ -20,13 +20,13 @@ class EstimateForm(JalaliDateMixin, forms.ModelForm):
 
     project = forms.ModelChoiceField(label="پروژه", queryset=Project.objects.none())
     contract = forms.ModelChoiceField(
-        label="قرارداد",
+        label="قرارداد (اختیاری)",
         queryset=Contract.objects.none(),
         required=False,
         empty_label="بدون قرارداد",
     )
     phase = forms.ModelChoiceField(
-        label="فاز پروژه",
+        label="فاز پروژه (اختیاری)",
         queryset=ProjectPhase.objects.none(),
         required=False,
         empty_label="بدون فاز",
@@ -53,6 +53,7 @@ class EstimateForm(JalaliDateMixin, forms.ModelForm):
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
+        self.fields["notes"].widget.attrs["rows"] = 3
         projects = (
             scoped_projects_for_form(
                 organization=organization,
@@ -182,5 +183,4 @@ class EstimateItemForm(JalaliDateMixin, forms.ModelForm):
             "unit",
             "unit_of_measure",
             "unit_price",
-            "sort_order",
         ]

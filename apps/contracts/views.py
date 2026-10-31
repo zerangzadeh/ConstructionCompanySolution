@@ -24,7 +24,11 @@ from apps.contracts.forms import (
     ContractualRevisionForm,
     ContractualWithdrawalForm,
 )
-from apps.contracts.models import ContractStatus, ContractTermVersionStatus
+from apps.contracts.models import (
+    ContractDirection,
+    ContractStatus,
+    ContractTermVersionStatus,
+)
 from apps.contracts.services import (
     can_manage_contracts,
     create_contract,
@@ -261,7 +265,10 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
             term.insurance_form = ContractInsuranceClassificationForm(
                 on_date=term.effective_from, prefix=str(term.pk)
             )
-    from apps.billing.journey_views import claim_create_allowed, journey_breadcrumbs
+    from apps.billing.journey_views import (
+        contract_claim_create_allowed,
+        journey_breadcrumbs,
+    )
     from apps.billing.services import get_progress_claims, get_project_baselines
     from apps.estimates.services import get_organization_estimates
 
@@ -280,18 +287,19 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
         if permitted(BusinessPermissionCode.ESTIMATES_VIEW)
         else None
     )
+    is_receivable = contract.direction == ContractDirection.RECEIVABLE
     related_claims = (
         get_progress_claims(
             actor=request.user, organization=request.organization
         ).filter(contract=contract)
-        if permitted(BusinessPermissionCode.CLAIMS_VIEW)
+        if is_receivable and permitted(BusinessPermissionCode.CLAIMS_VIEW)
         else None
     )
     related_baselines = (
         get_project_baselines(
             actor=request.user, organization=request.organization
         ).filter(contract=contract)
-        if permitted(BusinessPermissionCode.BASELINES_VIEW)
+        if is_receivable and permitted(BusinessPermissionCode.BASELINES_VIEW)
         else None
     )
     from apps.organizations.form_scoping import normalized_uuid
@@ -319,11 +327,14 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
             "page_breadcrumbs": journey_breadcrumbs(
                 request,
                 contract.title,
-                collection=("قراردادها", "contracts:list"),
+                collection=None
+                if context_estimate is not None
+                else ("قراردادها", "contracts:list"),
                 project=contract.project,
                 estimate=context_estimate,
             ),
             "related_estimates": related_estimates,
+            "is_receivable": is_receivable,
             "related_claims": related_claims,
             "related_baselines": related_baselines,
             "estimate_list_url": contextual_url("estimates:list", contract=contract),
@@ -334,9 +345,7 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
             "claim_create_url": contextual_url(
                 "billing:claim_create", contract=contract
             )
-            if contract.direction == "receivable"
-            and contract.status == "active"
-            and claim_create_allowed(request)
+            if contract_claim_create_allowed(request, contract)
             else "",
             "term_versions": terms,
             "can_review_commercial": has_business_permission(

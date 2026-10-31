@@ -108,7 +108,10 @@ def project_commercial_summary(
                 project=project,
             )
         ):
-            create_url = contextual_url(f"{namespace}:create", project=project.pk)
+            create_url = contextual_url(
+                f"{namespace}:create",
+                **{"project_id" if namespace == "estimates" else "project": project.pk},
+            )
         if recent and namespace == "billing":
             recent_label = (
                 f"صورت‌وضعیت {recent.claim_number} · نسخه {recent.revision_number}"
@@ -130,7 +133,12 @@ def project_commercial_summary(
                 }[namespace],
                 recent_label=recent_label,
                 recent_status=recent.get_status_display() if recent else "",
-                recent_url=reverse(detail_route, args=[recent.pk]) if recent else "",
+                recent_url=(
+                    reverse(detail_route, args=[recent.pk])
+                    + (f"?project_id={project.pk}" if namespace == "estimates" else "")
+                )
+                if recent
+                else "",
                 create_url=create_url,
                 create_label=create_label,
             )

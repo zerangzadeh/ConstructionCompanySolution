@@ -104,7 +104,11 @@ class ContextualCreateTests(JourneyFixture, TestCase):
         response = self.client.post(url, self.estimate_data())
         estimate = Estimate.objects.get(estimate_number="CTX-E")
         self.assertEqual(estimate.project, self.project)
-        self.assertRedirects(response, reverse("estimates:detail", args=[estimate.pk]))
+        self.assertRedirects(
+            response,
+            reverse("estimates:detail", args=[estimate.pk])
+            + f"?project_id={self.project.pk}",
+        )
         self.assertContains(
             self.client.get(response.url),
             reverse("projects:detail", args=[self.project.pk]),

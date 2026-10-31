@@ -51,6 +51,24 @@ def claim_create_allowed(request):
     )
 
 
+def contract_claim_create_allowed(request, contract):
+    """Match contextual Create entry rules without inventing billing eligibility."""
+    return (
+        contract is not None
+        and claim_create_allowed(request)
+        and get_organization_contracts(
+            user=request.user, organization=request.organization
+        )
+        .filter(
+            pk=contract.pk,
+            status=ContractStatus.ACTIVE,
+            direction=ContractDirection.RECEIVABLE,
+            project__deleted_at__isnull=True,
+        )
+        .exists()
+    )
+
+
 def breadcrumb_contract(request, *, project=None):
     """Optional navigation context from the existing authorized Contract source."""
     if len(request.GET.getlist("contract")) != 1 or not has_business_permission(

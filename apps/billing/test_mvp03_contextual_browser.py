@@ -193,7 +193,7 @@ class ContextualBrowserTests(JourneyFixture, StaticLiveServerTestCase):
         estimate_create = reverse("estimates:create")
         contract_create = reverse("contracts:create")
         claim_create = reverse("billing:claim_create")
-        estimate_context = estimate_create + f"?project={self.project.pk}"
+        estimate_context = estimate_create + f"?project_id={self.project.pk}"
         contract_context = contract_create + f"?project={self.project.pk}"
         claim_context = claim_create + f"?contract={self.contract.pk}"
 

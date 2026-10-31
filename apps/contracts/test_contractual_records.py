@@ -8,7 +8,7 @@ from uuid import uuid4
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import DatabaseError, close_old_connections, transaction
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
 
 from apps.accounting.models import JournalEntry
@@ -441,6 +441,7 @@ class ContractualRecordTests(TestCase):
                 project_change_proposal=other_proposal,
             )
 
+    @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_rtl_operational_views_are_tenant_scoped(self) -> None:
         record = self.make_record()
         self.client.force_login(self.owner)

@@ -46,7 +46,7 @@ class ContractBillingBrowserTests(JourneyFixture, StaticLiveServerTestCase):
         estimates = reverse("estimates:list") + f"?project_id={self.project.pk}"
         claims = reverse("billing:claim_list") + f"?project_id={self.project.pk}"
         contract_create = reverse("contracts:create") + f"?project={self.project.pk}"
-        estimate_create = reverse("estimates:create") + f"?project={self.project.pk}"
+        estimate_create = reverse("estimates:create") + f"?project_id={self.project.pk}"
         base = {"status": 200, "screenshot": True}
         self.browser(
             self.owner,

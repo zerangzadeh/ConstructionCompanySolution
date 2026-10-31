@@ -1,6 +1,6 @@
 """Commercial-review navigation uses the same project boundary as its service."""
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -17,6 +17,7 @@ from apps.organizations.services import ACTIVE_ORGANIZATION_SESSION_KEY
 from apps.projects.models import Project
 
 
+@override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
 class CommercialReviewNavigationTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -87,6 +88,30 @@ class CommercialReviewNavigationTests(TestCase):
         url = reverse("contracts:commercial_review", args=[self.contracts[0].pk])
         self.assertContains(detail, f'href="{url}"')
         self.assertContains(self.client.get(url), "خط زمانی و مقایسه تجاری قرارداد")
+
+    @override_settings(PRODUCT_SURFACE_PROFILE="MVP")
+    def test_mvp_hides_review_and_denies_direct_url_without_removing_backend(self):
+        from apps.contracts.commercial_review import get_commercial_review
+        from core.product_surface import route_capability, route_exposed
+
+        detail_url = reverse("contracts:detail", args=[self.contracts[0].pk])
+        review_url = reverse("contracts:commercial_review", args=[self.contracts[0].pk])
+        self.assertEqual(route_capability("contracts:commercial_review"), "commercial")
+        self.assertFalse(route_exposed("contracts:commercial_review"))
+        self.assertTrue(route_exposed("contracts:detail"))
+        response = self.client.get(detail_url)
+        self.assertTrue(response.context["can_review_commercial"])
+        self.assertNotContains(response, "مرور تجاری و استثناها")
+        self.assertNotContains(response, f'href="{review_url}"')
+        for url in (review_url, review_url + "?profile=FULL_ERP"):
+            self.assertEqual(self.client.get(url).status_code, 403)
+        # Product exposure does not deactivate the domain's existing read service.
+        self.assertEqual(
+            get_commercial_review(
+                organization=self.org, actor=self.user, contract_id=self.contracts[0].pk
+            ).contract.pk,
+            self.contracts[0].pk,
+        )
 
     def test_missing_review_permission_hides_link_and_denies_endpoint(self):
         self.role.permissions.remove(
