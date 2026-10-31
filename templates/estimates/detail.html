@@ -7,20 +7,22 @@
 {% block content %}
     <div dir="rtl">
         {% include "components/page_header.html" with page_breadcrumbs=page_breadcrumbs page_breadcrumb_label="برآوردها" page_breadcrumb_url="/estimates/" page_eyebrow="پیمان، متره و صورت‌وضعیت" page_title=estimate.title page_description=estimate.project.name only %}
-        {% if related_contract_url %}<section class="erp-surface mt-4 rounded-xl p-4"><p class="text-xs text-slate-500">قرارداد مرتبط با این برآورد</p><a class="mt-2 inline-block font-semibold text-blue-700" href="{{ related_contract_url }}">{{ estimate.contract.title }} · {{ estimate.contract.contract_number }}</a></section>{% elif not estimate.contract_id %}<p class="mt-4 text-sm text-slate-500">این برآورد به قراردادی متصل نشده است.</p>{% endif %}
+        {% if related_contract_url %}<section class="erp-surface mt-4 rounded-xl p-4"><p class="text-xs text-slate-500">قرارداد مرتبط با این برآورد</p><a class="mt-2 inline-block font-semibold text-blue-700" href="{{ related_contract_url }}">{{ estimate.contract.title }} · <bdi dir="ltr">{{ estimate.contract.contract_number }}</bdi></a></section>{% elif not estimate.contract_id %}<p class="mt-4 text-sm text-slate-500">این برآورد به قراردادی متصل نشده است. ایجاد قرارداد متصل از این صفحه در دسترس نیست.</p>{% endif %}
 
         <div class="mt-5 flex flex-wrap items-center gap-3">
             {% if estimate.status == "approved" %}<span class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">تأییدشده</span>
-            {% elif estimate.status == "revised" %}<span class="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">اصلاح‌شده</span>
+            {% elif estimate.status == "revised" %}<span class="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">{{ estimate.get_status_display }}</span>
             {% elif estimate.status == "archived" %}<span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">بایگانی‌شده</span>
             {% else %}<span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">پیش‌نویس</span>{% endif %}
             {% if estimate.status == "draft" and "estimates.approve" in business_permission_codes %}
                 <form method="post" action="{% url 'estimates:approve' estimate.id %}">
                     {% csrf_token %}
                     <button class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" type="submit">تأیید برآورد</button>
-                {% include "workforce/_native_choices.html" with choice_form=item_form %}</form></details>
-            {% elif estimate.status != "draft" %}
+                </form>
+            {% elif estimate.status == "approved" %}
                 <p class="text-sm font-medium text-emerald-700">این برآورد تأیید شده و امکان افزودن یا ویرایش ردیف‌ها وجود ندارد.</p>
+            {% elif estimate.status == "revised" %}<p class="text-sm text-slate-600">این برآورد بازنگری شده است؛ افزودن ردیف فقط در وضعیت پیش‌نویس امکان‌پذیر است.</p>
+            {% elif estimate.status == "archived" %}<p class="text-sm text-slate-600">این برآورد بایگانی شده است و برای مشاهده سوابق نگهداری می‌شود.</p>
             {% endif %}
         </div>
 
@@ -29,7 +31,7 @@
                 <h2 class="font-semibold text-slate-900">اطلاعات برآورد</h2>
                 <dl class="mt-5 space-y-4 text-sm">
                     <div class="flex justify-between gap-4"><dt class="text-slate-500">شماره برآورد</dt><dd class="font-medium text-slate-900" dir="ltr">{{ estimate.estimate_number }}</dd></div>
-                    <div class="flex justify-between gap-4"><dt class="text-slate-500">پروژه</dt><dd class="font-medium text-slate-900">{{ estimate.project.name }}</dd></div>
+                    <div class="flex justify-between gap-4"><dt class="text-slate-500">پروژه</dt><dd class="font-medium text-slate-900">{% if project_detail_url %}<a class="text-blue-700 hover:underline" href="{{ project_detail_url }}">{{ estimate.project.name }}</a>{% else %}{{ estimate.project.name }}{% endif %}</dd></div>
                     {% if estimate.phase %}<div class="flex justify-between gap-4"><dt class="text-slate-500">فاز</dt><dd class="font-medium text-slate-900">{{ estimate.phase.name }}</dd></div>{% endif %}
                     {% if estimate.contract %}<div class="flex justify-between gap-4"><dt class="text-slate-500">قرارداد</dt><dd class="font-medium text-slate-900" dir="ltr">{{ estimate.contract.contract_number }}</dd></div>{% endif %}
                 </dl>

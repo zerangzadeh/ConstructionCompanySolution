@@ -1,0 +1,95 @@
+{
+  "head": "58656e8657b3b316dcb418ec8a3084fd2b4b294b",
+  "template_compilation": "PASS",
+  "templates": [
+    "estimates/create.html",
+    "estimates/detail.html",
+    "contracts/create.html",
+    "contracts/detail.html",
+    "billing/claim_form.html",
+    "billing/claim_detail.html",
+    "components/business_create_context.html"
+  ],
+  "protected_sources_unchanged": [
+    {
+      "path": "apps/billing/services.py",
+      "sha256_normalized": "1bcd58962a3d590008d8d2d8e301eb8f7ccbb6f3fa8223b4989b08403b157034",
+      "matches_head": true
+    },
+    {
+      "path": "apps/billing/models.py",
+      "sha256_normalized": "a8f8f504f631bb1a44bd19ec44335f8a13e3a66301d29fc96a7b354cdfb3430a",
+      "matches_head": true
+    },
+    {
+      "path": "apps/contracts/services.py",
+      "sha256_normalized": "b3e8ba6d0b1560b875d913314b3aeed1a3c11255a5ad1121febdf4317d631d90",
+      "matches_head": true
+    },
+    {
+      "path": "apps/contracts/models.py",
+      "sha256_normalized": "34cbe3df62405910fd456adb52b23fb6606336bcd1ec510f42b2970435f92a1d",
+      "matches_head": true
+    },
+    {
+      "path": "apps/estimates/services.py",
+      "sha256_normalized": "0508c6c610f3a9e730c13f94f12171d122817143c3c1c072a44a26efe4ffa1ed",
+      "matches_head": true
+    },
+    {
+      "path": "apps/estimates/models.py",
+      "sha256_normalized": "87ffbc9e5ab69d22da802fdf23c2eab2a823516e4a83c27e33a4fa86f3ab5209",
+      "matches_head": true
+    },
+    {
+      "path": "apps/organizations/authorization.py",
+      "sha256_normalized": "0129af88ca339987e543c8f5a006f3c9f0348ea2e3a8ba016f5d987e52e6a600",
+      "matches_head": true
+    },
+    {
+      "path": "apps/workflows/services.py",
+      "sha256_normalized": "d5a884f447c135160029f3d5ba4912cfe11c1c1809cfb10c8afdae93a82d9efa",
+      "matches_head": true
+    },
+    {
+      "path": "core/product_surface.py",
+      "sha256_normalized": "6aa4075788968ba47db3a9436ae796e19483f92e0e3e5fe386b674a7e296f6ce",
+      "matches_head": true
+    },
+    {
+      "path": "config/settings/base.py",
+      "sha256_normalized": "091e958e364e90249ca6f602491269d53f2b444b65520019811ef9f2817feebc",
+      "matches_head": true
+    },
+    {
+      "path": "config/settings/development.py",
+      "sha256_normalized": "2b2b37c1e77d26ee5e6c7fefbead37a6e1a357fa3027bfa652b061814e00d9a9",
+      "matches_head": true
+    }
+  ],
+  "changed_among_tracked_entry_changes": [
+    "apps/billing/journey_views.py",
+    "apps/billing/templates/billing/claim_detail.html",
+    "apps/billing/templates/billing/claim_form.html",
+    "apps/billing/views.py",
+    "apps/contracts/views.py",
+    "apps/estimates/views.py",
+    "scripts/verification/mvp03_validate.py",
+    "templates/contracts/detail.html",
+    "templates/estimates/detail.html"
+  ],
+  "newly_modified_tracked_paths": [
+    "apps/billing/journey_forms.py",
+    "apps/contracts/forms.py",
+    "apps/estimates/forms.py",
+    "core/business_choices.py",
+    "docs/ui-guidelines.md",
+    "templates/contracts/create.html",
+    "templates/estimates/create.html"
+  ],
+  "configured_development_pending_migrations": [
+    "payroll.0010_cep069_reviewed_statutory_context"
+  ],
+  "development_migrations_applied_by_task": false,
+  "git_commit_or_push_by_task": false
+}

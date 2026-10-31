@@ -18,6 +18,7 @@ from apps.organizations.models import BusinessPermissionCode
 from core.business_choices import contextual_url
 from core.list_filters import (
     apply_table_filters,
+    contextual_list_filters,
     paginate_table,
     table_pagination_query,
 )
@@ -62,7 +63,11 @@ from .forms import (
     TaxpayerInvoiceForm,
 )
 from .journey_forms import ClaimCorrectionForm, ClaimDecisionForm
-from .journey_views import claim_create_allowed, journey_breadcrumbs
+from .journey_views import (
+    breadcrumb_contract,
+    claim_create_allowed,
+    journey_breadcrumbs,
+)
 from .models import (
     ContractComplianceEvidence,
     ContractGuarantee,
@@ -224,7 +229,9 @@ def baseline_detail(request: HttpRequest, baseline_id: str) -> HttpResponse:
             if baseline.status == "approved" and claim_create_allowed(request)
             else "",
             "page_breadcrumbs": journey_breadcrumbs(
+                request,
                 "مبنای اندازه‌گیری",
+                baseline.contract,
                 collection=("مبناهای اندازه‌گیری", "billing:baseline_list"),
             ),
             "baseline_items": baseline.items.select_related("activity", "wbs_node"),
@@ -287,8 +294,11 @@ def journey_list_context(request, records, key):
         "page_obj": page,
         "pagination_query": table_pagination_query(request),
         "pagination_rendered": True,
+        **contextual_list_filters(request, keys=("contract",)),
         "page_breadcrumbs": journey_breadcrumbs(
-            "پیشرفت کار" if prefix else "مبناهای اندازه‌گیری"
+            request,
+            "پیشرفت کار" if prefix else "مبناهای اندازه‌گیری",
+            breadcrumb_contract(request),
         ),
     }
 
@@ -306,7 +316,10 @@ def progress_detail(request: HttpRequest, record_id: str) -> HttpResponse:
         {
             "progress_record": record,
             "page_breadcrumbs": journey_breadcrumbs(
-                "جزئیات اندازه‌گیری", collection=("پیشرفت کار", "billing:progress_list")
+                request,
+                "جزئیات اندازه‌گیری",
+                record.baseline.contract,
+                collection=("پیشرفت کار", "billing:progress_list"),
             ),
         },
     )
@@ -382,6 +395,7 @@ def claim_list(request: HttpRequest) -> HttpResponse:
         claims = (
             claims.filter(contract_id=contract_id) if contract_id else claims.none()
         )
+    scoped_has_records = claims.exists()
     claims = apply_table_filters(
         claims,
         request,
@@ -391,13 +405,9 @@ def claim_list(request: HttpRequest) -> HttpResponse:
         choice_fields={
             "status": (
                 "status",
-                (
-                    "draft",
-                    "submitted",
-                    "approved",
-                    "returned",
-                    "superseded",
-                    "cancelled",
+                tuple(
+                    value
+                    for value, label in ProgressClaim._meta.get_field("status").choices
                 ),
             )
         },
@@ -417,6 +427,9 @@ def claim_list(request: HttpRequest) -> HttpResponse:
         "billing/claim_list.html",
         {
             "claims": page.object_list,
+            "scoped_has_records": scoped_has_records,
+            "claim_status_choices": ProgressClaim._meta.get_field("status").choices,
+            **contextual_list_filters(request),
             "selected_project": selected_project,
             "project_contracts_url": contextual_url(
                 "contracts:list", project_id=selected_project.pk
@@ -440,7 +453,12 @@ def claim_list(request: HttpRequest) -> HttpResponse:
             )
             if contract_filter
             else reverse("billing:claim_create"),
-            "page_breadcrumbs": journey_breadcrumbs("صورت‌وضعیت‌ها"),
+            "page_breadcrumbs": journey_breadcrumbs(
+                request,
+                "صورت‌وضعیت‌ها",
+                breadcrumb_contract(request, project=selected_project),
+                project=selected_project,
+            ),
         },
     )
 
@@ -561,9 +579,16 @@ def claim_journey_context(request, claim):
         .exists()
     )
     return {
+        "claim_title": f"صورت‌وضعیت {claim.claim_number} · نسخه {claim.revision_number}",
+        "project_detail_url": reverse("projects:detail", args=[claim.project_id])
+        if permitted(BusinessPermissionCode.PROJECTS_VIEW, object_scope=True)
+        else "",
         "page_breadcrumbs": journey_breadcrumbs(
+            request,
             f"صورت‌وضعیت {claim.claim_number}",
             claim.contract if contract_visible else None,
+            project=claim.project,
+            collection=("صورت‌وضعیت‌ها", "billing:claim_list"),
         ),
         "contract_visible": contract_visible,
         "baseline_visible": permitted(

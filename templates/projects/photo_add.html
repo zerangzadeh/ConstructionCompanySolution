@@ -3,7 +3,9 @@
 {% block title %}افزودن تصویر | {{ project.name }}{% endblock %}
 
 {% block content %}
-<nav class="flex items-center gap-2 text-xs text-slate-400" aria-label="مسیر صفحه"><a class="hover:text-blue-600" href="{% url 'projects:list' %}">پروژه‌ها</a><span>/</span><a class="hover:text-blue-600" href="{% url 'projects:detail' project.id %}">{{ project.name }}</a><span>/</span><a class="hover:text-blue-600" href="{% url 'projects:gallery' project.id %}">گالری پروژه</a><span>/</span><span>افزودن تصویر</span></nav>
+{% load product_surface %}{% url 'projects:list' as project_list_url %}{% url 'projects:detail' project.pk as project_detail_url %}{% if "documents.view" in business_permission_codes %}{% url 'projects:gallery' project.pk as gallery_url %}{% endif %}
+{% breadcrumb_trail "افزودن تصویر" "پروژه‌ها" project_list_url project.name project_detail_url "گالری پروژه" gallery_url as breadcrumbs %}
+{% include "components/breadcrumbs.html" with page_breadcrumbs=breadcrumbs only %}
 
 <div class="mt-4 flex flex-wrap items-end justify-between gap-3"><div><p class="text-xs font-semibold text-blue-600">ثبت ایمن در سامانه اسناد</p><h1 class="mt-1 text-2xl font-bold text-slate-950">افزودن تصویر</h1></div><a class="erp-btn erp-btn--secondary" href="{% url 'projects:gallery' project.id %}">بازگشت به گالری</a></div>
 

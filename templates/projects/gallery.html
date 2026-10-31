@@ -3,7 +3,9 @@
 {% block title %}گالری تصاویر پروژه | {{ project.name }}{% endblock %}
 
 {% block content %}
-<nav class="flex items-center gap-2 text-xs text-slate-400" aria-label="مسیر صفحه"><a class="hover:text-blue-600" href="{% url 'projects:list' %}">پروژه‌ها</a><span>/</span><a class="hover:text-blue-600" href="{% url 'projects:detail' project.id %}">{{ project.name }}</a><span>/</span><span>گالری پروژه</span></nav>
+{% load product_surface %}{% url 'projects:list' as project_list_url %}{% url 'projects:detail' project.pk as project_detail_url %}
+{% breadcrumb_trail "گالری پروژه" "پروژه‌ها" project_list_url project.name project_detail_url as breadcrumbs %}
+{% include "components/breadcrumbs.html" with page_breadcrumbs=breadcrumbs only %}
 
 <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p class="text-xs font-semibold text-blue-600">تصاویر کنترل‌شده پروژه</p><h1 class="mt-1 text-2xl font-bold text-slate-950">گالری تصاویر پروژه</h1><p class="mt-2 text-xs text-slate-500">{{ project.name }} · <span dir="ltr">{{ project.code }}</span></p></div>{% if can_upload %}<a class="erp-btn erp-btn--primary" href="{% url 'projects:photo_add' project.id %}">افزودن تصویر</a>{% endif %}</div>
 

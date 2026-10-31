@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-31",
+  "started": "2026-10-30",
+  "branch": "main",
+  "head": "58656e8657b3b316dcb418ec8a3084fd2b4b294b",
+  "breadcrumb_ux_remediation": "PASS",
+  "product_owner_visual_acceptance": "PENDING",
+  "functional_validation": {
+    "focused_tests": 40,
+    "focused_subtests": 2,
+    "related_tests": 31,
+    "related_subtests": 40,
+    "new_breadcrumb_tests": 5,
+    "result": "PASS",
+    "evidence": "test-results.json"
+  },
+  "browser_validation": {
+    "new_scenarios": 37,
+    "new_captures": 37,
+    "live_tests_passed": 2,
+    "index": "browser-index.json",
+    "desktop": "1440x900",
+    "mobile_width": 390,
+    "existing_approval_journey_scenarios": 15,
+    "existing_batches": [
+      "../remediation-20261030/browser/batch-A-estimate-contract-handoff.json",
+      "../remediation-20261030/browser/batch-F-mobile-claim-deductions.json",
+      "../remediation-20261030/browser/batch-M-decision-required-reason.json"
+    ],
+    "result": "PASS"
+  },
+  "coverage": [
+    "Project -> Estimate/Contract",
+    "Validated Estimate -> existing Contract with Estimate parent link",
+    "Contract -> Claim create/detail",
+    "Baseline/Progress detail and scoped/general lists",
+    "Actual Project/Estimate/Contract breadcrumb clicks",
+    "Validation error current/parent semantics",
+    "Workforce create/detail/edit/assignment/team",
+    "Timekeeping attendance form",
+    "Project gallery/upload",
+    "Materials/Party/Document list shared patterns",
+    "Permissions, tenant/project scope, foreign/unrelated parent suppression",
+    "MVP exposure, invalid/# links, final current non-link"
+  ],
+  "visual_inspection": [
+    "BC-estimate-contract-mobile",
+    "BC-claim-detail-mobile",
+    "BC-workforce-edit"
+  ],
+  "static_checks": {
+    "evidence": "static-source-evidence.json",
+    "protected_sources_unchanged": 24,
+    "compiled_templates": 13,
+    "ruff": "PASS",
+    "node_syntax": "PASS",
+    "django_check": "PASS",
+    "migration_drift": "No changes detected",
+    "git_diff_check": "PASS"
+  },
+  "attribution": [
+    "Materials missing breadcrumb corrected using the same shared renderer.",
+    "Initial independent-reviewer browser control lookup failed; final full rerun passed with an explicit HTTP decision-authority assertion before Chrome. No authority/workflow source mutation."
+  ],
+  "unchanged": [
+    "Domain rules and models",
+    "Financial calculations/authority",
+    "Workflow/approval semantics",
+    "Product Surface exposure catalog",
+    "Existing authentication/authorization and destination guards",
+    "Global application context",
+    "Previous uncommitted task changes"
+  ],
+  "production_or_git_actions": {
+    "migrations_applied": false,
+    "commit": false,
+    "push": false
+  },
+  "report": "../../../docs/governance/mvp/MVP-03_COMPLETION_REPORT.md",
+  "commands": {
+    "focused": ".venv/Scripts/python.exe scripts/verification/mvp03_validate.py apps/billing/test_mvp03_breadcrumbs.py apps/billing/test_mvp03.py apps/billing/test_mvp03_contextual_create.py core/test_cep017_navigation.py --reuse-db -q",
+    "closeout": ".venv/Scripts/python.exe scripts/verification/mvp03_validate.py apps/billing/test_mvp03_browser.py::ContractBillingBrowserTests::test_representative_journey_desktop_mobile_and_approval apps/billing/test_mvp03_breadcrumb_browser.py --reuse-db -q"
+  }
+}

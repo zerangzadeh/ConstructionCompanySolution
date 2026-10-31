@@ -24,10 +24,12 @@ from apps.organizations.decorators import (
 )
 from apps.organizations.models import BusinessPermissionCode
 from apps.projects.business_hub import filter_project_context
-from core.business_choices import contextual_url
+from apps.projects.services import get_organization_projects
+from core.business_choices import contextual_parent, contextual_url
 from core.list_filters import (
     apply_table_filters,
     build_table_filters,
+    contextual_list_filters,
     has_active_table_filters,
     paginate_table,
     table_pagination_query,
@@ -53,6 +55,7 @@ def estimate_list(request: HttpRequest) -> HttpResponse:
             if contract_id
             else estimates.none()
         )
+    scoped_has_records = estimates.exists()
     estimates = apply_table_filters(
         estimates,
         request,
@@ -80,13 +83,17 @@ def estimate_list(request: HttpRequest) -> HttpResponse:
         "estimates/list.html",
         {
             "estimates": page.object_list,
+            "scoped_has_records": scoped_has_records,
+            **contextual_list_filters(request),
             "selected_project": selected_project,
             "estimate_create_url": contextual_url(
                 "estimates:create", project=selected_project.pk
             )
             if selected_project
             else reverse("estimates:create"),
-            "page_breadcrumbs": journey_breadcrumbs("برآوردها"),
+            "page_breadcrumbs": journey_breadcrumbs(
+                request, "برآوردها", project=selected_project
+            ),
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
             "pagination_rendered": True,
@@ -114,14 +121,26 @@ def estimate_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.ESTIMATES_CREATE)
 def estimate_create(request: HttpRequest) -> HttpResponse:
+    context_project = (
+        contextual_parent(
+            request,
+            "project",
+            get_organization_projects(
+                user=request.user, organization=request.organization
+            ),
+        )
+        if "project" in request.GET
+        else None
+    )
     membership = get_active_membership(
         user=request.user, organization=request.organization
     )
     form = EstimateForm(
-        request.POST or None,
+        request.POST if request.method == "POST" else None,
         organization=request.organization,
         membership=membership,
         active_project=request.active_project,
+        context_project=context_project,
         initial={
             name: request.GET.get(name)
             for name in ("project", "contract")
@@ -156,8 +175,14 @@ def estimate_create(request: HttpRequest) -> HttpResponse:
         "estimates/create.html",
         {
             "form": form,
+            "cancel_url": reverse("projects:detail", args=[context_project.pk])
+            if context_project
+            else reverse("estimates:list"),
             "page_breadcrumbs": journey_breadcrumbs(
-                "برآورد جدید", collection=("برآوردها", "estimates:list")
+                request,
+                "برآورد جدید",
+                collection=("برآوردها", "estimates:list"),
+                project=context_project,
             ),
         },
     )
@@ -182,7 +207,12 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
         pk=estimate_id,
     )
     if request.method == "POST" and estimate.status != EstimateStatus.DRAFT:
-        messages.error(request, "برآورد تأییدشده قابل تغییر نیست.")
+        messages.error(
+            request,
+            "برآورد تأییدشده قابل تغییر نیست."
+            if estimate.status == EstimateStatus.APPROVED
+            else f"برآورد در وضعیت «{estimate.get_status_display()}» قابل تغییر نیست.",
+        )
         return redirect("estimates:detail", estimate_id=estimate.pk)
 
     item_form = EstimateItemForm(
@@ -218,12 +248,24 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
         "estimates/detail.html",
         {
             "estimate": estimate,
+            "project_detail_url": reverse("projects:detail", args=[estimate.project_id])
+            if has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.PROJECTS_VIEW,
+                project=estimate.project,
+            )
+            else "",
             "page_breadcrumbs": journey_breadcrumbs(
-                estimate.title, collection=("برآوردها", "estimates:list")
+                request,
+                estimate.title,
+                collection=("برآوردها", "estimates:list"),
+                project=estimate.project,
             ),
             "item_form": item_form,
             "related_contract_url": (
                 reverse("contracts:detail", args=[estimate.contract_id])
+                + f"?estimate={estimate.pk}"
                 if estimate.contract_id
                 and has_business_permission(
                     user=request.user,

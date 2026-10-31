@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-30",
+  "head": "58656e8657b3b316dcb418ec8a3084fd2b4b294b",
+  "functional_validation": "PASS",
+  "browser_interaction_validation": "PASS",
+  "visual_ux_remediation": "READY_FOR_HUMAN_REVIEW",
+  "product_owner_visual_acceptance": "PENDING",
+  "functional": {
+    "new_focused_tests_passed": 15,
+    "affected_existing_tests_passed": 57,
+    "affected_existing_subtests_passed": 28,
+    "deduplicated_live_browser_tests_passed": 3,
+    "intermediate_attribution": "test-results.json",
+    "final_focused_command": ".venv/Scripts/python.exe scripts/verification/mvp03_validate.py apps/billing/test_mvp03_contextual_create.py apps/billing/test_mvp03_contextual_browser.py::ContextualBrowserTests::test_general_create_submissions_and_native_context --reuse-db -q"
+  },
+  "browser": {
+    "new_scenarios": 34,
+    "new_captures": 34,
+    "index": "browser-index.json",
+    "desktop_viewport": "1440x900",
+    "mobile_width": 390,
+    "javascript_runtime": "enabled; native_choices=1 separately covered",
+    "existing_approval_journey_scenarios": 15,
+    "existing_approval_journey_batches": [
+      "../remediation-20261030/browser/batch-A-estimate-contract-handoff.json",
+      "../remediation-20261030/browser/batch-F-mobile-claim-deductions.json",
+      "../remediation-20261030/browser/batch-M-decision-required-reason.json"
+    ]
+  },
+  "limitations": [
+    {
+      "requirement": "Estimate -> new linked Contract",
+      "status": "DOMAIN_LIMITATION",
+      "evidence": "Estimate.contract is optional and points to an existing Contract; create_contract has no Estimate argument and no existing service attaches an existing Estimate. Existing permitted Contract opens; unlinked Estimate explains the limitation."
+    },
+    {
+      "requirement": "Multiple eligible current approved Baselines",
+      "status": "DOMAIN_LIMITATION",
+      "evidence": "baseline_one_current_approved_contract forbids more than one approved Baseline per tenant/Contract; its exact PostgreSQL constraint name is asserted in the focused test. No illegal browser fixture or live qualification claim."
+    },
+    {
+      "requirement": "Extra full JavaScript-disabled diagnostic",
+      "status": "OUTSIDE_REQUEST",
+      "evidence": "Existing Tailwind CDN runtime dependency prevents styled full-JS-disabled output. Native selector fallback passes in the normal JS-enabled runtime; no unrelated remediation."
+    }
+  ],
+  "visual_inspection": {
+    "inspected": [
+      "CTX-02-project-estimate-mobile",
+      "CTX-07-project-contract-mobile",
+      "CTX-13-contract-claim-entry",
+      "CTX-14-claim-mobile",
+      "CTX-19-no-baseline-mobile",
+      "CTX-22-tampered-contract"
+    ],
+    "finding": "Consistent readable RTL inherited context; business identities and isolated LTR codes; visible errors/prerequisite; no page horizontal overflow. Human acceptance pending."
+  },
+  "static_checks": {
+    "evidence": "static-source-evidence.json",
+    "ruff": "PASS",
+    "django_check": "PASS",
+    "migration_drift": "No changes detected",
+    "git_diff_check": "PASS",
+    "protected_sources_unchanged": 11,
+    "templates_compiled": 7
+  },
+  "security": "Server-reloaded tenant/permission/scoped parents on GET/POST; required restricted model choices; forged/missing/ambiguous/cross-tenant/stale references rejected; scoped and revoked permissions tested; service authorization unchanged.",
+  "scope_preservation": {
+    "entry": "entry-state.json",
+    "global_session_unchanged": true,
+    "new_schema_or_workflow": false,
+    "development_migrations_applied": false,
+    "git_commit_or_push": false
+  },
+  "report": "../../../docs/governance/mvp/MVP-03_COMPLETION_REPORT.md",
+  "commands": {
+    "affected": ".venv/Scripts/python.exe scripts/verification/mvp03_validate.py apps/billing/test_mvp03_contextual_create.py apps/billing/test_mvp03_contextual_browser.py::ContextualBrowserTests::test_general_create_submissions_and_native_context apps/billing/test_mvp03_remediation.py apps/billing/test_mvp03.py apps/projects/test_mvp03_business_hub.py tests/test_list_filters.py core/test_product_surface.py apps/billing/test_cep079_read_scope.py apps/billing/test_mvp03_browser.py::ContractBillingBrowserTests::test_representative_journey_desktop_mobile_and_approval --reuse-db -q",
+    "contextual_browser": ".venv/Scripts/python.exe scripts/verification/mvp03_validate.py apps/billing/test_mvp03_contextual_create.py apps/billing/test_mvp03_contextual_browser.py --reuse-db -q (at that revision the module had one browser test)",
+    "focused_closeout": ".venv/Scripts/python.exe scripts/verification/mvp03_validate.py apps/billing/test_mvp03_contextual_create.py apps/billing/test_mvp03_contextual_browser.py::ContextualBrowserTests::test_general_create_submissions_and_native_context --reuse-db -q"
+  }
+}

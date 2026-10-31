@@ -1,10 +1,83 @@
 """Reuse the qualified searchable selector with each consuming form's querysets."""
 
+from dataclasses import dataclass
 from typing import ClassVar
 from urllib.parse import urlencode
+from uuid import UUID
 
 from django import forms
+from django.db.models import Model, QuerySet
+from django.http import Http404, HttpRequest
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
+
+
+def contextual_parent(
+    request: HttpRequest, name: str, records: QuerySet
+) -> Model | None:
+    """Reload a reference from an already tenant/permission-scoped source.
+
+    An absent reference means general Create. Empty, ambiguous or inaccessible
+    references never fall back to another parent or global application context.
+    """
+    if name not in request.GET:
+        return None
+    values = request.GET.getlist(name)
+    try:
+        if len(values) != 1:
+            raise ValueError
+        identifier = UUID(values[0])
+    except (ValueError, TypeError, AttributeError) as exc:
+        raise Http404 from exc
+    return get_object_or_404(records, pk=identifier)
+
+
+@dataclass(frozen=True)
+class InheritedParent:
+    label: str
+    title: str
+    code: str
+    url: str
+    project_name: str = ""
+
+
+class InheritedParentInput(forms.HiddenInput):
+    """Re-render the trusted reference while validation uses the actual POST."""
+
+    def __init__(self, parent_value, **kwargs):
+        self.parent_value = str(parent_value)
+        super().__init__(**kwargs)
+
+    def format_value(self, value):
+        return self.parent_value
+
+
+def inherit_business_parent(
+    form: forms.BaseForm, name: str, parent: Model, *, detail_route: str
+) -> None:
+    """Present a server-resolved parent without making it a new authority.
+
+    Keep a required, restricted ModelChoiceField so forged or missing POST values
+    are rejected instead of silently ignored as with a disabled form field.
+    """
+    field = form.fields[name]
+    field.queryset = field.queryset.filter(pk=parent.pk)
+    field.required = True
+    field.error_messages["invalid_choice"] = (
+        f"{field.label} ارسال‌شده با زمینه این فرم هم‌خوان نیست."
+    )
+    field.widget = InheritedParentInput(
+        parent.pk, attrs={"data-inherited-parent": name}
+    )
+    form.initial[name] = parent.pk
+    context = InheritedParent(
+        label=field.label,
+        title=getattr(parent, "name", "") or getattr(parent, "title", ""),
+        code=getattr(parent, "contract_number", "") or getattr(parent, "code", ""),
+        url=reverse(detail_route, args=[parent.pk]),
+        project_name=parent.project.name if getattr(parent, "project_id", None) else "",
+    )
+    form.inherited_parents = (*getattr(form, "inherited_parents", ()), context)
 
 
 class SearchChoiceSelect(forms.Select):

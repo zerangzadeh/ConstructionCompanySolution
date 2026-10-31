@@ -14,6 +14,33 @@ from django.utils.dateparse import parse_date
 from core.jalali import jalali_to_gregorian
 
 
+def contextual_list_filters(
+    request: HttpRequest, *, keys: Sequence[str] = ("project_id", "contract")
+) -> dict[str, Any]:
+    """Keep applied business context when clearing temporary query controls.
+
+    Callers still authorize and apply their existing context filters. These
+    values are URL state only and grant no access or global session context.
+    """
+    context = {key: request.GET[key] for key in keys if request.GET.get(key)}
+    query = request.GET.copy()
+    for key in list(query):
+        if key not in context:
+            query.pop(key)
+    encoded = query.urlencode()
+    return {
+        "filter_context": context,
+        "clear_filters_url": f"{request.path}?{encoded}" if encoded else request.path,
+        "has_context": bool(context),
+        "has_temporary_filters": any(
+            value.strip()
+            for key, values in request.GET.lists()
+            if key not in context
+            for value in values
+        ),
+    }
+
+
 def apply_table_filters(
     queryset: QuerySet,
     request: HttpRequest,

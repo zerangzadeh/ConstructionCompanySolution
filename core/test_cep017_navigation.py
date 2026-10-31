@@ -74,5 +74,9 @@ class Cep017NavigationTemplateTests(SimpleTestCase):
         self.assertIn("data-mobile-nav", base)
         self.assertIn("data-mobile-nav-close", base)
         self.assertIn('event.key === "Escape"', base)
-        self.assertIn('aria-label="مسیر صفحه"', header)
-        self.assertIn("{% url 'home' %}", header)
+        breadcrumbs = (template_root / "components" / "breadcrumbs.html").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('include "components/breadcrumbs.html"', header)
+        self.assertIn('aria-label="مسیر صفحه"', breadcrumbs)
+        self.assertIn("{% url 'home' %}", breadcrumbs)

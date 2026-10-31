@@ -25,6 +25,7 @@ class CommercialSummary:
     state_count: int
     state_label: str
     list_url: str
+    list_label: str = ""
     recent_label: str = ""
     recent_status: str = ""
     recent_url: str = ""
@@ -122,6 +123,11 @@ def project_commercial_summary(
                 **counts,
                 state_label=state_label,
                 list_url=contextual_url(list_route, project_id=project.pk),
+                list_label={
+                    "estimates": "مشاهده همه برآوردهای پروژه",
+                    "contracts": "مشاهده همه قراردادهای پروژه",
+                    "billing": "مشاهده همه صورت‌وضعیت‌های پروژه",
+                }[namespace],
                 recent_label=recent_label,
                 recent_status=recent.get_status_display() if recent else "",
                 recent_url=reverse(detail_route, args=[recent.pk]) if recent else "",

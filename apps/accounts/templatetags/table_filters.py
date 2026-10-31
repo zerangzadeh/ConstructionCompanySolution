@@ -30,13 +30,17 @@ def table_filters(context, filters, form_id):
     return {
         "filters": filters,
         "form_id": form_id,
-        "has_active_filters": (
+        "has_active_filters": context["has_temporary_filters"]
+        if "has_temporary_filters" in context
+        else (
             has_active_table_filters(request, filter_names)
             or context.get("has_active_filters", False)
         )
         if request
         else context.get("has_active_filters", False),
         "request": request,
+        "filter_context": context.get("filter_context", {}),
+        "clear_filters_url": context.get("clear_filters_url"),
     }
 
 

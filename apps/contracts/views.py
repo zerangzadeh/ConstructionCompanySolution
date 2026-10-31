@@ -1,5 +1,6 @@
 import uuid
 
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -40,10 +41,12 @@ from apps.organizations.decorators import (
 )
 from apps.organizations.models import BusinessPermissionCode
 from apps.projects.business_hub import filter_project_context
-from core.business_choices import contextual_url
+from apps.projects.services import get_organization_projects
+from core.business_choices import contextual_parent, contextual_url
 from core.list_filters import (
     apply_table_filters,
     build_table_filters,
+    contextual_list_filters,
     has_active_table_filters,
     paginate_table,
     table_pagination_query,
@@ -60,6 +63,7 @@ def contract_list(request: HttpRequest) -> HttpResponse:
         organization=request.organization,
     )
     contracts, selected_project = filter_project_context(request, contracts)
+    scoped_has_records = contracts.exists()
     contracts = apply_table_filters(
         contracts,
         request,
@@ -87,13 +91,17 @@ def contract_list(request: HttpRequest) -> HttpResponse:
         "contracts/list.html",
         {
             "contracts": page.object_list,
+            "scoped_has_records": scoped_has_records,
+            **contextual_list_filters(request, keys=("project_id",)),
             "selected_project": selected_project,
             "create_url": contextual_url(
                 "contracts:create", project=selected_project.pk
             )
             if selected_project
             else reverse("contracts:create"),
-            "page_breadcrumbs": journey_breadcrumbs("قراردادها"),
+            "page_breadcrumbs": journey_breadcrumbs(
+                request, "قراردادها", project=selected_project
+            ),
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
             "can_manage_contracts": can_manage_contracts(
@@ -122,12 +130,56 @@ def contract_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.CONTRACTS_CREATE)
 def contract_create(request: HttpRequest) -> HttpResponse:
+    if "estimate" in request.GET:
+        from apps.estimates.services import get_organization_estimates
+
+        estimate = contextual_parent(
+            request,
+            "estimate",
+            get_organization_estimates(
+                user=request.user, organization=request.organization
+            ),
+        )
+        if "estimate" in request.POST and request.POST["estimate"] != str(estimate.pk):
+            raise PermissionDenied("زمینه برآورد با درخواست هم‌خوان نیست.")
+        if "project" in request.GET and request.GET["project"] != str(
+            estimate.project_id
+        ):
+            raise PermissionDenied("زمینه پروژه با برآورد هم‌خوان نیست.")
+        if estimate.contract_id:
+            contract = get_object_or_404(
+                get_organization_contracts(
+                    user=request.user, organization=request.organization
+                ),
+                pk=estimate.contract_id,
+                project_id=estimate.project_id,
+            )
+            return redirect("contracts:detail", contract_id=contract.pk)
+        messages.info(
+            request,
+            "این برآورد به قراردادی متصل نیست؛ ایجاد و اتصال قرارداد به برآورد از این مسیر پشتیبانی نمی‌شود.",
+        )
+        return redirect("estimates:detail", estimate_id=estimate.pk)
+    if "estimate" in request.POST:
+        raise PermissionDenied("ایجاد رابطه برآورد از این مسیر پشتیبانی نمی‌شود.")
+    context_project = (
+        contextual_parent(
+            request,
+            "project",
+            get_organization_projects(
+                user=request.user, organization=request.organization
+            ),
+        )
+        if "project" in request.GET
+        else None
+    )
     form = ContractForm(
-        request.POST or None,
+        request.POST if request.method == "POST" else None,
         organization=request.organization,
         membership=get_active_membership(
             user=request.user, organization=request.organization
         ),
+        context_project=context_project,
         initial={
             "project": request.GET.get("project")
             or getattr(request.active_project, "pk", None)
@@ -168,8 +220,14 @@ def contract_create(request: HttpRequest) -> HttpResponse:
         "contracts/create.html",
         {
             "form": form,
+            "cancel_url": reverse("projects:detail", args=[context_project.pk])
+            if context_project
+            else reverse("contracts:list"),
             "page_breadcrumbs": journey_breadcrumbs(
-                "قرارداد جدید", collection=("قراردادها", "contracts:list")
+                request,
+                "قرارداد جدید",
+                collection=("قراردادها", "contracts:list"),
+                project=context_project,
             ),
         },
     )
@@ -236,13 +294,34 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
         if permitted(BusinessPermissionCode.BASELINES_VIEW)
         else None
     )
+    from apps.organizations.form_scoping import normalized_uuid
+
+    context_estimate = None
+    if related_estimates is not None and len(request.GET.getlist("estimate")) == 1:
+        identifier = normalized_uuid(request.GET["estimate"])
+        if identifier:
+            context_estimate = related_estimates.filter(
+                pk=identifier, project=contract.project
+            ).first()
     return render(
         request,
         "contracts/detail.html",
         {
             "contract": contract,
+            "project_detail_url": reverse("projects:detail", args=[contract.project_id])
+            if has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.PROJECTS_VIEW,
+                project=contract.project,
+            )
+            else "",
             "page_breadcrumbs": journey_breadcrumbs(
-                contract.title, collection=("قراردادها", "contracts:list")
+                request,
+                contract.title,
+                collection=("قراردادها", "contracts:list"),
+                project=contract.project,
+                estimate=context_estimate,
             ),
             "related_estimates": related_estimates,
             "related_claims": related_claims,

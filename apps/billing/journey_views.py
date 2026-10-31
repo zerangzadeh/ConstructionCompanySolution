@@ -9,6 +9,8 @@ from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from apps.contracts.forms import ContractForm
+from apps.contracts.models import ContractDirection, ContractStatus
+from apps.contracts.services import get_organization_contracts
 from apps.estimates.forms import EstimateForm, EstimateItemForm
 from apps.organizations.authorization import (
     get_active_membership,
@@ -18,8 +20,9 @@ from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
 )
+from apps.organizations.form_scoping import normalized_uuid
 from apps.organizations.models import BusinessPermissionCode as P
-from core.business_choices import business_label, contextual_url
+from core.business_choices import business_label, contextual_parent, contextual_url
 
 from .journey_forms import ClaimCorrectionForm, ClaimCreateForm, ClaimDecisionForm
 from .services import (
@@ -48,7 +51,29 @@ def claim_create_allowed(request):
     )
 
 
-def journey_breadcrumbs(title, contract=None, *, collection=None):
+def breadcrumb_contract(request, *, project=None):
+    """Optional navigation context from the existing authorized Contract source."""
+    if len(request.GET.getlist("contract")) != 1 or not has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=P.CONTRACTS_VIEW,
+        allow_any_scope=True,
+    ):
+        return None
+    identifier = normalized_uuid(request.GET["contract"])
+    if not identifier:
+        return None
+    records = get_organization_contracts(
+        user=request.user, organization=request.organization
+    )
+    if project:
+        records = records.filter(project=project)
+    return records.filter(pk=identifier, project__deleted_at__isnull=True).first()
+
+
+def journey_breadcrumbs(
+    request, title, contract=None, *, collection=None, project=None, estimate=None
+):
     from core.product_surface import NAVIGATION_GROUPS
 
     group_label = next(
@@ -58,7 +83,37 @@ def journey_breadcrumbs(title, contract=None, *, collection=None):
         {"label": "خانه", "url": reverse("home")},
         {"label": group_label, "url": ""},
     ]
-    if contract:
+    project = project or (contract.project if contract else None)
+
+    def permitted(permission, *, scoped=False):
+        return has_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission=permission,
+            project=project if scoped else None,
+            allow_any_scope=not scoped,
+        )
+
+    if project:
+        crumbs.append(
+            {
+                "label": project.name,
+                "url": reverse("projects:detail", args=[project.pk])
+                if project.organization_id == request.organization.pk
+                and project.deleted_at is None
+                and permitted(P.PROJECTS_VIEW, scoped=True)
+                else "",
+            }
+        )
+    if estimate:
+        # The caller supplies only a related Estimate from its existing scoped source.
+        crumbs.append(
+            {
+                "label": estimate.title,
+                "url": reverse("estimates:detail", args=[estimate.pk]),
+            }
+        )
+    if contract and permitted(P.CONTRACTS_VIEW, scoped=True):
         crumbs.append({"label": "قراردادها", "url": reverse("contracts:list")})
         crumbs.append(
             {
@@ -66,8 +121,20 @@ def journey_breadcrumbs(title, contract=None, *, collection=None):
                 "url": reverse("contracts:detail", args=[contract.pk]),
             }
         )
-    elif collection:
-        crumbs.append({"label": collection[0], "url": reverse(collection[1])})
+    if collection:
+        permission = {
+            "estimates:list": P.ESTIMATES_VIEW,
+            "contracts:list": P.CONTRACTS_VIEW,
+            "billing:claim_list": P.CLAIMS_VIEW,
+            "billing:baseline_list": P.BASELINES_VIEW,
+            "billing:progress_list": P.PROGRESS_VIEW,
+        }[collection[1]]
+        crumbs.append(
+            {
+                "label": collection[0],
+                "url": reverse(collection[1]) if permitted(permission) else "",
+            }
+        )
     crumbs.append({"label": title, "url": ""})
     return crumbs
 
@@ -164,6 +231,27 @@ def claim_create(request):
         raise PermissionDenied(
             "برای ایجاد صورت‌وضعیت، دسترسی به قرارداد، مبنا و محاسبه لازم است."
         )
+    context_contract = (
+        contextual_parent(
+            request,
+            "contract",
+            get_organization_contracts(
+                user=request.user, organization=request.organization
+            ).filter(
+                status=ContractStatus.ACTIVE,
+                direction=ContractDirection.RECEIVABLE,
+                project__deleted_at__isnull=True,
+            ),
+        )
+        if "contract" in request.GET
+        else None
+    )
+    if (
+        context_contract
+        and "project" in request.GET
+        and request.GET["project"] != str(context_contract.project_id)
+    ):
+        raise PermissionDenied("زمینه پروژه با قرارداد هم‌خوان نیست.")
     initial = {
         name: request.GET.get(name)
         for name in ("contract", "baseline")
@@ -174,6 +262,7 @@ def claim_create(request):
         organization=request.organization,
         actor=request.user,
         active_project=request.active_project,
+        context_contract=context_contract,
         initial=initial,
     )
     if (
@@ -205,11 +294,14 @@ def claim_create(request):
         "billing/claim_form.html",
         {
             "form": form,
-            "cancel_url": contextual_url(
-                "billing:claim_list", contract=form.selected_contract
-            ),
+            "cancel_url": reverse("contracts:detail", args=[context_contract.pk])
+            if context_contract
+            else contextual_url("billing:claim_list", contract=form.selected_contract),
             "page_breadcrumbs": journey_breadcrumbs(
-                "صورت‌وضعیت جدید", collection=("صورت‌وضعیت‌ها", "billing:claim_list")
+                request,
+                "صورت‌وضعیت جدید",
+                form.selected_contract,
+                collection=("صورت‌وضعیت‌ها", "billing:claim_list"),
             ),
         },
     )
@@ -276,7 +368,9 @@ def claim_action(request, claim_id, action):
                 "submit": "صورت‌وضعیت برای بررسی ارسال شد.",
                 "approve": "صورت‌وضعیت تأیید شد.",
                 "return": "صورت‌وضعیت بازگردانده و نسخه اصلاحی ایجاد شد.",
-                "correct": "نسخه اصلاحی ایجاد شد؛ نسخه قبلی تا تأیید نسخه جدید حفظ می‌شود.",
+                "correct": "پیش‌نویس ابطال ایجاد شد؛ اثر ابطال پس از تأیید آن اعمال می‌شود."
+                if claim.correction_kind == "cancellation"
+                else "نسخه اصلاحی ایجاد شد؛ نسخه قبلی تا تأیید نسخه جدید حفظ می‌شود.",
             }[action],
         )
     except (ValidationError, PermissionDenied) as exc:

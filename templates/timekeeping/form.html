@@ -2,7 +2,8 @@
 {% load ui_actions static %}
 {% block title %}{{ title }} | سامانه مدیریت ساخت{% endblock %}
 {% block content %}
-{% include "components/page_header.html" with page_eyebrow="حضور و کارکرد" page_title=title page_description=description only %}
+{% load field_journey %}{% if "attendance.view" in business_permission_codes %}{% field_context_url "timekeeping:workbench" as breadcrumb_parent_url %}{% endif %}
+{% include "components/page_header.html" with page_breadcrumb_label="حضور و کارکرد" page_breadcrumb_url=breadcrumb_parent_url page_eyebrow="حضور و کارکرد" page_title=title page_description=description only %}
 {% include "workforce/_field_context.html" %}
 <section class="erp-surface mx-auto mt-5 max-w-4xl rounded-2xl p-5 sm:p-7">
   <form method="post" class="grid gap-4 sm:grid-cols-2" novalidate>

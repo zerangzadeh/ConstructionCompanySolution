@@ -3,12 +3,14 @@
 
 {% block title %}برآوردها | سامانه مدیریت ساخت{% endblock %}
 
+{% block table_filter_controls %}{% endblock %}
 {% block content %}
-{% table_filters filters "estimate-filters" %}
+
     {% if "estimates.create" in business_permission_codes %}
     {% include "components/page_header.html" with page_breadcrumbs=page_breadcrumbs page_eyebrow="پیمان، متره و صورت‌وضعیت" page_title="فهرست برآوردها" page_description=request.organization.name page_action_url=estimate_create_url page_action_label="برآورد جدید" only %}
     {% else %}{% include "components/page_header.html" with page_breadcrumbs=page_breadcrumbs page_eyebrow="پیمان، متره و صورت‌وضعیت" page_title="فهرست برآوردها" page_description=request.organization.name only %}{% endif %}
-    {% include "components/commercial_project_context.html" with filter_form="table-filters" %}
+    {% include "components/commercial_project_context.html" %}
+{% table_filters filters "table-filters" %}
 
     <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست برآوردها">
         {% if estimates %}
@@ -32,7 +34,7 @@
             </div>
             {% include "components/table_pagination.html" with page_obj=page_obj pagination_query=pagination_query only %}<div class="border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500">نمایش {{ estimates|length }} برآورد</div>
         {% else %}
-            {% if "estimates.create" in business_permission_codes %}{% include "components/empty_state.html" with empty_title="هنوز برآوردی ثبت نشده است" empty_description="برای شروع، یک برآورد جدید ثبت کنید." empty_action_url=estimate_create_url empty_action_label="ایجاد برآورد" only %}{% else %}{% include "components/empty_state.html" with empty_title="هنوز برآوردی ثبت نشده است" empty_description="برآوردی برای مشاهده وجود ندارد." only %}{% endif %}
+            {% if scoped_has_records %}{% include "components/filtered_empty_state.html" %}{% elif "estimates.create" in business_permission_codes %}{% include "components/empty_state.html" with empty_title="هنوز برآوردی ثبت نشده است" empty_description="برای شروع، یک برآورد جدید ثبت کنید." empty_action_url=estimate_create_url empty_action_label="ایجاد برآورد" only %}{% else %}{% include "components/empty_state.html" with empty_title="هنوز برآوردی ثبت نشده است" empty_description="برآوردی برای مشاهده وجود ندارد." only %}{% endif %}
         {% endif %}
     </section>
 {% endblock %}

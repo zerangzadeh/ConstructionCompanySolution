@@ -21,8 +21,14 @@ raise SystemExit(
         sys.argv[1:]
         or [
             "apps/billing/test_mvp03.py",
+            "apps/billing/test_mvp03_remediation.py",
+            "apps/billing/test_mvp03_contextual_create.py",
+            "apps/billing/test_mvp03_breadcrumbs.py",
             "apps/projects/test_mvp03_business_hub.py",
             "apps/billing/test_mvp03_browser.py",
+            "apps/billing/test_mvp03_remediation_browser.py",
+            "apps/billing/test_mvp03_contextual_browser.py",
+            "apps/billing/test_mvp03_breadcrumb_browser.py",
             "--reuse-db",
             "-q",
         ]

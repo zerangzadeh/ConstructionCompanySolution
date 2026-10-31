@@ -1,11 +1,8 @@
 {% extends "base.html" %}{% load product_surface %}
 {% block title %}{{ employee.first_name }} {{ employee.last_name }} | سامانه مدیریت ساخت{% endblock %}
 {% block content %}
-<nav class="text-xs text-slate-400" aria-label="مسیر صفحه">
-    <a class="transition hover:text-blue-700" href="{% url 'workforce:employee_list' %}">کارکنان</a>
-    <span class="mx-2" aria-hidden="true">/</span>
-    <span class="text-slate-600">{{ employee.first_name }} {{ employee.last_name }}</span>
-</nav>
+{% url 'workforce:employee_list' as breadcrumb_parent_url %}
+{% with current_label=employee.first_name|add:" "|add:employee.last_name %}{% include "components/breadcrumbs.html" with page_breadcrumb_label="کارکنان" page_breadcrumb_url=breadcrumb_parent_url page_title=current_label only %}{% endwith %}
 
 <section class="relative mt-4 overflow-hidden rounded-2xl bg-slate-950 px-5 py-6 text-white shadow-sm sm:px-7 sm:py-7">
     <div class="pointer-events-none absolute -left-12 -top-20 h-52 w-52 rounded-full bg-blue-500/20 blur-3xl"></div>

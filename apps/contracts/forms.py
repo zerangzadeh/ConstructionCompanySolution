@@ -12,7 +12,7 @@ from apps.organizations.models import InsuranceClassification, OrganizationMembe
 from apps.organizations.policy_services import available_insurance_classifications
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project
-from core.business_choices import configure_business_choice
+from core.business_choices import configure_business_choice, inherit_business_parent
 from core.forms import JalaliDateMixin
 from core.identifiers import canonicalize_upper_identifier
 
@@ -49,6 +49,7 @@ class ContractForm(JalaliDateMixin, forms.ModelForm):
         *args,
         organization=None,
         membership: OrganizationMembership | None = None,
+        context_project=None,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -72,7 +73,13 @@ class ContractForm(JalaliDateMixin, forms.ModelForm):
         self.fields["party"].label = "طرف قرارداد"
         self.fields["direction"].label = "جهت قرارداد"
         for name in ("project", "party"):
+            if name == "project" and context_project is not None:
+                continue
             configure_business_choice(self, name, "contract")
+        if context_project is not None:
+            inherit_business_parent(
+                self, "project", context_project, detail_route="projects:detail"
+            )
 
     def clean_party(self):
         party = self.cleaned_data["party"]

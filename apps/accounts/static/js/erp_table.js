@@ -59,6 +59,14 @@
                 event.preventDefault();
                 const url = new URL(window.location.href);
                 const form = link.closest("[data-table-filter-controls]")?.querySelector("form") || link.closest("form");
+                if (link.hasAttribute("data-context-preserving-clear")) {
+                    window.clearTimeout(timers.get(form));
+                    const target = new URL(link.href, window.location.href);
+                    if (target.origin === url.origin && target.pathname === url.pathname) {
+                        window.location.assign(`${target.pathname}${target.search}${target.hash}`);
+                    }
+                    return;
+                }
                 document.querySelectorAll("form[method='get']").forEach((getForm) => {
                     [...getForm.elements].filter((control) => control.name).forEach((control) => url.searchParams.delete(control.name));
                 });

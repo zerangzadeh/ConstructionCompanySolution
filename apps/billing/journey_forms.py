@@ -4,7 +4,8 @@ from django import forms
 
 from apps.contracts.models import Contract, ContractDirection, ContractStatus
 from apps.contracts.services import get_organization_contracts
-from core.business_choices import configure_business_choice
+from apps.organizations.form_scoping import normalized_uuid
+from core.business_choices import configure_business_choice, inherit_business_parent
 from core.forms import JalaliDateMixin
 
 from .models import ProjectBaseline, ProjectBaselineStatus
@@ -22,7 +23,15 @@ class ClaimCreateForm(JalaliDateMixin, forms.Form):
     period_end = forms.DateField(label="پایان دوره")
     measurement_cutoff = forms.DateField(label="تاریخ نهایی اندازه‌گیری")
 
-    def __init__(self, *args, organization, actor, active_project=None, **kwargs):
+    def __init__(
+        self,
+        *args,
+        organization,
+        actor,
+        active_project=None,
+        context_contract=None,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.error_messages["required"] = "این فیلد را تکمیل کنید."
@@ -35,6 +44,8 @@ class ClaimCreateForm(JalaliDateMixin, forms.Form):
             )
             .order_by("title", "pk")
         )
+        if context_contract is not None:
+            contracts = contracts.filter(pk=context_contract.pk)
         self.fields["contract"].queryset = contracts
         value = (
             self.data.get("contract") if self.is_bound else self.initial.get("contract")
@@ -47,6 +58,8 @@ class ClaimCreateForm(JalaliDateMixin, forms.Form):
             selected = contracts.filter(pk=value).first() if value else None
         except (ValueError, forms.ValidationError):
             selected = None
+        if context_contract is not None:
+            selected = context_contract
         self.selected_contract = selected
         baselines = get_project_baselines(
             actor=actor, organization=organization
@@ -54,21 +67,40 @@ class ClaimCreateForm(JalaliDateMixin, forms.Form):
             status=ProjectBaselineStatus.APPROVED,
         )
         self.fields["baseline"].queryset = (
-            baselines.filter(contract=selected).order_by("-version", "pk")
+            baselines.filter(
+                contract=selected, project_id=selected.project_id
+            ).order_by("-version", "pk")
             if selected
             else baselines.none()
         )
         if not self.is_bound and selected and "baseline" not in self.initial:
-            baseline = self.fields["baseline"].queryset.first()
-            if baseline:
-                self.initial["baseline"] = baseline.pk
+            candidates = list(self.fields["baseline"].queryset[:2])
+            if len(candidates) == 1:
+                self.initial["baseline"] = candidates[0].pk
+        self.no_eligible_baseline = (
+            context_contract is not None
+            and not self.fields["baseline"].queryset.exists()
+        )
         for name in ("contract", "baseline"):
+            if name == "contract" and context_contract is not None:
+                continue
             configure_business_choice(
                 self, name, "claim", parent="contract" if name == "baseline" else None
+            )
+        if context_contract is not None:
+            inherit_business_parent(
+                self, "contract", context_contract, detail_route="contracts:detail"
             )
 
     def clean(self):
         values = super().clean()
+        selected = values.get("contract")
+        if (
+            selected
+            and "project" in self.data
+            and normalized_uuid(self.data["project"]) != selected.project_id
+        ):
+            raise forms.ValidationError("پروژه ارسال‌شده با قرارداد هم‌خوان نیست.")
         start, end, cutoff = (
             values.get(n) for n in ("period_start", "period_end", "measurement_cutoff")
         )

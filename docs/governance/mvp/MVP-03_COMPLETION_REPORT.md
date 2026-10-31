@@ -6,6 +6,249 @@ bounded Human request in the attached
 MVP-03 instruction is the execution contract; these MVP packages are not CEPs.
 No CEP is reopened and no Registry lifecycle change is implied.
 
+## Breadcrumb UX remediation — 2026-10-30/31
+
+Completed the explicit breadcrumb-only Human request on current `main`, still
+`58656e8657b3b316dcb418ec8a3084fd2b4b294b` and equal to local `origin/main`.
+All preceding uncommitted work is preserved. No commit, push or migration.
+
+The existing page-header breadcrumb markup is now a shared
+`components/breadcrumbs.html` partial used by the page header and the custom
+MVP breadcrumb patterns. Existing Product Surface URL filtering remains in that
+single renderer. The final item is always a non-link with `aria-current="page"`,
+even if a caller supplies a URL. Invalid/hidden destinations and bare `#` do not
+become links. Conceptual levels without a dedicated business destination remain
+text; the existing Workforce link to a real Home section remains valid.
+
+| Journey / pattern | Result |
+| --- | --- |
+| Project → Estimate / Contract | Validated Project detail and permitted collection parents are links on scoped list, create and detail paths. |
+| Estimate → existing Contract | The existing related-Contract link carries temporary Estimate navigation context. Contract breadcrumbs reload that Estimate from the existing permission/tenant/project-scoped related source; unrelated, foreign or malformed references never become breadcrumb parents. Ordinary Contract access is unchanged. No Estimate is chosen implicitly from multiple related records. |
+| Contract → Claim | Permitted Project, Contract, Contract collection and Claim collection parents are linked, including create, validation errors and detail. |
+| Baseline / Progress | Detail and validated Contract-filtered list paths expose the real, permitted Project/Contract/collection destinations. General list pages retain a single current item. |
+| Workforce / Timekeeping | Worker create/edit/detail reuse the existing Workforce breadcrumb builder. Attendance/work forms and Timesheet detail link the existing workbench when permitted, retaining validated navigation context. Existing assignment/team hierarchy and permission checks remain. |
+| Other shared patterns | Project detail/gallery/upload, Daily Report detail, Inventory transaction detail and legacy Employee detail use the shared renderer. The Materials list has a shared Home/current breadcrumb. Party/Document list patterns were browser-checked. No unrelated headings/forms were redesigned. |
+
+All data/permission changes are presentation adapters and read-only navigation
+metadata. Destination pages retain their existing authorization. No backend
+domain rules, calculations, financial authority, workflows, models, exposure
+catalogs or permission grants changed. Existing UI-guideline breadcrumb rules
+already specify the requested behavior and were not duplicated.
+
+Evidence: `output/mvp-03/breadcrumb-remediation/VALIDATION.json`, browser index,
+test-result attribution and static-source evidence in the same directory.
+
+- Focused functional/security and existing journey checks: **40 PASS / 2
+  subtests PASS** (89.77s), including five new shared/business breadcrumb tests,
+  contextual create regressions and the adjusted shared navigation contract.
+- Related Workforce permission/navigation, Product Surface, Project hub and
+  previous UI regression checks: **31 PASS / 40 subtests PASS** in the combined
+  browser run. The two browser failures from that attempt were resolved or
+  qualified as described below; none of these 31 checks failed.
+- Final Chrome closeout: **2/2 live tests PASS** (212.23s). **37 new scenarios /
+  captures**, including desktop/mobile MVP-03 parents, actual breadcrumb clicks
+  to Project/Estimate/Contract, validation error, scoped/general Billing lists,
+  Workforce, Timekeeping, gallery/upload, Materials, Party and Document pages.
+  **15 existing journey scenarios** also pass through calculation, submission
+  and independent approval. Browser assertions require real parent links and
+  exactly one final non-clickable current item; no bare `#`, backend hierarchy
+  labels or horizontal page overflow are accepted.
+- Representative mobile Contract, Claim and Workforce captures were inspected:
+  business labels and hierarchy are readable and wrap correctly. Human visual
+  acceptance remains pending.
+- Initial browser findings: Materials had no breadcrumb and received the shared
+  minimal trail. One independent-reviewer control lookup failed on the first
+  regression attempt. An explicit HTTP assertion now proves the existing
+  reviewer decision authority before Chrome; the complete final browser rerun
+  passed. No permission, approval or workflow source was changed for that result.
+- **13 templates compile; 24 protected domain/model/authorization/workflow/
+  settings/Surface sources match HEAD.** Ruff, Node syntax, Django check and
+  `git diff --check` pass. Migration drift: **no changes detected**. The existing
+  pending Development `payroll.0010_cep069_reviewed_statutory_context` remains;
+  this task applied no migrations.
+
+```text
+BREADCRUMB UX REMEDIATION: PASS
+PRODUCT OWNER VISUAL ACCEPTANCE: PENDING
+```
+
+## Contextual Create follow-up — 2026-10-30
+
+Explicit Human request authorizes a reusable UI-guideline rule and bounded
+contextual creation for Project → Estimate/Contract and Contract → Claim,
+including server-reloaded parents, inherited-field presentation, navigation and
+tests. Entry main/origin/main remain `58656e8657b3b316dcb418ec8a3084fd2b4b294b`;
+the preceding UI remediation is still uncommitted and must be preserved.
+Intended changes: UI guidelines; shared business-choice/form presentation helper;
+Estimate/Contract/Billing create forms/views/templates and related-record links;
+focused tests, Chrome evidence, this report. No models/migrations, domain services,
+authorization catalogs, calculations, workflow semantics or Product Surface change.
+
+Domain limitation C: Estimate owns an optional FK to an existing Contract
+(`apps/estimates/models.py`, Estimate.contract); Contract has no Estimate parent.
+`create_contract` accepts no Estimate, and no existing service links a previously
+created Estimate to a new Contract. `create_estimate` accepts an existing Contract.
+Do not silently mutate Estimate.contract or invent conversion/attachment workflow.
+An existing authorized related Contract can be opened; an unlinked Estimate must
+receive truthful guidance rather than a misleading create-and-link action.
+
+The second domain boundary is `baseline_one_current_approved_contract`, the
+conditional database uniqueness constraint in ProjectBaseline. Approval supersedes
+the previous approved version atomically. Multiple approved versions cannot be
+represented as an eligible live set without violating the existing domain. The
+UI does not arbitrarily choose when more than one choice is returned, but tests
+must not disable this constraint or fabricate an illegal live browser fixture.
+
+Implemented within those boundaries:
+
+| Entry | Before → After |
+| --- | --- |
+| Project → Estimate | A preselected editable Project selector → visible inherited Project name/code and parent link; no redundant selector. The restricted required field rejects a forged or missing submitted parent. |
+| Project → Contract | The same inherited Project presentation and validation, without changing existing optional Estimate associations. |
+| Estimate → Contract | Existing authorized Contract opens directly; a guarded Estimate reference also redirects to it without creation. An unlinked Estimate explains the unsupported create-and-link relationship. No conversion, new FK, or direct attachment write was introduced. |
+| Contract → Claim | Visible inherited Contract title/number and derived Project; no Contract selector. Approved Baselines are restricted to that Contract and Project. Exactly one is selected automatically; none displays the actual prerequisite and prevents the contextual create action. No arbitrary selection if more than one candidate is returned. |
+| General Create | Explicit parent selectors, dependent choices and successful creation remain available for Estimates, Contracts and Claims. |
+| Navigation | Validation re-renders preserve the trusted parent; Cancel returns to its detail; successful creation opens the created record with permission-checked parent links. Global Project/Site session state stays separate. |
+
+The concise `Contextual Create & Parent-Child Context Preservation` rule is now
+in `docs/ui-guidelines.md`, with no technical implementation prescription or
+D1–D7 change. Presentation reuses the existing business-choice forms and one
+shared inherited-parent summary. Parent references are reloaded from existing
+tenant/permission/object-scoped sources on every request, including POST; existing
+domain services remain responsible for transactional business validation.
+
+Validation evidence: `output/mvp-03/contextual-create/VALIDATION.json` and its
+linked static/source, test and Chrome artifacts.
+
+- New functional/security suite: **15/15 PASS**. Includes missing/forged parents,
+  wrong Contract Baseline and derived Project, foreign tenant, invalid/empty/
+  duplicate references, revoked membership, independent create permissions,
+  explicit Project scope, soft-deleted Project, closed Contract and a genuinely
+  superseded approved Baseline. The database constraint's exact name is asserted
+  for the forbidden multiple-current-approved-Baseline case.
+- Affected existing functional/regression suite: **57 tests / 28 subtests PASS**
+  in the combined run, including existing journeys, Project hub, shared filters,
+  Product Surface and Billing read scope. Final focused closeout:
+  **16/16 PASS** (15 new functional checks and one live Chrome test, 77.43s).
+- New Chrome evidence: **34 scenarios / 34 captures PASS**, desktop 1440×900 and
+  mobile 390px. Real Project/Contract links, invalid forms, Cancel, successful
+  creation, inherited identity, single/no eligible Baseline, existing related
+  Contract, unlinked Estimate limitation, all three general create submissions,
+  native selector fallback, forged references, tenant/permission and stale parent
+  rejection are covered. The second live test exercises 28 contextual scenarios;
+  the closeout live test exercises 6 general/native scenarios.
+- Existing calculation → submit → independent approval Chrome journey:
+  **15 scenarios PASS**, including remote selector search and mobile final state.
+  This uses the existing remediation evidence directory; its three batch files
+  are explicitly referenced in the new evidence manifest.
+- Representative desktop/mobile captures inspected: consistent parent summary,
+  visible Persian validation/prerequisite messages, isolated LTR identifiers,
+  readable RTL layout, and no page-level horizontal overflow.
+- Ruff, Django system check, seven affected templates and `git diff --check`:
+  **PASS**. `makemigrations --check --dry-run`: **no changes detected**.
+  Eleven protected model/service/authorization/workflow/settings/Surface sources
+  match HEAD. No Development migrations were applied; the pre-existing pending
+  `payroll.0010_cep069_reviewed_statutory_context` remains unchanged.
+
+Coverage limits and observations:
+
+- Estimate → new connected Contract and multiple eligible current approved
+  Baselines remain the evidenced domain limitations above, rather than newly
+  implemented business capabilities. No illegal multi-Baseline browser fixture
+  was created; this branch is not claimed as live qualified.
+- An extra fully JavaScript-disabled diagnostic exposed the existing dependency
+  on runtime Tailwind CDN generation. This is outside this contextual-create
+  request and was not remediated. Native-selector fallback was separately
+  qualified in the normal JavaScript-enabled Chrome runtime; this report does
+  not claim full JavaScript-disabled visual support.
+- Intermediate test-harness failures (fixture approval evidence, consumed flash
+  message, duplicate helper argument and that extra diagnostic) were corrected
+  or attributed; no required failure is carried into the final results.
+
+No models, migrations, financial calculations, approval semantics, new business
+workflow, global context mechanism, CEP lifecycle, or MVP-04 scope changed.
+Preceding uncommitted remediation is preserved. No commit or push was performed.
+
+```text
+FUNCTIONAL VALIDATION: PASS
+BROWSER INTERACTION VALIDATION: PASS
+VISUAL UX REMEDIATION: READY_FOR_HUMAN_REVIEW
+PRODUCT OWNER VISUAL ACCEPTANCE: PENDING
+```
+
+## Targeted UI/UX remediation — 2026-10-30
+
+Completed the explicitly requested thirteen presentation fixes on clean local
+main at `58656e8657b3b316dcb418ec8a3084fd2b4b294b`, also local origin/main.
+The original implementation sections below retain their 2026-10-29 evidence;
+this section and the linked remediation artifacts describe the current changes.
+
+| Request | Result |
+| --- | --- |
+| 1 | Baseline/Progress document titles contain only page identity and BONIRA; pagination stays in the body. |
+| 2 | Estimate approved/revised/archived messages are state-specific; approval and item-add forms are separate and balanced. Existing lifecycle/permission conditions remain. |
+| 3 | Claim filters use all six existing model status values with their Persian labels, including Superseded and Cancelled. |
+| 4 | Project heading names Estimates, Contracts and Claims; each summary has its own explicit list action. No detailed workflow is embedded. |
+| 5 | The existing Billing navigation uses the Workforce active-button convention on list/detail/create pages, in a consistent order below the header. |
+| 6 | Contract identity visibly includes its canonical LTR number; dates use the shared Jalali formatter. Project, party, direction and status remain. |
+| 7 | Claim title includes number/revision; state section is «وضعیت و اقدام بعدی». Correction/cancellation copy and success messages describe the selected operation without changing services. |
+| 8 | Temporary-filter clearing retains applied Project/Contract query context. A separate explicit exit link leaves that context; global session context is unchanged. |
+| 9 | Lists distinguish a genuinely empty scoped dataset from no matches within an existing scoped dataset, with context-preserving recovery. |
+| 10 | Draft prerequisites are distinguished from verified-measurement inputs to meaningful work valuation. A real service-backed test creates a zero-work draft without measurements. |
+| 11 | Persian descriptions/links remain RTL; canonical contract identifiers use isolated LTR boundaries. |
+| 12 | Progress verification/rejection reasons have visible Persian labels and multiline required controls, with distinct existing button variants. |
+| 13 | Contract/Estimate filters render after header/context, using the shared components; Billing header/navigation/context/filter/content/pagination order is retained. |
+
+The shared table JavaScript previously intercepted Clear and deleted every GET
+form's query controls, including context fields. Commercial lists now opt into
+the server-built same-page Clear URL; unrelated default behavior is retained.
+The runtime table tag is owned by accounts; the unused core duplicate is unchanged.
+
+Validation and bounded regression evidence:
+
+- Affected functional/regression run: **57 tests and 28 subtests PASS** (105.52s),
+  including existing journey/security, scoped Project hub, shared list-filter,
+  Product Surface and Billing read-scope checks.
+- Final post-fix closeout: **18 tests and 8 subtests PASS** (180.62s), including
+  16 focused/shared-filter checks and two complete real-Chrome live tests.
+- Independent final Project handoffs: **1 live test PASS** (42.99s).
+- Combined browser evidence: **58 scenarios / 58 captures PASS**, desktop 1440px
+  and mobile 390px. Includes Project → Contracts/Estimates/Claims, Estimate →
+  Contract, Contract → Claim, all six actual Claim states on desktop/mobile,
+  Superseded/Cancelled filtering, Project/Contract-preserving Clear actions,
+  both empty-state meanings, Jalali Contract identity/dates and a real independent
+  Progress rejection. All Claim states were produced by existing governed services;
+  Estimate non-draft fixtures are read-only presentation fixtures, not new transitions.
+- **16 changed templates compile**; explicit rendered-tag balance checks pass;
+  Ruff check/format on **11 Python files**, both JavaScript syntax checks,
+  Django system check, schema-drift and diff checks PASS.
+- Eleven protected model/service/authorization/workflow/Product Surface/settings
+  sources match the entry commit. No source financial or lifecycle logic changed.
+  This is bounded regression evidence, not a new global ERP acceptance claim.
+- Agent inspected representative desktop/mobile renders. Product Owner visual
+  acceptance remains **PENDING**. Existing historical baseline fixture debt below
+  is retained; the entire legacy ERP suite was not rerun or reclassified.
+
+Superseded checks exposed the actual Clear interception defect and stale caption
+expectations. The browser harness also needed explicit UTF-8 subprocess capture
+on Windows and form-scoped field selection for two independently required `reason`
+fields. The test now fills the rejection form and completes the actual POST;
+native/backend validation was not weakened. Final checks above pass.
+
+Evidence: [remediation validation](../../../output/mvp-03/remediation-20261030/VALIDATION.json),
+[source/static checks](../../../output/mvp-03/remediation-20261030/static-source-evidence.json),
+[migration evidence](../../../output/mvp-03/remediation-20261030/migration-evidence.json),
+[functional run](../../../output/mvp03-remediation-functional.log),
+[final closeout](../../../output/mvp03-remediation-closeout.log),
+[Project handoffs](../../../output/mvp03-remediation-project-links.log),
+[desktop/mobile captures](../../../output/mvp-03/remediation-20261030/browser/).
+
+All data remains synthetic in the existing dedicated test database. No Development
+data mutation or migration was performed; payroll.0010 remains the sole pending
+Development migration. No models/migrations, permissions, workflow/calculation/
+financial semantics, Product Surface architecture, dependencies, production
+actions, MVP-04 work, branch/worktree, commit or push. HEAD/origin/main unchanged.
+
 ## Grounding and intended touch set
 
 - Branch main; HEAD and local origin/main
@@ -36,6 +279,21 @@ No CEP is reopened and no Registry lifecycle change is implied.
   claim-service mappings, so current source inspection supplies implementation evidence.
 
 ## Boundaries
+
+### 2026-10-30 targeted UI/UX remediation
+
+Explicit Human follow-up authorizes the thirteen presentation fixes in the
+attached remediation request. Entry main and origin/main are
+`58656e8657b3b316dcb418ec8a3084fd2b4b294b` (MVP_03); working tree clean.
+Intended surface: existing Contract/Estimate/Billing list/detail/form and Project
+summary templates; their presentation contexts in views/journey forms/views and
+Project summary adapter; shared list-filter/context/empty-state presentation;
+shared table-filter JavaScript; focused tests and existing Chrome verification
+harness; this report and MVP-03
+evidence. No models, migrations, source services, authorization, workflow,
+calculation, financial authority, Product Surface, settings or dependency changes.
+No Development data mutation, MVP-04 work, commit or push. Human visual acceptance
+remains pending. Earlier implementation evidence below describes the prior build.
 
 The subsequent explicit Human instruction authorizes Project as a contextual
 Contract & Claims hub. This bounded follow-up adds a read-only summary and

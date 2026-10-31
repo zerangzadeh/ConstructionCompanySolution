@@ -1424,6 +1424,22 @@ Application shell
   -> primary content
 ```
 
+### Contextual Create & Parent-Child Context Preservation
+
+When Create starts from a parent record, inherit its existing business relationship
+and visibly identify the parent by its business name/number. Do not require the
+same parent to be selected again or present it as a disabled editable-looking
+selector. Keep the inherited relationship through validation, re-rendering,
+successful creation and meaningful cancel/back/related-record navigation.
+
+Reload and validate parent references server-side on submission, including tenant,
+permission, object scope, lifecycle and parent-child consistency. Prior navigation
+never grants authority. Restrict dependent choices to eligible records of that
+parent. General Create entry points retain explicit parent selection under the
+same validations. Global application context and temporary query filters remain
+separate from business-record relationships. Use only supported domain relations;
+explain limitations rather than inventing attachment or conversion behavior.
+
 ## 38. Context-Aware and Cascading Selection Standard
 
 Use cascading fields whenever one choice constrains another, including:

@@ -10,10 +10,12 @@
         <form class="erp-surface mt-6 space-y-5 rounded-xl p-5 sm:p-6" method="post" novalidate>
             {% csrf_token %}{% include "workforce/_native_choices.html" with choice_form=form %}
             {% include "components/form_errors.html" with form=form only %}
-            {% for field in form %}
+{% include "components/business_create_context.html" %}
+{% for field in form.hidden_fields %}{{ field }}{% if field.errors %}<p class="text-sm text-red-700" role="alert">{{ field.label }}: {{ field.errors|join:", " }}</p>{% endif %}{% endfor %}
+            {% for field in form.visible_fields %}
                 {% include "components/form_field.html" with field=field only %}
             {% endfor %}
-            <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-5"><button class="erp-btn erp-btn--primary" type="submit">ایجاد قرارداد</button><a class="erp-btn erp-btn--secondary" href="{% url 'contracts:list' %}">انصراف</a></div>
+            <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-5"><button class="erp-btn erp-btn--primary" type="submit">ایجاد قرارداد</button><a class="erp-btn erp-btn--secondary" href="{{ cancel_url }}">انصراف</a></div>
         </form>
     </div>
 {% endblock %}

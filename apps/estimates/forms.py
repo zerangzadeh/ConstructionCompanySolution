@@ -10,7 +10,7 @@ from apps.organizations.form_scoping import (
     selected_form_project,
 )
 from apps.projects.models import Project, ProjectPhase
-from core.business_choices import configure_business_choice
+from core.business_choices import configure_business_choice, inherit_business_parent
 from core.forms import JalaliDateMixin
 from core.identifiers import canonicalize_upper_identifier
 
@@ -49,6 +49,7 @@ class EstimateForm(JalaliDateMixin, forms.ModelForm):
         organization=None,
         membership=None,
         active_project=None,
+        context_project=None,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -62,6 +63,8 @@ class EstimateForm(JalaliDateMixin, forms.ModelForm):
                 organization=organization, deleted_at__isnull=True
             ).order_by("name")
         )
+        if context_project is not None:
+            projects = projects.filter(pk=context_project.pk)
         self.fields["project"].queryset = projects
         self.fields["project"].widget.attrs["data-cascade-project"] = ""
         selected_project = selected_form_project(
@@ -72,6 +75,8 @@ class EstimateForm(JalaliDateMixin, forms.ModelForm):
             if self.is_bound or "project" in self.initial
             else active_project,
         )
+        if context_project is not None:
+            selected_project = context_project
         if not self.is_bound and selected_project is not None:
             self.initial.setdefault("project", selected_project.pk)
 
@@ -123,8 +128,14 @@ class EstimateForm(JalaliDateMixin, forms.ModelForm):
                 }
             )
         for name in ("project", "contract", "phase"):
+            if name == "project" and context_project is not None:
+                continue
             configure_business_choice(
                 self, name, "estimate", parent="project" if name != "project" else None
+            )
+        if context_project is not None:
+            inherit_business_parent(
+                self, "project", context_project, detail_route="projects:detail"
             )
 
     def clean(self):

@@ -24,6 +24,11 @@ from core.jalali import format_jalali
 
 @override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
 class ContractBillingBrowserTests(JourneyFixture, StaticLiveServerTestCase):
+    browser_evidence_directory = (
+        Path(__file__).resolve().parents[2]
+        / "output/mvp-03/remediation-20261030/browser"
+    )
+
     def test_project_hub_hands_off_to_dedicated_pages(self):
         self.make_fixture(persian=True)
         self.project.name = "پروژه نمونه سازه"
@@ -51,7 +56,7 @@ class ContractBillingBrowserTests(JourneyFixture, StaticLiveServerTestCase):
                     "name": "P-project-hub-desktop",
                     "path": project,
                     "mustText": [
-                        "پیمان و صورت‌وضعیت پروژه",
+                        "برآورد، قرارداد و صورت‌وضعیت پروژه",
                         "اجرای سازه بتنی",
                         "برآورد سازه پروژه",
                     ],
@@ -206,12 +211,19 @@ class ContractBillingBrowserTests(JourneyFixture, StaticLiveServerTestCase):
                 "node",
                 str(root / "scripts/verification/mvp02_browser.mjs"),
                 self.live_server_url,
-                str(root / "output/mvp-03/browser"),
+                str(
+                    getattr(
+                        self,
+                        "browser_evidence_directory",
+                        root / "output/mvp-03/browser",
+                    )
+                ),
                 actor.username,
             ],
             env=env,
             capture_output=True,
             text=True,
+            encoding="utf-8",
             timeout=240,
             check=False,
         )
@@ -219,7 +231,12 @@ class ContractBillingBrowserTests(JourneyFixture, StaticLiveServerTestCase):
         results = json.loads(result.stdout)
         self.assertEqual(len(results), len(scenarios))
         (
-            root / "output/mvp-03/browser" / f"batch-{scenarios[0]['name']}.json"
+            Path(
+                getattr(
+                    self, "browser_evidence_directory", root / "output/mvp-03/browser"
+                )
+            )
+            / f"batch-{scenarios[0]['name']}.json"
         ).write_text(
             json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8"
         )
@@ -299,7 +316,12 @@ class ContractBillingBrowserTests(JourneyFixture, StaticLiveServerTestCase):
                 scenario(
                     "A-estimate-contract-handoff",
                     reverse("estimates:detail", args=[estimate.pk]),
-                    steps=[{"clickHref": contract_url, "afterPath": contract_url}],
+                    steps=[
+                        {
+                            "clickHref": contract_url + f"?estimate={estimate.pk}",
+                            "afterPath": contract_url,
+                        }
+                    ],
                     mustText=["اجرای سازه بتنی", "برآورد سازه بتنی"],
                 ),
                 scenario(
@@ -348,7 +370,7 @@ class ContractBillingBrowserTests(JourneyFixture, StaticLiveServerTestCase):
                             "mustText": "پیش‌نویس صورت‌وضعیت",
                         }
                     ],
-                    mustText=["کسور تضمین", "بررسی و تأیید"],
+                    mustText=["کسور تضمین", "وضعیت و اقدام بعدی"],
                 ),
             ],
         )
@@ -390,7 +412,7 @@ class ContractBillingBrowserTests(JourneyFixture, StaticLiveServerTestCase):
                 scenario(
                     "I-filter-empty-state",
                     "/billing/claims/?q=no-such-contract",
-                    mustText=["صورت‌وضعیتی یافت نشد"],
+                    mustText=["با فیلترهای فعلی نتیجه‌ای یافت نشد"],
                 ),
                 scenario("J-mobile-create-form", create_context, mobile=True),
                 scenario(
@@ -404,6 +426,12 @@ class ContractBillingBrowserTests(JourneyFixture, StaticLiveServerTestCase):
         )
         claim.refresh_from_db()
         self.assertEqual(claim.status, "submitted")
+        self.login(self.manager)
+        decision_page = self.client.get(detail)
+        self.assertTrue(
+            decision_page.context["can_decide_claim"],
+            "The independent reviewer must retain the existing decision authority.",
+        )
         self.browser(
             self.manager,
             [

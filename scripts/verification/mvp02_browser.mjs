@@ -61,7 +61,11 @@ try {
     await evaluate(`(() => {const el=document.querySelector(${JSON.stringify(selector)});if(el){const r=el.getBoundingClientRect();if(r.top<0 || r.bottom>innerHeight) el.scrollIntoView({block:'center',behavior:'instant'});}})()`);
     await new Promise(done=>setTimeout(done,50));
     const rect = await evaluate(`(() => {const el=document.querySelector(${JSON.stringify(selector)}); if(!el) return null;const r=el.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
-    if (!rect) throw new Error('Missing clickable control '+selector);
+    if (!rect) {
+      const diagnostic = await evaluate(`({path:location.pathname,title:document.title,heading:document.querySelector('main h1')?.textContent,buttons:[...document.querySelectorAll('main button')].map(b=>b.textContent.trim())})`);
+      await writeFile(join(outputDirectory,actor+'-missing-control-diagnostic.json'),JSON.stringify({selector,...diagnostic},null,2));
+      throw new Error('Missing clickable control '+selector);
+    }
     await send('Input.dispatchMouseEvent', {type:'mousePressed',button:'left',clickCount:1,...rect});
     await send('Input.dispatchMouseEvent', {type:'mouseReleased',button:'left',clickCount:1,...rect});
   };
@@ -91,7 +95,8 @@ try {
     for (const step of scenario.steps || []) {
       if (step.fill) {
         await evaluate(`(() => {for(const [name,value] of Object.entries(${JSON.stringify(step.fill)})) {
-          const field=document.querySelector('[name="'+name+'"]');
+          const scope=document.querySelector(${JSON.stringify(step.formSelector || 'body')});
+          const field=scope?.querySelector('[name="'+name+'"]');
           if(!field) throw new Error('Missing form field '+name);
           if(field.tomselect) field.tomselect.setValue(value); else if(field.type==='checkbox') field.checked=!!value; else field.value=value;
           field.dispatchEvent(new Event('input',{bubbles:true}));
