@@ -1,32 +1,34 @@
-{% extends "base.html" %}
-
+{% extends "base.html" %}{% load static erp_format table_filters reference_lists %}
 {% block title %}کارگاه‌ها | سامانه مدیریت ساخت{% endblock %}
-
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}?v=20261101-contract-density-1"><link rel="stylesheet" href="{% static 'css/erp_secondary_reference_lists.css' %}?v=20261101-1">{% endblock %}
+{% block header_working_context %}{% if request.organization %}{% include "components/list_working_context.html" with request=request csrf_token=csrf_token active_project=active_project active_site=active_site context_projects=context_projects context_sites=context_sites context_requires_project=context_requires_project site_context_relevant=site_context_relevant header_layout=True only %}{% endif %}{% endblock %}
+{% block working_context %}{% endblock %}
+{% block table_filter_controls %}{% endblock %}
+{% block list_pagination %}{% endblock %}
 {% block content %}
-{% include "components/page_header.html" with page_eyebrow="عملیات پروژه" page_title="کارگاه‌ها" page_description="کارگاه‌های همه پروژه‌های شرکت" only %}
-
-<section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست کارگاه‌ها">
-{% if sites %}
-    <div class="erp-table-wrap">
-        <table class="w-full min-w-[720px] text-right text-sm">
-            <thead class="bg-slate-50 text-[11px] font-semibold text-slate-500">
-                <tr><th class="border-b border-slate-200 px-4 py-3">کد کارگاه</th><th class="border-b border-slate-200 px-4 py-3">نام کارگاه</th><th class="border-b border-slate-200 px-4 py-3">پروژه</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th><th class="border-b border-slate-200 px-4 py-3">نشانی</th></tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 bg-white">
-            {% for site in sites %}
-                <tr class="transition hover:bg-blue-50/40">
-                    <td class="whitespace-nowrap px-4 py-3.5 font-medium" dir="ltr"><a class="font-semibold text-blue-700 hover:underline" href="{% url 'projects:site_detail' site.project_id site.id %}">{{ site.code }}</a></td>
-                    <td class="px-4 py-3.5"><a class="font-semibold text-blue-700 hover:underline" href="{% url 'projects:site_detail' site.project_id site.id %}">{{ site.name }}</a></td>
-                    <td class="px-4 py-3.5"><a class="text-blue-700 hover:underline" href="{% url 'projects:site_list' site.project.id %}">کارگاه‌های {{ site.project.name }}</a><p class="text-xs text-slate-400" dir="ltr">{{ site.project.code }}</p></td>
-                    <td class="px-4 py-3.5">{% if site.is_active %}<span class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">فعال</span>{% else %}<span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">غیرفعال</span>{% endif %}</td>
-                    <td class="max-w-sm px-4 py-3.5 text-slate-500">{{ site.address|default:"—" }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+{% reference_list_state "sites" as list_ui %}
+<div class="erp-reference-list erp-contracts-list erp-secondary-list erp-sites-list">
+    <div class="erp-list-heading">{% include "components/page_header.html" with page_title="کارگاه‌ها" page_description="کارگاه‌های همه پروژه‌های شرکت" page_icon="document" only %}</div>
+    <div class="erp-list-workspace">
+        {% include "components/filter_bar.html" with bar=list_ui.bar reference_layout=True only %}
+        {% include "components/reference_list_toolbar.html" %}
+        <section class="erp-contracts-table overflow-x-auto" aria-label="فهرست کارگاه‌ها" tabindex="0">
+            {% if sites %}
+            <table class="erp-responsive-list" aria-label="کارگاه‌ها">
+                <thead><tr>{% for option in list_ui.sorts %}<th scope="col"{% if list_ui.sort.key == option.key %} aria-sort="{{ list_ui.sort.descending|yesno:'descending,ascending' }}"{% endif %}>{% table_sort_header option.key option.label %}</th>{% endfor %}<th scope="col">عملیات</th></tr></thead>
+                <tbody>{% for site in sites %}<tr>
+                    <td class="erp-list-identifier" data-label="کد کارگاه"><a href="{% url 'projects:site_detail' site.project_id site.id %}"><bdi dir="ltr">{{ site.code }}</bdi></a></td>
+                    <td class="erp-list-title"><a href="{% url 'projects:site_detail' site.project_id site.id %}">{{ site.name }}</a></td>
+                    <td data-label="پروژه"><a href="{% url 'projects:site_list' site.project.id %}">{{ site.project.name }}</a><span class="erp-list-subtitle"><bdi dir="ltr">{{ site.project.code }}</bdi></span></td>
+                    <td class="erp-list-status" data-label="وضعیت">{% if site.is_active %}{% include "components/status_badge.html" with status="active" label="فعال" only %}{% else %}{% include "components/status_badge.html" with status="inactive" label="غیرفعال" only %}{% endif %}</td>
+                    <td class="erp-list-address" data-label="نشانی">{{ site.address|default:"—" }}</td>
+                    <td class="erp-list-row-action"><details class="erp-list-row-menu"><summary class="erp-list-action" aria-label="عملیات کارگاه {{ site.name }}، پروژه {{ site.project.name }}"><span aria-hidden="true">⋮</span></summary><div class="erp-list-row-menu__items"><a href="{% url 'projects:site_detail' site.project_id site.id %}" target="_blank" rel="noopener">باز کردن جزئیات در زبانه جدید</a></div></details></td>
+                </tr>{% endfor %}</tbody>
+            </table>
+            {% elif list_ui.bar.chips %}{% include "components/filtered_empty_state.html" with clear_filters_url=list_ui.bar.clear_url %}
+            {% else %}{% include "components/empty_state.html" with empty_title="هنوز کارگاهی ثبت نشده است" empty_description="برای افزودن کارگاه، ابتدا پروژه موردنظر را باز کنید." only %}{% endif %}
+        </section>
+        {% include "components/list_pagination.html" with page_obj=page_obj pagination_query=pagination_query result_label="کارگاه" reference_layout=True only %}
     </div>
-{% else %}
-    {% include "components/empty_state.html" with empty_title="هنوز کارگاهی ثبت نشده است" empty_description="برای افزودن کارگاه، ابتدا پروژه موردنظر را باز کنید." only %}
-{% endif %}
-</section>
+</div>
 {% endblock %}

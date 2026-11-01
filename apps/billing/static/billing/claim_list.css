@@ -1,0 +1,31 @@
+/* Claims-specific geometry over the official Contracts list components. */
+.erp-claims-list .claim-journey { margin: -8px 0 18px; }
+.erp-claims-list .claim-journey nav { margin-top: 0; }
+.erp-claims-list .claim-journey [aria-current] { color: var(--bonira-royal-blue); border-color: var(--bonira-royal-blue); background: var(--bonira-soft); }
+.erp-claims-list .claim-project-link { margin: 12px 0; color: var(--bonira-royal-blue); font-size: 12px; }
+.erp-claims-list .claim-status-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0 0 16px; }
+.erp-claims-list .claim-status-summary__item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; background: var(--bonira-white); border: 1px solid var(--bonira-border); border-radius: 10px; }
+.erp-claims-list .claim-status-summary__item strong { font-size: 18px; }
+.erp-claims-list .erp-list-status .erp-badge, .erp-claims-list .claim-status-summary .erp-badge { white-space: normal; text-align: center; }
+.erp-claims-list .claim-net bdi { color: var(--bonira-royal-blue); font-weight: 700; }
+@media (min-width: 768px) {
+  .erp-claims-list .erp-responsive-list { min-width: 1080px; table-layout: auto; }
+  .erp-claims-list .erp-responsive-list th { width: auto; }
+  .erp-claims-list .erp-responsive-list .erp-list-title { width: 23%; min-width: 190px; }
+  .erp-claims-list .erp-responsive-list .erp-list-amount { text-align: end; }
+  .erp-claims-list .claim-period { font-size: 11px; white-space: nowrap; }
+}
+@media (max-width: 767px) {
+  .erp-claims-list .erp-list-heading > header { flex-wrap: wrap; }
+  .erp-claims-list .erp-list-heading p { max-width: none; }
+  .erp-claims-list .claim-status-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .erp-claims-list .claim-status-summary__item { padding: 10px; }
+  .erp-claims-list .erp-list-scope { flex-wrap: wrap; }
+}
+@media (min-width: 768px) {
+  .erp-claims-list .erp-responsive-list th:nth-child(n) { width: auto; }
+  .erp-claims-list .erp-responsive-list .erp-list-status { min-width: 172px; }
+  .erp-claims-list .erp-list-status .erp-badge { white-space: nowrap; overflow-wrap: normal; }
+  .erp-claims-list .erp-responsive-list .erp-list-title { min-width: 210px; }
+  .erp-claims-list .erp-list-identifier { white-space: nowrap; }
+}

@@ -1,0 +1,171 @@
+......F                                                                  [100%]
+================================== FAILURES ===================================
+______________ ContractDetailBrowserTests.test_reference_matrix _______________
+
+self = <apps.contracts.test_detail_dashboard.ContractDetailBrowserTests testMethod=test_reference_matrix>
+
+    def test_reference_matrix(self):
+        self.ready()
+        claim = self.rich()
+        Organization.objects.filter(pk=self.organization.pk).update(
+            name="\u0634\u0631\u06a9\u062a \u0646\u0645\u0648\u0646\u0647 \xb7 \u062f\u0627\u062f\u0647 \u0622\u0632\u0645\u0648\u0646"
+        )
+        Project.objects.filter(pk=self.project.pk).update(
+            name="\u0645\u062c\u062a\u0645\u0639 \u0645\u0633\u06a9\u0648\u0646\u06cc \u0628\u0627\u063a\u0633\u062a\u0627\u0646", code="PRJ-02-01"
+        )
+        Contract.objects.filter(pk=self.contract.pk).update(
+            title="\u0642\u0631\u0627\u0631\u062f\u0627\u062f \u0627\u062c\u0631\u0627\u06cc \u062a\u0623\u0633\u06cc\u0633\u0627\u062a \u0645\u06a9\u0627\u0646\u06cc\u06a9\u06cc \u0648 \u0628\u0631\u0642\u06cc",
+            contract_number="CTR-02-01-04",
+            counterparty_name="\u067e\u06cc\u0645\u0627\u0646\u06a9\u0627\u0631\u06cc \u062a\u0623\u0633\u06cc\u0633\u0627\u062a \u0646\u06cc\u0631\u0648\u06cc \u0634\u0631\u0642",
+            contract_value=Decimal(82000000000),
+            signed_at="2026-04-17",
+            start_date="2026-04-21",
+            end_date="2027-04-20",
+        )
+        ContractAmendment.objects.filter(contract=self.contract).update(
+            value_change=Decimal(-14800000000)
+        )
+        ProgressClaim.objects.filter(pk=claim.pk).update(
+            gross_amount=Decimal(55300000000), net_amount=Decimal(50000000000)
+        )
+        claim.refresh_from_db()
+        # Explicit synthetic rich-data records, never seeded into the application DB.
+        for number, state in ((2, "draft"), (3, "submitted")):
+            row = copy.copy(claim)
+            row.pk = uuid.uuid4()
+            row.claim_number = number
+            row.status = state
+            row.gross_amount = Decimal("800000000.1250")
+            row.net_amount = Decimal(700000000)
+            row.approved_at = None
+            row.submitted_at = None
+            row.returned_at = None
+            row.returned_revision_id = None
+            ProgressClaim.objects.bulk_create([row])
+        empty = Contract.objects.create(
+            organization=self.organization,
+            project=self.project,
+            title="\u0642\u0631\u0627\u0631\u062f\u0627\u062f \u0622\u063a\u0627\u0632\u06cc\u0646",
+            contract_number="EMPTY",
+            counterparty_name="\u0637\u0631\u0641 \u0642\u0631\u0627\u0631\u062f\u0627\u062f \u0646\u0645\u0648\u0646\u0647",
+            direction="receivable",
+        )
+        payable = Contract.objects.create(
+            organization=self.organization,
+            project=self.project,
+            title="\u0642\u0631\u0627\u0631\u062f\u0627\u062f \u0627\u062c\u0631\u0627\u06cc \u062a\u0623\u0633\u06cc\u0633\u0627\u062a \u0645\u06a9\u0627\u0646\u06cc\u06a9\u06cc \u0648 \u0628\u0631\u0642\u06cc",
+            contract_number="PAYABLE-01",
+            counterparty_name="\u067e\u06cc\u0645\u0627\u0646\u06a9\u0627\u0631 \u062a\u0623\u0633\u06cc\u0633\u0627\u062a \u0646\u0645\u0648\u0646\u0647",
+            direction="payable",
+        )
+        base = {
+            "status": 200,
+            "screenshot": True,
+            "noJsErrors": True,
+            "noHttpErrors": True,
+            "absentText": ["None", "UUID", "receivable", "payable"],
+        }
+        inspect = lambda expression, description: {
+            "inspect": expression,
+            "description": description,
+        }
+        rich_check = "document.querySelectorAll('.cd-kpi').length===5 && document.querySelectorAll('[data-chart-ready]').length===1 && Chart.getChart('contract-financial-chart').data.datasets[0].data[0]===55300000000 && document.querySelectorAll('.cd-claims tbody tr').length===3 && !document.querySelector('.cd-progress-row:first-of-type progress')"
+        scenarios = []
+        for mobile in (False, True):
+            suffix = "390" if mobile else "1440"
+            scenarios.extend(
+                [
+                    {
+                        **base,
+                        "name": "rich-" + suffix,
+                        "path": self.url,
+                        "mobile": mobile,
+                        "steps": [
+                            inspect(
+                                rich_check,
+                                "five KPIs, exact real gross data, 3 records, no fabricated physical progress",
+                            )
+                        ],
+                    },
+                    {
+                        **base,
+                        "name": "little-" + suffix,
+                        "path": reverse("contracts:detail", args=[empty.pk]),
+                        "mobile": mobile,
+                        "steps": [
+                            inspect(
+                                "!document.querySelector('canvas, progress') && document.querySelectorAll('.cd-kpi').length===5",
+                                "empty data retains hierarchy without invented charts",
+                            )
+                        ],
+                    },
+                    {
+                        **base,
+                        "name": "payable-" + suffix,
+                        "path": reverse("contracts:detail", args=[payable.pk]),
+                        "mobile": mobile,
+                        "steps": [
+                            inspect(
+                                "![...document.querySelectorAll('.contract-detail a')].some(a=>/billing\\/(claims|baselines)/.test(a.href))",
+                                "payable excludes receivable journey",
+                            )
+                        ],
+                    },
+                ]
+            )
+        scenarios.append(
+            {
+                **base,
+                "name": "rich-no-js",
+                "path": self.url,
+                "noJS": True,
+                "mustText": ["\u062a\u0623\u06cc\u06cc\u062f\u0634\u062f\u0647", "55,300,000,000", "\u062f\u0631 \u062d\u0627\u0644 \u0628\u0631\u0631\u0633\u06cc"],
+            }
+        )
+>       self.browser(self.owner, scenarios)
+
+apps\contracts\test_detail_dashboard.py:269: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:319
+E         throw new Error(scenario.name+': horizontal overflow');
+E               ^
+E   
+E   Error: rich-390: horizontal overflow
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:319:13
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-01T11:34:42.769552+00:00","event":"http.response","request_id":"2084ba60-7474-4a40-8016-124a5d98e655","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":2630}
+
+{"timestamp":"2026-11-01T11:34:52.117088+00:00","event":"http.response","request_id":"6a1ceb88-01ac-4181-8232-593da19e3ca5","method":"GET","route":null,"status_code":404,"duration_ms":763}
+
+{"timestamp":"2026-11-01T11:34:54.597403+00:00","event":"http.response","request_id":"d7b81047-e45e-4aa9-9340-a669f49d6a5f","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":2683}
+
+{"timestamp":"2026-11-01T11:34:57.461857+00:00","event":"http.response","request_id":"a1b7565f-d146-4998-be89-7e1b5b585a23","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1963}
+
+{"timestamp":"2026-11-01T11:35:00.890895+00:00","event":"http.response","request_id":"6f68f304-06a1-47e1-bd50-479cc1c743c6","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":2528}
+
+[01/Nov/2026 15:05:01,983] - Broken pipe from ('127.0.0.1', 58046)
+
+[01/Nov/2026 15:05:01,983] - Broken pipe from ('127.0.0.1', 61089)
+
+[01/Nov/2026 15:05:01,984] - Broken pipe from ('127.0.0.1', 64093)
+
+[01/Nov/2026 15:05:01,984] - Broken pipe from ('127.0.0.1', 56130)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 58046)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 61089)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 64093)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 56130)
+=========================== short test summary info ===========================
+FAILED apps/contracts/test_detail_dashboard.py::ContractDetailBrowserTests::test_reference_matrix
+1 failed, 6 passed in 137.02s (0:02:17)

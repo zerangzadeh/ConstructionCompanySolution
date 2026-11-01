@@ -1,0 +1,20 @@
+ apps/accounts/static/js/erp_filter_bar.js       | 26 +++++++
+ apps/contracts/forms.py                         | 12 +++
+ apps/contracts/test_filter_bar.py               | 39 ++++++++++
+ apps/contracts/views.py                         | 32 ++++++++
+ apps/projects/business_hub.py                   |  5 ++
+ apps/projects/views.py                          | 63 +++++++++++-----
+ docs/governance/mvp/MVP-03_COMPLETION_REPORT.md | 64 +++++++++++++++-
+ docs/ui-guidelines.md                           | 99 ++++++++++++++++++++++---
+ graphify-out/cache/last_query_stamp             |  2 +-
+ scripts/verification/mvp02_browser.mjs          | 26 ++++++-
+ templates/base.html                             |  5 +-
+ templates/components/README.md                  | 64 ++++++++++++++++
+ templates/components/filter_bar.html            | 49 ++++++------
+ templates/components/page_header.html           |  2 +-
+ templates/contracts/create.html                 | 76 ++++++++++++++-----
+ templates/contracts/detail.html                 | 49 ++++++++----
+ templates/contracts/list.html                   | 58 +++++++++++++--
+ templates/projects/detail.html                  | 94 ++++++++---------------
+ templates/projects/list.html                    | 75 +++++++++----------
+ 19 files changed, 638 insertions(+), 202 deletions(-)

@@ -1,12 +1,46 @@
-{% extends "base.html" %}
-{% block title %}گواهی‌های پرداخت پیمان جزء | بنیرا{% endblock %}
+{% extends "base.html" %}{% load static erp_format table_filters %}
+{% block title %}گواهی‌های پرداخت پیمانکار جزء | بنیرا{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}?v=20261101-contract-density-1"><link rel="stylesheet" href="{% static 'billing/payable_list.css' %}">{% endblock %}
+{% block header_working_context %}{% if request.organization %}{% include "components/list_working_context.html" with request=request csrf_token=csrf_token active_project=active_project active_site=active_site context_projects=context_projects context_sites=context_sites context_requires_project=context_requires_project site_context_relevant=site_context_relevant header_layout=True only %}{% endif %}{% endblock %}
+{% block working_context %}{% endblock %}
+{% block table_filter_controls %}{% endblock %}
+{% block list_pagination %}{% endblock %}
 {% block content %}
-{% include "components/page_header.html" with page_eyebrow="کنترل تجاری پرداختنی" page_title="گواهی‌های پرداخت پیمان جزء" page_description="مفهوم مستقل از صورت‌وضعیت دریافتنی؛ اندازه‌گیری، کسورات و زنجیره اصلاح" page_action_url="/billing/payable-certificates/new/" page_action_label="ایجاد گواهی" only %}
-<div class="mt-4"><a class="erp-button-secondary" href="{% url 'billing:payable_measurement_list' %}">اندازه‌گیری‌های پیمان جزء</a></div>
-<section class="erp-surface mt-6 overflow-hidden rounded-xl">
-  <div class="overflow-x-auto"><table class="w-full min-w-[760px] text-right text-sm">
-    <thead class="bg-slate-50 text-xs text-slate-500"><tr><th class="px-4 py-3">شماره/ویرایش</th><th class="px-4 py-3">پیمان جزء</th><th class="px-4 py-3">دوره</th><th class="px-4 py-3">خالص پرداختنی</th><th class="px-4 py-3">وضعیت</th></tr></thead>
-    <tbody class="divide-y divide-slate-100">{% for certificate in certificates %}<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-medium"><a class="text-blue-700 hover:underline" href="{% url 'billing:payable_certificate_detail' certificate.pk %}" dir="ltr">{{ certificate.certificate_number }}-{{ certificate.revision_number }}</a></td><td class="px-4 py-3">{{ certificate.contract.contract_number }}</td><td class="px-4 py-3" dir="ltr">{{ certificate.period_start|jalali_date }} — {{ certificate.period_end|jalali_date }}</td><td class="px-4 py-3 font-medium" dir="ltr">{{ certificate.net_amount }} {{ certificate.currency_code }}</td><td class="px-4 py-3">{% include "components/status_badge.html" with status=certificate.status label=certificate.get_status_display only %}</td></tr>{% empty %}<tr><td colspan="5">{% include "components/empty_state.html" with empty_title="گواهی پرداختی ثبت نشده است" empty_description="پس از ثبت و راستی‌آزمایی اندازه‌گیری پیمان جزء، گواهی‌های محاسبه‌شده اینجا نمایش داده می‌شوند." only %}</td></tr>{% endfor %}</tbody>
-  </table></div>
-</section>
+<div class="erp-reference-list erp-contracts-list erp-payable-list">
+  <div class="erp-list-heading">
+    {% include "components/page_header.html" with page_title="گواهی‌های پرداخت پیمانکار جزء" page_description="کنترل و تأیید مبالغ قابل پرداخت بابت کارکرد پیمانکاران جزء" page_action_url=create_url page_action_label="گواهی پرداخت جدید" page_icon="document" only %}
+  </div>
+  <div class="erp-list-workspace">
+    {% include "components/filter_bar.html" with bar=filter_bar reference_layout=True only %}
+    <div class="erp-list-toolbar" role="group" aria-label="نتایج و مرتب‌سازی">
+      {% include "components/list_result_summary.html" with bar=filter_bar reference_layout=True only %}
+      <details class="erp-list-sort-menu"><summary class="erp-list-sort" data-list-sort-summary><span>مرتب‌سازی:</span> <strong>{{ list_sort.label }}</strong><span class="erp-list-sort__direction"> · {{ list_sort.descending|yesno:"نزولی,صعودی" }}</span><span aria-hidden="true">⌄</span></summary><div class="erp-list-sort-menu__options" aria-label="انتخاب مرتب‌سازی">{% for option in sort_options %}{% table_sort_header option.key option.label %}{% endfor %}</div></details>
+    </div>
+    <section class="erp-contracts-table overflow-x-auto" aria-label="فهرست گواهی‌های پرداخت" tabindex="0">
+      {% if certificates %}
+      <table class="erp-responsive-list" aria-label="گواهی‌های پرداخت پیمانکار جزء">
+        <thead><tr>
+          {% for option in sort_options %}<th scope="col"{% if request.GET.sort == option.key %} aria-sort="{{ list_sort.descending|yesno:'descending,ascending' }}"{% endif %}>{% table_sort_header option.key option.label %}</th>{% endfor %}
+          <th scope="col">عملیات</th>
+        </tr></thead>
+        <tbody>{% for certificate in certificates %}<tr>
+          <td class="erp-list-identifier" data-label="شماره / ویرایش"><a href="{% url 'billing:payable_certificate_detail' certificate.pk %}"><bdi dir="ltr">{{ certificate.certificate_number|erp_number }}-{{ certificate.revision_number|erp_number }}</bdi></a></td>
+          <td class="erp-list-title" data-label="پیمان جزء"><bdi dir="ltr">{{ certificate.contract.contract_number }}</bdi><span class="erp-list-subtitle">{{ certificate.project.name }}</span></td>
+          <td data-label="طرف قرارداد">{{ certificate.party_identity_snapshot.display_name }}</td>
+          <td class="erp-payable-period" data-label="دوره"><bdi dir="ltr">{{ certificate.period_start|jalali_date }} — {{ certificate.period_end|jalali_date }}</bdi></td>
+          <td class="erp-list-amount" data-label="مبلغ ناخالص"><bdi dir="ltr">{{ certificate.gross_amount|erp_number }}</bdi><span class="erp-list-subtitle">{{ certificate.currency_code }}</span></td>
+          <td class="erp-list-amount" data-label="کسورات"><bdi dir="ltr">{{ certificate.adjustment_amount|erp_number }}</bdi><span class="erp-list-subtitle">{{ certificate.currency_code }}</span></td>
+          <td class="erp-list-amount erp-payable-net" data-label="خالص قابل پرداخت"><bdi dir="ltr">{{ certificate.net_amount|erp_number }}</bdi><span class="erp-list-subtitle">{{ certificate.currency_code }}</span></td>
+          <td class="erp-list-status" data-label="وضعیت">{% include "components/status_badge.html" with status=certificate.status label=certificate.get_status_display only %}</td>
+          <td data-label="تاریخ ثبت"><bdi dir="ltr">{{ certificate.created_at|jalali_date }}</bdi></td>
+          <td class="erp-list-row-action"><details class="erp-list-row-menu"><summary class="erp-list-action" aria-label="عملیات گواهی {{ certificate.certificate_number }} ویرایش {{ certificate.revision_number }}"><span aria-hidden="true">⋮</span></summary><div class="erp-list-row-menu__items"><a href="{% url 'billing:payable_certificate_detail' certificate.pk %}" target="_blank" rel="noopener">باز کردن جزئیات در زبانه جدید</a></div></details></td>
+        </tr>{% endfor %}</tbody>
+      </table>
+      {% elif scoped_has_records %}{% include "components/filtered_empty_state.html" %}
+      {% else %}{% include "components/empty_state.html" with empty_title="گواهی پرداختی ثبت نشده است" empty_description="پس از ثبت و راستی‌آزمایی اندازه‌گیری پیمان جزء، گواهی‌های محاسبه‌شده اینجا نمایش داده می‌شوند." only %}{% endif %}
+    </section>
+    {% include "components/list_pagination.html" with page_obj=page_obj pagination_query=pagination_query result_label="گواهی پرداخت" reference_layout=True only %}
+  </div>
+  {% if can_view_measurements %}<div class="erp-payable-related"><a class="erp-button-secondary" href="{% url 'billing:payable_measurement_list' %}">اندازه‌گیری‌های پیمان جزء</a></div>{% endif %}
+</div>
 {% endblock %}

@@ -36,10 +36,16 @@ try {
   });
   let id = 0;
   let documentStatus;
+  let jsErrors = [];
+  let httpErrors = [];
   const documentStatuses = new Map();
   const pending = new Map();
   socket.addEventListener('message', event => {
     const message = JSON.parse(event.data);
+    if (message.method === 'Runtime.exceptionThrown') jsErrors.push(message.params.exceptionDetails.text);
+    if (message.method === 'Network.responseReceived' && message.params.response.status >= 400) {
+      httpErrors.push({url:message.params.response.url,status:message.params.response.status});
+    }
     if (message.method === 'Network.responseReceived' && message.params.type === 'Document') {
       documentStatus = message.params.response.status;
       documentStatuses.set(message.params.response.url.split('#')[0], documentStatus);
@@ -57,10 +63,11 @@ try {
   const evaluate = async expression => (await send('Runtime.evaluate', { expression, returnByValue: true })).result.value;
   await send('Network.enable');
   await send('Page.enable');
+  await send('Runtime.enable');
   await send('Network.setCookie', { name: 'sessionid', value: cookie, url: base });
   await mkdir(outputDirectory, { recursive: true });
   const click = async selector => {
-    await evaluate(`(() => {const el=document.querySelector(${JSON.stringify(selector)});if(el){const r=el.getBoundingClientRect();if(r.top<0 || r.bottom>innerHeight) el.scrollIntoView({block:'center',behavior:'instant'});}})()`);
+    await evaluate(`(() => {const el=document.querySelector(${JSON.stringify(selector)});if(el){const r=el.getBoundingClientRect();if(r.top<0 || r.bottom>innerHeight || r.left<0 || r.right>innerWidth) el.scrollIntoView({block:'center',inline:'center',behavior:'instant'});}})()`);
     await new Promise(done=>setTimeout(done,50));
     const rect = await evaluate(`(() => {const el=document.querySelector(${JSON.stringify(selector)}); if(!el) return null;const r=el.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
     if (!rect) {
@@ -68,16 +75,24 @@ try {
       await writeFile(join(outputDirectory,actor+'-missing-control-diagnostic.json'),JSON.stringify({selector,...diagnostic},null,2));
       throw new Error('Missing clickable control '+selector);
     }
+    if (navigationTrace) navigationTrace.push(await evaluate(`(() => {const el=document.querySelector(${JSON.stringify(selector)}); const hit=document.elementFromPoint(${rect.x},${rect.y});return {before:location.href,selector:${JSON.stringify(selector)},label:el.textContent.trim(),href:el.href,hitHref:hit?.closest('a')?.href};})()`));
+    if (navigationTrace) await writeFile(navigationTracePath, JSON.stringify(navigationTrace, null, 2));
     await send('Input.dispatchMouseEvent', {type:'mousePressed',button:'left',clickCount:1,...rect});
     await send('Input.dispatchMouseEvent', {type:'mouseReleased',button:'left',clickCount:1,...rect});
   };
   const results = [];
+  let navigationTrace = null;
+  let navigationTracePath = null;
   for (const scenario of scenarios) {
-    const width = scenario.mobile ? 390 : 1440;
-    await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: !!scenario.mobile });
-    await send('Network.setBlockedURLs', {urls: []});
+    navigationTrace = scenario.traceNavigation ? [] : null;
+    navigationTracePath = scenario.traceNavigation ? join(outputDirectory, `${actor}-${scenario.name}-clicks.json`) : null;
+    const width = scenario.width || (scenario.mobile ? 390 : 1440);
+    await send('Emulation.setDeviceMetricsOverride', { width, height: scenario.height || 900, deviceScaleFactor: 1, mobile: !!scenario.mobile });
+    await send('Network.setBlockedURLs', {urls: scenario.blockedURLs || []});
     await send('Emulation.setScriptExecutionDisabled', {value: !!scenario.noJS});
     documentStatus = undefined;
+    jsErrors = [];
+    httpErrors = [];
     await send('Page.navigate', { url: new URL(scenario.path, base).href });
     let state;
     for (let i = 0; i < 300; i++) {
@@ -95,6 +110,11 @@ try {
       if (state?.ready === 'complete' && state.path === scenario.path.split('?')[0] && documentStatus) break;
     }
     for (const step of scenario.steps || []) {
+      if (step.resize) {
+        await send('Emulation.setDeviceMetricsOverride', {width:step.resize.width,height:step.resize.height || 900,deviceScaleFactor:1,mobile:step.resize.width<640});
+        await new Promise(done=>setTimeout(done,200));
+        if (!step.inspect) continue;
+      }
       if (step.fill) {
         await evaluate(`(() => {for(const [name,value] of Object.entries(${JSON.stringify(step.fill)})) {
           const scope=document.querySelector(${JSON.stringify(step.formSelector || 'body')});
@@ -269,6 +289,14 @@ try {
         if(documentStatus && settled?.ready==='complete' && (!step.afterPath || settled.path===step.afterPath) && (!step.afterPrefix || settled.path.startsWith(step.afterPrefix)) && (!step.mustText || settled.text.includes(step.mustText))) break;
         if(i===199) throw new Error(scenario.name+': interaction did not settle '+JSON.stringify(settled));
       }
+      if (navigationTrace?.length) {
+        navigationTrace.at(-1).after = await evaluate("location.href");
+        await writeFile(navigationTracePath, JSON.stringify(navigationTrace, null, 2));
+      }
+    }
+    if (navigationTrace) {
+      const last = navigationTrace.at(-1);
+      if (last) last.after = await evaluate("location.href");
     }
     state = await evaluate(`(() => ({
       ready:document.readyState,path:location.pathname,lang:document.documentElement.lang,dir:document.documentElement.dir,
@@ -280,6 +308,12 @@ try {
       technicalLabels:[...document.querySelectorAll('select option')].map(o=>o.textContent).filter(t=>/object \\(|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}/i.test(t)),
     }))()`);
     const visibleText = await evaluate('document.body.innerText');
+    if (scenario.noJsErrors && jsErrors.length) throw new Error(scenario.name+': JS exceptions '+JSON.stringify(jsErrors));
+    // The legacy shell's favicon is outside page asset validation.
+    const pageHttpErrors = httpErrors.filter(item=>!item.url.endsWith('/favicon.ico'));
+    if (scenario.noHttpErrors && pageHttpErrors.length) throw new Error(scenario.name+': HTTP errors '+JSON.stringify(pageHttpErrors));
+    state.jsErrors = jsErrors;
+    state.httpErrors = pageHttpErrors;
     if(!scenario.noJS && scenario.status===200) {
       const contract = await evaluate(`(() => {
         const selects=[...document.querySelectorAll('select[data-business-choice]')];
@@ -324,10 +358,21 @@ try {
       }
       const layout = await send('Page.getLayoutMetrics');
       const size=layout.cssContentSize;
+      if (scenario.viewportScreenshot) {
+        const viewport = await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
+        await writeFile(join(outputDirectory, `${actor}-${scenario.name}-viewport.png`),Buffer.from(viewport.data,'base64'));
+      }
       const shot = await send('Page.captureScreenshot', scenario.mobile ? {format:'png',captureBeyondViewport:true,clip:{x:0,y:0,width:size.width,height:size.height,scale:1}} : {format:'png',captureBeyondViewport:false});
       await writeFile(join(outputDirectory, `${actor}-${scenario.name}.png`), Buffer.from(shot.data, 'base64'));
+      if (scenario.bottomScreenshot) {
+        await evaluate('window.scrollTo(0,document.documentElement.scrollHeight)');
+        await new Promise(done=>setTimeout(done,120));
+        const bottom = await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
+        await writeFile(join(outputDirectory, `${actor}-${scenario.name}-bottom.png`),Buffer.from(bottom.data,'base64'));
+        await evaluate('window.scrollTo(0,0)');
+      }
     }
-    results.push({ name: scenario.name, status: documentStatus, ...state });
+    results.push({ name: scenario.name, status: documentStatus, ...state, ...(navigationTrace ? {navigationTrace} : {}) });
   }
   await writeFile(join(outputDirectory, `${actor}-results.json`), JSON.stringify(results, null, 2));
   process.stdout.write(JSON.stringify(results));

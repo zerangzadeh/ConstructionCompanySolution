@@ -1,0 +1,11 @@
+{% include "components/breadcrumbs.html" with page_breadcrumbs=page_breadcrumbs only %}
+<div class="erp-create-heading">
+    <header class="erp-create-heading__copy" aria-labelledby="erp-page-title">
+        <span class="erp-form-icon-tile erp-form-icon-tile--page">{% include "components/form_icon.html" with icon="document" only %}</span>
+        <div><h1 id="erp-page-title">{{ page_title }}</h1><p>{{ page_description }}</p></div>
+    </header>
+    <dl class="erp-create-context" aria-label="زمینه ایجاد رکورد"{% if form.inherited_parents %} data-inherited-context{% endif %}>
+        <div><dt><span class="erp-form-icon-tile">{% include "components/form_icon.html" with icon="company" only %}</span>شرکت</dt><dd>{{ organization.name }}</dd></div>
+        <div><dt><span class="erp-form-icon-tile">{% include "components/form_icon.html" with icon="layers" only %}</span>پروژه</dt><dd data-create-project-context>{% if form.inherited_parents %}{{ form.inherited_parents.0.title }}{% else %}انتخاب پروژه در فرم{% endif %}</dd></div>
+    </dl>
+</div>

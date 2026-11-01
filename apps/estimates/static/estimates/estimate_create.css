@@ -1,0 +1,24 @@
+/* Estimate Create: a single surface using shared form controls and tokens. */
+.estimate-create-page { max-width: 68rem; margin-inline: auto; }
+.estimate-create-page .erp-page-header { margin-block: 1rem 1.5rem; }
+.estimate-create-page #erp-page-title { display: flex; align-items: center; gap: .75rem; }
+.estimate-create-form { gap: 0; border: 1px solid var(--color-border-subtle); border-radius: .875rem; background: var(--color-bg-surface); box-shadow: 0 2px 5px rgb(14 39 70 / 6%); }
+.estimate-create-section { min-width: 0; }
+.estimate-create-section > .erp-form-section__header { margin: 0; padding: .875rem 1.5rem; border-bottom: 1px solid var(--color-border-subtle); }
+.estimate-create-section > .erp-form-grid { padding: 1.25rem 1.5rem 1.5rem; gap: 1.25rem 1.5rem; }
+.estimate-create-form .erp-form-field > label { margin-bottom: .5rem; }
+.estimate-field-optional { margin-inline-start: .375rem; font-size: .75rem; font-weight: 400; color: var(--color-text-muted); }
+main .estimate-create-form :is(input:not([type=hidden]), select, textarea), .estimate-create-form .erp-business-choice .ts-wrapper.single .ts-control { min-height: 2.75rem; }
+main .estimate-create-form input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]) { min-height: 2.75rem; }
+main .estimate-create-form .ts-control > input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]) { min-height: 0; }
+main .estimate-create-form textarea[name] { min-height: 5.5rem; }
+.estimate-create-form .erp-field-error, .estimate-create-form .erp-field-help { margin-top: .375rem; }
+.estimate-create-form .erp-form-footer { position: static; border: 0; border-top: 1px solid var(--color-border-subtle); border-radius: 0 0 .875rem .875rem; background: var(--color-bg-subtle); padding: .875rem 1rem; box-shadow: none; }
+.estimate-create-form :is(.ts-wrapper, .ts-control, input, textarea, select) { max-width: 100%; min-width: 0; }
+.estimate-create-form .ts-control .item { overflow-wrap: anywhere; }
+@media (max-width: 639px) {
+    .estimate-create-page .erp-page-header { margin-block: .75rem 1rem; }
+    .estimate-create-section > .erp-form-section__header { padding: .75rem 1rem; }
+    .estimate-create-section > .erp-form-grid { padding: 1rem; gap: 1rem; }
+    .estimate-create-form .erp-form-footer { padding: .75rem; }
+}

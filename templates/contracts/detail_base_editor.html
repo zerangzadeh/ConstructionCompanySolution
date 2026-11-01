@@ -1,0 +1,10 @@
+<details class="cd-panel cd-workspace-editor" id="draft-edit" {% if workspace.base_form.is_bound %}open{% endif %}>
+    <summary>ویرایش اطلاعات پیش‌نویس</summary>
+    <form method="post" id="contract-draft-base" action="{% url 'contracts:detail' contract.pk %}">
+        {% csrf_token %}<input type="hidden" name="detail_action" value="edit_base">
+        {% if workspace.base_form.errors %}<div class="cd-form-errors" role="alert">{{ workspace.base_form.non_field_errors }}<p>فیلدهای مشخص‌شده را بررسی کنید.</p></div>{% endif %}
+        <div class="cd-edit-grid">{% for field in workspace.base_form %}{% include "components/form_field.html" with field=field %}{% endfor %}</div>
+        <p class="cd-empty-note">شماره قرارداد، پروژه و تاریخ‌های ثبت‌شده در این فرم ثابت هستند.</p>
+        <button class="erp-btn erp-btn--primary" type="submit">ذخیره تغییرات پیش‌نویس</button>
+    </form>
+</details>

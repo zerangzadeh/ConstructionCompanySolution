@@ -1,0 +1,123 @@
+...F...                                                                  [100%]
+================================== FAILURES ===================================
+_________________ PayableDetailTests.test_handoff_boundaries __________________
+
+organization = <Organization: Pay Cert>
+source_kind = 'billing.payable_certificate.v1'
+direction = ObligationDirection.PAYABLE
+effective_on = datetime.date(2026, 11, 1)
+
+    def resolve_control_account_mapping(
+        *, organization: Organization, source_kind: str, direction: str, effective_on: date
+    ) -> ControlAccountMappingVersion:
+        """Return the one approved mapping or fail closed without any fallback."""
+    
+        mappings = ControlAccountMappingVersion.objects.filter(
+            organization=organization,
+            source_kind=source_kind,
+            direction=direction,
+            effective_from__lte=effective_on,
+        ).filter(Q(effective_to__isnull=True) | Q(effective_to__gte=effective_on))
+        try:
+>           return mappings.select_related("control_account").get()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\accounting\services.py:330: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <QuerySet []>, args = (), kwargs = {}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.accounting.models.ControlAccountMappingVersion.DoesNotExist: ControlAccountMappingVersion matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist
+
+The above exception was the direct cause of the following exception:
+
+self = <apps.billing.test_payable_detail.PayableDetailTests testMethod=test_handoff_boundaries>
+
+    def test_explicit_ap_and_non_operational_posting_handoffs(self) -> None:
+        self._measurement()
+        certificate = self._approve(self._certificate())
+        source = resolve_payable_certificate_obligation_source(
+            self.organization, certificate.pk, certificate.revision_number, ""
+        )
+        self.assertEqual(source.direction, ObligationDirection.PAYABLE)
+        self.assertEqual(source.amount, certificate.net_amount)
+        posting = get_posting_contract(
+            source_kind=PAYABLE_CERTIFICATE_SOURCE_KIND,
+            event_kind=PAYABLE_CERTIFICATE_POSTING_EVENT_KIND,
+        )
+        self.assertFalse(posting.operational_producer)
+>       recognize_obligation(
+            organization=self.organization,
+            actor=self.owner,
+            source_kind=PAYABLE_CERTIFICATE_SOURCE_KIND,
+            source_uuid=certificate.pk,
+            source_version=certificate.revision_number,
+            idempotency_key=f"PAY-CERT-{certificate.pk}",
+        )
+
+apps\billing\test_payable_certificates.py:367: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\subledgers\services.py:321: in recognize_obligation
+    control_mapping = resolve_control_account_mapping(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Pay Cert>
+source_kind = 'billing.payable_certificate.v1'
+direction = ObligationDirection.PAYABLE
+effective_on = datetime.date(2026, 11, 1)
+
+    def resolve_control_account_mapping(
+        *, organization: Organization, source_kind: str, direction: str, effective_on: date
+    ) -> ControlAccountMappingVersion:
+        """Return the one approved mapping or fail closed without any fallback."""
+    
+        mappings = ControlAccountMappingVersion.objects.filter(
+            organization=organization,
+            source_kind=source_kind,
+            direction=direction,
+            effective_from__lte=effective_on,
+        ).filter(Q(effective_to__isnull=True) | Q(effective_to__gte=effective_on))
+        try:
+            return mappings.select_related("control_account").get()
+        except ControlAccountMappingVersion.DoesNotExist as exc:
+>           raise ValidationError(
+                "\u0646\u06af\u0627\u0634\u062a \u0645\u0624\u062b\u0631 \u062d\u0633\u0627\u0628 \u06a9\u0646\u062a\u0631\u0644 \u0628\u0631\u0627\u06cc \u0627\u06cc\u0646 \u062a\u0639\u0647\u062f \u062a\u0623\u06cc\u06cc\u062f \u0646\u0634\u062f\u0647 \u0627\u0633\u062a."
+            ) from exc
+E           django.core.exceptions.ValidationError: ['\u0646\u06af\u0627\u0634\u062a \u0645\u0624\u062b\u0631 \u062d\u0633\u0627\u0628 \u06a9\u0646\u062a\u0631\u0644 \u0628\u0631\u0627\u06cc \u0627\u06cc\u0646 \u062a\u0639\u0647\u062f \u062a\u0623\u06cc\u06cc\u062f \u0646\u0634\u062f\u0647 \u0627\u0633\u062a.']
+
+apps\accounting\services.py:332: ValidationError
+=========================== short test summary info ===========================
+FAILED apps/billing/test_payable_detail.py::PayableDetailTests::test_handoff_boundaries
+1 failed, 6 passed in 165.73s (0:02:45)

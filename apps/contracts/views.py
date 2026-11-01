@@ -1,11 +1,13 @@
 import uuid
+from decimal import Decimal
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.db.models import Sum
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_http_methods, require_POST
 
 from apps.contracts.commercial_review import get_commercial_review
 from apps.contracts.contractual_services import (
@@ -29,6 +31,7 @@ from apps.contracts.models import (
     ContractDirection,
     ContractStatus,
     ContractTermVersionStatus,
+    ContractType,
 )
 from apps.contracts.services import (
     can_manage_contracts,
@@ -129,6 +132,10 @@ def contract_list(request: HttpRequest) -> HttpResponse:
         contracts = contracts.none()
     elif project := filter_form.cleaned_data.get("project"):
         contracts = contracts.filter(project=project)
+    # Read-only summary of the same authorized, filtered results, across all pages.
+    contract_total = contracts.aggregate(
+        total=Sum("contract_value", default=Decimal(0))
+    )["total"]
     page = paginate_table(
         contracts,
         request,
@@ -150,6 +157,15 @@ def contract_list(request: HttpRequest) -> HttpResponse:
         result_count=page.paginator.count,
         result_label="قرارداد",
     )
+    # Presentation of the existing allowlisted ordering; no new sort behavior.
+    sort_labels = {
+        "number": "شماره قرارداد",
+        "title": "عنوان قرارداد",
+        "counterparty": "طرف قرارداد",
+        "status": "وضعیت",
+        "value": "مبلغ قرارداد",
+    }
+    sort_key = request.GET.get("sort", "").strip()
     return render(
         request,
         "contracts/list.html",
@@ -158,6 +174,13 @@ def contract_list(request: HttpRequest) -> HttpResponse:
             "scoped_has_records": scoped_has_records,
             **contextual_list_filters(request, keys=("project_id",)),
             "filter_bar": filter_bar,
+            "contract_total": contract_total,
+            "list_sort": {
+                "key": sort_key if sort_key in sort_labels else "title",
+                "label": sort_labels.get(sort_key, "عنوان قرارداد"),
+                "descending": sort_key in sort_labels
+                and request.GET.get("direction", "asc").strip().lower() == "desc",
+            },
             "clear_filters_url": filter_bar["clear_url"],
             "selected_project": selected_project,
             "create_url": contextual_url(
@@ -285,6 +308,7 @@ def contract_create(request: HttpRequest) -> HttpResponse:
 
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.CONTRACTS_VIEW)
+@require_http_methods(["GET", "POST"])
 def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
     """Render one contract from the active organization only."""
 
@@ -300,12 +324,27 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
             "insurance_classification"
         )
     )
-    can_select = has_business_permission(
-        user=request.user,
-        organization=request.organization,
-        permission=BusinessPermissionCode.CONTRACT_TERMS_MANAGE,
-        project=contract.project,
+    from .detail_workspace import (
+        contract_workspace,
+        present_workspace_dashboard,
+        submit_workspace_form,
     )
+
+    workspace = contract_workspace(request, contract, terms)
+    if request.method == "POST":
+        try:
+            anchor = submit_workspace_form(request, contract, workspace)
+        except (ValueError, ValidationError) as exc:
+            workspace["forms"][request.POST["detail_action"]].add_error(
+                None, exc.messages if isinstance(exc, ValidationError) else str(exc)
+            )
+        else:
+            if anchor:
+                messages.success(request, "تغییرات قرارداد ذخیره شد.")
+                return redirect(
+                    reverse("contracts:detail", args=[contract.pk]) + "#" + anchor
+                )
+    can_select = workspace["can_terms"]
     for term in terms:
         if can_select and term.status == ContractTermVersionStatus.DRAFT:
             term.insurance_form = ContractInsuranceClassificationForm(
@@ -315,7 +354,15 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
         contract_claim_create_allowed,
         journey_breadcrumbs,
     )
-    from apps.billing.services import get_progress_claims, get_project_baselines
+    from apps.billing.payable_services import (
+        get_payable_certificates,
+        get_payable_measurements,
+    )
+    from apps.billing.services import (
+        get_progress_claims,
+        get_progress_records,
+        get_project_baselines,
+    )
     from apps.estimates.services import get_organization_estimates
 
     def permitted(permission):
@@ -338,16 +385,64 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
         get_progress_claims(
             actor=request.user, organization=request.organization
         ).filter(contract=contract)
-        if is_receivable and permitted(BusinessPermissionCode.CLAIMS_VIEW)
+        if not workspace["is_draft"]
+        and is_receivable
+        and permitted(BusinessPermissionCode.CLAIMS_VIEW)
         else None
     )
     related_baselines = (
         get_project_baselines(
             actor=request.user, organization=request.organization
         ).filter(contract=contract)
-        if is_receivable and permitted(BusinessPermissionCode.BASELINES_VIEW)
+        if not workspace["is_draft"]
+        and is_receivable
+        and permitted(BusinessPermissionCode.BASELINES_VIEW)
         else None
     )
+    related_certificates = None
+    if (
+        contract.direction == ContractDirection.PAYABLE
+        and not workspace["is_draft"]
+        and contract.contract_type == ContractType.SUBCONTRACT
+        and permitted(BusinessPermissionCode.PAYABLE_CERTIFICATES_VIEW)
+    ):
+        try:
+            related_certificates = get_payable_certificates(
+                actor=request.user, organization=request.organization
+            ).filter(contract=contract, project=contract.project)
+        except PermissionDenied:
+            # Preserve the existing payable selector's organization-scope gate.
+            # A readable contract does not grant access to its certificates.
+            pass
+    physical_empty = False
+    if (
+        not workspace["is_draft"]
+        and is_receivable
+        and permitted(BusinessPermissionCode.PROGRESS_VIEW)
+    ):
+        physical_empty = (
+            not get_progress_records(
+                actor=request.user, organization=request.organization
+            )
+            .filter(baseline__contract=contract, baseline__project=contract.project)
+            .exists()
+        )
+    elif (
+        contract.direction == ContractDirection.PAYABLE
+        and not workspace["is_draft"]
+        and contract.contract_type == ContractType.SUBCONTRACT
+        and permitted(BusinessPermissionCode.PAYABLE_MEASUREMENTS_VIEW)
+    ):
+        try:
+            physical_empty = (
+                not get_payable_measurements(
+                    actor=request.user, organization=request.organization
+                )
+                .filter(contract=contract, project=contract.project)
+                .exists()
+            )
+        except PermissionDenied:
+            pass
     from apps.organizations.form_scoping import normalized_uuid
 
     context_estimate = None
@@ -357,11 +452,25 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
             context_estimate = related_estimates.filter(
                 pk=identifier, project=contract.project
             ).first()
+    from .detail_dashboard import contract_dashboard
+
+    dashboard = contract_dashboard(
+        request,
+        contract,
+        claims=related_claims,
+        baselines=related_baselines,
+        estimates=related_estimates,
+        certificates=related_certificates,
+        physical_empty=physical_empty,
+    )
+    present_workspace_dashboard(contract, workspace, dashboard)
     return render(
         request,
         "contracts/detail.html",
         {
             "contract": contract,
+            "dashboard": dashboard,
+            "workspace": workspace,
             "project_detail_url": reverse("projects:detail", args=[contract.project_id])
             if has_business_permission(
                 user=request.user,
@@ -402,7 +511,6 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
             ),
         },
     )
-
 
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.CONTRACTS_VIEW)

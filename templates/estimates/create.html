@@ -1,16 +1,39 @@
 {% extends "base.html" %}
-{% block title %}ایجاد برآورد | سامانه مدیریت ساخت{% endblock %}
-{% block extra_head %}{% load field_journey %}{% prepare_native_choices form %}{{ form.media.css }}{% endblock %}
+{% load static field_journey %}
+{% block title %}ثبت برآورد جدید | بنیرا{% endblock %}
+{% block extra_head %}
+{% prepare_native_choices form %}{{ form.media.css }}
+<link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}">
+<link rel="stylesheet" href="{% static 'css/erp_create_form.css' %}">
+<link rel="stylesheet" href="{% static 'estimates/estimate_create.css' %}">
+{% endblock %}
 {% block extra_scripts %}{{ form.media.js }}{% endblock %}
 {% block content %}
-<div dir="rtl"><div class="mx-auto max-w-2xl">
-{% include "components/page_header.html" with page_breadcrumbs=page_breadcrumbs page_breadcrumb_label="برآوردها" page_breadcrumb_url="/estimates/" page_eyebrow="پیمان، متره و صورت‌وضعیت" page_title="ثبت برآورد جدید" page_description=request.organization.name only %}
-<p class="mt-4 text-xs leading-6 text-slate-500">انتخاب پروژه در این فرم، شرکت یا پروژه و کارگاه فعال برنامه را تغییر نمی‌دهد.</p>
-<form class="erp-surface mt-6 space-y-4 rounded-xl p-5 sm:p-6" method="post" novalidate>
-{% csrf_token %}{% include "workforce/_native_choices.html" with choice_form=form %}{% include "components/form_errors.html" with form=form only %}
-{% include "components/business_create_context.html" %}
-{% for field in form.hidden_fields %}{{ field }}{% if field.errors %}<p class="text-sm text-red-700" role="alert">{{ field.label }}: {{ field.errors|join:", " }}</p>{% endif %}{% endfor %}
-<div class="grid gap-4 sm:grid-cols-2">{% for field in form.visible_fields %}<div{% if field.name == "project" or field.name == "title" or field.name == "notes" %} class="sm:col-span-2"{% endif %}>{% include "components/form_field.html" with field=field only %}</div>{% endfor %}</div>
-<div class="flex flex-wrap gap-3 border-t border-slate-100 pt-5"><button class="erp-btn erp-btn--primary" type="submit">ثبت برآورد</button><a class="erp-btn erp-btn--secondary" href="{{ cancel_url }}">انصراف</a></div>
-</form></div></div>
+<div class="erp-create-page estimate-create-page">
+    {% include "components/page_header.html" with page_breadcrumbs=page_breadcrumbs page_title="ثبت برآورد جدید" page_description="ایجاد برآورد برای پروژه و قرارداد موردنظر" page_icon="document" only %}
+    <form class="erp-create-form estimate-create-form" method="post" novalidate aria-label="ثبت برآورد جدید">
+        {% csrf_token %}
+        {% include "workforce/_native_choices.html" with choice_form=form %}
+        {% include "components/form_errors.html" with form=form only %}
+        {% for field in form.hidden_fields %}{{ field }}{% if field.errors %}<p class="erp-field-error" role="alert">{{ field.label }}: {{ field.errors|join:", " }}</p>{% endif %}{% endfor %}
+        <section class="estimate-create-section" aria-labelledby="estimate-main-heading">
+            {% include "components/form_section_header.html" with heading_id="estimate-main-heading" heading="اطلاعات اصلی برآورد" icon="document" only %}
+            <div class="erp-form-grid erp-form-grid--two">
+                <div class="erp-form-grid__full">
+                    {% if form.project.is_hidden %}
+                        {% include "components/business_create_context.html" %}
+                    {% else %}
+                        {% include "estimates/create_field.html" with field=form.project label="پروژه" only %}
+                    {% endif %}
+                </div>
+                {% include "estimates/create_field.html" with field=form.contract label="قرارداد" only %}
+                {% include "estimates/create_field.html" with field=form.phase label="فاز پروژه" only %}
+                {% include "estimates/create_field.html" with field=form.estimate_number label="شماره برآورد" only %}
+                {% include "estimates/create_field.html" with field=form.title label="عنوان برآورد" only %}
+                <div class="erp-form-grid__full">{% include "estimates/create_field.html" with field=form.notes label="یادداشت‌ها" only %}</div>
+            </div>
+        </section>
+        {% include "components/form_footer.html" with submit_label="ثبت برآورد" cancel_url=cancel_url only %}
+    </form>
+</div>
 {% endblock %}

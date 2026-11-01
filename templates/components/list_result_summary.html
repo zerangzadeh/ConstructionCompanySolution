@@ -1,0 +1,4 @@
+{% load erp_format %}
+{% if reference_layout %}<div class="erp-list-result-summary">{% endif %}
+<p class="erp-list-result" role="status" data-filter-result-count><strong>{{ bar.result_count|erp_number }}</strong> {{ bar.result_label }}{% if not bar.chips and not bar.form.errors %}<span class="erp-list-muted"> · همه نتایج مجاز</span>{% endif %}</p>
+{% if reference_layout %}{% if total_amount != None %}<p class="erp-list-result-total" data-filter-result-total><span>مجموع مبلغ:</span> <strong data-money-display-enhanced="true"><bdi dir="ltr">{{ total_amount|erp_number }}</bdi></strong> <span>{{ currency }}</span><span class="sr-only">برای تمام قراردادهای همین نتایج</span></p>{% endif %}</div>{% endif %}

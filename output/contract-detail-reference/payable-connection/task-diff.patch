@@ -1,0 +1,182 @@
+--- apps/contracts/views.py (before this task)
++++ apps/contracts/views.py
+@@ -31,6 +31,7 @@
+     ContractDirection,
+     ContractStatus,
+     ContractTermVersionStatus,
++    ContractType,
+ )
+ from apps.contracts.services import (
+     can_manage_contracts,
+@@ -337,6 +338,7 @@
+         contract_claim_create_allowed,
+         journey_breadcrumbs,
+     )
++    from apps.billing.payable_services import get_payable_certificates
+     from apps.billing.services import get_progress_claims, get_project_baselines
+     from apps.estimates.services import get_organization_estimates
+ 
+@@ -370,6 +372,20 @@
+         if is_receivable and permitted(BusinessPermissionCode.BASELINES_VIEW)
+         else None
+     )
++    related_certificates = None
++    if (
++        contract.direction == ContractDirection.PAYABLE
++        and contract.contract_type == ContractType.SUBCONTRACT
++        and permitted(BusinessPermissionCode.PAYABLE_CERTIFICATES_VIEW)
++    ):
++        try:
++            related_certificates = get_payable_certificates(
++                actor=request.user, organization=request.organization
++            ).filter(contract=contract, project=contract.project)
++        except PermissionDenied:
++            # Preserve the existing payable selector's organization-scope gate.
++            # A readable contract does not grant access to its certificates.
++            pass
+     from apps.organizations.form_scoping import normalized_uuid
+ 
+     context_estimate = None
+@@ -387,6 +403,7 @@
+         claims=related_claims,
+         baselines=related_baselines,
+         estimates=related_estimates,
++        certificates=related_certificates,
+     )
+     return render(
+         request,
+--- apps/contracts/detail_dashboard.py (before this task)
++++ apps/contracts/detail_dashboard.py
+@@ -13,6 +13,7 @@
+ from django.http import HttpRequest
+ from django.urls import reverse
+ 
++from core.business_choices import contextual_url
+ from core.product_surface import route_exposed
+ 
+ from .models import Contract
+@@ -25,6 +26,7 @@
+     claims: QuerySet | None,
+     baselines: QuerySet | None,
+     estimates: QuerySet | None,
++    certificates: QuerySet | None = None,
+ ) -> dict[str, object]:
+     """Compose exact values from the view's tenant/project/permission scoped reads."""
+     try:
+@@ -42,9 +44,20 @@
+         Decimal(0),
+     )
+     effective = contract.contract_value + amendments
++    payable = contract.direction == "payable"
++    detail_route = (
++        "billing:payable_certificate_detail" if payable else "billing:claim_detail"
++    )
++    source = certificates if payable else claims
++    number_field = "certificate_number" if payable else "claim_number"
++    record_label = "گواهی پرداخت" if payable else "صورت‌وضعیت"
+     records = (
+-        claims.filter(project=contract.project).select_related(None)
+-        if claims is not None and route_exposed("billing:claim_detail")
++        source.filter(
++            organization=request.organization,
++            contract=contract,
++            project=contract.project,
++        ).select_related(None)
++        if source is not None and route_exposed(detail_route)
+         else None
+     )
+     unavailable = "صورت‌وضعیت قابل مشاهده‌ای ثبت نشده است."
+@@ -118,7 +131,9 @@
+             "unit": currency_label,
+             "tone": "approved",
+             "icon": "check",
+-            "note": "ناخالص صورت‌وضعیت‌های تأییدشده",
++            "note": "ناخالص گواهی‌های پرداخت تأییدشده"
++            if payable
++            else "ناخالص صورت‌وضعیت‌های تأییدشده",
+         },
+         {
+             "label": "مبلغ صورت‌وضعیت‌شده",
+@@ -150,9 +165,9 @@
+             )[:3]:
+                 recent.append(
+                     {
+-                        "title": f"{label} شماره {row.claim_number} · نسخه {row.revision_number}",
++                        "title": f"{label.replace('صورت‌وضعیت', record_label)} شماره {getattr(row, number_field)} · نسخه {row.revision_number}",
+                         "date": getattr(row, field),
+-                        "url": reverse("billing:claim_detail", args=[row.pk]),
++                        "url": reverse(detail_route, args=[row.pk]),
+                         "icon": "document",
+                     }
+                 )
+@@ -173,6 +188,23 @@
+         }
+         for row in segments
+     ]
++    billing_records = (
++        [
++            {
++                "number": getattr(row, number_field),
++                "revision_number": row.revision_number,
++                "period_end": row.period_end,
++                "gross_amount": row.gross_amount,
++                "currency_code": row.currency_code,
++                "status": row.status,
++                "status_label": row.get_status_display(),
++                "url": reverse(detail_route, args=[row.pk]),
++            }
++            for row in records.order_by("-created_at", "-pk")[:3]
++        ]
++        if records is not None
++        else None
++    )
+     return {
+         "kpis": kpis,
+         "currency": currency or "واحد پول تنظیم نشده",
+@@ -183,12 +215,23 @@
+         "chart_rows": chart_rows,
+         "financial_percent": percentage,
+         "unavailable": unavailable,
+-        "claims": list(records.order_by("-created_at", "-pk")[:3])
+-        if records is not None
+-        else None,
++        "billing_records": billing_records,
++        "billing_heading": "آخرین صورت‌وضعیت‌های پرداختنی"
++        if payable
++        else "آخرین صورت‌وضعیت‌ها",
++        "billing_nav_label": "صورت‌وضعیت‌های پرداختنی" if payable else "صورت‌وضعیت‌ها",
++        "billing_nav_url": "#billing-records"
++        if payable
++        else contextual_url("billing:claim_list", contract=contract),
++        "billing_list_label": "فهرست گواهی‌های پرداخت"
++        if payable
++        else "مشاهده همه صورت‌وضعیت‌ها",
++        "billing_list_url": reverse("billing:payable_certificate_list")
++        if payable
++        else contextual_url("billing:claim_list", contract=contract),
+         "recent": sorted(recent, key=lambda r: r["date"], reverse=True)[:3],
+         "show_baselines": baselines is not None
+         and route_exposed("billing:baseline_list"),
+-        "show_claims": records is not None,
++        "show_billing": records is not None,
+         "show_estimates": estimates is not None and route_exposed("estimates:list"),
+     }
+--- templates/contracts/detail.html (before this task)
++++ templates/contracts/detail.html
+@@ -19,13 +19,13 @@
+     </section>
+     <section class="cd-kpis cd-panel" aria-label="شاخص‌های اصلی قرارداد">{% for kpi in dashboard.kpis %}<article class="cd-kpi cd-kpi--{{ kpi.tone }}"><div><span class="cd-kpi-icon">{% include "contracts/detail_icon.html" with icon=kpi.icon only %}</span><h2>{{ kpi.label }}</h2></div><p><bdi dir="ltr">{{ kpi.value|erp_number|default_if_none:"—" }}</bdi>{% if kpi.value != None %}<small>{{ kpi.unit }}</small>{% endif %}</p><small class="cd-kpi-note">{% if kpi.value == None %}در دسترس نیست{% else %}{{ kpi.note }}{% endif %}</small></article>{% endfor %}</section>
+     <div class="cd-charts">
+-        <section class="cd-panel cd-progress" id="progress"><h2>مقایسه پیشرفت فیزیکی و مالی <span class="cd-info" title="پیشرفت مالی: نسبت ناخالص تأییدشده به مبلغ مؤثر؛ معادل وصول وجه نیست">ⓘ</span></h2><div class="cd-progress-row"><span>پیشرفت فیزیکی</span><strong>در دسترس نیست</strong><div class="cd-track cd-track--empty"></div></div><div class="cd-progress-row"><span>پیشرفت مالی (تأییدشده)</span><strong>{% if dashboard.financial_percent != None %}<bdi dir="ltr">{{ dashboard.financial_percent|erp_number }}٪</bdi>{% else %}در دسترس نیست{% endif %}</strong>{% if dashboard.financial_percent != None %}<progress max="100" value="{{ dashboard.financial_percent }}" aria-label="نسبت مالی تأییدشده"></progress>{% else %}<div class="cd-track cd-track--empty"></div>{% endif %}</div><p class="cd-note">پیشرفت فیزیکی تجمیعی قابل اتکا ثبت نشده است.</p></section>
++        <section class="cd-panel cd-progress" id="progress"><h2>مقایسه پیشرفت فیزیکی و مالی <span class="cd-info" title="پیشرفت مالی: نسبت ناخالص تأییدشده به مبلغ مؤثر؛ معادل گردش وجه نیست">ⓘ</span></h2><div class="cd-progress-row"><span>پیشرفت فیزیکی</span><strong>در دسترس نیست</strong><div class="cd-track cd-track--empty"></div></div><div class="cd-progress-row"><span>پیشرفت مالی (تأییدشده)</span><strong>{% if dashboard.financial_percent != None %}<bdi dir="ltr">{{ dashboard.financial_percent|erp_number }}٪</bdi>{% else %}در دسترس نیست{% endif %}</strong>{% if dashboard.financial_percent != None %}<progress max="100" value="{{ dashboard.financial_percent }}" aria-label="نسبت مالی تأییدشده"></progress>{% else %}<div class="cd-track cd-track--empty"></div>{% endif %}</div><p class="cd-note">پیشرفت فیزیکی تجمیعی قابل اتکا ثبت نشده است.</p></section>
+         <section class="cd-panel cd-financial"><h2>وضعیت مالی قرارداد <span class="cd-info" title="مبالغ ناخالص صورت‌وضعیت؛ بدون پیش‌نویس و سوابق بازگشتی، جایگزین‌شده یا باطل‌شده">ⓘ</span></h2>{% if dashboard.segments %}<div class="cd-financial-body"><div class="cd-chart-wrap"><canvas id="contract-financial-chart" hidden role="img" aria-describedby="contract-financial-legend" aria-label="ترکیب مبلغ مؤثر قرارداد؛ مبالغ دقیق در راهنمای مجاور"></canvas><noscript>مبالغ دقیق در راهنمای مجاور نمایش داده شده‌اند.</noscript></div><ul class="cd-legend" id="contract-financial-legend">{% for segment in dashboard.segments %}<li class="cd-legend--{{ segment.tone }}"><i aria-hidden="true"></i><span>{{ segment.label }}<small><bdi dir="ltr">{{ segment.value|erp_number }}</bdi> {{ dashboard.currency_label }} · <bdi dir="ltr">{{ segment.percent|erp_number }}٪</bdi></small></span></li>{% endfor %}</ul></div><div class="cd-data-table"><table><caption>داده‌های وضعیت مالی قرارداد — {{ dashboard.currency_label }}</caption><thead><tr><th scope="col">وضعیت</th><th scope="col">مبلغ</th><th scope="col">نسبت به مبلغ مؤثر</th></tr></thead><tbody>{% for segment in dashboard.segments %}<tr><th scope="row">{{ segment.label }}</th><td>{{ segment.value|erp_number }}</td><td>{{ segment.percent|erp_number }}٪</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="cd-unavailable">{% include "contracts/detail_icon.html" with icon="coins" only %}<p>{{ dashboard.unavailable }}</p></div>{% endif %}</section>
+     </div>
+-    <nav class="cd-journey" aria-label="مسیر قرارداد"><a class="is-current" href="#overview" aria-current="location">{% include "contracts/detail_icon.html" with icon="home" only %}نمای کلی</a>{% if dashboard.show_baselines %}<a href="{{ baseline_list_url }}">{% include "contracts/detail_icon.html" with icon="layers" only %}مبنای متره (BOQ)</a>{% endif %}<a href="#progress">{% include "contracts/detail_icon.html" with icon="target" only %}پیشرفت</a>{% if dashboard.show_claims %}<a href="{{ claim_list_url }}">{% include "contracts/detail_icon.html" with icon="document" only %}صورت‌وضعیت‌ها</a>{% endif %}{% if dashboard.show_estimates %}<a href="{{ estimate_list_url }}">{% include "contracts/detail_icon.html" with icon="layers" only %}برآوردها</a>{% endif %}<a href="#terms">{% include "contracts/detail_icon.html" with icon="document" only %}شرایط قرارداد</a><a href="#recent">{% include "contracts/detail_icon.html" with icon="history" only %}سوابق و فعالیت‌ها</a></nav>
++    <nav class="cd-journey" aria-label="مسیر قرارداد"><a class="is-current" href="#overview" aria-current="location">{% include "contracts/detail_icon.html" with icon="home" only %}نمای کلی</a>{% if dashboard.show_baselines %}<a href="{{ baseline_list_url }}">{% include "contracts/detail_icon.html" with icon="layers" only %}مبنای متره (BOQ)</a>{% endif %}<a href="#progress">{% include "contracts/detail_icon.html" with icon="target" only %}پیشرفت</a>{% if dashboard.show_billing %}<a href="{{ dashboard.billing_nav_url }}">{% include "contracts/detail_icon.html" with icon="document" only %}{{ dashboard.billing_nav_label }}</a>{% endif %}{% if dashboard.show_estimates %}<a href="{{ estimate_list_url }}">{% include "contracts/detail_icon.html" with icon="layers" only %}برآوردها</a>{% endif %}<a href="#terms">{% include "contracts/detail_icon.html" with icon="document" only %}شرایط قرارداد</a><a href="#recent">{% include "contracts/detail_icon.html" with icon="history" only %}سوابق و فعالیت‌ها</a></nav>
+     <div class="cd-bottom">
+         <section class="cd-panel cd-information" id="information"><h2>اطلاعات اصلی قرارداد</h2><dl><div><dt>شماره قرارداد</dt><dd><bdi dir="ltr">{{ contract.contract_number }}</bdi></dd></div><div><dt>مبلغ اولیه قرارداد</dt><dd><bdi dir="ltr">{{ contract.contract_value|erp_number }}</bdi> {{ dashboard.currency_label }}</dd></div><div><dt>الحاقیه‌های تأییدشده</dt><dd><bdi dir="ltr">{{ dashboard.amendments|erp_number }}</bdi> {{ dashboard.currency_label }}</dd></div><div><dt>مبلغ مؤثر قرارداد</dt><dd><bdi dir="ltr">{{ dashboard.effective|erp_number }}</bdi> {{ dashboard.currency_label }}</dd></div><div><dt>نوع قرارداد</dt><dd>{{ contract.get_contract_type_display|default:"ثبت نشده" }}</dd></div></dl><a class="cd-footer" href="#contract-more">مشاهده جزئیات کامل <span>←</span></a></section>
+-        <section class="cd-panel cd-claims"><h2>آخرین صورت‌وضعیت‌ها</h2>{% if dashboard.claims %}<div class="cd-table-wrap"><table><caption class="sr-only">آخرین صورت‌وضعیت‌های قابل مشاهده؛ مبالغ ناخالص هر دوره</caption><thead><tr><th>شماره / نسخه</th><th>دوره</th><th>مبلغ ناخالص</th><th>وضعیت</th></tr></thead><tbody>{% for claim in dashboard.claims %}<tr><td><a href="{% url 'billing:claim_detail' claim.pk %}"><bdi dir="ltr">{{ claim.claim_number|erp_number }} / {{ claim.revision_number|erp_number }}</bdi></a></td><td><bdi dir="ltr">{{ claim.period_end|jalali_date }}</bdi></td><td><bdi dir="ltr">{{ claim.gross_amount|erp_number }}</bdi><small>{% if claim.currency_code == "IRR" %}ریال{% else %}<code class="cd-currency">{{ claim.currency_code }}</code>{% endif %}</small></td><td>{% include "components/status_badge.html" with status=claim.status label=claim.get_status_display only %}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="cd-unavailable">{% include "contracts/detail_icon.html" with icon="document" only %}<p>{% if dashboard.show_claims %}صورت‌وضعیتی ثبت نشده است.{% else %}صورت‌وضعیتی در این نما در دسترس نیست.{% endif %}</p></div>{% endif %}{% if dashboard.show_claims %}<a class="cd-footer" href="{{ claim_list_url }}">مشاهده همه صورت‌وضعیت‌ها <span>←</span></a>{% endif %}</section>
++        <section class="cd-panel cd-claims" id="billing-records"><h2>{{ dashboard.billing_heading }}</h2>{% if dashboard.billing_records %}<div class="cd-table-wrap"><table><caption class="sr-only">آخرین صورت‌وضعیت‌های قابل مشاهده؛ مبالغ ناخالص هر دوره</caption><thead><tr><th>شماره / نسخه</th><th>دوره</th><th>مبلغ ناخالص</th><th>وضعیت</th></tr></thead><tbody>{% for record in dashboard.billing_records %}<tr><td><a href="{{ record.url }}"><bdi dir="ltr">{{ record.number|erp_number }} / {{ record.revision_number|erp_number }}</bdi></a></td><td><bdi dir="ltr">{{ record.period_end|jalali_date }}</bdi></td><td><bdi dir="ltr">{{ record.gross_amount|erp_number }}</bdi><small>{% if record.currency_code == "IRR" %}ریال{% else %}<code class="cd-currency">{{ record.currency_code }}</code>{% endif %}</small></td><td>{% include "components/status_badge.html" with status=record.status label=record.status_label only %}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="cd-unavailable">{% include "contracts/detail_icon.html" with icon="document" only %}<p>{% if dashboard.show_billing %}صورت‌وضعیتی ثبت نشده است.{% else %}صورت‌وضعیتی در این نما در دسترس نیست.{% endif %}</p></div>{% endif %}{% if dashboard.show_billing %}<a class="cd-footer" href="{{ dashboard.billing_list_url }}">{{ dashboard.billing_list_label }} <span>←</span></a>{% endif %}</section>
+         <section class="cd-panel cd-recent" id="recent"><h2>آخرین فعالیت‌ها</h2><ol>{% for item in dashboard.recent %}<li><span class="cd-activity-icon">{% include "contracts/detail_icon.html" with icon=item.icon only %}</span><div><a href="{{ item.url }}">{{ item.title }}</a><time>{{ item.date|jalali_datetime }}</time></div></li>{% endfor %}</ol><div class="cd-footer cd-note">رویدادهای ثبت‌شده در سوابق قابل مشاهده</div></section>
+     </div>
+     <details class="cd-more cd-panel" id="contract-more"><summary>جزئیات تکمیلی، برآوردها و سوابق مبنا</summary><h2>یادداشت‌ها</h2><p class="whitespace-pre-line">{{ contract.notes|default:"یادداشتی ثبت نشده است." }}</p>{% if dashboard.show_estimates %}<h2>برآوردهای مرتبط</h2>{% for estimate in related_estimates|slice:":5" %}<a class="cd-related" href="{% url 'estimates:detail' estimate.pk %}">{{ estimate.title }} · {{ estimate.estimate_number }}</a>{% empty %}<p>برآوردی به این قرارداد متصل نیست.</p>{% endfor %}<a class="cd-related" href="{{ estimate_list_url }}">همه برآوردهای این قرارداد ←</a>{% endif %}{% if dashboard.show_baselines %}<h2>مبنای اندازه‌گیری</h2>{% for baseline in related_baselines|slice:":5" %}<a class="cd-related" href="{% url 'billing:baseline_detail' baseline.pk %}">نسخه {{ baseline.version|erp_number }} · {{ baseline.get_status_display }}</a>{% empty %}<p>هنوز مبنای اندازه‌گیری ثبت نشده است؛ ایجاد صورت‌وضعیت به مبنای تأییدشده نیاز دارد.</p>{% endfor %}<a class="cd-related" href="{{ baseline_list_url }}">همه مبناهای این قرارداد ←</a>{% endif %}</details>

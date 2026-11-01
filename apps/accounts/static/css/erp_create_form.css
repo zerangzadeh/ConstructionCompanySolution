@@ -1,0 +1,83 @@
+/* Reference Create Form: opt-in shared presentation. */
+.erp-create-page { min-width: 0; color: var(--color-text-primary); }
+.erp-create-heading { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; margin-block: .5rem .75rem; }
+.erp-create-heading__copy { display: flex; align-items: center; gap: 1rem; min-width: 0; }
+.erp-create-heading h1 { font-size: 1.75rem; line-height: 1.4; font-weight: 700; }
+.erp-create-heading__copy p { margin-top: .375rem; color: var(--color-text-muted); font-size: .8125rem; }
+.erp-create-context { display: flex; align-items: stretch; width: 48%; max-width: 48%; border: 1px solid var(--color-border-subtle); border-radius: .75rem; background: var(--color-bg-subtle); padding: .75rem; gap: .875rem; }
+.erp-create-context > div { position: relative; display: flex; flex-direction: column; justify-content: center; min-height: 2.5rem; min-width: 0; flex: 1; padding-inline-start: 3.125rem; }
+.erp-create-context > div + div { border-inline-start: 1px solid var(--color-border-subtle); padding-inline-start: 4rem; }
+.erp-create-context dt .erp-form-icon-tile { position: absolute; inset-inline-start: 0; top: 50%; transform: translateY(-50%); }
+.erp-create-context > div + div .erp-form-icon-tile { inset-inline-start: .875rem; }
+.erp-create-context dt { font-size: .6875rem; color: var(--color-text-muted); }
+.erp-create-context dd { margin-top: .125rem; font-size: .75rem; font-weight: 600; overflow-wrap: anywhere; }
+.erp-form-icon-tile { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; flex-shrink: 0; border-radius: .75rem; color: var(--color-primary); background: var(--color-primary-hover-overlay); }
+.erp-form-icon-tile--page { width: 3.5rem; height: 3.5rem; border-radius: 1rem; }
+.erp-form-icon-tile--page svg { width: 2rem; height: 2rem; }
+.erp-create-form { display: flex; flex-direction: column; gap: .625rem; min-width: 0; }
+.erp-form-section, .erp-form-footer { min-width: 0; border: 1px solid var(--color-border-subtle); border-radius: .875rem; background: var(--color-bg-surface); box-shadow: 0 2px 4px rgb(14 39 70 / 6%); }
+.erp-form-section { padding: .5rem 1.5rem .625rem; }
+.erp-form-section__header { display: flex; align-items: center; gap: .75rem; margin-bottom: .375rem; }
+.erp-form-section__header .erp-form-icon-tile { width: 2.25rem; height: 2.25rem; }
+.erp-form-section__header h2 { font-size: 1rem; font-weight: 700; line-height: 1.375; }
+.erp-form-section__header p { color: var(--color-text-muted); font-size: .75rem; line-height: 1.4; }
+.erp-form-grid { display: grid; min-width: 0; gap: .5rem 1.5rem; align-items: start; }
+.erp-form-grid--two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.erp-form-grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.erp-form-grid__full { grid-column: 1 / -1; }
+.erp-form-section--compact { padding-block: .375rem .5rem; }
+.erp-form-section--compact .erp-form-section__header { margin-bottom: .125rem; }
+.erp-form-section--compact .erp-form-grid { row-gap: .375rem; }
+.erp-create-form .erp-form-field { min-width: 0; }
+.erp-create-form .erp-form-field > label, .erp-form-parent > span { display: block; margin-bottom: .25rem; font-size: .8125rem; line-height: 1.4; font-weight: 600; color: var(--color-text-primary); }
+.erp-create-form .erp-required { color: var(--color-danger); margin-inline-start: .25rem; }
+main .erp-create-form :is(input:not([type=hidden]), select, textarea) { border-color: var(--color-border-control); border-radius: .5rem; color: var(--color-text-primary); background-color: var(--color-bg-surface); font-size: .8125rem; min-height: 2.375rem; padding: .375rem .75rem; }
+main .erp-create-form input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]) { min-height: 2.375rem; padding: .375rem .75rem; }
+main .erp-create-form textarea[name] { min-height: 3.5rem; resize: vertical; }
+main .erp-create-form :is(input, textarea)::placeholder { color: var(--color-text-muted); opacity: 1; }
+main .erp-create-form :is(input, select, textarea):focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-focus-ring); }
+main .erp-create-form input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]):focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-focus-ring); }
+.erp-create-form .erp-business-choice .ts-wrapper.single .ts-control { min-height: 2.375rem; padding: .25rem .75rem; padding-inline-end: 2rem; border-color: var(--color-border-control); border-radius: .5rem; font-size: .8125rem; }
+.erp-create-form .business-choice-name { line-height: 1.2; }
+.erp-create-form .business-choice-code { font-size: .6875rem; line-height: 1.1; }
+main .erp-create-form .ts-control > input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]) { min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent; font-size: inherit; box-shadow: none; }
+.erp-create-form .erp-business-choice .ts-wrapper.focus .ts-control { border-color: var(--color-primary); outline: 2px solid var(--color-primary); }
+.erp-create-form .erp-field-error { color: var(--color-danger); font-size: .75rem; }
+main .erp-create-form [aria-invalid=true], .erp-create-form .erp-form-field--invalid .ts-control { border-color: var(--color-danger); }
+main .erp-create-form input[aria-invalid=true]:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]) { border-color: var(--color-danger); }
+.erp-create-form .erp-field-help { color: var(--color-text-muted); font-size: .75rem; }
+.erp-create-form .erp-money-unit { border-color: var(--color-border-control); color: var(--color-text-secondary); background: var(--color-bg-subtle); }
+.erp-create-form .erp-money-wrap:focus-within .erp-money-unit { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-primary-hover-overlay); }
+.erp-form-parent p { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; min-height: 2.375rem; border: 1px solid var(--color-border-subtle); background: var(--color-bg-subtle); border-radius: .5rem; padding: .375rem .75rem; font-size: .8125rem; font-weight: 600; }
+.erp-form-parent bdi { color: var(--color-text-muted); font-size: .75rem; font-weight: 400; }
+.erp-form-section--inline { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.65fr); gap: 1.5rem; align-items: center; }
+.erp-form-section--inline .erp-form-section__header { margin-bottom: 0; }
+.erp-form-footer { display: flex; align-items: center; gap: .75rem; padding: .375rem 1rem; position: sticky; bottom: .5rem; z-index: 30; }
+.erp-form-footer .erp-btn { min-height: 2.5rem; padding-inline: 1.5rem; border-radius: .625rem; }
+.erp-form-footer svg { width: 1.125rem; height: 1.125rem; }
+.erp-form-footer .erp-btn--primary { background: var(--color-primary); color: var(--bonira-white); }
+.erp-form-footer .erp-btn--primary:hover { background: var(--color-primary-strong); }
+.erp-form-footer .erp-btn--secondary { background: var(--color-bg-surface); border-color: var(--color-border-control); color: var(--color-text-primary); }
+.erp-create-form :is(input, select, textarea, button, a) { scroll-margin-block: 6rem; }
+@media (max-width: 1199px) {
+    .erp-create-heading { flex-wrap: wrap; gap: 1rem; }
+    .erp-create-context { width: 100%; max-width: 100%; }
+}
+@media (max-width: 639px) {
+    .erp-create-heading { margin-block: .75rem 1rem; }
+    .erp-create-heading h1 { font-size: 1.5rem; }
+    .erp-create-heading__copy { gap: .75rem; }
+    .erp-create-context { width: 100%; gap: .625rem; padding: .625rem; }
+    .erp-create-context .erp-form-icon-tile { display: none; }
+    .erp-create-context > div { padding-inline-start: 0; }
+    .erp-create-context > div + div { padding-inline-start: .625rem; }
+    .erp-form-section { padding: .875rem 1rem 1rem; }
+    .erp-form-grid--two, .erp-form-grid--three, .erp-form-section--inline { grid-template-columns: minmax(0, 1fr); }
+    .erp-form-section--inline { gap: .625rem; }
+    .erp-form-section__header { align-items: flex-start; }
+    main .erp-create-form :is(input:not([type=hidden]), select, textarea), .erp-create-form .erp-business-choice .ts-wrapper.single .ts-control, .erp-form-parent p { min-height: 2.75rem; }
+    main .erp-create-form input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]) { min-height: 2.75rem; }
+    main .erp-create-form .ts-control > input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]) { min-height: 0; }
+    .erp-form-footer { gap: .5rem; padding: .625rem; bottom: .375rem; }
+    .erp-form-footer .erp-btn { flex: 1; min-height: 2.75rem; padding-inline: .625rem; }
+}

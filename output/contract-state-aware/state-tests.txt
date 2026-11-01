@@ -1,0 +1,82 @@
+.......F                                                       [100%]
+================================== FAILURES ===================================
+_____ StateAwareBrowserTests.test_state_matrix_and_real_form_submissions ______
+
+self = <apps.contracts.test_state_workspace.StateAwareBrowserTests testMethod=test_state_matrix_and_real_form_submissions>
+
+    def test_state_matrix_and_real_form_submissions(self):
+        self.prepare_states()
+        base = {
+            "status": 200,
+            "screenshot": True,
+            "noJsErrors": True,
+            "noHttpErrors": True,
+            "absentText": ["در دسترس نیست"],
+        }
+        inspect = lambda expression, label: {
+            "inspect": expression,
+            "description": label,
+        }
+        scenarios = []
+        for key, c in self.states.items():
+            draft = c.status == "draft"
+            check = (
+                "!!document.querySelector('[data-draft-edit]') && !!document.querySelector('#contract-draft-base') && !!document.querySelector('#contract-draft-item') && !document.querySelector('canvas,.cd-claims')"
+                if draft
+                else "!document.querySelector('[data-draft-edit],#contract-draft-base,#contract-draft-item')"
+            )
+            if c.contract_type == "supplier":
+                check += " && !document.querySelector('#contract-draft-term,#terms,#progress,.cd-claims,canvas') && !!document.querySelector('.cd-supplier-note')"
+            elif draft:
+                check += " && !!document.querySelector('#contract-draft-term') && document.querySelectorAll('.cd-kpi').length===4"
+            else:
+                check += " && document.querySelectorAll('.cd-claims tbody tr').length===0 && document.querySelectorAll('canvas').length===1"
+            if c.direction == "payable":
+                check += " && ![...document.querySelectorAll('.contract-detail a')].some(a=>/billing\\/(claims|baselines)/.test(a.href))"
+            for width in (1440, 390):
+                scenarios.append(
+                    {
+                        **base,
+                        "name": key + "-" + str(width),
+                        "path": self.state_url(key),
+                        "mobile": width == 390,
+                        "steps": [
+                            inspect(
+                                check,
+                                "state-specific CTA, editor, operational widgets and supported journeys",
+                            )
+                        ],
+                    }
+                )
+>       self.browser(self.owner, scenarios)
+
+apps\contracts\test_state_workspace.py:388: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:251
+E           if(!passed) throw new Error(scenario.name+': '+step.description);
+E                             ^
+E   
+E   Error: active-receivable-1440: state-specific CTA, editor, operational widgets and supported journeys
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:251:27
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-01T15:19:19.324756+00:00","event":"http.response","request_id":"3fe364e0-9896-49b7-81f1-9e4a395bff86","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":874}
+
+{"timestamp":"2026-11-01T15:19:20.973625+00:00","event":"http.response","request_id":"16359ed6-0153-4553-aa71-b6d4ee88d92e","method":"GET","route":null,"status_code":404,"duration_ms":311}
+
+{"timestamp":"2026-11-01T15:19:21.843803+00:00","event":"http.response","request_id":"abb0f977-43de-402a-9519-6a4b80e57570","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":878}
+
+{"timestamp":"2026-11-01T15:19:23.725666+00:00","event":"http.response","request_id":"4971a684-660e-4705-bdec-46c8aba2f40b","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1213}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+=========================== short test summary info ===========================
+FAILED apps/contracts/test_state_workspace.py::StateAwareBrowserTests::test_state_matrix_and_real_form_submissions
+1 failed, 7 passed, 10 subtests passed in 43.09s

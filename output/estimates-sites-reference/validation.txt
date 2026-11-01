@@ -1,0 +1,82 @@
+.......................... [ 55%]
+..........FF.....F...                              [100%]
+================================== FAILURES ===================================
+_____ DeferredUiPatternTests.test_ess_grouping_preserves_permission_gates _____
+
+self = <core.test_cep003_localization_accessibility.DeferredUiPatternTests testMethod=test_ess_grouping_preserves_permission_gates>
+
+    def test_ess_grouping_preserves_permission_gates(self):
+        nav = Template('{% include "workforce/_ess_navigation.html" %}')
+        denied = nav.render(Context({"business_permission_codes": []}))
+        allowed = nav.render(
+            Context(
+                {
+                    "business_permission_codes": [
+                        "payroll_ess.view_own",
+                        "ess_evidence.view_own",
+                    ]
+                }
+            )
+        )
+        for title in ("\u062f\u0631\u062e\u0648\u0627\u0633\u062a\u200c\u0647\u0627 \u0648 \u062d\u0636\u0648\u0631", "\u062d\u0642\u0648\u0642 \u0648 \u0645\u0632\u0627\u06cc\u0627", "\u0627\u0637\u0644\u0627\u0639\u0627\u062a \u0634\u063a\u0644\u06cc \u0648 \u0627\u0633\u0646\u0627\u062f"):
+>           self.assertIn(title, allowed)
+E           AssertionError: '\u062f\u0631\u062e\u0648\u0627\u0633\u062a\\u200c\u0647\u0627 \u0648 \u062d\u0636\u0648\u0631' not found in '\\n\\n'
+
+core\test_cep003_localization_accessibility.py:375: AssertionError
+_ DeferredUiPatternTests.test_navigation_denies_ungranted_destinations_and_has_no_dead_placeholders _
+
+self = <core.test_cep003_localization_accessibility.DeferredUiPatternTests testMethod=test_navigation_denies_ungranted_destinations_and_has_no_dead_placeholders>
+
+    def test_navigation_denies_ungranted_destinations_and_has_no_dead_placeholders(
+        self,
+    ):
+        nav = Template('{% include "components/navigation_links.html" %}')
+        denied = nav.render(
+            Context(
+                {"navigation_is_authenticated": True, "business_permission_codes": []}
+            )
+        )
+        allowed = nav.render(
+            Context(
+                {
+                    "navigation_is_authenticated": True,
+                    "business_permission_codes": ["tender_bids.view"],
+                }
+            )
+        )
+        self.assertNotIn('href="/commercial/"', denied)
+>       self.assertEqual(allowed.count('href="/commercial/"'), 1)
+E       AssertionError: 0 != 1
+
+core\test_cep003_localization_accessibility.py:357: AssertionError
+_ DeferredUiReferenceTests.test_navigation_uses_existing_availability_flags_and_omits_empty_groups _
+
+self = <core.test_cep003_localization_accessibility.DeferredUiReferenceTests testMethod=test_navigation_uses_existing_availability_flags_and_omits_empty_groups>
+
+    def test_navigation_uses_existing_availability_flags_and_omits_empty_groups(self):
+        nav = Template('{% include "components/navigation_links.html" %}')
+        denied = nav.render(
+            Context(
+                {"navigation_is_authenticated": True, "business_permission_codes": []}
+            )
+        )
+        self.assertNotIn("erp-nav-group", denied)
+        available = nav.render(
+            Context(
+                {
+                    "navigation_is_authenticated": True,
+                    "business_permission_codes": [],
+                    "my_requests_workspace_available": True,
+                    "manager_workspace_available": True,
+                }
+            )
+        )
+>       self.assertIn('href="/workflows/my-requests/"', available)
+E       AssertionError: 'href="/workflows/my-requests/"' not found in '\\n<nav class="erp-nav" aria-label="\u0646\u0627\u0648\u0628\u0631\u06cc \u0627\u0635\u0644\u06cc" data-product-navigation="MVP-01">\\n    <a data-nav-id="NAV-001" class="erp-nav-link" href="/">\u062e\u0627\u0646\u0647</a>\\n    \\n    <a class="erp-nav-link" href="/accounts/settings/">\u067e\u0631\u0648\u0641\u0627\u06cc\u0644 \u06a9\u0627\u0631\u0628\u0631</a>\\n</nav>\\n\\n'
+
+core\test_cep003_localization_accessibility.py:634: AssertionError
+=========================== short test summary info ===========================
+FAILED core/test_cep003_localization_accessibility.py::DeferredUiPatternTests::test_ess_grouping_preserves_permission_gates
+FAILED core/test_cep003_localization_accessibility.py::DeferredUiPatternTests::test_navigation_denies_ungranted_destinations_and_has_no_dead_placeholders
+FAILED core/test_cep003_localization_accessibility.py::DeferredUiReferenceTests::test_navigation_uses_existing_availability_flags_and_omits_empty_groups
+3 failed, 44 passed, 68 subtests passed in 67.03s (0:01:07)

@@ -1,0 +1,9 @@
+<div class="cd-workspace-editor">
+    <h3>افزودن ردیف پیش‌نویس</h3>
+    <form method="post" id="contract-draft-item" action="{% url 'contracts:detail' contract.pk %}">
+        {% csrf_token %}<input type="hidden" name="detail_action" value="add_item">
+        {% if workspace.item_form.errors %}<div class="cd-form-errors" role="alert">{{ workspace.item_form.non_field_errors }}<p>فیلدهای مشخص‌شده را بررسی کنید.</p></div>{% endif %}
+        <div class="cd-edit-grid">{% for field in workspace.item_form %}{% include "components/form_field.html" with field=field %}{% endfor %}</div>
+        <button class="erp-btn erp-btn--secondary" type="submit">افزودن ردیف</button>
+    </form>
+</div>

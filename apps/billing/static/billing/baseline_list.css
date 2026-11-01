@@ -1,0 +1,38 @@
+/* Baseline-specific composition; reuse the Contracts list foundation. */
+.erp-baselines-list .erp-list-heading p { max-width: 900px; font-size: 13px; }
+.baseline-context { display: grid; grid-template-columns: 1.4fr 1fr auto; align-items: center; gap: 20px; background: white; border: 1px solid var(--bonira-light-gray); border-radius: 12px; padding: 16px 20px; margin-bottom: 14px; box-shadow: 0 2px 5px rgb(14 39 70 / 4%); }
+.baseline-context > div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.baseline-context > div + div { border-inline-start: 1px solid var(--bonira-light-gray); padding-inline-start: 20px; }
+.baseline-context p { flex-basis: 100%; font-size: 13px; font-weight: 600; }
+.baseline-context strong { font-size: 13px; }
+.baseline-context a { display: block; font-size: 12px; color: var(--bonira-royal-blue); }
+.baseline-version a { color: var(--bonira-royal-blue); font-weight: 600; }
+.baseline-current { display: inline-flex; margin-inline-start: 6px; color: #166534; background: #dcfce7; border: 1px solid #bbf7d0; border-radius: 6px; padding: 3px 7px; font-size: 11px; white-space: nowrap; }
+.baseline-empty { display: grid; justify-items: center; gap: 12px; padding: 32px 20px; text-align: center; border-radius: 12px; }
+.baseline-empty svg { color: #8fa5cf; }
+.baseline-empty h2 { font-size: 15px; font-weight: 600; }
+.baseline-empty p { font-size: 12px; color: var(--bonira-muted); }
+@media (min-width: 768px) {
+ .erp-baselines-list .erp-responsive-list { min-width: 850px; }
+ .erp-baselines-list .erp-responsive-list th:nth-child(1) { width: 24%; }
+ .erp-baselines-list .erp-responsive-list th:nth-child(2) { width: 17%; }
+ .erp-baselines-list .erp-responsive-list th:nth-child(3) { width: 16%; }
+ .erp-baselines-list .erp-responsive-list th:nth-child(4) { width: 12%; }
+ .erp-baselines-list .erp-responsive-list th:nth-child(5) { width: 16%; }
+ .erp-baselines-list .erp-responsive-list th:nth-child(6) { width: 11%; }
+ .erp-baselines-list .erp-responsive-list th:last-child { width: 4%; }
+ .erp-baselines-scoped .erp-responsive-list th:nth-child(1) { width: 20%; }
+ .erp-baselines-scoped .erp-responsive-list th:nth-child(2) { width: 14%; }
+ .erp-baselines-scoped .erp-responsive-list th:nth-child(3) { width: 19%; }
+ .erp-baselines-scoped .erp-responsive-list th:nth-child(4) { width: 15%; }
+ .erp-baselines-scoped .erp-responsive-list th:nth-child(5) { width: 28%; }
+ .erp-baselines-list .erp-responsive-list :is(td,th) { text-align: start; }
+ .erp-baselines-list .erp-responsive-list .erp-list-amount { text-align: end; }
+ .erp-baselines-list .erp-responsive-list td { padding-block: 12px; }
+}
+@media (max-width: 767px) {
+ .baseline-context { grid-template-columns: 1fr; gap: 12px; padding: 14px; }
+ .baseline-context > div + div { border-inline-start: 0; padding-inline-start: 0; border-top: 1px solid var(--bonira-light-gray); padding-top: 10px; }
+ .erp-baselines-list .erp-list-heading h1 { font-size: 20px; }
+ .erp-baselines-list .baseline-version { grid-column: 1 / -1; }
+}

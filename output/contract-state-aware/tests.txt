@@ -1,0 +1,317 @@
+FFF.FF............F..                                        [100%]
+================================== FAILURES ===================================
+_ StateAwareDetailTests.test_draft_base_and_item_writes_use_existing_services _
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_draft_base_and_item_writes_use_existing_services>
+
+    def test_draft_base_and_item_writes_use_existing_services(self):
+        c = self.states["draft-receivable"]
+        protected = (
+            c.contract_number,
+            c.project_id,
+            c.signed_at,
+            c.start_date,
+            c.end_date,
+        )
+        self.assertEqual(
+            self.client.post(
+>               self.url("draft-receivable"), self.base_data()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            ).status_code,
+            302,
+        )
+E       TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:158: TypeError
+_ StateAwareDetailTests.test_finalized_and_restricted_mutation_attempts_fail __
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_finalized_and_restricted_mutation_attempts_fail>
+
+    def test_finalized_and_restricted_mutation_attempts_fail(self):
+        for key in (
+            "active-receivable",
+            "active-subcontract",
+            "completed-subcontract",
+            "terminated-receivable",
+        ):
+            c = self.states[key]
+            before = Contract.objects.values().get(pk=c.pk)
+            self.assertEqual(
+>               self.client.post(self.url(key), self.base_data(key)).status_code, 403
+                                 ^^^^^^^^^^^^^
+            )
+E           TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:220: TypeError
+_____ StateAwareDetailTests.test_state_is_rechecked_after_form_validation _____
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_state_is_rechecked_after_form_validation>
+
+    def test_state_is_rechecked_after_form_validation(self):
+        from apps.contracts import detail_workspace
+    
+        original = detail_workspace.DraftContractEditForm.is_valid
+        c = self.states["draft-receivable"]
+    
+        def transition_during_validation(form):
+            valid = original(form)
+            Contract.objects.filter(pk=c.pk).update(status="active")
+            return valid
+    
+        with patch.object(
+            detail_workspace.DraftContractEditForm,
+            "is_valid",
+            transition_during_validation,
+        ):
+            self.assertEqual(
+                self.client.post(
+>                   self.url("draft-receivable"), self.base_data()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                ).status_code,
+                403,
+            )
+E           TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:295: TypeError
+_ StateAwareDetailTests.test_state_matrix_visibility_and_supported_journeys (key='draft-receivable') _
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_state_matrix_visibility_and_supported_journeys>
+
+    def test_state_matrix_visibility_and_supported_journeys(self):
+        for key, c in self.states.items():
+            with self.subTest(key=key):
+>               r = self.client.get(self.url(key))
+                                    ^^^^^^^^^^^^^
+E               TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:109: TypeError
+_ StateAwareDetailTests.test_state_matrix_visibility_and_supported_journeys (key='active-receivable') _
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_state_matrix_visibility_and_supported_journeys>
+
+    def test_state_matrix_visibility_and_supported_journeys(self):
+        for key, c in self.states.items():
+            with self.subTest(key=key):
+>               r = self.client.get(self.url(key))
+                                    ^^^^^^^^^^^^^
+E               TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:109: TypeError
+_ StateAwareDetailTests.test_state_matrix_visibility_and_supported_journeys (key='draft-subcontract') _
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_state_matrix_visibility_and_supported_journeys>
+
+    def test_state_matrix_visibility_and_supported_journeys(self):
+        for key, c in self.states.items():
+            with self.subTest(key=key):
+>               r = self.client.get(self.url(key))
+                                    ^^^^^^^^^^^^^
+E               TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:109: TypeError
+_ StateAwareDetailTests.test_state_matrix_visibility_and_supported_journeys (key='active-subcontract') _
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_state_matrix_visibility_and_supported_journeys>
+
+    def test_state_matrix_visibility_and_supported_journeys(self):
+        for key, c in self.states.items():
+            with self.subTest(key=key):
+>               r = self.client.get(self.url(key))
+                                    ^^^^^^^^^^^^^
+E               TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:109: TypeError
+_ StateAwareDetailTests.test_state_matrix_visibility_and_supported_journeys (key='draft-supplier') _
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_state_matrix_visibility_and_supported_journeys>
+
+    def test_state_matrix_visibility_and_supported_journeys(self):
+        for key, c in self.states.items():
+            with self.subTest(key=key):
+>               r = self.client.get(self.url(key))
+                                    ^^^^^^^^^^^^^
+E               TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:109: TypeError
+_ StateAwareDetailTests.test_state_matrix_visibility_and_supported_journeys (key='active-supplier') _
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_state_matrix_visibility_and_supported_journeys>
+
+    def test_state_matrix_visibility_and_supported_journeys(self):
+        for key, c in self.states.items():
+            with self.subTest(key=key):
+>               r = self.client.get(self.url(key))
+                                    ^^^^^^^^^^^^^
+E               TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:109: TypeError
+_ StateAwareDetailTests.test_state_matrix_visibility_and_supported_journeys (key='completed-subcontract') _
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_state_matrix_visibility_and_supported_journeys>
+
+    def test_state_matrix_visibility_and_supported_journeys(self):
+        for key, c in self.states.items():
+            with self.subTest(key=key):
+>               r = self.client.get(self.url(key))
+                                    ^^^^^^^^^^^^^
+E               TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:109: TypeError
+_ StateAwareDetailTests.test_state_matrix_visibility_and_supported_journeys (key='terminated-receivable') _
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_state_matrix_visibility_and_supported_journeys>
+
+    def test_state_matrix_visibility_and_supported_journeys(self):
+        for key, c in self.states.items():
+            with self.subTest(key=key):
+>               r = self.client.get(self.url(key))
+                                    ^^^^^^^^^^^^^
+E               TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:109: TypeError
+___ StateAwareDetailTests.test_supplier_rule_enforced_by_service_and_model ____
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_supplier_rule_enforced_by_service_and_model>
+
+    def test_supplier_rule_enforced_by_service_and_model(self):
+        c = self.states["draft-supplier"]
+        with self.assertRaises(ValidationError):
+            create_contract_term_version(
+                organization=self.organization,
+                actor=self.owner,
+                contract=c,
+                effective_from=date(2026, 9, 1),
+                reason="Test forbidden supplier type",
+            )
+        with self.assertRaises(ValidationError):
+            ContractTermVersion(
+                organization=self.organization,
+                contract=c,
+                version=1,
+                effective_from=date(2026, 9, 1),
+                reason="Test model boundary",
+                created_by=self.owner,
+            ).full_clean()
+        self.assertEqual(
+>           self.client.post(self.url("draft-supplier"), self.term_data()).status_code,
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+            403,
+        )
+E       TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:322: TypeError
+_________ StateAwareDetailTests.test_tenant_input_validation_and_csrf _________
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_tenant_input_validation_and_csrf>
+
+    def test_tenant_input_validation_and_csrf(self):
+        other = Organization.objects.create(name="Other", slug="state-other")
+        unit = UnitOfMeasure.objects.create(
+            organization=other,
+            code="FOREIGN",
+            name="Foreign",
+            symbol="foreign",
+            category="count",
+        )
+        r = self.client.post(
+>           self.url("draft-receivable"),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            {**self.item_data(), "unit_of_measure": str(unit.pk)},
+        )
+E       TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:251: TypeError
+_ StateAwareDetailTests.test_terms_are_drafts_and_prior_versions_are_retained (key='draft-receivable') _
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_terms_are_drafts_and_prior_versions_are_retained>
+
+    def test_terms_are_drafts_and_prior_versions_are_retained(self):
+        for key in ("draft-receivable", "draft-subcontract"):
+            with self.subTest(key=key):
+>               url = self.url(key)
+                      ^^^^^^^^^^^^^
+E               TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:182: TypeError
+_ StateAwareDetailTests.test_terms_are_drafts_and_prior_versions_are_retained (key='draft-subcontract') _
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_terms_are_drafts_and_prior_versions_are_retained>
+
+    def test_terms_are_drafts_and_prior_versions_are_retained(self):
+        for key in ("draft-receivable", "draft-subcontract"):
+            with self.subTest(key=key):
+>               url = self.url(key)
+                      ^^^^^^^^^^^^^
+E               TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:182: TypeError
+_____ StateAwareBrowserTests.test_state_matrix_and_real_form_submissions ______
+
+self = <apps.contracts.test_state_workspace.StateAwareBrowserTests testMethod=test_state_matrix_and_real_form_submissions>
+
+    def test_state_matrix_and_real_form_submissions(self):
+        self.prepare_states()
+        base = {
+            "status": 200,
+            "screenshot": True,
+            "noJsErrors": True,
+            "noHttpErrors": True,
+            "absentText": ["در دسترس نیست"],
+        }
+        inspect = lambda expression, label: {
+            "inspect": expression,
+            "description": label,
+        }
+        scenarios = []
+        for key, c in self.states.items():
+            draft = c.status == "draft"
+            check = (
+                "!!document.querySelector('[data-draft-edit]') && !!document.querySelector('#contract-draft-base') && !!document.querySelector('#contract-draft-item') && !document.querySelector('canvas,.cd-claims')"
+                if draft
+                else "!document.querySelector('[data-draft-edit],#contract-draft-base,#contract-draft-item')"
+            )
+            if c.contract_type == "supplier":
+                check += " && !document.querySelector('#contract-draft-term,#terms,#progress,.cd-claims,canvas') && !!document.querySelector('.cd-supplier-note')"
+            elif draft:
+                check += " && !!document.querySelector('#contract-draft-term') && document.querySelectorAll('.cd-kpi').length===4"
+            else:
+                check += " && document.querySelectorAll('.cd-claims tbody tr').length===0 && document.querySelectorAll('canvas').length===1"
+            if c.direction == "payable":
+                check += " && ![...document.querySelectorAll('.contract-detail a')].some(a=>/billing\\/(claims|baselines)/.test(a.href))"
+            for width in (1440, 390):
+                scenarios.append(
+                    {
+                        **base,
+                        "name": key + "-" + str(width),
+>                       "path": self.url(key),
+                                ^^^^^^^^^^^^^
+                        "mobile": width == 390,
+                        "steps": [
+                            inspect(
+                                check,
+                                "state-specific CTA, editor, operational widgets and supported journeys",
+                            )
+                        ],
+                    }
+                )
+E               TypeError: 'str' object is not callable
+
+apps\contracts\test_state_workspace.py:370: TypeError
+=========================== short test summary info ===========================
+FAILED apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_draft_base_and_item_writes_use_existing_services
+FAILED apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_finalized_and_restricted_mutation_attempts_fail
+FAILED apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_state_is_rechecked_after_form_validation
+SUBFAILED(key='draft-receivable') apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_state_matrix_visibility_and_supported_journeys
+SUBFAILED(key='active-receivable') apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_state_matrix_visibility_and_supported_journeys
+SUBFAILED(key='draft-subcontract') apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_state_matrix_visibility_and_supported_journeys
+SUBFAILED(key='active-subcontract') apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_state_matrix_visibility_and_supported_journeys
+SUBFAILED(key='draft-supplier') apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_state_matrix_visibility_and_supported_journeys
+SUBFAILED(key='active-supplier') apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_state_matrix_visibility_and_supported_journeys
+SUBFAILED(key='completed-subcontract') apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_state_matrix_visibility_and_supported_journeys
+SUBFAILED(key='terminated-receivable') apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_state_matrix_visibility_and_supported_journeys
+FAILED apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_supplier_rule_enforced_by_service_and_model
+FAILED apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_tenant_input_validation_and_csrf
+SUBFAILED(key='draft-receivable') apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_terms_are_drafts_and_prior_versions_are_retained
+SUBFAILED(key='draft-subcontract') apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_terms_are_drafts_and_prior_versions_are_retained
+FAILED apps/contracts/test_state_workspace.py::StateAwareBrowserTests::test_state_matrix_and_real_form_submissions
+16 failed, 15 passed, 2 subtests passed in 168.84s (0:02:48)

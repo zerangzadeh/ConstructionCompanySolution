@@ -197,19 +197,17 @@ def _payable_measurement(request: HttpRequest, measurement_id: str):
 @organization_permission_required(BusinessPermissionCode.BASELINES_VIEW)
 @require_GET
 def baseline_list(request: HttpRequest) -> HttpResponse:
-    return render(
+    from .baseline_list import baseline_list_context
+
+    context = baseline_list_context(
         request,
-        "billing/baseline_list.html",
-        {
-            **journey_list_context(
-                request,
-                get_project_baselines(
-                    actor=request.user, organization=request.organization
-                ),
-                "baselines",
-            ),
-        },
+        get_project_baselines(actor=request.user, organization=request.organization),
     )
+    if context["redirect_baseline_id"]:
+        return redirect(
+            "billing:baseline_detail", baseline_id=context["redirect_baseline_id"]
+        )
+    return render(request, "billing/baseline_list.html", context)
 
 
 @active_organization_required
@@ -219,6 +217,16 @@ def baseline_detail(request: HttpRequest, baseline_id: str) -> HttpResponse:
     baseline = _baseline(request, baseline_id)
     if baseline is None:
         return HttpResponseNotFound("مبنای تجاری یافت نشد.")
+    breadcrumbs = journey_breadcrumbs(
+        request,
+        "مبنای متره و صورت‌وضعیت",
+        baseline.contract,
+        collection=("نسخه‌های مبنا", "billing:baseline_list"),
+    )
+    breadcrumbs[-2]["url"] = (
+        reverse("billing:baseline_list")
+        + f"?contract={baseline.contract_id}&versions=1"
+    )
     return render(
         request,
         "billing/baseline_detail.html",
@@ -229,12 +237,7 @@ def baseline_detail(request: HttpRequest, baseline_id: str) -> HttpResponse:
             )
             if baseline.status == "approved" and claim_create_allowed(request)
             else "",
-            "page_breadcrumbs": journey_breadcrumbs(
-                request,
-                "مبنای اندازه‌گیری",
-                baseline.contract,
-                collection=("مبناهای اندازه‌گیری", "billing:baseline_list"),
-            ),
+            "page_breadcrumbs": breadcrumbs,
             "baseline_items": baseline.items.select_related("activity", "wbs_node"),
         },
     )
@@ -290,8 +293,11 @@ def journey_list_context(request, records, key):
     page = paginate_table(
         records, request, sort_fields={}, default_ordering=("-created_at", "pk")
     )
+    from .list_presentation import progress_filter_bar
+
     return {
         key: page.object_list,
+        "filter_bar": progress_filter_bar(request, page),
         "page_obj": page,
         "pagination_query": table_pagination_query(request),
         "pagination_rendered": True,
@@ -400,33 +406,9 @@ def claim_list(request: HttpRequest) -> HttpResponse:
             if contract_id and len(request.GET.getlist("contract")) == 1
             else claims.none()
         )
-    scoped_has_records = claims.exists()
-    claims = apply_table_filters(
-        claims,
-        request,
-        text_fields={}
-        if contract_scoped
-        else {"q": ("contract__title", "contract__contract_number", "project__name")},
-        choice_fields={
-            "status": (
-                "status",
-                tuple(
-                    value
-                    for value, label in ProgressClaim._meta.get_field("status").choices
-                ),
-            )
-        },
-    )
-    page = paginate_table(
-        claims,
-        request,
-        sort_fields={
-            "number": "claim_number",
-            "period": "period_start",
-            "amount": "net_amount",
-        },
-        default_ordering=("-created_at", "pk"),
-    )
+    from .claim_list import claim_list_context
+
+    list_context = claim_list_context(request, claims, contract_scoped=contract_scoped)
     can_create_claim = route_exposed("billing:claim_create") and (
         contract_claim_create_allowed(request, selected_contract)
         if contract_scoped
@@ -436,10 +418,8 @@ def claim_list(request: HttpRequest) -> HttpResponse:
         request,
         "billing/claim_list.html",
         {
-            "claims": page.object_list,
-            "scoped_has_records": scoped_has_records,
-            "claim_status_choices": ProgressClaim._meta.get_field("status").choices,
             **contextual_list_filters(request),
+            **list_context,
             "selected_project": selected_project,
             "project_contracts_url": contextual_url(
                 "contracts:list", project_id=selected_project.pk
@@ -455,8 +435,6 @@ def claim_list(request: HttpRequest) -> HttpResponse:
                 project=selected_project,
             )
             else "",
-            "page_obj": page,
-            "pagination_query": table_pagination_query(request),
             "pagination_rendered": True,
             "contract_scoped": contract_scoped,
             "selected_contract": selected_contract,
@@ -666,14 +644,17 @@ def recovery_guidance(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.PAYABLE_CERTIFICATES_VIEW)
 @require_GET
 def payable_certificate_list(request: HttpRequest) -> HttpResponse:
+    from .payable_list import payable_list_context
+
     return render(
         request,
         "billing/payable_certificate_list.html",
-        {
-            "certificates": get_payable_certificates(
+        payable_list_context(
+            request,
+            get_payable_certificates(
                 actor=request.user, organization=request.organization
-            )
-        },
+            ),
+        ),
     )
 
 
@@ -721,13 +702,16 @@ def payable_certificate_detail(
     certificate = _payable_certificate(request, certificate_id)
     if certificate is None:
         return HttpResponseNotFound("گواهی پرداخت یافت نشد.")
+    from .payable_detail import payable_detail_actions
+
     return render(
         request,
         "billing/payable_certificate_detail.html",
         {
+            **payable_detail_actions(request, certificate),
             "certificate": certificate,
             "certificate_items": certificate.items.select_related(
-                "contract_item", "measurement"
+                "contract_item__unit_of_measure", "measurement"
             ),
             "adjustments": certificate.adjustments.all(),
             "correction_revisions": certificate.correction_certificates.order_by(

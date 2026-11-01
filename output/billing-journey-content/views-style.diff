@@ -1,0 +1,14 @@
+--- 
++++ 
+@@ -293,8 +293,11 @@
+     page = paginate_table(
+         records, request, sort_fields={}, default_ordering=("-created_at", "pk")
+     )
++    from .list_presentation import progress_filter_bar
++
+     return {
+         key: page.object_list,
++        "filter_bar": progress_filter_bar(request, page),
+         "page_obj": page,
+         "pagination_query": table_pagination_query(request),
+         "pagination_rendered": True,

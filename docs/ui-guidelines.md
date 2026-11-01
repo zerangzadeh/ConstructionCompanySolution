@@ -593,9 +593,11 @@ avoid detached or duplicate filter controls.
 Use `components/filter_bar.html` and `build_filter_bar` for newly adopted lists.
 One prominent business search precedes compact quick filters. Put optional
 secondary controls in «فیلترهای بیشتر»; column-input rows are not the primary UX.
-Keep Apply, clear-all, removable active-filter chips and total result count in
-the same Filter Bar, including empty results. Keep primary Create in its shared
-page-header position. Chips remain visible when filter controls are collapsed.
+Keep Apply, clear-all and removable active-filter chips with the Filter Bar,
+including empty results. Keep the total result count visible in the same list
+workspace; the Contracts Reference List Page Pattern in section 30 places it in
+the adjacent Result Summary toolbar. Keep primary Create in its shared page-header
+position. Chips remain visible when filter controls are collapsed.
 
 Desktop order is Search → quick filters → More Filters → Apply. Mobile keeps
 Search full-width and groups quick filters under «فیلترها (n)», with wrapping
@@ -657,6 +659,35 @@ options have been checked for English leakage, mixed terminology, and correct
 RTL display.
 
 ---
+
+### 14.2 Reference Create Form Pattern
+
+The Product Owner's [supplied Contract Create image](../output/contract-create-reference/reference.png)
+(2026-11-01) is the final visual acceptance reference for BONIRA Create forms.
+`templates/contracts/create.html`
+implements the pattern; **Product Owner visual acceptance is PENDING**. This is
+not approval of the implementation or authorization to roll it out to other pages.
+
+Use a title/short description with the selected company/project context, five
+clearly separated logical sections, labels above compact 38px desktop controls
+(44px on mobile, following this supplied reference's density), two-column
+related fields and a three-column date group where appropriate. The Contract
+sections are basic information, party/classification, amount/status, dates and
+notes. Its status remains with classification as shown in the supplied reference.
+Use the sticky footer for the real primary submit and existing cancel destination.
+Only expose a separate draft action if the consuming form already supports it.
+Below 640px, grids become single-column and footer actions remain accessible.
+
+The shared implementation and explicit include parameters are documented in
+`templates/components/README.md` under Reference Create Form Pattern. Reuse the
+existing form-field error/help semantics, qualified Tom Select, Jalali date and
+Rial input helpers. Do not infer fields, validation, domain behavior, permission,
+scope, workflow or Product Surface from a visual reference.
+
+Acceptance requires functional checks and real Chrome evidence at 1440, 1024
+and 390px, direct screenshot comparison to the reference and separate Product
+Owner visual acceptance. Technical conformance does not issue that acceptance.
+See the [bounded implementation evidence](../output/contract-create-reference/REPORT.md).
 
 ## 15. Buttons
 
@@ -755,7 +786,10 @@ Approved detail-page structure:
 9. Information sections
 10. Related-domain lists
 
-Project Detail remains the strongest operational reference.
+These general guidelines do not define the final Projects detail-page design.
+The earlier designation of Project Detail as the strongest operational reference
+is superseded by the Projects Exception in section 30; independent Product Owner
+instruction is required for its final List/Detail structure.
 
 Record-section tabs do not replace the persistent sibling-page navigation
 defined in section 10.
@@ -1141,16 +1175,66 @@ page-level palette variation.
 
 ## 30. Approved Reference Pages
 
-The authoritative operational reference is:
+The approved shared operational references are:
 
 - Application Shell
 - Dashboard
-- Project List
-- Project Detail
 
-Other modules should reuse these patterns instead of inventing new visual conventions.
+Reuse these established shared patterns where applicable. List-page design for
+the targets below follows the Contracts reference, not the earlier blanket
+designation of Project List / Project Detail as references for other modules.
 
 The authoritative Admin reference is the customized Django Admin shell/changelist/changeform patterns defined in this document.
+
+### Reference List Page Pattern
+
+**Product Owner decision: 2026-11-01. Contracts List UI/UX: ACCEPTED.**
+
+`Contracts List` (`templates/contracts/list.html` and its existing opt-in shared
+list components) is BONIRA's official **Reference List Page** and reference
+implementation for designing or redesigning these List pages only:
+
+- `Estimates`
+- `Claims`
+- `Procurement`
+- `Inventory`
+
+These pages must inherit the Contracts List presentation and interaction patterns
+for:
+
+- Page Header, Search, Quick Filters, Advanced Filters and Active Filter Chips;
+- Result Summary and Sorting;
+- Table density, row hierarchy, Status badges, Row actions and Pagination; and
+- RTL/LTR behavior and responsive desktop/mobile behavior.
+
+Columns, filters, operations and content must come from the actual Domain of
+each consuming module. Reuse the pattern and existing components without copying
+Contract-specific fields or distorting business behavior. Render only supported,
+authorized operations and reliable domain read summaries; do not invent data,
+filters, calculations or actions for visual similarity. Authentication,
+Permissions, Tenant/Project Scope, Workflow and Domain authority remain unchanged.
+
+This is a design direction for separately authorized work on the four named
+Lists, not an automatic implementation rollout. This documentation decision does
+not redesign any page, extend adoption to other Lists, or accept the target pages
+before their own validation and Product Owner review.
+
+#### Projects Exception
+
+`Projects` is explicitly excluded from this Reference Pattern and its rollout.
+Projects has an independent design direction. Until a separate Product Owner
+instruction is received, do not apply Contracts-based UI changes to `Projects
+List`, and do not assume the final structure of either `Projects List` or
+`Project Detail`. Existing shared components or earlier reference designations
+do not override this exception or authorize automatic imitation/rollout.
+
+This decision does not amend Product Strategy D1–D7, the MVP Charter/package
+boundaries, capability exposure or Product Surface rules. It grants no new
+navigation, route, feature, permission or production authority. The existing
+capability-level Product Surface and server-side controls remain authoritative.
+
+The dated Product Owner acceptance and remediation record is maintained in
+[MVP-03_COMPLETION_REPORT.md](governance/mvp/MVP-03_COMPLETION_REPORT.md).
 
 ---
 
@@ -1364,7 +1448,7 @@ Database test-permission problems are environment issues and must not trigger UI
 
 At the start of a new UI/UX session:
 
-> Follow applicable `AGENTS.md` instructions and read both `docs/ui-guidelines.md` and `design/BONIRA_UI_COLOR_SYSTEM.md` before UI/UX work. Treat the approved Application Shell, Dashboard, Project List, Project Detail, customized Django Admin patterns, and the canonical BONIRA color tokens as authoritative references. Reuse established components, do not invent near-duplicate colors, and do not modify backend/domain behavior.
+> Follow applicable `AGENTS.md` instructions and read both `docs/ui-guidelines.md` and `design/BONIRA_UI_COLOR_SYSTEM.md` before UI/UX work. Treat the approved Application Shell, Dashboard, customized Django Admin patterns, and canonical BONIRA color tokens as shared references. For Estimates, Claims, Procurement and Inventory Lists, use the official Contracts List reference implementation under section 30. Projects is excluded and requires independent Product Owner direction; do not infer its final List/Detail design or roll out the Contracts pattern to it. Reuse established components, do not invent near-duplicate colors, and do not modify backend/domain behavior.
 
 In the same session, do not repeat the entire UI specification. Keep prompts task-specific and concise.
 

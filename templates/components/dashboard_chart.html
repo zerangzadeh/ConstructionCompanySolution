@@ -1,0 +1,8 @@
+{% load erp_format %}
+<figure class="erp-project-chart" aria-labelledby="{{ chart_id }}-title">
+    <figcaption><h2 id="{{ chart_id }}-title">{{ title }}</h2><p>{{ description }}</p></figcaption>
+    {% if rows %}
+    {% if render_chart != False %}<div class="erp-project-chart__canvas"><canvas id="{{ chart_id }}" role="img" aria-label="{{ title }}" aria-describedby="{{ chart_id }}-values" hidden>مقادیر نمودار در فهرست زیر آمده است.</canvas></div>{% endif %}
+    <dl id="{{ chart_id }}-values" class="erp-project-chart__values">{% for row in rows %}<div><dt>{{ row.label }}</dt><dd><bdi dir="ltr">{{ row.value|erp_number }}</bdi>{% if unit %} <span>{{ unit }}</span>{% endif %}</dd></div>{% endfor %}</dl>
+    {% else %}<div class="erp-project-chart__empty"><span aria-hidden="true">—</span><p>{{ empty_message }}</p></div>{% endif %}
+</figure>

@@ -1,0 +1,147 @@
+--- apps/contracts/detail_dashboard.py (before)
++++ apps/contracts/detail_dashboard.py
+@@ -2,8 +2,9 @@
+ 
+ No posting, settlement, progress measurement or lifecycle authority lives here.
+ Gross period amounts follow billing's active-claim convention; drafts, returned,
+-superseded and cancelled revisions do not contribute. Physical progress has no
+-governed contract-wide rollup, so it is deliberately unavailable.
++superseded and cancelled revisions do not contribute. Zero physical progress is
++an explicit empty state only when the scoped measurement selector proves absence;
++existing measurements still require a governed contract-wide rollup.
+ """
+ 
+ from decimal import Decimal
+@@ -27,6 +28,7 @@
+     baselines: QuerySet | None,
+     estimates: QuerySet | None,
+     certificates: QuerySet | None = None,
++    physical_empty: bool = False,
+ ) -> dict[str, object]:
+     """Compose exact values from the view's tenant/project/permission scoped reads."""
+     try:
+@@ -70,7 +72,7 @@
+     )
+     has_active = active is not None and active.exists()
+     comparable = (
+-        bool(currency and has_active)
++        bool(currency and records is not None)
+         and not active.exclude(
+             currency_code=currency, correction_kind="ordinary"
+         ).exists()
+@@ -90,9 +92,13 @@
+         )
+         approved, pending = totals["approved"], totals["pending"]
+         issued = approved + pending
+-        if effective > 0 and Decimal(0) <= issued <= effective:
++        if effective >= 0 and Decimal(0) <= issued <= effective:
+             remaining = effective - issued
+-            percentage = (approved / effective * 100).quantize(Decimal("0.1"))
++            percentage = (
++                (approved / effective * 100).quantize(Decimal("0.1"))
++                if effective > 0
++                else Decimal(0)
++            )
+             segments = [
+                 {"label": "تأییدشده", "value": approved, "tone": "approved"},
+                 {"label": "در حال بررسی", "value": pending, "tone": "pending"},
+@@ -103,8 +109,10 @@
+                 },
+             ]
+             for segment in segments:
+-                segment["percent"] = (segment["value"] / effective * 100).quantize(
+-                    Decimal("0.1")
++                segment["percent"] = (
++                    (segment["value"] / effective * 100).quantize(Decimal("0.1"))
++                    if effective > 0
++                    else Decimal(0)
+                 )
+         else:
+             unavailable = "مبلغ مؤثر و صورت‌وضعیت‌ها برای نمایش نسبت قابل مقایسه نیستند."
+@@ -145,11 +153,13 @@
+         },
+         {
+             "label": "پیشرفت فیزیکی",
+-            "value": None,
+-            "unit": "",
++            "value": Decimal(0) if physical_empty else None,
++            "unit": "٪" if physical_empty else "",
+             "tone": "physical",
+             "icon": "target",
+-            "note": "پیشرفت تجمیعی قابل اتکا در دسترس نیست",
++            "note": "اندازه‌گیری پیشرفت ثبت نشده"
++            if physical_empty
++            else "پیشرفت تجمیعی قابل اتکا در دسترس نیست",
+         },
+     ]
+     recent = []
+@@ -214,6 +224,7 @@
+         "segments": segments,
+         "chart_rows": chart_rows,
+         "financial_percent": percentage,
++        "physical_percent": Decimal(0) if physical_empty else None,
+         "unavailable": unavailable,
+         "billing_records": billing_records,
+         "billing_heading": "آخرین صورت‌وضعیت‌های پرداختنی"
+--- apps/contracts/views.py (before)
++++ apps/contracts/views.py
+@@ -338,8 +338,15 @@
+         contract_claim_create_allowed,
+         journey_breadcrumbs,
+     )
+-    from apps.billing.payable_services import get_payable_certificates
+-    from apps.billing.services import get_progress_claims, get_project_baselines
++    from apps.billing.payable_services import (
++        get_payable_certificates,
++        get_payable_measurements,
++    )
++    from apps.billing.services import (
++        get_progress_claims,
++        get_progress_records,
++        get_project_baselines,
++    )
+     from apps.estimates.services import get_organization_estimates
+ 
+     def permitted(permission):
+@@ -386,6 +393,22 @@
+             # Preserve the existing payable selector's organization-scope gate.
+             # A readable contract does not grant access to its certificates.
+             pass
++    physical_empty = False
++    if is_receivable and permitted(BusinessPermissionCode.PROGRESS_VIEW):
++        physical_empty = not get_progress_records(
++            actor=request.user, organization=request.organization
++        ).filter(baseline__contract=contract, baseline__project=contract.project).exists()
++    elif (
++        contract.direction == ContractDirection.PAYABLE
++        and contract.contract_type == ContractType.SUBCONTRACT
++        and permitted(BusinessPermissionCode.PAYABLE_MEASUREMENTS_VIEW)
++    ):
++        try:
++            physical_empty = not get_payable_measurements(
++                actor=request.user, organization=request.organization
++            ).filter(contract=contract, project=contract.project).exists()
++        except PermissionDenied:
++            pass
+     from apps.organizations.form_scoping import normalized_uuid
+ 
+     context_estimate = None
+@@ -404,6 +427,7 @@
+         baselines=related_baselines,
+         estimates=related_estimates,
+         certificates=related_certificates,
++        physical_empty=physical_empty,
+     )
+     return render(
+         request,
+--- templates/contracts/detail.html (before)
++++ templates/contracts/detail.html
+@@ -19,7 +19,7 @@
+     </section>
+     <section class="cd-kpis cd-panel" aria-label="شاخص‌های اصلی قرارداد">{% for kpi in dashboard.kpis %}<article class="cd-kpi cd-kpi--{{ kpi.tone }}"><div><span class="cd-kpi-icon">{% include "contracts/detail_icon.html" with icon=kpi.icon only %}</span><h2>{{ kpi.label }}</h2></div><p><bdi dir="ltr">{{ kpi.value|erp_number|default_if_none:"—" }}</bdi>{% if kpi.value != None %}<small>{{ kpi.unit }}</small>{% endif %}</p><small class="cd-kpi-note">{% if kpi.value == None %}در دسترس نیست{% else %}{{ kpi.note }}{% endif %}</small></article>{% endfor %}</section>
+     <div class="cd-charts">
+-        <section class="cd-panel cd-progress" id="progress"><h2>مقایسه پیشرفت فیزیکی و مالی <span class="cd-info" title="پیشرفت مالی: نسبت ناخالص تأییدشده به مبلغ مؤثر؛ معادل گردش وجه نیست">ⓘ</span></h2><div class="cd-progress-row"><span>پیشرفت فیزیکی</span><strong>در دسترس نیست</strong><div class="cd-track cd-track--empty"></div></div><div class="cd-progress-row"><span>پیشرفت مالی (تأییدشده)</span><strong>{% if dashboard.financial_percent != None %}<bdi dir="ltr">{{ dashboard.financial_percent|erp_number }}٪</bdi>{% else %}در دسترس نیست{% endif %}</strong>{% if dashboard.financial_percent != None %}<progress max="100" value="{{ dashboard.financial_percent }}" aria-label="نسبت مالی تأییدشده"></progress>{% else %}<div class="cd-track cd-track--empty"></div>{% endif %}</div><p class="cd-note">پیشرفت فیزیکی تجمیعی قابل اتکا ثبت نشده است.</p></section>
++        <section class="cd-panel cd-progress" id="progress"><h2>مقایسه پیشرفت فیزیکی و مالی <span class="cd-info" title="پیشرفت مالی: نسبت ناخالص تأییدشده به مبلغ مؤثر؛ معادل گردش وجه نیست">ⓘ</span></h2><div class="cd-progress-row"><span>پیشرفت فیزیکی</span><strong>{% if dashboard.physical_percent != None %}<bdi dir="ltr">{{ dashboard.physical_percent|erp_number }}٪</bdi>{% else %}در دسترس نیست{% endif %}</strong>{% if dashboard.physical_percent != None %}<progress max="100" value="{{ dashboard.physical_percent }}" aria-label="پیشرفت فیزیکی؛ اندازه‌گیری ثبت نشده"></progress>{% else %}<div class="cd-track cd-track--empty"></div>{% endif %}</div><div class="cd-progress-row"><span>پیشرفت مالی (تأییدشده)</span><strong>{% if dashboard.financial_percent != None %}<bdi dir="ltr">{{ dashboard.financial_percent|erp_number }}٪</bdi>{% else %}در دسترس نیست{% endif %}</strong>{% if dashboard.financial_percent != None %}<progress max="100" value="{{ dashboard.financial_percent }}" aria-label="نسبت مالی تأییدشده"></progress>{% else %}<div class="cd-track cd-track--empty"></div>{% endif %}</div><p class="cd-note">{% if dashboard.physical_percent != None %}هنوز اندازه‌گیری پیشرفت ثبت نشده است.{% else %}پیشرفت فیزیکی تجمیعی قابل اتکا ثبت نشده است.{% endif %}</p></section>
+         <section class="cd-panel cd-financial"><h2>وضعیت مالی قرارداد <span class="cd-info" title="مبالغ ناخالص صورت‌وضعیت؛ بدون پیش‌نویس و سوابق بازگشتی، جایگزین‌شده یا باطل‌شده">ⓘ</span></h2>{% if dashboard.segments %}<div class="cd-financial-body"><div class="cd-chart-wrap"><canvas id="contract-financial-chart" hidden role="img" aria-describedby="contract-financial-legend" aria-label="ترکیب مبلغ مؤثر قرارداد؛ مبالغ دقیق در راهنمای مجاور"></canvas><noscript>مبالغ دقیق در راهنمای مجاور نمایش داده شده‌اند.</noscript></div><ul class="cd-legend" id="contract-financial-legend">{% for segment in dashboard.segments %}<li class="cd-legend--{{ segment.tone }}"><i aria-hidden="true"></i><span>{{ segment.label }}<small><bdi dir="ltr">{{ segment.value|erp_number }}</bdi> {{ dashboard.currency_label }} · <bdi dir="ltr">{{ segment.percent|erp_number }}٪</bdi></small></span></li>{% endfor %}</ul></div><div class="cd-data-table"><table><caption>داده‌های وضعیت مالی قرارداد — {{ dashboard.currency_label }}</caption><thead><tr><th scope="col">وضعیت</th><th scope="col">مبلغ</th><th scope="col">نسبت به مبلغ مؤثر</th></tr></thead><tbody>{% for segment in dashboard.segments %}<tr><th scope="row">{{ segment.label }}</th><td>{{ segment.value|erp_number }}</td><td>{{ segment.percent|erp_number }}٪</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="cd-unavailable">{% include "contracts/detail_icon.html" with icon="coins" only %}<p>{{ dashboard.unavailable }}</p></div>{% endif %}</section>
+     </div>
+     <nav class="cd-journey" aria-label="مسیر قرارداد"><a class="is-current" href="#overview" aria-current="location">{% include "contracts/detail_icon.html" with icon="home" only %}نمای کلی</a>{% if dashboard.show_baselines %}<a href="{{ baseline_list_url }}">{% include "contracts/detail_icon.html" with icon="layers" only %}مبنای متره (BOQ)</a>{% endif %}<a href="#progress">{% include "contracts/detail_icon.html" with icon="target" only %}پیشرفت</a>{% if dashboard.show_billing %}<a href="{{ dashboard.billing_nav_url }}">{% include "contracts/detail_icon.html" with icon="document" only %}{{ dashboard.billing_nav_label }}</a>{% endif %}{% if dashboard.show_estimates %}<a href="{{ estimate_list_url }}">{% include "contracts/detail_icon.html" with icon="layers" only %}برآوردها</a>{% endif %}<a href="#terms">{% include "contracts/detail_icon.html" with icon="document" only %}شرایط قرارداد</a><a href="#recent">{% include "contracts/detail_icon.html" with icon="history" only %}سوابق و فعالیت‌ها</a></nav>

@@ -1,0 +1,36 @@
+/* Estimate/site adaptations of the shared Contracts list presentation. */
+.erp-secondary-list .erp-list-options,
+.erp-secondary-list .erp-list-options:not(:has([name="project"])) { flex: 1 1 500px; }
+.erp-secondary-list .erp-list-quick > div { flex: 1 1 128px; }
+.erp-secondary-list .erp-list-quick > div:has([name="project"]) { flex: 1 1 180px; min-width: 160px; max-width: none; }
+.erp-secondary-list .erp-list-quick > .erp-list-filter-actions { flex: 0 0 auto; }
+.erp-sites-list .erp-list-options { flex: 0 1 380px; }
+.erp-secondary-list .erp-list-scope { margin-block: 12px; }
+.erp-secondary-list .erp-list-context-note { color: var(--bonira-muted); font-size: 12px; margin-block: 10px; }
+.erp-secondary-list .erp-list-context-note a { color: var(--bonira-royal-blue); margin-inline-start: 8px; }
+.erp-secondary-list .erp-responsive-list th:nth-child(1) { width: 14%; }
+.erp-secondary-list .erp-responsive-list th:nth-child(2) { width: 29%; }
+.erp-secondary-list .erp-responsive-list th:nth-child(3) { width: 25%; }
+.erp-secondary-list .erp-responsive-list th:nth-child(4) { width: 12%; }
+.erp-secondary-list .erp-responsive-list th:nth-child(5) { width: 16%; }
+.erp-secondary-list .erp-responsive-list th:last-child { width: 4%; }
+.erp-sites-list .erp-responsive-list th:nth-child(2) { width: 24%; }
+.erp-sites-list .erp-responsive-list th:nth-child(3) { width: 24%; }
+.erp-sites-list .erp-responsive-list th:nth-child(4) { width: 10%; }
+.erp-sites-list .erp-responsive-list th:nth-child(5) { width: 24%; }
+.erp-secondary-list .erp-list-notes { display: block; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.erp-sites-list .erp-list-address { overflow-wrap: anywhere; color: var(--bonira-slate); }
+@media (min-width: 768px) {
+    .erp-secondary-list .erp-responsive-list { min-width: 880px; }
+    .erp-sites-list .erp-responsive-list { min-width: 820px; }
+    .erp-secondary-list .erp-responsive-list :is(th, td):nth-child(5) { text-align: end; }
+    .erp-sites-list .erp-responsive-list :is(th, td):nth-child(5) { text-align: start; }
+}
+@media (max-width: 767px) {
+    .erp-secondary-list .erp-list-quick > div:not(.erp-list-filter-actions) { flex-basis: 100%; min-width: 0; }
+    .erp-secondary-list .erp-list-title,
+    .erp-secondary-list .erp-list-subtitle,
+    .erp-secondary-list .erp-list-identifier { overflow-wrap: anywhere; }
+    .erp-sites-list .erp-list-address { grid-column: 1 / -1; }
+    .erp-secondary-list .erp-list-footer { align-items: flex-start; }
+}

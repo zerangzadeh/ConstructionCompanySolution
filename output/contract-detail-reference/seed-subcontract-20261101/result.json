@@ -1,0 +1,113 @@
+{
+  "contract": "UAT-SUB-02-03",
+  "contract_id": "23737c99-9249-41e5-a866-8c78867b10e9",
+  "tenant": "demo-construction-02",
+  "project": "PRJ-02-03",
+  "created": true,
+  "currency": "IRR",
+  "contract_value": "29700000000.00",
+  "contract_status": "active",
+  "contract_path": "/contracts/23737c99-9249-41e5-a866-8c78867b10e9/",
+  "payable_list_path": "/billing/payable-certificates/",
+  "estimates": [
+    {
+      "number": "UAT-EST-SUB-02-03-01",
+      "status": "approved",
+      "amount": "29700000000.00",
+      "path": "/estimates/f6a6e736-5339-4c7c-8e17-7788eaa5cd89/"
+    },
+    {
+      "number": "UAT-EST-SUB-02-03-02",
+      "status": "draft",
+      "amount": "14850000000.00",
+      "path": "/estimates/3bd6d5f2-3df5-4ab4-ab0d-62213ce0c41d/"
+    },
+    {
+      "number": "UAT-EST-SUB-02-03-03",
+      "status": "draft",
+      "amount": "7425000000.00",
+      "path": "/estimates/ecbd9132-b848-4ecf-837f-cfddb3ad96b9/"
+    }
+  ],
+  "certificates": [
+    {
+      "number": 1,
+      "status": "approved",
+      "gross": "2970000000.0000",
+      "net": "2970000000.0000",
+      "period_start": "2026-07-01",
+      "period_end": "2026-07-31",
+      "path": "/billing/payable-certificates/c88b6667-be01-4a4d-bd3d-8d9ae7b11a8a/"
+    },
+    {
+      "number": 2,
+      "status": "approved",
+      "gross": "5940000000.0000",
+      "net": "5940000000.0000",
+      "period_start": "2026-08-01",
+      "period_end": "2026-08-31",
+      "path": "/billing/payable-certificates/f0a8860c-c04b-4f90-b12f-e0068f449cf2/"
+    },
+    {
+      "number": 3,
+      "status": "submitted",
+      "gross": "4455000000.0000",
+      "net": "4455000000.0000",
+      "period_start": "2026-09-01",
+      "period_end": "2026-09-30",
+      "path": "/billing/payable-certificates/92e93ee9-6754-4837-8e85-eef9db89b089/"
+    }
+  ],
+  "measurements": 6,
+  "render_checks": [
+    {
+      "path": "/contracts/23737c99-9249-41e5-a866-8c78867b10e9/",
+      "status": 200
+    },
+    {
+      "path": "/billing/payable-certificates/",
+      "status": 200
+    },
+    {
+      "path": "/estimates/f6a6e736-5339-4c7c-8e17-7788eaa5cd89/",
+      "status": 200
+    },
+    {
+      "path": "/estimates/3bd6d5f2-3df5-4ab4-ab0d-62213ce0c41d/",
+      "status": 200
+    },
+    {
+      "path": "/estimates/ecbd9132-b848-4ecf-837f-cfddb3ad96b9/",
+      "status": 200
+    },
+    {
+      "path": "/billing/payable-certificates/c88b6667-be01-4a4d-bd3d-8d9ae7b11a8a/",
+      "status": 200
+    },
+    {
+      "path": "/billing/payable-certificates/f0a8860c-c04b-4f90-b12f-e0068f449cf2/",
+      "status": 200
+    },
+    {
+      "path": "/billing/payable-certificates/92e93ee9-6754-4837-8e85-eef9db89b089/",
+      "status": 200
+    }
+  ],
+  "protected_before_sha256": "1930027bf1cbab0964358da3b83410e41a98e4dd0d597b0e4843f51ec7bf3896",
+  "protected_after_sha256": "1930027bf1cbab0964358da3b83410e41a98e4dd0d597b0e4843f51ec7bf3896",
+  "previous_contracts_unchanged": true,
+  "downstream_financial_counts_before": {
+    "JournalEntry": 0,
+    "Obligation": 0,
+    "TreasuryMovement": 0,
+    "PaymentRequest": 16
+  },
+  "downstream_financial_counts_after": {
+    "JournalEntry": 0,
+    "Obligation": 0,
+    "TreasuryMovement": 0,
+    "PaymentRequest": 16
+  },
+  "receivable_records_created": false,
+  "notes": "Contract Detail currently does not consume payable certificates. Review these records through payable certificate pages; UI code and exposure were not changed."
+}

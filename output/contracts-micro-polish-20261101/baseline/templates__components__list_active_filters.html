@@ -1,0 +1,9 @@
+<div class="erp-list-chips" aria-label="فیلترهای فعال">
+    {% if bar.chips %}<span class="erp-list-muted">فیلترهای فعال:</span>{% endif %}
+    {% for chip in bar.chips %}
+    <a class="erp-list-chip" href="{{ chip.url }}" data-filter-chip="{{ chip.name }}"{% if reference_layout and chip.name == 'status' %} data-filter-value="{{ bar.form.status.value }}"{% endif %} aria-label="حذف فیلتر {{ chip.label }}: {{ chip.value }}">
+        <span>{{ chip.label }}: <bdi{% if chip.name == 'number' %} dir="ltr"{% endif %}>{{ chip.value }}</bdi></span><span aria-hidden="true">×</span>
+    </a>
+    {% endfor %}
+    {% if bar.chips or bar.form.errors %}<a class="erp-list-clear" href="{{ bar.clear_url }}" data-table-filter-clear data-context-preserving-clear>{% if reference_layout %}<span aria-hidden="true">×</span> پاک کردن همه{% else %}پاک‌کردن فیلترها{% endif %}</a>{% endif %}
+</div>

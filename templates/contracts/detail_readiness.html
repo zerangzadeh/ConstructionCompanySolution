@@ -1,0 +1,5 @@
+<section class="cd-panel cd-readiness" id="draft-review">
+    <h2>مرور آماده‌سازی قرارداد</h2>
+    <ol>{% for row in workspace.readiness %}<li><a href="{{ row.url }}"><strong>{{ row.label }}</strong><span class="{% if row.ready %}is-ready{% endif %}">{{ row.value }}</span></a></li>{% endfor %}</ol>
+    <p class="cd-empty-note">اطلاعات هر بخش را بررسی و تغییرات پیش‌نویس را ذخیره کنید. وضعیت آماده‌سازی به معنی تأیید یا فعال‌شدن قرارداد نیست.</p>
+</section>

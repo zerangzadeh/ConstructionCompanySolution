@@ -1,44 +1,39 @@
-{% extends "base.html" %}{% load erp_format table_filters %}
-
+{% extends "base.html" %}{% load static erp_format table_filters %}
 {% block title %}پروژه‌ها | سامانه مدیریت ساخت{% endblock %}
-
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}?v=20261101-list-polish-2"><link rel="stylesheet" href="{% static 'projects/workspace.css' %}?v=1">{% endblock %}
+{% block table_filter_controls %}{% endblock %}
+{% block list_pagination %}{% endblock %}
+{% block working_context %}{% if request.organization %}{% include "components/list_working_context.html" with request=request csrf_token=csrf_token active_project=active_project active_site=active_site context_projects=context_projects context_sites=context_sites context_requires_project=context_requires_project site_context_relevant=site_context_relevant only %}{% endif %}{% endblock %}
 {% block content %}
-{% table_filters filters "project-filters" %}
-    {% if "projects.create" in business_permission_codes %}{% url "projects:create" as project_create_url %}{% endif %}
-    {% include "components/page_header.html" with page_eyebrow="مدیریت پروژه‌ها" page_title="پروژه‌ها" page_description=request.organization.name page_action_url=project_create_url page_action_label="پروژه جدید" only %}
-
-    <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست پروژه‌ها">
-        <div class="flex flex-col gap-3 border-b border-slate-200 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div class="flex items-center gap-2"><span class="grid h-8 w-8 place-items-center rounded-lg bg-blue-50 text-blue-600"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg></span><div><h2 class="text-sm font-bold text-slate-900">فهرست پروژه‌ها</h2><p class="text-[11px] text-slate-400">اطلاعات کلیدی و وضعیت اجرایی</p></div></div>
-            {% if projects %}<span class="inline-flex w-fit rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{{ projects|length }} پروژه</span>{% endif %}
-        </div>
+<div class="erp-reference-list erp-project-list">
+    <div class="erp-list-heading">
+        {% if can_create_project %}{% url 'projects:create' as create_url %}{% endif %}
+        {% include "components/page_header.html" with page_title="پروژه‌ها" page_description="نمای یکپارچه پروژه‌ها و دسترسی به مرکز کنترل هر پروژه" page_action_url=create_url page_action_label="پروژه جدید" page_actions_near_title=True only %}
+    </div>
+    <div class="erp-list-workspace">
+        {% include "components/filter_bar.html" with bar=filter_bar only %}
+        {% include "components/list_result_toolbar.html" with bar=filter_bar sort=list_sort only %}
+        <section aria-label="فهرست پروژه‌ها">
         {% if projects %}
-            <div class="erp-table-wrap">
-                <table class="w-full min-w-[900px] border-collapse text-right text-sm">
-                    <thead class="bg-slate-50 text-[11px] font-semibold text-slate-500">
-                        <tr><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "code" "کد پروژه" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "name" "نام پروژه" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "status" "وضعیت" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "start_date" "تاریخ شروع" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "end_date" "تاریخ پایان" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "estimated_budget" "بودجه تخمینی" %} ({{ request.organization.currency }})</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "actual_budget" "بودجه واقعی" %} ({{ request.organization.currency }})</th><th class="border-b border-slate-200 px-4 py-3 text-center">جزئیات</th></tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 bg-white">
-                        {% for project in projects %}
-                            <tr class="group transition hover:bg-blue-50/40">
-                                <td class="whitespace-nowrap px-4 py-3.5"><a class="font-medium text-blue-700 hover:text-blue-900" dir="ltr" href="{% url 'projects:detail' project.id %}">{{ project.code }}</a></td>
-                                <td class="px-4 py-3.5"><a class="font-semibold text-blue-700 hover:underline" href="{% url 'projects:detail' project.id %}">{{ project.name }}</a>{% if project.description %}<p class="mt-0.5 max-w-sm truncate text-[11px] text-slate-400">{{ project.description }}</p>{% endif %}</td>
-                                <td class="whitespace-nowrap px-4 py-3.5">
-                                    {% include "components/status_badge.html" with status=project.status label=project.get_status_display only %}
-                                </td>
-                                <td class="whitespace-nowrap px-4 py-3.5 text-slate-600" dir="ltr">{{ project.start_date|default:"—" }}</td>
-                                <td class="whitespace-nowrap px-4 py-3.5 text-slate-600" dir="ltr">{{ project.end_date|default:"—" }}</td>
-                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-medium tabular-nums text-slate-800" dir="ltr">{{ project.estimated_budget|erp_number }}</td>
-                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-medium tabular-nums text-slate-800" dir="ltr">{{ project.actual_budget|erp_number }}</td>
-                                <td class="px-4 py-3.5 text-center">{% url 'projects:detail' project.id as detail_url %}{% include "components/record_detail_link.html" with detail_url=detail_url record_label=project.name only %}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% include "components/table_pagination.html" with page_obj=page_obj pagination_query=pagination_query only %}<div class="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500"><span>نمایش {{ projects|length }} پروژه در این صفحه</span></div>
-        {% else %}
-            {% include "components/empty_state.html" with empty_title="هنوز پروژه‌ای ثبت نشده است" empty_description="اولین پروژه این شرکت را ایجاد کنید." empty_action_url=project_create_url empty_action_label="ایجاد پروژه" only %}
-        {% endif %}
-    </section>
+            <table class="erp-responsive-list" aria-label="پروژه‌ها">
+                <thead><tr>
+                    <th scope="col">{% table_sort_header 'code' 'کد پروژه' %}</th><th scope="col">{% table_sort_header 'name' 'نام پروژه' %}</th><th scope="col">{% table_sort_header 'status' 'وضعیت' %}</th><th scope="col" class="erp-list-amount">{% table_sort_header 'estimated_budget' 'بودجه تخمینی' %}</th><th scope="col" class="erp-list-amount">{% table_sort_header 'actual_budget' 'بودجه واقعی' %}</th><th scope="col">{% table_sort_header 'start_date' 'تاریخ شروع' %}</th><th scope="col">{% table_sort_header 'end_date' 'تاریخ پایان' %}</th><th scope="col"><span class="sr-only">عملیات</span></th>
+                </tr></thead>
+                <tbody>{% for project in projects %}<tr>
+                    <td class="erp-list-identifier"><a href="{% url 'projects:detail' project.pk %}"><bdi dir="ltr">{{ project.code }}</bdi></a></td>
+                    <td class="erp-list-title"><a href="{% url 'projects:detail' project.pk %}">{{ project.name }}</a>{% if project.description %}<span class="erp-list-subtitle erp-project-description">{{ project.description }}</span>{% endif %}</td>
+                    <td class="erp-list-status">{% include "components/status_badge.html" with status=project.status label=project.get_status_display only %}</td>
+                    <td class="erp-list-amount" data-label="بودجه تخمینی"><bdi dir="ltr">{{ project.estimated_budget|erp_number }}</bdi><span class="erp-list-subtitle">{{ request.organization.currency }}</span></td>
+                    <td class="erp-list-amount" data-label="بودجه واقعی"><bdi dir="ltr">{{ project.actual_budget|erp_number }}</bdi><span class="erp-list-subtitle">{{ request.organization.currency }}</span></td>
+                    <td data-label="تاریخ شروع"><bdi dir="ltr">{{ project.start_date|jalali_date|default:"—" }}</bdi></td>
+                    <td data-label="تاریخ پایان"><bdi dir="ltr">{{ project.end_date|jalali_date|default:"—" }}</bdi></td>
+                    <td class="erp-list-row-action"><a class="erp-list-action" href="{% url 'projects:detail' project.pk %}" aria-label="مشاهده پروژه {{ project.code }}">مشاهده ←</a></td>
+                </tr>{% endfor %}</tbody>
+            </table>
+        {% elif scoped_has_records %}{% include "components/filtered_empty_state.html" %}
+        {% else %}{% include "components/empty_state.html" with empty_title="هنوز پروژه‌ای ثبت نشده است" empty_description="پروژه‌ای در محدوده دسترسی شما وجود ندارد." empty_action_url=create_url empty_action_label="پروژه جدید" only %}{% endif %}
+        </section>
+        {% include "components/list_pagination.html" with page_obj=page_obj pagination_query=pagination_query result_label="پروژه" only %}
+    </div>
+</div>
 {% endblock %}

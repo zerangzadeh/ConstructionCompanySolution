@@ -1,0 +1,127 @@
+{
+  "mode": "apply",
+  "contract_number": "UAT-REC-02-03",
+  "tenant": "demo-construction-02",
+  "project_code": "PRJ-02-03",
+  "project_name": "بازسازی کارخانه نوآوران",
+  "contract_value": "196200000000.00",
+  "source_contract": "CTR-02-03-01",
+  "policy_id": "c8e9de14-242d-4866-aa67-463f85a892f8",
+  "policy_parameters": {
+    "tax_rate": "10",
+    "tax_basis": "gross",
+    "insurance_rate": "6.6",
+    "insurance_basis": "gross"
+  },
+  "policy_authority_extension_required": "Reuse existing published configuration only on this NEW local demo contract; no legal/statutory/production assertion and no Platform policy change.",
+  "planned_claim_states": [
+    "approved",
+    "submitted",
+    "returned",
+    "draft"
+  ],
+  "returned_claim_creates_linked_draft_revision": true,
+  "periods": [
+    {
+      "start": "2026-10-24",
+      "end": "2026-10-25"
+    },
+    {
+      "start": "2026-10-26",
+      "end": "2026-10-27"
+    },
+    {
+      "start": "2026-10-28",
+      "end": "2026-10-29"
+    },
+    {
+      "start": "2026-10-30",
+      "end": "2026-10-31"
+    }
+  ],
+  "contract_id": "ac494a22-bf60-4249-8cee-3cd828206861",
+  "contract_path": "/contracts/ac494a22-bf60-4249-8cee-3cd828206861/",
+  "claims": [
+    {
+      "number": 1,
+      "revision": 1,
+      "status": "approved",
+      "gross": "19620000000.0000",
+      "net": "20287080000.0000",
+      "path": "/billing/claims/01b8c11f-504d-48e9-b13f-09321155634a/"
+    },
+    {
+      "number": 2,
+      "revision": 1,
+      "status": "submitted",
+      "gross": "29430000000.0000",
+      "net": "30430620000.0000",
+      "path": "/billing/claims/40d90f07-688c-48a5-9264-e409bddb2598/"
+    },
+    {
+      "number": 3,
+      "revision": 1,
+      "status": "returned",
+      "gross": "49050000000.0000",
+      "net": "50717700000.0000",
+      "path": "/billing/claims/bafb467e-f3e2-4648-8e9e-1e64cf9af646/"
+    },
+    {
+      "number": 3,
+      "revision": 2,
+      "status": "draft",
+      "gross": "49050000000.0000",
+      "net": "50717700000.0000",
+      "path": "/billing/claims/f2e884dc-a51f-4595-8af4-c7761f2e1125/"
+    },
+    {
+      "number": 4,
+      "revision": 1,
+      "status": "draft",
+      "gross": "68670000000.0000",
+      "net": "71004780000.0000",
+      "path": "/billing/claims/a86ea752-4152-4923-a246-485a6bdf9adb/"
+    }
+  ],
+  "render_checks": [
+    {
+      "path": "/contracts/ac494a22-bf60-4249-8cee-3cd828206861/",
+      "status": 200
+    },
+    {
+      "path": "/billing/claims/01b8c11f-504d-48e9-b13f-09321155634a/",
+      "status": 200
+    },
+    {
+      "path": "/billing/claims/40d90f07-688c-48a5-9264-e409bddb2598/",
+      "status": 200
+    },
+    {
+      "path": "/billing/claims/bafb467e-f3e2-4648-8e9e-1e64cf9af646/",
+      "status": 200
+    },
+    {
+      "path": "/billing/claims/f2e884dc-a51f-4595-8af4-c7761f2e1125/",
+      "status": 200
+    },
+    {
+      "path": "/billing/claims/a86ea752-4152-4923-a246-485a6bdf9adb/",
+      "status": 200
+    }
+  ],
+  "protected_before": "c6a57ba855615a049c084df1a8569e911b52f735d82a156b38e1f8ac6d993734",
+  "protected_after": "c6a57ba855615a049c084df1a8569e911b52f735d82a156b38e1f8ac6d993734",
+  "downstream_finance_before": {
+    "JournalEntry": 0,
+    "Obligation": 0,
+    "TreasuryMovement": 0,
+    "PaymentRequest": 16
+  },
+  "downstream_finance_after": {
+    "JournalEntry": 0,
+    "Obligation": 0,
+    "TreasuryMovement": 0,
+    "PaymentRequest": 16
+  },
+  "policy_unchanged": true
+}

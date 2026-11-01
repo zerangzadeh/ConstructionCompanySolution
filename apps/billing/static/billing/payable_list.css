@@ -1,0 +1,29 @@
+/* Reuse the official Contracts list; only certificate column geometry differs. */
+.erp-payable-list .erp-payable-related { margin-top: 16px; }
+.erp-payable-list .erp-payable-net bdi { color: var(--bonira-royal-blue); font-weight: 700; }
+@media (min-width: 768px) {
+    .erp-payable-list .erp-responsive-list { min-width: 1100px; }
+    .erp-payable-list .erp-responsive-list th:nth-child(1) { width: 8%; }
+    .erp-payable-list .erp-responsive-list th:nth-child(2) { width: 12%; }
+    .erp-payable-list .erp-responsive-list th:nth-child(3) { width: 12%; }
+    .erp-payable-list .erp-responsive-list th:nth-child(4) { width: 16%; }
+    .erp-payable-list .erp-responsive-list th:nth-child(5),
+    .erp-payable-list .erp-responsive-list th:nth-child(6),
+    .erp-payable-list .erp-responsive-list th:nth-child(7) { width: 11%; }
+    .erp-payable-list .erp-responsive-list th:nth-child(8) { width: 10%; }
+    .erp-payable-list .erp-responsive-list th:nth-child(9) { width: 7%; }
+    .erp-payable-list .erp-responsive-list th:last-child { width: 4%; }
+    .erp-payable-list .erp-responsive-list .erp-list-amount { text-align: end; }
+    .erp-payable-list .erp-payable-period { white-space: nowrap; font-size: 11px; }
+}
+@media (max-width: 767px) {
+    .erp-payable-list .erp-list-heading > header { flex-wrap: wrap; }
+    .erp-payable-list .erp-list-heading p { max-width: none; }
+    .erp-payable-list .erp-list-heading h1 { font-size: 20px; }
+    .erp-payable-list .erp-list-toolbar { align-items: start; }
+}
+
+@media (min-width: 1280px) {
+    .erp-payable-list .erp-list-options:not(:has([name="project"])) { flex-basis: 680px; }
+}
+.erp-payable-list .erp-list-status .erp-badge { max-width: 100%; white-space: normal; text-align: center; }

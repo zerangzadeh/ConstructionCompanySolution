@@ -1,0 +1,33 @@
+/* Billing content follows the official Contracts list palette and density. */
+.billing-progress-list [data-billing-navigation], .billing-baseline-detail [data-billing-navigation] { margin-bottom: 18px; }
+.billing-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-block: 16px; }
+.billing-summary__item { border: 1px solid var(--bonira-light-gray); border-radius: 12px; background: var(--bonira-white); padding: 14px 16px; box-shadow: 0 2px 5px rgb(14 39 70 / 4%); }
+.billing-items { margin-top: 18px; border: 1px solid var(--bonira-light-gray); border-radius: 12px; background: var(--bonira-white); overflow: hidden; }
+.billing-progress-list .erp-responsive-list .erp-list-title { width: 46%; }
+@media (min-width: 768px) {
+ .billing-progress-list .erp-responsive-list { min-width: 800px; }
+ .billing-progress-list .erp-responsive-list th:nth-child(n), .billing-baseline-detail .erp-responsive-list th:nth-child(n) { width: auto; }
+ .billing-progress-list .erp-responsive-list th:first-child { width: 46%; }
+ .billing-progress-list .erp-list-status { min-width: 155px; }
+ .billing-baseline-detail .erp-responsive-list { min-width: 720px; }
+ .billing-baseline-detail .erp-responsive-list th:nth-child(2) { width: 36%; }
+}
+@media (max-width: 767px) {
+ .billing-summary { grid-template-columns: 1fr; gap: 8px; }
+ .billing-summary__item { display: flex; align-items: center; justify-content: space-between; padding: 12px; }
+ .billing-summary__item p { margin: 0; }
+ .billing-baseline-detail .erp-list-heading h1 { font-size: 20px; }
+ .billing-progress-list .erp-responsive-list .erp-list-title { width: auto; }
+ .billing-progress-list .erp-list-search { flex-wrap: wrap; }
+ .billing-progress-list .erp-list-search__input { min-width: 0; }
+ .billing-progress-list .erp-list-status .erp-badge { white-space: normal; }
+ .billing-baseline-detail .billing-items { background: transparent; border: 0; }
+ .billing-baseline-detail .billing-items > div:first-child { padding-inline: 0; border: 0; }
+}
+@media (max-width: 767px) {
+ .billing-progress-list .erp-responsive-list td[colspan], .billing-baseline-detail .erp-responsive-list td[colspan] { grid-column: 1 / -1; }
+}
+.billing-progress-list .erp-list-search__submit { display: inline-flex; flex-shrink: 0; }
+.billing-progress-list .erp-list-search__input input { padding-inline-start: 38px; }
+.billing-progress-list .erp-list-search { display: flex; align-items: center; gap: 10px; }
+.billing-progress-list .erp-list-search__input { flex: 1; min-width: 0; }

@@ -1,0 +1,109 @@
+/* Projects only. Canonical BONIRA tokens come from the shared reference-list CSS. */
+.erp-project-list .erp-list-search { flex: 1; }
+.erp-project-list .erp-list-options { flex: 1.4; }
+.erp-project-list .erp-list-more__fields { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.erp-project-list .erp-responsive-list th:nth-child(1) { width: 12%; }
+.erp-project-list .erp-responsive-list th:nth-child(2) { width: 23%; }
+.erp-project-list .erp-responsive-list th:nth-child(3) { width: 9%; }
+.erp-project-list .erp-responsive-list th:nth-child(4), .erp-project-list .erp-responsive-list th:nth-child(5) { width: 16%; }
+.erp-project-list .erp-responsive-list th:nth-child(6), .erp-project-list .erp-responsive-list th:nth-child(7) { width: 9%; }
+.erp-project-list .erp-responsive-list th:last-child { width: 6%; }
+.erp-project-description { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.erp-command-center { color: var(--bonira-ink); }
+.erp-command-center h1 { font-size: 23px; font-weight: 600; }
+.erp-command-center h2 { font-size: 13px; font-weight: 600; }
+.erp-project-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.erp-project-eyebrow { color: var(--bonira-royal-blue); font-size: 11px; margin-bottom: 3px; }
+.erp-project-heading__identity { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.erp-project-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; color: var(--bonira-muted); font-size: 11px; margin-top: 7px; }
+.erp-project-meta > bdi { color: var(--bonira-deep-navy); background: var(--bonira-light-gray); border-radius: 4px; padding: 2px 6px; font-feature-settings: normal; }
+.erp-project-tabs { display: flex; flex-wrap: wrap; gap: 2px 16px; padding-inline: 12px; border-bottom: 1px solid var(--bonira-light-gray); background: var(--bonira-white); border-radius: 8px 8px 0 0; }
+.erp-project-tabs a { padding-block: 11px; font-size: 11px; color: var(--bonira-slate); border-bottom: 2px solid transparent; }
+.erp-project-tabs a:hover, .erp-project-tabs a.is-current { border-color: var(--bonira-royal-blue); color: var(--bonira-royal-blue); }
+.erp-project-kpis { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); margin-block: 14px; gap: 10px; }
+.erp-project-kpis article { min-width: 0; background: var(--bonira-white); border: 1px solid var(--bonira-light-gray); border-radius: 8px; padding: 12px 14px; position: relative; }
+.erp-project-kpis article > p { color: var(--bonira-slate); font-size: 11px; }
+.erp-project-kpi-value { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px; margin-block: 8px 4px; }
+.erp-project-kpi-value bdi { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.erp-project-kpi-value span, .erp-project-kpis small { font-size: 10px; color: var(--bonira-muted); }
+.erp-project-kpis article > a { display: inline-block; margin-top: 6px; font-size: 10px; color: var(--bonira-royal-blue); }
+.erp-project-analytics { display: grid; grid-template-columns: minmax(0,1.25fr) minmax(0,1fr); gap: 14px; }
+.erp-project-analytics > :only-child { grid-column: 1 / -1; }
+.erp-project-panel { min-width: 0; background: var(--bonira-white); border: 1px solid var(--bonira-light-gray); border-radius: 8px; overflow: hidden; }
+.erp-project-chart { padding: 14px 16px 8px; }
+.erp-project-chart figcaption p, .erp-project-section-heading p { margin-top: 4px; font-size: 11px; color: var(--bonira-muted); line-height: 1.8; }
+.erp-project-chart__canvas { display: none; position: relative; height: 160px; margin-top: 10px; min-width: 0; max-width: 100%; }
+.erp-project-chart__canvas[data-chart-ready] { display: block; }
+.erp-project-chart__canvas canvas { max-width: 100%; }
+.erp-project-chart__values { margin-top: 12px; border-top: 1px solid var(--bonira-light-gray); font-size: 11px; }
+.erp-project-chart__values > div { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; padding-block: 6px; }
+.erp-project-chart__values dt { color: var(--bonira-slate); }
+.erp-project-chart__values dd { font-weight: 500; font-variant-numeric: tabular-nums; }
+.erp-project-chart__values dd span { color: var(--bonira-muted); font-size: 10px; font-weight: 400; }
+.erp-project-chart__empty { min-height: 150px; display: grid; place-content: center; gap: 8px; text-align: center; color: var(--bonira-muted); font-size: 12px; }
+.erp-project-chart__empty > span { font-size: 24px; }
+.erp-project-coverage { margin: 8px 16px; padding: 8px 10px; background: var(--color-warning-soft, rgb(217 119 6 / 8%)); color: var(--color-warning, #D97706); border-radius: 6px; font-size: 11px; line-height: 1.9; }
+.erp-project-note { font-size: 11px; color: var(--bonira-muted); line-height: 1.9; padding: 4px 16px 10px; }
+.erp-project-evidence { margin: 8px 16px 14px; font-size: 11px; }
+.erp-project-evidence summary { cursor: pointer; color: var(--bonira-royal-blue); }
+.erp-project-evidence ul { margin-top: 10px; }
+.erp-project-evidence li { padding-block: 6px; overflow-wrap: anywhere; border-top: 1px solid var(--bonira-light-gray); }
+.erp-project-evidence__totals { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; color: var(--bonira-slate); }
+.erp-project-progress { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; border: 1px solid var(--bonira-light-gray); border-radius: 8px; padding: 12px 16px; margin-top: 14px; background: var(--bonira-soft); }
+.erp-project-progress p { margin-top: 4px; font-size: 11px; color: var(--bonira-muted); }
+.erp-project-progress a { font-size: 11px; color: var(--bonira-royal-blue); }
+.erp-command-center #commercial-summary { margin-top: 14px; padding: 14px 16px; border-radius: 8px; box-shadow: none; }
+.erp-command-center #commercial-summary > p { font-size: 11px; margin-top: 2px; }
+.erp-command-center #commercial-summary > div { margin-top: 12px; gap: 12px; }
+.erp-command-center #commercial-summary article { background: var(--bonira-soft); padding: 12px; border-color: var(--bonira-light-gray); }
+.erp-command-center #commercial-summary article > div:last-child { margin-top: 12px; gap: 10px; font-size: 11px; }
+.erp-project-operations { display: grid; grid-template-columns: minmax(0,1.5fr) minmax(0,1fr); gap: 14px; margin-top: 14px; }
+.erp-project-operations > :only-child { grid-column: 1 / -1; }
+.erp-project-section-heading { padding: 14px 16px; border-bottom: 1px solid var(--bonira-light-gray); }
+.erp-project-recent ul { padding-inline: 16px; }
+.erp-project-recent li { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-bottom: 1px solid var(--bonira-light-gray); padding-block: 10px; }
+.erp-project-recent li:last-child { border: 0; }
+.erp-project-recent li > div { min-width: 0; }
+.erp-project-record-kind { font-size: 10px; color: var(--bonira-muted); }
+.erp-project-recent a { display: block; font-size: 12px; font-weight: 500; overflow-wrap: anywhere; }
+.erp-project-recent a:hover { color: var(--bonira-royal-blue); text-decoration: underline; }
+.erp-project-recent time { font-size: 10px; color: var(--bonira-muted); display: block; margin-top: 3px; }
+.erp-project-quick { display: grid; grid-template-columns: 1fr 1fr; padding: 12px 16px; gap: 10px; }
+.erp-project-quick a { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 10px; background: var(--bonira-soft); border: 1px solid var(--bonira-light-gray); border-radius: 6px; font-size: 11px; color: var(--bonira-deep-navy); }
+.erp-project-quick a:hover { border-color: var(--bonira-royal-blue); color: var(--bonira-royal-blue); }
+.erp-project-information { margin-top: 14px; }
+.erp-project-information dl { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px 24px; padding: 16px; }
+.erp-project-information dt { color: var(--bonira-muted); font-size: 11px; }
+.erp-project-information dd { font-size: 12px; margin-top: 4px; overflow-wrap: anywhere; }
+.erp-project-information #description { padding: 0 16px 16px; }
+.erp-project-information h3 { font-size: 12px; font-weight: 600; }
+.erp-project-information #description p { color: var(--bonira-slate); font-size: 12px; margin-top: 8px; line-height: 1.9; }
+.erp-project-information form { border-top: 1px solid var(--bonira-light-gray); padding: 12px 16px; }
+.erp-project-archive { color: var(--color-danger, #B91C1C); font-size: 11px; padding: 8px 12px; border: 1px solid currentColor; border-radius: 6px; }
+.erp-command-center section[id] { scroll-margin-top: 80px; }
+@media (max-width: 1199px) {
+    .erp-project-analytics, .erp-project-operations { grid-template-columns: 1fr; }
+    .erp-project-information dl { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .erp-project-kpis { grid-template-columns: repeat(3,minmax(0,1fr)); }
+    .erp-project-list .erp-list-more__fields { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 639px) {
+    .erp-project-heading { flex-wrap: wrap; gap: 10px; }
+    .erp-command-center h1 { font-size: 20px; }
+    .erp-project-meta { gap: 5px 10px; }
+    .erp-project-kpis { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+    .erp-project-kpis article { padding: 10px; }
+    .erp-project-kpi-value bdi { font-size: 17px; }
+    .erp-project-kpi-value span { font-size: 9px; }
+    .erp-project-chart__canvas { height: 180px; }
+    .erp-project-chart, .erp-project-section-heading { padding: 12px; }
+    .erp-project-tabs { gap: 0 14px; padding-inline: 10px; }
+    .erp-project-tabs a { font-size: 10px; padding-block: 9px; }
+    .erp-project-information dl, .erp-project-list .erp-list-more__fields { grid-template-columns: 1fr; }
+    .erp-project-progress { padding: 10px 12px; }
+}
+
+.erp-project-chart__values dt::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 2px; margin-inline-end: 6px; background: var(--bonira-royal-blue); }
+.erp-project-chart__values > div:nth-child(2) dt::before { background: var(--bonira-deep-navy); }
+.erp-project-chart__values > div:nth-child(3) dt::before { background: var(--bonira-muted); }
+.erp-project-chart__values > div:nth-child(4) dt::before { background: var(--bonira-light-gray); }

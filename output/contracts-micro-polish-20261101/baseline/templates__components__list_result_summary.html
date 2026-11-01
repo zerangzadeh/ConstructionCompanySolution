@@ -1,0 +1,2 @@
+{% load erp_format %}
+<p class="erp-list-result" role="status" data-filter-result-count><strong>{{ bar.result_count|erp_number }}</strong> {{ bar.result_label }}{% if not bar.chips and not bar.form.errors %}<span class="erp-list-muted"> · همه نتایج مجاز</span>{% endif %}</p>

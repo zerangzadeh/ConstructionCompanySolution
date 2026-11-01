@@ -1,0 +1,8 @@
+{% load table_filters %}
+<div class="erp-list-toolbar" role="group" aria-label="نتایج و مرتب‌سازی">
+    {% include "components/list_result_summary.html" with bar=list_ui.bar reference_layout=True only %}
+    <details class="erp-list-sort-menu">
+        <summary class="erp-list-sort" data-list-sort-summary><span>مرتب‌سازی:</span> <strong>{{ list_ui.sort.label }}</strong><span class="erp-list-sort__direction"> · {{ list_ui.sort.descending|yesno:"نزولی,صعودی" }}</span><span aria-hidden="true">⌄</span></summary>
+        <div class="erp-list-sort-menu__options" aria-label="انتخاب مرتب‌سازی">{% for option in list_ui.sorts %}{% table_sort_header option.key option.label %}{% endfor %}</div>
+    </details>
+</div>

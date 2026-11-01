@@ -1,0 +1,29 @@
+ apps/accounts/static/js/erp_filter_bar.js          |  26 +++++
+ .../billing/templates/billing/baseline_detail.html |   5 +-
+ apps/billing/templates/billing/baseline_list.html  |  41 +++++--
+ apps/billing/templates/billing/journey_nav.html    |   2 +-
+ .../billing/payable_certificate_detail.html        |  71 +++++++++---
+ .../billing/payable_certificate_list.html          |  54 +++++++--
+ apps/billing/views.py                              |  53 +++++----
+ apps/contracts/forms.py                            |  28 ++++-
+ apps/contracts/test_filter_bar.py                  |  39 +++++++
+ apps/contracts/views.py                            | 128 +++++++++++++++++++--
+ apps/projects/business_hub.py                      |   5 +
+ apps/projects/views.py                             |  63 +++++++---
+ docs/governance/mvp/MVP-03_COMPLETION_REPORT.md    |  64 ++++++++++-
+ docs/ui-guidelines.md                              | 102 ++++++++++++++--
+ graphify-out/cache/last_query_stamp                |   2 +-
+ .../browser/f61-owner-P-project-hub-desktop.png    | Bin 122342 -> 129363 bytes
+ .../browser/f61-owner-Q-project-hub-mobile.png     | Bin 144659 -> 159300 bytes
+ .../f61-owner-R-project-contracts-filter.png       | Bin 96325 -> 104266 bytes
+ scripts/verification/mvp02_browser.mjs             |  37 +++++-
+ templates/base.html                                |   5 +-
+ templates/components/README.md                     |  64 +++++++++++
+ templates/components/filter_bar.html               |  49 ++++----
+ templates/components/page_header.html              |   2 +-
+ templates/contracts/create.html                    |  76 +++++++++---
+ templates/contracts/detail.html                    |  66 ++++++-----
+ templates/contracts/list.html                      |  58 ++++++++--
+ templates/projects/detail.html                     |  94 +++++----------
+ templates/projects/list.html                       |  75 ++++++------
+ 28 files changed, 926 insertions(+), 283 deletions(-)

@@ -1,0 +1,214 @@
+.....................F.                                                  [100%]
+================================== FAILURES ===================================
+_ BillingJourneyNavigationBrowserTests.test_all_tabs_global_scoped_empty_single_multiple_and_restricted _
+
+self = <apps.billing.test_journey_navigation.BillingJourneyNavigationBrowserTests testMethod=test_all_tabs_global_scoped_empty_single_multiple_and_restricted>
+
+    def test_all_tabs_global_scoped_empty_single_multiple_and_restricted(self):
+        self.make_fixture(persian=True)
+        claims = reverse("billing:claim_list")
+        baselines = reverse("billing:baseline_list")
+        progress = reverse("billing:progress_list")
+        query = f"?contract={self.contract.pk}"
+        base = {
+            "status": 200,
+            "screenshot": True,
+            "traceNavigation": True,
+            "noJsErrors": True,
+            "noHttpErrors": True,
+        }
+    
+        def cycle(name, start, baseline_destination, *, scoped=False, mobile=False):
+            suffix = query if scoped else ""
+            steps = []
+            for tab, destination in (
+                ("baselines", baseline_destination),
+                ("progress", progress),
+                ("claims", claims),
+            ):
+                steps.append(
+                    {
+                        "clickSelector": f"[data-journey-tab={tab}]",
+                        "afterPath": destination,
+                    }
+                )
+                steps.append(
+                    {
+                        "inspect": f"document.querySelector('[data-journey-tab={tab}]').getAttribute('aria-current')==='page' && document.querySelector('[data-journey-tab=claims]').getAttribute('href')==={claims + suffix!r} && !/\\/billing\\/claims\\/[^/?]+\\//.test(location.pathname)",
+                        "description": "correct destination, active tab and contract context; no Claim Detail",
+                    }
+                )
+            return {
+                **base,
+                "name": name,
+                "path": start,
+                "mobile": mobile,
+                "steps": steps,
+            }
+    
+        claim = None
+        for stage in ("empty", "single", "multiple"):
+            if stage == "single":
+                claim = self._claim()
+            if stage == "multiple":
+                self._baseline()
+            target = (
+                reverse("billing:baseline_detail", args=[claim.baseline_id])
+                if stage == "single"
+                else baselines
+            )
+            scenarios = []
+            for mobile in (False, True):
+                device = "mobile" if mobile else "desktop"
+                scenarios.extend(
+                    [
+                        cycle(
+                            f"{stage}-global-{device}", claims, baselines, mobile=mobile
+                        ),
+                        cycle(
+                            f"{stage}-scoped-{device}",
+                            claims + query,
+                            target,
+                            scoped=True,
+                            mobile=mobile,
+                        ),
+                    ]
+                )
+            if claim:
+                scenarios.append(
+                    cycle(
+                        f"{stage}-from-claim-detail",
+                        reverse("billing:claim_detail", args=[claim.pk]),
+                        target,
+                        scoped=True,
+                    )
+                )
+>           self.browser(self.owner, scenarios)
+
+apps\billing\test_journey_navigation.py:207: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:287
+E           if(i===199) throw new Error(scenario.name+': interaction did not settle '+JSON.stringify(settled));
+E                             ^
+E   
+E   Error: single-scoped-mobile: interaction did not settle {"ready":"complete","path":"/billing/baselines/abc1cd3a-e8f7-420b-ba90-fa13c413d273/","text":"\u0631\u0641\u062a\u0646 \u0628\u0647 \u0645\u062d\u062a\u0648\u0627\u06cc \u0627\u0635\u0644\u06cc\\nF61\\nF\\n\u0634\u0631\u06a9\u062a\\nF61\\n\u067e\u0631\u0648\u0698\u0647\\n\u0647\u0645\u0647 \u067e\u0631\u0648\u0698\u0647\u200c\u0647\u0627\u06cc \u062f\u0631 \u062f\u0633\u062a\u0631\u0633\\nF61-P \u2014 Baseline project\\n\u0627\u0646\u062a\u062e\u0627\u0628 \u067e\u0631\u0648\u0698\u0647 \u0648 \u06a9\u0627\u0631\u06af\u0627\u0647\\n\u062e\u0627\u0646\u0647\\n\u067e\u06cc\u0645\u0627\u0646\u060c \u0645\u062a\u0631\u0647 \u0648 \u0635\u0648\u0631\u062a\u200c\u0648\u0636\u0639\u06cc\u062a\\nBaseline project\\n\u0642\u0631\u0627\u0631\u062f\u0627\u062f\u0647\u0627\\n\u0627\u062c\u0631\u0627\u06cc \u0633\u0627\u0632\u0647 \u0628\u062a\u0646\u06cc\\n\u0646\u0633\u062e\u0647\u200c\u0647\u0627\u06cc \u0645\u0628\u0646\u0627\\n\u0645\u0628\u0646\u0627\u06cc \u0645\u062a\u0631\u0647 \u0648 \u0635\u0648\u0631\u062a\u200c\u0648\u0636\u0639\u06cc\u062a\\n\\nBaseline project\\n\\n\u0627\u062c\u0631\u0627\u06cc \u0633\u0627\u0632\u0647 \u0628\u062a\u0646\u06cc\\n\\n\u0646\u0633\u062e\u0647 \u0648 \u0631\u062f\u06cc\u0641\u200c\u0647\u0627\u06cc \u0645\u0628\u0646\u0627\u06cc \u0645\u062a\u0631\u0647 \u0648 \u0635\u0648\u0631\u062a\u200c\u0648\u0636\u0639\u06cc\u062a\\n\\n\u0635\u0648\u0631\u062a\u200c\u0648\u0636\u0639\u06cc\u062a \u062c\u062f\u06cc\u062f\\n\u0647\u0645\u0647 \u0646\u0633\u062e\u0647\u200c\u0647\u0627\u06cc \u0627\u06cc\u0646 \u0642\u0631\u0627\u0631\u062f\u0627\u062f\\n\u0635\u0648\u0631\u062a\u200c\u0648\u0636\u0639\u06cc\u062a\u200c\u0647\u0627\\n\u0645\u0628\u0646\u0627\u06cc \u0645\u062a\u0631\u0647 \u0648 \u0635\u0648\u0631\u062a\u200c\u0648\u0636\u0639\u06cc\u062a\\n\u06a9\u0627\u0631\u06a9\u0631\u062f \u0648 \u067e\u06cc\u0634\u0631\u0641\u062a\\n\\n\u0646\u0633\u062e\u0647\\n\\n1\\n\\n\u0633\u0642\u0641 \u0645\u0624\u062b\u0631\\n\\n120\\n\\n\u0648\u0636\u0639\u06cc\u062a\\n\\n\u062a\u0623\u06cc\u06cc\u062f\u0634\u062f\u0647\\n\\n\u0631\u062f\u06cc\u0641\u200c\u0647\u0627\u06cc \u0645\u0628\u0646\u0627\\n\u0631\u062f\u06cc\u0641\\t\u0634\u0631\u062d\\t\u0645\u0642\u062f\u0627\u0631\\t\u0646\u0631\u062e\\t\u0627\u0631\u0632\u0634\\n1\\tConcrete work\\t1 m3\\t120\\t120"}
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:287:27
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-01T17:22:42.010413+00:00","event":"http.response","request_id":"216a7ae9-e35a-49b7-8641-57b30c09a06d","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":738}
+
+{"timestamp":"2026-11-01T17:22:45.015743+00:00","event":"http.response","request_id":"595a3705-8784-405c-b4d5-20cc4307f146","method":"GET","route":null,"status_code":404,"duration_ms":701}
+
+{"timestamp":"2026-11-01T17:22:45.347234+00:00","event":"http.response","request_id":"70de2dfc-82c7-4185-a344-5638d315e688","method":"GET","route":"billing:baseline_list","status_code":200,"duration_ms":810}
+
+{"timestamp":"2026-11-01T17:22:46.289847+00:00","event":"http.response","request_id":"708d28e7-b22e-45a3-a83b-f6bcc1682d99","method":"GET","route":"billing:progress_list","status_code":200,"duration_ms":535}
+
+{"timestamp":"2026-11-01T17:22:47.504901+00:00","event":"http.response","request_id":"37b911f9-f53e-47aa-be0c-b3b9fc663594","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":809}
+
+{"timestamp":"2026-11-01T17:22:48.992255+00:00","event":"http.response","request_id":"e7cef9f9-0670-4c27-b3a4-833099b4a617","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":926}
+
+{"timestamp":"2026-11-01T17:22:50.006552+00:00","event":"http.response","request_id":"bedccb29-2ead-4f08-b0dd-bdaba690da2a","method":"GET","route":"billing:baseline_list","status_code":200,"duration_ms":690}
+
+{"timestamp":"2026-11-01T17:22:50.986521+00:00","event":"http.response","request_id":"81f4339e-1e72-4d59-b887-ba64d040c6a6","method":"GET","route":"billing:progress_list","status_code":200,"duration_ms":659}
+
+{"timestamp":"2026-11-01T17:22:52.144663+00:00","event":"http.response","request_id":"c4c69b1e-60da-47ef-9362-0abb0bd682f3","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":816}
+
+{"timestamp":"2026-11-01T17:22:53.286698+00:00","event":"http.response","request_id":"9d001aa0-551b-4067-a67b-58c7eeb23e4d","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":605}
+
+{"timestamp":"2026-11-01T17:22:54.006642+00:00","event":"http.response","request_id":"15a0938b-4074-4d88-9ccd-8b78f9c12fd0","method":"GET","route":"billing:baseline_list","status_code":200,"duration_ms":395}
+
+{"timestamp":"2026-11-01T17:22:54.729860+00:00","event":"http.response","request_id":"4328284b-1e89-4dce-a653-b6a11c6a6133","method":"GET","route":"billing:progress_list","status_code":200,"duration_ms":400}
+
+{"timestamp":"2026-11-01T17:22:55.690448+00:00","event":"http.response","request_id":"09176bd7-e9cc-4664-aeb3-2ce3885329ad","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":625}
+
+{"timestamp":"2026-11-01T17:22:57.151387+00:00","event":"http.response","request_id":"fe663fee-5847-4a37-8b74-c7e1a1dc6834","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":898}
+
+{"timestamp":"2026-11-01T17:22:58.147107+00:00","event":"http.response","request_id":"13ec4e0b-5c36-41db-a0f5-ae7f06923b86","method":"GET","route":"billing:baseline_list","status_code":200,"duration_ms":652}
+
+{"timestamp":"2026-11-01T17:22:59.087497+00:00","event":"http.response","request_id":"1d87a046-b105-4451-a17e-12879a3a6614","method":"GET","route":"billing:progress_list","status_code":200,"duration_ms":631}
+
+{"timestamp":"2026-11-01T17:23:00.549040+00:00","event":"http.response","request_id":"befe19a5-29dd-49e5-a645-fe38e0b2e4a1","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":992}
+
+[01/Nov/2026 20:53:01,851] - Broken pipe from ('127.0.0.1', 65184)
+
+[01/Nov/2026 20:53:01,910] - Broken pipe from ('127.0.0.1', 55451)
+
+{"timestamp":"2026-11-01T17:23:06.673670+00:00","event":"http.response","request_id":"2c758f22-30c3-4965-bd83-12f24104e897","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":946}
+
+{"timestamp":"2026-11-01T17:23:08.438622+00:00","event":"http.response","request_id":"93d20029-ccc7-4393-9216-fa7737c5669b","method":"GET","route":null,"status_code":404,"duration_ms":489}
+
+{"timestamp":"2026-11-01T17:23:08.644891+00:00","event":"http.response","request_id":"1145b73a-3a89-43cb-a80f-f5bf04913766","method":"GET","route":"billing:baseline_list","status_code":200,"duration_ms":597}
+
+{"timestamp":"2026-11-01T17:23:09.661268+00:00","event":"http.response","request_id":"a3160cc2-26bf-4c66-be63-d2bb4b44eb9a","method":"GET","route":"billing:progress_list","status_code":200,"duration_ms":542}
+
+{"timestamp":"2026-11-01T17:23:10.751434+00:00","event":"http.response","request_id":"4cc112eb-2c34-420f-9185-8e0d9e7b66eb","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":695}
+
+{"timestamp":"2026-11-01T17:23:12.315052+00:00","event":"http.response","request_id":"835efde9-8f55-42c9-9dfd-e48ee296629d","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":1003}
+
+{"timestamp":"2026-11-01T17:23:13.062791+00:00","event":"http.response","request_id":"4609b0e8-103c-48e8-a523-545b81d9fad7","method":"GET","route":"billing:baseline_list","status_code":302,"duration_ms":400}
+
+{"timestamp":"2026-11-01T17:23:13.808337+00:00","event":"http.response","request_id":"1e7a831b-8482-462a-b126-6d53cc55b059","method":"GET","route":"billing:baseline_detail","status_code":200,"duration_ms":740}
+
+{"timestamp":"2026-11-01T17:23:14.940113+00:00","event":"http.response","request_id":"08b95b36-8bea-40b2-ac0f-fa474c00f229","method":"GET","route":"billing:progress_list","status_code":200,"duration_ms":622}
+
+{"timestamp":"2026-11-01T17:23:16.161713+00:00","event":"http.response","request_id":"02487f02-e729-4ec3-a07a-79ea63de1d6d","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":895}
+
+{"timestamp":"2026-11-01T17:23:17.257089+00:00","event":"http.response","request_id":"fda15f03-df2e-4700-af38-dc3ed5daea3b","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":585}
+
+{"timestamp":"2026-11-01T17:23:18.072019+00:00","event":"http.response","request_id":"98f9c5fb-4a6c-43ad-84cb-3f5b3910648e","method":"GET","route":"billing:baseline_list","status_code":200,"duration_ms":493}
+
+{"timestamp":"2026-11-01T17:23:18.833803+00:00","event":"http.response","request_id":"5487f9b2-762d-43a8-a641-93ab285683cd","method":"GET","route":"billing:progress_list","status_code":200,"duration_ms":431}
+
+{"timestamp":"2026-11-01T17:23:19.827200+00:00","event":"http.response","request_id":"8818867b-c752-455f-af4f-de2b1c182959","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":675}
+
+{"timestamp":"2026-11-01T17:23:21.180141+00:00","event":"http.response","request_id":"d30691ba-8db4-4c0e-8001-3649fcb77b12","method":"GET","route":"billing:claim_list","status_code":200,"duration_ms":843}
+
+{"timestamp":"2026-11-01T17:23:21.925532+00:00","event":"http.response","request_id":"ee842fce-47db-4198-8ebe-65a1efbad707","method":"GET","route":"billing:baseline_list","status_code":302,"duration_ms":421}
+
+{"timestamp":"2026-11-01T17:23:22.631394+00:00","event":"http.response","request_id":"c083d2d2-2d39-4ecc-9b89-77348e88bac5","method":"GET","route":"billing:baseline_detail","status_code":200,"duration_ms":702}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 65184)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 55451)
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+=========================== short test summary info ===========================
+FAILED apps/billing/test_journey_navigation.py::BillingJourneyNavigationBrowserTests::test_all_tabs_global_scoped_empty_single_multiple_and_restricted
+1 failed, 22 passed in 205.23s (0:03:25)

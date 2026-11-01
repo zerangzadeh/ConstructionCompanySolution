@@ -1,6 +1,7 @@
 """Read-only project context for the dedicated commercial workspaces."""
 
 from dataclasses import dataclass
+from datetime import datetime
 
 from django.db.models import Count, Q, QuerySet
 from django.http import Http404, HttpRequest
@@ -31,6 +32,8 @@ class CommercialSummary:
     recent_url: str = ""
     create_url: str = ""
     create_label: str = ""
+    recent_created_at: datetime | None = None
+    recent_state_code: str = ""
 
 
 def project_commercial_summary(
@@ -141,6 +144,8 @@ def project_commercial_summary(
                 else "",
                 create_url=create_url,
                 create_label=create_label,
+                recent_created_at=recent.created_at if recent else None,
+                recent_state_code=recent.status if recent else "",
             )
         )
     return tuple(cards)

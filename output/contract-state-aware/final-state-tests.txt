@@ -1,0 +1,243 @@
+..F...........                                               [100%]
+================================== FAILURES ===================================
+__ StateAwareDetailTests.test_each_existing_write_permission_is_independent ___
+
+self = <django.db.backends.utils.CursorWrapper object at 0x000001728CD72F50>
+sql = 'SELECT DISTINCT "contracts_contract"."id", "contracts_contract"."created_at", "contracts_contract"."updated_at", "con...s_at" > %s) AND U0."scope_type" = %s)) AND "contracts_contract"."id" = %s) LIMIT 21 FOR UPDATE OF "contracts_contract"'
+params = (UUID('f7d6bc57-0a1d-4235-8e09-fe66fe118d13'), UUID('f7d6bc57-0a1d-4235-8e09-fe66fe118d13'), UUID('9f73d09b-cae9-4ba8-..., tzinfo=datetime.timezone.utc), datetime.datetime(2026, 11, 1, 15, 27, 59, 909950, tzinfo=datetime.timezone.utc), ...)
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x000001728CD72F50>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+                return self.cursor.execute(sql)
+            else:
+>               return self.cursor.execute(sql, params)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.venv\Lib\site-packages\django\db\backends\utils.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <django.db.backends.postgresql.base.Cursor [closed] [INTRANS] (host=127.0.0.1 user=construction_erp_app database=test_bonira_contract_detail_ref_20261101) at 0x1728cddd160>
+query = 'SELECT DISTINCT "contracts_contract"."id", "contracts_contract"."created_at", "contracts_contract"."updated_at", "con...s_at" > %s) AND U0."scope_type" = %s)) AND "contracts_contract"."id" = %s) LIMIT 21 FOR UPDATE OF "contracts_contract"'
+params = (UUID('f7d6bc57-0a1d-4235-8e09-fe66fe118d13'), UUID('f7d6bc57-0a1d-4235-8e09-fe66fe118d13'), UUID('9f73d09b-cae9-4ba8-..., tzinfo=datetime.timezone.utc), datetime.datetime(2026, 11, 1, 15, 27, 59, 909950, tzinfo=datetime.timezone.utc), ...)
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.FeatureNotSupported: FOR UPDATE is not allowed with DISTINCT clause
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: FeatureNotSupported
+
+The above exception was the direct cause of the following exception:
+
+self = <apps.contracts.test_state_workspace.StateAwareDetailTests testMethod=test_each_existing_write_permission_is_independent>
+
+    def test_each_existing_write_permission_is_independent(self):
+        from apps.projects.test_command_center import scoped_reader
+    
+        editor, _role, _grant = scoped_reader(
+            self.organization,
+            self.project,
+            ["contracts.view", "contracts.change"],
+            username="base-only-editor",
+        )
+        self.login(editor)
+        r = self.client.get(self.state_url("draft-receivable"))
+        self.assertTrue(r.context["workspace"]["can_edit"])
+        self.assertFalse(r.context["workspace"]["can_add_item"])
+        self.assertFalse(r.context["workspace"]["can_terms"])
+        self.assertEqual(
+>           self.client.post(
+                self.state_url("draft-receivable"), self.base_data()
+            ).status_code,
+            302,
+        )
+
+apps\contracts\test_state_workspace.py:368: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\django\test\client.py:1156: in post
+    response = super().post(
+.venv\Lib\site-packages\django\test\client.py:499: in post
+    return self.generic(
+.venv\Lib\site-packages\django\test\client.py:671: in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\test\client.py:1090: in request
+    self.check_exception(response)
+.venv\Lib\site-packages\django\test\client.py:805: in check_exception
+    raise exc_value
+.venv\Lib\site-packages\django\core\handlers\exception.py:55: in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\handlers\base.py:197: in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:52: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\organizations\decorators.py:77: in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\views\decorators\http.py:64: in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\contracts\views.py:336: in contract_detail
+    anchor = submit_workspace_form(request, contract, workspace)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\contracts\detail_workspace.py:218: in submit_workspace_form
+    .get(pk=contract.pk)
+     ^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:631: in get
+    num = len(clone)
+          ^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:368: in __len__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <django.db.backends.postgresql.base.Cursor [closed] [INTRANS] (host=127.0.0.1 user=construction_erp_app database=test_bonira_contract_detail_ref_20261101) at 0x1728cddd160>
+query = 'SELECT DISTINCT "contracts_contract"."id", "contracts_contract"."created_at", "contracts_contract"."updated_at", "con...s_at" > %s) AND U0."scope_type" = %s)) AND "contracts_contract"."id" = %s) LIMIT 21 FOR UPDATE OF "contracts_contract"'
+params = (UUID('f7d6bc57-0a1d-4235-8e09-fe66fe118d13'), UUID('f7d6bc57-0a1d-4235-8e09-fe66fe118d13'), UUID('9f73d09b-cae9-4ba8-..., tzinfo=datetime.timezone.utc), datetime.datetime(2026, 11, 1, 15, 27, 59, 909950, tzinfo=datetime.timezone.utc), ...)
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           django.db.utils.NotSupportedError: FOR UPDATE is not allowed with DISTINCT clause
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: NotSupportedError
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-01T15:27:59.797454+00:00","event":"http.response","request_id":"1fabb203-4d02-427d-8fca-5e7b5b2d6901","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":188}
+
+{"timestamp":"2026-11-01T15:28:00.000099+00:00","event":"http.response","request_id":"cfd519bc-b28e-4b3c-a061-17b5ff1d09d0","method":"POST","route":"contracts:detail","status_code":500,"duration_ms":201}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+ERROR    django.request:log.py:253 Internal Server Error: /contracts/8a728a83-0fe7-47b0-9199-3a291adcdb3c/
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.FeatureNotSupported: FOR UPDATE is not allowed with DISTINCT clause
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\contracts\views.py", line 336, in contract_detail
+    anchor = submit_workspace_form(request, contract, workspace)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\contracts\detail_workspace.py", line 218, in submit_workspace_form
+    .get(pk=contract.pk)
+     ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 631, in get
+    num = len(clone)
+          ^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 368, in __len__
+    self._fetch_all()
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 1954, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 93, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1623, in execute_sql
+    cursor.execute(sql, params)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+django.db.utils.NotSupportedError: FOR UPDATE is not allowed with DISTINCT clause
+ERROR    bonira.request:telemetry.py:78 http.response
+=========================== short test summary info ===========================
+FAILED apps/contracts/test_state_workspace.py::StateAwareDetailTests::test_each_existing_write_permission_is_independent
+1 failed, 13 passed, 12 subtests passed in 159.71s (0:02:39)

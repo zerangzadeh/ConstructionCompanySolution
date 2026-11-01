@@ -1,21 +1,61 @@
 {% extends "base.html" %}
-
-{% block title %}قرارداد جدید | سامانه مدیریت ساخت{% endblock %}
-
-{% block extra_head %}{% load field_journey %}{% prepare_native_choices form %}{{ form.media.css }}{% endblock %}
-{% block extra_scripts %}{{ form.media.js }}{% endblock %}
+{% load static field_journey product_surface %}
+{% block title %}ایجاد قرارداد | بنیرا{% endblock %}
+{% block extra_head %}
+    {% prepare_native_choices form %}{{ form.media.css }}
+    <link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}">
+    <link rel="stylesheet" href="{% static 'css/erp_create_form.css' %}">
+{% endblock %}
+{% block extra_scripts %}
+    {{ form.media.js }}
+    <script src="{% static 'js/erp_create_form.js' %}" defer></script>
+{% endblock %}
 {% block content %}
-    <div class="mx-auto max-w-2xl">
-        {% include "components/page_header.html" with page_breadcrumbs=page_breadcrumbs page_breadcrumb_label="قراردادها" page_breadcrumb_url="/contracts/" page_eyebrow="پیمان، متره و صورت‌وضعیت" page_title="ایجاد قرارداد" page_description=request.organization.name only %}
-        <form class="erp-surface mt-6 space-y-5 rounded-xl p-5 sm:p-6" method="post" novalidate>
-            {% csrf_token %}{% include "workforce/_native_choices.html" with choice_form=form %}
-            {% include "components/form_errors.html" with form=form only %}
-{% include "components/business_create_context.html" %}
-{% for field in form.hidden_fields %}{{ field }}{% if field.errors %}<p class="text-sm text-red-700" role="alert">{{ field.label }}: {{ field.errors|join:", " }}</p>{% endif %}{% endfor %}
-            {% for field in form.visible_fields %}
-                {% include "components/form_field.html" with field=field only %}
-            {% endfor %}
-            <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-5"><button class="erp-btn erp-btn--primary" type="submit">ایجاد قرارداد</button><a class="erp-btn erp-btn--secondary" href="{{ cancel_url }}">انصراف</a></div>
-        </form>
-    </div>
+<div class="erp-create-page" data-create-page>
+    {% include "components/create_form_header.html" with page_title="ایجاد قرارداد" page_description="ثبت قرارداد جدید و مدیریت اطلاعات اصلی قرارداد." organization=request.organization form=form page_breadcrumbs=page_breadcrumbs only %}
+    <form class="erp-create-form" method="post" novalidate aria-label="ایجاد قرارداد">
+        {% csrf_token %}
+        {% include "workforce/_native_choices.html" with choice_form=form %}
+        {% include "components/form_errors.html" with form=form only %}
+        {% for field in form.hidden_fields %}{{ field }}{% if field.errors %}<p class="erp-field-error" role="alert">{{ field.label }}: {{ field.errors|join:", " }}</p>{% endif %}{% endfor %}
+        <section class="erp-form-section" aria-labelledby="contract-basic-heading">
+            {% include "components/form_section_header.html" with heading_id="contract-basic-heading" heading="اطلاعات پایه قرارداد" description="پروژه، شماره و عنوان اصلی قرارداد را مشخص کنید." icon="document" only %}
+            <div class="erp-form-grid erp-form-grid--two">
+                {% if not form.project.is_hidden %}
+                    {% include "components/form_field.html" with field=form.project only %}
+                {% else %}
+                    <div class="erp-form-parent"><span>پروژه</span><p>{% if form.inherited_parents.0.url|surface_url_exposed %}<a class="text-blue-700 hover:underline" href="{{ form.inherited_parents.0.url }}">{{ form.inherited_parents.0.title }}</a>{% else %}{{ form.inherited_parents.0.title }}{% endif %}{% if form.inherited_parents.0.code %}<bdi dir="ltr">{{ form.inherited_parents.0.code }}</bdi>{% endif %}</p></div>
+                {% endif %}
+                {% include "components/form_field.html" with field=form.contract_number only %}
+                <div class="erp-form-grid__full">{% include "components/form_field.html" with field=form.title only %}</div>
+            </div>
+        </section>
+        <section class="erp-form-section erp-form-section--compact" aria-labelledby="contract-party-heading">
+            {% include "components/form_section_header.html" with heading_id="contract-party-heading" heading="طرف قرارداد و دسته‌بندی" description="طرف قرارداد، سمت و نوع همکاری را تعیین کنید." icon="layers" only %}
+            <div class="erp-form-grid erp-form-grid--two">
+                {% include "components/form_field.html" with field=form.party only %}
+                {% include "components/form_field.html" with field=form.direction only %}
+                {% include "components/form_field.html" with field=form.contract_type only %}
+                {% include "components/form_field.html" with field=form.status only %}
+            </div>
+        </section>
+        <section class="erp-form-section erp-form-section--compact erp-form-section--inline" aria-labelledby="contract-value-heading">
+            {% include "components/form_section_header.html" with heading_id="contract-value-heading" heading="مبلغ و وضعیت" description="مبلغ قرارداد را به ریال وارد کنید." icon="coins" only %}
+            {% include "components/form_field.html" with field=form.contract_value only %}
+        </section>
+        <section class="erp-form-section erp-form-section--compact" aria-labelledby="contract-dates-heading">
+            {% include "components/form_section_header.html" with heading_id="contract-dates-heading" heading="تاریخ‌ها و زمان‌بندی" description="تاریخ‌های کلیدی قرارداد شامل امضا، شروع و پایان." icon="calendar" only %}
+            <div class="erp-form-grid erp-form-grid--three">
+                {% include "components/form_field.html" with field=form.signed_at only %}
+                {% include "components/form_field.html" with field=form.start_date only %}
+                {% include "components/form_field.html" with field=form.end_date only %}
+            </div>
+        </section>
+        <section class="erp-form-section" aria-labelledby="contract-notes-heading">
+            {% include "components/form_section_header.html" with heading_id="contract-notes-heading" heading="توضیحات" description="توضیحات تکمیلی و یادداشت‌های مرتبط با قرارداد." icon="notes" only %}
+            {% include "components/form_field.html" with field=form.notes only %}
+        </section>
+        {% include "components/form_footer.html" with submit_label="ایجاد قرارداد" cancel_url=cancel_url only %}
+    </form>
+</div>
 {% endblock %}

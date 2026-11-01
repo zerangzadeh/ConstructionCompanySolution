@@ -17,7 +17,7 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
-from apps.projects.business_hub import project_commercial_summary
+from apps.projects.dashboard import project_dashboard
 from apps.projects.forms import (
     ActivityForm,
     ProjectForm,
@@ -25,6 +25,7 @@ from apps.projects.forms import (
     ProjectSiteForm,
     WBSNodeForm,
 )
+from apps.projects.list_filters import ProjectListFilterForm
 from apps.projects.models import ProjectPhaseStatus, ProjectSite, ProjectStatus
 from apps.projects.services import (
     archive_activity,
@@ -49,13 +50,13 @@ from apps.projects.services import (
     get_organization_wbs_nodes,
     get_project_control_comparison,
     get_project_control_exceptions,
-    get_project_cost_projection,
     get_project_cost_reconciliation,
     transition_activity_status,
     transition_project_phase_status,
 )
 from core.list_filters import (
     apply_table_filters,
+    build_filter_bar,
     build_table_filters,
     has_active_table_filters,
     paginate_table,
@@ -74,13 +75,18 @@ def project_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
+    scoped_has_records = projects.exists()
+    filter_form = ProjectListFilterForm(request.GET)
+    valid_filters = filter_form.is_valid()
     projects = apply_table_filters(
         projects,
         request,
-        text_fields={"code": ("code",), "name": ("name",)},
+        text_fields={"q": ("code", "name"), "code": ("code",), "name": ("name",)},
         choice_fields={"status": ("status", ProjectStatus.values)},
         date_fields={"start_date": "start_date", "end_date": "end_date"},
     )
+    if not valid_filters:
+        projects = projects.none()
     page = paginate_table(
         projects,
         request,
@@ -95,6 +101,29 @@ def project_list(request: HttpRequest) -> HttpResponse:
         },
         default_ordering=("name", "pk"),
     )
+    sort_labels = {
+        "code": "کد پروژه",
+        "name": "نام پروژه",
+        "status": "وضعیت",
+        "start_date": "تاریخ شروع",
+        "end_date": "تاریخ پایان",
+        "estimated_budget": "بودجه تخمینی",
+        "actual_budget": "بودجه واقعی",
+    }
+    sort_key = request.GET.get("sort", "").strip()
+    filter_bar = build_filter_bar(
+        request,
+        form=filter_form,
+        quick_fields=("status",),
+        secondary_fields=tuple(
+            name
+            for name in filter_form.fields
+            if name not in {"q", "status"}
+            and (name not in {"code", "name"} or request.GET.get(name))
+        ),
+        result_count=page.paginator.count,
+        result_label="پروژه",
+    )
     return render(
         request,
         "projects/list.html",
@@ -103,6 +132,19 @@ def project_list(request: HttpRequest) -> HttpResponse:
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
             "pagination_rendered": True,
+            "filter_bar": filter_bar,
+            "clear_filters_url": filter_bar["clear_url"],
+            "scoped_has_records": scoped_has_records,
+            "list_sort": {
+                "label": sort_labels.get(sort_key, "نام پروژه"),
+                "descending": sort_key in sort_labels
+                and request.GET.get("direction", "asc").strip().lower() == "desc",
+            },
+            "can_create_project": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.PROJECTS_CREATE,
+            ),
             "filters": build_table_filters(
                 request,
                 [
@@ -164,25 +206,12 @@ def project_detail(request: HttpRequest, project_id: str) -> HttpResponse:
         organization=request.organization,
         project_id=project_id,
     )
-    cost_projection = None
-    if has_business_permission(
-        user=request.user,
-        organization=request.organization,
-        permission=BusinessPermissionCode.PROJECT_COSTS_VIEW,
-        project=project,
-    ):
-        cost_projection = get_project_cost_projection(
-            organization=request.organization,
-            project=project,
-            actor=request.user,
-        )
     return render(
         request,
         "projects/detail.html",
         {
             "project": project,
-            "cost_projection": cost_projection,
-            "commercial_summary": project_commercial_summary(request, project),
+            **project_dashboard(request, project),
         },
     )
 

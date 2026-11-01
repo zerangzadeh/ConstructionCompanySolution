@@ -2,6 +2,7 @@ from django import forms
 
 from apps.contracts.models import (
     Contract,
+    ContractDirection,
     ContractStatus,
     ContractualRecord,
     ContractualRecordKind,
@@ -71,7 +72,32 @@ class ContractForm(JalaliDateMixin, forms.ModelForm):
         self.fields.pop("counterparty_name")
         self.fields["party"].required = True
         self.fields["party"].label = "طرف قرارداد"
-        self.fields["direction"].label = "جهت قرارداد"
+        self.fields["direction"].label = "سمت قرارداد"
+        direction_labels = {
+            ContractDirection.RECEIVABLE: "با کارفرما",
+            ContractDirection.PAYABLE: "با پیمانکار / تأمین‌کننده",
+        }
+        self.fields["direction"].choices = [
+            (value, direction_labels.get(value, label))
+            for value, label in self.fields["direction"].choices
+        ]
+        for name in ("direction", "contract_type"):
+            self.fields[name].choices = [
+                (value, "انتخاب کنید…" if value == "" else label)
+                for value, label in self.fields[name].choices
+            ]
+        self.fields["contract_number"].widget.attrs.update(
+            {"placeholder": "مثال: CNT-1405-001", "dir": "ltr"}
+        )
+        self.fields["title"].widget.attrs["placeholder"] = (
+            "عنوان کوتاه و دقیق قرارداد را وارد کنید…"
+        )
+        self.fields["notes"].widget.attrs.update(
+            {
+                "rows": 2,
+                "placeholder": "نکات مهم و توضیحات مرتبط با قرارداد را وارد کنید…",
+            }
+        )
         for name in ("project", "party"):
             if name == "project" and context_project is not None:
                 continue

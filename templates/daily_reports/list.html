@@ -1,9 +1,61 @@
-{% extends "base.html" %}{% load table_filters %}
-{% block title %}گزارش‌های روزانه | سامانه مدیریت ساخت{% endblock %}
+{% extends "base.html" %}{% load static erp_format table_filters %}
+{% block title %}گزارش‌های روزانه | بنیرا{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}"><link rel="stylesheet" href="{% static 'daily_reports/list.css' %}">{% endblock %}
+{% block header_working_context %}{% if request.organization %}{% include "components/list_working_context.html" with request=request csrf_token=csrf_token active_project=active_project active_site=active_site context_projects=context_projects context_sites=context_sites context_requires_project=context_requires_project site_context_relevant=site_context_relevant header_layout=True only %}{% endif %}{% endblock %}
+{% block working_context %}{% endblock %}
+{% block table_filter_controls %}{% endblock %}
+{% block list_pagination %}{% endblock %}
+{% block extra_scripts %}<script src="{% static 'daily_reports/list.js' %}" defer></script>{% endblock %}
 {% block content %}
-{% table_filters filters "daily-report-filters" %}
-{% if "daily_reports.create" in business_permission_codes %}{% url "daily_reports:create" as create_url %}{% endif %}{% include "components/page_header.html" with page_eyebrow="عملیات کارگاهی" page_title="گزارش‌های روزانه" page_description=request.organization.name page_action_url=create_url page_action_label="گزارش جدید" only %}
-<section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست گزارش‌های روزانه">
-{% if reports %}<div class="erp-panel-header"><div><h2 class="text-sm font-semibold text-slate-900">دفتر گزارش‌های کارگاهی</h2><p class="mt-0.5 text-[11px] text-slate-500">فعالیت روزانه، وضعیت و نیروی انسانی</p></div><span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{{ reports|length }} گزارش</span></div><div class="erp-table-wrap"><table class="w-full min-w-[950px] text-right"><thead><tr><th class="border-b border-slate-200 px-4 py-3">پروژه و کارگاه</th><th class="border-b border-slate-200 px-4 py-3">فاز</th><th class="border-b border-slate-200 px-4 py-3">تاریخ گزارش</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th><th class="border-b border-slate-200 px-4 py-3 text-left">نیروی کار</th><th class="border-b border-slate-200 px-4 py-3">نویسنده</th></tr></thead><tbody class="divide-y divide-slate-100">{% for report in reports %}<tr><td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'daily_reports:detail' report.id %}">{{ report.project.name }}</a><p class="mt-0.5 text-[11px] text-slate-500">{{ report.site.name }}</p></td><td class="px-4 py-3.5 text-slate-600">{{ report.phase.name|default:"بدون فاز" }}</td><td class="whitespace-nowrap px-4 py-3.5" dir="ltr"><a class="font-semibold text-blue-700 hover:underline" href="{% url 'daily_reports:detail' report.id %}">{{ report.reporting_date }}</a></td><td class="px-4 py-3.5">{% include "components/status_badge.html" with status=report.status label=report.get_status_display only %}</td><td class="whitespace-nowrap px-4 py-3.5 text-left" dir="ltr">{{ report.labor_count }} <span dir="rtl">نفر</span></td><td class="px-4 py-3.5" dir="ltr">{{ report.created_by.username|default:"—" }}</td></tr>{% endfor %}</tbody></table></div><div class="border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500">نمایش {{ reports|length }} گزارش روزانه</div>{% else %}{% include "components/empty_state.html" with empty_title="هنوز گزارش روزانه‌ای ثبت نشده است" empty_description="اولین گزارش کارگاهی شرکت را ایجاد کنید." empty_action_url=create_url empty_action_label="ثبت گزارش" only %}{% endif %}
-</section>
+<div class="erp-reference-list erp-contracts-list erp-daily-list">
+    <div class="erp-list-heading">
+        {% if "daily_reports.create" in business_permission_codes %}{% url "daily_reports:create" as create_url %}{% endif %}
+        {% include "components/page_header.html" with page_breadcrumbs=page_breadcrumbs page_title="گزارش‌های روزانه" page_description="ثبت و پیگیری فعالیت‌ها، نیروی کار و پیشرفت روزانه کارگاه‌ها" page_action_url=create_url page_action_label="گزارش روزانه جدید" page_icon="document" only %}
+    </div>
+    <section class="daily-summary" aria-label="خلاصه گزارش‌های مجاز" aria-describedby="daily-summary-scope">
+        <article class="daily-kpi"><div><h2>کل گزارش‌ها</h2><strong data-summary="total">{{ summary.total|erp_number }}</strong></div><span class="daily-kpi__icon" aria-hidden="true">{% include "daily_reports/list_icon.html" with icon="total" only %}</span></article>
+        <article class="daily-kpi daily-kpi--draft"><div><h2>پیش‌نویس</h2><strong data-summary="draft">{{ summary.draft|erp_number }}</strong></div><span class="daily-kpi__icon" aria-hidden="true">{% include "daily_reports/list_icon.html" with icon="draft" only %}</span></article>
+        <article class="daily-kpi"><div><h2>ارسال‌شده</h2><strong data-summary="submitted">{{ summary.submitted|erp_number }}</strong></div><span class="daily-kpi__icon" aria-hidden="true">{% include "daily_reports/list_icon.html" with icon="submitted" only %}</span></article>
+        <article class="daily-kpi daily-kpi--approved"><div><h2>تأییدشده</h2><strong data-summary="approved">{{ summary.approved|erp_number }}</strong></div><span class="daily-kpi__icon" aria-hidden="true">{% include "daily_reports/list_icon.html" with icon="approved" only %}</span></article>
+    </section>
+    <p id="daily-summary-scope" class="daily-summary-note">خلاصه همه گزارش‌های قابل مشاهده شما؛ فیلترهای زیر فقط فهرست نتایج را محدود می‌کنند.</p>
+    <div class="erp-list-workspace">
+        <div class="daily-filter-panel">
+            <h2 class="daily-section-heading">{% include "daily_reports/list_icon.html" with icon="filter" only %}فیلتر گزارش‌ها</h2>
+            {% include "components/filter_bar.html" with bar=filter_bar reference_layout=True only %}
+        </div>
+        <section class="daily-results" aria-label="فهرست گزارش‌های روزانه">
+            {% include "components/reference_list_toolbar.html" %}
+            {% if reports %}
+            <div class="daily-table-wrap">
+                <table class="erp-responsive-list" aria-label="گزارش‌های روزانه">
+                    <thead><tr>
+                        <th scope="col"{% if list_ui.sort.key == "project" %} aria-sort="{{ list_ui.sort.descending|yesno:'descending,ascending' }}"{% endif %}>{% table_sort_header "project" "پروژه / کارگاه" %}</th>
+                        <th scope="col"{% if list_ui.sort.key == "reporting_date" %} aria-sort="{{ list_ui.sort.descending|yesno:'descending,ascending' }}"{% endif %}>{% table_sort_header "reporting_date" "تاریخ گزارش" %}</th>
+                        <th scope="col"{% if list_ui.sort.key == "phase" %} aria-sort="{{ list_ui.sort.descending|yesno:'descending,ascending' }}"{% endif %}>{% table_sort_header "phase" "فاز / فعالیت اصلی" %}</th>
+                        <th scope="col"{% if list_ui.sort.key == "labor_count" %} aria-sort="{{ list_ui.sort.descending|yesno:'descending,ascending' }}"{% endif %}>{% table_sort_header "labor_count" "نیروی کار" %}</th>
+                        <th scope="col"{% if list_ui.sort.key == "status" %} aria-sort="{{ list_ui.sort.descending|yesno:'descending,ascending' }}"{% endif %}>{% table_sort_header "status" "وضعیت" %}</th>
+                        <th scope="col"{% if list_ui.sort.key == "author" %} aria-sort="{{ list_ui.sort.descending|yesno:'descending,ascending' }}"{% endif %}>{% table_sort_header "author" "نویسنده" %}</th>
+                        <th scope="col">عملیات</th>
+                    </tr></thead>
+                    <tbody>{% for report in reports %}
+                        <tr>
+                            <td class="erp-list-title" data-label="پروژه / کارگاه"><a href="{% url 'daily_reports:detail' report.pk %}">{{ report.project.name }}</a><span class="erp-list-subtitle">{{ report.site.name }}</span></td>
+                            <td class="daily-report-date" data-label="تاریخ گزارش"><a href="{% url 'daily_reports:detail' report.pk %}"><bdi dir="ltr">{{ report.reporting_date|jalali_date }}</bdi></a></td>
+                            <td class="daily-activity" data-label="فاز / فعالیت اصلی">{% if report.phase %}<strong>{{ report.phase.name }}</strong>{% endif %}<span title="{{ report.work_performed }}">{{ report.work_performed|truncatechars:64 }}</span></td>
+                            <td class="daily-labor" data-label="نیروی کار"><bdi>{{ report.labor_count|erp_number }}</bdi> <span>نفر</span></td>
+                            <td class="erp-list-status" data-label="وضعیت"><span class="daily-status daily-status--{{ report.status }}"><span aria-hidden="true">●</span>{{ report.get_status_display }}</span></td>
+                            <td data-label="نویسنده">{% if report.created_by %}<bdi>{{ report.created_by.get_full_name|default:report.created_by.username }}</bdi>{% else %}—{% endif %}</td>
+                            <td class="erp-list-row-action" data-label="عملیات"><details class="erp-list-row-menu"><summary class="erp-list-action" aria-label="عملیات گزارش {{ report.project.name }}، {{ report.reporting_date|jalali_date }}">⋮</summary><div class="erp-list-row-menu__items"><a href="{% url 'daily_reports:detail' report.pk %}">مشاهده جزئیات</a></div></details></td>
+                        </tr>
+                    {% endfor %}</tbody>
+                </table>
+            </div>
+            {% else %}
+                {% if filter_bar.chips or filter_bar.form.errors %}{% include "components/empty_state.html" with empty_title="گزارشی با این فیلترها یافت نشد" empty_description="فیلترها را تغییر دهید یا پاک کنید." empty_action_url=filter_bar.clear_url empty_action_label="پاک کردن فیلترها" only %}{% else %}{% include "components/empty_state.html" with empty_title="هنوز گزارش روزانه‌ای ثبت نشده است" empty_description="گزارش‌های قابل مشاهده شما در این فهرست نمایش داده می‌شوند." empty_action_url=create_url empty_action_label="گزارش روزانه جدید" only %}{% endif %}
+            {% endif %}
+            {% include "components/list_pagination.html" with page_obj=page_obj pagination_query=pagination_query result_label="گزارش" reference_layout=True only %}
+        </section>
+    </div>
+</div>
 {% endblock %}

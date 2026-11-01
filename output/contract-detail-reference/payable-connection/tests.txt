@@ -1,0 +1,315 @@
+......FFFF....................F.                                       [100%]
+================================== FAILURES ===================================
+__ PayableContractDetailTests.test_existing_selector_scope_gate_is_preserved __
+
+self = <apps.contracts.test_payable_detail_dashboard.PayableContractDetailTests testMethod=test_existing_selector_scope_gate_is_preserved>
+
+    def setUp(self):
+>       self.prepare_payable()
+
+apps\contracts\test_payable_detail_dashboard.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\contracts\test_payable_detail_dashboard.py:134: in prepare_payable
+    approve_payable_certificate(
+apps\billing\payable_services.py:1049: in approve_payable_certificate
+    return approve_payable_certificate_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\payable_workflow.py:572: in approve_payable_certificate_with_workflow
+    return _complete(
+apps\billing\payable_workflow.py:544: in _complete
+    item = claim_work_item(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\workflows\runtime.py:1081: in claim_work_item
+    actor_membership = _require_permission(
+apps\workflows\runtime.py:76: in _require_permission
+    membership = require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: payable-independent-approver>, organization = <Organization: F61>
+permission = BusinessPermissionCode.WORK_ITEMS_CLAIM
+message = 'مجوز لازم برای عملیات گردش\u200cکار را ندارید.', project = None
+site = None, allow_any_scope = True, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات گردش‌کار را ندارید.
+
+apps\organizations\authorization.py:441: PermissionDenied
+_ PayableContractDetailTests.test_payable_incompatible_currency_or_correction_does_not_fabricate_totals _
+
+self = <apps.contracts.test_payable_detail_dashboard.PayableContractDetailTests testMethod=test_payable_incompatible_currency_or_correction_does_not_fabricate_totals>
+
+    def setUp(self):
+>       self.prepare_payable()
+
+apps\contracts\test_payable_detail_dashboard.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\contracts\test_payable_detail_dashboard.py:134: in prepare_payable
+    approve_payable_certificate(
+apps\billing\payable_services.py:1049: in approve_payable_certificate
+    return approve_payable_certificate_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\payable_workflow.py:572: in approve_payable_certificate_with_workflow
+    return _complete(
+apps\billing\payable_workflow.py:544: in _complete
+    item = claim_work_item(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\workflows\runtime.py:1081: in claim_work_item
+    actor_membership = _require_permission(
+apps\workflows\runtime.py:76: in _require_permission
+    membership = require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: payable-independent-approver>, organization = <Organization: F61>
+permission = BusinessPermissionCode.WORK_ITEMS_CLAIM
+message = 'مجوز لازم برای عملیات گردش\u200cکار را ندارید.', project = None
+site = None, allow_any_scope = True, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات گردش‌کار را ندارید.
+
+apps\organizations\authorization.py:441: PermissionDenied
+_ PayableContractDetailTests.test_payable_permission_is_independent_of_receivable_permission _
+
+self = <apps.contracts.test_payable_detail_dashboard.PayableContractDetailTests testMethod=test_payable_permission_is_independent_of_receivable_permission>
+
+    def setUp(self):
+>       self.prepare_payable()
+
+apps\contracts\test_payable_detail_dashboard.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\contracts\test_payable_detail_dashboard.py:134: in prepare_payable
+    approve_payable_certificate(
+apps\billing\payable_services.py:1049: in approve_payable_certificate
+    return approve_payable_certificate_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\payable_workflow.py:572: in approve_payable_certificate_with_workflow
+    return _complete(
+apps\billing\payable_workflow.py:544: in _complete
+    item = claim_work_item(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\workflows\runtime.py:1081: in claim_work_item
+    actor_membership = _require_permission(
+apps\workflows\runtime.py:76: in _require_permission
+    membership = require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: payable-independent-approver>, organization = <Organization: F61>
+permission = BusinessPermissionCode.WORK_ITEMS_CLAIM
+message = 'مجوز لازم برای عملیات گردش\u200cکار را ندارید.', project = None
+site = None, allow_any_scope = True, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات گردش‌کار را ندارید.
+
+apps\organizations\authorization.py:441: PermissionDenied
+___ PayableContractDetailTests.test_scoped_payable_amounts_links_and_events ___
+
+self = <apps.contracts.test_payable_detail_dashboard.PayableContractDetailTests testMethod=test_scoped_payable_amounts_links_and_events>
+
+    def setUp(self):
+>       self.prepare_payable()
+
+apps\contracts\test_payable_detail_dashboard.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\contracts\test_payable_detail_dashboard.py:134: in prepare_payable
+    approve_payable_certificate(
+apps\billing\payable_services.py:1049: in approve_payable_certificate
+    return approve_payable_certificate_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\payable_workflow.py:572: in approve_payable_certificate_with_workflow
+    return _complete(
+apps\billing\payable_workflow.py:544: in _complete
+    item = claim_work_item(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\workflows\runtime.py:1081: in claim_work_item
+    actor_membership = _require_permission(
+apps\workflows\runtime.py:76: in _require_permission
+    membership = require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: payable-independent-approver>, organization = <Organization: F61>
+permission = BusinessPermissionCode.WORK_ITEMS_CLAIM
+message = 'مجوز لازم برای عملیات گردش\u200cکار را ندارید.', project = None
+site = None, allow_any_scope = True, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات گردش‌کار را ندارید.
+
+apps\organizations\authorization.py:441: PermissionDenied
+_ PayableContractDetailBrowserTests.test_payable_and_restricted_desktop_mobile _
+
+self = <apps.contracts.test_payable_detail_dashboard.PayableContractDetailBrowserTests testMethod=test_payable_and_restricted_desktop_mobile>
+
+    
+>   def test_payable_and_restricted_desktop_mobile(self):
+        ^^^^^^^^^^^^^^^^^^^^^^
+
+apps\contracts\test_payable_detail_dashboard.py:259: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\contracts\test_payable_detail_dashboard.py:134: in prepare_payable
+    approve_payable_certificate(
+apps\billing\payable_services.py:1049: in approve_payable_certificate
+    return approve_payable_certificate_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\payable_workflow.py:572: in approve_payable_certificate_with_workflow
+    return _complete(
+apps\billing\payable_workflow.py:544: in _complete
+    item = claim_work_item(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\workflows\runtime.py:1081: in claim_work_item
+    actor_membership = _require_permission(
+apps\workflows\runtime.py:76: in _require_permission
+    membership = require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: payable-independent-approver>, organization = <Organization: F61>
+permission = BusinessPermissionCode.WORK_ITEMS_CLAIM
+message = 'مجوز لازم برای عملیات گردش\u200cکار را ندارید.', project = None
+site = None, allow_any_scope = True, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز لازم برای عملیات گردش‌کار را ندارید.
+
+apps\organizations\authorization.py:441: PermissionDenied
+=========================== short test summary info ===========================
+FAILED apps/contracts/test_payable_detail_dashboard.py::PayableContractDetailTests::test_existing_selector_scope_gate_is_preserved
+FAILED apps/contracts/test_payable_detail_dashboard.py::PayableContractDetailTests::test_payable_incompatible_currency_or_correction_does_not_fabricate_totals
+FAILED apps/contracts/test_payable_detail_dashboard.py::PayableContractDetailTests::test_payable_permission_is_independent_of_receivable_permission
+FAILED apps/contracts/test_payable_detail_dashboard.py::PayableContractDetailTests::test_scoped_payable_amounts_links_and_events
+FAILED apps/contracts/test_payable_detail_dashboard.py::PayableContractDetailBrowserTests::test_payable_and_restricted_desktop_mobile
+5 failed, 27 passed, 2 subtests passed in 173.72s (0:02:53)

@@ -1,0 +1,60 @@
+--- views-before
++++ views-after
+@@ -403,33 +403,9 @@
+             if contract_id and len(request.GET.getlist("contract")) == 1
+             else claims.none()
+         )
+-    scoped_has_records = claims.exists()
+-    claims = apply_table_filters(
+-        claims,
+-        request,
+-        text_fields={}
+-        if contract_scoped
+-        else {"q": ("contract__title", "contract__contract_number", "project__name")},
+-        choice_fields={
+-            "status": (
+-                "status",
+-                tuple(
+-                    value
+-                    for value, label in ProgressClaim._meta.get_field("status").choices
+-                ),
+-            )
+-        },
+-    )
+-    page = paginate_table(
+-        claims,
+-        request,
+-        sort_fields={
+-            "number": "claim_number",
+-            "period": "period_start",
+-            "amount": "net_amount",
+-        },
+-        default_ordering=("-created_at", "pk"),
+-    )
++    from .claim_list import claim_list_context
++
++    list_context = claim_list_context(request, claims, contract_scoped=contract_scoped)
+     can_create_claim = route_exposed("billing:claim_create") and (
+         contract_claim_create_allowed(request, selected_contract)
+         if contract_scoped
+@@ -439,10 +415,8 @@
+         request,
+         "billing/claim_list.html",
+         {
+-            "claims": page.object_list,
+-            "scoped_has_records": scoped_has_records,
+-            "claim_status_choices": ProgressClaim._meta.get_field("status").choices,
+             **contextual_list_filters(request),
++            **list_context,
+             "selected_project": selected_project,
+             "project_contracts_url": contextual_url(
+                 "contracts:list", project_id=selected_project.pk
+@@ -458,8 +432,6 @@
+                 project=selected_project,
+             )
+             else "",
+-            "page_obj": page,
+-            "pagination_query": table_pagination_query(request),
+             "pagination_rendered": True,
+             "contract_scoped": contract_scoped,
+             "selected_contract": selected_contract,

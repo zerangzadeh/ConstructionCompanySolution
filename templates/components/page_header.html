@@ -5,7 +5,7 @@
         {% if page_eyebrow %}
             <p class="text-xs font-semibold text-blue-600">{{ page_eyebrow }}</p>
         {% endif %}
-        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">{{ page_title }}</h1>
+        <h1 id="erp-page-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">{% if page_icon == "document" %}<svg class="erp-page-header__icon" width="30" height="34" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 2H4a1 1 0 0 0-1 1v22a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9Z"/><path d="M14 2v7h7M7 14h10M7 19h7"/></svg>{% endif %}{{ page_title }}</h1>
         {% if page_description %}
             <p class="mt-1 text-sm text-slate-500">{{ page_description }}</p>
         {% endif %}

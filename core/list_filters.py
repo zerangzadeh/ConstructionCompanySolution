@@ -23,6 +23,7 @@ def build_filter_bar(
     context: Mapping[str, str] | None = None,
     result_count: int,
     result_label: str = "رکورد",
+    search_field: str = "q",
 ) -> dict[str, Any]:
     """Presentation state only; callers authorize and filter before counting.
 
@@ -72,7 +73,7 @@ def build_filter_bar(
         )
     return {
         "form": form,
-        "search": form["q"],
+        "search": form[search_field],
         "quick_fields": [form[name] for name in quick_fields if name in form.fields],
         "secondary_fields": [
             form[name] for name in secondary_fields if name in form.fields

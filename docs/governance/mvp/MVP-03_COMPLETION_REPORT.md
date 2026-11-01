@@ -6,7 +6,64 @@ bounded Human request in the attached
 MVP-03 instruction is the execution contract; these MVP packages are not CEPs.
 No CEP is reopened and no Registry lifecycle change is implied.
 
+## Contracts List Product Owner acceptance and Reference Pattern — 2026-11-01
+
+**Current decision: Contracts List UI/UX is accepted by the Product Owner and is
+BONIRA's official Reference List Page.** This records the Product Owner's explicit
+2026-11-01 instruction in this chat; acceptance is not inferred from automated
+tests or Codex's earlier `READY FOR REVIEW` result.
+
+The canonical design rule is
+[Reference List Page Pattern, section 30 of the UI guidelines](../../ui-guidelines.md#reference-list-page-pattern).
+Its design/redesign targets are **Estimates, Claims, Procurement and Inventory
+List pages only**. They inherit Page Header, Search, Quick Filters, Advanced
+Filters, Active Filter Chips, Result Summary, Sorting, Table density, Row
+hierarchy, Status badges, Row actions, Pagination, RTL/LTR and responsive behavior.
+Each module retains its actual Domain columns, filters, operations and content;
+visual reuse must not invent capabilities or change business behavior.
+
+**Projects is outside this rollout.** It has an independent design direction.
+Until a separate Product Owner instruction, no Contracts-reference UI changes may
+be applied to Projects List, and no final Projects List or Project Detail
+structure may be assumed. Earlier generic Project List/Detail reference wording
+in UI-guideline sections 17, 30 and 35 is superseded by this explicit exception.
+
+The current accepted Contracts implementation and review evidence are recorded in
+the [final visual-refinement report](../../../output/contracts-density-polish-20261101/REVIEW.md),
+[desktop capture](../../../output/contracts-density-polish-20261101/desktop-advanced.jpg),
+[mobile advanced filters](../../../output/contracts-density-polish-20261101/mobile-advanced.jpg)
+and [mobile results](../../../output/contracts-density-polish-20261101/mobile-summary.jpg).
+Those implementation records retain their earlier pre-acceptance review statuses;
+this dated Human decision supersedes them for Contracts List UI/UX acceptance.
+
+```text
+CONTRACTS LIST — PRODUCT OWNER VISUAL ACCEPTANCE: PASS
+REFERENCE LIST PAGE: CONTRACTS LIST
+DESIGN TARGETS: ESTIMATES / CLAIMS / PROCUREMENT / INVENTORY LISTS
+PROJECTS: EXCLUDED — INDEPENDENT INSTRUCTION REQUIRED
+IMPLEMENTATION ROLLOUT IN THIS TASK: NOT EXECUTED
+```
+
+This acceptance is limited to Contracts List. It does not accept other pages or
+close MVP-03 as a whole; their separate review/acceptance states remain unchanged.
+The earlier 2026-10-31 Contract List `PENDING` snapshot below is historical and
+is superseded only for this page. The accepted reference uses the adjacent
+Result Summary toolbar; its count placement supersedes that earlier Filter Bar
+placement description, while filter submission/clear/context behavior is retained.
+
+This documentation decision changes no Product Strategy D1–D7, MVP Charter or
+package boundary, Product Surface, Domain, Model/Migration, Permission,
+Tenant/Project Scope or Workflow. It does not expose a hidden capability or
+authorize automatic cross-page rollout, CEP/MVP completion, production action or
+certification. Only this existing report and the UI guidelines are updated; no
+parallel decision/status document is created, and no page is changed in this task.
+No commit or push is authorized or performed.
+
 ## Shared Filter Bar and Contract List UX — 2026-10-31
+
+Historical checkpoint: its Contracts List visual-acceptance status and count
+placement are superseded by the 2026-11-01 decision above; its original execution
+evidence and all unrelated page/package acceptance states are retained.
 
 Completed the explicit bounded Human UI/UX request on current `main`, HEAD and
 `origin/main` `1f4a07062d017e678dfc3eabf8075a642a24ffd5`. Earlier local remediation
@@ -23,8 +80,9 @@ existing explicit-submit table script continues to navigate by GET. Existing Tom
 Select and Jalali widgets are reused without dependencies or a new UI framework.
 No HTMX partial-refresh behavior is introduced.
 
-Contract List is the only adopted list. Search covers Contract number/title,
-Project name and both retained/current counterparty names. Quick filters are
+At this 2026-10-31 checkpoint, Contract List was the only adopted list. Search
+covers Contract number/title, Project name and both retained/current counterparty
+names. Quick filters are
 Status, «سمت قرارداد» and optional searchable Project. The backend sides render
 as «با کارفرما» and «با پیمانکار / تأمین‌کننده». The `side` query parameter avoids
 colliding with the existing `direction` sort parameter. Existing number/title/
@@ -82,7 +140,7 @@ SHARED FILTER BAR FOUNDATION: PASS
 
 MVP-03 CONTRACT LIST FILTER UX: PASS
 
-PRODUCT OWNER VISUAL ACCEPTANCE: PENDING
+PRODUCT OWNER VISUAL ACCEPTANCE (2026-10-31 CONTRACT LIST SNAPSHOT): PENDING
 
 ## Contract direction remediation — 2026-10-31
 

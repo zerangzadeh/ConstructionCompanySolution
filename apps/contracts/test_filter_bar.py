@@ -1,5 +1,6 @@
 """Contract List filtering stays inside the existing scoped read boundary."""
 
+from decimal import Decimal
 from urllib.parse import parse_qs, urlsplit
 
 from django.test import TestCase, override_settings
@@ -81,6 +82,32 @@ class ContractFilterTests(JourneyFixture, TestCase):
         response = self.client.get(self.url, {**query, "side": "receivable"})
         self.assertEqual(response.context["contracts"], [])
 
+    def test_amount_summary_uses_filtered_results_before_pagination(self):
+        self.payable.contract_value = Decimal("2000.20")
+        self.payable.save(update_fields=["contract_value"])
+        Contract.objects.bulk_create(
+            [
+                Contract(
+                    organization=self.organization,
+                    project=self.project,
+                    contract_number=f"TOTAL-{index:02}",
+                    title="قرارداد جمع نتایج",
+                    counterparty_name="طرف نمونه",
+                    direction="payable",
+                    contract_value=Decimal("0.01"),
+                )
+                for index in range(26)
+            ]
+        )
+        for page in (1, 2):
+            response = self.client.get(self.url, {"side": "payable", "page": page})
+            self.assertEqual(response.context["filter_bar"]["result_count"], 27)
+            self.assertEqual(response.context["contract_total"], Decimal("2000.46"))
+            self.assertContains(response, "data-filter-result-total")
+        for query in ({"q": "no-matching-contract"}, {"status": "forged"}):
+            response = self.client.get(self.url, query)
+            self.assertEqual(response.context["contract_total"], Decimal(0))
+
     def test_project_context_has_no_duplicate_selector_and_survives_chip_clear(self):
         before = dict(self.client.session)
         response = self.client.get(
@@ -136,6 +163,12 @@ class ContractFilterTests(JourneyFixture, TestCase):
             contract_number="PRIVATE",
             title="PRIVATE CONTRACT",
             counterparty_name="Other",
+            contract_value=Decimal("99999999.99"),
+        )
+        self.payable.contract_value = Decimal("10.01")
+        self.payable.save(update_fields=["contract_value"])
+        self.assertEqual(
+            self.client.get(self.url).context["contract_total"], Decimal("110.01")
         )
         for identifier in (foreign_project.pk,):
             response = self.client.get(self.url, {"project": identifier})
@@ -170,11 +203,17 @@ class ContractFilterTests(JourneyFixture, TestCase):
         )
         self.login(actor)
         self.assertEqual(
+            self.client.get(self.url).context["contract_total"], Decimal(0)
+        )
+        self.assertEqual(
             self.client.get(self.url, {"filter_options": "project"}).json()["results"],
             [],
         )
         grant.project = self.project
         grant.save()
+        self.assertEqual(
+            self.client.get(self.url).context["contract_total"], Decimal("110.01")
+        )
         # A Contracts viewer needs no new Create or Projects permission to filter
         # names already visible in their permitted Contract rows.
         payload = self.client.get(self.url, {"filter_options": "project"}).json()
