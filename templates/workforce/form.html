@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ title }} | سامانه مدیریت ساخت{% endblock %}
-{% block extra_head %}{% if work_team_form %}{% load field_journey %}{% prepare_native_choices form %}{{ form.media.css }}{% endif %}{% endblock %}
+{% block extra_head %}{% if work_team_form %}{% load field_journey %}{% include "workforce/_form_assets.html" %}{% endif %}{% endblock %}
 {% block content %}
 {% load field_journey %}{% workforce_mvp as workforce_is_mvp %}
 {% if work_team_form %}
@@ -9,12 +9,13 @@
 {% else %}
 {% if workforce_is_mvp %}{% field_breadcrumbs title workforce_parent=True as breadcrumbs %}{% include "workforce/_field_header.html" with page_breadcrumbs=breadcrumbs page_title=title page_description=request.organization.name %}{% else %}{% include "components/page_header.html" with page_eyebrow="منابع انسانی" page_title=title page_description=request.organization.name only %}{% endif %}
 {% endif %}
-<form class="erp-surface {% if work_team_form %}mt-4 max-w-3xl rounded-xl p-4{% else %}mt-6 max-w-4xl rounded-xl p-5{% endif %}" method="post"{% if work_team_form %} data-work-team-form{% endif %}>
+<form class="{% if work_team_form %}erp-create-form {% endif %}erp-surface {% if work_team_form %}mt-4 max-w-3xl rounded-xl p-4{% else %}mt-6 max-w-4xl rounded-xl p-5{% endif %}" method="post"{% if work_team_form %} data-work-team-form{% endif %}>
     {% csrf_token %}
+    {% if work_team_form %}{% include "workforce/_form_sections.html" %}{% else %}
     {% include "components/form_errors.html" with form=form only %}
     <div class="grid {% if work_team_form %}gap-3{% else %}gap-4{% endif %} sm:grid-cols-2">{% for field in form %}{% if work_team_form and field.name == "description" %}<div class="sm:col-span-2">{% endif %}{% include "components/form_field.html" with field=field only %}{% if work_team_form and field.name == "description" %}</div>{% endif %}{% endfor %}</div>
-    {% if work_team_form %}{% include "workforce/_native_choices.html" with choice_form=form %}{% endif %}
-    <div class="{% if work_team_form %}mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4{% else %}mt-6 flex gap-3{% endif %}"><button class="erp-btn erp-btn--primary" type="submit">ثبت</button><a class="erp-btn erp-btn--secondary" href="{% url back_url %}">انصراف</a></div>
+    {% endif %}
+    {% if work_team_form %}{% url back_url as cancel_url %}{% include "components/form_footer.html" with submit_label="ثبت" cancel_url=cancel_url only %}{% else %}<div class="{% if work_team_form %}mt-4 flex flex-wrap gap-2 border-t border-slate-100 pt-4{% else %}mt-6 flex gap-3{% endif %}"><button class="erp-btn erp-btn--primary" type="submit">ثبت</button><a class="erp-btn erp-btn--secondary" href="{% url back_url %}">انصراف</a></div>{% endif %}
 </form>
 {% endblock %}
 {% block extra_scripts %}{% if work_team_form %}{{ form.media.js }}{% endif %}{% endblock %}

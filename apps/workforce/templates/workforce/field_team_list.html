@@ -1,0 +1,12 @@
+{% extends "workforce/field_list_base.html" %}{% load field_journey table_filters %}
+{% block title %}گروه‌های کاری | بنیرا{% endblock %}
+{% block field_heading %}
+{% if "work_teams.create" in business_permission_codes %}{% url "workforce:work_team_create" as create_url %}{% endif %}
+{% field_breadcrumbs "گروه‌های کاری" workforce_parent=True as breadcrumbs %}
+{% include "workforce/_field_header.html" with page_breadcrumbs=breadcrumbs page_title="گروه‌های کاری" page_description="سامان‌دهی نیروها در تیم‌های اجرایی در سطح شرکت" page_action_url=create_url page_action_label="گروه جدید" page_filters=True %}
+{% endblock %}
+{% block field_sort %}{% table_sort_header "team" "نام گروه" %}{% table_sort_header "department" "واحد شرکتی" %}{% table_sort_header "lead" "سرپرست" %}{% endblock %}
+{% block field_results %}
+{% if work_teams %}<table class="erp-responsive-list" aria-label="گروه‌های کاری"><thead><tr><th scope="col">کد گروه</th><th scope="col">{% table_sort_header "team" "گروه کاری" %}</th><th scope="col">{% table_sort_header "department" "واحد شرکتی" %}</th><th scope="col">{% table_sort_header "lead" "سرپرست" %}</th><th scope="col">عملیات</th></tr></thead><tbody>{% for team in work_teams %}<tr><td class="erp-list-identifier"><bdi>{{ team.code }}</bdi></td><td class="erp-list-title">{{ team.name }}</td><td data-label="واحد شرکتی">{{ team.department.name|default:"—" }}</td><td data-label="سرپرست">{% if team.lead %}{{ team.lead.first_name }} {{ team.lead.last_name }}{% else %}—{% endif %}</td><td class="erp-list-row-action">{% if "work_teams.archive" in business_permission_codes %}<details class="erp-list-row-menu"><summary class="erp-list-action" aria-label="عملیات گروه {{ team.name }}"><span aria-hidden="true">⋮</span></summary><div class="erp-list-row-menu__items !fixed !bottom-auto"><form method="post" action="{% url 'workforce:work_team_archive' team.pk %}">{% csrf_token %}<button class="erp-btn erp-btn--secondary" type="submit">بایگانی گروه</button></form></div></details>{% else %}—{% endif %}</td></tr>{% endfor %}</tbody></table>
+{% elif filter_bar.chips %}{% include "components/filtered_empty_state.html" with clear_filters_url=filter_bar.clear_url %}{% else %}{% include "components/empty_state.html" with empty_title="گروه کاری ثبت نشده است" empty_description="نیروها را در اکیپ‌های اجرایی سازمان‌دهی کنید." empty_action_url=create_url empty_action_label="گروه جدید" only %}{% endif %}
+{% endblock %}

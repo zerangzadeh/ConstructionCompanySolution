@@ -43,9 +43,9 @@ from .models import (
 
 
 def _error_message(exc: Exception) -> str:
-    if isinstance(exc, ValidationError):
-        return "؛ ".join(exc.messages)
-    return str(exc)
+    from apps.workforce.field_presentation import presentation_error
+
+    return presentation_error(exc)
 
 
 def _field_context(request):
@@ -123,9 +123,35 @@ def workbench(request: HttpRequest) -> HttpResponse:
         include_employee=True,
     )
     data = history_context(request, context)
+    from core.list_filters import build_filter_bar
+
+    history_form = data["history_form"]
+    if not history_form.is_bound:
+        history_form.cleaned_data = {}
+    data["history_filter_bar"] = build_filter_bar(
+        request,
+        form=history_form,
+        search_field="employee",
+        quick_fields=("project", "site"),
+        secondary_fields=("date_from", "date_to"),
+        result_count=sum(
+            data[key]["page"].paginator.count
+            for key in (
+                "attendance_page",
+                "correction_page",
+                "leave_page",
+                "overtime_page",
+                "timesheet_page",
+            )
+        ),
+        result_label="سابقه",
+    )
     data["calendars"] = WorkCalendar.objects.filter(
         organization=request.organization
     ).prefetch_related("shifts")[:20]
+    from apps.workforce.field_presentation import cascade_filter_chips
+
+    cascade_filter_chips(data["history_filter_bar"])
     return render(request, "timekeeping/workbench.html", data)
 
 
@@ -604,14 +630,47 @@ def timesheet_detail(request: HttpRequest, timesheet_id) -> HttpResponse:
                     else ""
                 )
             )
+    from apps.organizations.authorization import has_business_permission
+
+    entries = list(sheet.entries.select_related("project", "site", "activity"))
+
+    def can_act(permission):
+        return has_business_permission(
+            user=request.user, organization=request.organization, permission=permission
+        ) and all(
+            has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=permission,
+                project=entry.project,
+                site=entry.site,
+            )
+            for entry in entries
+        )
+
+    can_prepare = (
+        sheet.state == "draft"
+        and sheet.prepared_by_id == request.user.pk
+        and can_act("timesheets.prepare")
+    )
+    allocated_minutes = sum(entry.minutes for entry in entries)
     return render(
         request,
         "timekeeping/timesheet_detail.html",
         {
             "timesheet": sheet,
-            "entries": sheet.entries.select_related("project", "site", "activity"),
+            "entries": entries,
             "form": form,
             "field_context": _field_context(request),
+            "back_url": _workbench_url(request),
+            "can_prepare": can_prepare,
+            "can_submit": can_prepare
+            and bool(entries)
+            and allocated_minutes == sheet.declared_minutes,
+            "can_review": sheet.state == "submitted"
+            and request.user.pk not in (sheet.prepared_by_id, sheet.submitted_by_id)
+            and can_act("timesheets.review"),
+            "allocated_minutes": allocated_minutes,
         },
     )
 
@@ -726,17 +785,19 @@ def record_detail(request: HttpRequest, kind: str, record_id: str) -> HttpRespon
     if kind == "attendance":
         title = "سابقه حضور"
         rows = [
-            ("کارمند", record.employee, "text"),
+            ("نیروی کار", record.employee, "text"),
             ("تاریخ", record.work_date, "date"),
             ("ورود", record.check_in_at, "datetime"),
             ("خروج", record.check_out_at, "datetime"),
             ("وضعیت", record.get_state_display(), "text"),
             ("شرح استثنا", record.exception_notes, "text"),
+            ("زمان ثبت", record.created_at, "datetime"),
+            ("زمان قطعی‌سازی", record.finalized_at, "datetime"),
         ]
     elif kind == "correction":
         title = "درخواست اصلاح حضور"
         rows = [
-            ("کارمند", record.attendance.employee, "text"),
+            ("نیروی کار", record.attendance.employee, "text"),
             ("تاریخ حضور", record.attendance.work_date, "date"),
             ("نوع", record.get_kind_display(), "text"),
             ("وضعیت", record.get_status_display(), "text"),
@@ -745,11 +806,13 @@ def record_detail(request: HttpRequest, kind: str, record_id: str) -> HttpRespon
             ("ورود پیشنهادی", record.replacement_check_in_at, "datetime"),
             ("خروج پیشنهادی", record.replacement_check_out_at, "datetime"),
             ("دلیل بررسی", record.review_reason, "text"),
+            ("زمان درخواست", record.created_at, "datetime"),
+            ("زمان بررسی", record.reviewed_at, "datetime"),
         ]
     else:
         title = record.get_kind_display() if kind == "leave" else "درخواست اضافه‌کاری"
         rows = [
-            ("کارمند", record.employee, "text"),
+            ("نیروی کار", record.employee, "text"),
             ("پروژه", record.project, "text"),
             ("کارگاه", record.site, "text"),
             ("شروع", record.starts_at, "datetime"),
@@ -757,13 +820,28 @@ def record_detail(request: HttpRequest, kind: str, record_id: str) -> HttpRespon
             ("وضعیت", record.get_state_display(), "text"),
             ("دلیل درخواست", record.reason, "text"),
             ("دلیل بررسی", record.review_reason, "text"),
+            ("زمان درخواست", record.created_at, "datetime"),
+            ("زمان بررسی", record.reviewed_at, "datetime"),
         ]
+    from .presentation import record_actions
+
+    source = record.attendance if kind == "correction" else record
     return render(
         request,
-        "components/read_only_record_detail.html",
+        "timekeeping/record_detail.html",
         {
             "detail_title": title,
             "detail_rows": rows,
             "back_url": _workbench_url(request),
+            "record": record,
+            "record_kind": kind,
+            "source": source,
+            "worker_name": f"{source.employee.first_name} {source.employee.last_name}",
+            "record_state": record.status if kind == "correction" else record.state,
+            "record_state_label": record.get_status_display()
+            if kind == "correction"
+            else record.get_state_display(),
+            "actions": record_actions(request, record, kind),
+            "field_context": _field_context(request),
         },
     )

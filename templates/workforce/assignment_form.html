@@ -1,15 +1,12 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load field_journey %}
 {% block title %}تخصیص نیرو به پروژه و کارگاه | بنیرا{% endblock %}
-{% block extra_head %}{% load field_journey %}{% prepare_native_choices form %}{{ form.media.css }}{% endblock %}
-{% block content %}{% load field_journey %}
+{% block extra_head %}{% include "workforce/_form_assets.html" %}{% endblock %}
+{% block content %}<div class="erp-create-page">
 {% field_breadcrumbs "تخصیص جدید" assignment_parent=True as breadcrumbs %}
 {% include "workforce/_field_header.html" with page_breadcrumbs=breadcrumbs page_title="تخصیص جدید" page_description="نیرو، محل فعالیت، مسئولیت و بازه تخصیص را مشخص کنید." %}
-<form class="erp-surface mt-5 max-w-4xl rounded-xl p-5" method="post" novalidate>
-  {% csrf_token %}
-  {% include "components/form_errors.html" with form=form only %}
-  <div class="grid gap-4 sm:grid-cols-2">{% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}</div>
-  {% include "workforce/_native_choices.html" with choice_form=form %}
-  <div class="mt-5 flex gap-3 border-t border-slate-100 pt-4"><button class="erp-btn erp-btn--primary" type="submit">ثبت تخصیص</button><a class="erp-btn erp-btn--secondary" href="{% url 'workforce:assignment_list' %}">انصراف</a></div>
-</form>
-{% endblock %}
+<form class="erp-create-form mt-5" method="post" novalidate aria-label="تخصیص جدید">{% csrf_token %}
+{% include "workforce/_form_sections.html" %}
+{% field_context_url "workforce:assignment_list" as cancel_url %}
+{% include "components/form_footer.html" with submit_label="ثبت تخصیص" cancel_url=cancel_url only %}
+</form></div>{% endblock %}
 {% block extra_scripts %}{{ form.media.js }}{% endblock %}

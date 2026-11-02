@@ -497,7 +497,7 @@ class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
                         {
                             "fill": {"work_date": "1405/07/28", "minutes": "480"},
                             "submit": True,
-                            "formSelector": "main form.grid",
+                            "formSelector": "main form[data-timesheet-entry]",
                             "afterPrefix": "/timekeeping/timesheets/",
                             "mustText": "ردیف تخصیص زمان ثبت شد.",
                         },

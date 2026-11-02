@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% load erp_format %}
+{% block title %}{{ detail_title }} | بنیرا{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_title=detail_title page_description=worker_name page_breadcrumb_label="حضور و کارکرد" page_breadcrumb_url=back_url only %}
+<section class="erp-surface mt-5 rounded-xl p-5">
+  <div class="flex flex-wrap items-start justify-between gap-3"><div><h2 class="text-lg font-bold">{{ worker_name }}</h2><p class="mt-1 text-sm text-slate-500">{{ source.project.name|default:"شرکت" }}{% if source.site %} · {{ source.site.name }}{% endif %}</p></div>{% include "components/status_badge.html" with status=record_state label=record_state_label only %}</div>
+  <dl class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{% for label, value, kind in detail_rows %}<div class="min-w-0"><dt class="text-xs text-slate-500">{{ label }}</dt><dd class="mt-1 break-words font-semibold">{% if value == None or value == "" %}—{% elif kind == "date" %}{{ value|jalali_date }}{% elif kind == "datetime" %}{{ value|jalali_datetime }}{% else %}{{ value }}{% endif %}</dd></div>{% endfor %}</dl>
+</section>
+{% include "timekeeping/_record_actions.html" %}
+{% if not actions %}<p class="mt-4 text-sm text-slate-500">این سابقه برای نقش و وضعیت فعلی قابل اقدام نیست. پیگیری سوابق از فهرست حضور و کارکرد در دسترس است.</p>{% endif %}
+{% if record_kind == "correction" %}<a class="erp-btn erp-btn--secondary mt-4" href="{% url 'timekeeping:record_detail' 'attendance' source.pk %}">مشاهده حضور مبنا</a>{% endif %}
+<a class="erp-btn erp-btn--secondary mt-4" href="{{ back_url }}">بازگشت به حضور و کارکرد</a>
+{% endblock %}

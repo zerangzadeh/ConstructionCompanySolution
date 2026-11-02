@@ -21,7 +21,7 @@ from apps.organizations.decorators import (
 from apps.organizations.models import BusinessPermissionCode as P
 from apps.projects.models import Project, ProjectSite
 from core.forms import normalize_jalali_digits
-from core.list_filters import table_pagination_query
+from core.list_filters import apply_table_sorting, table_pagination_query
 
 from .field_forms import (
     FieldAssignmentForm,
@@ -30,6 +30,7 @@ from .field_forms import (
     business_label,
     page_filter_values,
 )
+from .field_presentation import list_presentation, presentation_error
 from .field_selectors import (
     context_employees,
     current_assignments,
@@ -90,6 +91,8 @@ def index(request):
             )
         if form.cleaned_data["status"]:
             employees = employees.filter(status=form.cleaned_data["status"])
+    elif form.is_bound:
+        employees = employees.none()
     assignments = current_assignments(
         organization=request.organization, user=request.user, context=context
     )
@@ -98,9 +101,17 @@ def index(request):
             "project_assignments", queryset=assignments, to_attr="field_assignments"
         )
     )
-    page = Paginator(employees.order_by("last_name", "first_name", "pk"), 25).get_page(
-        request.GET.get("page")
+    employees = apply_table_sorting(
+        employees,
+        request,
+        sort_fields={
+            "name": ("last_name", "first_name", "pk"),
+            "number": ("employee_number", "pk"),
+            "status": ("status", "pk"),
+        },
+        default_ordering=("last_name", "first_name", "pk"),
     )
+    page = Paginator(employees, 25).get_page(request.GET.get("page"))
     rows = [
         {
             "employee": employee,
@@ -119,6 +130,7 @@ def index(request):
             "pagination_query": table_pagination_query(request),
             "create_url": _url("workforce:field_create", context),
             "timekeeping_url": _url("timekeeping:workbench", context),
+            **list_presentation(request, form, page, kind="workers"),
         },
     )
 
@@ -178,6 +190,9 @@ def detail(request, employee_id):
             "timesheet_url": _url("timekeeping:timesheet_create", worker_context),
             "overtime_url": _url("timekeeping:overtime_create", worker_context),
             "back_url": _url("workforce:field_list", context),
+            "has_active_assignments": employee.project_assignments.filter(
+                status="active"
+            ).exists(),
         },
     )
 
@@ -303,12 +318,7 @@ def assign(request, employee_id):
                 **form.cleaned_data,
             )
         except (IntegrityError, ValidationError, ValueError) as exc:
-            form.add_error(
-                None,
-                "؛ ".join(exc.messages)
-                if isinstance(exc, ValidationError)
-                else str(exc),
-            )
+            form.add_error(None, presentation_error(exc))
         else:
             messages.success(request, "تخصیص نیروی کار ثبت شد.")
             return redirect(

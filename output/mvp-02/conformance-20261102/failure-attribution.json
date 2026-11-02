@@ -1,0 +1,33 @@
+{
+  "broader_run": {
+    "log": "regression-attempt-1.log",
+    "result": "FAIL",
+    "passed": 188,
+    "failed": 4,
+    "subtests_passed": 66
+  },
+  "findings": [
+    {
+      "test": "P11RoleCatalogCloseoutTests.test_platform_navigation_exposes_all_approved_platform_controls",
+      "classification": "BASELINE TEST DEBT",
+      "evidence": "Expected platform role-catalog navigation in MVP; absent under unchanged central exposure/navigation. core/product_surface.py and shared shell/organization implementation have no remediation diff; independently documented in original MVP-02 completion and baseline findings.",
+      "scope": "Unrelated platform/hidden administration; unchanged."
+    },
+    {
+      "test": "P11RoleCatalogCloseoutTests.test_role_catalog_routes_enforce_platform_and_tenant_boundaries",
+      "classification": "BASELINE TEST DEBT",
+      "evidence": "Expected HTTP 200, observed 403 on platform/role-catalog surface. No changed Workforce/Timekeeping presentation is reached. Same baseline documented in prior MVP-02 evidence.",
+      "scope": "Unrelated platform/hidden administration; unchanged."
+    },
+    {
+      "test": "ConformanceBrowserTests.test_frozen_details_and_policy_aware_review",
+      "classification": "HARNESS ISSUE",
+      "evidence": "Selector action*=review matched the permitted /preview/ action. Screenshot proves approved record has no editor/submit/review. Corrected assertion to /review/ and /submit/ route segments; rerun in followup-final.log."
+    },
+    {
+      "test": "MissionRoutingConcurrencyTests.test_duplicate_source_race_has_one_native_target",
+      "classification": "TEST INFRASTRUCTURE DEBT",
+      "evidence": "Failure occurs during standard Django flush: retained payments_paymentdocumentlink FK references documents_document. Original race assertions reached completion; no Workforce/Timekeeping product exception. Follow-up runner uses existing test_-guarded cascading flush only for this test class; original test assertions unchanged."
+    }
+  ]
+}

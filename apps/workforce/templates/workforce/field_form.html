@@ -1,14 +1,14 @@
-{% extends "base.html" %}{% load static %}
+{% extends "base.html" %}{% load field_journey %}
 {% block title %}{{ title }} | بنیرا{% endblock %}
-{% block content %}{% load field_journey %}
-{% if assignment_employee %}
-{% field_breadcrumbs "تخصیص جدید" assignment_parent=True as breadcrumbs %}
-{% include "workforce/_field_header.html" with page_breadcrumbs=breadcrumbs page_title=title %}
-{% else %}
-{% field_breadcrumbs title workforce_parent=True as breadcrumbs %}
-{% include "workforce/_field_header.html" with page_breadcrumbs=breadcrumbs page_eyebrow="نیروهای کار" page_title=title %}
-{% endif %}
-<section class="erp-surface mx-auto mt-5 max-w-3xl rounded-xl p-5"><form method="post" class="grid gap-4 sm:grid-cols-2" novalidate>{% csrf_token %}{% if form.non_field_errors %}<div class="sm:col-span-2 rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">{{ form.non_field_errors }}</div>{% endif %}{% if assignment_employee %}<div data-assignment-worker><p class="mb-2 text-sm font-medium text-slate-700">نیروی کار</p><p class="font-semibold text-slate-900">{{ assignment_employee.first_name }} {{ assignment_employee.last_name }}</p><p class="text-xs text-slate-500" dir="auto">{{ assignment_employee.employee_number }}</p></div>{% endif %}{% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}{% include "workforce/_native_choices.html" with choice_form=form %}<div class="flex flex-wrap gap-2 border-t pt-4 sm:col-span-2"><button class="erp-btn erp-btn--primary">ثبت اطلاعات</button><a class="erp-btn erp-btn--secondary" href="{{ back_url }}">انصراف</a></div></form></section>
+{% block extra_head %}{% include "workforce/_form_assets.html" %}{% endblock %}
+{% block content %}
+<div class="erp-create-page">
+{% if assignment_employee %}{% field_breadcrumbs "تخصیص جدید" assignment_parent=True as breadcrumbs %}{% else %}{% field_breadcrumbs title workforce_parent=True as breadcrumbs %}{% endif %}
+{% include "workforce/_field_header.html" with page_breadcrumbs=breadcrumbs page_title=title page_description=request.organization.name %}
+<form method="post" class="erp-create-form mt-5" novalidate aria-label="{{ title }}">{% csrf_token %}
+{% if assignment_employee %}<div class="erp-form-section" data-assignment-worker><span class="text-xs text-slate-500">نیروی کار</span><p class="font-semibold">{{ assignment_employee.first_name }} {{ assignment_employee.last_name }}</p><bdi class="text-xs text-slate-500">{{ assignment_employee.employee_number }}</bdi></div>{% endif %}
+{% include "workforce/_form_sections.html" %}
+{% include "components/form_footer.html" with submit_label="ثبت اطلاعات" cancel_url=back_url only %}
+</form></div>
 {% endblock %}
-{% block extra_head %}{% load field_journey %}{% prepare_native_choices form %}{{ form.media.css }}{% endblock %}
 {% block extra_scripts %}{{ form.media.js }}{% endblock %}

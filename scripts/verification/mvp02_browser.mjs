@@ -261,7 +261,13 @@ try {
       if(step.inspect) {
         if(step.waitMs) await new Promise(done=>setTimeout(done,step.waitMs));
         const passed=await evaluate(step.inspect);
-        if(!passed) throw new Error(scenario.name+': '+step.description);
+        if(!passed) {
+          const diagnostic = await evaluate(`({url:location.pathname,width:innerWidth,menus:[...document.querySelectorAll('main details[open]')].map(d=>({classes:d.className,rect:d.getBoundingClientRect().toJSON(),items:[...d.querySelectorAll('.erp-list-row-menu__items')].map(e=>({rect:e.getBoundingClientRect().toJSON(),position:getComputedStyle(e).position,width:getComputedStyle(e).width}))}))})`);
+          await writeFile(join(outputDirectory, `${actor}-${scenario.name}-inspection-diagnostic.json`),JSON.stringify(diagnostic,null,2));
+          const shot = await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
+          await writeFile(join(outputDirectory, `${actor}-${scenario.name}-inspection-diagnostic.png`),Buffer.from(shot.data,'base64'));
+          throw new Error(scenario.name+': '+step.description);
+        }
         continue;
       }
       documentStatus = undefined;
@@ -350,13 +356,15 @@ try {
     if (scenario.groups && JSON.stringify(state.groups) !== JSON.stringify(scenario.groups)) throw new Error(`${scenario.name}: incorrect groups`);
     if (JSON.stringify(state.groups) !== JSON.stringify(state.mobileGroups)) throw new Error(`${scenario.name}: desktop/mobile differ`);
     if (scenario.path === '/' && state.scroll > state.width + 1) throw new Error(`${scenario.name}: Home overflows`);
-    if (scenario.mobile) {
+    // Other mobile scenarios verify the shell navigation. Its outside click
+    // deliberately closes row menus, so preserve an open popup for visual QA.
+    if (scenario.mobile && !scenario.preserveScrollScreenshot) {
       const opened = await evaluate(`(() => {const n=document.querySelector('.erp-mobile-nav'); n.querySelector('summary').click(); return n.open && n.getBoundingClientRect().width>0;})()`);
       if (!opened) throw new Error(`${scenario.name}: mobile navigation did not open`);
       await evaluate(`document.querySelector('.erp-mobile-nav summary').click()`);
     }
     if (scenario.screenshot) {
-      await evaluate('window.scrollTo(0,0)');
+      if (!scenario.preserveScrollScreenshot) await evaluate('window.scrollTo(0,0)');
       await new Promise(done=>setTimeout(done,120));
       if(scenario.name==='UX-worker-create-desktop') {
         const viewport = await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});

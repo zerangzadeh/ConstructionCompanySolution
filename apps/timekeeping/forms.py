@@ -142,7 +142,7 @@ class ShiftBreakForm(StyledForm):
 
 
 class ScopedForm(StyledForm):
-    employee = forms.ModelChoiceField(label="کارمند", queryset=Employee.objects.none())
+    employee = forms.ModelChoiceField(label="نیروی کار", queryset=Employee.objects.none())
     project = forms.ModelChoiceField(
         label="پروژه", queryset=Project.objects.none(), required=False
     )
@@ -261,7 +261,7 @@ class OvertimeForm(TimeRequestForm):
 
 
 class TimesheetForm(StyledForm):
-    employee = forms.ModelChoiceField(label="کارمند", queryset=Employee.objects.none())
+    employee = forms.ModelChoiceField(label="نیروی کار", queryset=Employee.objects.none())
     period_start = forms.DateField(
         label="شروع دوره", widget=forms.DateInput(attrs={"type": "date"})
     )

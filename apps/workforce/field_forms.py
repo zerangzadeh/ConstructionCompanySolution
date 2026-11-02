@@ -307,7 +307,7 @@ class AssignmentFilterForm(FieldFilterForm):
         from .field_selectors import scoped_employees
 
         super().__init__(*args, organization=organization, user=user, **kwargs)
-        self.fields.pop("q")
+        self.fields["q"].label = "جست‌وجوی نیرو یا مسئولیت"
         self.fields["status"].choices = (
             ("", "همه وضعیت‌ها"),
             ("active", "فعال"),

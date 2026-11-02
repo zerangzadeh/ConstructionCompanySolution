@@ -880,14 +880,16 @@ class MVP02SelectorTests(TestCase):
                 [breadcrumb.index(label) for label in labels],
                 sorted(breadcrumb.index(label) for label in labels),
             )
-            controls = html.split("data-workforce-team-filters>", 1)[1].split(
+            controls = html.split('id="list-filter-bar"', 1)[1].split(
                 "</form>", 1
             )[0]
             self.assertIn("اعمال فیلتر", controls)
-            self.assertIn("پاک کردن", controls)
-            self.assertEqual(html.count("اعمال فیلتر"), 1)
+            self.assertEqual(html.count('id="list-filter-bar"'), 1)
+            if query:
+                self.assertContains(response, "پاک کردن")
+                self.assertTrue(response.context["filter_bar"]["chips"])
             self.assertNotIn('id="work-team-filters-row"', html)
-            for name in ("team", "department", "lead"):
+            for name in ("q", "department", "lead"):
                 self.assertIn('name="' + name + '"', controls)
             self.assert_persistent_workforce_tabs(response)
         self.assertNotContains(

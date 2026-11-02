@@ -1,3 +1,244 @@
+# MVP-02 UI/UX conformance remediation — 2026-11-02
+
+**MVP-02 UI/UX CONFORMANCE IMPLEMENTATION COMPLETE** — Development/non-production.
+**Product Owner visual acceptance: PENDING.** This is technical implementation
+conformance, not Human visual acceptance, release certification or production authority.
+
+## 1. Authority and repository grounding
+
+The supplied bounded Human request authorizes this later UI/UX remediation after
+MVP-04, with Project pages explicitly excluded. Actual entry was **clean `main`**
+at `d9adfa0d418bba1fa8831d0f7bbcb9e598c2015f` (`MVP_04`); local `origin/main`
+was equal to HEAD. This reconciles the request's uncommitted-tree description with
+repository reality. HEAD and branch remain unchanged; changes are uncommitted.
+No reset, clean, checkout, stash, branch/worktree creation, index update, commit,
+push or production operation. MVP-05: **NOT STARTED**.
+
+Canonical sources reconciled: UI guidelines; frozen D1–D7; current Roadmap §10;
+original MVP-02 completion and earlier remediation evidence; central Product
+Surface; actual URLs/views/templates; shared components; Contracts Reference List,
+Reference Create Form and newer Procurement/Inventory patterns. This request
+provides bounded authority to adopt these patterns on MVP-02. It does not expand
+any capability, change a CEP, or issue acceptance of another package.
+
+## 2. Discovered surface, before assessment and target pattern
+
+The complete pre-implementation route/template/business-purpose/page-type/
+visibility/journey/deficiency/target inventory is
+[DISCOVERY.md](../../../output/mvp-02/conformance-20261102/DISCOVERY.md).
+It records **25 principal pages/variants**, existing POST-only transitions,
+scoped lookups and legacy compatibility adapters. Exact scope comes from current
+central exposure plus actual implementation and MVP-02 evidence, not app names.
+
+| Page family | Before | Implemented target |
+| --- | --- | --- |
+| Worker list | Basic filter grid; no chips/count/sort/mobile cards/menu | Shared Reference List, business identity, scoped filters, chips, count, stable allowlisted sort, badges, row menu, pagination and mobile cards |
+| Assignment list | No business search/chips/count; raw start date and wide mobile table | Same Reference List over actual worker/project/site/responsibility/dates/state; existing end/cancel under menu; Jalali dates |
+| Crew list | Separate three-input filter; exposed archive; absent paging UI/mobile cards | Reference List with business search, secondary filters, chips, count, sort, paging, mobile cards and archive menu |
+| Worker create/edit and both assignment forms | Undifferentiated grid | Shared grouped sections, existing bound fields/selectors, inline errors, error summary and sticky submit/cancel |
+| Crew creation | Compact but ungrouped | Shared sections/footer; company scope, manual code and qualified masters preserved |
+| Attendance/request/timesheet/setup/correction forms | Flat fields | Grouped identity/context, time and details using existing form-field/Jalali/Tom Select contracts |
+| Worker detail | Surname title, repeated identity, edit-centric CTA | Full name, state badge, operational CTA, source/back links and secondary menu; no edit/status controls for terminated collaboration |
+| Timekeeping workspace | Large filters before daily actions; sparse history context | Daily operations first, compact filters/chips/count, distinct source histories, worker/project/site/date/entry/exit/state, independent pagination and source actions |
+| Attendance/correction/leave/overtime detail | Generic key/value dead end | Dedicated state-aware Timekeeping detail, business identity/context/dates/reasons/history and eligible next action |
+| Timesheet detail/allocation | Weak state cues; overflowing review row; actor-ineligible affordances | Allocation progress, state/actor/permission-aware submission/review, responsive entry, frozen approved history and contextual return |
+
+## 3. Project exclusions and backend preservation
+
+**EXCLUDED — PROJECT PAGE:** every Project List/Create/Edit/Detail/dashboard/hub,
+Project template, page layout/styling and Project navigation implementation.
+Project destinations, Site pages and Daily Report pages remain unchanged.
+Existing links/context/selectors continue to work. No newly discovered defect
+required a Project-page change; no Project remediation was performed.
+
+Full HR/ESS/employment/foundation, Payroll and technical attendance import remain
+UI-hidden. Existing compatibility routes continue to adapt to the Field UI.
+No hidden capability was activated. **UI-Hidden ≠ Backend-Disabled.**
+
+## 4. Actual implementation touch set
+
+The exact 29-file source/document/test touch set and final SHA-256 values are in
+[VALIDATION.json](../../../output/mvp-02/conformance-20261102/VALIDATION.json).
+The bounded seams are:
+
+- Workforce field views/filter forms, presentation helper and presentation tag;
+  field list/form/detail templates; crew/assignment read/form presentation in
+  existing views and templates.
+- Timekeeping view composition, two worker labels, dedicated action-presentation
+  helper/detail and existing workspace/form/timesheet templates.
+- Reused **unchanged** shared Reference List/Form CSS/components, form-field,
+  validation, semantic badges, qualified Tom Select, Jalali and pagination helpers.
+- One small opt-in `workforce/field_list.js` positions the existing reference
+  menus within the viewport, closes them on scroll/resize and preserves their
+  existing disclosure/focus/Escape/outside-click behavior. Browser evidence
+  justified this adapter because the reference popup clipped inside a scroller.
+- Focused regression/Chrome scenarios; a diagnostic/screenshot improvement to the
+  existing installed-Chrome probe; this report and separate current evidence.
+
+No dependency added. No model/schema/migration, domain service, calculation,
+authorization enforcement/catalog, SoD, workflow, selector authority or Product
+Surface change. Working context remains independent of page filters. Services
+still re-authorize and enforce every mutation; UI affordances grant no authority.
+
+## 5. Browser, responsive and screenshot verification
+
+**PASS — 122 distinct browser scenarios**: **112 expected HTTP 200**, **5 expected
+403**, **5 expected 404**. Installed real Chrome (`Program Files/Google/Chrome`),
+headless/CDP against isolated PostgreSQL and Django live servers. No browser binary
+was downloaded. [browser-summary.json](../../../output/mvp-02/conformance-20261102/browser-summary.json)
+records every scenario and its source result file.
+
+- All **25 principal pages/variants at 1440, 1024 and 390**: 75 matrix scenarios.
+  Desktop/tablet tables scroll inside their result container; mobile uses the
+  accepted cards where appropriate. Document overflow, RTL, header CTA bounds,
+  business labels, selector enhancement and JS/HTTP failures are checked.
+- Nine row-menu scenarios across all three widths; nine frozen-worker/approved-
+  timesheet/missing-policy-review scenarios; 11 connected journey/denial scenarios.
+- The retained A–H browser test also passes all **18** existing scenarios: worker
+  creation without login, Project/Site/Daily Report entry, independent attendance,
+  overtime, timesheet/allocation, hidden HR/ESS, reader/foreign actor and mobile.
+  Navigation creates no inferred domain facts; existing source assertions remain.
+- Connected journeys exercise actual navigation → worker/detail, scoped worker
+  selection, attendance/overtime/timesheet entry, allocation, search, sorting,
+  pagination, Back, refresh, validation failure retention, unauthorized user,
+  foreign tenant and mismatched Project/Site. Existing focused tests cover forged
+  selectors, scoped reads/writes and mixed-site timesheet protection.
+- Frozen records omit unsupported edit/submit/review controls. An independent
+  eligible reviewer can act; the originating actor cannot review their own record.
+  Missing approved policy reference does not expose an approval control.
+
+All generated principal screenshots were inspected through viewport images and
+contact sheets; menu, validation, operational workspace and frozen-state images
+were additionally inspected. Compared with the accepted
+[Contracts List capture](../../../output/contracts-micro-polish-20261101/browser/f61-owner-REF-pagination-and-sort-desktop.png)
+and the
+[Reference Form capture](../../../output/contract-create-reference/browser/f61-owner-create-1440.png).
+Reference Form implementation acceptance remains separately pending; using its
+shared presentation does not issue Product Owner acceptance.
+
+Current screenshots and reviewed QA sheets are under
+[browser/](../../../output/mvp-02/conformance-20261102/browser/).
+Use `*-viewport.png` for open menus. Full-page mobile captures can place a sticky
+footer at the capture viewport; bottom/viewport captures were also reviewed.
+No Objective Project visual correction was attempted.
+
+## 6. Failures, corrections and regression results
+
+Raw failed runs remain failed and retained; no failed run is relabelled PASS.
+
+| Run | Actual result | Attribution / follow-up |
+| --- | --- | --- |
+| focused-attempt-1 | 63 tests + 38 subtests PASS; 11 failed assertions | Ten missing page-filter explanation assertions fixed in UI; one obsolete crew-filter DOM contract updated to the shared pattern without weakening hierarchy/filter checks |
+| focused-final | **69 tests + 48 subtests PASS**, zero failures | Workforce/selector/context, Timekeeping, central surface and new focused checks |
+| browser-attempt-1 | FAIL | Objective tablet table overflow; fixed with existing result containment |
+| browser-attempt-2 / menu diagnostic | FAIL | Objective clipped row popup; fixed with bounded positioning adapter; nine menu scenarios subsequently PASS |
+| browser-final | FAIL after principal matrix/menu success | Journey assertion selected shell search instead of list search. Screenshot proved chip/value retention; assertion qualified to list form |
+| journeys-final | **PASS** | 17 scenarios including six refreshed matrix captures and 11 journey/denial scenarios |
+| regression-attempt-1 | **188 tests + 66 subtests PASS; 4 FAIL** | Two unrelated platform baseline tests, one review-vs-preview selector error, one retained-table teardown error; full classification below |
+| followup-final | **8 tests PASS**, zero failures | Six conformance tests, frozen browser test (nine scenarios), original concurrency assertions with isolated guarded cascading teardown |
+| menus-capture-final | **PASS**, nine scenarios | Current menu/date presentation and desktop/tablet captures |
+| mobile-menu-capture-final | **PASS**, three scenarios | Open-popup captures after preventing the probe's separate mobile-nav check from closing them |
+
+The two platform tests still fail and were **not fixed, hidden or waived**:
+`test_platform_navigation_exposes_all_approved_platform_controls` expects the
+role-catalog navigation in MVP; `test_role_catalog_routes_enforce_platform_and_tenant_boundaries`
+expects 200 where the unchanged central exposure returns 403. Their organization,
+platform and shared-shell implementation is unchanged; the original MVP-02
+report already independently records these baseline failures. Neither failure
+reaches the remediated presentation. They remain **BASELINE TEST DEBT** outside
+this request. No broad-suite PASS is claimed.
+
+The frozen detail assertion matched `/preview/` with `action*=review`; the corrected
+selector uses `/review/`. The screenshot shows no editor/submit/review on approved
+history. Classification: **HARNESS ISSUE**, resolved and rerun.
+
+The mission concurrency test failed during Django teardown because retained
+`payments_paymentdocumentlink` references `documents_document`. Its race assertions
+were unchanged. A separate runner reuses the existing browser class's
+`test_`-database-guarded cascading Django flush only for this class. Classification:
+**TEST INFRASTRUCTURE DEBT**, isolated verification mitigation; no product,
+Development database, table or migration repair. The isolated original race test
+now passes. Historical generated CEP-062 traces are preserved byte-for-byte by
+the runners; synthetic uploads are confined to current evidence.
+
+[Failure attribution](../../../output/mvp-02/conformance-20261102/failure-attribution.json),
+[regression argv](../../../output/mvp-02/conformance-20261102/regression-argv.json),
+[raw broader log](../../../output/mvp-02/conformance-20261102/regression-attempt-1.log),
+[follow-up argv](../../../output/mvp-02/conformance-20261102/followup-argv.json),
+[passing follow-up log](../../../output/mvp-02/conformance-20261102/followup-final.log)
+and [JUnit](../../../output/mvp-02/conformance-20261102/followup-junit.xml)
+retain precise results. No full-repository regression claim.
+
+## 7. Project-page preservation evidence
+
+**PASS:** all **75 Project implementation files** and all **230 protected files**
+match their entry SHA-256 values. Protected scope includes Project app/templates,
+shared components/assets, core, configuration, Workforce/Timekeeping models,
+migrations and domain/selector authorities, Roadmap and CEP Registry.
+No Project file is in the remediation diff.
+[Entry baseline](../../../output/mvp-02/conformance-20261102/baseline.json),
+[preservation result](../../../output/mvp-02/conformance-20261102/preservation.json)
+and final validation manifest prove byte preservation. Original MVP-02 completion
+and other package evidence remain unchanged.
+
+## 8. Technical leakage, permission and scope result
+
+**Technical leakage: PASS** within the inspected surface. No visible raw UUID,
+model-object string, internal field/permission/service/enum label was found.
+Business codes remain business labels. Service failures are translated at the
+presentation boundary; domain validation and rejection remain authoritative.
+
+**Tenant / Project / Site isolation: PASS** in focused and browser coverage.
+Existing authenticated membership, tenant, permission, scoped selector/query,
+critical service and protected-operation checks remain intact. Page filters and
+presentation state never write working-context session state or grant access.
+
+## 9. Static validation, decisions and limitations
+
+Django check, migration drift (**No changes detected**), changed Python Ruff,
+new/formatted-module format check, 11 principal template compilations, shared
+static resolution, two JavaScript syntax checks and `git diff --check` PASS.
+[Static checks](../../../output/mvp-02/conformance-20261102/static-checks.json).
+No Development migration was applied by this remediation.
+
+No remaining in-scope Product Owner business/domain decision is needed. Visual
+acceptance is **PENDING**. Known limits: the two unchanged platform baseline tests;
+the isolated teardown infrastructure mitigation; representative synthetic
+non-production evidence; no independent assistive-technology certification,
+full-repository regression, production migration/deployment, Human sign-off or
+release certification. Historical hidden-domain evidence retains its own scope.
+
+## 10. Final technical status
+
+```text
+MVP-02 UI/UX REMEDIATION: PASS
+MVP-02 SURFACE INVENTORY: COMPLETE
+PROJECT PAGES PRESERVED: PASS
+LIST PATTERN CONFORMANCE: PASS
+FORM PATTERN CONFORMANCE: PASS
+DETAIL PATTERN CONFORMANCE: PASS
+OPERATIONAL WORKSPACE UX: PASS
+TECHNICAL LEAKAGE: PASS
+NAVIGATION / JOURNEY CONTINUITY: PASS
+TENANT / PROJECT / SITE ISOLATION: PASS
+FUNCTIONAL REGRESSION: PASS
+RESPONSIVE BROWSER VALIDATION: PASS
+PRODUCT OWNER VISUAL ACCEPTANCE: PENDING
+MVP-02 UI/UX CONFORMANCE IMPLEMENTATION COMPLETE
+```
+
+The scoped functional-regression status uses the passing affected assertions and
+corrected follow-up; it does not turn the broader 188/4 run into a passing run or
+close its two unrelated baseline failures. Stop after this remediation. No commit,
+no push, no MVP-05.
+
+---
+
+# Retained earlier remediation evidence
+
+The dated evidence below remains historical with its original build, scope and
+acceptance limitations. Its earlier Project/Site work is not part of this remediation.
+
 # MVP-02 UI/UX Remediation — 2026-10-29
 
 **Status: READY_FOR_HUMAN_REVIEW — Development/non-production only.**

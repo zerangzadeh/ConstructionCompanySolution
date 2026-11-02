@@ -1,0 +1,10 @@
+{% load field_ui %}
+{% include "components/form_errors.html" with form=form only %}
+{% if form.errors %}<div class="rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert" tabindex="-1" data-field-errors>ثبت انجام نشد. خطاهای مشخص‌شده را اصلاح کنید؛ اطلاعات واردشده حفظ شده است.</div>{% endif %}
+{% for field in form.hidden_fields %}{{ field }}{{ field.errors }}{% endfor %}
+{% field_form_sections form as sections %}
+{% for section in sections %}<section class="erp-form-section erp-form-section--compact" aria-labelledby="{{ section.id }}">
+  {% include "components/form_section_header.html" with heading_id=section.id heading=section.title icon=section.icon only %}
+  <div class="erp-form-grid erp-form-grid--two">{% for field in section.fields %}{% if field.field.widget.input_type == "checkbox" or field.field.widget.attrs.rows %}<div class="erp-form-grid__full">{% include "components/form_field.html" with field=field only %}</div>{% else %}{% include "components/form_field.html" with field=field only %}{% endif %}{% endfor %}</div>
+</section>{% endfor %}
+{% include "workforce/_native_choices.html" with choice_form=form %}

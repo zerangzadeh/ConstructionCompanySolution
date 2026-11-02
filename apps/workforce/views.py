@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.http import (
     FileResponse,
     Http404,
@@ -1232,6 +1233,27 @@ def position_archive(request: HttpRequest, position_id: str) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.WORK_TEAMS_VIEW)
 @require_GET
 def work_team_list(request: HttpRequest) -> HttpResponse:
+    from core.product_surface import surface_profile
+
+    if surface_profile() == "MVP":
+        from .field_presentation import TeamFilterForm, list_presentation
+
+        # Keep the earlier `team` query as a compatibility alias.
+        values = request.GET.copy()
+        if "q" not in values and values.get("team"):
+            values["q"] = values["team"]
+        form = TeamFilterForm(values)
+        records = get_organization_work_teams(user=request.user, organization=request.organization)
+        records = apply_table_filters(
+            records, request,
+            text_fields={"q": ("name", "code"), "team": ("name", "code"), "department": ("department__name",), "lead": ("lead__first_name", "lead__last_name")},
+        )
+        page = paginate_table(records, request, sort_fields={"team": ("name", "code", "pk"), "department": ("department__name", "pk"), "lead": ("lead__last_name", "lead__first_name", "pk")}, default_ordering=("name", "pk"))
+        return render(request, "workforce/field_team_list.html", {
+            "work_teams": page.object_list, "page_obj": page,
+            "pagination_query": table_pagination_query(request),
+            **list_presentation(request, form, page, kind="teams"),
+        })
     return _master_list(
         request,
         get_organization_work_teams,
@@ -1273,7 +1295,9 @@ def work_team_create(request: HttpRequest) -> HttpResponse:
                 **form.cleaned_data,
             )
         except (PermissionDenied, ValueError) as exc:
-            form.add_error(None, str(exc))
+            from .field_presentation import presentation_error
+
+            form.add_error(None, presentation_error(exc))
         else:
             messages.success(request, "گروه کاری ایجاد شد.")
             return redirect("workforce:work_team_list")
@@ -1308,7 +1332,9 @@ def work_team_archive(request: HttpRequest, team_id: str) -> HttpResponse:
         )
         messages.success(request, "گروه کاری بایگانی شد.")
     except (PermissionDenied, ValueError) as exc:
-        messages.error(request, str(exc))
+        from .field_presentation import presentation_error
+
+        messages.error(request, presentation_error(exc))
     return redirect("workforce:work_team_list")
 
 
@@ -1325,6 +1351,9 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
     form = AssignmentFilterForm(values or None, organization=request.organization, user=request.user)
     if values:
         if form.is_valid():
+            if form.cleaned_data.get("q"):
+                q = form.cleaned_data["q"]
+                assignments = assignments.filter(Q(employee__first_name__icontains=q) | Q(employee__last_name__icontains=q) | Q(employee__employee_number__icontains=q) | Q(role_title__icontains=q))
             for name in ("employee", "project", "site", "status"):
                 if form.cleaned_data.get(name):
                     assignments = assignments.filter(**{name: form.cleaned_data[name]})
@@ -1339,14 +1368,16 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
         assignments,
         request,
         sort_fields={
-            "employee": ("employee__last_name", "employee__first_name"),
-            "project": "project__name",
-            "role": "role_title",
-            "start_date": "start_date",
-            "status": "status",
+            "employee": ("employee__last_name", "employee__first_name", "pk"),
+            "project": ("project__name", "pk"),
+            "role": ("role_title", "pk"),
+            "start_date": ("start_date", "pk"),
+            "status": ("status", "pk"),
         },
         default_ordering=("-start_date", "pk"),
     )
+    from .field_presentation import list_presentation
+
     return render(
         request,
         "workforce/assignment_list.html",
@@ -1356,6 +1387,7 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
             "pagination_query": table_pagination_query(request),
             "form": form,
             "has_active_filters": has_active_table_filters(request),
+            **list_presentation(request, form, page, kind="assignments"),
         },
     )
 
@@ -1385,7 +1417,9 @@ def assignment_create(request: HttpRequest) -> HttpResponse:
                 **form.cleaned_data,
             )
         except (PermissionDenied, ValueError) as exc:
-            form.add_error(None, str(exc))
+            from .field_presentation import presentation_error
+
+            form.add_error(None, presentation_error(exc))
         else:
             messages.success(request, "کارمند به پروژه تخصیص یافت.")
             return redirect("workforce:assignment_list")
