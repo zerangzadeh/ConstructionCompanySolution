@@ -30,3 +30,32 @@ def breadcrumb_trail(current_label, *parents):
 @register.filter
 def surface_link_active(link, view_name):
     return link.is_active_for(view_name)
+
+
+@register.simple_tag
+def module_selector_links(groups, view_name, current_path):
+    """Present only already-authorized shell destinations; grant nothing.
+
+    Canonical active-route aliases win. For descendants without an alias,
+    highlight the longest existing destination path. No new destination,
+    namespace map, permission or exposure policy is created.
+    """
+    items = [
+        {"link": link, "url": reverse(link.route), "active": False}
+        for group in groups
+        for link in group.links
+    ]
+    active = next(
+        (item for item in items if item["link"].is_active_for(view_name)), None
+    )
+    if active is None:
+        candidates = [
+            item
+            for item in items
+            if current_path == item["url"]
+            or current_path.startswith(item["url"].rstrip("/") + "/")
+        ]
+        active = max(candidates, key=lambda item: len(item["url"]), default=None)
+    if active is not None:
+        active["active"] = True
+    return items

@@ -1,0 +1,152 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ ModuleSelectorBrowserTests.test_four_representative_routes_and_restricted_membership_offline _
+
+self = <test_f3_module_selector.ModuleSelectorBrowserTests testMethod=test_four_representative_routes_and_restricted_membership_offline>
+
+    def test_four_representative_routes_and_restricted_membership_offline(self):
+        restricted = User.objects.create_user(username="f3-project-reader")
+        role = OrganizationRole.objects.create(
+            organization=self.organization,
+            code="f3-project-reader",
+            name="Project reader",
+        )
+        role.permissions.add(BusinessPermission.objects.get(code="projects.view"))
+        membership = self.organization.memberships.create(
+            user=restricted, role_definition=role, status=MembershipStatus.ACTIVE
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+        )
+        scenarios = []
+        sessions = {}
+        for label, actor in (("owner", self.owner), ("restricted", restricted)):
+            # force_login on a client already holding another actor's session
+            # invalidates that session; each browser actor needs its own client.
+            self.client = Client()
+            self.login(actor)
+            sessions[label] = self.client.cookies["sessionid"].value
+            routes = (
+                ["projects:list"]
+                if label == "restricted"
+                else [
+                    "projects:list",
+                    "contracts:list",
+                    "procurement:request_list",
+                    "workforce:field_list",
+                ]
+            )
+            for route in routes:
+                path = reverse(route)
+                self.assertTrue(url_exposed(path))
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 200)
+                groups = response.context["product_navigation_groups"]
+                expected = [
+                    {"label": link.label, "url": reverse(link.route)}
+                    for group in groups
+                    for link in group.links
+                ]
+                if label == "restricted":
+                    self.assertNotIn(
+                        reverse("contracts:list"), [x["url"] for x in expected]
+                    )
+                    self.assertIn(
+                        reverse("projects:list"), [x["url"] for x in expected]
+                    )
+                for width in (1440, 390):
+                    scenarios.append(
+                        {
+                            "name": f"{label}-{route.replace(':', '-')}-{width}",
+                            "path": path,
+                            "width": width,
+                            "actor": label,
+                            "expected": expected,
+                            "active": path,
+                            "navigateTo": reverse("contracts:list")
+                            if label == "owner" and route == "projects:list"
+                            else "",
+                        }
+                    )
+        output = ROOT / "output/f3/browser"
+        output.mkdir(parents=True, exist_ok=True)
+        env = os.environ.copy()
+        env["F3_SESSIONS"] = json.dumps(sessions)
+        env["F3_SCENARIOS"] = json.dumps(scenarios)
+        result = subprocess.run(
+            [
+                "node",
+                str(ROOT / "scripts/verification/f3_browser.mjs"),
+                self.live_server_url,
+                str(output),
+            ],
+            env=env,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=240,
+            check=False,
+        )
+        (output / "command.txt").write_text(
+            f"exit={result.returncode}\n{result.stdout}\n{result.stderr}",
+            encoding="utf-8",
+        )
+>       self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-6000:])
+E       AssertionError: 1 != 0 : node:internal/modules/run_main:107
+E           triggerUncaughtException(
+E           ^
+E       
+E       Error: Native modal traps keyboard focus
+E           at assert (file:///E:/Construction_Company_Solution/scripts/verification/f3_browser.mjs:96:58)
+E           at file:///E:/Construction_Company_Solution/scripts/verification/f3_browser.mjs:172:5
+E       
+E       Node.js v24.20.0
+
+tests\test_f3_module_selector.py:174: AssertionError
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-02T17:27:48.794286+00:00","event":"http.response","request_id":"b8e90567-3818-48f5-99b6-443c5b920b54","method":"GET","route":"projects:list","status_code":200,"duration_ms":293}
+
+{"timestamp":"2026-11-02T17:27:48.998088+00:00","event":"http.response","request_id":"ccc4210c-8443-483a-9897-8c6bab9830bd","method":"GET","route":"contracts:list","status_code":200,"duration_ms":194}
+
+{"timestamp":"2026-11-02T17:27:49.173412+00:00","event":"http.response","request_id":"0704336f-8b78-4f25-91db-2d7dfa4ebbf3","method":"GET","route":"procurement:request_list","status_code":200,"duration_ms":176}
+
+{"timestamp":"2026-11-02T17:27:49.382291+00:00","event":"http.response","request_id":"3c89fbad-c977-4424-8827-9bd899c51609","method":"GET","route":"workforce:field_list","status_code":200,"duration_ms":204}
+
+{"timestamp":"2026-11-02T17:27:49.508521+00:00","event":"http.response","request_id":"b54b73c3-805c-4556-84f9-33280ba7ad4b","method":"GET","route":"projects:list","status_code":200,"duration_ms":103}
+
+{"timestamp":"2026-11-02T17:27:50.435030+00:00","event":"http.response","request_id":"c93b009c-7e30-4198-afcd-b90b7c82e5cc","method":"GET","route":"projects:list","status_code":200,"duration_ms":322}
+
+{"timestamp":"2026-11-02T17:27:51.318777+00:00","event":"http.response","request_id":"f5421245-f8e6-4589-8fe5-137f646ce6c5","method":"GET","route":null,"status_code":404,"duration_ms":235}
+
+[02/Nov/2026 20:57:52,301] - Broken pipe from ('127.0.0.1', 60457)
+
+[02/Nov/2026 20:57:52,301] - Broken pipe from ('127.0.0.1', 57091)
+
+[02/Nov/2026 20:57:52,301] - Broken pipe from ('127.0.0.1', 61713)
+
+[02/Nov/2026 20:57:52,302] - Broken pipe from ('127.0.0.1', 63514)
+
+[02/Nov/2026 20:57:52,302] - Broken pipe from ('127.0.0.1', 61641)
+
+[02/Nov/2026 20:57:52,302] - Broken pipe from ('127.0.0.1', 63008)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 60457)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 57091)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 61713)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 63514)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 61641)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 63008)
+=========================== short test summary info ===========================
+FAILED tests/test_f3_module_selector.py::ModuleSelectorBrowserTests::test_four_representative_routes_and_restricted_membership_offline
+1 failed in 27.30s

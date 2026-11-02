@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="18" time="50.451" timestamp="2026-11-02T20:55:07.457361+03:30" hostname="Zerangzadeh"><testcase classname="core.test_product_surface.ProductSurfaceHttpTests" name="test_permission_and_exposure_are_intersections" time="10.839" /><testcase classname="core.test_product_surface.ProductSurfaceHttpTests" name="test_home_desktop_mobile_and_admin_navigation_share_five_groups" time="0.488" /><testcase classname="tests.test_f3_module_selector.ModuleSelectorBrowserTests" name="test_four_representative_routes_and_restricted_membership_offline" time="38.585"><failure message="AssertionError: 1 != 0 : node:internal/modules/run_main:107&#10;    triggerUncaughtException(&#10;    ^&#10;&#10;Error: Page did not settle: location.pathname===&quot;/projects/&quot; &amp;&amp; document.readyState==='complete'&#10;    at waitFor (file:///E:/Construction_Company_Solution/scripts/verification/f3_browser.mjs:74:11)&#10;    at async file:///E:/Construction_Company_Solution/scripts/verification/f3_browser.mjs:114:5&#10;&#10;Node.js v24.20.0">self = &lt;test_f3_module_selector.ModuleSelectorBrowserTests testMethod=test_four_representative_routes_and_restricted_membership_offline&gt;
+
+    def test_four_representative_routes_and_restricted_membership_offline(self):
+        restricted = User.objects.create_user(username="f3-project-reader")
+        role = OrganizationRole.objects.create(
+            organization=self.organization,
+            code="f3-project-reader",
+            name="Project reader",
+        )
+        role.permissions.add(BusinessPermission.objects.get(code="projects.view"))
+        membership = self.organization.memberships.create(
+            user=restricted, role_definition=role, status=MembershipStatus.ACTIVE
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+        )
+        scenarios = []
+        sessions = {}
+        for label, actor in (("owner", self.owner), ("restricted", restricted)):
+            self.login(actor)
+            sessions[label] = self.client.cookies["sessionid"].value
+            routes = (
+                ["projects:list"]
+                if label == "restricted"
+                else [
+                    "projects:list",
+                    "contracts:list",
+                    "procurement:request_list",
+                    "workforce:field_list",
+                ]
+            )
+            for route in routes:
+                path = reverse(route)
+                self.assertTrue(url_exposed(path))
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 200)
+                groups = response.context["product_navigation_groups"]
+                expected = [
+                    {"label": link.label, "url": reverse(link.route)}
+                    for group in groups
+                    for link in group.links
+                ]
+                if label == "restricted":
+                    self.assertNotIn(
+                        reverse("contracts:list"), [x["url"] for x in expected]
+                    )
+                    self.assertIn(
+                        reverse("projects:list"), [x["url"] for x in expected]
+                    )
+                for width in (1440, 390):
+                    scenarios.append(
+                        {
+                            "name": f"{label}-{route.replace(':', '-')}-{width}",
+                            "path": path,
+                            "width": width,
+                            "actor": label,
+                            "expected": expected,
+                            "active": path,
+                            "navigateTo": reverse("contracts:list")
+                            if label == "owner" and route == "projects:list"
+                            else "",
+                        }
+                    )
+        output = ROOT / "output/f3/browser"
+        output.mkdir(parents=True, exist_ok=True)
+        env = os.environ.copy()
+        env["F3_SESSIONS"] = json.dumps(sessions)
+        env["F3_SCENARIOS"] = json.dumps(scenarios)
+        result = subprocess.run(
+            [
+                "node",
+                str(ROOT / "scripts/verification/f3_browser.mjs"),
+                self.live_server_url,
+                str(output),
+            ],
+            env=env,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=240,
+            check=False,
+        )
+        (output / "command.txt").write_text(
+            f"exit={result.returncode}\n{result.stdout}\n{result.stderr}",
+            encoding="utf-8",
+        )
+&gt;       self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-6000:])
+E       AssertionError: 1 != 0 : node:internal/modules/run_main:107
+E           triggerUncaughtException(
+E           ^
+E       
+E       Error: Page did not settle: location.pathname==="/projects/" &amp;&amp; document.readyState==='complete'
+E           at waitFor (file:///E:/Construction_Company_Solution/scripts/verification/f3_browser.mjs:74:11)
+E           at async file:///E:/Construction_Company_Solution/scripts/verification/f3_browser.mjs:114:5
+E       
+E       Node.js v24.20.0
+
+tests\test_f3_module_selector.py:171: AssertionError</failure></testcase><testcase classname="tests.test_f3_module_selector.ModuleSelectorPresentationTests" name="test_current_route_alias_and_longest_authorized_parent_path" time="0.021" /><testcase classname="tests.test_f3_module_selector.ModuleSelectorPresentationTests" name="test_empty_navigation_has_no_fabricated_destination" time="0.002" /><testcase classname="tests.test_f3_module_selector.ModuleSelectorPresentationTests" name="test_only_canonical_filtered_links_and_labels_are_rendered" time="0.004" /><testcase classname="core.test_cep017_navigation.Cep017NavigationTemplateTests" name="test_canonical_navigation_register_is_complete_and_persian_first" time="0.006" /><testcase classname="core.test_cep017_navigation.Cep017NavigationTemplateTests" name="test_empty_groups_and_hidden_targets_are_not_placeholders" time="0.002" /><testcase classname="core.test_cep017_navigation.Cep017NavigationTemplateTests" name="test_rfq_navigation_renders_one_state_for_each_permission_variant" time="0.003" /><testcase classname="core.test_cep017_navigation.Cep017NavigationTemplateTests" name="test_shared_breadcrumb_and_mobile_close_contract_are_present" time="0.003" /><testcase classname="core.test_product_surface.SurfacePolicyTests" name="test_navigation_permissions_empty_groups_and_operational_reports" time="0.001" /></testsuite></testsuites>

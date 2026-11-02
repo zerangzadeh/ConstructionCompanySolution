@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="66.331" timestamp="2026-11-02T20:43:55.104901+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_f2_shared_interactions.SharedInteractionBrowserTests" name="test_three_surfaces_at_desktop_and_mobile_offline" time="65.573"><failure message="AssertionError: 1 != 0 : node:internal/modules/run_main:107&#10;    triggerUncaughtException(&#10;    ^&#10;&#10;Error: Page did not settle: document.readyState==='complete' &amp;&amp; !!document.querySelector('.erp-message--success') &amp;&amp; !document.querySelector('form[action$=&quot;/submit/&quot;]')&#10;    at waitFor (file:///E:/Construction_Company_Solution/scripts/verification/f2_browser.mjs:73:11)&#10;    at async file:///E:/Construction_Company_Solution/scripts/verification/f2_browser.mjs:180:7&#10;&#10;Node.js v24.20.0">self = &lt;test_f2_shared_interactions.SharedInteractionBrowserTests testMethod=test_three_surfaces_at_desktop_and_mobile_offline&gt;
+
+    def test_three_surfaces_at_desktop_and_mobile_offline(self):
+        make_field_fixture(self.owner, self.organization)
+        self.login(self.owner)
+        scenarios = []
+        request_ids = []
+        for width in (1440, 390):
+            record = create_purchase_request(
+                organization=self.organization,
+                project=self.project,
+                actor=self.owner,
+                request_number=f"F2-PR-{width}",
+                title="مصالح آزمایشی F2",
+            )
+            add_purchase_request_item(
+                organization=self.organization,
+                actor=self.owner,
+                purchase_request=record,
+                material=self.material,
+                quantity=Decimal(2),
+            )
+            request_ids.append(record.pk)
+            for name, route, args, choice, query, action in (
+                (
+                    "mvp02-worker",
+                    "workforce:field_create",
+                    [],
+                    "work_team",
+                    "آرماتور",
+                    False,
+                ),
+                ("mvp03-contract", "contracts:create", [], "project", "سازه", False),
+                (
+                    "mvp04-pr",
+                    "procurement:request_detail",
+                    [record.pk],
+                    "material",
+                    "سیمان",
+                    True,
+                ),
+            ):
+                path = reverse(route, args=args)
+                self.assertTrue(url_exposed(path))
+                scenarios.append(
+                    {
+                        "name": f"{name}-{width}",
+                        "path": path,
+                        "width": width,
+                        "choice": choice,
+                        "query": query,
+                        "action": action,
+                    }
+                )
+        evidence = ROOT / "output/f2/browser"
+        evidence.mkdir(parents=True, exist_ok=True)
+        env = os.environ.copy()
+        env["F2_SESSION"] = self.client.cookies["sessionid"].value
+        env["F2_SCENARIOS"] = json.dumps(scenarios)
+        result = subprocess.run(
+            [
+                "node",
+                str(ROOT / "scripts/verification/f2_browser.mjs"),
+                self.live_server_url,
+                str(evidence),
+            ],
+            env=env,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=240,
+            check=False,
+        )
+        (evidence / "command.txt").write_text(
+            f"exit={result.returncode}\n{result.stdout}\n{result.stderr}",
+            encoding="utf-8",
+        )
+&gt;       self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-5000:])
+E       AssertionError: 1 != 0 : node:internal/modules/run_main:107
+E           triggerUncaughtException(
+E           ^
+E       
+E       Error: Page did not settle: document.readyState==='complete' &amp;&amp; !!document.querySelector('.erp-message--success') &amp;&amp; !document.querySelector('form[action$="/submit/"]')
+E           at waitFor (file:///E:/Construction_Company_Solution/scripts/verification/f2_browser.mjs:73:11)
+E           at async file:///E:/Construction_Company_Solution/scripts/verification/f2_browser.mjs:180:7
+E       
+E       Node.js v24.20.0
+
+tests\test_f2_shared_interactions.py:106: AssertionError</failure></testcase></testsuite></testsuites>

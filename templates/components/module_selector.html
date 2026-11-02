@@ -1,0 +1,17 @@
+{% load product_surface %}
+{% module_selector_links product_navigation_groups request.resolver_match.view_name request.path as module_links %}
+<button class="erp-module-trigger" type="button" data-module-trigger aria-label="انتخاب بخش سامانه" aria-haspopup="dialog" aria-controls="erp-module-selector" aria-expanded="false">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    <span>بخش‌ها</span>
+</button>
+<dialog id="erp-module-selector" class="erp-module-selector" aria-labelledby="erp-module-selector-title">
+    <div class="erp-module-selector__heading">
+        <h2 id="erp-module-selector-title">بخش‌های سامانه</h2>
+        <button class="erp-module-selector__close" type="button" data-module-close aria-label="بستن انتخاب بخش">بستن <span aria-hidden="true">×</span></button>
+    </div>
+    <nav class="erp-module-selector__row" aria-label="بخش‌های قابل دسترسی" tabindex="0">
+        {% for item in module_links %}
+        <a class="erp-module-selector__link" href="{{ item.url }}"{% if item.active %} aria-current="page"{% endif %}>{{ item.link.label }}{% if item.active %}<span class="erp-module-selector__current">بخش جاری</span>{% endif %}</a>
+        {% empty %}<p class="erp-module-selector__empty">بخشی برای نمایش در دسترس نیست.</p>{% endfor %}
+    </nav>
+</dialog>

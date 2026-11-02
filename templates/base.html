@@ -12,6 +12,7 @@
     <script src="{% static 'js/erp_money.js' %}" defer></script>
     <script src="{% static 'js/erp_table.js' %}?v=20261023-cep078-associated-filters" defer></script>
     <script src="{% static 'js/erp_context.js' %}?v=20261025-uiux-business-context" defer></script>
+    {% if request.user.is_authenticated %}<link rel="stylesheet" href="{% static 'css/erp_module_selector.css' %}">{% endif %}
     <style>
          :root {
             --erp-canvas: #f8fafc;
@@ -705,6 +706,7 @@
                     </div>
                 </details>
                 <a class="flex min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700" href="{% url 'organizations:select' %}"><svg class="h-4 w-4 shrink-0 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18M5 21V7h8v14m0-10h6v10M8 10h2m-2 4h2m-2 4h2m8-4h-2m2 4h-2"/></svg><span class="hidden text-slate-400 sm:inline">شرکت فعال:</span><span class="max-w-28 truncate sm:max-w-56">{{ request.organization.name|default:"انتخاب شرکت" }}</span></a>
+                {% include "components/module_selector.html" %}
                 {% block header_working_context %}{% endblock %}
                 {% if request.organization %}<form class="hidden min-w-0 flex-1 md:flex" method="get" action="{% url 'global_search' %}"><label class="sr-only" for="header-global-search">جستجوی پروژه و مصالح</label><input id="header-global-search" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs" name="q" minlength="2" maxlength="100" autocomplete="off" placeholder="جستجوی پروژه و مصالح"></form>{% endif %}
                 <div class="hidden h-5 w-px bg-slate-200 md:block"></div>
@@ -744,6 +746,7 @@
         })();
 
     </script>
+    {% if request.user.is_authenticated %}<script src="{% static 'js/erp_module_selector.js' %}" defer></script>{% endif %}
     {% block extra_scripts %}{% endblock %}
 </body>
 

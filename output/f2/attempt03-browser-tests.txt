@@ -1,0 +1,174 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ SharedInteractionBrowserTests.test_three_surfaces_at_desktop_and_mobile_offline _
+
+self = <test_f2_shared_interactions.SharedInteractionBrowserTests testMethod=test_three_surfaces_at_desktop_and_mobile_offline>
+
+    def test_three_surfaces_at_desktop_and_mobile_offline(self):
+        make_field_fixture(self.owner, self.organization)
+        self.login(self.owner)
+        scenarios = []
+        request_ids = []
+        for width in (1440, 390):
+            record = create_purchase_request(
+                organization=self.organization,
+                project=self.project,
+                actor=self.owner,
+                request_number=f"F2-PR-{width}",
+                title="\u0645\u0635\u0627\u0644\u062d \u0622\u0632\u0645\u0627\u06cc\u0634\u06cc F2",
+            )
+            add_purchase_request_item(
+                organization=self.organization,
+                actor=self.owner,
+                purchase_request=record,
+                material=self.material,
+                quantity=Decimal(2),
+            )
+            request_ids.append(record.pk)
+            for name, route, args, choice, query, action in (
+                (
+                    "mvp02-worker",
+                    "workforce:field_create",
+                    [],
+                    "work_team",
+                    "\u0622\u0631\u0645\u0627\u062a\u0648\u0631",
+                    False,
+                ),
+                ("mvp03-contract", "contracts:create", [], "project", "\u0633\u0627\u0632\u0647", False),
+                (
+                    "mvp04-pr",
+                    "procurement:request_detail",
+                    [record.pk],
+                    "material",
+                    "\u0633\u06cc\u0645\u0627\u0646",
+                    True,
+                ),
+            ):
+                path = reverse(route, args=args)
+                self.assertTrue(url_exposed(path))
+                scenarios.append(
+                    {
+                        "name": f"{name}-{width}",
+                        "path": path,
+                        "width": width,
+                        "choice": choice,
+                        "query": query,
+                        "action": action,
+                    }
+                )
+        evidence = ROOT / "output/f2/browser"
+        evidence.mkdir(parents=True, exist_ok=True)
+        env = os.environ.copy()
+        env["F2_SESSION"] = self.client.cookies["sessionid"].value
+        env["F2_SCENARIOS"] = json.dumps(scenarios)
+        result = subprocess.run(
+            [
+                "node",
+                str(ROOT / "scripts/verification/f2_browser.mjs"),
+                self.live_server_url,
+                str(evidence),
+            ],
+            env=env,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=240,
+            check=False,
+        )
+        (evidence / "command.txt").write_text(
+            f"exit={result.returncode}\n{result.stdout}\n{result.stderr}",
+            encoding="utf-8",
+        )
+>       self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-5000:])
+E       AssertionError: 1 != 0 : node:internal/modules/run_main:107
+E           triggerUncaughtException(
+E           ^
+E       
+E       Error: Page did not settle: document.readyState==='complete' && !!document.querySelector('.erp-message--success') && !document.querySelector('form[action$="/submit/"]')
+E           at waitFor (file:///E:/Construction_Company_Solution/scripts/verification/f2_browser.mjs:73:11)
+E           at async file:///E:/Construction_Company_Solution/scripts/verification/f2_browser.mjs:180:7
+E       
+E       Node.js v24.20.0
+
+tests\test_f2_shared_interactions.py:106: AssertionError
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-02T17:14:13.989521+00:00","event":"http.response","request_id":"a72cc09d-fcf5-4ac3-8a3d-1ae580304c09","method":"GET","route":"workforce:field_create","status_code":200,"duration_ms":496}
+
+{"timestamp":"2026-11-02T17:14:14.876250+00:00","event":"http.response","request_id":"e004f6d9-9398-4298-a32e-ed4bfbb02316","method":"GET","route":null,"status_code":404,"duration_ms":232}
+
+{"timestamp":"2026-11-02T17:14:15.452557+00:00","event":"http.response","request_id":"bc038040-4697-4364-81b4-b39b683dc322","method":"GET","route":"workforce:field_choices","status_code":200,"duration_ms":159}
+
+{"timestamp":"2026-11-02T17:14:16.559922+00:00","event":"http.response","request_id":"f2a9377c-7192-4f85-818b-e3d7da20a4f2","method":"GET","route":"contracts:create","status_code":200,"duration_ms":415}
+
+{"timestamp":"2026-11-02T17:14:17.095862+00:00","event":"http.response","request_id":"09c499c8-707f-4ca7-9862-19d64693d4cd","method":"GET","route":"billing:journey_choices","status_code":200,"duration_ms":122}
+
+{"timestamp":"2026-11-02T17:14:17.402820+00:00","event":"http.response","request_id":"3353ac38-5d8a-4646-94f4-93892a188a7e","method":"GET","route":"billing:journey_choices","status_code":200,"duration_ms":132}
+
+{"timestamp":"2026-11-02T17:14:18.315965+00:00","event":"http.response","request_id":"5baecea3-7ad2-486c-8fb2-0545f0e9d7d2","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":551}
+
+{"timestamp":"2026-11-02T17:14:18.999470+00:00","event":"http.response","request_id":"72b18ffb-e47a-4443-ad12-b4430c2d7b5c","method":"GET","route":"procurement:request_choices","status_code":200,"duration_ms":181}
+
+{"timestamp":"2026-11-02T17:14:19.348894+00:00","event":"http.response","request_id":"9958d352-f27a-49d4-bb82-281429f741aa","method":"GET","route":"procurement:request_choices","status_code":200,"duration_ms":265}
+
+{"timestamp":"2026-11-02T17:14:22.113148+00:00","event":"http.response","request_id":"1754cd43-b097-40ef-b9c3-1947f5729e59","method":"POST","route":"procurement:request_submit","status_code":302,"duration_ms":845}
+
+{"timestamp":"2026-11-02T17:14:22.722821+00:00","event":"http.response","request_id":"95a5b5bc-9672-49ad-b276-66a74ef11ddf","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":602}
+
+{"timestamp":"2026-11-02T17:14:25.418944+00:00","event":"http.response","request_id":"0a0d9347-7518-4268-ba6f-549f6247390a","method":"GET","route":"workforce:field_create","status_code":200,"duration_ms":513}
+
+{"timestamp":"2026-11-02T17:14:26.195079+00:00","event":"http.response","request_id":"dcbd5997-70b9-4333-99b9-f5aef73b2265","method":"GET","route":"workforce:field_choices","status_code":200,"duration_ms":154}
+
+{"timestamp":"2026-11-02T17:14:26.484341+00:00","event":"http.response","request_id":"b7e05f83-961d-49c9-a768-040059dfd283","method":"GET","route":"workforce:field_choices","status_code":200,"duration_ms":151}
+
+{"timestamp":"2026-11-02T17:14:27.091582+00:00","event":"http.response","request_id":"1c94dd44-8aa5-491b-a438-8326c0a73982","method":"GET","route":"contracts:create","status_code":200,"duration_ms":329}
+
+{"timestamp":"2026-11-02T17:14:28.002992+00:00","event":"http.response","request_id":"8eeb2562-67de-4314-8bf4-1061a1ff54f9","method":"GET","route":"billing:journey_choices","status_code":200,"duration_ms":197}
+
+{"timestamp":"2026-11-02T17:14:28.922056+00:00","event":"http.response","request_id":"9bc16003-c531-4704-b6d9-d9d9b6fbd4d8","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":670}
+
+{"timestamp":"2026-11-02T17:14:29.585434+00:00","event":"http.response","request_id":"1719ebd6-9c67-4f1d-9ca2-7cb0c8e42d92","method":"GET","route":"procurement:request_choices","status_code":200,"duration_ms":137}
+
+{"timestamp":"2026-11-02T17:14:29.867200+00:00","event":"http.response","request_id":"c2483685-9edb-411e-bc6d-be873c4f9ea2","method":"GET","route":"procurement:request_choices","status_code":200,"duration_ms":122}
+
+[02/Nov/2026 20:44:53,468] - Broken pipe from ('127.0.0.1', 59672)
+
+[02/Nov/2026 20:44:53,468] - Broken pipe from ('127.0.0.1', 56316)
+
+[02/Nov/2026 20:44:53,468] - Broken pipe from ('127.0.0.1', 57940)
+
+[02/Nov/2026 20:44:53,468] - Broken pipe from ('127.0.0.1', 64776)
+
+[02/Nov/2026 20:44:53,470] - Broken pipe from ('127.0.0.1', 65206)
+
+[02/Nov/2026 20:44:53,470] - Broken pipe from ('127.0.0.1', 52284)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 59672)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 56316)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 57940)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 64776)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 65206)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 52284)
+=========================== short test summary info ===========================
+FAILED tests/test_f2_shared_interactions.py::SharedInteractionBrowserTests::test_three_surfaces_at_desktop_and_mobile_offline
+1 failed in 66.37s (0:01:06)

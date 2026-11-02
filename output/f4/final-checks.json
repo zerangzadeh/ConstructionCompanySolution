@@ -1,0 +1,21 @@
+{
+  "node --check scripts/verification/f4_browser.mjs": {
+    "exit": 0,
+    "output": ""
+  },
+  ".venv/Scripts/ruff.exe check tests/test_f4_frontend_conformance.py": {
+    "exit": 0,
+    "output": "All checks passed!\n"
+  },
+  ".venv/Scripts/ruff.exe format --check tests/test_f4_frontend_conformance.py": {
+    "exit": 0,
+    "output": "1 file already formatted\n"
+  },
+  "git diff --check": {
+    "exit": 0,
+    "output": "warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'core/templatetags/product_surface.py', LF will be replaced by CRLF the next time Git touches it\n"
+  },
+  "entry_hashes": "187/187 PASS",
+  "new_files_within_F4_scope": true,
+  "report_links": "PASS"
+}

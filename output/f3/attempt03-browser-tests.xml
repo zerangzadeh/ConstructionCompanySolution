@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="27.252" timestamp="2026-11-02T20:57:33.360007+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_f3_module_selector.ModuleSelectorBrowserTests" name="test_four_representative_routes_and_restricted_membership_offline" time="26.769"><failure message="AssertionError: 1 != 0 : node:internal/modules/run_main:107&#10;    triggerUncaughtException(&#10;    ^&#10;&#10;Error: Native modal traps keyboard focus&#10;    at assert (file:///E:/Construction_Company_Solution/scripts/verification/f3_browser.mjs:96:58)&#10;    at file:///E:/Construction_Company_Solution/scripts/verification/f3_browser.mjs:172:5&#10;&#10;Node.js v24.20.0">self = &lt;test_f3_module_selector.ModuleSelectorBrowserTests testMethod=test_four_representative_routes_and_restricted_membership_offline&gt;
+
+    def test_four_representative_routes_and_restricted_membership_offline(self):
+        restricted = User.objects.create_user(username="f3-project-reader")
+        role = OrganizationRole.objects.create(
+            organization=self.organization,
+            code="f3-project-reader",
+            name="Project reader",
+        )
+        role.permissions.add(BusinessPermission.objects.get(code="projects.view"))
+        membership = self.organization.memberships.create(
+            user=restricted, role_definition=role, status=MembershipStatus.ACTIVE
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+        )
+        scenarios = []
+        sessions = {}
+        for label, actor in (("owner", self.owner), ("restricted", restricted)):
+            # force_login on a client already holding another actor's session
+            # invalidates that session; each browser actor needs its own client.
+            self.client = Client()
+            self.login(actor)
+            sessions[label] = self.client.cookies["sessionid"].value
+            routes = (
+                ["projects:list"]
+                if label == "restricted"
+                else [
+                    "projects:list",
+                    "contracts:list",
+                    "procurement:request_list",
+                    "workforce:field_list",
+                ]
+            )
+            for route in routes:
+                path = reverse(route)
+                self.assertTrue(url_exposed(path))
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 200)
+                groups = response.context["product_navigation_groups"]
+                expected = [
+                    {"label": link.label, "url": reverse(link.route)}
+                    for group in groups
+                    for link in group.links
+                ]
+                if label == "restricted":
+                    self.assertNotIn(
+                        reverse("contracts:list"), [x["url"] for x in expected]
+                    )
+                    self.assertIn(
+                        reverse("projects:list"), [x["url"] for x in expected]
+                    )
+                for width in (1440, 390):
+                    scenarios.append(
+                        {
+                            "name": f"{label}-{route.replace(':', '-')}-{width}",
+                            "path": path,
+                            "width": width,
+                            "actor": label,
+                            "expected": expected,
+                            "active": path,
+                            "navigateTo": reverse("contracts:list")
+                            if label == "owner" and route == "projects:list"
+                            else "",
+                        }
+                    )
+        output = ROOT / "output/f3/browser"
+        output.mkdir(parents=True, exist_ok=True)
+        env = os.environ.copy()
+        env["F3_SESSIONS"] = json.dumps(sessions)
+        env["F3_SCENARIOS"] = json.dumps(scenarios)
+        result = subprocess.run(
+            [
+                "node",
+                str(ROOT / "scripts/verification/f3_browser.mjs"),
+                self.live_server_url,
+                str(output),
+            ],
+            env=env,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=240,
+            check=False,
+        )
+        (output / "command.txt").write_text(
+            f"exit={result.returncode}\n{result.stdout}\n{result.stderr}",
+            encoding="utf-8",
+        )
+&gt;       self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-6000:])
+E       AssertionError: 1 != 0 : node:internal/modules/run_main:107
+E           triggerUncaughtException(
+E           ^
+E       
+E       Error: Native modal traps keyboard focus
+E           at assert (file:///E:/Construction_Company_Solution/scripts/verification/f3_browser.mjs:96:58)
+E           at file:///E:/Construction_Company_Solution/scripts/verification/f3_browser.mjs:172:5
+E       
+E       Node.js v24.20.0
+
+tests\test_f3_module_selector.py:174: AssertionError</failure></testcase></testsuite></testsuites>
