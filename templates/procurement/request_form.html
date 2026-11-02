@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% load static field_journey %}
+{% block title %}درخواست خرید جدید | بنیرا{% endblock %}
+{% block extra_head %}{% prepare_native_choices form %}{{ form.media.css }}<link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}"><link rel="stylesheet" href="{% static 'css/erp_create_form.css' %}">{% endblock %}
+{% block extra_scripts %}{{ form.media.js }}<script src="{% static 'js/erp_create_form.js' %}" defer></script>{% endblock %}
+{% block content %}<div class="erp-create-page" data-create-page>
+{% include "components/create_form_header.html" with page_title="درخواست خرید جدید" page_description="نیازهای خرید پروژه را ثبت کنید؛ پس از ثبت، اقلام را اضافه و درخواست را برای بررسی ارسال کنید." organization=request.organization form=form only %}
+<form class="erp-create-form" method="post" novalidate aria-label="درخواست خرید جدید">{% csrf_token %}
+{% include "components/form_errors.html" with form=form only %}
+{% for field in form.hidden_fields %}{{ field }}{% if field.errors %}<p class="erp-field-error" role="alert">{{ field.label }}: {{ field.errors|join:", " }}</p>{% endif %}{% endfor %}
+<section class="erp-form-section" aria-labelledby="request-basic-heading">
+{% include "components/form_section_header.html" with heading_id="request-basic-heading" heading="اطلاعات درخواست" description="پروژه و مشخصات درخواست خرید را مشخص کنید." icon="document" only %}
+<div class="erp-form-grid erp-form-grid--two">
+{% if not form.project.is_hidden %}{% include "components/form_field.html" with field=form.project only %}{% else %}<div class="erp-form-parent"><span>پروژه</span><p>{{ form.inherited_parents.0.title }} <bdi dir="ltr">{{ form.inherited_parents.0.code }}</bdi></p></div>{% endif %}
+{% include "components/form_field.html" with field=form.request_number only %}
+<div class="erp-form-grid__full">{% include "components/form_field.html" with field=form.title only %}</div>
+</div></section>
+<section class="erp-form-section" aria-labelledby="request-date-heading">{% include "components/form_section_header.html" with heading_id="request-date-heading" heading="زمان نیاز" description="در صورت مشخص بودن، تاریخ موردنیاز پروژه را وارد کنید." icon="calendar" only %}<div class="erp-form-grid erp-form-grid--two">{% include "components/form_field.html" with field=form.required_by only %}</div></section>
+<section class="erp-form-section" aria-labelledby="request-notes-heading">{% include "components/form_section_header.html" with heading_id="request-notes-heading" heading="توضیحات" description="توضیحات تکمیلی خرید و محل مصرف را ثبت کنید." icon="notes" only %}{% include "components/form_field.html" with field=form.notes only %}</section>
+{% include "components/form_footer.html" with submit_label="ثبت درخواست و افزودن اقلام" cancel_url=cancel_url only %}
+</form></div>{% endblock %}

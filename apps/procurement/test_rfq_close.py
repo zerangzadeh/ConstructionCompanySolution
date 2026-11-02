@@ -68,6 +68,14 @@ class RFQCloseFixtureMixin(ProcurementFixtureMixin):
             purchase_request_item=item,
             quantity=Decimal("10.0000"),
         )
+        from .scope_test_helpers import define_fixture_scopes
+
+        define_fixture_scopes(
+            organization=self.organization,
+            actor=self.owner,
+            rfq=rfq,
+            specifications=getattr(self, "scope_specifications", (("LINE-1", True),)),
+        )
         submit_rfq_for_issue(organization=self.organization, actor=self.member, rfq=rfq)
         suppliers = [self.supplier]
         if include_absent_invitation:

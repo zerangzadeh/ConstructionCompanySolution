@@ -3,7 +3,9 @@
 from uuid import uuid4
 
 from django import forms
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms import formset_factory
+from django.http import Http404
 
 from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import BusinessPermissionCode as P
@@ -31,6 +33,7 @@ ACTIONS = {
     "finalize_comparison": (P.RFQ_QUOTES_FINALIZE_COMPARISON, "نهایی‌سازی مقایسه"),
     "prepare_award": (P.RFQ_QUOTES_PREPARE_SOURCING_AWARD, "آماده‌سازی انتخاب"),
     "finalize_award": (P.RFQ_QUOTES_FINALIZE_SOURCING_AWARD, "نهایی‌سازی انتخاب"),
+    "attach_evidence": (P.RFQS_CUSTODY_SEALED_EVIDENCE, "نگهداری اصل و پیوست پیشنهاد"),
 }
 
 
@@ -52,7 +55,7 @@ def confidential_revisions(*, rfq, actor):
         membership__status="active",
         revocation__isnull=True,
     ).values("quote_revision_id")
-    return records.filter(pk__in=grants)
+    return records.filter(pk__in=grants, opening_event__isnull=False)
 
 
 def comparison_records(*, rfq, actor):
@@ -80,7 +83,13 @@ def revision_label(revision):
 
 
 def comparison_label(comparison):
-    return f"{comparison.commercial_scope.scope_code} · {comparison.get_status_display()} · {format_jalali(comparison.created_at, include_time=True)}"
+    return f"{scope_label(comparison.commercial_scope)} · {comparison.get_status_display()} · {format_jalali(comparison.created_at, include_time=True)}"
+
+
+def scope_label(scope):
+    line = scope.rfq_version_line
+    name = line.material.name if line else f"بسته {scope.scope_code}"
+    return f"{name} · {scope.required_quantity} {scope.unit_of_measure.symbol} · نسخه استعلام {scope.rfq_version.version_number}"
 
 
 class RFQActionForm(JalaliDateMixin, forms.Form):
@@ -88,7 +97,7 @@ class RFQActionForm(JalaliDateMixin, forms.Form):
         label="زمان ارائه تأمین‌کننده", required=False
     )
 
-    def __init__(self, *args, rfq, actor, action, **kwargs):
+    def __init__(self, *args, rfq, actor, action, context=None, **kwargs):
         super().__init__(*args, **kwargs)
         org = rfq.organization
         revisions = m.QuoteRevision.objects.filter(
@@ -106,7 +115,7 @@ class RFQActionForm(JalaliDateMixin, forms.Form):
             fields.pop("supplier_submitted_at")
         text = lambda label: forms.CharField(label=label, max_length=500)
         key = lambda: forms.CharField(
-            label="شناسه پیگیری عملیات", max_length=128, initial=uuid4
+            max_length=128, initial=uuid4, widget=forms.HiddenInput
         )
         rev = lambda qs=revisions: choice(qs, "نسخه پیشنهاد", describe=revision_label)
         comp = lambda qs=comparisons: choice(qs, "مقایسه", describe=comparison_label)
@@ -128,20 +137,28 @@ class RFQActionForm(JalaliDateMixin, forms.Form):
                         "دعوت‌نامه",
                         describe=lambda x: x.supplier.display_name,
                     ),
-                    "integrity_fingerprint": forms.RegexField(
-                        r"^[0-9a-fA-F]{64}$",
-                        label="اثر انگشت SHA-256 منبع",
-                        max_length=64,
+                    "source_file": forms.FileField(
+                        label="اصل فایل دریافتی برای ثبت رسید",
+                        help_text="رسید از خود فایل محاسبه می‌شود. فایل در این مرحله نگهداری نمی‌شود؛ اصل آن را برای نگهداری حفاظت‌شده پس از بستن استعلام حفظ کنید.",
                     ),
                     "source_channel": forms.ChoiceField(
-                        label="مسیر دریافت", choices=m.QuoteSourceChannel.choices
-                    ),
-                    "source_reference": forms.CharField(
-                        label="مرجع دریافت", max_length=255, required=False
+                        label="مسیر دریافت",
+                        choices=[
+                            x
+                            for x in m.QuoteSourceChannel.choices
+                            if x[0] != "external_portal"
+                        ],
                     ),
                     "idempotency_key": key(),
                 }
             )
+        elif action == "attach_evidence":
+            fields["quote_revision"] = rev(revisions.filter(status="submitted"))
+            fields["evidence_type"] = forms.ChoiceField(
+                label="نوع مدرک", choices=m.QuoteEvidenceType.choices
+            )
+            fields["upload"] = forms.FileField(label="فایل اصل یا پیوست")
+            fields["idempotency_key"] = key()
         elif action in {
             "submit",
             "withdraw",
@@ -149,13 +166,21 @@ class RFQActionForm(JalaliDateMixin, forms.Form):
             "grant_access",
             "prepare_admissibility",
         }:
-            fields["quote_revision"] = rev(
-                confidential if action == "prepare_admissibility" else revisions
-            )
+            targets = confidential if action == "prepare_admissibility" else revisions
+            if action == "submit" and not (context and context.get("quote_revision")):
+                targets = targets.filter(status="captured")
+            elif action == "withdraw" and not (
+                context and context.get("quote_revision")
+            ):
+                targets = targets.filter(status__in=["captured", "submitted"])
+            elif action in {"request_opening", "grant_access"}:
+                targets = targets.filter(status="submitted", is_late=False)
+            fields["quote_revision"] = rev(targets)
             if action in {"request_opening", "grant_access"}:
                 fields["reason"] = text("دلیل")
             if action == "grant_access":
                 fields["membership"] = member()
+                fields["membership"].queryset = members.exclude(user=actor)
             if action == "prepare_admissibility":
                 fields.update(
                     {
@@ -188,7 +213,11 @@ class RFQActionForm(JalaliDateMixin, forms.Form):
                 m.QuoteConfidentialAccessGrant.objects.filter(
                     organization=org,
                     quote_revision__in=revisions,
-                    revocation__isnull=True,
+                    **(
+                        {}
+                        if context and context.get("grant")
+                        else {"revocation__isnull": True}
+                    ),
                 ),
                 "دسترسی فعال",
                 describe=lambda x: (
@@ -226,9 +255,7 @@ class RFQActionForm(JalaliDateMixin, forms.Form):
                     rfq_version__version_number=rfq.current_version_number,
                 ),
                 "دامنه تجاری حاکم",
-                describe=lambda x: (
-                    f"{x.scope_code} · {x.required_quantity} {x.unit_of_measure.symbol}"
-                ),
+                describe=scope_label,
             )
             fields["supersedes"] = choice(
                 comparisons.filter(finalized_at__isnull=False),
@@ -241,7 +268,7 @@ class RFQActionForm(JalaliDateMixin, forms.Form):
             fields["comparison"] = comp(
                 comparisons.filter(finalized_at__isnull=False)
                 if action == "prepare_award"
-                else comparisons
+                else comparisons.filter(finalized_at__isnull=True)
             )
             if action == "appoint_evaluator":
                 fields["membership"] = member()
@@ -268,6 +295,7 @@ class RFQActionForm(JalaliDateMixin, forms.Form):
                     comparison__in=comparisons,
                     membership__user=actor,
                     revoked_at__isnull=True,
+                    comparison__finalized_at__isnull=True,
                 ),
                 "انتصاب ارزیابی من",
                 describe=lambda x: comparison_label(x.comparison),
@@ -324,6 +352,28 @@ class RFQActionForm(JalaliDateMixin, forms.Form):
                     f"{comparison_label(x.comparison)} · {x.get_outcome_display()}"
                 ),
             )
+        # Contextual parents are selected from the same scoped queryset and pinned
+        # on POST. A URL or hidden value never supplies authority.
+        self.context_objects = {}
+        for name, field in fields.items():
+            if (
+                isinstance(field, forms.ModelChoiceField)
+                and context
+                and context.get(name)
+            ):
+                try:
+                    target = field.queryset.get(pk=context[name])
+                except (ValueError, ObjectDoesNotExist, ValidationError):
+                    raise Http404("مرجع مجاز این مرحله یافت نشد.") from None
+                field.queryset = field.queryset.filter(pk=target.pk)
+                field.initial = target.pk
+                field.widget = forms.HiddenInput()
+                self.context_objects[name] = field.label_from_instance(target)
+        if action == "evaluate" and "appointment" in self.context_objects:
+            appointment = fields["appointment"].queryset.get()
+            fields["input"].queryset = fields["input"].queryset.filter(
+                comparison=appointment.comparison
+            )
         for field in fields.values():
             if isinstance(field, forms.ChoiceField) and not isinstance(
                 field, forms.ModelChoiceField
@@ -351,11 +401,18 @@ class ComparisonInputForm(forms.Form):
         label="مبنای پیشنهاد جایگزین", max_length=500, required=False
     )
 
-    def __init__(self, *args, rfq, actor, **kwargs):
+    def __init__(self, *args, rfq, actor, scope=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["quote_revision_id"] = choice(
             confidential_revisions(rfq=rfq, actor=actor)
-            .filter(rfq_version__version_number=rfq.current_version_number)
+            .filter(
+                rfq_version__version_number=rfq.current_version_number,
+                status="submitted",
+                is_late=False,
+                admissibility_decisions__state="admissible",
+                admissibility_decisions__superseded_by__isnull=True,
+            )
+            .distinct()
             .select_related("envelope__supplier"),
             "نسخه پیشنهادی",
             describe=revision_label,
@@ -368,7 +425,7 @@ class AwardAllocationForm(forms.Form):
         label="مقدار تخصیص", max_digits=18, decimal_places=4, min_value=0
     )
 
-    def __init__(self, *args, rfq, actor, **kwargs):
+    def __init__(self, *args, rfq, actor, comparison=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["comparison_input_id"] = choice(
             m.CommercialComparisonInput.objects.filter(
@@ -376,6 +433,7 @@ class AwardAllocationForm(forms.Form):
                 comparison__in=comparison_records(rfq=rfq, actor=actor).filter(
                     finalized_at__isnull=False
                 ),
+                **({"comparison": comparison} if comparison else {}),
             ),
             "ورودی انتخاب",
             describe=lambda x: (

@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, Validat
 from django.db import transaction
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods
 
 from apps.organizations.authorization import (
@@ -23,6 +24,7 @@ from apps.procurement import admissibility_services as admissibility
 from apps.procurement import comparison_services as commercial
 from apps.procurement import opening_services as opening
 from apps.procurement import quote_services as quotes
+from apps.procurement.buyer_ui import action_url, presentation_error, workspace_context
 from apps.procurement.models import (
     QuoteRevision,
     RequestForQuotationInvitation,
@@ -88,6 +90,7 @@ def buyer_progress(request: HttpRequest, rfq, actions: list[dict]) -> dict:
 
 @active_organization_required
 @organization_permission_required(P.RFQS_VIEW)
+@never_cache
 @require_GET
 def buyer_workspace(request: HttpRequest, rfq_id: str) -> HttpResponse:
     rfq = _rfq(request, rfq_id)
@@ -125,6 +128,117 @@ def buyer_workspace(request: HttpRequest, rfq_id: str) -> HttpResponse:
     )
     award_scope = comparisons if can_award else comparisons.none()
     actions = action_links(request, rfq)
+    context = workspace_context(request, rfq)
+    comparisons_list = list(
+        inputs.select_related(
+            "commercial_scope__rfq_version_line__material",
+            "commercial_scope__unit_of_measure",
+            "commercial_scope__rfq_version",
+        ).prefetch_related(
+            "inputs__assertion",
+            "inputs__admissibility_decision",
+            "inputs__evaluations__evaluated_by",
+            "evaluator_appointments__membership__user",
+            "evaluator_appointments__conflicts",
+            "superseded_by",
+        )
+    )
+    allowed_actions = (
+        {item["code"] for item in actions}
+        if request.organization.status == "active"
+        else set()
+    )
+    for comparison in comparisons_list:
+        comparison.ui_actions = []
+        comparison.has_successor = bool(list(comparison.superseded_by.all()))
+        candidates = (
+            ["prepare_award"]
+            if comparison.finalized_at
+            else []
+            if comparison.has_successor
+            else ["appoint_evaluator", "finalize_comparison"]
+        )
+        for code in candidates:
+            if code in allowed_actions:
+                comparison.ui_actions.append(
+                    {
+                        "code": code,
+                        "title": ACTIONS[code][1],
+                        "url": action_url(rfq, code, comparison=comparison.pk),
+                    }
+                )
+        for appointment in comparison.evaluator_appointments.all():
+            appointment.ui_actions = []
+            if (
+                appointment.membership.user_id == request.user.pk
+                and not appointment.revoked_at
+                and not comparison.finalized_at
+                and not comparison.has_successor
+            ):
+                for code in ("evaluate", "declare_conflict"):
+                    if code in allowed_actions:
+                        appointment.ui_actions.append(
+                            {
+                                "title": ACTIONS[code][1],
+                                "url": action_url(
+                                    rfq, code, appointment=appointment.pk
+                                ),
+                            }
+                        )
+            for conflict in appointment.conflicts.all():
+                conflict.ui_url = (
+                    action_url(rfq, "dispose_conflict", conflict=conflict.pk)
+                    if "dispose_conflict" in allowed_actions
+                    and conflict.disposition == "proposed"
+                    and conflict.declared_by_id != request.user.pk
+                    and not conflict.superseded_by.exists()
+                    else None
+                )
+    preparations = list(
+        SourcingAwardPreparation.objects.filter(
+            organization=request.organization, comparison__in=award_scope
+        )
+        .select_related("comparison__commercial_scope", "prepared_by", "final_award")
+        .prefetch_related(
+            "allocations__comparison_input__quote_revision__envelope__supplier"
+        )
+    )
+    for preparation in preparations:
+        preparation.ui_url = (
+            action_url(rfq, "finalize_award", preparation=preparation.pk)
+            if "finalize_award" in allowed_actions
+            and not hasattr(preparation, "final_award")
+            else None
+        )
+    # Approved allocation consumption is a separate explicit PO action. The
+    # existing confidential comparison scope above still controls this page.
+    from .order_ui import award_groups
+
+    awards = list(
+        SourcingAward.objects.filter(
+            organization=request.organization, comparison__in=award_scope
+        )
+        .select_related(
+            "comparison__commercial_scope__rfq_version__rfq__project", "finalized_by"
+        )
+        .prefetch_related(
+            "allocations__quote_revision__envelope__supplier", "superseded_by"
+        )
+    )
+    can_create_order = has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=P.PURCHASE_ORDERS_CREATE,
+        project=rfq.project,
+    )
+    for award in awards:
+        award.order_groups = (
+            award_groups(request, award)
+            if can_create_order
+            and award.outcome == "awarded"
+            and not list(award.superseded_by.all())
+            else []
+        )
     return render(
         request,
         "procurement/rfq_buyer_workspace.html",
@@ -132,17 +246,10 @@ def buyer_workspace(request: HttpRequest, rfq_id: str) -> HttpResponse:
             "rfq": rfq,
             "actions": actions,
             "progress": buyer_progress(request, rfq, actions),
-            "comparisons": inputs,
-            "award_preparations": SourcingAwardPreparation.objects.filter(
-                organization=request.organization, comparison__in=award_scope
-            )
-            .select_related("comparison__commercial_scope")
-            .prefetch_related("allocations"),
-            "awards": SourcingAward.objects.filter(
-                organization=request.organization, comparison__in=award_scope
-            )
-            .select_related("comparison__commercial_scope")
-            .prefetch_related("allocations__quote_revision__envelope__supplier"),
+            **context,
+            "comparisons": comparisons_list,
+            "award_preparations": preparations,
+            "awards": awards,
         },
     )
 
@@ -150,7 +257,23 @@ def buyer_workspace(request: HttpRequest, rfq_id: str) -> HttpResponse:
 def _execute(action: str, *, organization, actor, data: dict, rows: list[dict]):
     common = {"organization": organization, "actor": actor}
     if action == "capture":
-        return quotes.capture_quote_revision(**common, **data)
+        # Receipt metadata is derived from actual source bytes, without creating
+        # custody or processing evidence before the existing close gate.
+        from apps.procurement.custody_services import _stage_upload
+
+        staged = _stage_upload(data.pop("source_file"))
+        try:
+            return quotes.capture_quote_revision(
+                **common, integrity_fingerprint=staged.sha256, **data
+            )
+        finally:
+            staged.path.unlink(missing_ok=True)
+    if action == "attach_evidence":
+        from apps.procurement.custody_services import custody_sealed_quote_evidence
+
+        return custody_sealed_quote_evidence(
+            **common, evidence_slot="attachment-" + data["idempotency_key"], **data
+        )
     if action in {"submit", "withdraw"}:
         data["revision"] = data.pop("quote_revision")
         command = (
@@ -196,6 +319,7 @@ def _execute(action: str, *, organization, actor, data: dict, rows: list[dict]):
 
 @active_organization_required
 @organization_permission_required(P.RFQS_VIEW)
+@never_cache
 @require_http_methods(["GET", "POST"])
 def buyer_action(request: HttpRequest, rfq_id: str, action: str) -> HttpResponse:
     if action not in ACTIONS:
@@ -211,19 +335,36 @@ def buyer_action(request: HttpRequest, rfq_id: str, action: str) -> HttpResponse
     )
     form = RFQActionForm(
         request.POST if request.method == "POST" else None,
+        request.FILES if request.method == "POST" else None,
         rfq=rfq,
         actor=request.user,
         action=action,
+        context=request.GET,
     )
     factory = {
         "prepare_comparison": ComparisonInputs,
         "prepare_award": AwardAllocations,
     }.get(action)
+    row_kwargs = {"rfq": rfq, "actor": request.user}
+    if action == "prepare_award":
+        selected = (
+            request.POST.get("comparison")
+            if request.method == "POST"
+            else request.GET.get("comparison")
+        )
+        try:
+            row_kwargs["comparison"] = (
+                form.fields["comparison"].queryset.filter(pk=selected).first()
+                if selected
+                else None
+            )
+        except (ValueError, ValidationError):
+            row_kwargs["comparison"] = None
     rows = (
         factory(
             request.POST if request.method == "POST" else None,
             prefix="rows",
-            form_kwargs={"rfq": rfq, "actor": request.user},
+            form_kwargs=row_kwargs,
         )
         if factory
         else None
@@ -247,13 +388,18 @@ def buyer_action(request: HttpRequest, rfq_id: str, action: str) -> HttpResponse
                     message="مجوز و دامنه معتبر لازم است.",
                 )
                 locked_form = RFQActionForm(
-                    request.POST, rfq=rfq, actor=request.user, action=action
+                    request.POST,
+                    request.FILES,
+                    rfq=rfq,
+                    actor=request.user,
+                    action=action,
+                    context=request.GET,
                 )
                 locked_rows = (
                     factory(
                         request.POST,
                         prefix="rows",
-                        form_kwargs={"rfq": rfq, "actor": request.user},
+                        form_kwargs=row_kwargs,
                     )
                     if factory
                     else None
@@ -303,9 +449,7 @@ def buyer_action(request: HttpRequest, rfq_id: str, action: str) -> HttpResponse
             error = (
                 "مرجع مجاز یافت نشد یا پیش‌نیاز مرحله برقرار نیست."
                 if isinstance(exc, ObjectDoesNotExist)
-                else "؛ ".join(exc.messages)
-                if isinstance(exc, ValidationError)
-                else str(exc)
+                else presentation_error(exc)
             )
             form.add_error(None, error)
         else:
@@ -320,6 +464,42 @@ def buyer_action(request: HttpRequest, rfq_id: str, action: str) -> HttpResponse
             "rows": rows,
             "action": action,
             "action_title": title,
+            "context_objects": form.context_objects,
         },
         status=400 if request.method == "POST" else 200,
     )
+
+
+@active_organization_required
+@organization_permission_required(P.RFQS_VIEW)
+@never_cache
+@require_GET
+def buyer_document(request: HttpRequest, rfq_id: str, evidence_id: str) -> HttpResponse:
+    from apps.procurement.models import QuoteRevisionEvidence
+
+    rfq = _rfq(request, rfq_id)
+    try:
+        evidence = QuoteRevisionEvidence.objects.select_related("quote_revision").get(
+            pk=evidence_id,
+            organization=request.organization,
+            quote_revision__envelope__rfq=rfq,
+        )
+    except QuoteRevisionEvidence.DoesNotExist as exc:
+        raise Http404("مدرک مجاز یافت نشد.") from exc
+    try:
+        delivery = opening.deliver_quote_confidential_document(
+            organization=request.organization,
+            actor=request.user,
+            quote_revision=evidence.quote_revision,
+            evidence=evidence,
+        )
+    except (PermissionDenied, ValueError, ObjectDoesNotExist):
+        return HttpResponse(
+            "مشاهده این مدرک به گشایش معتبر، سلامت فایل و دسترسی فعال همین نسخه نیاز دارد.",
+            status=403,
+            content_type="text/plain; charset=utf-8",
+        )
+    response = HttpResponse(delivery.content, content_type=delivery.content_type)
+    response["Content-Disposition"] = delivery.content_disposition
+    response["X-Content-Type-Options"] = "nosniff"
+    return response

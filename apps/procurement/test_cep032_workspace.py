@@ -109,7 +109,8 @@ class RFQBuyerWorkspaceTests(ProcurementFixtureMixin, TestCase):
         self.assertContains(
             response, reverse("procurement:request_detail", args=[purchase_request.pk])
         )
-        self.assertContains(response, "نمایش فراداده پیشنهاد نیازمند مجوز جداگانه")
+        self.assertContains(response, "اقلام استعلام")
+        self.assertNotContains(response, "پیشنهادهای مهروموم‌شده")
 
     def test_foreign_tenant_and_unauthorized_state_do_not_leak(self):
         self.login(self.member)

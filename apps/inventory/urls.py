@@ -1,10 +1,15 @@
 from django.urls import path
 
-from apps.inventory import p8_views, views
+from apps.inventory import journey_views, p8_views, views
 
 app_name = "inventory"
 
 urlpatterns = [
+    path(
+        "transactions/choices/<slug:purpose>/<slug:field>/",
+        journey_views.journey_choices,
+        name="journey_choices",
+    ),
     path("", views.warehouse_list, name="warehouse_list"),
     path("custody/", p8_views.custody_workbench, name="custody_workbench"),
     path("valuation/", p8_views.valuation_workbench, name="valuation_workbench"),
@@ -58,16 +63,20 @@ urlpatterns = [
         views.warehouse_archive,
         name="warehouse_archive",
     ),
-    path("transactions/", views.transaction_list, name="transaction_list"),
-    path("transactions/create/", views.transaction_create, name="transaction_create"),
+    path("transactions/", journey_views.transaction_list, name="transaction_list"),
+    path(
+        "transactions/create/",
+        journey_views.transaction_create,
+        name="transaction_create",
+    ),
     path(
         "transactions/<uuid:transaction_id>/",
-        views.transaction_detail,
+        journey_views.transaction_detail,
         name="transaction_detail",
     ),
     path(
         "transactions/<uuid:transaction_id>/post/",
-        views.transaction_post,
+        journey_views.transaction_post,
         name="transaction_post",
     ),
     path(
@@ -77,7 +86,7 @@ urlpatterns = [
     ),
     path(
         "transactions/<uuid:transaction_id>/reverse/",
-        views.transaction_reverse,
+        journey_views.transaction_reverse,
         name="transaction_reverse",
     ),
     path(

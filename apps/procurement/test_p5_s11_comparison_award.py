@@ -45,8 +45,6 @@ from apps.procurement.models import (
     CommercialComparisonStatus,
     CommercialExceptionCode,
     CommercialExceptionStatus,
-    CommercialScopeType,
-    RFQCommercialScope,
     SourcingAward,
     SourcingAwardOutcome,
     SourcingAwardPreparation,
@@ -65,18 +63,8 @@ class P5S11FixtureMixin(AdmissibilityFixtureMixin):
         super().setUp()
         self._activate_self_approval_policy(allow=False)
         self.decision = self._approve_admissible()
-        line = self.revision.rfq_version.lines.get()
-        self.scope = RFQCommercialScope.objects.create(
-            organization=self.organization,
-            rfq_version=self.revision.rfq_version,
-            rfq_version_line=line,
-            scope_type=CommercialScopeType.LINE,
-            scope_code="LINE-1",
-            required_quantity=line.quantity,
-            unit_of_measure=line.unit_of_measure,
-            independently_awardable=True,
-            allows_split_award=True,
-            created_by=self.owner,
+        self.scope = self.revision.rfq_version.commercial_scopes.get(
+            scope_code="LINE-1"
         )
         for code in (
             BusinessPermissionCode.RFQ_QUOTES_PREPARE_COMPARISON,
@@ -310,6 +298,8 @@ class P5S11SelfFinalizationPolicyTests(P5S11FixtureMixin, TestCase):
 
 
 class P5S11TwoRevisionFixtureMixin(SealedCustodyFixtureMixin):
+    scope_specifications = (("TWO-LINE", True), ("TWO-NOSPLIT", False))
+
     """Two genuinely closed/opened/admitted revisions for comparison-only tests."""
 
     def setUp(self):
@@ -410,18 +400,8 @@ class P5S11TwoRevisionFixtureMixin(SealedCustodyFixtureMixin):
                 organization=self.organization, actor=self.approver, preparation=prep
             )
         self.decision = self.revision_one.admissibility_decisions.latest("created_at")
-        line = self.revision_one.rfq_version.lines.get()
-        self.scope = RFQCommercialScope.objects.create(
-            organization=self.organization,
-            rfq_version=self.revision_one.rfq_version,
-            rfq_version_line=line,
-            scope_type=CommercialScopeType.LINE,
-            scope_code="TWO-LINE",
-            required_quantity=line.quantity,
-            unit_of_measure=line.unit_of_measure,
-            independently_awardable=True,
-            allows_split_award=True,
-            created_by=self.owner,
+        self.scope = self.revision_one.rfq_version.commercial_scopes.get(
+            scope_code="TWO-LINE"
         )
 
     def _make_actor(self, username):
@@ -546,18 +526,8 @@ class P5S11TieAndSplitTests(P5S11TwoRevisionFixtureMixin, TestCase):
         )
 
     def test_split_award_is_explicit_and_allocation_inputs_are_governing(self):
-        line = self.revision_one.rfq_version.lines.get()
-        unsplittable = RFQCommercialScope.objects.create(
-            organization=self.organization,
-            rfq_version=self.revision_one.rfq_version,
-            rfq_version_line=line,
-            scope_type=CommercialScopeType.LINE,
-            scope_code="TWO-NOSPLIT",
-            required_quantity=line.quantity,
-            unit_of_measure=line.unit_of_measure,
-            independently_awardable=True,
-            allows_split_award=False,
-            created_by=self.owner,
+        unsplittable = self.revision_one.rfq_version.commercial_scopes.get(
+            scope_code="TWO-NOSPLIT"
         )
         finalized = self._finalized(scope=unsplittable, key="two-no-split")
         split = [
@@ -586,7 +556,9 @@ class P5S11TieAndSplitTests(P5S11TwoRevisionFixtureMixin, TestCase):
                     actor=self.preparer,
                     comparison=governing,
                     outcome=SourcingAwardOutcome.AWARDED,
-                    allocations=[{"comparison_input_id": item.pk, "quantity": quantity}],
+                    allocations=[
+                        {"comparison_input_id": item.pk, "quantity": quantity}
+                    ],
                     reason="invalid allocation",
                     evidence="allocation evidence",
                     idempotency_key=f"allocation-{key}",
@@ -600,7 +572,9 @@ class P5S11TieAndSplitTests(P5S11TwoRevisionFixtureMixin, TestCase):
                 actor=self.preparer,
                 comparison=governing,
                 outcome=SourcingAwardOutcome.AWARDED,
-                allocations=[{"comparison_input_id": foreign_input.pk, "quantity": "1"}],
+                allocations=[
+                    {"comparison_input_id": foreign_input.pk, "quantity": "1"}
+                ],
                 reason="ineligible input",
                 evidence="allocation evidence",
                 idempotency_key="foreign-input",
@@ -834,7 +808,9 @@ class P5S11ConcurrencyTests(P5S11FixtureMixin, TransactionTestCase):
             preparation_id = preparation_ids.pop()
             try:
                 return finalize_sourcing_award(
-                    organization=type(self.organization).objects.get(pk=organization_id),
+                    organization=type(self.organization).objects.get(
+                        pk=organization_id
+                    ),
                     actor=type(self.approver).objects.get(pk=approver_id),
                     preparation=SourcingAwardPreparation.objects.get(pk=preparation_id),
                 ).pk

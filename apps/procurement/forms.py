@@ -302,15 +302,15 @@ class SealedEvidenceUploadForm(_StyledForm):
         ),
     )
     evidence_slot = forms.CharField(
-        label="نام کوتاه پیوست",
         required=False,
         max_length=80,
-        help_text="برای پیوست تکمیلی، یک نام یکتا با حروف لاتین، عدد یا خط تیره وارد کنید؛ برای اصل پیشنهاد لازم نیست.",
+        widget=forms.HiddenInput(),
+        initial=lambda: uuid4().hex,
     )
     upload = forms.FileField(label="فایل پیشنهاد یا پیوست")
     idempotency_key = forms.CharField(
         max_length=128, widget=forms.HiddenInput(), initial=lambda: uuid4().hex
     )
     expected_sha256 = forms.CharField(
-        label="هش مورد انتظار SHA-256", required=False, max_length=64
+        required=False, max_length=64, widget=forms.HiddenInput()
     )

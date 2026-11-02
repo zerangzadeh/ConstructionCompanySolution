@@ -278,6 +278,28 @@ def transaction_create(request: HttpRequest) -> HttpResponse:
             user=request.user, organization=request.organization
         ),
     )
+    # Qualified GRN context prefills the existing form; navigation never mutates.
+    if "goods_receipt_item" in request.GET:
+        from core.business_choices import contextual_parent
+
+        source = contextual_parent(
+            request,
+            "goods_receipt_item",
+            form.fields["goods_receipt_item"].queryset.select_related(
+                "goods_receipt", "material"
+            ),
+        )
+        form.fields["goods_receipt_item"].label_from_instance = lambda item: (
+            f"{item.goods_receipt.receipt_number} · {item.material.name} · {item.quantity}"
+        )
+        form.initial.update(
+            transaction_type=StockTransactionType.RECEIPT,
+            goods_receipt_item=source.pk,
+            material=source.material_id,
+            project=source.goods_receipt.project_id,
+            quantity=source.quantity,
+            reference=source.goods_receipt.receipt_number,
+        )
     if request.method == "POST" and form.is_valid():
         data = form.cleaned_data
         try:

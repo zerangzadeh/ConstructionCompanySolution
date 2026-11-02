@@ -60,7 +60,7 @@ try {
     pending.set(next, { done, fail });
     socket.send(JSON.stringify({ id: next, method, params }));
   });
-  const evaluate = async expression => (await send('Runtime.evaluate', { expression, returnByValue: true })).result.value;
+  const evaluate = async expression => (await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true })).result.value;
   await send('Network.enable');
   await send('Page.enable');
   await send('Runtime.enable');
@@ -110,6 +110,13 @@ try {
       if (state?.ready === 'complete' && state.path === scenario.path.split('?')[0] && documentStatus) break;
     }
     for (const step of scenario.steps || []) {
+      if (step.upload) {
+        const { root } = await send('DOM.getDocument');
+        const { nodeId } = await send('DOM.querySelector', {nodeId:root.nodeId, selector:step.upload.selector});
+        if (!nodeId) throw new Error('Missing source-file input');
+        await send('DOM.setFileInputFiles', {nodeId, files:[resolve(step.upload.path)]});
+        continue;
+      }
       if (step.resize) {
         await send('Emulation.setDeviceMetricsOverride', {width:step.resize.width,height:step.resize.height || 900,deviceScaleFactor:1,mobile:step.resize.width<640});
         await new Promise(done=>setTimeout(done,200));
@@ -117,7 +124,7 @@ try {
       }
       if (step.fill) {
         await evaluate(`(() => {for(const [name,value] of Object.entries(${JSON.stringify(step.fill)})) {
-          const scope=document.querySelector(${JSON.stringify(step.formSelector || 'body')});
+          const scope=document.querySelector(${JSON.stringify(step.formSelector || 'main')});
           const field=scope?.querySelector('[name="'+name+'"]');
           if(!field) throw new Error('Missing form field '+name);
           if(field.tomselect) field.tomselect.setValue(value); else if(field.type==='checkbox') field.checked=!!value; else field.value=value;

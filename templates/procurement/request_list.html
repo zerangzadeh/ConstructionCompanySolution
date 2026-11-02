@@ -1,6 +1,29 @@
-{% extends "base.html" %}{% load table_filters %}
-{% block title %}درخواست‌های خرید | سامانه مدیریت ساخت{% endblock %}
+{% extends "base.html" %}{% load static table_filters erp_format %}
+{% block title %}درخواست‌های خرید | بنیرا{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}">{% endblock %}
+{% block table_filter_controls %}{% endblock %}{% block list_pagination %}{% endblock %}
 {% block content %}
-{% table_filters filters "purchase-request-filters" %}
-{% if "purchase_requests.create" in business_permission_codes %}{% url "procurement:request_create" as create_url %}{% endif %}{% include "components/page_header.html" with page_eyebrow="تدارکات" page_title="درخواست‌های خرید" page_description="نیازهای خرید پروژه" page_action_url=create_url page_action_label="درخواست جدید" only %}<div class="mt-5 flex flex-wrap gap-2"><a class="erp-btn erp-btn--secondary" href="{% url 'procurement:order_list' %}">سفارش‌های خرید</a><a class="erp-btn erp-btn--secondary" href="{% url 'procurement:receipt_list' %}">رسیدهای کالا</a></div><section class="erp-surface mt-4 overflow-hidden rounded-xl">{% if requests %}<div class="erp-table-wrap"><table class="w-full min-w-[850px] text-right"><thead><tr><th class="border-b border-slate-200 px-4 py-3">شماره و عنوان</th><th class="border-b border-slate-200 px-4 py-3">پروژه</th><th class="border-b border-slate-200 px-4 py-3">تاریخ نیاز</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th></tr></thead><tbody class="divide-y divide-slate-100">{% for item in requests %}<tr><td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'procurement:request_detail' item.id %}">{{ item.title }}</a><p class="text-[11px] text-slate-500" dir="ltr"><a class="font-semibold text-blue-700 hover:underline" href="{% url 'procurement:request_detail' item.id %}">{{ item.request_number }}</a></p></td><td class="px-4 py-3.5">{{ item.project.name }}</td><td class="px-4 py-3.5" dir="ltr">{{ item.required_by|default:"—" }}</td><td class="px-4 py-3.5">{% include "components/status_badge.html" with status=item.status label=item.get_status_display only %}</td></tr>{% endfor %}</tbody></table></div>{% else %}{% include "components/empty_state.html" with empty_title="درخواست خریدی وجود ندارد" empty_description="نیازهای مصالح پروژه را ثبت کنید." empty_action_url=create_url empty_action_label="درخواست جدید" only %}{% endif %}</section>
+<div class="erp-reference-list erp-contracts-list">
+<div class="erp-list-heading">{% include "components/page_header.html" with page_title="درخواست‌های خرید" page_description="ثبت و پیگیری نیازهای خرید پروژه" page_action_url=create_url page_action_label="درخواست خرید جدید" page_icon="document" only %}</div>
+{% if selected_project %}<aside class="erp-list-scope" aria-label="زمینه پروژه"><div><span class="erp-list-muted">درخواست‌های پروژه</span> <strong>{{ selected_project.name }}</strong><p>فهرست به درخواست‌های مجاز همین پروژه محدود است.</p></div><a href="{% url 'procurement:request_list' %}">همه درخواست‌های مجاز</a></aside>{% endif %}
+<div class="erp-list-workspace">
+{% include "components/filter_bar.html" with bar=filter_bar reference_layout=True only %}
+<div class="erp-list-toolbar" role="group" aria-label="نتایج و مرتب‌سازی">
+{% include "components/list_result_summary.html" with bar=filter_bar reference_layout=True only %}
+<details class="erp-list-sort-menu"><summary class="erp-list-sort" data-list-sort-summary>مرتب‌سازی: <strong>{{ list_sort.label }}</strong> · {{ list_sort.descending|yesno:"نزولی,صعودی" }} ⌄</summary><div class="erp-list-sort-menu__options">{% table_sort_header "number" "شماره درخواست" %}{% table_sort_header "title" "عنوان درخواست" %}{% table_sort_header "project" "پروژه" %}{% table_sort_header "status" "وضعیت" %}{% table_sort_header "required_by" "تاریخ نیاز" %}</div></details>
+</div>
+<section class="erp-contracts-table overflow-x-auto" aria-label="فهرست درخواست‌های خرید" tabindex="0">
+{% if requests %}<table class="erp-responsive-list" aria-label="درخواست‌های خرید"><thead><tr><th>{% table_sort_header "number" "شماره درخواست" %}</th><th>{% table_sort_header "title" "عنوان / پروژه" %}</th><th>{% table_sort_header "required_by" "تاریخ نیاز" %}</th><th>{% table_sort_header "status" "وضعیت" %}</th><th>عملیات</th></tr></thead><tbody>
+{% for item in requests %}<tr>
+<td class="erp-list-identifier" data-label="شماره درخواست"><a href="{% url 'procurement:request_detail' item.pk %}"><bdi dir="ltr">{{ item.request_number }}</bdi></a></td>
+<td class="erp-list-title"><a href="{% url 'procurement:request_detail' item.pk %}">{{ item.title }}</a><span class="erp-list-subtitle">{{ item.project.name }}</span></td>
+<td data-label="تاریخ نیاز"><bdi dir="ltr">{{ item.required_by|jalali_date|default:"—" }}</bdi></td>
+<td class="erp-list-status" data-label="وضعیت">{% include "components/status_badge.html" with status=item.status label=item.get_status_display only %}</td>
+<td class="erp-list-row-action"><details class="erp-list-row-menu"><summary class="erp-list-action" aria-label="عملیات درخواست {{ item.request_number }}"><span aria-hidden="true">⋮</span></summary><div class="erp-list-row-menu__items"><a href="{% url 'procurement:request_detail' item.pk %}">مشاهده درخواست</a></div></details></td>
+</tr>{% endfor %}</tbody></table>
+{% elif scoped_has_records %}{% include "components/filtered_empty_state.html" %}
+{% else %}{% include "components/empty_state.html" with empty_title="هنوز درخواست خریدی ثبت نشده است" empty_description="نیازهای مصالح پروژه را در یک درخواست خرید ثبت کنید." empty_action_url=create_url empty_action_label="درخواست خرید جدید" only %}{% endif %}
+</section>
+{% include "components/list_pagination.html" with page_obj=page_obj pagination_query=pagination_query result_label="درخواست خرید" reference_layout=True only %}
+</div></div>
 {% endblock %}

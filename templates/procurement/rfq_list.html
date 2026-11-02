@@ -1,7 +1,29 @@
-{% extends "base.html" %}{% load erp_format %}
-{% block title %}استعلام و انتخاب تأمین‌کننده | تدارکات{% endblock %}
+{% extends "base.html" %}{% load static table_filters erp_format %}
+{% block title %}استعلام‌های خرید | بنیرا{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}">{% endblock %}
+{% block table_filter_controls %}{% endblock %}{% block list_pagination %}{% endblock %}
 {% block content %}
-{% if "rfqs.create" in business_permission_codes %}{% url 'procurement:rfq_create' as create_url %}{% endif %}
-{% include "components/page_header.html" with page_eyebrow="تدارکات" page_title="استعلام و انتخاب تأمین‌کننده" page_description="مسیر مجاز استعلام، پیشنهاد، مقایسه و انتخاب" page_action_url=create_url page_action_label="استعلام جدید" only %}
-<section class="erp-surface mt-5 overflow-hidden rounded-xl">{% if rfqs %}<div class="erp-table-wrap"><table class="w-full min-w-[750px] text-right"><thead><tr><th class="border-b border-slate-200 px-4 py-3">استعلام</th><th class="border-b border-slate-200 px-4 py-3">پروژه</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th><th class="border-b border-slate-200 px-4 py-3">مهلت</th></tr></thead><tbody class="divide-y divide-slate-100">{% for rfq in rfqs %}<tr><td class="px-4 py-3"><a class="font-semibold text-blue-700" href="{% url 'procurement:rfq_detail' rfq.pk %}">{{ rfq.title }}</a><span class="block text-xs text-slate-500" dir="ltr"><a class="font-semibold text-blue-700 hover:underline" href="{% url 'procurement:rfq_detail' rfq.pk %}">{{ rfq.rfq_number }}</a></span></td><td class="px-4 py-3">{{ rfq.project.name }}</td><td class="px-4 py-3">{{ rfq.get_status_display }}</td><td class="px-4 py-3" dir="ltr">{{ rfq.closing_at|jalali_datetime }}</td></tr>{% endfor %}</tbody></table></div>{% else %}{% include "components/empty_state.html" with empty_title="استعلامی وجود ندارد" empty_description="استعلام‌های مجاز پروژه در اینجا نمایش داده می‌شوند." empty_action_url=create_url empty_action_label="استعلام جدید" only %}{% endif %}</section>
+<div class="erp-reference-list erp-contracts-list">
+<div class="erp-list-heading">{% include "components/page_header.html" with page_title="استعلام‌های خرید" page_description="آماده‌سازی و صدور استعلام بر پایه درخواست خرید تأییدشده" page_action_url=create_url page_action_label="استعلام جدید" page_icon="document" only %}</div>
+
+<div class="erp-list-workspace">
+{% include "components/filter_bar.html" with bar=filter_bar reference_layout=True only %}
+<div class="erp-list-toolbar" role="group" aria-label="نتایج و مرتب‌سازی">
+{% include "components/list_result_summary.html" with bar=filter_bar reference_layout=True only %}
+<details class="erp-list-sort-menu"><summary class="erp-list-sort" data-list-sort-summary>مرتب‌سازی: <strong>{{ list_sort.label }}</strong> · {{ list_sort.descending|yesno:"نزولی,صعودی" }} ⌄</summary><div class="erp-list-sort-menu__options">{% table_sort_header "number" "شماره استعلام" %}{% table_sort_header "title" "عنوان استعلام" %}{% table_sort_header "project" "پروژه" %}{% table_sort_header "status" "وضعیت" %}{% table_sort_header "closing" "مهلت دریافت" %}</div></details>
+</div>
+<section class="erp-contracts-table overflow-x-auto" aria-label="فهرست استعلام‌های خرید" tabindex="0">
+{% if rfqs %}<table class="erp-responsive-list" aria-label="استعلام‌های خرید"><thead><tr><th>{% table_sort_header "number" "شماره استعلام" %}</th><th>{% table_sort_header "title" "عنوان / پروژه" %}</th><th>{% table_sort_header "closing" "مهلت دریافت" %}</th><th>{% table_sort_header "status" "وضعیت" %}</th><th>عملیات</th></tr></thead><tbody>
+{% for item in rfqs %}<tr>
+<td class="erp-list-identifier" data-label="شماره استعلام"><a href="{% url 'procurement:rfq_detail' item.pk %}"><bdi dir="ltr">{{ item.rfq_number }}</bdi></a></td>
+<td class="erp-list-title"><a href="{% url 'procurement:rfq_detail' item.pk %}">{{ item.title }}</a><span class="erp-list-subtitle">{{ item.project.name }}</span></td>
+<td data-label="مهلت دریافت"><bdi dir="ltr">{{ item.closing_at|jalali_datetime|default:"—" }}</bdi></td>
+<td class="erp-list-status" data-label="وضعیت">{% include "components/status_badge.html" with status=item.status label=item.get_status_display only %}</td>
+<td class="erp-list-row-action"><details class="erp-list-row-menu"><summary class="erp-list-action" aria-label="عملیات استعلام {{ item.rfq_number }}"><span aria-hidden="true">⋮</span></summary><div class="erp-list-row-menu__items"><a href="{% url 'procurement:rfq_detail' item.pk %}">مشاهده استعلام</a></div></details></td>
+</tr>{% endfor %}</tbody></table>
+{% elif scoped_has_records %}{% include "components/filtered_empty_state.html" %}
+{% else %}{% include "components/empty_state.html" with empty_title="هنوز استعلامی وجود ندارد" empty_description="استعلام را بر پایه درخواست خرید تأییدشده آماده و صادر کنید." empty_action_url=create_url empty_action_label="استعلام جدید" only %}{% endif %}
+</section>
+{% include "components/list_pagination.html" with page_obj=page_obj pagination_query=pagination_query result_label="استعلام" reference_layout=True only %}
+</div></div>
 {% endblock %}

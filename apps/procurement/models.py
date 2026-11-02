@@ -355,6 +355,7 @@ class RequestForQuotation(UUIDModel, TimeStampedModel):
         db_index=True,
     )
     current_version_number = models.PositiveIntegerField(default=0)
+    commercial_scope_required = models.BooleanField(default=True, editable=False)
     submitted_at = models.DateTimeField(null=True, blank=True)
     issued_at = models.DateTimeField(null=True, blank=True)
     issued_by = models.ForeignKey(
@@ -434,10 +435,13 @@ class RequestForQuotation(UUIDModel, TimeStampedModel):
     def save(self, *args: object, **kwargs: object) -> None:
         if self.pk and not self._state.adding:
             previous = type(self).objects.get(pk=self.pk)
+            if previous.commercial_scope_required != self.commercial_scope_required:
+                raise ValidationError("الزام دامنه خرید استعلام تغییرپذیر نیست.")
             frozen = (
                 "organization_id",
                 "project_id",
                 "purchase_request_id",
+                "commercial_scope_required",
                 "rfq_number",
                 "title",
                 "terms",
@@ -539,7 +543,25 @@ class RequestForQuotationLine(UUIDModel, TimeStampedModel):
         super().save(*args, **kwargs)
 
 
+class RFQVersionQuerySet(models.QuerySet):
+    def update(self, **kwargs: object) -> int:
+        if {
+            "commercial_scope_definition",
+            "commercial_scope_definition_id",
+        } & kwargs.keys():
+            raise ValidationError("تعریف دامنه خرید نسخه صادرشده تغییرپذیر نیست.")
+        return super().update(**kwargs)
+
+
 class RequestForQuotationVersion(UUIDModel, TimeStampedModel):
+    objects = models.Manager.from_queryset(RFQVersionQuerySet)()
+    commercial_scope_definition = models.ForeignKey(
+        "RFQCommercialScopeDefinition",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="issued_versions",
+    )
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.CASCADE,
@@ -578,7 +600,28 @@ class RequestForQuotationVersion(UUIDModel, TimeStampedModel):
 
     def clean(self) -> None:
         super().clean()
-        validate_related_organizations(self, rfq=self.rfq if self.rfq_id else None)
+        validate_related_organizations(
+            self,
+            rfq=self.rfq if self.rfq_id else None,
+            commercial_scope_definition=self.commercial_scope_definition
+            if self.commercial_scope_definition_id
+            else None,
+        )
+        if self.commercial_scope_definition_id and (
+            self.commercial_scope_definition.rfq_id != self.rfq_id
+            or self.commercial_scope_definition.version_number != self.version_number
+        ):
+            raise ValidationError(
+                "تعریف دامنه خرید باید متعلق به همین نسخه استعلام باشد."
+            )
+        if (
+            self.rfq_id
+            and self.rfq.commercial_scope_required
+            and not self.commercial_scope_definition_id
+        ):
+            raise ValidationError(
+                "نسخه جدید استعلام به تعریف صریح دامنه خرید نیاز دارد."
+            )
         self.terms = self.terms.strip()
         self.idempotency_key = self.idempotency_key.strip()
         self.payload_fingerprint = self.payload_fingerprint.strip().lower()
@@ -848,9 +891,7 @@ class SupplierPortalInvitation(UUIDModel, CreatedAtModel):
         super().clean()
         validate_related_organizations(
             self,
-            rfq_invitation=self.rfq_invitation
-            if self.rfq_invitation_id
-            else None,
+            rfq_invitation=self.rfq_invitation if self.rfq_invitation_id else None,
             accepted_principal=self.accepted_principal
             if self.accepted_principal_id
             else None,
@@ -916,15 +957,15 @@ class SupplierPortalGrant(UUIDModel, CreatedAtModel):
             portal_invitation=self.portal_invitation
             if self.portal_invitation_id
             else None,
-            rfq_invitation=self.rfq_invitation
-            if self.rfq_invitation_id
-            else None,
+            rfq_invitation=self.rfq_invitation if self.rfq_invitation_id else None,
         )
         if self.portal_invitation_id and (
             self.portal_invitation.rfq_invitation_id != self.rfq_invitation_id
             or self.portal_invitation.accepted_principal_id != self.principal_id
         ):
-            raise ValidationError("مجوز درگاه باید دقیقاً از همان دعوت‌نامه پذیرفته‌شده بیاید.")
+            raise ValidationError(
+                "مجوز درگاه باید دقیقاً از همان دعوت‌نامه پذیرفته‌شده بیاید."
+            )
 
     def save(self, *args: object, **kwargs: object) -> None:
         if not self._state.adding:
@@ -974,7 +1015,9 @@ class SupplierPortalSubmissionReceipt(UUIDModel, CreatedAtModel):
         "organizations.Organization", on_delete=models.PROTECT
     )
     grant = models.ForeignKey(
-        SupplierPortalGrant, on_delete=models.PROTECT, related_name="submission_receipts"
+        SupplierPortalGrant,
+        on_delete=models.PROTECT,
+        related_name="submission_receipts",
     )
     quote_revision = models.OneToOneField(
         "QuoteRevision", on_delete=models.PROTECT, related_name="portal_receipt"
@@ -1011,8 +1054,10 @@ class SupplierPortalSubmissionReceipt(UUIDModel, CreatedAtModel):
             raise ValidationError("کلید یکتای رسید الزامی است.")
         if not re.fullmatch(r"[0-9a-f]{64}", self.payload_fingerprint):
             raise ValidationError("اثر انگشت رسید معتبر نیست.")
-        if self.grant_id and self.quote_revision_id and (
-            self.grant.rfq_invitation_id != self.quote_revision.invitation_id
+        if (
+            self.grant_id
+            and self.quote_revision_id
+            and (self.grant.rfq_invitation_id != self.quote_revision.invitation_id)
         ):
             raise ValidationError("رسید باید به پیشنهاد همان مجوز درگاه اشاره کند.")
 
@@ -1361,13 +1406,19 @@ class QuoteRevisionEvidence(UUIDModel, CreatedAtModel):
             raise ValidationError("نوع شاهد پیشنهاد معتبر نیست.")
         if self.source_channel not in QuoteEvidenceSourceChannel.values:
             raise ValidationError("کانال منبع شاهد پیشنهاد معتبر نیست.")
-        if self.source_channel == QuoteEvidenceSourceChannel.EXTERNAL_PORTAL_UPLOAD and (
-            self.evidence_type != QuoteEvidenceType.SUPPLIER_ORIGINAL
-            or self.canonical_sha256 != self.revision_fingerprint
-            or self.quote_revision.source_channel != QuoteSourceChannel.EXTERNAL_PORTAL
-            or self.quote_revision.captured_by_id != self.captured_by_id
+        if (
+            self.source_channel == QuoteEvidenceSourceChannel.EXTERNAL_PORTAL_UPLOAD
+            and (
+                self.evidence_type != QuoteEvidenceType.SUPPLIER_ORIGINAL
+                or self.canonical_sha256 != self.revision_fingerprint
+                or self.quote_revision.source_channel
+                != QuoteSourceChannel.EXTERNAL_PORTAL
+                or self.quote_revision.captured_by_id != self.captured_by_id
+            )
         ):
-            raise ValidationError("شاهد درگاه باید همان اصل و بایت‌های پیشنهاد خارجی باشد.")
+            raise ValidationError(
+                "شاهد درگاه باید همان اصل و بایت‌های پیشنهاد خارجی باشد."
+            )
         if self.received_at > self.custodied_at:
             raise ValidationError("زمان نگهداری نمی‌تواند پیش از دریافت باشد.")
 
@@ -2314,6 +2365,11 @@ class SourcingAwardOutcome(models.TextChoices):
     NO_AWARD = "no_award", "بدون انتخاب"
 
 
+class RFQCommercialScopeManager(ImmutableOpeningEvidenceManager):
+    def bulk_create(self, *args: object, **kwargs: object):
+        raise ValidationError("دامنه‌های خرید باید با کنترل تعریف نسخه ثبت شوند.")
+
+
 class RFQCommercialScope(UUIDModel, CreatedAtModel):
     """Immutable explicit line/lot commercial applicability for one RFQ version."""
 
@@ -2347,7 +2403,7 @@ class RFQCommercialScope(UUIDModel, CreatedAtModel):
         related_name="rfq_commercial_scopes_created",
     )
 
-    objects = ImmutableOpeningEvidenceManager()
+    objects = RFQCommercialScopeManager()
 
     class Meta:
         constraints = [  # noqa: RUF012
@@ -2390,6 +2446,29 @@ class RFQCommercialScope(UUIDModel, CreatedAtModel):
         ):
             raise ValidationError("تقسیم ردیف فقط برای ردیف مستقل مجاز است.")
 
+        if self.rfq_version_id and self.rfq_version.commercial_scope_definition_id:
+            entries = self.rfq_version.commercial_scope_definition.payload["scopes"]
+            entry = next(
+                (row for row in entries if row["scope_code"] == self.scope_code), None
+            )
+            if not entry or any(
+                (
+                    entry["scope_type"] != self.scope_type,
+                    Decimal(entry["required_quantity"]) != self.required_quantity,
+                    entry["unit_of_measure_id"] != str(self.unit_of_measure_id),
+                    entry["independently_awardable"] != self.independently_awardable,
+                    entry["allows_split_award"] != self.allows_split_award,
+                    entry["allows_alternates"] != self.allows_alternates,
+                    self.scope_type == "line"
+                    and self.rfq_version_line_id
+                    and entry["lines"][0]["purchase_request_item_id"]
+                    != str(self.rfq_version_line.purchase_request_item_id),
+                )
+            ):
+                raise ValidationError(
+                    "دامنه خرید باید دقیقاً با تعریف ثبت‌شده نسخه صادرشده برابر باشد."
+                )
+
     def save(self, *args: object, **kwargs: object) -> None:
         if not self._state.adding:
             raise ValidationError("دامنه تجاری RFQ تغییرپذیر نیست.")
@@ -2398,6 +2477,60 @@ class RFQCommercialScope(UUIDModel, CreatedAtModel):
 
     def delete(self, *args: object, **kwargs: object) -> None:
         raise ValidationError("دامنه تجاری RFQ حذف‌پذیر نیست.")
+
+
+class RFQCommercialScopeDefinition(UUIDModel, CreatedAtModel):
+    """An explicit append-only proposal; issuing pins one exact definition."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    rfq = models.ForeignKey(
+        RequestForQuotation, on_delete=models.PROTECT, related_name="scope_definitions"
+    )
+    version_number = models.PositiveIntegerField()
+    revision_number = models.PositiveIntegerField()
+    payload = models.JSONField()
+    payload_fingerprint = models.CharField(max_length=64)
+    idempotency_key = models.CharField(max_length=128)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    objects = ImmutableOpeningEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["rfq", "version_number", "revision_number"],
+                name="uq_rfq_scope_definition_revision",
+            ),
+            models.UniqueConstraint(
+                fields=["rfq", "idempotency_key"], name="uq_rfq_scope_definition_key"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(version_number__gt=0, revision_number__gt=0),
+                name="rfq_scope_definition_versions_positive",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(self, rfq=self.rfq if self.rfq_id else None)
+        if not self.idempotency_key.strip() or not re.fullmatch(
+            r"[0-9a-f]{64}", self.payload_fingerprint
+        ):
+            raise ValidationError("اطلاعات ثبت تعریف دامنه خرید معتبر نیست.")
+        if not isinstance(self.payload, dict) or not self.payload.get("scopes"):
+            raise ValidationError("تعریف صریح حداقل یک دامنه خرید لازم است.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError(
+                "تعریف ثبت‌شده دامنه خرید تغییرپذیر نیست؛ تعریف جدید ثبت کنید."
+            )
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("تعریف دامنه خرید حذف‌پذیر نیست.")
 
 
 class QuoteCommercialAssertion(UUIDModel, CreatedAtModel):

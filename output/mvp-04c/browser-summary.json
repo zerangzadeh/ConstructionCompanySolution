@@ -1,0 +1,496 @@
+{
+  "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  "mode": "headless=new",
+  "viewport_widths": [
+    1440,
+    1024,
+    390
+  ],
+  "count": 46,
+  "scenarios": [
+    {
+      "scenario": "award-contextual-po-entry",
+      "evidence": "batch-award-contextual-po-entry.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "draft-detail-1440",
+      "evidence": "batch-draft-detail-1440.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "draft-detail-1024",
+      "evidence": "batch-draft-detail-1440.json",
+      "status": 200,
+      "width": 1009,
+      "scroll": 1009,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "draft-detail-390",
+      "evidence": "batch-draft-detail-1440.json",
+      "status": 200,
+      "width": 390,
+      "scroll": 390,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "duplicate-allocation-consumption-denied",
+      "evidence": "batch-duplicate-allocation-consumption-denied.json",
+      "status": 200,
+      "width": 1440,
+      "scroll": 1440,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:54149/procurement/orders/from-award/34ab490a-566c-4468-a9c1-14e4a79a1d2e/?supplier=e7ff9909-3ea0-4516-a709-effae681a73e",
+          "status": 400
+        }
+      ]
+    },
+    {
+      "scenario": "fixed-source-create-1440",
+      "evidence": "batch-fixed-source-create-1440.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "fixed-source-create-1024",
+      "evidence": "batch-fixed-source-create-1440.json",
+      "status": 200,
+      "width": 1009,
+      "scroll": 1009,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "fixed-source-create-390",
+      "evidence": "batch-fixed-source-create-1440.json",
+      "status": 200,
+      "width": 390,
+      "scroll": 390,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "issue-po-explicit-action",
+      "evidence": "batch-issue-po-explicit-action.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "issued-detail-1440",
+      "evidence": "batch-issued-detail-1440.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "issued-detail-1024",
+      "evidence": "batch-issued-detail-1440.json",
+      "status": 200,
+      "width": 1009,
+      "scroll": 1009,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "issued-detail-390",
+      "evidence": "batch-issued-detail-1440.json",
+      "status": 200,
+      "width": 390,
+      "scroll": 390,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "issued-po-grn-entry-1440",
+      "evidence": "batch-issued-po-grn-entry-1440.json",
+      "status": 200,
+      "width": 1440,
+      "scroll": 1440,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "issued-po-grn-entry-1024",
+      "evidence": "batch-issued-po-grn-entry-1440.json",
+      "status": 200,
+      "width": 1024,
+      "scroll": 1024,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "issued-po-grn-entry-390",
+      "evidence": "batch-issued-po-grn-entry-1440.json",
+      "status": 200,
+      "width": 390,
+      "scroll": 390,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "legacy-create-1440",
+      "evidence": "batch-legacy-create-1440.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "legacy-create-1024",
+      "evidence": "batch-legacy-create-1440.json",
+      "status": 200,
+      "width": 1009,
+      "scroll": 1009,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "legacy-create-390",
+      "evidence": "batch-legacy-create-1440.json",
+      "status": 200,
+      "width": 390,
+      "scroll": 390,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "legacy-create-retention",
+      "evidence": "batch-legacy-create-retention.json",
+      "status": 400,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:49673/procurement/orders/create/",
+          "status": 400
+        }
+      ]
+    },
+    {
+      "scenario": "legacy-create-draft",
+      "evidence": "batch-legacy-create-retention.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "legacy-line-entry-and-issue",
+      "evidence": "batch-legacy-line-entry-and-issue.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "po-list-1440",
+      "evidence": "batch-po-list-1440.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "po-list-1024",
+      "evidence": "batch-po-list-1440.json",
+      "status": 200,
+      "width": 1009,
+      "scroll": 1009,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "po-list-390",
+      "evidence": "batch-po-list-1440.json",
+      "status": 200,
+      "width": 390,
+      "scroll": 390,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "list-filter-sort-chips",
+      "evidence": "batch-po-list-1440.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "list-pagination-second-page",
+      "evidence": "batch-po-list-1440.json",
+      "status": 200,
+      "width": 1440,
+      "scroll": 1440,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "single-partial-award-po-draft",
+      "evidence": "batch-single-partial-award-po-draft.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "source-create-1440",
+      "evidence": "batch-source-create-1440.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "source-create-1024",
+      "evidence": "batch-source-create-1440.json",
+      "status": 200,
+      "width": 1009,
+      "scroll": 1009,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "source-create-390",
+      "evidence": "batch-source-create-1440.json",
+      "status": 200,
+      "width": 390,
+      "scroll": 390,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "source-validation-retention",
+      "evidence": "batch-source-validation-retention.json",
+      "status": 400,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:54149/procurement/orders/from-award/34ab490a-566c-4468-a9c1-14e4a79a1d2e/?supplier=e7ff9909-3ea0-4516-a709-effae681a73e",
+          "status": 400
+        }
+      ]
+    },
+    {
+      "scenario": "source-excess-quantity-denied",
+      "evidence": "batch-source-validation-retention.json",
+      "status": 400,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:54149/procurement/orders/from-award/34ab490a-566c-4468-a9c1-14e4a79a1d2e/?supplier=e7ff9909-3ea0-4516-a709-effae681a73e",
+          "status": 400
+        }
+      ]
+    },
+    {
+      "scenario": "forged-supplier-denied",
+      "evidence": "batch-source-validation-retention.json",
+      "status": 400,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:54149/procurement/orders/from-award/34ab490a-566c-4468-a9c1-14e4a79a1d2e/?supplier=e7ff9909-3ea0-4516-a709-effae681a73e",
+          "status": 400
+        }
+      ]
+    },
+    {
+      "scenario": "forged-project-denied",
+      "evidence": "batch-source-validation-retention.json",
+      "status": 400,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:54149/procurement/orders/from-award/34ab490a-566c-4468-a9c1-14e4a79a1d2e/?supplier=e7ff9909-3ea0-4516-a709-effae681a73e",
+          "status": 400
+        }
+      ]
+    },
+    {
+      "scenario": "forged-allocation-denied",
+      "evidence": "batch-source-validation-retention.json",
+      "status": 400,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:54149/procurement/orders/from-award/34ab490a-566c-4468-a9c1-14e4a79a1d2e/?supplier=e7ff9909-3ea0-4516-a709-effae681a73e",
+          "status": 400
+        }
+      ]
+    },
+    {
+      "scenario": "split-all-consumed-remaining-zero",
+      "evidence": "batch-split-all-consumed-remaining-zero.json",
+      "status": 200,
+      "width": 1440,
+      "scroll": 1440,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "split-supplier-1-draft",
+      "evidence": "batch-split-supplier-1-draft.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "split-supplier-2-draft",
+      "evidence": "batch-split-supplier-2-draft.json",
+      "status": 200,
+      "width": 1425,
+      "scroll": 1425,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "split-supplier-selection",
+      "evidence": "batch-split-supplier-selection.json",
+      "status": 200,
+      "width": 1440,
+      "scroll": 1440,
+      "javascript_errors": [],
+      "http_errors": []
+    },
+    {
+      "scenario": "split-wrong-supplier-allocation-denial",
+      "evidence": "batch-split-wrong-supplier-allocation-denial.json",
+      "status": 200,
+      "width": 1440,
+      "scroll": 1440,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:51787/procurement/orders/from-award/07e7ff06-3ece-4031-9780-3c175b513d4b/?supplier=28af1914-d95f-437c-a099-4e2c69d26126",
+          "status": 400
+        }
+      ]
+    },
+    {
+      "scenario": "unauthorized-po-create",
+      "evidence": "batch-unauthorized-po-create.json",
+      "status": 403,
+      "width": 1440,
+      "scroll": 1440,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:54149/procurement/orders/create/",
+          "status": 403
+        }
+      ]
+    },
+    {
+      "scenario": "unauthorized-source-entry",
+      "evidence": "batch-unauthorized-po-create.json",
+      "status": 403,
+      "width": 1440,
+      "scroll": 1440,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:54149/procurement/orders/from-award/34ab490a-566c-4468-a9c1-14e4a79a1d2e/?supplier=e7ff9909-3ea0-4516-a709-effae681a73e",
+          "status": 403
+        }
+      ]
+    },
+    {
+      "scenario": "wrong-project-po-detail",
+      "evidence": "batch-wrong-project-po-detail.json",
+      "status": 404,
+      "width": 1440,
+      "scroll": 1440,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:54149/procurement/orders/7f5bccbe-ca86-44ae-9c04-2c62af4c1ecc/",
+          "status": 404
+        }
+      ]
+    },
+    {
+      "scenario": "wrong-project-source",
+      "evidence": "batch-wrong-project-po-detail.json",
+      "status": 404,
+      "width": 1440,
+      "scroll": 1440,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:54149/procurement/orders/from-award/34ab490a-566c-4468-a9c1-14e4a79a1d2e/?supplier=e7ff9909-3ea0-4516-a709-effae681a73e",
+          "status": 404
+        }
+      ]
+    },
+    {
+      "scenario": "wrong-tenant-po-detail",
+      "evidence": "batch-wrong-tenant-po-detail.json",
+      "status": 404,
+      "width": 1440,
+      "scroll": 1440,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:54149/procurement/orders/7f5bccbe-ca86-44ae-9c04-2c62af4c1ecc/",
+          "status": 404
+        }
+      ]
+    },
+    {
+      "scenario": "wrong-tenant-award-source",
+      "evidence": "batch-wrong-tenant-po-detail.json",
+      "status": 404,
+      "width": 1440,
+      "scroll": 1440,
+      "javascript_errors": [],
+      "http_errors": [
+        {
+          "url": "http://localhost:54149/procurement/orders/from-award/34ab490a-566c-4468-a9c1-14e4a79a1d2e/?supplier=e7ff9909-3ea0-4516-a709-effae681a73e",
+          "status": 404
+        }
+      ]
+    }
+  ]
+}

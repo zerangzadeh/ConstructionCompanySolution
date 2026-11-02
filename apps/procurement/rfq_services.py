@@ -94,6 +94,7 @@ def _fingerprint(
     rfq: RequestForQuotation,
     lines: list[RequestForQuotationLine],
     suppliers: list[BusinessParty],
+    scope_definition=None,
 ) -> str:
     payload = {
         "rfq": str(rfq.pk),
@@ -111,6 +112,11 @@ def _fingerprint(
         ],
         "suppliers": sorted(str(x.pk) for x in suppliers),
     }
+    if scope_definition is not None:
+        payload["commercial_scope_definition"] = {
+            "id": str(scope_definition.pk),
+            "fingerprint": scope_definition.payload_fingerprint,
+        }
     return hashlib.sha256(
         json.dumps(payload, separators=(",", ":"), sort_keys=True).encode()
     ).hexdigest()
@@ -377,10 +383,18 @@ def issue_rfq(
         raise ValueError("تأمین‌کننده تکراری مجاز نیست.")
     for supplier in suppliers:
         _supplier(organization=organization, supplier=supplier)
-    fingerprint = _fingerprint(locked, lines, suppliers)
+    from .commercial_scope_services import (
+        definition_for_issue,
+        freeze_commercial_scopes,
+    )
+
     existing = RequestForQuotationVersion.objects.filter(
         rfq=locked, idempotency_key=key
     ).first()
+    definition = definition_for_issue(
+        organization=organization, rfq=locked, existing=existing
+    )
+    fingerprint = _fingerprint(locked, lines, suppliers, definition)
     if existing:
         if existing.payload_fingerprint != fingerprint:
             raise ValueError("تلاش تکراری صدور با داده متفاوت رد شد.")
@@ -399,6 +413,7 @@ def issue_rfq(
         earliest_opening_at=locked.earliest_opening_at,
         idempotency_key=key,
         payload_fingerprint=fingerprint,
+        commercial_scope_definition=definition,
     )
     try:
         version.full_clean()
@@ -422,6 +437,7 @@ def issue_rfq(
             for x in lines
         ]
     )
+    freeze_commercial_scopes(version=version)
     RequestForQuotationInvitation.objects.bulk_create(
         [
             RequestForQuotationInvitation(
@@ -458,6 +474,8 @@ def issue_rfq(
         metadata={
             "version_id": str(version.pk),
             "version_number": version.version_number,
+            "scope_definition_id": str(definition.pk) if definition else None,
+            "scope_fingerprint": definition.payload_fingerprint if definition else None,
             "invitation_count": len(suppliers),
             "idempotency_key": key,
         },
@@ -504,12 +522,20 @@ def issue_rfq_addendum(
     changed.terms = terms.strip()
     changed.closing_at = closing_at
     changed.earliest_opening_at = earliest_opening_at
-    fingerprint = _fingerprint(
-        changed, lines, list(BusinessParty.objects.filter(pk__in=suppliers))
+    from .commercial_scope_services import (
+        definition_for_issue,
+        freeze_commercial_scopes,
     )
+
     existing = RequestForQuotationVersion.objects.filter(
         rfq=locked, idempotency_key=key
     ).first()
+    definition = definition_for_issue(
+        organization=organization, rfq=locked, existing=existing
+    )
+    fingerprint = _fingerprint(
+        changed, lines, list(BusinessParty.objects.filter(pk__in=suppliers)), definition
+    )
     if existing:
         if existing.payload_fingerprint != fingerprint:
             raise ValueError("تلاش تکراری الحاقیه با داده متفاوت رد شد.")
@@ -527,6 +553,7 @@ def issue_rfq_addendum(
         is_addendum=True,
         idempotency_key=key,
         payload_fingerprint=fingerprint,
+        commercial_scope_definition=definition,
     )
     version.full_clean()
     version.save()
@@ -548,6 +575,7 @@ def issue_rfq_addendum(
             for x in previous.lines.all()
         ]
     )
+    freeze_commercial_scopes(version=version)
     RequestForQuotationInvitation.objects.bulk_create(
         [
             RequestForQuotationInvitation(
@@ -565,23 +593,29 @@ def issue_rfq_addendum(
     locked.earliest_opening_at = earliest_opening_at
     locked.current_version_number = version.version_number
     locked.updated_by = actor
-    locked.save(
-        update_fields=[
-            "terms",
-            "closing_at",
-            "earliest_opening_at",
-            "current_version_number",
-            "updated_by",
-            "updated_at",
-        ]
+    # Refresh only the RFQ projection after its immutable addendum is recorded.
+    # Model.save deliberately rejects direct edits to issued header fields.
+    RequestForQuotation.objects.filter(pk=locked.pk, organization=organization).update(
+        terms=changed.terms,
+        closing_at=closing_at,
+        earliest_opening_at=earliest_opening_at,
+        current_version_number=version.version_number,
+        updated_by=actor,
+        updated_at=now,
     )
+    locked.refresh_from_db()
     record_audit_event(
         action=AuditAction.RFQ_ADDENDUM_ISSUED,
         entity_type="rfq",
         entity_id=locked.pk,
         organization=organization,
         actor=actor,
-        metadata={"version_id": str(version.pk), "idempotency_key": key},
+        metadata={
+            "version_id": str(version.pk),
+            "idempotency_key": key,
+            "scope_definition_id": str(definition.pk) if definition else None,
+            "scope_fingerprint": definition.payload_fingerprint if definition else None,
+        },
     )
     return version
 

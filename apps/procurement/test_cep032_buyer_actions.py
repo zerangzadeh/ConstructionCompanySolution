@@ -21,6 +21,7 @@ from apps.procurement.rfq_services import (
     issue_rfq,
     submit_rfq_for_issue,
 )
+from apps.procurement.test_p5_s08_sealed_custody import _pdf_upload
 from apps.procurement.test_p5_s11_comparison_award import P5S11FixtureMixin
 
 
@@ -245,6 +246,9 @@ class BuyerActionTests(P5S11FixtureMixin, TestCase):
             purchase_request_item=source.items.get(),
             quantity=Decimal(2),
         )
+        from apps.procurement.scope_test_helpers import define_fixture_scopes
+
+        define_fixture_scopes(organization=self.organization, actor=self.owner, rfq=rfq)
         submit_rfq_for_issue(organization=self.organization, actor=self.owner, rfq=rfq)
         version = issue_rfq(
             organization=self.organization,
@@ -257,12 +261,16 @@ class BuyerActionTests(P5S11FixtureMixin, TestCase):
         self.login(self.owner)
         payload = {
             "invitation": version.invitations.get().pk,
-            "integrity_fingerprint": "a" * 64,
             "source_channel": "manual_capture",
             "idempotency_key": "ui-capture",
         }
         for _ in range(2):
-            self.assertEqual(self.action("capture", payload, rfq=rfq).status_code, 302)
+            self.assertEqual(
+                self.action(
+                    "capture", {**payload, "source_file": _pdf_upload()}, rfq=rfq
+                ).status_code,
+                302,
+            )
         revision = m.QuoteRevision.objects.get(envelope__rfq=rfq)
         self.assertEqual(
             self.action(
@@ -365,7 +373,7 @@ class BuyerActionTests(P5S11FixtureMixin, TestCase):
                     reverse("procurement:rfq_buyer_action", args=[self.rfq.pk, action])
                 )
                 self.assertEqual(response.status_code, 200)
-                self.assertContains(response, "فقط منابع مجاز همین استعلام")
+                self.assertContains(response, "فقط پیشنهادها و مدارک مجاز همین استعلام")
         self.assertEqual(m.CommercialComparison.objects.count(), before)
 
     def test_explicit_no_award_and_cross_comparison_allocation_rejection(self):

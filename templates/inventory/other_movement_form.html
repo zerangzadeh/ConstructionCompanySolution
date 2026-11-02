@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% load static field_journey %}
+{% block title %}گردش جدید انبار | بنیرا{% endblock %}
+{% block extra_head %}{% prepare_native_choices form %}{{ form.media.css }}<link rel="stylesheet" href="{% static 'css/erp_create_form.css' %}">{% endblock %}
+{% block extra_scripts %}{{ form.media.js }}{% endblock %}
+{% block content %}<div class="erp-create-page">{% include "components/page_header.html" with page_title="گردش جدید انبار" page_description="گردش ابتدا به‌صورت پیش‌نویس ثبت می‌شود." only %}<a class="my-4 inline-block text-sm text-blue-700" href="{% url 'inventory:transaction_create' %}">ورود از رسید کالا</a><form class="erp-create-form" method="post" aria-label="سایر گردش‌های انبار">{% csrf_token %}{% include "components/form_errors.html" with form=form only %}<section class="erp-form-section"><div class="erp-form-grid erp-form-grid--two">{% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}</div></section>{% url 'inventory:transaction_list' as cancel_url %}{% include "components/form_footer.html" with submit_label="ثبت پیش‌نویس گردش" cancel_url=cancel_url only %}</form></div>{% endblock %}

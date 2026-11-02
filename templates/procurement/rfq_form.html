@@ -1,6 +1,14 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load static %}
 {% block title %}استعلام جدید | تدارکات{% endblock %}
-{% block content %}
-{% include "components/page_header.html" with page_eyebrow="تدارکات" page_title="استعلام جدید" page_description="مبنای استعلام باید درخواست خرید تأییدشده و همان پروژه باشد." only %}
-<form method="post" class="erp-surface mt-5 max-w-2xl rounded-xl p-5">{% csrf_token %}{% if form.non_field_errors %}<div role="alert" class="mb-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">{{ form.non_field_errors }}</div>{% endif %}<div class="space-y-4">{% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}</div><button class="erp-btn erp-btn--primary mt-5" type="submit">ثبت پیش‌نویس</button></form>
-{% endblock %}
+{% block extra_head %}{{ form.media.css }}<link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}"><link rel="stylesheet" href="{% static 'css/erp_create_form.css' %}">{% endblock %}
+{% block extra_scripts %}{{ form.media.js }}{% endblock %}
+{% block content %}<div class="erp-create-page">
+{% include "components/page_header.html" with page_title="استعلام جدید" page_description="استعلام بر پایه درخواست خرید تأییدشده همین پروژه ثبت می‌شود." only %}
+{% if source_request %}<aside class="erp-surface mb-4 rounded-xl p-4 text-sm"><p>درخواست مبنا: <strong><bdi dir="ltr">{{ source_request.request_number }}</bdi> · {{ source_request.title }}</strong></p><p class="mt-1 text-slate-500">پروژه: {{ source_request.project.name }}</p>{% if can_view_source %}<a class="mt-2 inline-block text-blue-700" href="{% url 'procurement:request_detail' source_request.pk %}">بازگشت به درخواست خرید</a>{% endif %}</aside>{% endif %}
+<form method="post" class="erp-create-form" novalidate aria-label="استعلام جدید">{% csrf_token %}
+{% include "components/form_errors.html" with form=form only %}
+{% for field in form.hidden_fields %}{{ field }}{% if field.errors %}<p class="erp-field-error" role="alert">{{ field.label }}: {{ field.errors|join:", " }}</p>{% endif %}{% endfor %}
+<section class="erp-form-section" aria-labelledby="rfq-basic">{% include "components/form_section_header.html" with heading_id="rfq-basic" heading="اطلاعات استعلام" icon="document" only %}<div class="erp-form-grid erp-form-grid--two">{% if not source_request %}{% include "components/form_field.html" with field=form.purchase_request_id only %}{% endif %}{% include "components/form_field.html" with field=form.rfq_number only %}{% include "components/form_field.html" with field=form.title only %}</div></section>
+<section class="erp-form-section" aria-labelledby="rfq-dates">{% include "components/form_section_header.html" with heading_id="rfq-dates" heading="مهلت دریافت و گشایش" description="گشایش نمی‌تواند پیش از پایان دریافت پیشنهادها باشد." icon="calendar" only %}<div class="erp-form-grid erp-form-grid--two">{% include "components/form_field.html" with field=form.closing_at only %}{% include "components/form_field.html" with field=form.earliest_opening_at only %}</div></section>
+<section class="erp-form-section" aria-labelledby="rfq-terms">{% include "components/form_section_header.html" with heading_id="rfq-terms" heading="شرایط استعلام" icon="notes" only %}{% include "components/form_field.html" with field=form.terms only %}</section>
+{% url 'procurement:rfq_list' as cancel_url %}{% include "components/form_footer.html" with submit_label="ثبت پیش‌نویس استعلام" cancel_url=cancel_url only %}</form></div>{% endblock %}

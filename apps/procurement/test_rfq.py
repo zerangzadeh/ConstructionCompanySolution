@@ -51,6 +51,14 @@ class RequestForQuotationServiceTests(ProcurementFixtureMixin, TestCase):
 
     def test_issue_is_idempotent_and_snapshots_are_immutable(self):
         rfq = self._draft()
+        from .scope_test_helpers import define_fixture_scopes
+
+        define_fixture_scopes(
+            organization=self.organization,
+            actor=self.owner,
+            rfq=rfq,
+            specifications=getattr(self, "scope_specifications", (("LINE-1", True),)),
+        )
         submit_rfq_for_issue(organization=self.organization, actor=self.member, rfq=rfq)
         version = issue_rfq(
             organization=self.organization,
@@ -75,6 +83,14 @@ class RequestForQuotationServiceTests(ProcurementFixtureMixin, TestCase):
 
     def test_addendum_cannot_move_opening_boundary_earlier(self):
         rfq = self._draft()
+        from .scope_test_helpers import define_fixture_scopes
+
+        define_fixture_scopes(
+            organization=self.organization,
+            actor=self.owner,
+            rfq=rfq,
+            specifications=getattr(self, "scope_specifications", (("LINE-1", True),)),
+        )
         submit_rfq_for_issue(organization=self.organization, actor=self.member, rfq=rfq)
         issue_rfq(
             organization=self.organization,
@@ -138,6 +154,14 @@ class RequestForQuotationConcurrencyTests(ProcurementFixtureMixin, TransactionTe
             rfq=rfq,
             purchase_request_item=item,
             quantity=Decimal("10.0000"),
+        )
+        from .scope_test_helpers import define_fixture_scopes
+
+        define_fixture_scopes(
+            organization=self.organization,
+            actor=self.owner,
+            rfq=rfq,
+            specifications=getattr(self, "scope_specifications", (("LINE-1", True),)),
         )
         submit_rfq_for_issue(organization=self.organization, actor=self.member, rfq=rfq)
         barrier = Barrier(2)

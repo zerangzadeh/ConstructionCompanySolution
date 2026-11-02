@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotFound
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
@@ -22,10 +23,8 @@ from apps.procurement.forms import (
     GoodsReceiptForm,
     OrderItemForm,
     PurchaseOrderForm,
-    PurchaseRequestForm,
     ReasonForm,
     ReceiptItemForm,
-    RequestItemForm,
     SealedEvidenceUploadForm,
     SupplierPortalInvitationForm,
     SupplierPortalSubmissionForm,
@@ -71,13 +70,18 @@ from apps.procurement.services import (
     submit_purchase_request,
     void_goods_receipt,
 )
+from core.business_choices import contextual_parent, contextual_url
 from core.list_filters import (
     apply_table_filters,
+    build_filter_bar,
     build_table_filters,
     has_active_table_filters,
     paginate_table,
     table_pagination_query,
 )
+
+from .request_forms import RequestCreateForm, RequestFilterForm, RequestLineForm
+from .request_ui import detail_context, error_text, permitted
 
 
 def _not_found(record: object | None, message: str):
@@ -93,8 +97,8 @@ def _request_record(
             organization=request.organization,
             purchase_request_id=request_id,
         )
-    except PermissionDenied:
-        return HttpResponseNotFound("درخواست خرید یافت نشد.")
+    except PermissionDenied as exc:
+        raise Http404("درخواست خرید یافت نشد.") from exc
 
 
 def _order_record(request: HttpRequest, order_id: str) -> PurchaseOrder | HttpResponse:
@@ -302,6 +306,8 @@ def portal_grant_revoke(
 
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.RFQS_CUSTODY_SEALED_EVIDENCE)
+@never_cache
+@require_http_methods(["GET", "POST"])
 def sealed_evidence_custody(request: HttpRequest, revision_id: str) -> HttpResponse:
     try:
         revision = QuoteRevision.objects.get(
@@ -309,6 +315,13 @@ def sealed_evidence_custody(request: HttpRequest, revision_id: str) -> HttpRespo
         )
     except QuoteRevision.DoesNotExist as exc:
         raise Http404("نسخه پیشنهاد یافت نشد.") from exc
+    require_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.RFQS_CUSTODY_SEALED_EVIDENCE,
+        project=revision.envelope.rfq.project,
+        message="مجوز نگهداری پیشنهاد در این پروژه را ندارید.",
+    )
     form = SealedEvidenceUploadForm(request.POST or None, request.FILES or None)
     if request.method == "POST" and form.is_valid():
         try:
@@ -319,7 +332,9 @@ def sealed_evidence_custody(request: HttpRequest, revision_id: str) -> HttpRespo
                 **form.cleaned_data,
             )
         except (PermissionDenied, ValueError) as exc:
-            form.add_error(None, str(exc))
+            from .buyer_ui import presentation_error
+
+            form.add_error(None, presentation_error(exc))
         else:
             messages.success(
                 request,
@@ -331,7 +346,13 @@ def sealed_evidence_custody(request: HttpRequest, revision_id: str) -> HttpRespo
     return render(
         request,
         "procurement/sealed_evidence_custody.html",
-        {"revision": revision, "form": form},
+        {
+            "revision": revision,
+            "form": form,
+            "can_view_rfq": permitted(
+                request, BusinessPermissionCode.RFQS_VIEW, revision.envelope.rfq.project
+            ),
+        },
     )
 
 
@@ -342,28 +363,66 @@ def purchase_request_list(request: HttpRequest) -> HttpResponse:
     records = get_organization_purchase_requests(
         user=request.user, organization=request.organization
     )
+    membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
+    projects = (
+        RequestCreateForm(organization=request.organization, membership=membership)
+        .fields["project"]
+        .queryset
+    )
+    project = contextual_parent(request, "project_id", projects)
+    if project:
+        records = records.filter(project=project)
+    scoped_has_records = records.exists()
+    form = RequestFilterForm(
+        request.GET, projects=projects, project_scoped=project is not None
+    )
+    if not form.is_valid():
+        records = records.none()
+    else:
+        if chosen := form.cleaned_data.get("project"):
+            records = records.filter(project=chosen)
     records = apply_table_filters(
         records,
         request,
         text_fields={
+            "q": ("request_number", "title", "project__name"),
             "request": ("request_number", "title"),
-            "project": ("project__name",),
         },
         choice_fields={"status": ("status", PurchaseRequestStatus.values)},
         date_fields={"required_by": "required_by"},
     )
+    sorts = {
+        "number": "request_number",
+        "title": "title",
+        "project": "project__name",
+        "required_by": "required_by",
+        "status": "status",
+    }
+    labels = {
+        "number": "شماره درخواست",
+        "title": "عنوان درخواست",
+        "project": "پروژه",
+        "required_by": "تاریخ نیاز",
+        "status": "وضعیت",
+    }
     page = paginate_table(
-        records,
+        records, request, sort_fields=sorts, default_ordering=("-created_at", "pk")
+    )
+    bar = build_filter_bar(
         request,
-        sort_fields={
-            "number": "request_number",
-            "title": "title",
-            "record": "title",
-            "project": "project__name",
-            "required_by": "required_by",
-            "status": "status",
-        },
-        default_ordering=("-created_at", "pk"),
+        form=form,
+        quick_fields=("status", "project"),
+        secondary_fields=("required_by_from", "required_by_to"),
+        context={"project_id": str(project.pk)} if project else {},
+        result_count=page.paginator.count,
+        result_label="درخواست خرید",
+    )
+    create_url = (
+        contextual_url("procurement:request_create", project_id=project.pk)
+        if project
+        else reverse("procurement:request_create")
     )
     return render(
         request,
@@ -372,25 +431,21 @@ def purchase_request_list(request: HttpRequest) -> HttpResponse:
             "requests": page.object_list,
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
-            "filters": build_table_filters(
-                request,
-                [
-                    {"name": "request", "kind": "text", "label": "شماره و عنوان"},
-                    {"name": "project", "kind": "text", "label": "پروژه"},
-                    {
-                        "name": "required_by",
-                        "kind": "date_range",
-                        "label": "تاریخ نیاز",
-                    },
-                    {
-                        "name": "status",
-                        "kind": "select",
-                        "label": "وضعیت",
-                        "choices": PurchaseRequestStatus.choices,
-                    },
-                ],
-            ),
-            "has_active_filters": has_active_table_filters(request),
+            "filter_bar": bar,
+            "scoped_has_records": scoped_has_records,
+            "selected_project": project,
+            "clear_filters_url": bar["clear_url"],
+            "create_url": create_url
+            if permitted(
+                request, BusinessPermissionCode.PURCHASE_REQUESTS_CREATE, project
+            )
+            and request.organization.status == "active"
+            else "",
+            "list_sort": {
+                "label": labels.get(request.GET.get("sort"), "جدیدترین درخواست"),
+                "descending": request.GET.get("direction") == "desc"
+                or request.GET.get("sort") not in sorts,
+            },
         },
     )
 
@@ -398,12 +453,20 @@ def purchase_request_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.PURCHASE_REQUESTS_CREATE)
 def purchase_request_create(request: HttpRequest) -> HttpResponse:
-    form = PurchaseRequestForm(
-        request.POST or None,
+    membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
+    projects = (
+        RequestCreateForm(organization=request.organization, membership=membership)
+        .fields["project"]
+        .queryset
+    )
+    project = contextual_parent(request, "project_id", projects)
+    form = RequestCreateForm(
+        request.POST if request.method == "POST" else None,
         organization=request.organization,
-        membership=get_active_membership(
-            user=request.user, organization=request.organization
-        ),
+        membership=membership,
+        context_project=project,
     )
     if request.method == "POST" and form.is_valid():
         try:
@@ -412,17 +475,21 @@ def purchase_request_create(request: HttpRequest) -> HttpResponse:
                 actor=request.user,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValueError) as exc:
-            form.add_error(None, str(exc))
+        except (PermissionDenied, ValidationError, ValueError) as exc:
+            form.add_error(None, error_text(exc))
         else:
             return redirect("procurement:request_detail", request_id=record.pk)
     return render(
         request,
-        "procurement/form.html",
+        "procurement/request_form.html",
         {
             "form": form,
             "title": "درخواست خرید جدید",
-            "back_url": "procurement:request_list",
+            "cancel_url": contextual_url(
+                "procurement:request_list", project_id=project.pk
+            )
+            if project
+            else reverse("procurement:request_list"),
         },
     )
 
@@ -435,13 +502,7 @@ def purchase_request_detail(request: HttpRequest, request_id: str) -> HttpRespon
     if isinstance(record, HttpResponse):
         return record
     return render(
-        request,
-        "procurement/request_detail.html",
-        {
-            "purchase_request": record,
-            "item_form": RequestItemForm(organization=request.organization),
-            "reason_form": ReasonForm(),
-        },
+        request, "procurement/request_detail.html", detail_context(request, record)
     )
 
 
@@ -452,7 +513,7 @@ def purchase_request_item_add(request: HttpRequest, request_id: str) -> HttpResp
     record = _request_record(request, request_id)
     if isinstance(record, HttpResponse):
         return record
-    form = RequestItemForm(request.POST, organization=request.organization)
+    form = RequestLineForm(request.POST, organization=request.organization)
     if form.is_valid():
         try:
             data = form.cleaned_data
@@ -463,12 +524,17 @@ def purchase_request_item_add(request: HttpRequest, request_id: str) -> HttpResp
                 unit_of_measure=data["material"].unit_of_measure,
                 **data,
             )
+        except (PermissionDenied, ValidationError, ValueError) as exc:
+            form.add_error(None, error_text(exc))
+        else:
             messages.success(request, "ردیف درخواست خرید افزوده شد.")
-        except (PermissionDenied, ValueError) as exc:
-            messages.error(request, str(exc))
-    else:
-        messages.error(request, "فیلدهای ردیف درخواست را بررسی کنید.")
-    return redirect("procurement:request_detail", request_id=request_id)
+            return redirect("procurement:request_detail", request_id=request_id)
+    return render(
+        request,
+        "procurement/request_detail.html",
+        detail_context(request, record, item_form=form),
+        status=400,
+    )
 
 
 @active_organization_required
@@ -486,7 +552,7 @@ def purchase_request_submit(request: HttpRequest, request_id: str) -> HttpRespon
         )
         messages.success(request, "درخواست خرید ارسال شد.")
     except (PermissionDenied, ValidationError, ValueError) as exc:
-        messages.error(request, str(exc))
+        messages.error(request, error_text(exc))
     return redirect("procurement:request_detail", request_id=request_id)
 
 
@@ -496,7 +562,10 @@ def _request_decision(
     record = _request_record(request, request_id)
     if isinstance(record, HttpResponse):
         return record
-    form = ReasonForm(request.POST)
+    action = "approve" if approve else "reject"
+    form = ReasonForm(
+        request.POST, prefix=action if f"{action}-reason" in request.POST else None
+    )
     if form.is_valid():
         try:
             service = approve_purchase_request if approve else reject_purchase_request
@@ -510,10 +579,17 @@ def _request_decision(
                 request, "درخواست خرید تأیید شد." if approve else "درخواست خرید رد شد."
             )
         except (PermissionDenied, ValidationError, ValueError) as exc:
-            messages.error(request, str(exc))
-    else:
-        messages.error(request, "دلیل را وارد کنید.")
-    return redirect("procurement:request_detail", request_id=request_id)
+            form.add_error(None, error_text(exc))
+        else:
+            return redirect("procurement:request_detail", request_id=request_id)
+    return render(
+        request,
+        "procurement/request_detail.html",
+        detail_context(
+            request, record, **{f"{action}_form": form, "open_action": action}
+        ),
+        status=400,
+    )
 
 
 @active_organization_required
@@ -537,7 +613,9 @@ def purchase_request_cancel(request: HttpRequest, request_id: str) -> HttpRespon
     record = _request_record(request, request_id)
     if isinstance(record, HttpResponse):
         return record
-    form = ReasonForm(request.POST)
+    form = ReasonForm(
+        request.POST, prefix="cancel" if "cancel-reason" in request.POST else None
+    )
     if form.is_valid():
         try:
             cancel_purchase_request(
@@ -548,10 +626,15 @@ def purchase_request_cancel(request: HttpRequest, request_id: str) -> HttpRespon
             )
             messages.success(request, "درخواست خرید لغو شد.")
         except (PermissionDenied, ValidationError, ValueError) as exc:
-            messages.error(request, str(exc))
-    else:
-        messages.error(request, "دلیل لغو را وارد کنید.")
-    return redirect("procurement:request_detail", request_id=request_id)
+            form.add_error(None, error_text(exc))
+        else:
+            return redirect("procurement:request_detail", request_id=request_id)
+    return render(
+        request,
+        "procurement/request_detail.html",
+        detail_context(request, record, cancel_form=form, open_action="cancel"),
+        status=400,
+    )
 
 
 @active_organization_required
@@ -610,13 +693,33 @@ def purchase_order_list(request: HttpRequest) -> HttpResponse:
 
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.PURCHASE_ORDERS_CREATE)
+@never_cache
+@require_http_methods(["GET", "POST"])
 def purchase_order_create(request: HttpRequest) -> HttpResponse:
-    form = PurchaseOrderForm(
+    from .buyer_ui import presentation_error
+    from .order_forms import OrderCreateForm
+
+    if any(
+        key in request.GET or key in request.POST
+        for key in ("award", "source_award", "allocations", "allocation_ids")
+    ):
+        raise PermissionDenied(
+            "برای سفارش از انتخاب نهایی، از اقدام ایجاد سفارش خرید همان انتخاب استفاده کنید."
+        )
+    membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
+    parents = (
+        PurchaseOrderForm(organization=request.organization, membership=membership)
+        .fields["project"]
+        .queryset
+    )
+    parent = contextual_parent(request, "project", parents)
+    form = OrderCreateForm(
         request.POST or None,
         organization=request.organization,
-        membership=get_active_membership(
-            user=request.user, organization=request.organization
-        ),
+        membership=membership,
+        context_project=parent,
     )
     if request.method == "POST" and form.is_valid():
         try:
@@ -626,17 +729,20 @@ def purchase_order_create(request: HttpRequest) -> HttpResponse:
                 **form.cleaned_data,
             )
         except (PermissionDenied, ValueError) as exc:
-            form.add_error(None, str(exc))
+            form.add_error(None, presentation_error(exc))
         else:
             return redirect("procurement:order_detail", order_id=record.pk)
     return render(
         request,
-        "procurement/form.html",
+        "procurement/order_create.html",
         {
             "form": form,
             "title": "سفارش خرید جدید",
             "back_url": "procurement:order_list",
+            "context_project": parent,
+            "can_view_rfqs": permitted(request, BusinessPermissionCode.RFQS_VIEW),
         },
+        status=400 if request.method == "POST" else 200,
     )
 
 
@@ -786,12 +892,30 @@ def goods_receipt_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.GOODS_RECEIPTS_CREATE)
 def goods_receipt_create(request: HttpRequest) -> HttpResponse:
-    form = GoodsReceiptForm(
+    from .order_forms import ReceiptContextForm
+
+    membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
+    parents = (
+        GoodsReceiptForm(organization=request.organization, membership=membership)
+        .fields["purchase_order"]
+        .queryset.filter(current_version__isnull=False)
+    )
+    source_order = contextual_parent(request, "purchase_order", parents)
+    if source_order:
+        require_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission=BusinessPermissionCode.GOODS_RECEIPTS_CREATE,
+            project=source_order.project,
+            message="مجوز ثبت رسید کالا برای این پروژه را ندارید.",
+        )
+    form = ReceiptContextForm(
         request.POST or None,
         organization=request.organization,
-        membership=get_active_membership(
-            user=request.user, organization=request.organization
-        ),
+        membership=membership,
+        source_order=source_order,
     )
     if request.method == "POST" and form.is_valid():
         try:
@@ -811,6 +935,7 @@ def goods_receipt_create(request: HttpRequest) -> HttpResponse:
             "form": form,
             "title": "رسید کالای جدید",
             "back_url": "procurement:receipt_list",
+            "source_order": source_order,
         },
     )
 

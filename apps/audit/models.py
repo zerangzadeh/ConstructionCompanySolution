@@ -8,8 +8,14 @@ from core.models import CreatedAtModel, UUIDModel
 
 
 class AuditAction(models.TextChoices):
-    ACCOUNTING_YEAR_END_CONFIGURED = "accounting.year_end_configured", "حساب‌های بستن سال تنظیم شد"
-    ACCOUNTING_YEAR_END_TRANSITION = "accounting.year_end_transition", "وضعیت بستن سال تغییر کرد"
+    ACCOUNTING_YEAR_END_CONFIGURED = (
+        "accounting.year_end_configured",
+        "حساب‌های بستن سال تنظیم شد",
+    )
+    ACCOUNTING_YEAR_END_TRANSITION = (
+        "accounting.year_end_transition",
+        "وضعیت بستن سال تغییر کرد",
+    )
 
     PAYROLL_AP_ENROLLMENT_PREPARED = (
         "payroll_ap.enrollment_prepared",
@@ -1134,6 +1140,10 @@ class AuditAction(models.TextChoices):
     )
     RFQ_CREATED = "rfq.created", "استعلام خرید ایجاد شد"
     RFQ_LINE_ADDED = "rfq.line_added", "ردیف استعلام خرید افزوده شد"
+    RFQ_COMMERCIAL_SCOPE_DEFINED = (
+        "rfq.commercial_scope_defined",
+        "دامنه خرید استعلام تعریف شد",
+    )
     RFQ_SUBMITTED = "rfq.submitted", "استعلام خرید برای صدور ارسال شد"
     RFQ_ISSUED = "rfq.issued", "استعلام خرید صادر شد"
     RFQ_ADDENDUM_ISSUED = "rfq.addendum_issued", "الحاقیه استعلام خرید صادر شد"

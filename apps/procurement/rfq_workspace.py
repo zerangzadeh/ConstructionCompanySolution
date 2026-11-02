@@ -1,8 +1,7 @@
 """Discoverability and safe actions over existing Procurement RFQ authority."""
 
-from uuid import UUID
-
 from django.core.exceptions import PermissionDenied
+from django.db.models import prefetch_related_objects
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
@@ -13,14 +12,11 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode as P
-from apps.parties.models import BusinessParty
 from apps.procurement.models import (
-    CommercialComparison,
     PurchaseRequest,
     PurchaseRequestItem,
-    QuoteRevision,
-    SourcingAward,
 )
+from apps.procurement.request_ui import eligible_rfqs, permitted
 from apps.procurement.rfq_forms import (
     RFQCancelForm,
     RFQCloseForm,
@@ -34,10 +30,11 @@ from apps.procurement.rfq_services import (
     close_rfq,
     create_rfq,
     get_organization_rfq,
-    get_organization_rfqs,
     issue_rfq,
     submit_rfq_for_issue,
 )
+from apps.procurement.rfq_ui import list_context, preparation_error_text
+from core.business_choices import contextual_parent
 
 
 def _rfq(request: HttpRequest, rfq_id: str):
@@ -52,87 +49,92 @@ def _rfq(request: HttpRequest, rfq_id: str):
 
 
 def _context(request: HttpRequest, rfq):
+    prefetch_related_objects(
+        [rfq],
+        "versions__commercial_scope_definition",
+        "versions__commercial_scopes__unit_of_measure",
+        "versions__lines__material",
+        "versions__lines__unit_of_measure",
+        "versions__invitations__supplier",
+    )
     org = request.organization
     project = rfq.project
-    can_quotes = has_business_permission(
-        user=request.user,
-        organization=org,
-        permission=P.RFQ_QUOTES_VIEW_METADATA,
-        project=project,
-    )
-    can_compare = any(
-        has_business_permission(
-            user=request.user,
-            organization=org,
-            permission=code,
-            project=project,
+    active = org.status == "active" and project.deleted_at is None
+
+    def allowed(code):
+        return active and permitted(request, code, project)
+
+    state = rfq.status
+    scope = _scope_context(request, rfq)
+    lines = list(
+        rfq.lines.select_related("material", "unit_of_measure").order_by(
+            "sort_order", "created_at"
         )
-        for code in (
-            P.RFQ_QUOTES_PREPARE_COMPARISON,
-            P.RFQ_QUOTES_EVALUATE_COMPARISON,
-            P.RFQ_QUOTES_FINALIZE_COMPARISON,
-        )
-    )
-    can_award = any(
-        has_business_permission(
-            user=request.user,
-            organization=org,
-            permission=code,
-            project=project,
-        )
-        for code in (
-            P.RFQ_QUOTES_PREPARE_SOURCING_AWARD,
-            P.RFQ_QUOTES_FINALIZE_SOURCING_AWARD,
-        )
-    )
-    revisions = (
-        list(
-            QuoteRevision.objects.filter(
-                organization=org,
-                envelope__rfq=rfq,
-            )
-            .select_related("envelope__supplier")
-            .order_by("-created_at")
-        )
-        if can_quotes
-        else []
-    )
-    comparisons = (
-        list(
-            CommercialComparison.objects.filter(
-                organization=org,
-                commercial_scope__rfq_version__rfq=rfq,
-            )
-            .select_related("commercial_scope")
-            .order_by("-created_at")
-        )
-        if can_compare
-        else []
-    )
-    awards = (
-        list(
-            SourcingAward.objects.filter(
-                organization=org,
-                comparison__commercial_scope__rfq_version__rfq=rfq,
-            )
-            .select_related("comparison")
-            .order_by("-created_at")
-        )
-        if can_award
-        else []
     )
     return {
         "rfq": rfq,
-        "quote_revisions": revisions,
-        "comparisons": comparisons,
-        "awards": awards,
-        "can_quotes": can_quotes,
-        "can_compare": can_compare,
-        "can_award": can_award,
-        "line_form": RFQLineForm(),
-        "issue_form": RFQIssueForm(),
+        "selected_lines": lines,
+        "can_view_source": permitted(request, P.PURCHASE_REQUESTS_VIEW, project),
+        "can_add_line": state == "draft" and allowed(P.RFQS_CHANGE),
+        "can_submit": state == "draft" and allowed(P.RFQS_SUBMIT),
+        "can_issue": state == "submitted_for_issue" and allowed(P.RFQS_ISSUE),
+        "can_close": state == "issued" and allowed(P.RFQS_CLOSE_CUSTODY),
+        "can_cancel": state not in ("closed", "cancelled") and allowed(P.RFQS_CANCEL),
+        "can_buyer": state in ("issued", "closed")
+        and any(
+            permitted(request, code, project)
+            for code in (
+                P.RFQ_QUOTES_VIEW_METADATA,
+                P.RFQ_QUOTES_PREPARE_COMPARISON,
+                P.RFQ_QUOTES_EVALUATE_COMPARISON,
+                P.RFQ_QUOTES_FINALIZE_COMPARISON,
+                P.RFQ_QUOTES_PREPARE_SOURCING_AWARD,
+                P.RFQ_QUOTES_FINALIZE_SOURCING_AWARD,
+            )
+        ),
+        "state_description": {
+            "draft": "اقلام را از درخواست خرید انتخاب کنید، دامنه خرید را صریحاً تعریف کنید و استعلام را برای صدور بفرستید.",
+            "submitted_for_issue": "استعلام آماده بررسی برای صدور است. دامنه خرید معتبر و حداقل یک تأمین‌کننده برای صدور لازم است.",
+            "issued": "استعلام صادر شده است. اقلام، دامنه خرید، مهلت‌ها و دعوت‌نامه‌های هر نسخه تثبیت شده‌اند؛ تغییر از مسیر الحاقیه انجام می‌شود.",
+            "closed": "استعلام بسته شده است. اطلاعات نسخه‌های صادرشده فقط خواندنی است.",
+            "cancelled": "استعلام لغو شده است و قابل ادامه نیست. تاریخچه نسخه‌ها حفظ شده است.",
+        }[state],
+        "line_form": RFQLineForm(rfq=rfq),
+        "issue_form": RFQIssueForm(organization=org),
+        **scope,
         "close_form": RFQCloseForm(),
         "cancel_form": RFQCancelForm(),
+    }
+
+
+def _scope_context(request, rfq):
+    from .commercial_scope_forms import source_signature
+    from .commercial_scope_services import latest_definition, source_lines
+
+    definition = latest_definition(rfq, rfq.current_version_number + 1)
+    return {
+        "prepared_scope": definition,
+        "scope_ready": bool(
+            definition
+            and definition.payload["source_fingerprint"]
+            == source_signature(source_lines(rfq, rfq.current_version_number + 1))
+        ),
+        "can_manage_scope": request.organization.status == "active"
+        and rfq.status in ("draft", "submitted_for_issue", "issued")
+        and has_business_permission(
+            user=request.user,
+            organization=request.organization,
+            project=rfq.project,
+            permission=P.RFQS_ADDENDUM if rfq.current_version_number else P.RFQS_CHANGE,
+        ),
+        "can_addendum": request.organization.status == "active"
+        and rfq.status == "issued"
+        and has_business_permission(
+            user=request.user,
+            organization=request.organization,
+            project=rfq.project,
+            permission=P.RFQS_ADDENDUM,
+        ),
     }
 
 
@@ -140,15 +142,7 @@ def _context(request: HttpRequest, rfq):
 @organization_permission_required(P.RFQS_VIEW)
 @require_GET
 def rfq_list(request: HttpRequest) -> HttpResponse:
-    return render(
-        request,
-        "procurement/rfq_list.html",
-        {
-            "rfqs": get_organization_rfqs(
-                user=request.user, organization=request.organization
-            ).order_by("-created_at")[:100],
-        },
-    )
+    return render(request, "procurement/rfq_list.html", list_context(request))
 
 
 @active_organization_required
@@ -163,13 +157,17 @@ def rfq_detail(request: HttpRequest, rfq_id: str) -> HttpResponse:
 @organization_permission_required(P.RFQS_CREATE)
 @require_http_methods(["GET", "POST"])
 def rfq_create(request: HttpRequest) -> HttpResponse:
-    form = RFQCreateForm(request.POST or None)
+    requests = eligible_rfqs(request)
+    source = contextual_parent(request, "purchase_request", requests)
+    form = RFQCreateForm(
+        request.POST if request.method == "POST" else None,
+        requests=requests,
+        source=source,
+        initial={"title": source.title} if source else None,
+    )
     if request.method == "POST" and form.is_valid():
         try:
-            purchase_request = PurchaseRequest.objects.select_related("project").get(
-                pk=form.cleaned_data["purchase_request_id"],
-                organization=request.organization,
-            )
+            purchase_request = form.cleaned_data["purchase_request_id"]
             rfq = create_rfq(
                 organization=request.organization,
                 actor=request.user,
@@ -186,14 +184,19 @@ def rfq_create(request: HttpRequest) -> HttpResponse:
                 None,
                 "درخواست خرید مجاز یافت نشد یا داده استعلام نامعتبر است."
                 if isinstance(exc, PurchaseRequest.DoesNotExist)
-                else str(exc),
+                else preparation_error_text(exc),
             )
         else:
             return redirect("procurement:rfq_detail", rfq_id=rfq.pk)
     return render(
         request,
         "procurement/rfq_form.html",
-        {"form": form},
+        {
+            "form": form,
+            "source_request": source,
+            "can_view_source": source is not None
+            and permitted(request, P.PURCHASE_REQUESTS_VIEW, source.project),
+        },
         status=400 if request.method == "POST" else 200,
     )
 
@@ -204,15 +207,11 @@ def rfq_create(request: HttpRequest) -> HttpResponse:
 def rfq_line_add(request: HttpRequest, rfq_id: str) -> HttpResponse:
     rfq = _rfq(request, rfq_id)
     context = _context(request, rfq)
-    form = RFQLineForm(request.POST)
+    form = RFQLineForm(request.POST, rfq=rfq)
     context["line_form"] = form
     if form.is_valid():
         try:
-            item = PurchaseRequestItem.objects.get(
-                pk=form.cleaned_data["purchase_request_item_id"],
-                organization=request.organization,
-                purchase_request=rfq.purchase_request,
-            )
+            item = form.cleaned_data["purchase_request_item_id"]
             add_rfq_line(
                 organization=request.organization,
                 actor=request.user,
@@ -226,7 +225,7 @@ def rfq_line_add(request: HttpRequest, rfq_id: str) -> HttpResponse:
                 None,
                 "ردیف درخواست خرید مجاز یافت نشد."
                 if isinstance(exc, PurchaseRequestItem.DoesNotExist)
-                else str(exc),
+                else preparation_error_text(exc),
             )
         else:
             return redirect("procurement:rfq_detail", rfq_id=rfq.pk)
@@ -244,7 +243,7 @@ def rfq_submit(request: HttpRequest, rfq_id: str) -> HttpResponse:
         )
     except (PermissionDenied, ValueError) as exc:
         context = _context(request, rfq)
-        context["action_error"] = str(exc)
+        context["action_error"] = preparation_error_text(exc)
         return render(request, "procurement/rfq_detail.html", context, status=400)
     return redirect("procurement:rfq_detail", rfq_id=rfq.pk)
 
@@ -255,22 +254,11 @@ def rfq_submit(request: HttpRequest, rfq_id: str) -> HttpResponse:
 def rfq_issue(request: HttpRequest, rfq_id: str) -> HttpResponse:
     rfq = _rfq(request, rfq_id)
     context = _context(request, rfq)
-    form = RFQIssueForm(request.POST)
+    form = RFQIssueForm(request.POST, organization=request.organization)
     context["issue_form"] = form
     if form.is_valid():
         try:
-            ids = [
-                UUID(value.strip())
-                for value in form.cleaned_data["supplier_ids"].split(",")
-            ]
-            suppliers = list(
-                BusinessParty.objects.filter(
-                    organization=request.organization,
-                    pk__in=ids,
-                )
-            )
-            if len(suppliers) != len(ids):
-                raise PermissionDenied("تأمین‌کننده مجاز یافت نشد.")
+            suppliers = list(form.cleaned_data["supplier_ids"])
             issue_rfq(
                 organization=request.organization,
                 actor=request.user,
@@ -279,7 +267,7 @@ def rfq_issue(request: HttpRequest, rfq_id: str) -> HttpResponse:
                 idempotency_key=form.cleaned_data["idempotency_key"],
             )
         except (ValueError, PermissionDenied) as exc:
-            form.add_error(None, str(exc))
+            form.add_error(None, preparation_error_text(exc))
         else:
             return redirect("procurement:rfq_detail", rfq_id=rfq.pk)
     return render(request, "procurement/rfq_detail.html", context, status=400)
@@ -293,6 +281,7 @@ def rfq_close(request: HttpRequest, rfq_id: str) -> HttpResponse:
     context = _context(request, rfq)
     form = RFQCloseForm(request.POST)
     context["close_form"] = form
+    context["open_action"] = "close"
     if form.is_valid():
         try:
             close_rfq(
@@ -302,7 +291,7 @@ def rfq_close(request: HttpRequest, rfq_id: str) -> HttpResponse:
                 idempotency_key=form.cleaned_data["idempotency_key"],
             )
         except (ValueError, PermissionDenied) as exc:
-            form.add_error(None, str(exc))
+            form.add_error(None, preparation_error_text(exc))
         else:
             return redirect("procurement:rfq_detail", rfq_id=rfq.pk)
     return render(request, "procurement/rfq_detail.html", context, status=400)
@@ -316,6 +305,7 @@ def rfq_cancel(request: HttpRequest, rfq_id: str) -> HttpResponse:
     context = _context(request, rfq)
     form = RFQCancelForm(request.POST)
     context["cancel_form"] = form
+    context["open_action"] = "cancel"
     if form.is_valid():
         try:
             cancel_rfq(
@@ -325,7 +315,7 @@ def rfq_cancel(request: HttpRequest, rfq_id: str) -> HttpResponse:
                 reason=form.cleaned_data["reason"],
             )
         except (ValueError, PermissionDenied) as exc:
-            form.add_error(None, str(exc))
+            form.add_error(None, preparation_error_text(exc))
         else:
             return redirect("procurement:rfq_detail", rfq_id=rfq.pk)
     return render(request, "procurement/rfq_detail.html", context, status=400)
