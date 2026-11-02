@@ -1,0 +1,35 @@
+.F.....                                                                  [100%]
+================================== FAILURES ===================================
+_ PresentationContractsTests.test_home_prioritizes_existing_tasks_and_alerts_without_business_summaries _
+
+self = <test_uiux_stage3a.PresentationContractsTests testMethod=test_home_prioritizes_existing_tasks_and_alerts_without_business_summaries>
+
+    def test_home_prioritizes_existing_tasks_and_alerts_without_business_summaries(
+        self,
+    ):
+        html = render_to_string(
+            "home.html",
+            {
+                "home_state": "normal",
+                "home_organization": SimpleNamespace(name="Context"),
+                "home_workspaces": [
+                    HomeLink("Projects", "projects:list", "projects.view")
+                ],
+                "home_assigned_work": HomeLink(
+                    "Assigned", "workflows:workbench", "work_items.view"
+                ),
+                "home_alerts": HomeLink(
+                    "Alerts", "support:notifications", "support.notifications_view"
+                ),
+            },
+        )
+        self.assertLess(
+>           html.index('id="home-start-work"'), html.index('id="home-workspaces"')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+E       ValueError: substring not found
+
+tests\test_uiux_stage3a.py:95: ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_uiux_stage3a.py::PresentationContractsTests::test_home_prioritizes_existing_tasks_and_alerts_without_business_summaries
+1 failed, 6 passed in 0.92s

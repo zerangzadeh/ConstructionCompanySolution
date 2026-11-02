@@ -1,0 +1,118 @@
+E                                                                        [100%]
+=================================== ERRORS ====================================
+_ ERROR at setup of OfflineFrontendBrowserTests.test_representative_pages_with_external_network_blocked _
+
+self = <django.db.backends.utils.CursorWrapper object at 0x000001F67DF50390>
+sql = 'UPDATE "workflows_workflowversion" SET "created_at" = %s, "updated_at" = %s, "organization_id" = %s, "definition_id" ... = %s, "published_by_id" = %s, "retired_at" = NULL, "retired_by_id" = NULL WHERE "workflows_workflowversion"."id" = %s'
+params = (datetime.datetime(2026, 11, 2, 12, 21, 52, 661000, tzinfo=datetime.timezone.utc), datetime.datetime(2026, 11, 2, 12, ... UUID('325ec0db-f566-43c8-88ca-6c0df18c5bce'), UUID('983d2301-77a9-4416-b69e-893b6e93ae8b'), Int4(1), 'published', ...)
+ignored_wrapper_args = (False, {'connection': <DatabaseWrapper vendor='postgresql' alias='default'>, 'cursor': <django.db.backends.utils.CursorWrapper object at 0x000001F67DF50390>})
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None:
+                # params default might be backend specific.
+                return self.cursor.execute(sql)
+            else:
+>               return self.cursor.execute(sql, params)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.venv\Lib\site-packages\django\db\backends\utils.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <django.db.backends.postgresql.base.Cursor [closed] [IDLE] (host=127.0.0.1 user=construction_erp_app database=test_construction_erp) at 0x1f67deecbb0>
+query = 'UPDATE "workflows_workflowversion" SET "created_at" = %s, "updated_at" = %s, "organization_id" = %s, "definition_id" ... = %s, "published_by_id" = %s, "retired_at" = NULL, "retired_by_id" = NULL WHERE "workflows_workflowversion"."id" = %s'
+params = (datetime.datetime(2026, 11, 2, 12, 21, 52, 661000, tzinfo=datetime.timezone.utc), datetime.datetime(2026, 11, 2, 12, ... UUID('325ec0db-f566-43c8-88ca-6c0df18c5bce'), UUID('983d2301-77a9-4416-b69e-893b6e93ae8b'), Int4(1), 'published', ...)
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.CheckViolation: published workflow versions are immutable except retirement
+E           CONTEXT:  PL/pgSQL function workflows_guard_version_state() line 26 at RAISE
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: CheckViolation
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\db\backends\base\creation.py:163: in deserialize_db_from_string
+    obj.save()
+.venv\Lib\site-packages\django\core\serializers\base.py:265: in save
+    models.Model.save_base(self.object, using=using, raw=True, **kwargs)
+.venv\Lib\site-packages\django\db\models\base.py:1008: in save_base
+    updated = self._save_table(
+.venv\Lib\site-packages\django\db\models\base.py:1138: in _save_table
+    updated = self._do_update(
+.venv\Lib\site-packages\django\db\models\base.py:1203: in _do_update
+    return filtered._update(values) > 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:1288: in _update
+    return query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <django.db.backends.postgresql.base.Cursor [closed] [IDLE] (host=127.0.0.1 user=construction_erp_app database=test_construction_erp) at 0x1f67deecbb0>
+query = 'UPDATE "workflows_workflowversion" SET "created_at" = %s, "updated_at" = %s, "organization_id" = %s, "definition_id" ... = %s, "published_by_id" = %s, "retired_at" = NULL, "retired_by_id" = NULL WHERE "workflows_workflowversion"."id" = %s'
+params = (datetime.datetime(2026, 11, 2, 12, 21, 52, 661000, tzinfo=datetime.timezone.utc), datetime.datetime(2026, 11, 2, 12, ... UUID('325ec0db-f566-43c8-88ca-6c0df18c5bce'), UUID('983d2301-77a9-4416-b69e-893b6e93ae8b'), Int4(1), 'published', ...)
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           django.db.utils.IntegrityError: published workflow versions are immutable except retirement
+E           CONTEXT:  PL/pgSQL function workflows_guard_version_state() line 26 at RAISE
+
+.venv\Lib\site-packages\psycopg\cursor.py:117: IntegrityError
+=========================== short test summary info ===========================
+ERROR tests/test_f1_offline_browser.py::OfflineFrontendBrowserTests::test_representative_pages_with_external_network_blocked
+1 error in 45.05s

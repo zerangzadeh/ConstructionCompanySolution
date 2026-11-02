@@ -6,7 +6,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}بنیرا{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{% static 'css/erp_jalali.css' %}">
     <link rel="stylesheet" href="{% static 'css/erp_money.css' %}">
     <script src="{% static 'js/erp_jalali.js' %}?v=20261023-cep078-month-focus" defer></script>
@@ -663,6 +662,8 @@
         }
     </style>
     {% block extra_head %}{% endblock %}
+    {# Match the previous CDN compiler's late head insertion/cascade order. #}
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
 </head>
 
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">

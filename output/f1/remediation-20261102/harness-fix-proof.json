@@ -1,0 +1,32 @@
+{
+  "issue": "F1-exposed browser retry synchronization race",
+  "head_template_target_before_fix": {
+    "cases": 1,
+    "failed": 0
+  },
+  "local_template_target_before_fix": {
+    "cases": 1,
+    "failed": 1
+  },
+  "diagnostic_repeat_before_fix": {
+    "cases": 1,
+    "failed": 0
+  },
+  "local_template_target_after_fix": {
+    "cases": 1,
+    "failed": 0
+  },
+  "cause": "The old wait accepted any Retry button, including an intermediate/focus-preload error. It could lift the network block while the debounced typed lookup or rendering was still active.",
+  "fix": "Require a non-canceled failed request for the exact endpoint and typed q, matching input, failed widget, loading=0 and visible Retry before restoring network.",
+  "assertions_preserved": [
+    "Retry button selector and real click",
+    "Retry succeeds with options and loading=0",
+    "Original 100 polling attempts and 100ms interval",
+    "All authorization, HTTP, state, overflow and technical-label checks"
+  ],
+  "production_javascript_changed": false,
+  "fixture_permissions_changed": false,
+  "tests_skipped_or_xfailed": false,
+  "full_journey_retry_screenshot": "verified/existing-browser/workforce/mvp02-uiux-owner-UX-lookup-retry.png",
+  "full_journey_reaches_existing_clear_context_failure": true
+}

@@ -1,0 +1,297 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ OfflineFrontendBrowserTests.test_representative_pages_with_external_network_blocked _
+
+self = <test_f1_offline_browser.OfflineFrontendBrowserTests testMethod=test_representative_pages_with_external_network_blocked>
+
+    def test_representative_pages_with_external_network_blocked(self):
+        contract = create_contract(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            contract_number="F1-C01",
+            title="\u0642\u0631\u0627\u0631\u062f\u0627\u062f \u0633\u0627\u0632\u0647 \u0622\u0632\u0645\u0627\u06cc\u0634\u06cc",
+            counterparty_name="\u067e\u06cc\u0645\u0627\u0646\u06a9\u0627\u0631 \u0622\u0632\u0645\u0627\u06cc\u0634\u06cc",
+            direction="payable",
+            contract_value=Decimal(125000000),
+        )
+        estimate = create_estimate(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            estimate_number="F1-E01",
+            title="\u0628\u0631\u0622\u0648\u0631\u062f \u0633\u0627\u0632\u0647 \u0622\u0632\u0645\u0627\u06cc\u0634\u06cc",
+        )
+        request = create_purchase_request(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            request_number="F1-PR01",
+            title="\u062f\u0631\u062e\u0648\u0627\u0633\u062a \u0645\u0635\u0627\u0644\u062d \u0622\u0632\u0645\u0627\u06cc\u0634\u06cc",
+        )
+        order, _item = self.make_order()
+        receipt = self.create_receipt(order)
+        _project, _site, _team, employee, _report = make_field_fixture(
+            self.owner, self.organization
+        )
+        self.login(self.owner)
+        pages = [
+            ("login", "accounts:login", [], {"anonymous": True}),
+            ("shell", "home", [], {}),
+            ("projects-list", "projects:list", [], {}),
+            ("project-detail", "projects:detail", [self.project.pk], {}),
+            ("contracts-list", "contracts:list", [], {}),
+            ("contract-detail", "contracts:detail", [contract.pk], {}),
+            ("estimate-detail", "estimates:detail", [estimate.pk], {}),
+            ("pr-list", "procurement:request_list", [], {}),
+            ("pr-detail", "procurement:request_detail", [request.pk], {}),
+            ("rfq-list", "procurement:rfq_list", [], {}),
+            ("po-detail", "procurement:order_detail", [order.pk], {}),
+            ("grn-detail", "procurement:receipt_detail", [receipt.pk], {}),
+            ("inventory", "inventory:transaction_list", [], {}),
+            ("workforce", "workforce:field_list", [], {}),
+            ("worker-detail", "workforce:field_detail", [employee.pk], {}),
+            (
+                "worker-form",
+                "workforce:field_create",
+                [],
+                {"lookup": True, "datepicker": True},
+            ),
+            ("timekeeping", "timekeeping:workbench", [], {}),
+        ]
+        scenarios = []
+        for width in (1440, 1024, 390):
+            for name, route, args, options in pages:
+                path = reverse(route, args=args)
+                self.assertTrue(url_exposed(path), route)
+                scenarios.append(
+                    {"name": f"{name}-{width}", "path": path, "width": width, **options}
+                )
+        phase = os.environ.get("F1_PHASE", "offline")
+        evidence = ROOT / "output/f1" / phase
+        evidence.mkdir(parents=True, exist_ok=True)
+        env = os.environ.copy()
+        env["F1_SESSION"] = self.client.cookies["sessionid"].value
+        env["F1_SCENARIOS"] = json.dumps(scenarios)
+>       result = subprocess.run(
+            [
+                "node",
+                str(ROOT / "scripts/verification/f1_browser.mjs"),
+                self.live_server_url,
+                str(evidence),
+            ],
+            env=env,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=300,
+            check=False,
+        )
+E       AssertionError: 1 != 0 : node:internal/modules/run_main:107
+E           triggerUncaughtException(
+E           ^
+E       
+E       Error: worker-form-390: asset/network failures {"bad":[],"failures":[{"type":"Fetch","error":"net::ERR_ABORTED"}],"external":[{"url":"https://cdn.tailwindcss.com/","type":"Script","blocked":false},{"url":"https://cdn.tailwindcss.com/3.4.17","type":"Script","blocked":false}]}
+E           at file:///E:/Construction_Company_Solution/scripts/verification/f1_browser.mjs:149:80
+E       
+E       Node.js v24.20.0
+
+tests\test_f1_offline_browser.py:98: AssertionError
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-02T12:42:43.571546+00:00","event":"http.response","request_id":"5f09e7a3-53bb-4017-b2e5-ed5f28428c33","method":"POST","route":"procurement:receipt_create","status_code":302,"duration_ms":141}
+
+{"timestamp":"2026-11-02T12:42:44.652889+00:00","event":"http.response","request_id":"92a1e9b1-a2b9-42b0-8d4d-facdfcfcf69d","method":"GET","route":"accounts:login","status_code":200,"duration_ms":96}
+
+{"timestamp":"2026-11-02T12:42:45.973352+00:00","event":"http.response","request_id":"1730d24b-3caf-4ebb-9cb2-1ec0df1a0e68","method":"GET","route":null,"status_code":404,"duration_ms":6}
+
+{"timestamp":"2026-11-02T12:42:47.391716+00:00","event":"http.response","request_id":"42330e9a-f480-4849-8879-d94036360f63","method":"GET","route":"home","status_code":200,"duration_ms":477}
+
+{"timestamp":"2026-11-02T12:42:48.973665+00:00","event":"http.response","request_id":"0fd83724-e4f2-4482-ac1b-5305cf33fa9a","method":"GET","route":"projects:list","status_code":200,"duration_ms":484}
+
+{"timestamp":"2026-11-02T12:42:51.063219+00:00","event":"http.response","request_id":"6350064c-33bd-499a-b84f-d895bc7dee76","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1162}
+
+{"timestamp":"2026-11-02T12:42:52.473167+00:00","event":"http.response","request_id":"2e247284-6ae9-4250-a342-7d89b8e35661","method":"GET","route":"contracts:list","status_code":200,"duration_ms":402}
+
+{"timestamp":"2026-11-02T12:42:54.126119+00:00","event":"http.response","request_id":"d9fbd214-d7ab-4244-808a-c48edd2ca468","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":703}
+
+{"timestamp":"2026-11-02T12:42:55.563147+00:00","event":"http.response","request_id":"2e48fdb9-1960-4a7f-883d-65601490aa02","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":461}
+
+{"timestamp":"2026-11-02T12:42:56.907131+00:00","event":"http.response","request_id":"762472d4-a6f8-4e1d-8647-900680be9f30","method":"GET","route":"procurement:request_list","status_code":200,"duration_ms":348}
+
+{"timestamp":"2026-11-02T12:42:58.376554+00:00","event":"http.response","request_id":"a0485666-4369-4619-be74-3ab49331eb44","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":515}
+
+{"timestamp":"2026-11-02T12:42:59.776262+00:00","event":"http.response","request_id":"43472c2c-4819-4681-b771-fa61baaec6a1","method":"GET","route":"procurement:rfq_list","status_code":200,"duration_ms":416}
+
+{"timestamp":"2026-11-02T12:43:01.216941+00:00","event":"http.response","request_id":"d2b9f910-d840-4f54-bfd6-a733551acd5d","method":"GET","route":"procurement:order_detail","status_code":200,"duration_ms":335}
+
+{"timestamp":"2026-11-02T12:43:02.778109+00:00","event":"http.response","request_id":"c69b85b5-2e93-4582-b41a-2f8c7490da7d","method":"GET","route":"procurement:receipt_detail","status_code":200,"duration_ms":598}
+
+{"timestamp":"2026-11-02T12:43:04.242382+00:00","event":"http.response","request_id":"0eef30f3-8f66-4232-9038-722fd863d12c","method":"GET","route":"inventory:transaction_list","status_code":200,"duration_ms":540}
+
+{"timestamp":"2026-11-02T12:43:05.703364+00:00","event":"http.response","request_id":"80b8b884-8c9f-4a39-8e0b-6079b8fced70","method":"GET","route":"workforce:field_list","status_code":200,"duration_ms":504}
+
+{"timestamp":"2026-11-02T12:43:07.112844+00:00","event":"http.response","request_id":"938b2904-8780-471c-8115-6e9a033901a8","method":"GET","route":"workforce:field_detail","status_code":200,"duration_ms":476}
+
+{"timestamp":"2026-11-02T12:43:08.903220+00:00","event":"http.response","request_id":"ad9b587a-6b62-4c10-8138-4d1f6f6e5b26","method":"GET","route":"workforce:field_create","status_code":200,"duration_ms":519}
+
+{"timestamp":"2026-11-02T12:43:10.187180+00:00","event":"http.response","request_id":"fa479b11-4851-4ee4-9d46-567e706df00f","method":"GET","route":"workforce:field_choices","status_code":200,"duration_ms":143}
+
+{"timestamp":"2026-11-02T12:43:10.558614+00:00","event":"http.response","request_id":"5fda49b3-cc34-42f7-aae8-bab606574058","method":"GET","route":"workforce:field_choices","status_code":200,"duration_ms":202}
+
+{"timestamp":"2026-11-02T12:43:11.387518+00:00","event":"http.response","request_id":"3f15817a-86a2-4e7a-b1a0-69e9c415e773","method":"GET","route":"timekeeping:workbench","status_code":200,"duration_ms":597}
+
+{"timestamp":"2026-11-02T12:43:12.555021+00:00","event":"http.response","request_id":"d5d56460-f71f-4078-b825-5989163e423b","method":"GET","route":"accounts:login","status_code":200,"duration_ms":164}
+
+{"timestamp":"2026-11-02T12:43:14.045545+00:00","event":"http.response","request_id":"450b43a4-e1b9-4294-89bc-99d95728f2ae","method":"GET","route":"home","status_code":200,"duration_ms":429}
+
+{"timestamp":"2026-11-02T12:43:15.381178+00:00","event":"http.response","request_id":"a869f179-e851-4d7a-9c15-272ea959e14d","method":"GET","route":"projects:list","status_code":200,"duration_ms":446}
+
+{"timestamp":"2026-11-02T12:43:17.689761+00:00","event":"http.response","request_id":"d6565f25-d113-4e8f-947c-81a5180880a8","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1323}
+
+{"timestamp":"2026-11-02T12:43:19.590337+00:00","event":"http.response","request_id":"68dd098a-b0ab-4033-8ff6-88e35ebd1bb1","method":"GET","route":"contracts:list","status_code":200,"duration_ms":390}
+
+{"timestamp":"2026-11-02T12:43:21.559660+00:00","event":"http.response","request_id":"678df2bf-dd6e-49d5-ad4c-2beac458a2ec","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":881}
+
+{"timestamp":"2026-11-02T12:43:23.245264+00:00","event":"http.response","request_id":"336a0e6a-c45a-4b3b-be26-623eddd2a5ae","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":613}
+
+{"timestamp":"2026-11-02T12:43:25.337868+00:00","event":"http.response","request_id":"b9900958-66a4-4945-9735-2dd4275b7a56","method":"GET","route":"procurement:request_list","status_code":200,"duration_ms":499}
+
+{"timestamp":"2026-11-02T12:43:27.828934+00:00","event":"http.response","request_id":"35cc7d93-d49d-47c2-8342-9bdf968f36c9","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":633}
+
+{"timestamp":"2026-11-02T12:43:30.237662+00:00","event":"http.response","request_id":"49f889d4-3720-4428-bb22-65869a4e99de","method":"GET","route":"procurement:rfq_list","status_code":200,"duration_ms":452}
+
+{"timestamp":"2026-11-02T12:43:32.621416+00:00","event":"http.response","request_id":"0a6bb67b-1111-4352-af32-e12d03028e14","method":"GET","route":"procurement:order_detail","status_code":200,"duration_ms":648}
+
+{"timestamp":"2026-11-02T12:43:34.482621+00:00","event":"http.response","request_id":"d684ba90-61d2-4015-9529-143d7b585871","method":"GET","route":"procurement:receipt_detail","status_code":200,"duration_ms":648}
+
+{"timestamp":"2026-11-02T12:43:36.899880+00:00","event":"http.response","request_id":"69e9f2be-36a6-4aaf-8818-90762bb9fdc8","method":"GET","route":"inventory:transaction_list","status_code":200,"duration_ms":497}
+
+{"timestamp":"2026-11-02T12:43:38.352454+00:00","event":"http.response","request_id":"9696fdbc-b21d-426a-a5ef-694c741e8479","method":"GET","route":"workforce:field_list","status_code":200,"duration_ms":478}
+
+{"timestamp":"2026-11-02T12:43:40.466485+00:00","event":"http.response","request_id":"2a54f13c-f385-48dd-a2db-29b922496494","method":"GET","route":"workforce:field_detail","status_code":200,"duration_ms":792}
+
+{"timestamp":"2026-11-02T12:43:41.934158+00:00","event":"http.response","request_id":"0796957e-dc4e-4a77-b1dc-12d09a7384d6","method":"GET","route":"workforce:field_create","status_code":200,"duration_ms":497}
+
+{"timestamp":"2026-11-02T12:43:43.429507+00:00","event":"http.response","request_id":"46fead98-2f42-48e5-bd22-7810eea619ed","method":"GET","route":"workforce:field_choices","status_code":200,"duration_ms":137}
+
+{"timestamp":"2026-11-02T12:43:43.874898+00:00","event":"http.response","request_id":"06d64601-1f31-499f-b30e-ec7df7f985db","method":"GET","route":"workforce:field_choices","status_code":200,"duration_ms":274}
+
+{"timestamp":"2026-11-02T12:43:44.790457+00:00","event":"http.response","request_id":"eace6f15-547e-4ab7-a672-23eb9193b764","method":"GET","route":"timekeeping:workbench","status_code":200,"duration_ms":643}
+
+{"timestamp":"2026-11-02T12:43:45.813463+00:00","event":"http.response","request_id":"6410918e-bea2-4a2d-a829-a9c3eef499bb","method":"GET","route":"accounts:login","status_code":200,"duration_ms":47}
+
+{"timestamp":"2026-11-02T12:43:47.490977+00:00","event":"http.response","request_id":"1cae2302-0625-4e20-abdc-2c86ad32a0b1","method":"GET","route":"home","status_code":200,"duration_ms":474}
+
+{"timestamp":"2026-11-02T12:43:49.012658+00:00","event":"http.response","request_id":"c0ae3b77-3a1c-4f7c-b364-deb654dde80e","method":"GET","route":"projects:list","status_code":200,"duration_ms":486}
+
+{"timestamp":"2026-11-02T12:43:51.439696+00:00","event":"http.response","request_id":"99c7beb4-7bf2-44c7-848a-391e267136a7","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1182}
+
+{"timestamp":"2026-11-02T12:43:53.194298+00:00","event":"http.response","request_id":"5c05ee04-e01f-4297-82ab-acf08ba016c1","method":"GET","route":"contracts:list","status_code":200,"duration_ms":346}
+
+{"timestamp":"2026-11-02T12:43:54.981513+00:00","event":"http.response","request_id":"d0866ecf-d62e-4978-8515-987a3acf8a36","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":780}
+
+{"timestamp":"2026-11-02T12:43:56.795887+00:00","event":"http.response","request_id":"d81b5709-db91-4ae0-b859-91239970db06","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":561}
+
+{"timestamp":"2026-11-02T12:43:58.321756+00:00","event":"http.response","request_id":"a6df1fdc-299c-4140-9f37-db82765663fd","method":"GET","route":"procurement:request_list","status_code":200,"duration_ms":483}
+
+{"timestamp":"2026-11-02T12:43:59.970444+00:00","event":"http.response","request_id":"b5632ebe-5751-4085-8c39-2521d123d7b7","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":530}
+
+{"timestamp":"2026-11-02T12:44:01.521839+00:00","event":"http.response","request_id":"be351a93-2c64-4c6b-9a49-49308ac7657d","method":"GET","route":"procurement:rfq_list","status_code":200,"duration_ms":485}
+
+{"timestamp":"2026-11-02T12:44:03.189648+00:00","event":"http.response","request_id":"d56a4690-e353-44d4-9154-692f55b26dc7","method":"GET","route":"procurement:order_detail","status_code":200,"duration_ms":478}
+
+{"timestamp":"2026-11-02T12:44:05.308214+00:00","event":"http.response","request_id":"c48e1a85-0b71-46cf-96b7-f9a8465298af","method":"GET","route":"procurement:receipt_detail","status_code":200,"duration_ms":1102}
+
+{"timestamp":"2026-11-02T12:44:06.700917+00:00","event":"http.response","request_id":"5d1e3c52-73fe-4717-8920-ce43ec63928e","method":"GET","route":"inventory:transaction_list","status_code":200,"duration_ms":455}
+
+{"timestamp":"2026-11-02T12:44:09.266553+00:00","event":"http.response","request_id":"f6182b1d-1e45-416e-b31d-a5679f9cd814","method":"GET","route":"workforce:field_list","status_code":200,"duration_ms":547}
+
+{"timestamp":"2026-11-02T12:44:10.974648+00:00","event":"http.response","request_id":"f4319c34-a48a-4acd-bece-799b8a18a914","method":"GET","route":"workforce:field_detail","status_code":200,"duration_ms":583}
+
+{"timestamp":"2026-11-02T12:44:12.418877+00:00","event":"http.response","request_id":"cfedc082-e5c7-4259-9792-2a31ae577a44","method":"GET","route":"workforce:field_create","status_code":200,"duration_ms":436}
+
+{"timestamp":"2026-11-02T12:44:13.975759+00:00","event":"http.response","request_id":"42f648ea-6783-4a95-ba81-08a677cf4f37","method":"GET","route":"workforce:field_choices","status_code":200,"duration_ms":244}
+
+[02/Nov/2026 16:14:13,976] - Broken pipe from ('127.0.0.1', 60684)
+
+{"timestamp":"2026-11-02T12:44:14.222389+00:00","event":"http.response","request_id":"0b72a766-2653-4917-a65f-64f08386b518","method":"GET","route":"workforce:field_choices","status_code":200,"duration_ms":266}
+
+[02/Nov/2026 16:14:14,473] - Broken pipe from ('127.0.0.1', 52967)
+
+[02/Nov/2026 16:14:14,475] - Broken pipe from ('127.0.0.1', 64559)
+
+[02/Nov/2026 16:14:14,475] - Broken pipe from ('127.0.0.1', 58944)
+
+[02/Nov/2026 16:14:14,475] - Broken pipe from ('127.0.0.1', 60357)
+
+[02/Nov/2026 16:14:14,476] - Broken pipe from ('127.0.0.1', 57621)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 60684)
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 52967)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 64559)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 58944)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 60357)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 57621)
+=========================== short test summary info ===========================
+FAILED tests/test_f1_offline_browser.py::OfflineFrontendBrowserTests::test_representative_pages_with_external_network_blocked
+1 failed in 1184.77s (0:19:44)

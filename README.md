@@ -86,6 +86,41 @@ Never commit `.env`, passwords, tokens, or other credentials.
 
 ## Common commands
 
+### Local frontend assets (Tailwind CSS 3.4.17)
+
+Run from the repository root with Node.js/npm on the build machine:
+
+```powershell
+npm ci --ignore-scripts --no-audit --no-fund
+npm run build:css
+# Development: rebuild the same stylesheet when templates/JS/Python change.
+npm run watch:css
+```
+
+`package-lock.json` locks the build dependencies; Tailwind is pinned exactly to
+`3.4.17`. Input: `frontend/tailwind.css`; configuration: `tailwind.config.cjs`;
+output: `apps/accounts/static/css/tailwind.css`. Commit the generated CSS with
+source changes that affect utility classes. Use complete utility class literals
+in templates, JavaScript and Python widgets/presentation code; avoid assembling
+utility names from fragments. The configuration scans these runtime sources,
+excluding tests, migrations and vendored scripts. The stylesheet loads last in
+the document head, matching the previous CDN-generated CSS cascade. Existing
+BONIRA custom CSS remains unchanged.
+
+Django development staticfiles serves this output directly from the app. For
+the existing production deployment model, build before collecting static files,
+with the required production environment variables configured:
+
+```powershell
+python manage.py collectstatic --noinput --settings=config.settings.production
+```
+
+The existing static server serves the collected `DJANGO_STATIC_ROOT` at the
+configured static URL. This command is deployment documentation, not production
+deployment authorization. Normal application serving needs neither Node.js nor
+internet access after the assets have been built and collected. Development
+`check` and test commands follow below.
+
 Run these commands from an activated virtual environment:
 
 ```powershell

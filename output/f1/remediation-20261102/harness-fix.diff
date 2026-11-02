@@ -1,0 +1,56 @@
+diff --git a/scripts/verification/mvp02_browser.mjs b/scripts/verification/mvp02_browser.mjs
+index 0a885e25..b0dcde59 100644
+--- a/scripts/verification/mvp02_browser.mjs
++++ b/scripts/verification/mvp02_browser.mjs
+@@ -39,9 +39,13 @@ try {
+   let jsErrors = [];
+   let httpErrors = [];
+   const documentStatuses = new Map();
++  const requestURLs = new Map();
++  let failedRequests = [];
+   const pending = new Map();
+   socket.addEventListener('message', event => {
+     const message = JSON.parse(event.data);
++    if (message.method === 'Network.requestWillBeSent') requestURLs.set(message.params.requestId,message.params.request.url);
++    if (message.method === 'Network.loadingFailed') failedRequests.push({url:requestURLs.get(message.params.requestId),canceled:!!message.params.canceled,error:message.params.errorText});
+     if (message.method === 'Runtime.exceptionThrown') jsErrors.push(message.params.exceptionDetails.text);
+     if (message.method === 'Network.responseReceived' && message.params.response.status >= 400) {
+       httpErrors.push({url:message.params.response.url,status:message.params.response.status});
+@@ -71,7 +75,7 @@ try {
+     await new Promise(done=>setTimeout(done,50));
+     const rect = await evaluate(`(() => {const el=document.querySelector(${JSON.stringify(selector)}); if(!el) return null;const r=el.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
+     if (!rect) {
+-      const diagnostic = await evaluate(`({path:location.pathname,title:document.title,heading:document.querySelector('main h1')?.textContent,buttons:[...document.querySelectorAll('main button')].map(b=>b.textContent.trim())})`);
++      const diagnostic = await evaluate(`({path:location.pathname,title:document.title,heading:document.querySelector('main h1')?.textContent,buttons:[...document.querySelectorAll('main button')].map(b=>b.textContent.trim()),choices:[...document.querySelectorAll('select[data-business-choice]')].map(s=>({name:s.name,typed:s.tomselect?.control_input.value,query:s.tomselect?.lastValue,loading:s.tomselect?.loading,failed:s.tomselect?.boniraFailed,open:s.tomselect?.isOpen,options:Object.keys(s.tomselect?.options||{}).length,retry:!!s.tomselect?.dropdown.querySelector('[data-choice-retry]')}))})`);
+       await writeFile(join(outputDirectory,actor+'-missing-control-diagnostic.json'),JSON.stringify({selector,...diagnostic},null,2));
+       throw new Error('Missing clickable control '+selector);
+     }
+@@ -93,6 +97,7 @@ try {
+     documentStatus = undefined;
+     jsErrors = [];
+     httpErrors = [];
++    failedRequests = [];
+     await send('Page.navigate', { url: new URL(scenario.path, base).href });
+     let state;
+     for (let i = 0; i < 300; i++) {
+@@ -221,11 +226,19 @@ try {
+         await send('Network.setBlockedURLs',{urls:['*workforce/field/choices/*']});
+         await click('select[name="'+name+'"] + .ts-wrapper .ts-control');
+         await send('Input.insertText',{text:query});
++        let synchronizedFailure, preloadRetryPolls=0;
+         for(let i=0;i<100;i++) {
+           await new Promise(done=>setTimeout(done,100));
+-          if(await evaluate(`!!document.querySelector('select[name="'+${JSON.stringify(name)}+'"]').tomselect.dropdown.querySelector('[data-choice-retry]')`)) break;
++          const ui=await evaluate(`(() => {const s=document.querySelector('select[name="'+${JSON.stringify(name)}+'"]'),t=s.tomselect;return {endpoint:s.dataset.optionsUrl,input:t.control_input.value,loading:t.loading,failed:t.boniraFailed,retry:!!t.dropdown.querySelector('[data-choice-retry]')}})()`);
++          const endpoint=new URL(ui.endpoint,base);
++          const matchingFailure=failedRequests.find(r=>{if(r.canceled || !r.url)return false;const u=new URL(r.url);return u.origin===endpoint.origin && u.pathname===endpoint.pathname && u.searchParams.get('q')===query;});
++          // A focus-preload error can render Retry before the debounced typed
++          // query starts. Keep the fault active until that exact query fails.
++          if(ui.retry && !matchingFailure) preloadRetryPolls++;
++          if(matchingFailure && ui.input===query && ui.failed && ui.loading===0 && ui.retry) {synchronizedFailure={query,matchingFailure,ui,preloadRetryPolls};break;}
+           if(i===99) throw new Error('Failed lookup has no retry state '+JSON.stringify(await evaluate(`(() => {const t=document.querySelector('select[name="'+${JSON.stringify(name)}+'"]').tomselect;return {failed:t.boniraFailed,query:t.lastValue,loading:t.loading,open:t.isOpen,html:t.dropdown.innerHTML};})()`)));
+         }
++        await writeFile(join(outputDirectory,actor+'-'+scenario.name+'-retry-synchronization.json'),JSON.stringify(synchronizedFailure,null,2));
+         if(step.recover) {
+           await send('Network.setBlockedURLs',{urls:[]});
+           await click('select[name="'+name+'"] + .ts-wrapper [data-choice-retry]');

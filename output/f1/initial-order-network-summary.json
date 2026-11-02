@@ -1,0 +1,60 @@
+{
+  "chrome": "Chrome/156.0.8078.48",
+  "pages": 51,
+  "widths": {
+    "1440": 17,
+    "1024": 17,
+    "390": 17
+  },
+  "responses": 864,
+  "response_types": {
+    "Document": 51,
+    "Stylesheet": 270,
+    "Script": 330,
+    "Image": 6,
+    "Font": 201,
+    "Other": 1,
+    "Fetch": 5
+  },
+  "application_external_requests": [],
+  "offline_negative_control": [
+    {
+      "blocked": true,
+      "requests": [
+        {
+          "url": "https://offline-proof.invalid/f1",
+          "type": "XHR",
+          "blocked": true
+        }
+      ],
+      "failures": [
+        {
+          "url": "https://offline-proof.invalid/f1",
+          "type": "Fetch",
+          "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector",
+          "blocked": "inspector",
+          "canceled": false
+        }
+      ]
+    }
+  ],
+  "js_exceptions": [],
+  "console_errors": [],
+  "bad_responses": [
+    {
+      "url": "http://localhost:54170/favicon.ico",
+      "type": "Other",
+      "status": 404,
+      "cached": false
+    }
+  ],
+  "canceled_superseded_lookups": [],
+  "document_statuses": {
+    "200": 51
+  },
+  "actions": {
+    "Tom Select remote lookup and selection over loopback": 3,
+    "Jalali picker open": 3,
+    "mobile navigation open/close": 16
+  }
+}

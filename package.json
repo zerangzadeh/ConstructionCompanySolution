@@ -1,0 +1,11 @@
+{
+  "name": "bonira-frontend-assets",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.cjs -i frontend/tailwind.css -o apps/accounts/static/css/tailwind.css --minify",
+    "watch:css": "npm run build:css -- --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

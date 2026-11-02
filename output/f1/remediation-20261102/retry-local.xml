@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="40.501" timestamp="2026-11-02T19:29:39.645633+03:30" hostname="Zerangzadeh"><testcase classname="apps.workforce.test_mvp02_browser.FieldWorkforceBrowserTests" name="test_uiux_remediation_desktop_mobile_and_cascades" time="39.915"><failure message="AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:76&#10;      throw new Error('Missing clickable control '+selector);&#10;            ^&#10;&#10;Error: Missing clickable control select[name=&quot;work_team&quot;] + .ts-wrapper [data-choice-retry]&#10;    at click (file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:76:13)&#10;    at async file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:231:11&#10;&#10;Node.js v24.20.0">self = &lt;apps.workforce.test_mvp02_browser.FieldWorkforceBrowserTests testMethod=test_uiux_remediation_desktop_mobile_and_cascades&gt;
+
+    def test_uiux_remediation_desktop_mobile_and_cascades(self):
+        from apps.projects.models import Project, ProjectSite
+        from apps.workforce.field_services import save_field_employee
+        from apps.workforce.models import WorkTeam
+        from apps.workforce.services import assign_employee_to_project
+    
+        owner = User.objects.create_user(username="mvp02-uiux-owner")
+        organization = create_organization_with_owner(
+            owner=owner, name="شرکت نمونه بنیرا", slug="mvp02-uiux"
+        )
+        project, site, team, employee, report = make_field_fixture(owner, organization)
+        second = Project.objects.create(
+            organization=organization,
+            code="SECOND",
+            name="پروژه ساختمان آزمایشی",
+            created_by=owner,
+        )
+        second_site = ProjectSite.objects.create(
+            organization=organization,
+            project=second,
+            code="WEST",
+            name="کارگاه غربی",
+            created_by=owner,
+        )
+        other = save_field_employee(
+            organization=organization,
+            actor=owner,
+            employee_number="OTHER",
+            first_name="نیروی",
+            last_name="ساختمان",
+            start_date=date(2026, 10, 1),
+        )
+        assign_employee_to_project(
+            organization=organization,
+            actor=owner,
+            employee=other,
+            project=second,
+            site=second_site,
+            start_date=date(2026, 10, 1),
+        )
+        WorkTeam.objects.bulk_create(
+            [
+                WorkTeam(
+                    organization=organization,
+                    code=f"REMOTE-{i}",
+                    name=f"اکیپ بتن‌ریزی {i}",
+                )
+                for i in range(45)
+            ]
+        )
+        from apps.workforce.field_forms import FieldEmployeeForm
+    
+        initial_ids = {
+            row[0]
+            for row in FieldEmployeeForm(organization=organization)
+            .fields["work_team"]
+            .widget.choices
+        }
+        remote = next(
+            row
+            for row in WorkTeam.objects.filter(organization=organization)
+            if str(row.pk) not in initial_ids
+        )
+        calendar = create_work_calendar(
+            organization=organization,
+            actor=owner,
+            code="UIUX",
+            name="تقویم کارگاه",
+            effective_from=date(2026, 1, 1),
+            working_weekdays=[1, 2, 3, 4, 5],
+        )
+        record = AttendanceRecord.objects.create(
+            organization=organization,
+            employee=employee,
+            project=project,
+            site=site,
+            calendar=calendar,
+            work_date=date(2026, 10, 1),
+            state="finalized",
+            source="manual",
+            captured_by=owner,
+            check_in_at=datetime(2026, 10, 1, 5, tzinfo=UTC),
+            check_out_at=datetime(2026, 10, 1, 13, tzinfo=UTC),
+        )
+        sheet = Timesheet.objects.create(
+            organization=organization,
+            employee=employee,
+            period_start=date(2026, 10, 1),
+            period_end=date(2026, 10, 1),
+            declared_minutes=480,
+            prepared_by=owner,
+        )
+        context = FieldContext(project=project, site=site, employee=employee)
+        query = "?" + context.query
+        pages = [
+            ("worker-list", reverse("workforce:field_list")),
+            ("worker-create", reverse("workforce:field_create")),
+            ("worker-edit", reverse("workforce:field_edit", args=[employee.pk])),
+            ("worker-detail", reverse("workforce:field_detail", args=[employee.pk])),
+            ("assignment-list", reverse("workforce:assignment_list")),
+            ("assignment-create", reverse("workforce:assignment_create")),
+            (
+                "worker-assignment",
+                reverse("workforce:field_assign", args=[employee.pk]) + query,
+            ),
+            ("workbench", reverse("timekeeping:workbench") + query),
+            ("attendance", reverse("timekeeping:attendance_create") + query),
+            ("leave-mission", reverse("timekeeping:leave_mission_create") + query),
+            ("overtime", reverse("timekeeping:overtime_create") + query),
+            (
+                "correction",
+                reverse("timekeeping:attendance_correction_create", args=[record.pk])
+                + query,
+            ),
+            ("timesheet", reverse("timekeeping:timesheet_create") + query),
+            (
+                "allocation",
+                reverse("timekeeping:timesheet_detail", args=[sheet.pk]) + query,
+            ),
+            ("project", reverse("projects:detail", args=[project.pk])),
+            ("site", reverse("projects:site_detail", args=[project.pk, site.pk])),
+            ("daily-report", reverse("daily_reports:detail", args=[report.pk])),
+        ]
+        scenarios = []
+        for mobile in (False, True):
+            for label, path in pages:
+                scenarios.append(
+                    {
+                        "name": "UX-" + label + ("-mobile" if mobile else "-desktop"),
+                        "path": path,
+                        "status": 200,
+                        "mobile": mobile,
+                        "screenshot": True,
+                        "absentText": ["حداکثر ۴۰ گزینه"],
+                    }
+                )
+        scenarios += [
+            {
+                "name": "UX-remote-keyboard",
+                "path": reverse("workforce:field_create"),
+                "status": 200,
+                "steps": [
+                    {
+                        "searchChoice": {
+                            "name": "work_team",
+                            "query": remote.name,
+                            "value": str(remote.pk),
+                        },
+                        "keyboard": True,
+                    }
+                ],
+                "screenshot": True,
+            },
+            {
+                "name": "UX-project-site-worker-cascade",
+                "path": reverse("timekeeping:leave_mission_create") + query,
+                "status": 200,
+                "steps": [
+                    {
+                        "searchChoice": {
+                            "name": "project",
+                            "query": "ساختمان",
+                            "value": str(second.pk),
+                        },
+                        "expectCleared": ["site", "employee"],
+                    },
+                    {
+                        "searchChoice": {
+                            "name": "site",
+                            "query": "غربی",
+                            "value": str(second_site.pk),
+                        },
+                        "expectCleared": ["employee"],
+                    },
+                    {
+                        "searchChoice": {
+                            "name": "employee",
+                            "query": "ساختمان",
+                            "value": str(other.pk),
+                        }
+                    },
+                    {
+                        "inspect": "!document.querySelector('[name=site]').tomselect.options["
+                        + repr(str(site.pk))
+                        + "] &amp;&amp; !document.querySelector('[name=employee]').tomselect.options["
+                        + repr(str(employee.pk))
+                        + "]",
+                        "description": "context contains unrelated options",
+                    },
+                ],
+                "screenshot": True,
+            },
+            {
+                "name": "UX-selected-validation-error",
+                "path": reverse("workforce:field_create"),
+                "status": 200,
+                "steps": [
+                    {
+                        "searchChoice": {
+                            "name": "work_team",
+                            "query": remote.name,
+                            "value": str(remote.pk),
+                        }
+                    },
+                    {"submit": True, "afterPath": reverse("workforce:field_create")},
+                    {
+                        "inspect": "document.querySelector('[name=work_team]').value === "
+                        + repr(str(remote.pk)),
+                        "description": "selected canonical worker team lost after error",
+                    },
+                ],
+                "screenshot": True,
+            },
+            {
+                "name": "UX-no-javascript",
+                "path": reverse("workforce:field_edit", args=[employee.pk]),
+                "status": 200,
+                "noJS": True,
+                "steps": [
+                    {
+                        "fill": {"first_name": "نیروی", "last_name": "آزمایشی"},
+                        "submit": True,
+                        "afterPrefix": "/workforce/field/",
+                    }
+                ],
+                "mustText": [team.name],
+                "screenshot": True,
+            },
+        ]
+        scenarios += [
+            {
+                "name": "UX-dropdown-desktop",
+                "path": reverse("workforce:field_create"),
+                "status": 200,
+                "steps": [{"openChoice": "work_team"}],
+                "screenshot": True,
+            },
+            {
+                "name": "UX-dropdown-mobile",
+                "path": reverse("workforce:field_create"),
+                "status": 200,
+                "mobile": True,
+                "steps": [{"openChoice": "work_team"}],
+                "screenshot": True,
+            },
+            {
+                "name": "UX-native-complete-catalogue",
+                "path": reverse("workforce:field_create") + "?native_choices=1",
+                "status": 200,
+                "noJS": True,
+                "steps": [
+                    {
+                        "fill": {
+                            "employee_number": "NATIVE-BROWSER",
+                            "first_name": "نیروی",
+                            "last_name": "بدون جاوااسکریپت",
+                            "start_date": "1405/07/09",
+                            "work_team": str(remote.pk),
+                        },
+                        "submit": True,
+                        "afterPrefix": "/workforce/field/",
+                    }
+                ],
+                "mustText": [remote.name],
+                "screenshot": True,
+            },
+            {
+                "name": "UX-htmx-lifecycle",
+                "path": reverse("workforce:field_create"),
+                "status": 200,
+                "steps": [
+                    {
+                        "inspect": "(() =&gt; { const count=document.querySelectorAll('.ts-wrapper').length;document.dispatchEvent(new Event('htmx:afterSwap')); document.dispatchEvent(new Event('htmx:afterSwap')); if(document.querySelectorAll('.ts-wrapper').length!==count) return false;const root=document.querySelector('main form');document.dispatchEvent(new CustomEvent('htmx:beforeCleanupElement',{detail:{elt:root}})); if(root.querySelector('.ts-wrapper')) return false; document.dispatchEvent(new Event('htmx:afterSwap'));return document.querySelectorAll('.ts-wrapper').length===count;})()",
+                        "description": "widget lifecycle duplicates controls or fails cleanup",
+                    }
+                ],
+            },
+        ]
+        scenarios += [
+            {
+                "name": "UX-lookup-error",
+                "path": reverse("workforce:field_create"),
+                "status": 200,
+                "steps": [
+                    {"failedLookup": {"name": "work_team", "query": remote.name}}
+                ],
+                "screenshot": True,
+            },
+            {
+                "name": "UX-lookup-retry",
+                "path": reverse("workforce:field_create"),
+                "status": 200,
+                "steps": [
+                    {
+                        "failedLookup": {"name": "work_team", "query": remote.name},
+                        "recover": True,
+                    }
+                ],
+                "screenshot": True,
+            },
+            {
+                "name": "UX-scroll-catalogue",
+                "path": reverse("workforce:field_create"),
+                "status": 200,
+                "steps": [{"scrollChoices": "work_team"}],
+                "screenshot": True,
+            },
+        ]
+        scenarios += [
+            {
+                "name": "UX-clear-context-filter",
+                "path": reverse("timekeeping:workbench") + query,
+                "status": 200,
+                "steps": [{"clearChoice": "project"}],
+                "screenshot": True,
+            },
+            {
+                "name": "UX-empty-lookup",
+                "path": reverse("workforce:field_create"),
+                "status": 200,
+                "steps": [{"emptyLookup": "work_team"}],
+                "screenshot": True,
+            },
+        ]
+        scenarios += [
+            {
+                "name": "UX-filter-integrated-search",
+                "path": reverse("timekeeping:workbench"),
+                "status": 200,
+                "steps": [
+                    {
+                        "searchChoice": {
+                            "name": "project",
+                            "query": "ساختمان",
+                            "value": str(second.pk),
+                        },
+                        "typeOnly": True,
+                    }
+                ],
+                "screenshot": True,
+            }
+        ]
+&gt;       self._probe(owner, scenarios)
+
+apps\workforce\test_mvp02_browser.py:961: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\workforce\test_mvp02_browser.py:327: in _probe
+    self.assertEqual(result.returncode, 0, (result.stderr or "")[-4000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:76
+E         throw new Error('Missing clickable control '+selector);
+E               ^
+E   
+E   Error: Missing clickable control select[name="work_team"] + .ts-wrapper [data-choice-retry]
+E       at click (file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:76:13)
+E       at async file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:231:11
+E   
+E   Node.js v24.20.0</failure></testcase></testsuite></testsuites>

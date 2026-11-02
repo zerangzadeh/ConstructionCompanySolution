@@ -1,0 +1,335 @@
+{
+  "raw_focused_regression": "FAIL",
+  "raw_exit": "exit=1",
+  "summary": "23 failed, 143 passed, 59 subtests passed in 1466.24s",
+  "failure_events": 23,
+  "categories": {
+    "stale test / pre-existing view-contract expectation": 10,
+    "pre-existing fixture issue": 11,
+    "pre-existing browser-harness issue": 2
+  },
+  "remaining_F1_regressions": 0,
+  "missing_dynamic_class_failures": 0,
+  "unattributed_failures": 0,
+  "F1_exposed_harness_defect_fixed": 1,
+  "representative_browser_tests": [
+    {
+      "class": "tests.test_f1_offline_browser.OfflineFrontendBrowserTests",
+      "test": "test_representative_pages_with_external_network_blocked",
+      "result": "PASS"
+    },
+    {
+      "class": "apps.workforce.test_mvp02_conformance.ConformanceBrowserTests",
+      "test": "test_frozen_details_and_policy_aware_review",
+      "result": "PASS"
+    },
+    {
+      "class": "apps.workforce.test_mvp02_conformance.ConformanceBrowserTests",
+      "test": "test_principal_surface_and_journeys",
+      "result": "PASS"
+    },
+    {
+      "class": "apps.projects.test_command_center_browser.ProjectWorkspaceBrowserTests",
+      "test": "test_real_cost_chart_and_incomplete_coverage",
+      "result": "PASS"
+    },
+    {
+      "class": "apps.contracts.test_reference_list_browser.ReferenceContractListBrowserTests",
+      "test": "test_pagination_sorting_cards_and_filter_disclosures",
+      "result": "PASS"
+    },
+    {
+      "class": "apps.billing.test_mvp03_browser.ContractBillingBrowserTests",
+      "test": "test_representative_journey_desktop_mobile_and_approval",
+      "result": "PASS"
+    },
+    {
+      "class": "apps.procurement.test_mvp04a_browser.PurchaseRequestBrowserTests",
+      "test": "test_real_chrome_pr_journey_responsive_and_authority_boundaries",
+      "result": "PASS"
+    },
+    {
+      "class": "apps.procurement.test_mvp04d_browser.ReceiptBrowserTests",
+      "test": "test_contextual_partial_second_full_receipt_and_inventory_entry",
+      "result": "PASS"
+    }
+  ],
+  "attributions": [
+    {
+      "event": 1,
+      "class": "apps.billing.test_mvp03_remediation.JourneyRemediationTests",
+      "test": "test_clear_filters_preserves_applied_context_and_global_session",
+      "reason": "AssertionError: False is not true : Couldn't find 'href=\"/estimates/?project_id=UUID&amp;contract=UUID\" data-table-filter-clear' in the following response",
+      "category": "stale test / pre-existing view-contract expectation",
+      "detail": "Older markup, labels, identifiers, sort/query or context-key assumptions differ from unchanged current implementation.",
+      "baseline_proof": "Exact HEAD failure reason reproduced",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 2,
+      "class": "apps.billing.test_mvp03_remediation.JourneyRemediationTests",
+      "test": "test_clear_filters_preserves_applied_context_and_global_session",
+      "reason": "AssertionError: {'pro[62 chars]: ['UUID'], 'sort': ['number']} != {'pro[62 chars]: ['UUID']}",
+      "category": "stale test / pre-existing view-contract expectation",
+      "detail": "Older markup, labels, identifiers, sort/query or context-key assumptions differ from unchanged current implementation.",
+      "baseline_proof": "Exact HEAD failure reason reproduced",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 3,
+      "class": "apps.billing.test_mvp03_remediation.JourneyRemediationTests",
+      "test": "test_clear_filters_preserves_applied_context_and_global_session",
+      "reason": "KeyError: 'clear_filters_url'",
+      "category": "stale test / pre-existing view-contract expectation",
+      "detail": "Older markup, labels, identifiers, sort/query or context-key assumptions differ from unchanged current implementation.",
+      "baseline_proof": "Exact HEAD failure reason reproduced",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 4,
+      "class": "apps.billing.test_mvp03_remediation.JourneyRemediationTests",
+      "test": "test_contract_identity_jalali_dates_and_progress_reason_markup",
+      "reason": "AssertionError: False is not true : Couldn't find '<bdi class=\"font-semibold\" dir=\"ltr\">F61-C</bdi>' in the following response",
+      "category": "stale test / pre-existing view-contract expectation",
+      "detail": "Older markup, labels, identifiers, sort/query or context-key assumptions differ from unchanged current implementation.",
+      "baseline_proof": "Exact HEAD failure reason reproduced",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 5,
+      "class": "apps.billing.test_mvp03_remediation.JourneyRemediationTests",
+      "test": "test_estimate_states_have_correct_copy_and_balanced_separate_forms",
+      "reason": "IndexError: list index out of range",
+      "category": "stale test / pre-existing view-contract expectation",
+      "detail": "Older markup, labels, identifiers, sort/query or context-key assumptions differ from unchanged current implementation.",
+      "baseline_proof": "Exact HEAD failure reason reproduced",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 6,
+      "class": "apps.billing.test_mvp03_remediation.JourneyRemediationTests",
+      "test": "test_plain_titles_and_active_billing_navigation",
+      "reason": "AssertionError: 'مبنای متره و صورت\\u200cوضعیت | بنیرا' != 'مبناهای اندازه\\u200cگیری | بنیرا'",
+      "category": "stale test / pre-existing view-contract expectation",
+      "detail": "Older markup, labels, identifiers, sort/query or context-key assumptions differ from unchanged current implementation.",
+      "baseline_proof": "Exact HEAD failure reason reproduced",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 7,
+      "class": "apps.billing.test_mvp03_remediation.JourneyRemediationTests",
+      "test": "test_plain_titles_and_active_billing_navigation",
+      "reason": "AssertionError: 'کارکرد و پیشرفت | بنیرا' != 'پیشرفت کار | بنیرا'",
+      "category": "stale test / pre-existing view-contract expectation",
+      "detail": "Older markup, labels, identifiers, sort/query or context-key assumptions differ from unchanged current implementation.",
+      "baseline_proof": "Exact HEAD failure reason reproduced",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 8,
+      "class": "apps.billing.test_mvp03_remediation.JourneyRemediationTests",
+      "test": "test_true_empty_context_is_distinct_from_filtered_empty",
+      "reason": "AssertionError: False is not true : Couldn't find 'هنوز صورت‌وضعیتی در این زمینه ثبت نشده است' in the following response",
+      "category": "stale test / pre-existing view-contract expectation",
+      "detail": "Older markup, labels, identifiers, sort/query or context-key assumptions differ from unchanged current implementation.",
+      "baseline_proof": "Exact HEAD failure reason reproduced",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 9,
+      "class": "apps.procurement.test_mvp04c.AwardPOJourneyTests",
+      "test": "test_contextual_entry_conserved_partial_award_retry_and_no_downstream",
+      "reason": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "category": "pre-existing fixture issue",
+      "detail": "Approver membership has no object-scope grant; _grant adds permission only. Opening approval correctly denies before UI rendering.",
+      "baseline_proof": "Exact HEAD reproduction",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 10,
+      "class": "apps.procurement.test_mvp04c.AwardPOJourneyTests",
+      "test": "test_create_and_issue_have_no_receiving_inventory_or_financial_side_effect",
+      "reason": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "category": "pre-existing fixture issue",
+      "detail": "Approver membership has no object-scope grant; _grant adds permission only. Opening approval correctly denies before UI rendering.",
+      "baseline_proof": "Same pre-render fixture stack and authorization denial; representative HEAD reproduction",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 11,
+      "class": "apps.procurement.test_mvp04c.AwardPOJourneyTests",
+      "test": "test_forged_supplier_project_allocation_excess_and_direct_bypass_denied",
+      "reason": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "category": "pre-existing fixture issue",
+      "detail": "Approver membership has no object-scope grant; _grant adds permission only. Opening approval correctly denies before UI rendering.",
+      "baseline_proof": "Same pre-render fixture stack and authorization denial; representative HEAD reproduction",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 12,
+      "class": "apps.procurement.test_mvp04c.AwardPOJourneyTests",
+      "test": "test_issue_frozen_version_source_and_contextual_grn_entry_only",
+      "reason": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "category": "pre-existing fixture issue",
+      "detail": "Approver membership has no object-scope grant; _grant adds permission only. Opening approval correctly denies before UI rendering.",
+      "baseline_proof": "Same pre-render fixture stack and authorization denial; representative HEAD reproduction",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 13,
+      "class": "apps.procurement.test_mvp04c.AwardPOJourneyTests",
+      "test": "test_legacy_direct_create_line_issue_and_business_labels",
+      "reason": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "category": "pre-existing fixture issue",
+      "detail": "Approver membership has no object-scope grant; _grant adds permission only. Opening approval correctly denies before UI rendering.",
+      "baseline_proof": "Same pre-render fixture stack and authorization denial; representative HEAD reproduction",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 14,
+      "class": "apps.procurement.test_mvp04c.AwardPOJourneyTests",
+      "test": "test_list_real_filters_chips_sort_pagination_and_retention",
+      "reason": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "category": "pre-existing fixture issue",
+      "detail": "Approver membership has no object-scope grant; _grant adds permission only. Opening approval correctly denies before UI rendering.",
+      "baseline_proof": "Same pre-render fixture stack and authorization denial; representative HEAD reproduction",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 15,
+      "class": "apps.procurement.test_mvp04c.AwardPOJourneyTests",
+      "test": "test_source_post_remains_csrf_protected",
+      "reason": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "category": "pre-existing fixture issue",
+      "detail": "Approver membership has no object-scope grant; _grant adds permission only. Opening approval correctly denies before UI rendering.",
+      "baseline_proof": "Same pre-render fixture stack and authorization denial; representative HEAD reproduction",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 16,
+      "class": "apps.procurement.test_mvp04c.AwardPOJourneyTests",
+      "test": "test_sourced_draft_cannot_accept_unsourced_direct_rows",
+      "reason": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "category": "pre-existing fixture issue",
+      "detail": "Approver membership has no object-scope grant; _grant adds permission only. Opening approval correctly denies before UI rendering.",
+      "baseline_proof": "Same pre-render fixture stack and authorization denial; representative HEAD reproduction",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 17,
+      "class": "apps.procurement.test_mvp04c.AwardPOJourneyTests",
+      "test": "test_unauthorized_tenant_and_project_denial",
+      "reason": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "category": "pre-existing fixture issue",
+      "detail": "Approver membership has no object-scope grant; _grant adds permission only. Opening approval correctly denies before UI rendering.",
+      "baseline_proof": "Same pre-render fixture stack and authorization denial; representative HEAD reproduction",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 18,
+      "class": "apps.procurement.test_mvp04c.AwardConsumptionConcurrencyTests",
+      "test": "test_two_explicit_orders_cannot_consume_the_same_allocation",
+      "reason": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "category": "pre-existing fixture issue",
+      "detail": "Approver membership has no object-scope grant; _grant adds permission only. Opening approval correctly denies before UI rendering.",
+      "baseline_proof": "Same pre-render fixture stack and authorization denial; representative HEAD reproduction",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 19,
+      "class": "apps.projects.test_command_center_browser.ProjectWorkspaceBrowserTests",
+      "test": "test_projects_list_journeys_and_command_center_states",
+      "reason": "Error: PRJ-advanced-dates: supported dates retained as chips",
+      "category": "pre-existing browser-harness issue",
+      "detail": "Gregorian ISO values are inserted into Jalali-enhanced fields; the harness then expects date-filter chips/results. The same step fails under HEAD.",
+      "baseline_proof": "Exact HEAD browser trigger reproduced",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 20,
+      "class": "apps.workforce.test_mvp02_browser.FieldWorkforceBrowserTests",
+      "test": "test_uiux_remediation_desktop_mobile_and_cascades",
+      "reason": "Error: Clearing project retained stale URL context {\"url\":\"http://localhost:PORT/timekeeping/?project=UUID&site=UUID&employee=UUID\",\"ready\":\"complete\",\"fields\":[{\"name\":\"employee\",\"value\":\"\",\"disabled\":false,\"bound\":\"true\",\"input\":\"\"},{\"name\":\"project\",\"value\":\"\",\"disabled\":false,\"bound\":\"true\",\"input\":\"\"},{\"name\":\"site\",\"value\":\"\",\"disabled\":true,\"bound\":\"true\",\"input\":\"\"}]}",
+      "category": "pre-existing browser-harness issue",
+      "detail": "Harness expects clearing a selector to navigate automatically; HEAD/current Filter Bar requires explicit Apply. The repaired retry/error/scroll steps now pass before this unchanged failure.",
+      "baseline_proof": "Exact HEAD clear-context trigger reproduced",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 21,
+      "class": "apps.procurement.test_mvp04c_browser.PurchaseOrderBrowserTests",
+      "test": "test_legacy_direct_flow_list_and_responsive_patterns",
+      "reason": "django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "category": "pre-existing fixture issue",
+      "detail": "Approver membership has no object-scope grant; _grant adds permission only. Opening approval correctly denies before UI rendering.",
+      "baseline_proof": "Same pre-render fixture stack and authorization denial; representative HEAD reproduction",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 22,
+      "class": "tests.test_filter_bar.FilterBarTests",
+      "test": "test_rendered_chips_escape_search_and_expose_business_choice_labels",
+      "reason": "AssertionError: 'data-filter-result-count' not found in '\\n\\n<script src=\"/static/js/erp_filter_bar.js?v=20261101-contract-micro-1\" defer></script>\\n<section class=\"erp-list-filters\" aria-label=\"جست\\u200cوجو و فیلتر\" data-filter-bar data-table-filter-controls=\"list-filter-bar\">\\n    <form id=\"list-filter-bar\" method=\"get\" data-table-filter-form data-filter-submit=\"explicit\" aria-label=\"فیلتر فهرست\">\\n        <input type=\"hidden\" name=\"project_id\" value=\"trusted-parent\">\\n        <div class=\"erp-list-filters__top\">\\n            <div class=\"erp-list-search\">\\n                <label class=\"erp-list-search__label\" for=\"id_q\">جست\\u200cوجو</label>\\n                <div class=\"erp-list-search__input\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" aria-hidden=\"true\"><circle cx=\"10.5\" cy=\"10.5\" r=\"6.5\"/><path d=\"m16 16 4 4\"/></svg><input type=\"text\" name=\"q\" value=\"&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;\" id=\"id_q\"></div>\\n                <button class=\"erp-btn erp-btn--primary erp-list-search__submit\" type=\"submit\">جست\\u200cوجو</button>\\n                \\n            </div>\\n            <details class=\"erp-list-options\" data-filter-options open>\\n                <summary class=\"erp-list-options__summary\">فیلترها (2)</summary>\\n                <div class=\"erp-list-quick\">\\n                    <div class=\"min-w-0 flex-1 lg:min-w-48\">\\n    <label class=\"mb-1.5 block text-xs font-semibold text-slate-600\" for=\"id_side\">سمت قرارداد</label>\\n    <select name=\"side\" id=\"id_side\">\\n  <option value=\"\">همه</option>\\n\\n  <option value=\"receivable\" selected>با کارفرما</option>\\n\\n</select>\\n    \\n</div>\\n\\n                    <div class=\"erp-list-filter-actions\">\\n                        <button class=\"erp-btn erp-btn--secondary\" type=\"button\" data-more-toggle aria-controls=\"list-more-filters\" aria-expanded=\"false\" hidden>فیلترهای بیشتر <span aria-hidden=\"true\">⌄</span></button>\\n                        <button class=\"erp-btn erp-btn--primary\" type=\"submit\" data-filter-apply>اعمال فیلتر</button>\\n                    </div>\\n                </div>\\n            </details>\\n        </div>\\n        \\n        \\n        <details id=\"list-more-filters\" class=\"erp-list-more\" data-more-filters>\\n            <summary>فیلترهای بیشتر</summary>\\n            \\n            <div class=\"erp-list-more__fields\"><div class=\"min-w-0 flex-1 lg:min-w-32\">\\n    <label class=\"mb-1.5 block text-xs font-semibold text-slate-600\" for=\"id_number\">شماره</label>\\n    <input type=\"text\" name=\"number\" id=\"id_number\">\\n    \\n</div>\\n<button class=\"erp-btn erp-btn--primary erp-btn--compact\" type=\"submit\">اعمال فیلترهای بیشتر</button></div>\\n            \\n        </details>\\n        \\n        \\n    </form>\\n    <div class=\"erp-list-filter-summary\">\\n        <div class=\"erp-list-chips\" aria-label=\"فیلترهای فعال\">\\n    <span class=\"erp-list-muted\">فیلترهای فعال:</span>\\n    \\n    <a class=\"erp-list-chip\" href=\"/contracts/?side=receivable&amp;project_id=trusted-parent\" data-filter-chip=\"q\" aria-label=\"حذف فیلتر جست\\u200cوجو: &lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;\">\\n        <span><span class=\"erp-list-chip__label\">جست\\u200cوجو:</span> <bdi>&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;</bdi></span><span aria-hidden=\"true\">×</span>\\n    </a>\\n    \\n    <a class=\"erp-list-chip\" href=\"/contracts/?q=%3Cscript%3Ealert%28%22x%22%29%3C%2Fscript%3E&amp;project_id=trusted-parent\" data-filter-chip=\"side\" aria-label=\"حذف فیلتر سمت قرارداد: با کارفرما\">\\n        <span><span class=\"erp-list-chip__label\">سمت قرارداد:</span> <bdi>با کارفرما</bdi></span><span aria-hidden=\"true\">×</span>\\n    </a>\\n    \\n    <a class=\"erp-list-clear\" href=\"/contracts/?project_id=trusted-parent\" data-table-filter-clear data-context-preserving-clear>پاک\\u200cکردن فیلترها</a>\\n</div>\\n\\n    </div>\\n</section>\\n'",
+      "category": "stale test / pre-existing view-contract expectation",
+      "detail": "Older markup, labels, identifiers, sort/query or context-key assumptions differ from unchanged current implementation.",
+      "baseline_proof": "Exact HEAD failure reason reproduced",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    },
+    {
+      "event": 23,
+      "class": "tests.test_uiux_stage3a.PresentationContractsTests",
+      "test": "test_home_prioritizes_existing_tasks_and_alerts_without_business_summaries",
+      "reason": "ValueError: substring not found",
+      "category": "stale test / pre-existing view-contract expectation",
+      "detail": "Older markup, labels, identifiers, sort/query or context-key assumptions differ from unchanged current implementation.",
+      "baseline_proof": "Exact HEAD failure reason reproduced",
+      "attributable_to_F1": false,
+      "missing_dynamic_class": false,
+      "resolution": "Left unchanged outside F1-only fix authority; failure retained."
+    }
+  ]
+}
