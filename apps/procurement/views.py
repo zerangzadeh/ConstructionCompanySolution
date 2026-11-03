@@ -410,6 +410,13 @@ def purchase_request_list(request: HttpRequest) -> HttpResponse:
     page = paginate_table(
         records, request, sort_fields=sorts, default_ordering=("-created_at", "pk")
     )
+    if request.GET.get("format") == "xlsx":
+        from apps.procurement.xlsx_exports import procurement_download
+
+        return procurement_download(
+            "request", page.paginator.object_list, organization=request.organization
+        )
+
     bar = build_filter_bar(
         request,
         form=form,

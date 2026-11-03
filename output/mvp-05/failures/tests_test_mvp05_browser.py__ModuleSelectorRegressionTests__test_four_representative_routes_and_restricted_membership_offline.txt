@@ -1,0 +1,26 @@
+self = <test_mvp05_browser.ModuleSelectorRegressionTests testMethod=test_four_representative_routes_and_restricted_membership_offline>
+
+    def test_four_representative_routes_and_restricted_membership_offline(self):
+        with patch.dict(
+            os.environ,
+            {
+                "MODULE_SELECTOR_EVIDENCE_DIRECTORY": str(
+                    ROOT / "output/mvp-05/module-selector-regression"
+                )
+            },
+        ):
+>           super().test_four_representative_routes_and_restricted_membership_offline()
+
+tests\test_mvp05_browser.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_f3_module_selector.py:237: in test_four_representative_routes_and_restricted_membership_offline
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-6000:])
+E   AssertionError: 1 != 0 : node:internal/modules/run_main:107
+E       triggerUncaughtException(
+E       ^
+E   
+E   Error: Page did not settle: Math.abs(document.querySelector(".erp-module-selector__row").scrollLeft) < 2
+E       at waitFor (file:///E:/Construction_Company_Solution/scripts/verification/f3_browser.mjs:75:11)
+E       at async file:///E:/Construction_Company_Solution/scripts/verification/f3_browser.mjs:182:7
+E   
+E   Node.js v24.20.0

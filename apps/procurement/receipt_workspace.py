@@ -124,6 +124,13 @@ def receipt_list(request):
     page = paginate_table(
         records, request, sort_fields=sorts, default_ordering=("-received_at", "pk")
     )
+    if request.GET.get("format") == "xlsx":
+        from apps.procurement.xlsx_exports import procurement_download
+
+        return procurement_download(
+            "receipt", page.paginator.object_list, organization=request.organization
+        )
+
     bar = build_filter_bar(
         request,
         form=form,

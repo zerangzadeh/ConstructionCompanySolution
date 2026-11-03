@@ -1,0 +1,51 @@
+self = <apps.procurement.test_mvp04c.AwardPOJourneyTests testMethod=test_issue_frozen_version_source_and_contextual_grn_entry_only>
+
+    def setUp(self):
+>       super().setUp()
+
+apps\procurement\test_mvp04c.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\procurement\test_p5_s11_comparison_award.py:63: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: admissibility-approver>
+organization = <Organization: Procurement Co>
+permission = BusinessPermissionCode.RFQ_QUOTES_APPROVE_OPEN
+message = 'اجازه انجام عملیات حفاظت\u200cشده پیشنهاد را ندارید.'
+project = <Project: PROC - Procurement Project>, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.
+
+apps\organizations\authorization.py:441: PermissionDenied

@@ -144,7 +144,16 @@ def _scope_context(request, rfq):
 @organization_permission_required(P.RFQS_VIEW)
 @require_GET
 def rfq_list(request: HttpRequest) -> HttpResponse:
-    return render(request, "procurement/rfq_list.html", list_context(request))
+    context = list_context(request)
+    if request.GET.get("format") == "xlsx":
+        from .xlsx_exports import procurement_download
+
+        return procurement_download(
+            "rfq",
+            context["page_obj"].paginator.object_list,
+            organization=request.organization,
+        )
+    return render(request, "procurement/rfq_list.html", context)
 
 
 @active_organization_required

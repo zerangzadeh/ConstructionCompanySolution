@@ -4,7 +4,9 @@
 {% block table_filter_controls %}{% endblock %}{% block list_pagination %}{% endblock %}
 {% block content %}
 <div class="erp-reference-list erp-contracts-list">
-<div class="erp-list-heading">{% include "components/page_header.html" with page_title="استعلام‌های خرید" page_description="آماده‌سازی و صدور استعلام بر پایه درخواست خرید تأییدشده" page_action_url=create_url page_action_label="استعلام جدید" page_icon="document" only %}</div>
+<div class="erp-list-heading">{% include "components/page_header.html" with page_title="استعلام‌های خرید" page_description="آماده‌سازی و صدور استعلام بر پایه درخواست خرید تأییدشده" page_action_url=create_url page_action_label="استعلام جدید" page_icon="document" only %}
+{% include "components/xlsx_action.html" %}
+</div>
 
 <div class="erp-list-workspace">
 {% include "components/filter_bar.html" with bar=filter_bar reference_layout=True only %}

@@ -133,6 +133,13 @@ def transaction_list(request):
     page = paginate_table(
         records, request, sort_fields=sorts, default_ordering=("-occurred_at", "pk")
     )
+    if request.GET.get("format") == "xlsx":
+        from apps.inventory.xlsx_exports import movements_download
+
+        return movements_download(
+            page.paginator.object_list, organization=request.organization
+        )
+
     bar = build_filter_bar(
         request,
         form=form,

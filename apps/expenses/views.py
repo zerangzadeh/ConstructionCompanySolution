@@ -98,6 +98,13 @@ def expense_list(request: HttpRequest) -> HttpResponse:
         },
         default_ordering=("-incurred_on", "-created_at", "pk"),
     )
+    if request.GET.get("format") == "xlsx":
+        from apps.expenses.xlsx_exports import expenses_download
+
+        return expenses_download(
+            page.paginator.object_list, organization=request.organization
+        )
+
     return render(
         request,
         "expenses/list.html",

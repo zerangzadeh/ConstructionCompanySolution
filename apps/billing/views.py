@@ -436,6 +436,13 @@ def claim_list(request: HttpRequest) -> HttpResponse:
     from .claim_list import claim_list_context
 
     list_context = claim_list_context(request, claims, contract_scoped=contract_scoped)
+    if request.GET.get("format") == "xlsx":
+        from .xlsx_exports import claims_download
+
+        return claims_download(
+            list_context["page_obj"].paginator.object_list,
+            organization=request.organization,
+        )
     can_create_claim = route_exposed("billing:claim_create") and (
         contract_claim_create_allowed(request, selected_contract)
         if contract_scoped
@@ -487,6 +494,18 @@ def claim_list(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.CLAIMS_VIEW)
 @require_GET
 def claim_detail(request: HttpRequest, claim_id: str) -> HttpResponse:
+    if request.GET.get("format") == "xlsx":
+        from .xlsx_exports import claims_download
+
+        claim = _claim(request, claim_id)
+        if claim is None:
+            return HttpResponseNotFound("صورت‌وضعیت یافت نشد.")
+        return claims_download(
+            get_progress_claims(
+                actor=request.user, organization=request.organization
+            ).filter(pk=claim.pk),
+            organization=request.organization,
+        )
     return render_claim_detail(request, claim_id)
 
 

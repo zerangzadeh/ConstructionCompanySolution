@@ -9,6 +9,8 @@
 <div class="erp-reference-list erp-contracts-list erp-claims-list">
   <div class="erp-list-heading">
     {% include "components/page_header.html" with page_breadcrumbs=page_breadcrumbs page_title="صورت‌وضعیت‌ها" page_description="پیگیری دوره، مبلغ و وضعیت تأیید صورت‌وضعیت قراردادها" page_action_url=create_url page_action_label="صورت‌وضعیت جدید" page_icon="document" only %}
+{% include "components/xlsx_action.html" %}
+
   </div>
   {% include "components/commercial_project_context.html" %}
   {% if selected_contract %}<aside class="erp-list-scope" aria-label="زمینه قرارداد"><div><span class="erp-list-muted">صورت‌وضعیت‌های قرارداد</span> <strong>{{ selected_contract.title }}</strong><p><bdi dir="ltr">{{ selected_contract.contract_number }}</bdi> · {{ selected_contract.project.name }}</p></div><a href="{% url 'contracts:detail' selected_contract.pk %}">بازگشت به قرارداد ←</a></aside>{% endif %}
