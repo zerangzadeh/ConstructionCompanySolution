@@ -1,0 +1,81 @@
+[
+  {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "apps/contracts/hub.py",
+      "apps/contracts/test_hub.py",
+      "apps/contracts/templatetags",
+      "apps/contracts/views.py",
+      "apps/billing/views.py",
+      "apps/billing/list_presentation.py",
+      "apps/billing/test_journey_navigation.py",
+      "apps/billing/test_journey_content.py",
+      "scripts/verification/contract_hub_validate.py"
+    ],
+    "exit_code": 0,
+    "output": "All checks passed!\n"
+  },
+  {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "apps/contracts/hub.py",
+      "apps/contracts/test_hub.py",
+      "apps/contracts/templatetags",
+      "apps/contracts/views.py",
+      "apps/billing/views.py",
+      "apps/billing/list_presentation.py",
+      "apps/billing/test_journey_navigation.py",
+      "apps/billing/test_journey_content.py",
+      "scripts/verification/contract_hub_validate.py"
+    ],
+    "exit_code": 1,
+    "output": "unformatted: File would be reformatted\n   --> apps\\contracts\\views.py:519:1\n    |\n518 |\n519 +\n520 | @active_organization_required\n    |\n\nunformatted: File would be reformatted\n  --> scripts\\verification\\contract_hub_validate.py:33:36\n   |\n32 |             if connection.settings_dict[\"NAME\"] != test_database:\n   -                 raise RuntimeError(\"Contract Hub reset requires its dedicated test database\")\n33 +                 raise RuntimeError(\n34 +                     \"Contract Hub reset requires its dedicated test database\"\n35 +                 )\n36 |             call_command(\n--------------------------------------------------------------------------------\n48 | raise SystemExit(pytest.main(sys.argv[1:]))\n   -\n   |\n\n2 files would be reformatted, 8 files already formatted\n"
+  },
+  {
+    "command": [
+      "node",
+      "--check",
+      "scripts/verification/contract_hub_browser.mjs"
+    ],
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "node",
+      "--check",
+      "apps/contracts/static/contracts/detail.js"
+    ],
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+      "manage.py",
+      "check"
+    ],
+    "exit_code": 0,
+    "output": "System check identified no issues (0 silenced).\n"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check",
+      "--",
+      "apps/contracts",
+      "apps/billing",
+      "templates/contracts"
+    ],
+    "exit_code": 0,
+    "output": "warning: in the working copy of 'apps/billing/list_presentation.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/billing/test_journey_navigation.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/contracts/static/contracts/detail.css', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/contracts/static/contracts/detail.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'templates/contracts/detail_terms.html', LF will be replaced by CRLF the next time Git touches it\n"
+  }
+]

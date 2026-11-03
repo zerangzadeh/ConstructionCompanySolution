@@ -1,0 +1,330 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ ContractHubBrowserTests.test_contract_hub_and_shared_foundation_offline_in_installed_chrome _
+
+self = <apps.contracts.test_hub.ContractHubBrowserTests testMethod=test_contract_hub_and_shared_foundation_offline_in_installed_chrome>
+
+    def test_contract_hub_and_shared_foundation_offline_in_installed_chrome(self):
+        self.prepare_hub()
+        request_progress_verification(
+            organization=self.organization, actor=self.owner, record=self.new_record
+        )
+        reader, _, _ = scoped_reader(
+            self.organization, self.project, ["contracts.view"], username="hub-reader"
+        )
+        sessions, scenarios = {}, []
+        for name, actor in (
+            ("owner", self.owner),
+            ("reviewer", self.manager),
+            ("restricted", reader),
+        ):
+            self.client = Client()
+            self.login(actor)
+            sessions[name] = self.client.cookies["sessionid"].value
+        for width in (1440, 1024, 390):
+            cases = [
+                (
+                    "hub-handoff",
+                    "owner",
+                    reverse("contracts:detail", args=[self.contract.pk]),
+                    {
+                        "steps": [
+                            {
+                                "click": '[data-contract-hub-navigation] a[href*="section=quantities"]',
+                                "path": quantities(self.contract),
+                            },
+                            {
+                                "click": '.cd-quantity-tabs a[href*="pane=basis"]',
+                                "path": quantities(self.contract, pane="basis"),
+                            },
+                            {
+                                "click": ".cd-quantity-table a[href*=line_key]",
+                                "path": reverse("billing:progress_list")
+                                + f"?contract={self.contract.pk}&line_key=ITEM-01",
+                            },
+                        ]
+                    },
+                ),
+                ("receivable-items", "owner", quantities(self.contract), {}),
+                (
+                    "receivable-basis",
+                    "owner",
+                    quantities(self.contract, pane="basis"),
+                    {
+                        "inspect": "document.querySelectorAll('.cd-quantity-table tbody tr').length===1 && !!document.querySelector('.cd-quantity-table a[href*=line_key]')"
+                    },
+                ),
+                (
+                    "historical-basis",
+                    "owner",
+                    quantities(
+                        self.contract,
+                        pane="basis",
+                        baseline=self.old_record.baseline_id,
+                    ),
+                    {"inspect": "!!document.querySelector('.cd-history-note')"},
+                ),
+                (
+                    "payable-items",
+                    "owner",
+                    quantities(self.payable),
+                    {
+                        "inspect": "!document.querySelector('[href*=\"pane=basis\"]') && !!document.querySelector('.cd-quantity-table a[href*=contract_item]')"
+                    },
+                ),
+                (
+                    "measurement-history",
+                    "owner",
+                    reverse("billing:progress_list")
+                    + f"?contract={self.contract.pk}&line_key=ITEM-01",
+                    {
+                        "inspect": "document.querySelectorAll('[data-progress-records] tbody tr').length===2"
+                    },
+                ),
+                (
+                    "contract-selector",
+                    "owner",
+                    reverse("contracts:create"),
+                    {"choice": "project", "query": "Baseline"},
+                ),
+                (
+                    "restricted-items",
+                    "restricted",
+                    quantities(self.contract),
+                    {
+                        "inspect": '!document.querySelector(\'[href*="pane=basis"],.cd-quantity-tabs a[href*="/billing/"]\')'
+                    },
+                ),
+                (
+                    "measurement-decision",
+                    "reviewer",
+                    reverse("billing:progress_detail", args=[self.new_record.pk]),
+                    {"decision": True, "confirm": width == 390},
+                ),
+            ]
+            for label, actor_name, path, extra in cases:
+                # Preflight responses must not rotate the sessions retained for Chrome.
+                self.client = Client()
+                self.login(
+                    {
+                        "owner": self.owner,
+                        "reviewer": self.manager,
+                        "restricted": reader,
+                    }[actor_name]
+                )
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 200)
+                expected = [
+                    {"label": link.label, "url": reverse(link.route)}
+                    for group in response.context["product_navigation_groups"]
+                    for link in group.links
+                ]
+                active = [
+                    item["url"]
+                    for item in module_selector_links(
+                        response.context["product_navigation_groups"],
+                        response.resolver_match.view_name,
+                        response.wsgi_request.path,
+                    )
+                    if item["active"]
+                ]
+                self.assertLessEqual(len(active), 1)
+                if response.resolver_match.namespace == "contracts":
+                    self.assertEqual(len(active), 1)
+                scenarios.append(
+                    {
+                        "name": f"{label}-{width}",
+                        "actor": actor_name,
+                        "path": path,
+                        "width": width,
+                        "expected": expected,
+                        "active": active,
+                        **extra,
+                    }
+                )
+        output = OUTPUT / "browser"
+        output.mkdir(parents=True, exist_ok=True)
+        env = os.environ.copy()
+        env["HUB_SESSIONS"] = json.dumps(sessions)
+        env["HUB_SCENARIOS"] = json.dumps(scenarios)
+        result = subprocess.run(
+            [
+                "node",
+                str(ROOT / "scripts/verification/contract_hub_browser.mjs"),
+                self.live_server_url,
+                str(output),
+            ],
+            env=env,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=420,
+            check=False,
+        )
+        (output / "command.txt").write_text(
+            f"exit={result.returncode}\n{result.stdout}\n{result.stderr}",
+            encoding="utf-8",
+        )
+>       self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-5000:])
+E       AssertionError: 1 != 0 : node:internal/modules/run_main:107
+E           triggerUncaughtException(
+E           ^
+E       
+E       Error: ReferenceError: Swal is not defined
+E           at <anonymous>:1:1
+E           at evaluate (file:///E:/Construction_Company_Solution/scripts/verification/contract_hub_browser.mjs:67:40)
+E           at async file:///E:/Construction_Company_Solution/scripts/verification/contract_hub_browser.mjs:248:16
+E       
+E       Node.js v24.20.0
+
+apps\contracts\test_hub.py:399: AssertionError
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-02T19:23:33.671240+00:00","event":"http.response","request_id":"41ae2c67-297f-443d-a731-12fa043e618e","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1040}
+
+{"timestamp":"2026-11-02T19:23:34.545310+00:00","event":"http.response","request_id":"7d0924bf-8b96-4748-b5d8-eb0ed318245a","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":852}
+
+{"timestamp":"2026-11-02T19:23:35.530560+00:00","event":"http.response","request_id":"d7406829-ddb6-447f-b344-a32e9b6ff332","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":966}
+
+{"timestamp":"2026-11-02T19:23:36.619348+00:00","event":"http.response","request_id":"fe109e64-244a-4aff-8662-7f83afed0423","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1069}
+
+{"timestamp":"2026-11-02T19:23:37.445944+00:00","event":"http.response","request_id":"53ba1561-9372-4220-9ae6-a9a3cb46a6bc","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":808}
+
+{"timestamp":"2026-11-02T19:23:37.936917+00:00","event":"http.response","request_id":"bde2e669-3ca6-445c-be89-52d0333e018d","method":"GET","route":"billing:progress_list","status_code":200,"duration_ms":470}
+
+{"timestamp":"2026-11-02T19:23:38.265692+00:00","event":"http.response","request_id":"cae68099-2fb9-43fd-8046-f8306ff506cf","method":"GET","route":"contracts:create","status_code":200,"duration_ms":314}
+
+{"timestamp":"2026-11-02T19:23:38.501012+00:00","event":"http.response","request_id":"d1a667dc-7d2f-4e15-8f7c-6d345d5d830d","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":214}
+
+{"timestamp":"2026-11-02T19:23:38.918241+00:00","event":"http.response","request_id":"9ec5e033-f614-4a00-a188-f8e63d377971","method":"GET","route":"billing:progress_detail","status_code":200,"duration_ms":402}
+
+{"timestamp":"2026-11-02T19:23:39.778570+00:00","event":"http.response","request_id":"18ddb343-f34c-45c0-81cb-e5700676cf15","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":835}
+
+{"timestamp":"2026-11-02T19:23:40.761573+00:00","event":"http.response","request_id":"c5f7e738-1395-4519-95e9-579d2ef2f328","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":969}
+
+{"timestamp":"2026-11-02T19:23:41.592970+00:00","event":"http.response","request_id":"236859e7-761f-4e68-9f3f-d05ee0a2ff55","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":812}
+
+{"timestamp":"2026-11-02T19:23:42.521039+00:00","event":"http.response","request_id":"bca6af9e-0f84-4503-973f-4e5d51849984","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":911}
+
+{"timestamp":"2026-11-02T19:23:43.497524+00:00","event":"http.response","request_id":"f0a38a41-b8ee-4a88-a526-d31e36a71cc0","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":958}
+
+{"timestamp":"2026-11-02T19:23:44.040488+00:00","event":"http.response","request_id":"625d9735-dcde-44cc-8aae-f71d38405010","method":"GET","route":"billing:progress_list","status_code":200,"duration_ms":520}
+
+{"timestamp":"2026-11-02T19:23:44.344297+00:00","event":"http.response","request_id":"c139a99f-7cbf-4dca-b45c-f137e2f57367","method":"GET","route":"contracts:create","status_code":200,"duration_ms":286}
+
+{"timestamp":"2026-11-02T19:23:44.597909+00:00","event":"http.response","request_id":"5a15cc0c-518c-42ac-b6d7-138282f28749","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":234}
+
+{"timestamp":"2026-11-02T19:23:45.078962+00:00","event":"http.response","request_id":"f12ce52b-2461-4507-ad64-c8b8464edde9","method":"GET","route":"billing:progress_detail","status_code":200,"duration_ms":465}
+
+{"timestamp":"2026-11-02T19:23:46.071620+00:00","event":"http.response","request_id":"6c08c1f9-7f9f-4a7c-a908-93f831ab5a0e","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":970}
+
+{"timestamp":"2026-11-02T19:23:46.931546+00:00","event":"http.response","request_id":"e76308a1-5394-4402-9873-cbcf98c63bd1","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":838}
+
+{"timestamp":"2026-11-02T19:23:47.862926+00:00","event":"http.response","request_id":"fcc4af30-53ae-4797-9c4c-45b5e41cfd49","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":916}
+
+{"timestamp":"2026-11-02T19:23:48.862578+00:00","event":"http.response","request_id":"f3a20cf2-23e9-43c4-ab4e-5f22b21aea55","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":975}
+
+{"timestamp":"2026-11-02T19:23:49.823306+00:00","event":"http.response","request_id":"da4e0346-f4da-43ca-89c8-f80a0078ae76","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":939}
+
+{"timestamp":"2026-11-02T19:23:50.347502+00:00","event":"http.response","request_id":"9a46a97d-f5db-41e9-8cef-ec9ef9e1b4a2","method":"GET","route":"billing:progress_list","status_code":200,"duration_ms":510}
+
+{"timestamp":"2026-11-02T19:23:50.625889+00:00","event":"http.response","request_id":"00a66ac2-056a-4d41-a3ac-a2f8f6b66fd2","method":"GET","route":"contracts:create","status_code":200,"duration_ms":261}
+
+{"timestamp":"2026-11-02T19:23:50.917276+00:00","event":"http.response","request_id":"1527f23d-5239-49db-920b-e66bb3848eae","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":270}
+
+{"timestamp":"2026-11-02T19:23:51.327165+00:00","event":"http.response","request_id":"9fd0fb05-d082-4b4e-b162-dc0966190306","method":"GET","route":"billing:progress_detail","status_code":200,"duration_ms":395}
+
+{"timestamp":"2026-11-02T19:23:53.065142+00:00","event":"http.response","request_id":"9114cf10-4df5-4cff-9c6d-4b95d5480851","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1108}
+
+{"timestamp":"2026-11-02T19:23:54.190328+00:00","event":"http.response","request_id":"8b3595bb-2771-4e2b-aef6-3098d9a1fa9e","method":"GET","route":null,"status_code":404,"duration_ms":326}
+
+{"timestamp":"2026-11-02T19:23:56.407679+00:00","event":"http.response","request_id":"6040b36c-c243-4fae-921e-f9b8e1f6517c","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1020}
+
+{"timestamp":"2026-11-02T19:23:57.901031+00:00","event":"http.response","request_id":"96bff7ba-1850-41ed-9cbb-c6b32252a0d8","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1304}
+
+{"timestamp":"2026-11-02T19:23:58.939182+00:00","event":"http.response","request_id":"ae0c060a-12a2-488a-a374-1d4c1fc473b2","method":"GET","route":"billing:progress_list","status_code":200,"duration_ms":858}
+
+{"timestamp":"2026-11-02T19:24:01.254245+00:00","event":"http.response","request_id":"b7fb2a19-8add-4e94-a365-857a66339dae","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1602}
+
+{"timestamp":"2026-11-02T19:24:04.389992+00:00","event":"http.response","request_id":"f9776179-b48d-4db3-9c0c-f9dc7540d994","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1173}
+
+{"timestamp":"2026-11-02T19:24:07.717623+00:00","event":"http.response","request_id":"ef495da5-120d-4e46-bc14-c2703b56cbdc","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1381}
+
+{"timestamp":"2026-11-02T19:24:10.987195+00:00","event":"http.response","request_id":"5d10d614-d7d6-4ef8-a34e-e2d49f5d0455","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1243}
+
+{"timestamp":"2026-11-02T19:24:13.702626+00:00","event":"http.response","request_id":"a1a06525-1509-463d-94fc-eba64882894c","method":"GET","route":"billing:progress_list","status_code":200,"duration_ms":653}
+
+{"timestamp":"2026-11-02T19:24:16.154089+00:00","event":"http.response","request_id":"7b4b086e-3de5-4c8e-a9f2-97873793f089","method":"GET","route":"contracts:create","status_code":200,"duration_ms":633}
+
+{"timestamp":"2026-11-02T19:24:18.579172+00:00","event":"http.response","request_id":"93aeb600-06cc-4be9-9b7a-f97dd4746cb8","method":"GET","route":"billing:journey_choices","status_code":200,"duration_ms":214}
+
+{"timestamp":"2026-11-02T19:24:18.922641+00:00","event":"http.response","request_id":"447424b5-7e42-4ec8-96dd-4f0dcd40822c","method":"GET","route":"billing:journey_choices","status_code":200,"duration_ms":261}
+
+{"timestamp":"2026-11-02T19:24:19.950271+00:00","event":"http.response","request_id":"fdb4d8ef-143d-46c3-a50f-3f3485884235","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":568}
+
+{"timestamp":"2026-11-02T19:24:22.697225+00:00","event":"http.response","request_id":"0c22f86a-c207-4941-9599-c9cd1831c1f5","method":"GET","route":"billing:progress_detail","status_code":200,"duration_ms":765}
+
+[02/Nov/2026 22:54:24,810] - Broken pipe from ('127.0.0.1', 61996)
+
+[02/Nov/2026 22:54:24,812] - Broken pipe from ('127.0.0.1', 57382)
+
+[02/Nov/2026 22:54:24,813] - Broken pipe from ('127.0.0.1', 50147)
+
+[02/Nov/2026 22:54:24,814] - Broken pipe from ('127.0.0.1', 51287)
+
+[02/Nov/2026 22:54:24,815] - Broken pipe from ('127.0.0.1', 65380)
+
+[02/Nov/2026 22:54:24,815] - Broken pipe from ('127.0.0.1', 62696)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 61996)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 57382)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 50147)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 51287)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 65380)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 62696)
+=========================== short test summary info ===========================
+FAILED apps/contracts/test_hub.py::ContractHubBrowserTests::test_contract_hub_and_shared_foundation_offline_in_installed_chrome
+1 failed in 123.64s (0:02:03)

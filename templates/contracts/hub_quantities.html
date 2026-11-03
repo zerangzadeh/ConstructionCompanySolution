@@ -1,0 +1,33 @@
+{% load erp_format %}
+<section class="cd-panel cd-quantities" aria-labelledby="quantities-heading" data-contract-quantities>
+  <h2 id="quantities-heading">مقادیر و بهای قرارداد</h2>
+  <nav class="cd-quantity-tabs" aria-label="بخش‌های مقادیر و بهای قرارداد">
+    <a class="erp-btn erp-btn--secondary{% if hub.pane == 'items' %} erp-btn--active{% endif %}" href="{{ hub.url }}"{% if hub.pane == 'items' %} aria-current="page"{% endif %}>فهرست مقادیر و بهای قرارداد</a>
+    {% if hub.basis_allowed %}<a class="erp-btn erp-btn--secondary{% if hub.pane == 'basis' %} erp-btn--active{% endif %}" href="{{ hub.url }}&amp;pane=basis"{% if hub.pane == 'basis' %} aria-current="page"{% endif %}>مبنای متره و صورت‌وضعیت</a>{% endif %}
+    {% if hub.history_url %}<a class="erp-btn erp-btn--secondary" href="{{ hub.history_url }}">سوابق کارکرد</a>{% endif %}
+  </nav>
+  {% if hub.pane == 'basis' %}
+    {% if hub.baseline %}
+    <div class="cd-basis-context">
+      <dl class="cd-basis-facts">
+        <div><dt>نسخه مبنا</dt><dd><strong>نسخه {{ hub.baseline.version|erp_number }}</strong> {% include "components/status_badge.html" with status=hub.baseline.status label=hub.baseline.get_status_display only %}</dd></div>
+        <div><dt>تاریخ اثر</dt><dd><bdi dir="ltr">{{ hub.baseline.effective_date|jalali_date }}</bdi></dd></div>
+        <div><dt>سقف مؤثر قرارداد</dt><dd><bdi dir="ltr">{{ hub.baseline.effective_ceiling|erp_number }}</bdi> <span class="cd-note">{{ dashboard.currency_label }}</span></dd></div>
+      </dl>
+      <a class="erp-btn erp-btn--secondary" href="{% url 'billing:baseline_detail' hub.baseline.pk %}">جزئیات نسخه مبنا</a>
+    </div>
+    {% if hub.baseline.approved_at %}<details class="cd-approval-evidence"><summary>شواهد تأیید نسخه</summary><dl><div><dt>تأییدکننده</dt><dd>{{ hub.baseline.approved_by.get_full_name|default:hub.baseline.approved_by }}</dd></div><div><dt>زمان تأیید</dt><dd>{{ hub.baseline.approved_at|jalali_datetime }}</dd></div>{% if hub.baseline.approval_reason %}<div class="cd-approval-reason"><dt>دلیل تأیید</dt><dd>{{ hub.baseline.approval_reason }}</dd></div>{% endif %}</dl></details>{% endif %}
+    {% if hub.baseline.status != 'approved' %}<p class="cd-state-note cd-history-note">این نسخه برای بازبینی سوابق نمایش داده می‌شود؛ انتخاب نسخه، وضعیت یا مجازبودن عملیات آن را تغییر نمی‌دهد.</p>{% endif %}
+    {% endif %}
+    <details class="cd-versions"><summary>نسخه‌های مبنا</summary><div class="cd-version-links">{% for version in hub.versions %}<a class="erp-btn erp-btn--secondary" href="{{ hub.url }}&amp;pane=basis&amp;baseline={{ version.pk }}"{% if version.pk == hub.baseline.pk %} aria-current="page"{% endif %}>نسخه {{ version.version|erp_number }} · {{ version.get_status_display }}</a>{% empty %}<p>هنوز مبنای متره و صورت‌وضعیت ثبت نشده است.</p>{% endfor %}<a class="cd-related" href="{{ baseline_list_url }}&amp;versions=1">همه نسخه‌های این قرارداد ←</a></div></details>
+  {% else %}<p class="cd-empty-note">{% if workspace.receivable %}مقادیر و نرخ‌های ردیف‌های قرارداد؛ مبنای متره و صورت‌وضعیت، نسخه‌ها و سوابق مستقل خود را دارد.{% else %}مقادیر و نرخ‌های ثبت‌شده ردیف‌های همین قرارداد.{% endif %}</p>{% endif %}
+  <div class="erp-table-wrap" tabindex="0" aria-label="جدول مقادیر و بهای قرارداد">
+    <table class="cd-quantity-table erp-responsive-list"><caption class="sr-only">{% if hub.pane == 'basis' %}ردیف‌های نسخه انتخاب‌شده مبنا{% else %}فهرست مقادیر و بهای قرارداد{% endif %}</caption>
+      <colgroup><col class="cd-col-number"><col><col class="cd-col-unit"><col class="cd-col-quantity"><col class="cd-col-money"><col class="cd-col-money">{% if hub.history_url %}<col class="cd-col-actions">{% endif %}</colgroup>
+      <thead><tr><th scope="col">ردیف</th><th scope="col">شرح</th><th scope="col">واحد</th><th scope="col">{% if hub.pane == 'basis' %}مقدار مبنا{% else %}مقدار قرارداد{% endif %}</th><th scope="col">نرخ واحد ({{ dashboard.currency_label }})</th><th scope="col">ارزش ردیف ({{ dashboard.currency_label }})</th>{% if hub.history_url %}<th scope="col">عملیات</th>{% endif %}</tr></thead>
+      <tbody>{% for item in hub.page.object_list %}<tr><td class="erp-list-identifier" data-label="ردیف">{{ forloop.counter0|add:hub.page.start_index|erp_number }}</td><td class="erp-list-title" data-label="شرح">{{ item.description }}</td><td class="cd-quantity-unit" data-label="واحد"><bdi dir="auto">{% if hub.pane == 'basis' %}{{ item.unit }}{% else %}{{ item.unit_of_measure.symbol|default:item.unit }}{% endif %}</bdi></td><td class="cd-quantity-value" data-label="{% if hub.pane == 'basis' %}مقدار مبنا{% else %}مقدار قرارداد{% endif %}"><bdi dir="ltr">{% if hub.pane == 'basis' %}{{ item.planned_quantity|erp_number }}{% else %}{{ item.quantity|erp_number }}{% endif %}</bdi></td><td class="erp-list-amount" data-label="نرخ واحد ({{ dashboard.currency_label }})"><bdi dir="ltr">{% if hub.pane == 'basis' %}{{ item.unit_rate|erp_number }}{% else %}{{ item.unit_price|erp_number }}{% endif %}</bdi></td><td class="erp-list-amount" data-label="ارزش ردیف ({{ dashboard.currency_label }})"><bdi dir="ltr">{% if hub.pane == 'basis' %}{{ item.planned_value|erp_number }}{% else %}{{ item.line_total|erp_number }}{% endif %}</bdi></td>{% if hub.history_url %}<td class="erp-list-row-action" data-label="عملیات">{% if hub.pane == 'basis' %}<a class="erp-btn erp-btn--secondary" href="{{ hub.history_url }}&amp;line_key={{ item.line_key|urlencode }}">سوابق کارکرد</a>{% elif workspace.payable %}<a class="erp-btn erp-btn--secondary" href="{{ hub.history_url }}&amp;contract_item={{ item.pk }}">سوابق کارکرد</a>{% else %}<span class="cd-note">سوابق از ردیف مبنا</span>{% endif %}</td>{% endif %}</tr>{% empty %}<tr><td colspan="7" class="cd-empty-note">ردیفی در این بخش ثبت نشده است.</td></tr>{% endfor %}</tbody>
+    </table>
+  </div>
+  {% if hub.page %}{% include "components/list_pagination.html" with page_obj=hub.page pagination_query=hub.pagination_query result_label="ردیف" only %}{% endif %}
+  {% if workspace.is_draft %}<a class="cd-related" href="{{ hub.root }}#items">آماده‌سازی ردیف‌های پیش‌نویس ←</a>{% endif %}
+</section>

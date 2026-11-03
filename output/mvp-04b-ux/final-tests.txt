@@ -1,0 +1,655 @@
+.............................FFFFFFFF..FFFE.F.F....... [ 94%]
+...                                                                    [100%]
+=================================== ERRORS ====================================
+_ ERROR at teardown of P5S11ConcurrencyTests.test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity _
+.venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: cannot truncate a table referenced in a foreign key constraint
+E   DETAIL:  Table "payments_payment" references "projects_projectphase".
+E   HINT:  Truncate table "payments_payment" at the same time, or use TRUNCATE ... CASCADE.
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\core\management\commands\flush.py:71: in handle
+    connection.ops.execute_sql_flush(sql_list)
+.venv\Lib\site-packages\django\db\backends\base\operations.py:473: in execute_sql_flush
+    cursor.execute(sql)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: cannot truncate a table referenced in a foreign key constraint
+E   DETAIL:  Table "payments_payment" references "projects_projectphase".
+E   HINT:  Truncate table "payments_payment" at the same time, or use TRUNCATE ... CASCADE.
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\core\management\__init__.py:194: in call_command
+    return command.execute(*args, **defaults)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\base.py:464: in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\commands\flush.py:73: in handle
+    raise CommandError(
+E   django.core.management.base.CommandError: Database test_bonira_f2_20261102 couldn't be flushed. Possible reasons:
+E     * The database isn't running or isn't configured correctly.
+E     * At least one of the expected database tables doesn't exist.
+E     * The SQL was invalid.
+E   Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command wasn't able to run.
+================================== FAILURES ===================================
+_ P5S11ComparisonAwardTests.test_no_award_is_explicit_has_no_allocations_and_does_not_mutate_downstream _
+apps\procurement\test_p5_s11_comparison_award.py:63: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11SelfFinalizationPolicyTests.test_tenant_policy_explicitly_allows_s11_comparison_and_award_self_finalization _
+apps\procurement\test_p5_s11_comparison_award.py:63: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11TieAndSplitTests.test_award_is_sourcing_only_conserves_quantity_and_self_finalization_is_policy_gated _
+apps\procurement\test_p5_s11_comparison_award.py:376: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11TieAndSplitTests.test_conflict_cannot_self_clear_and_blocks_evaluation_until_disposed _
+apps\procurement\test_p5_s11_comparison_award.py:376: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11TieAndSplitTests.test_exception_closed_catalogue_and_independent_lifecycle _
+apps\procurement\test_p5_s11_comparison_award.py:376: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11TieAndSplitTests.test_reproducible_asserted_input_lineage_and_immutable_finalization _
+apps\procurement\test_p5_s11_comparison_award.py:376: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11TieAndSplitTests.test_split_award_is_explicit_and_allocation_inputs_are_governing _
+apps\procurement\test_p5_s11_comparison_award.py:376: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ P5S11TieAndSplitTests.test_tie_requires_explicit_resolution_and_split_award_retains_exact_revisions _
+apps\procurement\test_p5_s11_comparison_award.py:376: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ScopeConcurrencyTests.test_two_revisions_with_same_expected_revision_cannot_overwrite _
+.venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: cannot truncate a table referenced in a foreign key constraint
+E   DETAIL:  Table "payments_payment" references "projects_projectphase".
+E   HINT:  Truncate table "payments_payment" at the same time, or use TRUNCATE ... CASCADE.
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\core\management\commands\flush.py:71: in handle
+    connection.ops.execute_sql_flush(sql_list)
+.venv\Lib\site-packages\django\db\backends\base\operations.py:473: in execute_sql_flush
+    cursor.execute(sql)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: cannot truncate a table referenced in a foreign key constraint
+E   DETAIL:  Table "payments_payment" references "projects_projectphase".
+E   HINT:  Truncate table "payments_payment" at the same time, or use TRUNCATE ... CASCADE.
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\core\management\__init__.py:194: in call_command
+    return command.execute(*args, **defaults)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\base.py:464: in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\commands\flush.py:73: in handle
+    raise CommandError(
+E   django.core.management.base.CommandError: Database test_bonira_f2_20261102 couldn't be flushed. Possible reasons:
+E     * The database isn't running or isn't configured correctly.
+E     * At least one of the expected database tables doesn't exist.
+E     * The SQL was invalid.
+E   Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command wasn't able to run.
+_ RequestForQuotationConcurrencyTests.test_concurrent_identical_issue_creates_one_version _
+.venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: cannot truncate a table referenced in a foreign key constraint
+E   DETAIL:  Table "payments_payment" references "projects_projectphase".
+E   HINT:  Truncate table "payments_payment" at the same time, or use TRUNCATE ... CASCADE.
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\core\management\commands\flush.py:71: in handle
+    connection.ops.execute_sql_flush(sql_list)
+.venv\Lib\site-packages\django\db\backends\base\operations.py:473: in execute_sql_flush
+    cursor.execute(sql)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: cannot truncate a table referenced in a foreign key constraint
+E   DETAIL:  Table "payments_payment" references "projects_projectphase".
+E   HINT:  Truncate table "payments_payment" at the same time, or use TRUNCATE ... CASCADE.
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\core\management\__init__.py:194: in call_command
+    return command.execute(*args, **defaults)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\base.py:464: in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\commands\flush.py:73: in handle
+    raise CommandError(
+E   django.core.management.base.CommandError: Database test_bonira_f2_20261102 couldn't be flushed. Possible reasons:
+E     * The database isn't running or isn't configured correctly.
+E     * At least one of the expected database tables doesn't exist.
+E     * The SQL was invalid.
+E   Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command wasn't able to run.
+_ P5S11ConcurrencyTests.test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity _
+apps\procurement\test_p5_s11_comparison_award.py:63: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0639\u0645\u0644\u06cc\u0627\u062a \u062d\u0641\u0627\u0638\u062a\u200c\u0634\u062f\u0647 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ ScopeBrowserTests.test_explicit_scope_issue_addendum_and_responsive_denials _
+apps\procurement\test_mvp04b_browser.py:169: in test_explicit_scope_issue_addendum_and_responsive_denials
+    self.browser(
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : \u067e\u0631\u0648\u0698\u0647\u200c\u0647\u0627\\n\u06a9\u0627\u0631\u06af\u0627\u0647\u200c\u0647\u0627\\n\u06af\u0632\u0627\u0631\u0634\u200c\u0647\u0627\u06cc \u0631\u0648\u0632\u0627\u0646\u0647\\n\u0646\u06cc\u0631\u0648\u0647\u0627\u06cc \u06a9\u0627\u0631\\n\u062d\u0636\u0648\u0631 \u0648 \u06a9\u0627\u0631\u06a9\u0631\u062f\\n\u062a\u062c\u0647\u06cc\u0632\u0627\u062a \u0639\u0645\u0644\u06cc\u0627\u062a\u06cc\\n\u0647\u0632\u06cc\u0646\u0647\u200c\u0647\u0627 \u0648 \u062a\u0646\u062e\u0648\u0627\u0647\\n\u0627\u06cc\u0645\u0646\u06cc\\n\u06a9\u06cc\u0641\u06cc\u062a\\n\u067e\u06cc\u0645\u0627\u0646\u060c \u0645\u062a\u0631\u0647 \u0648 \u0635\u0648\u0631\u062a\u200c\u0648\u0636\u0639\u06cc\u062a\\n\u2304\\n\u0628\u0631\u0622\u0648\u0631\u062f \u0648 \u0641\u0647\u0631\u0633\u062a\u200c\u0628\u0647\u0627\\n\u0642\u0631\u0627\u0631\u062f\u0627\u062f\u0647\u0627\\n\u0635\u0648\u0631\u062a\u200c\u0648\u0636\u0639\u06cc\u062a \u0648 \u0635\u0648\u0631\u062a\u062d\u0633\u0627\u0628\\n\u062a\u062f\u0627\u0631\u06a9\u0627\u062a\u060c \u0645\u0635\u0627\u0644\u062d \u0648 \u0627\u0646\u0628\u0627\u0631\\n\u2304\\n\u062f\u0631\u062e\u0648\u0627\u0633\u062a\u200c\u0647\u0627\u06cc \u062e\u0631\u06cc\u062f\\n\u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0648 \u0627\u0646\u062a\u062e\u0627\u0628 \u062a\u0623\u0645\u06cc\u0646\u200c\u06a9\u0646\u0646\u062f\u0647\\n\u0633\u0641\u0627\u0631\u0634\u200c\u0647\u0627\u06cc \u062e\u0631\u06cc\u062f\\n\u0631\u0633\u06cc\u062f \u06a9\u0627\u0644\u0627\\n\u0645\u0635\u0627\u0644\u062d \u0648 \u06a9\u0627\u0644\u0627\\n\u0627\u0646\u0628\u0627\u0631\\n\u06a9\u0627\u0631\u062a\u0627\u0628\u0644\u060c \u0627\u0633\u0646\u0627\u062f \u0648 \u06af\u0632\u0627\u0631\u0634\u200c\u0647\u0627\\n\u2304\\n\u0648\u0638\u0627\u06cc\u0641 \u0645\u0646\\n\u0637\u0631\u0641\u200c\u0647\u0627\u06cc \u062a\u062c\u0627\u0631\u06cc\\n\u0627\u0633\u0646\u0627\u062f\\n\u06af\u0631\u062f\u0634\u200c\u06a9\u0627\u0631\u0647\u0627\\n\u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0648 \u0645\u062f\u06cc\u0631\u06cc\u062a \u062f\u0633\u062a\u0631\u0633\u06cc\\n\u2304\\n\u067e\u0631\u0648\u0641\u0627\u06cc\u0644 \u06a9\u0627\u0631\u0628\u0631\\n\u0627\u0646\u062a\u062e\u0627\u0628 \u0634\u0631\u06a9\u062a\\n\u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0634\u0631\u06a9\u062a\\n\u0627\u0639\u0636\u0627 \u0648 \u062f\u0633\u062a\u0631\u0633\u06cc\u200c\u0647\u0627\\n\u0646\u0642\u0634\u200c\u0647\u0627\u06cc \u0634\u0631\u06a9\u062a\\n\u0633\u0648\u0627\u0628\u0642 \u0641\u0639\u0627\u0644\u06cc\u062a\\n\u0641\u0636\u0627\u06cc \u06a9\u0627\u0631\u06cc \u0641\u0639\u0627\u0644\\nERP\\n\u062e\u0631\u0648\u062c \u0627\u0632 \u062d\u0633\u0627\u0628\\n\u0634\u0631\u06a9\u062a \u0641\u0639\u0627\u0644:\\n\u0634\u0631\u06a9\u062a \u0633\u0627\u062e\u062a\u0645\u0627\u0646\u06cc \u0646\u0645\u0648\u0646\u0647\\n\u0645\u0627\u0698\u0648\u0644\u200c\u0647\u0627\\n\u062c\u0633\u062a\u062c\u0648\u06cc \u067e\u0631\u0648\u0698\u0647 \u0648 \u0645\u0635\u0627\u0644\u062d\\n\u0633\u0627\u0645\u0627\u0646\u0647 \u062c\u0627\u0645\u0639 \u0648 \u06cc\u06a9\u067e\u0627\u0631\u0686\u0647 \u0645\u062f\u06cc\u0631\u06cc\u062a \u0634\u0631\u06a9\u062a\\nP\\nprocurement-owner\\n\u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0634\u062e\u0635\u06cc\\n\u0634\u0631\u06a9\u062a\\n\u0634\u0631\u06a9\u062a \u0633\u0627\u062e\u062a\u0645\u0627\u0646\u06cc \u0646\u0645\u0648\u0646\u0647\\n\u067e\u0631\u0648\u0698\u0647\\n\u0647\u0645\u0647 \u067e\u0631\u0648\u0698\u0647\u200c\u0647\u0627\u06cc \u062f\u0631 \u062f\u0633\u062a\u0631\u0633\\nPROC \u2014 \u067e\u0631\u0648\u0698\u0647 \u0646\u0645\u0648\u0646\u0647 \u0633\u0627\u0632\u0647\\n\u0627\u0646\u062a\u062e\u0627\u0628 \u067e\u0631\u0648\u0698\u0647 \u0648 \u06a9\u0627\u0631\u06af\u0627\u0647\\n\u0627\u0633\u062a\u0639\u0644\u0627\u0645\u200c\u0647\u0627\u06cc \u062e\u0631\u06cc\u062f / RFQ-SCOPE\\n\\n\u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u062e\u0631\u06cc\u062f \xb7 RFQ-SCOPE\\n\\n\u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0645\u0635\u0627\u0644\u062d \u067e\u0631\u0648\u0698\u0647\\n\\n\u067e\u0631\u0648\u0698\u0647 \u0646\u0645\u0648\u0646\u0647 \u0633\u0627\u0632\u0647\\n\\n\u0635\u0627\u062f\u0631\u0634\u062f\u0647\\n\u22ee\\n\u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u0645\u0628\u0646\u0627\\nPR-SCOPE \xb7 \u0645\u0635\u0627\u0644\u062d \u0641\u0648\u0646\u062f\u0627\u0633\u06cc\u0648\u0646\\n\u0645\u0647\u0644\u062a \u062f\u0631\u06cc\u0627\u0641\u062a\\n1405/08/14 21:03\\n\u0632\u0645\u0627\u0646 \u0645\u062c\u0627\u0632 \u06af\u0634\u0627\u06cc\u0634\\n1405/08/14 21:03\\n\u0646\u0633\u062e\u0647 \u0635\u0627\u062f\u0631\u0634\u062f\u0647\\n2\\n\\n\u0627\u0635\u0644\u0627\u062d \u0634\u0631\u0627\u06cc\u0637 \u0646\u0633\u062e\u0647 \u062f\u0648\u0645\\n\\n\u06f1 \xb7 \u0627\u0642\u0644\u0627\u0645 \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f\\n\u06f2 \xb7 \u0645\u0642\u062f\u0627\u0631 \u0648 \u0646\u062d\u0648\u0647 \u0627\u0646\u062a\u062e\u0627\u0628\\n\u06f3 \xb7 \u062a\u0623\u0645\u06cc\u0646\u200c\u06a9\u0646\u0646\u062f\u06af\u0627\u0646 \u0648 \u0635\u062f\u0648\u0631\\n\u0635\u0627\u062f\u0631\u0634\u062f\u0647\\n\\n\u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0635\u0627\u062f\u0631 \u0634\u062f\u0647 \u0627\u0633\u062a. \u0627\u0642\u0644\u0627\u0645\u060c \u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0627\u0646\u062a\u062e\u0627\u0628\u060c \u0645\u0647\u0644\u062a\u200c\u0647\u0627 \u0648 \u062f\u0639\u0648\u062a\u200c\u0646\u0627\u0645\u0647\u200c\u0647\u0627\u06cc \u0647\u0631 \u0646\u0633\u062e\u0647 \u062a\u062b\u0628\u06cc\u062a \u0634\u062f\u0647\u200c\u0627\u0646\u062f\u061b \u062a\u063a\u06cc\u06cc\u0631 \u0627\u0632 \u0645\u0633\u06cc\u0631 \u0627\u0644\u062d\u0627\u0642\u06cc\u0647 \u0627\u0646\u062c\u0627\u0645 \u0645\u06cc\u200c\u0634\u0648\u062f.\\n\\n\u0646\u062d\u0648\u0647 \u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0648 \u0627\u0646\u062a\u062e\u0627\u0628 \u062a\u0623\u0645\u06cc\u0646\u200c\u06a9\u0646\u0646\u062f\u0647\\n\\n\u0627\u0642\u0644\u0627\u0645 \u0627\u0632 \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u0645\u0628\u0646\u0627 \u0622\u0645\u062f\u0647\u200c\u0627\u0646\u062f\u061b \u0645\u0642\u062f\u0627\u0631 \u0648 \u0646\u062d\u0648\u0647 \u0627\u0646\u062a\u062e\u0627\u0628 \u0631\u0627 \u0628\u0631\u0631\u0633\u06cc \u0648 \u062a\u0623\u06cc\u06cc\u062f \u06a9\u0646\u06cc\u062f.\\n\\n\u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0646\u0633\u062e\u0647 \u062c\u0627\u0631\u06cc\\n\u0633\u06cc\u0645\u0627\u0646 \u067e\u0631\u062a\u0644\u0646\u062f\\n\\n2 \u06a9\u06cc\u0633\u0647 \xb7 \u0627\u0646\u062a\u062e\u0627\u0628 \u0645\u0633\u062a\u0642\u0644: \u0628\u0644\u0647 \xb7 \u0627\u0645\u06a9\u0627\u0646 \u062a\u0642\u0633\u06cc\u0645 \u062e\u0631\u06cc\u062f: \u062e\u06cc\u0631 \xb7 \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u062c\u0627\u06cc\u06af\u0632\u06cc\u0646 \u0645\u062c\u0627\u0632: \u0628\u0644\u0647\\n\\n\u0634\u0631\u062d \u06a9\u0627\u0644\u0627 / \u062e\u062f\u0645\u062a\\t\u0645\u0642\u062f\u0627\u0631 \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f\\t\u0645\u0642\u062f\u0627\u0631 \u0642\u0644\u0645 \u0627\u0633\u062a\u0639\u0644\u0627\u0645\\t\u0648\u0627\u062d\u062f\\n\u0633\u06cc\u0645\u0627\u0646 \u067e\u0631\u062a\u0644\u0646\u062f\\t10\\t10\\t\u06a9\u06cc\u0633\u0647\\n\u06af\u0631\u0648\u0647\u200c\u0628\u0646\u062f\u06cc \u0627\u0642\u0644\u0627\u0645 \u062f\u0631 \u06af\u0631\u0648\u0647 \u062e\u0631\u06cc\u062f (\u0627\u062e\u062a\u06cc\u0627\u0631\u06cc)\\n\\n\u0628\u0631\u0627\u06cc \u0645\u0642\u0627\u06cc\u0633\u0647 \u0648 \u0627\u0646\u062a\u062e\u0627\u0628 \u0686\u0646\u062f \u0642\u0644\u0645 \u0628\u0647\u200c\u0635\u0648\u0631\u062a \u06cc\u06a9 \u0645\u062c\u0645\u0648\u0639\u0647\u060c \u0627\u0642\u0644\u0627\u0645 \u0645\u0648\u062c\u0648\u062f \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f.\\n\\n+ \u0627\u06cc\u062c\u0627\u062f \u06af\u0631\u0648\u0647 \u062e\u0631\u06cc\u062f\\n\u0631\u0627\u0647\u0646\u0645\u0627\u06cc \u0627\u06cc\u0646 \u0645\u0631\u062d\u0644\u0647\\n\u0645\u0642\u062f\u0627\u0631 \u0627\u0633\u062a\u0639\u0644\u0627\u0645\\n\\n\u0645\u0642\u062f\u0627\u0631 \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062e\u0631\u06cc\u062f \u0648 \u0633\u0642\u0641 \u0642\u0644\u0645 \u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0646\u0645\u0627\u06cc\u0634 \u062f\u0627\u062f\u0647 \u0645\u06cc\u200c\u0634\u0648\u062f. \u0645\u0642\u062f\u0627\u0631 \u0645\u0648\u0631\u062f \u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0645\u06cc\u200c\u062a\u0648\u0627\u0646\u062f \u06a9\u0645\u062a\u0631 \u0627\u0632 \u0633\u0642\u0641 \u0647\u0645\u0627\u0646 \u0642\u0644\u0645 \u0628\u0627\u0634\u062f.\\n\\n\u0646\u062d\u0648\u0647 \u0645\u0642\u0627\u06cc\u0633\u0647 \u0648 \u0627\u0646\u062a\u062e\u0627\u0628\\n\\n\u0627\u0646\u062a\u062e\u0627\u0628 \u0645\u0633\u062a\u0642\u0644: \u0647\u0631 \u0642\u0644\u0645 \u062c\u062f\u0627\u06af\u0627\u0646\u0647 \u0645\u0642\u0627\u06cc\u0633\u0647 \u0648 \u0627\u0646\u062a\u062e\u0627\u0628 \u0645\u06cc\u200c\u0634\u0648\u062f.\\n\\n\u0627\u0645\u06a9\u0627\u0646 \u062a\u0642\u0633\u06cc\u0645 \u062e\u0631\u06cc\u062f: \u062e\u0631\u06cc\u062f \u0628\u06cc\u0646 \u0686\u0646\u062f \u062a\u0623\u0645\u06cc\u0646\u200c\u06a9\u0646\u0646\u062f\u0647 \u0642\u0627\u0628\u0644 \u062a\u0642\u0633\u06cc\u0645 \u0627\u0633\u062a.\\n\\n\u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u062c\u0627\u06cc\u06af\u0632\u06cc\u0646 \u0645\u062c\u0627\u0632: \u062a\u0623\u0645\u06cc\u0646\u200c\u06a9\u0646\u0646\u062f\u0647 \u0645\u06cc\u200c\u062a\u0648\u0627\u0646\u062f \u067e\u06cc\u0634\u0646\u0647\u0627\u062f \u062c\u0627\u06cc\u06af\u0632\u06cc\u0646 \u0627\u0631\u0627\u0626\u0647 \u06a9\u0646\u062f.\\n\\n\u06af\u0631\u0648\u0647 \u062e\u0631\u06cc\u062f\\n\\n\u0686\u0646\u062f \u0642\u0644\u0645 \u0631\u0627 \u0622\u06af\u0627\u0647\u0627\u0646\u0647 \u0628\u0631\u0627\u06cc \u0645\u0642\u0627\u06cc\u0633\u0647 \u0648 \u0627\u0646\u062a\u062e\u0627\u0628 \u062f\u0631 \u06cc\u06a9 \u0645\u062c\u0645\u0648\u0639\u0647 \u0642\u0631\u0627\u0631 \u062f\u0647\u06cc\u062f. \u062b\u0628\u062a \u06af\u0631\u0648\u0647\u060c \u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0642\u0628\u0644\u06cc \u0631\u0627 \u062d\u0630\u0641 \u0646\u0645\u06cc\u200c\u06a9\u0646\u062f\u061b \u0628\u0631\u0627\u06cc \u062a\u063a\u06cc\u06cc\u0631 \u06af\u0631\u0648\u0647 \u062b\u0628\u062a\u200c\u0634\u062f\u0647 \u0627\u0632 \xab\u0627\u0635\u0644\u0627\u062d \u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u06af\u0631\u0648\u0647\xbb \u0627\u0633\u062a\u0641\u0627\u062f\u0647 \u06a9\u0646\u06cc\u062f.\\n\\n\u0646\u0633\u062e\u0647\u200c\u0647\u0627\u06cc \u0642\u0628\u0644\u06cc \u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0627\u0633\u062a\u0639\u0644\u0627\u0645\\n\u0646\u0633\u062e\u0647\u200c\u0647\u0627 \u0648 \u062f\u0639\u0648\u062a\u200c\u0646\u0627\u0645\u0647\u200c\u0647\u0627\\n\u0646\u0633\u062e\u0647 1 \xb7 1405/08/11 21:04\\n\\n\u0645\u0647\u0644\u062a \u062f\u0631\u06cc\u0627\u0641\u062a: 1405/08/13 21:03 \xb7 \u0632\u0645\u0627\u0646 \u06af\u0634\u0627\u06cc\u0634: 1405/08/13 21:03\\n\\n\u0627\u0642\u0644\u0627\u0645 \u062a\u062b\u0628\u06cc\u062a\u200c\u0634\u062f\u0647 \u0646\u0633\u062e\u0647\\n\\n\u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0627\u0646\u062a\u062e\u0627\u0628 \u062a\u0623\u0645\u06cc\u0646\u200c\u06a9\u0646\u0646\u062f\u0647 \u0627\u06cc\u0646 \u0646\u0633\u062e\u0647\\n\\n\u0627\u0642\u0644\u0627\u0645 \u0648 \u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0627\u06cc\u0646 \u0646\u0633\u062e\u0647 \u0647\u0646\u06af\u0627\u0645 \u0635\u062f\u0648\u0631 \u062a\u062b\u0628\u06cc\u062a \u0634\u062f\u0647\u200c\u0627\u0646\u062f.\\n\\n\u062a\u0623\u0645\u06cc\u0646\u200c\u06a9\u0646\u0646\u062f\u06af\u0627\u0646 \u062f\u0639\u0648\u062a\u200c\u0634\u062f\u0647\\nSupplier \xb7 \u0622\u0645\u0627\u062f\u0647\\n\u0646\u0633\u062e\u0647 2 \xb7 1405/08/11 21:04\\n\\n\u0645\u0647\u0644\u062a \u062f\u0631\u06cc\u0627\u0641\u062a: 1405/08/14 21:03 \xb7 \u0632\u0645\u0627\u0646 \u06af\u0634\u0627\u06cc\u0634: 1405/08/14 21:03\\n\\n\u0627\u0635\u0644\u0627\u062d \u0634\u0631\u0627\u06cc\u0637 \u0646\u0633\u062e\u0647 \u062f\u0648\u0645\\n\\n\u0627\u0642\u0644\u0627\u0645 \u062a\u062b\u0628\u06cc\u062a\u200c\u0634\u062f\u0647 \u0646\u0633\u062e\u0647\\n\\n\u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0627\u0646\u062a\u062e\u0627\u0628 \u062a\u0623\u0645\u06cc\u0646\u200c\u06a9\u0646\u0646\u062f\u0647 \u0627\u06cc\u0646 \u0646\u0633\u062e\u0647\\n\\n\u0627\u0642\u0644\u0627\u0645 \u0648 \u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0627\u06cc\u0646 \u0646\u0633\u062e\u0647 \u0647\u0646\u06af\u0627\u0645 \u0635\u062f\u0648\u0631 \u062a\u062b\u0628\u06cc\u062a \u0634\u062f\u0647\u200c\u0627\u0646\u062f.\\n\\n\u062a\u0623\u0645\u06cc\u0646\u200c\u06a9\u0646\u0646\u062f\u06af\u0627\u0646 \u062f\u0639\u0648\u062a\u200c\u0634\u062f\u0647\\nSupplier \xb7 \u0622\u0645\u0627\u062f\u0647\\n\u0644\u063a\u0648 \u0627\u0633\u062a\u0639\u0644\u0627\u0645"}
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:316:27
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-02T21:04:02.526828+00:00","event":"http.response","request_id":"26401bca-7ba3-4064-99d4-3f688268f936","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":1789}
+
+{"timestamp":"2026-11-02T21:04:04.903052+00:00","event":"http.response","request_id":"f4d51178-073c-4515-b016-e6403ea77b05","method":"GET","route":null,"status_code":404,"duration_ms":1509}
+
+{"timestamp":"2026-11-02T21:04:05.272624+00:00","event":"http.response","request_id":"89e8ffcb-fdd9-42c0-89d9-a8ba893b3e64","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":1283}
+
+{"timestamp":"2026-11-02T21:04:07.245275+00:00","event":"http.response","request_id":"e179af93-34b9-4139-a40d-9f0c022cc507","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":1306}
+
+{"timestamp":"2026-11-02T21:04:09.748662+00:00","event":"http.response","request_id":"cd57aa77-d860-495d-b24f-dbd3c5cb3cb9","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1538}
+
+{"timestamp":"2026-11-02T21:04:11.974390+00:00","event":"http.response","request_id":"5fa999f8-f19c-436d-b6fc-998a1b72a1d7","method":"POST","route":"procurement:rfq_issue","status_code":400,"duration_ms":1755}
+
+{"timestamp":"2026-11-02T21:04:14.027190+00:00","event":"http.response","request_id":"4e660740-d937-4718-ae64-6cdd00c97eda","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":1199}
+
+{"timestamp":"2026-11-02T21:04:15.970904+00:00","event":"http.response","request_id":"f405ac7c-5f5d-438b-b765-34420be68053","method":"POST","route":"procurement:rfq_scope_define","status_code":400,"duration_ms":1518}
+
+{"timestamp":"2026-11-02T21:04:19.086498+00:00","event":"http.response","request_id":"d22d1fc4-b5a7-432b-a2b4-7b7a7ac6359f","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":2027}
+
+{"timestamp":"2026-11-02T21:04:20.653464+00:00","event":"http.response","request_id":"f95060b7-6ebb-43d3-bbd4-5cb06aeca7dd","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":1065}
+
+{"timestamp":"2026-11-02T21:04:22.154585+00:00","event":"http.response","request_id":"0f8a8aa0-3968-4a85-ae30-d243f2684e27","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":1397}
+
+{"timestamp":"2026-11-02T21:04:24.182942+00:00","event":"http.response","request_id":"fdde57aa-7e1a-4034-a763-8ce5319b21c0","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1409}
+
+{"timestamp":"2026-11-02T21:04:25.598382+00:00","event":"http.response","request_id":"7e772478-87dc-4d1f-94f8-bb17560be77c","method":"POST","route":"procurement:rfq_issue","status_code":302,"duration_ms":1177}
+
+{"timestamp":"2026-11-02T21:04:27.093167+00:00","event":"http.response","request_id":"e999cf60-7fb3-4fa1-847a-fdfd7908496d","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1482}
+
+{"timestamp":"2026-11-02T21:04:34.926100+00:00","event":"http.response","request_id":"bfc7c634-ff75-49e8-82e6-59e9a6fee0bd","method":"GET","route":"procurement:rfq_addendum","status_code":200,"duration_ms":920}
+
+{"timestamp":"2026-11-02T21:04:36.042615+00:00","event":"http.response","request_id":"362045d4-5405-45b0-b4fc-4e52742aac4f","method":"GET","route":null,"status_code":404,"duration_ms":629}
+
+{"timestamp":"2026-11-02T21:04:36.637377+00:00","event":"http.response","request_id":"85adde48-9214-47e5-9729-5835a9fb937e","method":"POST","route":"procurement:rfq_addendum","status_code":400,"duration_ms":1100}
+
+{"timestamp":"2026-11-02T21:04:37.967160+00:00","event":"http.response","request_id":"6be39853-4fd4-4d5d-8a6e-533f86a17903","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":826}
+
+{"timestamp":"2026-11-02T21:04:39.033716+00:00","event":"http.response","request_id":"d5ce898a-3ce8-476e-b9d3-c69f2a25859c","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":657}
+
+{"timestamp":"2026-11-02T21:04:40.259326+00:00","event":"http.response","request_id":"a9037c6e-f34e-47a3-a1f4-714c72407572","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":1200}
+
+{"timestamp":"2026-11-02T21:04:42.112104+00:00","event":"http.response","request_id":"9d3881f1-efe1-412d-94b0-42eaa630fcd5","method":"GET","route":"procurement:rfq_addendum","status_code":200,"duration_ms":1143}
+
+{"timestamp":"2026-11-02T21:04:43.911286+00:00","event":"http.response","request_id":"82c06d85-cdd6-4783-b2fd-23a4d3086dd8","method":"GET","route":"procurement:rfq_addendum","status_code":200,"duration_ms":1026}
+
+{"timestamp":"2026-11-02T21:04:45.688696+00:00","event":"http.response","request_id":"b2544edd-78fd-4d0d-9f17-c60d103bfac7","method":"GET","route":"procurement:rfq_addendum","status_code":200,"duration_ms":1199}
+
+{"timestamp":"2026-11-02T21:04:47.970209+00:00","event":"http.response","request_id":"e4a27c74-fad5-416e-aa72-56256034a37a","method":"GET","route":"procurement:rfq_addendum","status_code":200,"duration_ms":1501}
+
+{"timestamp":"2026-11-02T21:04:50.115333+00:00","event":"http.response","request_id":"04d654b1-70c3-442c-ba9f-59b1dfcdf331","method":"POST","route":"procurement:rfq_addendum","status_code":302,"duration_ms":1310}
+
+{"timestamp":"2026-11-02T21:04:52.108628+00:00","event":"http.response","request_id":"ea78e7fa-eedd-4495-9f09-7fe36b66b074","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1773}
+
+[03/Nov/2026 00:35:14,645] - Broken pipe from ('127.0.0.1', 54767)
+
+[03/Nov/2026 00:35:14,645] - Broken pipe from ('127.0.0.1', 60826)
+
+[03/Nov/2026 00:35:14,647] - Broken pipe from ('127.0.0.1', 64817)
+
+[03/Nov/2026 00:35:14,648] - Broken pipe from ('127.0.0.1', 50231)
+
+[03/Nov/2026 00:35:14,649] - Broken pipe from ('127.0.0.1', 62750)
+
+[03/Nov/2026 00:35:14,649] - Broken pipe from ('127.0.0.1', 62774)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Bad Request: /procurement/rfqs/7e7dbf53-39cd-4006-9694-f9b8434e7931/issue/
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Bad Request: /procurement/rfqs/7e7dbf53-39cd-4006-9694-f9b8434e7931/scope/
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Bad Request: /procurement/rfqs/7e7dbf53-39cd-4006-9694-f9b8434e7931/addendum/
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 54767)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 60826)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 64817)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 50231)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 62750)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 62774)
+_ RFQPreparationBrowserTests.test_end_to_end_rfq_preparation_issue_and_responsive_history _
+apps\procurement\test_mvp04b1_browser.py:402: in test_end_to_end_rfq_preparation_issue_and_responsive_history
+    self.browser(
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:80
+E         throw new Error('Missing clickable control '+selector);
+E               ^
+E   
+E   Error: Missing clickable control .rfq-config__line-add > summary
+E       at click (file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:80:13)
+E       at async file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:270:9
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-02T21:06:35.797483+00:00","event":"http.response","request_id":"5a7a84a3-b6c4-4b98-bbb0-723a4a33805f","method":"GET","route":"procurement:rfq_list","status_code":200,"duration_ms":1428}
+
+{"timestamp":"2026-11-02T21:06:37.901335+00:00","event":"http.response","request_id":"e599f2b6-d83e-4a67-86ce-9980cc821957","method":"GET","route":null,"status_code":404,"duration_ms":1485}
+
+{"timestamp":"2026-11-02T21:06:39.658183+00:00","event":"http.response","request_id":"dd269172-21af-4dbe-8586-a03448411da4","method":"GET","route":"procurement:rfq_list","status_code":200,"duration_ms":2215}
+
+{"timestamp":"2026-11-02T21:06:43.974521+00:00","event":"http.response","request_id":"99779b5d-0450-4dbb-b91c-de74c6e26b6f","method":"GET","route":"procurement:rfq_list","status_code":200,"duration_ms":2491}
+
+{"timestamp":"2026-11-02T21:06:46.749079+00:00","event":"http.response","request_id":"7b6728ad-a372-4d29-a500-254d2039cd93","method":"GET","route":"procurement:rfq_list","status_code":200,"duration_ms":2068}
+
+{"timestamp":"2026-11-02T21:06:53.313264+00:00","event":"http.response","request_id":"d284cd4e-c235-4fb6-9f88-8fca918e912a","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":1826}
+
+{"timestamp":"2026-11-02T21:06:55.814130+00:00","event":"http.response","request_id":"1ec2c726-6d63-4a05-ae37-c8b057df27be","method":"GET","route":null,"status_code":404,"duration_ms":1811}
+
+{"timestamp":"2026-11-02T21:06:56.661292+00:00","event":"http.response","request_id":"504fca72-ecad-44a8-9101-d587ee1d088a","method":"GET","route":"procurement:rfq_create","status_code":200,"duration_ms":2462}
+
+{"timestamp":"2026-11-02T21:07:00.849035+00:00","event":"http.response","request_id":"5959c1d5-c69e-4a42-a59b-8690eeec3400","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":2951}
+
+{"timestamp":"2026-11-02T21:07:03.087024+00:00","event":"http.response","request_id":"4abf4677-d66f-4dbd-9688-791c63876319","method":"GET","route":"procurement:rfq_create","status_code":200,"duration_ms":1751}
+
+{"timestamp":"2026-11-02T21:07:06.299709+00:00","event":"http.response","request_id":"eb44e8b5-5821-4cd8-9104-a9ebe1711935","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":2459}
+
+{"timestamp":"2026-11-02T21:07:09.407501+00:00","event":"http.response","request_id":"eac429a1-b15f-42a2-9153-11648f3e9435","method":"GET","route":"procurement:rfq_create","status_code":200,"duration_ms":2150}
+
+[03/Nov/2026 00:37:19,537] - Broken pipe from ('127.0.0.1', 56773)
+
+[03/Nov/2026 00:37:19,538] - Broken pipe from ('127.0.0.1', 60556)
+
+[03/Nov/2026 00:37:19,538] - Broken pipe from ('127.0.0.1', 50491)
+
+[03/Nov/2026 00:37:19,580] - Broken pipe from ('127.0.0.1', 55168)
+
+[03/Nov/2026 00:37:19,581] - Broken pipe from ('127.0.0.1', 55538)
+
+[03/Nov/2026 00:37:19,650] - Broken pipe from ('127.0.0.1', 59805)
+
+{"timestamp":"2026-11-02T21:07:22.120200+00:00","event":"http.response","request_id":"bc93fa86-dd09-4b78-8c5d-4af83b4e39af","method":"GET","route":"procurement:rfq_create","status_code":200,"duration_ms":617}
+
+{"timestamp":"2026-11-02T21:07:23.135398+00:00","event":"http.response","request_id":"550f4024-7594-4576-98c4-4fe52dd71fa3","method":"GET","route":null,"status_code":404,"duration_ms":575}
+
+{"timestamp":"2026-11-02T21:07:23.495187+00:00","event":"http.response","request_id":"9705a8af-4db7-432d-991a-ec87cc74454e","method":"POST","route":"procurement:rfq_create","status_code":400,"duration_ms":715}
+
+{"timestamp":"2026-11-02T21:07:24.578423+00:00","event":"http.response","request_id":"71826f3f-7302-4114-8bf7-c29ca9fe48d0","method":"GET","route":"procurement:rfq_create","status_code":200,"duration_ms":683}
+
+{"timestamp":"2026-11-02T21:07:25.281909+00:00","event":"http.response","request_id":"ac8280da-0286-4de4-adc1-d66afde1da28","method":"POST","route":"procurement:rfq_create","status_code":302,"duration_ms":490}
+
+{"timestamp":"2026-11-02T21:07:26.417625+00:00","event":"http.response","request_id":"dd315d2b-2a28-4f59-8933-b9404b4f368d","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1126}
+
+[03/Nov/2026 00:37:27,730] - Broken pipe from ('127.0.0.1', 63057)
+
+[03/Nov/2026 00:37:27,731] - Broken pipe from ('127.0.0.1', 49361)
+
+[03/Nov/2026 00:37:27,732] - Broken pipe from ('127.0.0.1', 50161)
+
+[03/Nov/2026 00:37:27,795] - Broken pipe from ('127.0.0.1', 61584)
+
+[03/Nov/2026 00:37:27,798] - Broken pipe from ('127.0.0.1', 55027)
+
+[03/Nov/2026 00:37:27,799] - Broken pipe from ('127.0.0.1', 53857)
+
+{"timestamp":"2026-11-02T21:07:30.229459+00:00","event":"http.response","request_id":"4a74121e-8566-4fed-94b5-28d3d85dd725","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":978}
+
+{"timestamp":"2026-11-02T21:07:31.382576+00:00","event":"http.response","request_id":"0dc679dc-bc53-4d80-88be-ec581be320da","method":"GET","route":null,"status_code":404,"duration_ms":689}
+
+{"timestamp":"2026-11-02T21:07:32.076124+00:00","event":"http.response","request_id":"dacb9e42-f934-4c4e-b45a-6122a6c4760b","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":984}
+
+{"timestamp":"2026-11-02T21:07:33.635798+00:00","event":"http.response","request_id":"3c64637d-286d-4cf0-a69f-c64e15591820","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":984}
+
+{"timestamp":"2026-11-02T21:07:35.068796+00:00","event":"http.response","request_id":"19bb1611-ad52-4154-849e-66ed93dca7de","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":957}
+
+{"timestamp":"2026-11-02T21:07:35.991554+00:00","event":"http.response","request_id":"4a3af138-51cb-48f9-9a9c-f98cf92093bd","method":"GET","route":"procurement:rfq_choices","status_code":200,"duration_ms":300}
+
+{"timestamp":"2026-11-02T21:07:36.338392+00:00","event":"http.response","request_id":"76d12a92-8b74-40fe-824c-5329f5c32524","method":"GET","route":"procurement:rfq_choices","status_code":200,"duration_ms":328}
+
+{"timestamp":"2026-11-02T21:07:37.547090+00:00","event":"http.response","request_id":"eca4c458-bfbe-416c-8597-696a2892a362","method":"POST","route":"procurement:rfq_line_add","status_code":400,"duration_ms":943}
+
+{"timestamp":"2026-11-02T21:07:38.763860+00:00","event":"http.response","request_id":"7e035c65-1211-4a95-af45-297cc4d22e76","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":811}
+
+{"timestamp":"2026-11-02T21:07:39.704748+00:00","event":"http.response","request_id":"0c05c874-d846-4f3c-bf87-57a23ce6a829","method":"GET","route":"procurement:rfq_choices","status_code":200,"duration_ms":313}
+
+{"timestamp":"2026-11-02T21:07:40.023079+00:00","event":"http.response","request_id":"7a42a5bc-06f8-4458-8a6a-9377bc0e0243","method":"GET","route":"procurement:rfq_choices","status_code":200,"duration_ms":311}
+
+{"timestamp":"2026-11-02T21:07:40.948081+00:00","event":"http.response","request_id":"9cddab0f-9fa7-41f3-98dc-e170c177f0fd","method":"POST","route":"procurement:rfq_line_add","status_code":302,"duration_ms":725}
+
+{"timestamp":"2026-11-02T21:07:41.779560+00:00","event":"http.response","request_id":"588eba17-4c14-41e5-966d-0664a2c21676","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":827}
+
+[03/Nov/2026 00:37:42,372] - Broken pipe from ('127.0.0.1', 51357)
+
+[03/Nov/2026 00:37:42,372] - Broken pipe from ('127.0.0.1', 56293)
+
+{"timestamp":"2026-11-02T21:07:44.831694+00:00","event":"http.response","request_id":"9c0c51f5-8324-4d6d-8ded-5aa8f71e4c99","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1230}
+
+{"timestamp":"2026-11-02T21:07:45.989305+00:00","event":"http.response","request_id":"998c5d07-7e26-4904-9576-155f62187960","method":"GET","route":null,"status_code":404,"duration_ms":741}
+
+{"timestamp":"2026-11-02T21:07:46.277365+00:00","event":"http.response","request_id":"e0204ac5-841b-40ba-bed1-d0790ee9e151","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":912}
+
+{"timestamp":"2026-11-02T21:07:47.242683+00:00","event":"http.response","request_id":"9236f841-494c-4175-932e-299ee6f28fea","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":520}
+
+{"timestamp":"2026-11-02T21:07:47.929867+00:00","event":"http.response","request_id":"9e4c05cc-dc53-4ce7-ab24-d4345eb64359","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":683}
+
+{"timestamp":"2026-11-02T21:07:49.128899+00:00","event":"http.response","request_id":"cffb52b7-97db-4353-8fac-ca05ca8c0921","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":1019}
+
+{"timestamp":"2026-11-02T21:07:50.426702+00:00","event":"http.response","request_id":"5d75cb0e-df9e-4eb8-b96a-7febb378fb9c","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":995}
+
+{"timestamp":"2026-11-02T21:07:51.096744+00:00","event":"http.response","request_id":"d654537d-f12a-4cee-9330-e9d6f99922d1","method":"POST","route":"procurement:rfq_submit","status_code":302,"duration_ms":389}
+
+{"timestamp":"2026-11-02T21:07:52.000328+00:00","event":"http.response","request_id":"68b829e1-585f-4e8c-8ba3-0a783329857f","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":888}
+
+[03/Nov/2026 00:37:52,811] - Broken pipe from ('127.0.0.1', 49235)
+
+[03/Nov/2026 00:37:52,812] - Broken pipe from ('127.0.0.1', 60847)
+
+{"timestamp":"2026-11-02T21:07:55.239759+00:00","event":"http.response","request_id":"3ed5d169-80e5-4d06-ba86-1e2fe5cb9cbe","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":856}
+
+{"timestamp":"2026-11-02T21:07:56.180636+00:00","event":"http.response","request_id":"561543af-542d-4b70-b9ed-4ae0e5568422","method":"GET","route":null,"status_code":404,"duration_ms":493}
+
+{"timestamp":"2026-11-02T21:07:56.897407+00:00","event":"http.response","request_id":"faff444a-ce96-40d9-936f-ede270da1824","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":821}
+
+{"timestamp":"2026-11-02T21:07:58.470385+00:00","event":"http.response","request_id":"55147896-aa75-4118-a8b3-19cdbc21bc6a","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1100}
+
+{"timestamp":"2026-11-02T21:08:00.140244+00:00","event":"http.response","request_id":"d8b2d1b6-f762-442f-a146-4b449e99e462","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1123}
+
+{"timestamp":"2026-11-02T21:08:01.473904+00:00","event":"http.response","request_id":"cfbfae8b-af93-4f08-8698-6ca90df67887","method":"POST","route":"procurement:rfq_issue","status_code":400,"duration_ms":1113}
+
+{"timestamp":"2026-11-02T21:08:03.507280+00:00","event":"http.response","request_id":"c5112e0d-40e8-46e9-9043-68fc519e63c8","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1415}
+
+{"timestamp":"2026-11-02T21:08:04.766310+00:00","event":"http.response","request_id":"cf8ad3a0-ea0c-44ca-8431-96d59639b477","method":"POST","route":"procurement:rfq_issue","status_code":400,"duration_ms":1048}
+
+{"timestamp":"2026-11-02T21:08:06.157979+00:00","event":"http.response","request_id":"b4aed0c4-abb5-42a5-a70f-9066aac66a3f","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":900}
+
+{"timestamp":"2026-11-02T21:08:07.101296+00:00","event":"http.response","request_id":"ad5d190b-96df-43f3-933d-e0edc44d99f5","method":"POST","route":"procurement:rfq_issue","status_code":302,"duration_ms":725}
+
+{"timestamp":"2026-11-02T21:08:08.175354+00:00","event":"http.response","request_id":"86057470-e98d-4b8c-9a4a-755f87a3739a","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1066}
+
+[03/Nov/2026 00:38:09,340] - Broken pipe from ('127.0.0.1', 49288)
+
+[03/Nov/2026 00:38:09,343] - Broken pipe from ('127.0.0.1', 61182)
+
+{"timestamp":"2026-11-02T21:08:15.886275+00:00","event":"http.response","request_id":"55c48dbb-e4cd-4585-9bfc-a40c3ef3ba38","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":3335}
+
+{"timestamp":"2026-11-02T21:08:19.077528+00:00","event":"http.response","request_id":"15e42726-df77-4033-b60f-44b21714bfc5","method":"GET","route":null,"status_code":404,"duration_ms":2189}
+
+{"timestamp":"2026-11-02T21:08:21.653887+00:00","event":"http.response","request_id":"43072ed1-ad54-4753-8787-d49a06744424","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":2719}
+
+{"timestamp":"2026-11-02T21:08:24.049969+00:00","event":"http.response","request_id":"9b7ecb17-1b7c-4cc3-88c5-8c5ae8da632d","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1280}
+
+{"timestamp":"2026-11-02T21:08:25.816451+00:00","event":"http.response","request_id":"b01b0150-a509-48dc-9d8d-f076fa917601","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":918}
+
+{"timestamp":"2026-11-02T21:08:26.911230+00:00","event":"http.response","request_id":"1d753bc9-5bd6-4017-b396-0abe482d9b18","method":"GET","route":"procurement:rfq_addendum","status_code":200,"duration_ms":720}
+
+{"timestamp":"2026-11-02T21:08:28.736411+00:00","event":"http.response","request_id":"427fbf6c-8c58-43f8-a735-befc2534466f","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1079}
+
+[03/Nov/2026 00:38:30,639] - Broken pipe from ('127.0.0.1', 49870)
+
+[03/Nov/2026 00:38:30,648] - Broken pipe from ('127.0.0.1', 56701)
+
+{"timestamp":"2026-11-02T21:08:33.353907+00:00","event":"http.response","request_id":"be04cb9b-745e-43de-a370-f7c41af57132","method":"GET","route":"procurement:rfq_create","status_code":200,"duration_ms":787}
+
+{"timestamp":"2026-11-02T21:08:34.256347+00:00","event":"http.response","request_id":"70127317-acd9-4707-90c3-aa735cb25300","method":"GET","route":null,"status_code":404,"duration_ms":459}
+
+[03/Nov/2026 00:38:34,339] - Broken pipe from ('127.0.0.1', 65505)
+
+[03/Nov/2026 00:38:34,535] - Broken pipe from ('127.0.0.1', 58780)
+
+[03/Nov/2026 00:38:34,545] - Broken pipe from ('127.0.0.1', 53559)
+
+[03/Nov/2026 00:38:34,547] - Broken pipe from ('127.0.0.1', 64565)
+
+[03/Nov/2026 00:38:34,550] - Broken pipe from ('127.0.0.1', 54976)
+
+[03/Nov/2026 00:38:34,551] - Broken pipe from ('127.0.0.1', 49897)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 56773)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 60556)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 50491)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 55168)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 55538)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 59805)
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Bad Request: /procurement/rfqs/create/
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 63057)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 49361)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 50161)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 61584)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 55027)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 53857)
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Bad Request: /procurement/rfqs/f15aa5db-4d3d-487b-b321-4817f8e97234/lines/
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 51357)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 56293)
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 49235)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 60847)
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Bad Request: /procurement/rfqs/f15aa5db-4d3d-487b-b321-4817f8e97234/issue/
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Bad Request: /procurement/rfqs/f15aa5db-4d3d-487b-b321-4817f8e97234/issue/
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 49288)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 61182)
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 49870)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 56701)
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 65505)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 58780)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 53559)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 64565)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 54976)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 49897)
+=========================== short test summary info ===========================
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11ComparisonAwardTests::test_no_award_is_explicit_has_no_allocations_and_does_not_mutate_downstream
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11SelfFinalizationPolicyTests::test_tenant_policy_explicitly_allows_s11_comparison_and_award_self_finalization
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11TieAndSplitTests::test_award_is_sourcing_only_conserves_quantity_and_self_finalization_is_policy_gated
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11TieAndSplitTests::test_conflict_cannot_self_clear_and_blocks_evaluation_until_disposed
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11TieAndSplitTests::test_exception_closed_catalogue_and_independent_lifecycle
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11TieAndSplitTests::test_reproducible_asserted_input_lineage_and_immutable_finalization
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11TieAndSplitTests::test_split_award_is_explicit_and_allocation_inputs_are_governing
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11TieAndSplitTests::test_tie_requires_explicit_resolution_and_split_award_retains_exact_revisions
+FAILED apps/procurement/test_mvp04b_scope.py::ScopeConcurrencyTests::test_two_revisions_with_same_expected_revision_cannot_overwrite
+FAILED apps/procurement/test_rfq.py::RequestForQuotationConcurrencyTests::test_concurrent_identical_issue_creates_one_version
+FAILED apps/procurement/test_p5_s11_comparison_award.py::P5S11ConcurrencyTests::test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity
+FAILED apps/procurement/test_mvp04b_browser.py::ScopeBrowserTests::test_explicit_scope_issue_addendum_and_responsive_denials
+FAILED apps/procurement/test_mvp04b1_browser.py::RFQPreparationBrowserTests::test_end_to_end_rfq_preparation_issue_and_responsive_history
+ERROR apps/procurement/test_p5_s11_comparison_award.py::P5S11ConcurrencyTests::test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity
+13 failed, 43 passed, 1 error, 20 subtests passed in 861.47s (0:14:21)

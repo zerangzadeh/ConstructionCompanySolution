@@ -369,7 +369,7 @@ class ExplicitScopeTests(CommercialScopeFixture, TestCase):
         self.assertEqual(rfq.scope_definitions.count(), 1)
         self.issue(rfq)
         response = self.client.get(reverse("procurement:rfq_detail", args=[rfq.pk]))
-        self.assertContains(response, "دامنه تثبیت‌شده")
+        self.assertContains(response, "تنظیمات نسخه جاری")
         self.login(self.viewer)
         self.assertEqual(self.client.get(url).status_code, 403)
 

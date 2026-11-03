@@ -1,0 +1,155 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ ContractHubBrowserTests.test_contract_hub_and_shared_foundation_offline_in_installed_chrome _
+
+self = <apps.contracts.test_hub.ContractHubBrowserTests testMethod=test_contract_hub_and_shared_foundation_offline_in_installed_chrome>
+
+    def test_contract_hub_and_shared_foundation_offline_in_installed_chrome(self):
+        self.prepare_hub()
+        request_progress_verification(
+            organization=self.organization, actor=self.owner, record=self.new_record
+        )
+        reader, _, _ = scoped_reader(
+            self.organization, self.project, ["contracts.view"], username="hub-reader"
+        )
+        sessions, scenarios = {}, []
+        for name, actor in (
+            ("owner", self.owner),
+            ("reviewer", self.manager),
+            ("restricted", reader),
+        ):
+            self.client = Client()
+            self.login(actor)
+            sessions[name] = self.client.cookies["sessionid"].value
+        for width in (1440, 1024, 390):
+            cases = [
+                (
+                    "hub-handoff",
+                    "owner",
+                    reverse("contracts:detail", args=[self.contract.pk]),
+                    {
+                        "steps": [
+                            {
+                                "click": '[data-contract-hub-navigation] a[href*="section=quantities"]',
+                                "path": quantities(self.contract),
+                            },
+                            {
+                                "click": '.cd-quantity-tabs a[href*="pane=basis"]',
+                                "path": quantities(self.contract, pane="basis"),
+                            },
+                            {
+                                "click": ".cd-quantity-table a[href*=line_key]",
+                                "path": reverse("billing:progress_list")
+                                + f"?contract={self.contract.pk}&line_key=ITEM-01",
+                            },
+                        ]
+                    },
+                ),
+                ("receivable-items", "owner", quantities(self.contract), {}),
+                (
+                    "receivable-basis",
+                    "owner",
+                    quantities(self.contract, pane="basis"),
+                    {
+                        "inspect": "document.querySelectorAll('.cd-quantity-table tbody tr').length===1 && !!document.querySelector('.cd-quantity-table a[href*=line_key]')"
+                    },
+                ),
+                (
+                    "historical-basis",
+                    "owner",
+                    quantities(
+                        self.contract,
+                        pane="basis",
+                        baseline=self.old_record.baseline_id,
+                    ),
+                    {"inspect": "!!document.querySelector('.cd-history-note')"},
+                ),
+                (
+                    "payable-items",
+                    "owner",
+                    quantities(self.payable),
+                    {
+                        "inspect": "!document.querySelector('[href*=\"pane=basis\"]') && !!document.querySelector('.cd-quantity-table a[href*=contract_item]')"
+                    },
+                ),
+                (
+                    "measurement-history",
+                    "owner",
+                    reverse("billing:progress_list")
+                    + f"?contract={self.contract.pk}&line_key=ITEM-01",
+                    {
+                        "inspect": "document.querySelectorAll('[data-progress-records] tbody tr').length===2"
+                    },
+                ),
+                (
+                    "contract-selector",
+                    "owner",
+                    reverse("contracts:create"),
+                    {"choice": "project", "query": "Baseline"},
+                ),
+                (
+                    "restricted-items",
+                    "restricted",
+                    quantities(self.contract),
+                    {
+                        "inspect": '!document.querySelector(\'[href*="pane=basis"],.cd-quantity-tabs a[href*="/billing/"]\')'
+                    },
+                ),
+                (
+                    "measurement-decision",
+                    "reviewer",
+                    reverse("billing:progress_detail", args=[self.new_record.pk]),
+                    {"decision": True, "confirm": width == 390},
+                ),
+            ]
+            for label, actor_name, path, extra in cases:
+                self.login(
+                    {
+                        "owner": self.owner,
+                        "reviewer": self.manager,
+                        "restricted": reader,
+                    }[actor_name]
+                )
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 200)
+                expected = [
+                    {"label": link.label, "url": reverse(link.route)}
+                    for group in response.context["product_navigation_groups"]
+                    for link in group.links
+                ]
+                active = [
+                    item["url"]
+                    for item in module_selector_links(
+                        response.context["product_navigation_groups"],
+                        response.resolver_match.view_name,
+                        response.wsgi_request.path,
+                    )
+                    if item["active"]
+                ]
+>               self.assertEqual(len(active), 1)
+E               AssertionError: 0 != 1
+
+apps\contracts\test_hub.py:360: AssertionError
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-02T19:18:22.740601+00:00","event":"http.response","request_id":"fa9f3709-63dd-4d98-93bc-ce08344db148","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1165}
+
+{"timestamp":"2026-11-02T19:18:23.701578+00:00","event":"http.response","request_id":"60283960-1cc1-4d3e-855d-14645b1a0e09","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":946}
+
+{"timestamp":"2026-11-02T19:18:25.087153+00:00","event":"http.response","request_id":"1a85fb9d-1fc5-4d67-8d37-239ffc6282c5","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1363}
+
+{"timestamp":"2026-11-02T19:18:26.402592+00:00","event":"http.response","request_id":"7a782bb4-2d61-4331-ac83-bbb938a8a376","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1295}
+
+{"timestamp":"2026-11-02T19:18:27.553285+00:00","event":"http.response","request_id":"dc9947c3-306b-4a4a-8d24-64ddaf887454","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1130}
+
+{"timestamp":"2026-11-02T19:18:28.602391+00:00","event":"http.response","request_id":"5b5bca36-e83f-4e46-948c-5afeb3679a2c","method":"GET","route":"billing:progress_list","status_code":200,"duration_ms":1031}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+=========================== short test summary info ===========================
+FAILED apps/contracts/test_hub.py::ContractHubBrowserTests::test_contract_hub_and_shared_foundation_offline_in_installed_chrome
+1 failed in 65.44s (0:01:05)

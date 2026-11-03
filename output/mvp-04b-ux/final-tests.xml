@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="13" skipped="0" tests="77" time="861.388" timestamp="2026-11-03T00:24:31.184095+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_rfq_configuration_ux.RFQConfigurationUXTests" name="test_existing_false_flag_and_multiple_scopes_are_preserved" time="20.692" /><testcase classname="tests.test_rfq_configuration_ux.RFQConfigurationUXTests" name="test_forged_hidden_version_and_csrf_fail_closed" time="2.909" /><testcase classname="tests.test_rfq_configuration_ux.RFQConfigurationUXTests" name="test_get_prefills_existing_rows_and_never_persists" time="2.700" /><testcase classname="tests.test_rfq_configuration_ux.RFQConfigurationUXTests" name="test_group_members_prefill_select_and_replace_without_losing_lines" time="6.546" /><testcase classname="tests.test_rfq_configuration_ux.RFQConfigurationUXTests" name="test_invalid_quantity_flags_and_missing_fields_retain_bound_errors" time="6.359" /><testcase classname="tests.test_rfq_configuration_ux.RFQConfigurationUXTests" name="test_only_group_configuration_does_not_infer_independent_line_scopes" time="3.014" /><testcase classname="tests.test_rfq_configuration_ux.RFQConfigurationUXTests" name="test_read_only_project_tenant_and_suspended_boundaries" time="3.439" /><testcase classname="tests.test_rfq_configuration_ux.RFQConfigurationUXTests" name="test_single_confirmation_multiple_rows_replays_and_issues_exactly" time="3.111" /><testcase classname="tests.test_rfq_configuration_ux.RFQConfigurationUXTests" name="test_stale_revision_and_source_changes_fail_without_overwrite" time="8.116" /><testcase classname="apps.procurement.test_mvp04b_scope.ExplicitScopeTests" name="test_addendum_requires_explicit_next_definition_and_preserves_prior_scope" time="5.304" /><testcase classname="apps.procurement.test_mvp04b_scope.ExplicitScopeTests" name="test_http_explicit_form_validation_replay_and_issue" time="7.614" /><testcase classname="apps.procurement.test_mvp04b_scope.ExplicitScopeTests" name="test_invalid_source_quantities_flags_and_units_fail_closed" time="4.727" /><testcase classname="apps.procurement.test_mvp04b_scope.ExplicitScopeTests" name="test_line_partial_flags_pin_and_retry_are_exact_and_audited" time="3.425" /><testcase classname="apps.procurement.test_mvp04b_scope.ExplicitScopeTests" name="test_lot_retains_explicit_members_quantities_and_unit_without_allocations" time="3.545" /><testcase classname="apps.procurement.test_mvp04b_scope.ExplicitScopeTests" name="test_no_silent_default_and_issue_fails_atomically_without_definition" time="3.139" /><testcase classname="apps.procurement.test_mvp04b_scope.ExplicitScopeTests" name="test_permission_wrong_project_and_tenant_are_denied_in_service" time="2.640" /><testcase classname="apps.procurement.test_mvp04b_scope.ExplicitScopeTests" name="test_revision_optimism_idempotency_and_immutable_definition" time="3.141" /><testcase classname="apps.procurement.test_mvp04b_scope.ExplicitScopeTests" name="test_scope_issue_rolls_back_version_invitations_and_scope_on_failure" time="3.322" /><testcase classname="apps.procurement.test_mvp04b_scope.ExplicitScopeTests" name="test_source_drift_requires_new_explicit_definition" time="3.310" /><testcase classname="apps.procurement.test_mvp04b1.RFQPreparationTests" name="test_action_flags_project_scope_and_unauthorized_direct_posts" time="5.841" /><testcase classname="apps.procurement.test_mvp04b1.RFQPreparationTests" name="test_context_and_general_creation_keep_parent_and_validate_dates" time="4.913" /><testcase classname="apps.procurement.test_mvp04b1.RFQPreparationTests" name="test_forged_parent_line_supplier_and_internal_keys_fail_without_identifier_echo" time="8.557" /><testcase classname="apps.procurement.test_mvp04b1.RFQPreparationTests" name="test_forged_scope_unit_is_rejected_without_raw_uuid_error" time="4.907" /><testcase classname="apps.procurement.test_mvp04b1.RFQPreparationTests" name="test_issue_freeze_supplier_error_retention_and_preparation_only_read_model" time="10.246" /><testcase classname="apps.procurement.test_mvp04b1.RFQPreparationTests" name="test_line_selector_uses_source_and_excludes_already_selected" time="2.923" /><testcase classname="apps.procurement.test_mvp04b1.RFQPreparationTests" name="test_list_search_filters_sort_pagination_and_business_chips" time="5.739" /><testcase classname="apps.procurement.test_rfq.RequestForQuotationServiceTests" name="test_addendum_cannot_move_opening_boundary_earlier" time="2.511" /><testcase classname="apps.procurement.test_rfq.RequestForQuotationServiceTests" name="test_issue_is_idempotent_and_snapshots_are_immutable" time="2.505" /><testcase classname="apps.procurement.test_rfq.RequestForQuotationServiceTests" name="test_read_scope_and_cross_tenant_project_are_denied" time="3.361" /><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11ComparisonAwardTests" name="test_no_award_is_explicit_has_no_allocations_and_does_not_mutate_downstream" time="10.194"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:63: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11SelfFinalizationPolicyTests" name="test_tenant_policy_explicitly_allows_s11_comparison_and_award_self_finalization" time="4.894"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:63: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests" name="test_award_is_sourcing_only_conserves_quantity_and_self_finalization_is_policy_gated" time="5.627"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:376: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests" name="test_conflict_cannot_self_clear_and_blocks_evaluation_until_disposed" time="4.897"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:376: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests" name="test_exception_closed_catalogue_and_independent_lifecycle" time="4.768"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:376: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests" name="test_reproducible_asserted_input_lineage_and_immutable_finalization" time="5.040"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:376: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests" name="test_split_award_is_explicit_and_allocation_inputs_are_governing" time="5.214"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:376: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests" name="test_tie_requires_explicit_resolution_and_split_award_retains_exact_revisions" time="5.202"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:376: in setUp
+    approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_mvp04f.ConnectedJourneyTests" name="test_no_award_has_history_and_no_downstream_continuation" time="55.794" /><testcase classname="apps.procurement.test_mvp04f.ConnectedJourneyTests" name="test_split_award_separate_supplier_orders_receipts_and_exact_lineage" time="97.803" /><testcase classname="apps.procurement.test_mvp04b_scope.ScopeConcurrencyTests" name="test_two_revisions_with_same_expected_revision_cannot_overwrite" time="16.769"><failure message="django.core.management.base.CommandError: Database test_bonira_f2_20261102 couldn't be flushed. Possible reasons:&#10;  * The database isn't running or isn't configured correctly.&#10;  * At least one of the expected database tables doesn't exist.&#10;  * The SQL was invalid.&#10;Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command wasn't able to run.">.venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: cannot truncate a table referenced in a foreign key constraint
+E   DETAIL:  Table "payments_payment" references "projects_projectphase".
+E   HINT:  Truncate table "payments_payment" at the same time, or use TRUNCATE ... CASCADE.
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\core\management\commands\flush.py:71: in handle
+    connection.ops.execute_sql_flush(sql_list)
+.venv\Lib\site-packages\django\db\backends\base\operations.py:473: in execute_sql_flush
+    cursor.execute(sql)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: cannot truncate a table referenced in a foreign key constraint
+E   DETAIL:  Table "payments_payment" references "projects_projectphase".
+E   HINT:  Truncate table "payments_payment" at the same time, or use TRUNCATE ... CASCADE.
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\core\management\__init__.py:194: in call_command
+    return command.execute(*args, **defaults)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\base.py:464: in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\commands\flush.py:73: in handle
+    raise CommandError(
+E   django.core.management.base.CommandError: Database test_bonira_f2_20261102 couldn't be flushed. Possible reasons:
+E     * The database isn't running or isn't configured correctly.
+E     * At least one of the expected database tables doesn't exist.
+E     * The SQL was invalid.
+E   Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command wasn't able to run.</failure></testcase><testcase classname="apps.procurement.test_rfq.RequestForQuotationConcurrencyTests" name="test_concurrent_identical_issue_creates_one_version" time="16.202"><failure message="django.core.management.base.CommandError: Database test_bonira_f2_20261102 couldn't be flushed. Possible reasons:&#10;  * The database isn't running or isn't configured correctly.&#10;  * At least one of the expected database tables doesn't exist.&#10;  * The SQL was invalid.&#10;Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command wasn't able to run.">.venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: cannot truncate a table referenced in a foreign key constraint
+E   DETAIL:  Table "payments_payment" references "projects_projectphase".
+E   HINT:  Truncate table "payments_payment" at the same time, or use TRUNCATE ... CASCADE.
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\core\management\commands\flush.py:71: in handle
+    connection.ops.execute_sql_flush(sql_list)
+.venv\Lib\site-packages\django\db\backends\base\operations.py:473: in execute_sql_flush
+    cursor.execute(sql)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: cannot truncate a table referenced in a foreign key constraint
+E   DETAIL:  Table "payments_payment" references "projects_projectphase".
+E   HINT:  Truncate table "payments_payment" at the same time, or use TRUNCATE ... CASCADE.
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\core\management\__init__.py:194: in call_command
+    return command.execute(*args, **defaults)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\base.py:464: in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\commands\flush.py:73: in handle
+    raise CommandError(
+E   django.core.management.base.CommandError: Database test_bonira_f2_20261102 couldn't be flushed. Possible reasons:
+E     * The database isn't running or isn't configured correctly.
+E     * At least one of the expected database tables doesn't exist.
+E     * The SQL was invalid.
+E   Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command wasn't able to run.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11ConcurrencyTests" name="test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity" time="17.454"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.">apps\procurement\test_p5_s11_comparison_award.py:63: in setUp
+    super().setUp()
+apps\procurement\test_p5_s10_admissibility.py:80: in setUp
+    self.opening = approve_quote_opening(
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.</failure></testcase><testcase classname="apps.procurement.test_p5_s11_comparison_award.P5S11ConcurrencyTests" name="test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity" time="0.001"><error message="failed on teardown with &quot;django.core.management.base.CommandError: Database test_bonira_f2_20261102 couldn't be flushed. Possible reasons:&#10;  * The database isn't running or isn't configured correctly.&#10;  * At least one of the expected database tables doesn't exist.&#10;  * The SQL was invalid.&#10;Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command wasn't able to run.&quot;">.venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: cannot truncate a table referenced in a foreign key constraint
+E   DETAIL:  Table "payments_payment" references "projects_projectphase".
+E   HINT:  Truncate table "payments_payment" at the same time, or use TRUNCATE ... CASCADE.
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\core\management\commands\flush.py:71: in handle
+    connection.ops.execute_sql_flush(sql_list)
+.venv\Lib\site-packages\django\db\backends\base\operations.py:473: in execute_sql_flush
+    cursor.execute(sql)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:103: in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: cannot truncate a table referenced in a foreign key constraint
+E   DETAIL:  Table "payments_payment" references "projects_projectphase".
+E   HINT:  Truncate table "payments_payment" at the same time, or use TRUNCATE ... CASCADE.
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\core\management\__init__.py:194: in call_command
+    return command.execute(*args, **defaults)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\base.py:464: in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\commands\flush.py:73: in handle
+    raise CommandError(
+E   django.core.management.base.CommandError: Database test_bonira_f2_20261102 couldn't be flushed. Possible reasons:
+E     * The database isn't running or isn't configured correctly.
+E     * At least one of the expected database tables doesn't exist.
+E     * The SQL was invalid.
+E   Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command wasn't able to run.</error></testcase><testcase classname="tests.test_rfq_configuration_browser.RFQConfigurationBrowserTests" name="test_configuration_journey_responsive_offline_and_boundaries" time="129.267" /><testcase classname="apps.procurement.test_mvp04b_browser.ScopeBrowserTests" name="test_explicit_scope_issue_addendum_and_responsive_denials" time="121.247"><failure message="AssertionError: 1 != 0 : پروژه‌ها\nکارگاه‌ها\nگزارش‌های روزانه\nنیروهای کار\nحضور و کارکرد\nتجهیزات عملیاتی\nهزینه‌ها و تنخواه\nایمنی\nکیفیت\nپیمان، متره و صورت‌وضعیت\n⌄\nبرآورد و فهرست‌بها\nقراردادها\nصورت‌وضعیت و صورتحساب\nتدارکات، مصالح و انبار\n⌄\nدرخواست‌های خرید\nاستعلام و انتخاب تأمین‌کننده\nسفارش‌های خرید\nرسید کالا\nمصالح و کالا\nانبار\nکارتابل، اسناد و گزارش‌ها\n⌄\nوظایف من\nطرف‌های تجاری\nاسناد\nگردش‌کارها\nتنظیمات و مدیریت دسترسی\n⌄\nپروفایل کاربر\nانتخاب شرکت\nتنظیمات شرکت\nاعضا و دسترسی‌ها\nنقش‌های شرکت\nسوابق فعالیت\nفضای کاری فعال\nERP\nخروج از حساب\nشرکت فعال:\nشرکت ساختمانی نمونه\nماژول‌ها\nجستجوی پروژه و مصالح\nسامانه جامع و یکپارچه مدیریت شرکت\nP\nprocurement-owner\nتنظیمات شخصی\nشرکت\nشرکت ساختمانی نمونه\nپروژه\nهمه پروژه‌های در دسترس\nPROC — پروژه نمونه سازه\nانتخاب پروژه و کارگاه\nاستعلام‌های خرید / RFQ-SCOPE\n\nاستعلام خرید · RFQ-SCOPE\n\nاستعلام مصالح پروژه\n\nپروژه نمونه سازه\n\nصادرشده\n⋮\nدرخواست خرید مبنا\nPR-SCOPE · مصالح فونداسیون\nمهلت دریافت\n1405/08/14 21:03\nزمان مجاز گشایش\n1405/08/14 21:03\nنسخه صادرشده\n2\n\nاصلاح شرایط نسخه دوم\n\n۱ · اقلام درخواست خرید\n۲ · مقدار و نحوه انتخاب\n۳ · تأمین‌کنندگان و صدور\nصادرشده\n\nاستعلام صادر شده است. اقلام، تنظیمات انتخاب، مهلت‌ها و دعوت‌نامه‌های هر نسخه تثبیت شده‌اند؛ تغییر از مسیر الحاقیه انجام می‌شود.\n\nنحوه استعلام و انتخاب تأمین‌کننده\n\nاقلام از درخواست خرید مبنا آمده‌اند؛ مقدار و نحوه انتخاب را بررسی و تأیید کنید.\n\nتنظیمات نسخه جاری\nسیمان پرتلند\n\n2 کیسه · انتخاب مستقل: بله · امکان تقسیم خرید: خیر · پیشنهاد جایگزین مجاز: بله\n\nشرح کالا / خدمت\tمقدار درخواست خرید\tمقدار قلم استعلام\tواحد\nسیمان پرتلند\t10\t10\tکیسه\nگروه‌بندی اقلام در گروه خرید (اختیاری)\n\nبرای مقایسه و انتخاب چند قلم به‌صورت یک مجموعه، اقلام موجود را انتخاب کنید.\n\n+ ایجاد گروه خرید\nراهنمای این مرحله\nمقدار استعلام\n\nمقدار درخواست خرید و سقف قلم استعلام نمایش داده می‌شود. مقدار مورد استعلام می‌تواند کمتر از سقف همان قلم باشد.\n\nنحوه مقایسه و انتخاب\n\nانتخاب مستقل: هر قلم جداگانه مقایسه و انتخاب می‌شود.\n\nامکان تقسیم خرید: خرید بین چند تأمین‌کننده قابل تقسیم است.\n\nپیشنهاد جایگزین مجاز: تأمین‌کننده می‌تواند پیشنهاد جایگزین ارائه کند.\n\nگروه خرید\n\nچند قلم را آگاهانه برای مقایسه و انتخاب در یک مجموعه قرار دهید. ثبت گروه، تنظیمات قبلی را حذف نمی‌کند؛ برای تغییر گروه ثبت‌شده از «اصلاح تنظیمات گروه» استفاده کنید.\n\nنسخه‌های قبلی تنظیمات استعلام\nنسخه‌ها و دعوت‌نامه‌ها\nنسخه 1 · 1405/08/11 21:04\n\nمهلت دریافت: 1405/08/13 21:03 · زمان گشایش: 1405/08/13 21:03\n\nاقلام تثبیت‌شده نسخه\n\nتنظیمات انتخاب تأمین‌کننده این نسخه\n\nاقلام و تنظیمات این نسخه هنگام صدور تثبیت شده‌اند.\n\nتأمین‌کنندگان دعوت‌شده\nSupplier · آماده\nنسخه 2 · 1405/08/11 21:04\n\nمهلت دریافت: 1405/08/14 21:03 · زمان گشایش: 1405/08/14 21:03\n\nاصلاح شرایط نسخه دوم\n\nاقلام تثبیت‌شده نسخه\n\nتنظیمات انتخاب تأمین‌کننده این نسخه\n\nاقلام و تنظیمات این نسخه هنگام صدور تثبیت شده‌اند.\n\nتأمین‌کنندگان دعوت‌شده\nSupplier · آماده\nلغو استعلام&quot;}&#10;    at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:316:27&#10;&#10;Node.js v24.20.0">apps\procurement\test_mvp04b_browser.py:169: in test_explicit_scope_issue_addendum_and_responsive_denials
+    self.browser(
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : پروژه‌ها\nکارگاه‌ها\nگزارش‌های روزانه\nنیروهای کار\nحضور و کارکرد\nتجهیزات عملیاتی\nهزینه‌ها و تنخواه\nایمنی\nکیفیت\nپیمان، متره و صورت‌وضعیت\n⌄\nبرآورد و فهرست‌بها\nقراردادها\nصورت‌وضعیت و صورتحساب\nتدارکات، مصالح و انبار\n⌄\nدرخواست‌های خرید\nاستعلام و انتخاب تأمین‌کننده\nسفارش‌های خرید\nرسید کالا\nمصالح و کالا\nانبار\nکارتابل، اسناد و گزارش‌ها\n⌄\nوظایف من\nطرف‌های تجاری\nاسناد\nگردش‌کارها\nتنظیمات و مدیریت دسترسی\n⌄\nپروفایل کاربر\nانتخاب شرکت\nتنظیمات شرکت\nاعضا و دسترسی‌ها\nنقش‌های شرکت\nسوابق فعالیت\nفضای کاری فعال\nERP\nخروج از حساب\nشرکت فعال:\nشرکت ساختمانی نمونه\nماژول‌ها\nجستجوی پروژه و مصالح\nسامانه جامع و یکپارچه مدیریت شرکت\nP\nprocurement-owner\nتنظیمات شخصی\nشرکت\nشرکت ساختمانی نمونه\nپروژه\nهمه پروژه‌های در دسترس\nPROC — پروژه نمونه سازه\nانتخاب پروژه و کارگاه\nاستعلام‌های خرید / RFQ-SCOPE\n\nاستعلام خرید · RFQ-SCOPE\n\nاستعلام مصالح پروژه\n\nپروژه نمونه سازه\n\nصادرشده\n⋮\nدرخواست خرید مبنا\nPR-SCOPE · مصالح فونداسیون\nمهلت دریافت\n1405/08/14 21:03\nزمان مجاز گشایش\n1405/08/14 21:03\nنسخه صادرشده\n2\n\nاصلاح شرایط نسخه دوم\n\n۱ · اقلام درخواست خرید\n۲ · مقدار و نحوه انتخاب\n۳ · تأمین‌کنندگان و صدور\nصادرشده\n\nاستعلام صادر شده است. اقلام، تنظیمات انتخاب، مهلت‌ها و دعوت‌نامه‌های هر نسخه تثبیت شده‌اند؛ تغییر از مسیر الحاقیه انجام می‌شود.\n\nنحوه استعلام و انتخاب تأمین‌کننده\n\nاقلام از درخواست خرید مبنا آمده‌اند؛ مقدار و نحوه انتخاب را بررسی و تأیید کنید.\n\nتنظیمات نسخه جاری\nسیمان پرتلند\n\n2 کیسه · انتخاب مستقل: بله · امکان تقسیم خرید: خیر · پیشنهاد جایگزین مجاز: بله\n\nشرح کالا / خدمت\tمقدار درخواست خرید\tمقدار قلم استعلام\tواحد\nسیمان پرتلند\t10\t10\tکیسه\nگروه‌بندی اقلام در گروه خرید (اختیاری)\n\nبرای مقایسه و انتخاب چند قلم به‌صورت یک مجموعه، اقلام موجود را انتخاب کنید.\n\n+ ایجاد گروه خرید\nراهنمای این مرحله\nمقدار استعلام\n\nمقدار درخواست خرید و سقف قلم استعلام نمایش داده می‌شود. مقدار مورد استعلام می‌تواند کمتر از سقف همان قلم باشد.\n\nنحوه مقایسه و انتخاب\n\nانتخاب مستقل: هر قلم جداگانه مقایسه و انتخاب می‌شود.\n\nامکان تقسیم خرید: خرید بین چند تأمین‌کننده قابل تقسیم است.\n\nپیشنهاد جایگزین مجاز: تأمین‌کننده می‌تواند پیشنهاد جایگزین ارائه کند.\n\nگروه خرید\n\nچند قلم را آگاهانه برای مقایسه و انتخاب در یک مجموعه قرار دهید. ثبت گروه، تنظیمات قبلی را حذف نمی‌کند؛ برای تغییر گروه ثبت‌شده از «اصلاح تنظیمات گروه» استفاده کنید.\n\nنسخه‌های قبلی تنظیمات استعلام\nنسخه‌ها و دعوت‌نامه‌ها\nنسخه 1 · 1405/08/11 21:04\n\nمهلت دریافت: 1405/08/13 21:03 · زمان گشایش: 1405/08/13 21:03\n\nاقلام تثبیت‌شده نسخه\n\nتنظیمات انتخاب تأمین‌کننده این نسخه\n\nاقلام و تنظیمات این نسخه هنگام صدور تثبیت شده‌اند.\n\nتأمین‌کنندگان دعوت‌شده\nSupplier · آماده\nنسخه 2 · 1405/08/11 21:04\n\nمهلت دریافت: 1405/08/14 21:03 · زمان گشایش: 1405/08/14 21:03\n\nاصلاح شرایط نسخه دوم\n\nاقلام تثبیت‌شده نسخه\n\nتنظیمات انتخاب تأمین‌کننده این نسخه\n\nاقلام و تنظیمات این نسخه هنگام صدور تثبیت شده‌اند.\n\nتأمین‌کنندگان دعوت‌شده\nSupplier · آماده\nلغو استعلام"}
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:316:27
+E   
+E   Node.js v24.20.0</failure></testcase><testcase classname="apps.procurement.test_mvp04b1_browser.RFQPreparationBrowserTests" name="test_browser_denials_and_forged_context" time="41.762" /><testcase classname="apps.procurement.test_mvp04b1_browser.RFQPreparationBrowserTests" name="test_end_to_end_rfq_preparation_issue_and_responsive_history" time="166.037"><failure message="AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:80&#10;      throw new Error('Missing clickable control '+selector);&#10;            ^&#10;&#10;Error: Missing clickable control .rfq-config__line-add &gt; summary&#10;    at click (file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:80:13)&#10;    at async file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:270:9&#10;&#10;Node.js v24.20.0">apps\procurement\test_mvp04b1_browser.py:402: in test_end_to_end_rfq_preparation_issue_and_responsive_history
+    self.browser(
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:80
+E         throw new Error('Missing clickable control '+selector);
+E               ^
+E   
+E   Error: Missing clickable control .rfq-config__line-add &gt; summary
+E       at click (file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:80:13)
+E       at async file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:270:9
+E   
+E   Node.js v24.20.0</failure></testcase><testcase classname="tests.test_f3_module_selector.ModuleSelectorPresentationTests" name="test_cards_are_only_projections_of_authorized_destinations" time="0.029" /><testcase classname="tests.test_f3_module_selector.ModuleSelectorPresentationTests" name="test_current_route_alias_and_longest_authorized_parent_path" time="0.025" /><testcase classname="tests.test_f3_module_selector.ModuleSelectorPresentationTests" name="test_each_authorized_child_highlights_its_family" time="0.134" /><testcase classname="tests.test_f3_module_selector.ModuleSelectorPresentationTests" name="test_empty_navigation_has_no_fabricated_destination" time="0.003" /><testcase classname="tests.test_f3_module_selector.ModuleSelectorPresentationTests" name="test_only_canonical_filtered_links_and_labels_are_rendered" time="0.025" /><testcase classname="core.test_cep017_navigation.Cep017NavigationTemplateTests" name="test_canonical_navigation_register_is_complete_and_persian_first" time="0.022" /><testcase classname="core.test_cep017_navigation.Cep017NavigationTemplateTests" name="test_empty_groups_and_hidden_targets_are_not_placeholders" time="0.008" /><testcase classname="core.test_cep017_navigation.Cep017NavigationTemplateTests" name="test_rfq_navigation_renders_one_state_for_each_permission_variant" time="0.009" /><testcase classname="core.test_cep017_navigation.Cep017NavigationTemplateTests" name="test_shared_breadcrumb_and_mobile_close_contract_are_present" time="0.004" /><testcase classname="core.test_product_surface.SurfacePolicyTests" name="test_navigation_permissions_empty_groups_and_operational_reports" time="0.006" /></testsuite></testsuites>

@@ -32,6 +32,14 @@ class JourneyNavigationTests(JourneyFixture, TestCase):
         self.contract_query = f"?contract={self.contract.pk}"
 
     def assert_tabs(self, response, scoped):
+        if response.resolver_match.url_name in (
+            "claim_list",
+            "progress_list",
+            "progress_detail",
+        ):
+            self.assertEqual(JourneyLinks(response).links, {})
+            self.assertNotContains(response, "data-billing-navigation")
+            return
         expected = {
             tab: reverse(f"billing:{route}_list")
             + (self.contract_query if scoped else "")
@@ -41,6 +49,11 @@ class JourneyNavigationTests(JourneyFixture, TestCase):
                 ("progress", "progress"),
             )
         }
+        if scoped:
+            expected["baselines"] = (
+                reverse("contracts:detail", args=[self.contract.pk])
+                + "?section=quantities&pane=basis"
+            )
         self.assertEqual(JourneyLinks(response).links, expected)
 
     def test_zero_one_and_multiple_baseline_routing_and_all_tabs(self):
@@ -76,7 +89,7 @@ class JourneyNavigationTests(JourneyFixture, TestCase):
         reader, _, _ = scoped_reader(self.organization, self.project, ["claims.view"])
         self.login(reader)
         result = self.client.get(reverse("billing:claim_list") + self.contract_query)
-        self.assertEqual(set(JourneyLinks(result).links), {"claims"})
+        self.assertEqual(JourneyLinks(result).links, {})
         self.assertEqual(
             self.client.get(
                 reverse("billing:baseline_list") + self.contract_query
@@ -142,20 +155,54 @@ class BillingJourneyNavigationBrowserTests(JourneyFixture, StaticLiveServerTestC
         def cycle(name, start, baseline_destination, *, scoped=False, mobile=False):
             suffix = query if scoped else ""
             steps = []
+            from_claims_list = start == claims + suffix
+            if from_claims_list and scoped:
+                steps += [
+                    {
+                        "inspect": "!document.querySelector('[data-billing-navigation]')",
+                        "description": "Claims list is a focused collection",
+                    },
+                    {
+                        "clickSelector": ".erp-list-scope a",
+                        "afterPath": reverse(
+                            "contracts:detail", args=[self.contract.pk]
+                        ),
+                    },
+                    {
+                        "clickSelector": '[data-contract-hub-navigation] a[href*="section=quantities"]',
+                        "afterPath": reverse(
+                            "contracts:detail", args=[self.contract.pk]
+                        ),
+                    },
+                ]
+            elif from_claims_list:
+                start = baselines
             for tab, destination in (
                 ("baselines", baseline_destination),
                 ("progress", progress),
-                ("claims", claims),
             ):
+                selector = f"[data-journey-tab={tab}]"
+                if scoped and tab == "baselines":
+                    destination = reverse("contracts:detail", args=[self.contract.pk])
+                    if from_claims_list:
+                        selector = '.cd-quantity-tabs a[href*="pane=basis"]'
+                if scoped and tab == "progress":
+                    selector = '.cd-quantity-tabs a[href*="/billing/progress/"]'
                 steps.append(
                     {
-                        "clickSelector": f"[data-journey-tab={tab}]",
+                        "clickSelector": selector,
                         "afterPath": destination,
                     }
                 )
                 steps.append(
                     {
-                        "inspect": f"document.querySelector('[data-journey-tab={tab}]').getAttribute('aria-current')==='page' && document.querySelector('[data-journey-tab=claims]').getAttribute('href')==={claims + suffix!r} && !/\\/billing\\/claims\\/[^/?]+\\//.test(location.pathname)",
+                        "inspect": (
+                            "!!document.querySelector('[data-contract-quantities]') && new URLSearchParams(location.search).get('pane')==='basis'"
+                            if scoped and tab == "baselines"
+                            else f"!document.querySelector('[data-billing-navigation]') && location.pathname==={progress!r} && location.search==={suffix!r}"
+                            if tab == "progress"
+                            else f"document.querySelector('[data-journey-tab={tab}]').getAttribute('aria-current')==='page' && document.querySelector('[data-journey-tab=claims]').getAttribute('href')==={claims + suffix!r} && !/\\/billing\\/claims\\/[^/?]+\\//.test(location.pathname)"
+                        ),
                         "description": "correct destination, active tab and contract context; no Claim Detail",
                     }
                 )

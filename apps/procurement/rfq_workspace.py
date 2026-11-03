@@ -67,9 +67,9 @@ def _context(request: HttpRequest, rfq):
     state = rfq.status
     scope = _scope_context(request, rfq)
     lines = list(
-        rfq.lines.select_related("material", "unit_of_measure").order_by(
-            "sort_order", "created_at"
-        )
+        rfq.lines.select_related(
+            "material", "unit_of_measure", "purchase_request_item"
+        ).order_by("sort_order", "created_at")
     )
     return {
         "rfq": rfq,
@@ -93,9 +93,9 @@ def _context(request: HttpRequest, rfq):
             )
         ),
         "state_description": {
-            "draft": "اقلام را از درخواست خرید انتخاب کنید، دامنه خرید را صریحاً تعریف کنید و استعلام را برای صدور بفرستید.",
-            "submitted_for_issue": "استعلام آماده بررسی برای صدور است. دامنه خرید معتبر و حداقل یک تأمین‌کننده برای صدور لازم است.",
-            "issued": "استعلام صادر شده است. اقلام، دامنه خرید، مهلت‌ها و دعوت‌نامه‌های هر نسخه تثبیت شده‌اند؛ تغییر از مسیر الحاقیه انجام می‌شود.",
+            "draft": "اقلام درخواست خرید را انتخاب کنید، مقدار و نحوه انتخاب تأمین‌کننده را تأیید کنید و استعلام را برای صدور بفرستید.",
+            "submitted_for_issue": "تنظیمات انتخاب تأمین‌کننده را بررسی کنید؛ سپس تأمین‌کنندگان را انتخاب و استعلام را صادر کنید.",
+            "issued": "استعلام صادر شده است. اقلام، تنظیمات انتخاب، مهلت‌ها و دعوت‌نامه‌های هر نسخه تثبیت شده‌اند؛ تغییر از مسیر الحاقیه انجام می‌شود.",
             "closed": "استعلام بسته شده است. اطلاعات نسخه‌های صادرشده فقط خواندنی است.",
             "cancelled": "استعلام لغو شده است و قابل ادامه نیست. تاریخچه نسخه‌ها حفظ شده است.",
         }[state],
@@ -110,9 +110,11 @@ def _context(request: HttpRequest, rfq):
 def _scope_context(request, rfq):
     from .commercial_scope_forms import source_signature
     from .commercial_scope_services import latest_definition, source_lines
+    from .scope_presentation import configuration_context
 
     definition = latest_definition(rfq, rfq.current_version_number + 1)
     return {
+        **configuration_context(rfq, definition),
         "prepared_scope": definition,
         "scope_ready": bool(
             definition

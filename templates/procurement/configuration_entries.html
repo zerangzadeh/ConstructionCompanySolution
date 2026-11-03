@@ -1,0 +1,9 @@
+{% load erp_format %}
+{% for entry in entries %}
+<article class="rfq-config__saved">
+  <h3>{% if entry.scope_type == 'lot' %}گروه خرید: {% endif %}{{ entry.title }}</h3>
+  <p>{{ entry.required_quantity|erp_number }} {{ entry.unit_name }} · انتخاب مستقل: {{ entry.independently_awardable|yesno:"بله,خیر" }} · امکان تقسیم خرید: {{ entry.allows_split_award|yesno:"بله,خیر" }} · پیشنهاد جایگزین مجاز: {{ entry.allows_alternates|yesno:"بله,خیر" }}</p>
+  {% if entry.scope_type == 'lot' %}<ul>{% for member in entry.members %}<li>{{ member.item.material.name }} · مقدار استعلام: {{ member.quantity|erp_number }} {{ member.item.unit_of_measure.name }}<p>مقدار درخواست خرید: {{ member.item.quantity|erp_number }} · سقف قلم در استعلام: {{ member.source_quantity|erp_number }}</p></li>{% endfor %}</ul>{% endif %}
+  {% if editable %}<a class="text-blue-700" href="{% url 'procurement:rfq_scope_define' rfq.pk %}?edit={{ entry.scope_code|urlencode }}">اصلاح تنظیمات {% if entry.scope_type == 'lot' %}گروه{% else %}قلم{% endif %}</a>{% endif %}
+</article>
+{% endfor %}

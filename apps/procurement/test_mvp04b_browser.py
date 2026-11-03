@@ -21,7 +21,7 @@ class ScopeBrowserTests(CommercialScopeFixture, StaticLiveServerTestCase):
     browser = browser_fixture.ContractBillingBrowserTests.browser
     _fixture_teardown = browser_fixture.ContractBillingBrowserTests._fixture_teardown
     browser_evidence_directory = (
-        Path(__file__).resolve().parents[2] / "output/mvp-04b/browser"
+        Path(__file__).resolve().parents[2] / "output/mvp-04b-ux/legacy-scope-browser"
     )
 
     def case(self, name, path, **kwargs):
@@ -68,8 +68,8 @@ class ScopeBrowserTests(CommercialScopeFixture, StaticLiveServerTestCase):
                     mustText=["درخواست خرید تأییدشده مبنا", "سیمان پرتلند"],
                     steps=[
                         {
-                            "inspect": "['scope_type','independently_awardable','allows_split_award','allows_alternates'].every(n=>document.querySelector('[name='+n+']').value==='') && !/[a-f0-9]{8}-[a-f0-9]{4}-/i.test(document.querySelector('main').innerText)",
-                            "description": "no silently chosen structure or policy and no visible UUID",
+                            "inspect": "['scope_type','independently_awardable','allows_split_award','allows_alternates'].map(n=>document.querySelector('[name='+n+']').value).join(',')==='lot,yes,no,no' && !/[a-f0-9]{8}-[a-f0-9]{4}-/i.test(document.querySelector('main').innerText)",
+                            "description": "business defaults remain editable before explicit save; no visible UUID",
                         }
                     ],
                 )
@@ -87,7 +87,7 @@ class ScopeBrowserTests(CommercialScopeFixture, StaticLiveServerTestCase):
                             "formSelector": f"form[action='{issue_url}']",
                             "clickSelector": f"form[action='{issue_url}'] button",
                             "afterPath": issue_url,
-                            "mustText": "صریحاً تعریف",
+                            "mustText": "تأیید و ذخیره",
                         },
                     ],
                 ),
@@ -101,12 +101,13 @@ class ScopeBrowserTests(CommercialScopeFixture, StaticLiveServerTestCase):
                             "fill": {
                                 "scope_type": "line",
                                 "scope_code": "خرید سیمان",
+                                "select_0": True,
                                 "member_0": "5",
                                 "independently_awardable": "no",
                                 "allows_split_award": "yes",
                                 "allows_alternates": "no",
                             },
-                            "formSelector": "form[aria-label='تعریف دامنه خرید']",
+                            "formSelector": "form[aria-label='تنظیم گروه خرید']",
                             "clickSelector": "button[value=append]",
                             "afterPath": scope_url,
                         },
@@ -124,15 +125,16 @@ class ScopeBrowserTests(CommercialScopeFixture, StaticLiveServerTestCase):
                             "fill": {
                                 "scope_type": "line",
                                 "scope_code": "خرید سیمان",
+                                "select_0": True,
                                 "member_0": "5",
                                 "independently_awardable": "yes",
                                 "allows_split_award": "no",
                                 "allows_alternates": "no",
                             },
-                            "formSelector": "form[aria-label='تعریف دامنه خرید']",
+                            "formSelector": "form[aria-label='تنظیم گروه خرید']",
                             "clickSelector": "button[value=append]",
                             "afterPath": scope_url,
-                            "mustText": "دامنه‌های ثبت‌شده",
+                            "mustText": "تنظیمات نسخه جاری",
                         },
                     ],
                 ),
@@ -145,7 +147,7 @@ class ScopeBrowserTests(CommercialScopeFixture, StaticLiveServerTestCase):
                             "formSelector": f"form[action='{issue_url}']",
                             "clickSelector": f"form[action='{issue_url}'] button",
                             "afterPath": detail_url,
-                            "mustText": "دامنه تثبیت‌شده",
+                            "mustText": "تنظیمات نسخه جاری",
                         },
                     ],
                 ),
@@ -178,7 +180,7 @@ class ScopeBrowserTests(CommercialScopeFixture, StaticLiveServerTestCase):
                             "formSelector": "form[aria-label='صدور الحاقیه']",
                             "clickSelector": "form[aria-label='صدور الحاقیه'] button[type=submit]",
                             "afterPath": addendum_url,
-                            "mustText": "صریحاً تعریف",
+                            "mustText": "تأیید و ذخیره",
                         }
                     ],
                 ),
@@ -191,12 +193,13 @@ class ScopeBrowserTests(CommercialScopeFixture, StaticLiveServerTestCase):
                             "fill": {
                                 "scope_type": "line",
                                 "scope_code": "خرید سیمان نسخه دوم",
+                                "select_0": True,
                                 "member_0": "2",
                                 "independently_awardable": "yes",
                                 "allows_split_award": "no",
                                 "allows_alternates": "yes",
                             },
-                            "formSelector": "form[aria-label='تعریف دامنه خرید']",
+                            "formSelector": "form[aria-label='تنظیم گروه خرید']",
                             "clickSelector": "button[value=append]",
                             "afterPath": scope_url,
                         },
@@ -219,7 +222,7 @@ class ScopeBrowserTests(CommercialScopeFixture, StaticLiveServerTestCase):
                             "formSelector": "form[aria-label='صدور الحاقیه']",
                             "clickSelector": "form[aria-label='صدور الحاقیه'] button[type=submit]",
                             "afterPath": detail_url,
-                            "mustText": "خرید سیمان نسخه دوم",
+                            "mustText": "تنظیمات نسخه جاری",
                         },
                     ],
                 ),

@@ -1,0 +1,158 @@
+{
+  "unchanged_source_proof": [
+    {
+      "path": "apps/procurement/test_p5_s11_comparison_award.py",
+      "unchanged_from_HEAD": true,
+      "sha256": "28a3ccc1fbbb8f48f7f64245f2630e4cf0125c66993a65bc95e7b8599aeaa679"
+    },
+    {
+      "path": "apps/procurement/test_p5_s10_admissibility.py",
+      "unchanged_from_HEAD": true,
+      "sha256": "569373cbc9fb3e6d19e17773661343e92e3e3e77e24d1a6c6573310b2131f80a"
+    },
+    {
+      "path": "apps/procurement/test_p5_s08_sealed_custody.py",
+      "unchanged_from_HEAD": true,
+      "sha256": "55227ded23cdc731dac8d1e8ebf909b653c27ba9f57b5ddb69d510d98b95a504"
+    },
+    {
+      "path": "apps/procurement/opening_services.py",
+      "unchanged_from_HEAD": true,
+      "sha256": "244d756318646f8784e829df57ba6830a7901b8c79b4b5e489fb56987b7c6ce7"
+    },
+    {
+      "path": "apps/procurement/comparison_services.py",
+      "unchanged_from_HEAD": true,
+      "sha256": "65687dc802dbce08bc20a9f49e62950690f1a613a56ca1dac408ddf2d5f6e66d"
+    },
+    {
+      "path": "apps/organizations/authorization.py",
+      "unchanged_from_HEAD": true,
+      "sha256": "0129af88ca339987e543c8f5a006f3c9f0348ea2e3a8ba016f5d987e52e6a600"
+    },
+    {
+      "path": "apps/organizations/models.py",
+      "unchanged_from_HEAD": true,
+      "sha256": "768c89a19439553aed934b441f068a832120e48cdd222557e419819d45233f01"
+    },
+    {
+      "path": "conftest.py",
+      "unchanged_from_HEAD": true,
+      "sha256": "5b399f7247e832d8a371fbfb5652f1a8cf14d77203e8d6cd319db5b089a24f4b"
+    }
+  ],
+  "failures": [
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11ComparisonAwardTests.test_no_award_is_explicit_has_no_allocations_and_does_not_mutate_downstream",
+      "phase": "failure",
+      "category": "BASELINE TEST DEBT",
+      "reason": "Existing fixture fails at protected quote opening authorization in setUp, before any changed UI/form/view adapter executes. Fixtures and involved domain/authorization sources are byte-identical to HEAD.",
+      "trace_excerpt": "apps\\procurement\\test_p5_s11_comparison_award.py:63: in setUp\n    super().setUp()\napps\\procurement\\test_p5_s10_admissibility.py:80: in setUp\n    self.opening = approve_quote_opening(\napps\\procurement\\opening_services.py:450: in approve_quote_opening\n    revision, _ = _lock_target(\napps\\procurement\\opening_services.py:193: in _lock_target\n    require_business_permission(\napps\\organizations\\authorization.py:441: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "full_evidence": "final-tests.xml"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11SelfFinalizationPolicyTests.test_tenant_policy_explicitly_allows_s11_comparison_and_award_self_finalization",
+      "phase": "failure",
+      "category": "BASELINE TEST DEBT",
+      "reason": "Existing fixture fails at protected quote opening authorization in setUp, before any changed UI/form/view adapter executes. Fixtures and involved domain/authorization sources are byte-identical to HEAD.",
+      "trace_excerpt": "apps\\procurement\\test_p5_s11_comparison_award.py:63: in setUp\n    super().setUp()\napps\\procurement\\test_p5_s10_admissibility.py:80: in setUp\n    self.opening = approve_quote_opening(\napps\\procurement\\opening_services.py:450: in approve_quote_opening\n    revision, _ = _lock_target(\napps\\procurement\\opening_services.py:193: in _lock_target\n    require_business_permission(\napps\\organizations\\authorization.py:441: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "full_evidence": "final-tests.xml"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_award_is_sourcing_only_conserves_quantity_and_self_finalization_is_policy_gated",
+      "phase": "failure",
+      "category": "BASELINE TEST DEBT",
+      "reason": "Existing fixture fails at protected quote opening authorization in setUp, before any changed UI/form/view adapter executes. Fixtures and involved domain/authorization sources are byte-identical to HEAD.",
+      "trace_excerpt": "apps\\procurement\\test_p5_s11_comparison_award.py:376: in setUp\n    approve_quote_opening(\napps\\procurement\\opening_services.py:450: in approve_quote_opening\n    revision, _ = _lock_target(\napps\\procurement\\opening_services.py:193: in _lock_target\n    require_business_permission(\napps\\organizations\\authorization.py:441: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "full_evidence": "final-tests.xml"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_conflict_cannot_self_clear_and_blocks_evaluation_until_disposed",
+      "phase": "failure",
+      "category": "BASELINE TEST DEBT",
+      "reason": "Existing fixture fails at protected quote opening authorization in setUp, before any changed UI/form/view adapter executes. Fixtures and involved domain/authorization sources are byte-identical to HEAD.",
+      "trace_excerpt": "apps\\procurement\\test_p5_s11_comparison_award.py:376: in setUp\n    approve_quote_opening(\napps\\procurement\\opening_services.py:450: in approve_quote_opening\n    revision, _ = _lock_target(\napps\\procurement\\opening_services.py:193: in _lock_target\n    require_business_permission(\napps\\organizations\\authorization.py:441: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "full_evidence": "final-tests.xml"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_exception_closed_catalogue_and_independent_lifecycle",
+      "phase": "failure",
+      "category": "BASELINE TEST DEBT",
+      "reason": "Existing fixture fails at protected quote opening authorization in setUp, before any changed UI/form/view adapter executes. Fixtures and involved domain/authorization sources are byte-identical to HEAD.",
+      "trace_excerpt": "apps\\procurement\\test_p5_s11_comparison_award.py:376: in setUp\n    approve_quote_opening(\napps\\procurement\\opening_services.py:450: in approve_quote_opening\n    revision, _ = _lock_target(\napps\\procurement\\opening_services.py:193: in _lock_target\n    require_business_permission(\napps\\organizations\\authorization.py:441: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "full_evidence": "final-tests.xml"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_reproducible_asserted_input_lineage_and_immutable_finalization",
+      "phase": "failure",
+      "category": "BASELINE TEST DEBT",
+      "reason": "Existing fixture fails at protected quote opening authorization in setUp, before any changed UI/form/view adapter executes. Fixtures and involved domain/authorization sources are byte-identical to HEAD.",
+      "trace_excerpt": "apps\\procurement\\test_p5_s11_comparison_award.py:376: in setUp\n    approve_quote_opening(\napps\\procurement\\opening_services.py:450: in approve_quote_opening\n    revision, _ = _lock_target(\napps\\procurement\\opening_services.py:193: in _lock_target\n    require_business_permission(\napps\\organizations\\authorization.py:441: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "full_evidence": "final-tests.xml"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_split_award_is_explicit_and_allocation_inputs_are_governing",
+      "phase": "failure",
+      "category": "BASELINE TEST DEBT",
+      "reason": "Existing fixture fails at protected quote opening authorization in setUp, before any changed UI/form/view adapter executes. Fixtures and involved domain/authorization sources are byte-identical to HEAD.",
+      "trace_excerpt": "apps\\procurement\\test_p5_s11_comparison_award.py:376: in setUp\n    approve_quote_opening(\napps\\procurement\\opening_services.py:450: in approve_quote_opening\n    revision, _ = _lock_target(\napps\\procurement\\opening_services.py:193: in _lock_target\n    require_business_permission(\napps\\organizations\\authorization.py:441: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "full_evidence": "final-tests.xml"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_tie_requires_explicit_resolution_and_split_award_retains_exact_revisions",
+      "phase": "failure",
+      "category": "BASELINE TEST DEBT",
+      "reason": "Existing fixture fails at protected quote opening authorization in setUp, before any changed UI/form/view adapter executes. Fixtures and involved domain/authorization sources are byte-identical to HEAD.",
+      "trace_excerpt": "apps\\procurement\\test_p5_s11_comparison_award.py:376: in setUp\n    approve_quote_opening(\napps\\procurement\\opening_services.py:450: in approve_quote_opening\n    revision, _ = _lock_target(\napps\\procurement\\opening_services.py:193: in _lock_target\n    require_business_permission(\napps\\organizations\\authorization.py:441: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "full_evidence": "final-tests.xml"
+    },
+    {
+      "test": "apps.procurement.test_mvp04b_scope.ScopeConcurrencyTests.test_two_revisions_with_same_expected_revision_cannot_overwrite",
+      "phase": "failure",
+      "category": "TEST INFRASTRUCTURE DEBT",
+      "reason": "Retained payments_payment FK blocks default Django transaction teardown; bounded verification harness uses the already-qualified CASCADE policy only in the named disposable DB.",
+      "trace_excerpt": ".venv\\Lib\\site-packages\\django\\db\\backends\\utils.py:103: in _execute\n    return self.cursor.execute(sql)\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\psycopg\\cursor.py:117: in execute\n    raise ex.with_traceback(None)\nE   psycopg.errors.FeatureNotSupported: cannot truncate a table referenced in a foreign key constraint\nE   DETAIL:  Table \"payments_payment\" references \"projects_projectphase\".\nE   HINT:  Truncate table \"payments_payment\" at the same time, or use TRUNCATE ... CASCADE.\n\nThe above exception was the direct cause of the following exception:\n.venv\\Lib\\site-packages\\django\\core\\management\\commands\\flush.py:71: in handle\n    connection.ops.execute_sql_flush(sql_list)\n.venv\\Lib\\site-packages\\django\\db\\backends\\base\\operations.py:473: in execute_sql_flush\n    cursor.execute(sql)\n.venv\\Lib\\site-packages\\django\\db\\backends\\utils.py:79: in execute\n    return self._execute_with_wrappers(\n.venv\\Lib\\site-packages\\django\\db\\backends\\utils.py:92: in _execute_with_wrappers\n    return executor(sql, params, many, context)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv",
+      "full_evidence": "final-tests.xml"
+    },
+    {
+      "test": "apps.procurement.test_rfq.RequestForQuotationConcurrencyTests.test_concurrent_identical_issue_creates_one_version",
+      "phase": "failure",
+      "category": "TEST INFRASTRUCTURE DEBT",
+      "reason": "Retained payments_payment FK blocks default Django transaction teardown; bounded verification harness uses the already-qualified CASCADE policy only in the named disposable DB.",
+      "trace_excerpt": ".venv\\Lib\\site-packages\\django\\db\\backends\\utils.py:103: in _execute\n    return self.cursor.execute(sql)\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\psycopg\\cursor.py:117: in execute\n    raise ex.with_traceback(None)\nE   psycopg.errors.FeatureNotSupported: cannot truncate a table referenced in a foreign key constraint\nE   DETAIL:  Table \"payments_payment\" references \"projects_projectphase\".\nE   HINT:  Truncate table \"payments_payment\" at the same time, or use TRUNCATE ... CASCADE.\n\nThe above exception was the direct cause of the following exception:\n.venv\\Lib\\site-packages\\django\\core\\management\\commands\\flush.py:71: in handle\n    connection.ops.execute_sql_flush(sql_list)\n.venv\\Lib\\site-packages\\django\\db\\backends\\base\\operations.py:473: in execute_sql_flush\n    cursor.execute(sql)\n.venv\\Lib\\site-packages\\django\\db\\backends\\utils.py:79: in execute\n    return self._execute_with_wrappers(\n.venv\\Lib\\site-packages\\django\\db\\backends\\utils.py:92: in _execute_with_wrappers\n    return executor(sql, params, many, context)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv",
+      "full_evidence": "final-tests.xml"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11ConcurrencyTests.test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity",
+      "phase": "failure",
+      "category": "BASELINE TEST DEBT",
+      "reason": "Existing fixture fails at protected quote opening authorization in setUp, before any changed UI/form/view adapter executes. Fixtures and involved domain/authorization sources are byte-identical to HEAD.",
+      "trace_excerpt": "apps\\procurement\\test_p5_s11_comparison_award.py:63: in setUp\n    super().setUp()\napps\\procurement\\test_p5_s10_admissibility.py:80: in setUp\n    self.opening = approve_quote_opening(\napps\\procurement\\opening_services.py:450: in approve_quote_opening\n    revision, _ = _lock_target(\napps\\procurement\\opening_services.py:193: in _lock_target\n    require_business_permission(\napps\\organizations\\authorization.py:441: in require_business_permission\n    raise PermissionDenied(message)\nE   django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.",
+      "full_evidence": "final-tests.xml"
+    },
+    {
+      "test": "apps.procurement.test_p5_s11_comparison_award.P5S11ConcurrencyTests.test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity",
+      "phase": "error",
+      "category": "TEST INFRASTRUCTURE DEBT",
+      "reason": "Retained payments_payment FK blocks default Django transaction teardown; bounded verification harness uses the already-qualified CASCADE policy only in the named disposable DB.",
+      "trace_excerpt": ".venv\\Lib\\site-packages\\django\\db\\backends\\utils.py:103: in _execute\n    return self.cursor.execute(sql)\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n.venv\\Lib\\site-packages\\psycopg\\cursor.py:117: in execute\n    raise ex.with_traceback(None)\nE   psycopg.errors.FeatureNotSupported: cannot truncate a table referenced in a foreign key constraint\nE   DETAIL:  Table \"payments_payment\" references \"projects_projectphase\".\nE   HINT:  Truncate table \"payments_payment\" at the same time, or use TRUNCATE ... CASCADE.\n\nThe above exception was the direct cause of the following exception:\n.venv\\Lib\\site-packages\\django\\core\\management\\commands\\flush.py:71: in handle\n    connection.ops.execute_sql_flush(sql_list)\n.venv\\Lib\\site-packages\\django\\db\\backends\\base\\operations.py:473: in execute_sql_flush\n    cursor.execute(sql)\n.venv\\Lib\\site-packages\\django\\db\\backends\\utils.py:79: in execute\n    return self._execute_with_wrappers(\n.venv\\Lib\\site-packages\\django\\db\\backends\\utils.py:92: in _execute_with_wrappers\n    return executor(sql, params, many, context)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n.venv",
+      "full_evidence": "final-tests.xml"
+    },
+    {
+      "test": "apps.procurement.test_mvp04b_browser.ScopeBrowserTests.test_explicit_scope_issue_addendum_and_responsive_denials",
+      "phase": "failure",
+      "category": "REMEDIATION TEST EXPECTATION",
+      "reason": "Legacy browser expects a hidden technical line-scope title, or a test-only disclosure selector was also added to the unrelated general PR picker. Expectations/selectors corrected; domain assertions retained.",
+      "trace_excerpt": "apps\\procurement\\test_mvp04b_browser.py:169: in test_explicit_scope_issue_addendum_and_responsive_denials\n    self.browser(\napps\\billing\\test_mvp03_browser.py:230: in browser\n    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])\nE   AssertionError: 1 != 0 : پروژه‌ها\\nکارگاه‌ها\\nگزارش‌های روزانه\\nنیروهای کار\\nحضور و کارکرد\\nتجهیزات عملیاتی\\nهزینه‌ها و تنخواه\\nایمنی\\nکیفیت\\nپیمان، متره و صورت‌وضعیت\\n⌄\\nبرآورد و فهرست‌بها\\nقراردادها\\nصورت‌وضعیت و صورتحساب\\nتدارکات، مصالح و انبار\\n⌄\\nدرخواست‌های خرید\\nاستعلام و انتخاب تأمین‌کننده\\nسفارش‌های خرید\\nرسید کالا\\nمصالح و کالا\\nانبار\\nکارتابل، اسناد و گزارش‌ها\\n⌄\\nوظایف من\\nطرف‌های تجاری\\nاسناد\\nگردش‌کارها\\nتنظیمات و مدیریت دسترسی\\n⌄\\nپروفایل کاربر\\nانتخاب شرکت\\nتنظیمات شرکت\\nاعضا و دسترسی‌ها\\nنقش‌های شرکت\\nسوابق فعالیت\\nفضای کاری فعال\\nERP\\nخروج از حساب\\nشرکت فعال:\\nشرکت ساختمانی نمونه\\nماژول‌ها\\nجستجوی پروژه و مصالح\\nسامانه جامع و یکپارچه مدیریت شرکت\\nP\\nprocurement-owner\\nتنظیمات شخصی\\nشرکت\\nشرکت ساختمانی نمونه\\nپروژه\\nهمه پروژه‌های در دسترس\\nPROC — پروژه نمونه سازه\\nانتخاب پروژه و کارگاه\\nاستعلام‌های خرید / RF",
+      "full_evidence": "final-tests.xml"
+    },
+    {
+      "test": "apps.procurement.test_mvp04b1_browser.RFQPreparationBrowserTests.test_end_to_end_rfq_preparation_issue_and_responsive_history",
+      "phase": "failure",
+      "category": "REMEDIATION TEST EXPECTATION",
+      "reason": "Legacy browser expects a hidden technical line-scope title, or a test-only disclosure selector was also added to the unrelated general PR picker. Expectations/selectors corrected; domain assertions retained.",
+      "trace_excerpt": "apps\\procurement\\test_mvp04b1_browser.py:402: in test_end_to_end_rfq_preparation_issue_and_responsive_history\n    self.browser(\napps\\billing\\test_mvp03_browser.py:230: in browser\n    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])\nE   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:80\nE         throw new Error('Missing clickable control '+selector);\nE               ^\nE   \nE   Error: Missing clickable control .rfq-config__line-add > summary\nE       at click (file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:80:13)\nE       at async file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:270:9\nE   \nE   Node.js v24.20.0",
+      "full_evidence": "final-tests.xml"
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-03",
+  "branch": "main",
+  "head": "b97fcc45a92737b83e9c3ffb14b589cfdc4250d7",
+  "product_touch_set": [
+    "apps/billing/templates/billing/progress_detail.html",
+    "apps/billing/static/billing/measurement_detail.css",
+    "apps/billing/views.py"
+  ],
+  "checks": [
+    {
+      "command": [
+        "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "apps/billing/views.py",
+        "apps/billing/test_journey_content.py",
+        "apps/billing/test_journey_navigation.py",
+        "apps/contracts/test_hub.py"
+      ],
+      "exit_code": 0,
+      "output": "All checks passed!\n"
+    },
+    {
+      "command": [
+        "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "apps/billing/views.py",
+        "apps/billing/test_journey_content.py",
+        "apps/billing/test_journey_navigation.py",
+        "apps/contracts/test_hub.py"
+      ],
+      "exit_code": 0,
+      "output": "4 files already formatted\n"
+    },
+    {
+      "command": [
+        "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+        "manage.py",
+        "check"
+      ],
+      "exit_code": 0,
+      "output": "System check identified no issues (0 silenced).\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "apps/billing/templates/billing/progress_detail.html",
+        "apps/billing/static/billing/measurement_detail.css",
+        "apps/billing/views.py",
+        "apps/billing/test_journey_content.py",
+        "apps/billing/test_journey_navigation.py",
+        "apps/contracts/test_hub.py"
+      ],
+      "exit_code": 0,
+      "output": "warning: in the working copy of 'apps/billing/test_journey_navigation.py', LF will be replaced by CRLF the next time Git touches it\n"
+    }
+  ],
+  "tests_passed": 6,
+  "chrome_cases_passed": 12,
+  "widths": [
+    1440,
+    1024,
+    390
+  ],
+  "states": [
+    "draft",
+    "submitted",
+    "verified",
+    "rejected"
+  ],
+  "source_hashes": {
+    "apps/billing/templates/billing/progress_detail.html": "15166fa2c96832fb52fd5aab21688e0e274f931d91b87198410983f3c993a1f5",
+    "apps/billing/static/billing/measurement_detail.css": "ee0345b761eda5b27843cd6d8dd15844b5b1844cd362c5b045351ffadf8d48f1",
+    "apps/billing/views.py": "7060aeb2c3f9c421131cd2328c3bd27610c414a42bcdfe68a71f6d9a5e5fdc13",
+    "apps/billing/test_journey_content.py": "43cc063a3685bff512f2865da2de5dd6c0ef27017d169eadaeaeede985374cdf",
+    "apps/billing/test_journey_navigation.py": "21e3524302271c8761d9863b8bc4618e553f48d7c9bb62b2ee90d5654473d18b",
+    "apps/contracts/test_hub.py": "9289d2e2310591d78030073ecf2ea5adb7d11e63669b92191b0ceeebd3e9d352"
+  },
+  "source_values_and_lifecycle": "Existing source values/services unchanged; all four states identical after confirmation dismissal.",
+  "runtime_assets": "Existing shared interaction includes plus one local domain-layout stylesheet, resolved by Django; no remote references or imports.",
+  "concurrent_work": "Module Selector and procurement edits owned elsewhere; this task does not edit or qualify those changes.",
+  "git_writes": "NONE"
+}

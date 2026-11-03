@@ -5,7 +5,6 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
-from apps.materials.models import UnitOfMeasure
 from apps.organizations.authorization import require_business_permission
 from apps.organizations.decorators import active_organization_required
 from apps.organizations.models import BusinessPermissionCode as P
@@ -15,6 +14,11 @@ from .commercial_scope_services import define_rfq_commercial_scope, latest_defin
 from .rfq_services import issue_rfq_addendum
 from .rfq_ui import preparation_error_text
 from .rfq_workspace import _rfq
+from .scope_presentation import (
+    RFQItemConfigurationForm,
+    configuration_context,
+    definition_entries,
+)
 
 
 @active_organization_required
@@ -26,15 +30,18 @@ def scope_define(request: HttpRequest, rfq_id: str) -> HttpResponse:
         organization=request.organization,
         permission=P.RFQS_ADDENDUM if rfq.current_version_number else P.RFQS_CHANGE,
         project=rfq.project,
-        message="اجازه تعریف دامنه خرید این استعلام را ندارید.",
+        message="اجازه تنظیم نحوه انتخاب تأمین‌کننده این استعلام را ندارید.",
     )
     if rfq.status not in ("draft", "submitted_for_issue", "issued"):
-        raise PermissionDenied("در وضعیت فعلی تعریف دامنه خرید مجاز نیست.")
+        raise PermissionDenied("در وضعیت فعلی تغییر تنظیمات استعلام مجاز نیست.")
     definition = latest_definition(rfq, rfq.current_version_number + 1)
+    if request.method == "POST" and request.POST.get("operation") == "configure_items":
+        return _configure_items(request, rfq, definition)
     form = ScopeDefinitionForm(
         request.POST if request.method == "POST" else None,
         rfq=rfq,
         definition=definition,
+        edit_code=request.GET.get("edit"),
     )
     if request.method == "POST" and form.is_valid():
         replay = rfq.scope_definitions.filter(
@@ -48,9 +55,7 @@ def scope_define(request: HttpRequest, rfq_id: str) -> HttpResponse:
         if operation not in ("append", "replace") or (
             operation == "replace" and not exists
         ):
-            form.add_error(
-                None, "برای جایگزینی، عنوان یکی از دامنه‌های ثبت‌شده را وارد کنید."
-            )
+            form.add_error(None, "برای اصلاح، یکی از تنظیمات ثبت‌شده را انتخاب کنید.")
         elif operation == "append" and exists and replay is None:
             form.add_error(
                 "scope_code",
@@ -73,31 +78,6 @@ def scope_define(request: HttpRequest, rfq_id: str) -> HttpResponse:
                 form.add_error(None, preparation_error_text(exc))
             else:
                 return redirect("procurement:rfq_scope_define", rfq_id=rfq.pk)
-    entries = []
-    if definition:
-        members = {
-            str(item.pk): item
-            for item in rfq.purchase_request.items.select_related(
-                "material", "unit_of_measure"
-            )
-        }
-        units = {
-            str(unit.pk): unit.name
-            for unit in UnitOfMeasure.objects.filter(organization=request.organization)
-        }
-        for row in definition.payload["scopes"]:
-            entry = dict(
-                row,
-                unit_name=units.get(row["unit_of_measure_id"], ""),
-                member_labels=[],
-            )
-            for member in row["lines"]:
-                item = members.get(member["purchase_request_item_id"])
-                if item:
-                    entry["member_labels"].append(
-                        f"{item.material.name} · {member['quantity']} {item.unit_of_measure.name}"
-                    )
-            entries.append(entry)
     return render(
         request,
         "procurement/scope_form.html",
@@ -105,10 +85,41 @@ def scope_define(request: HttpRequest, rfq_id: str) -> HttpResponse:
             "rfq": rfq,
             "form": form,
             "definition": definition,
-            "definition_entries": entries,
+            "definition_entries": definition_entries(rfq, definition),
         },
         status=400 if form.is_bound else 200,
     )
+
+
+def _configure_items(request, rfq, definition) -> HttpResponse:
+    """Explicit row confirmation through the unchanged versioned domain service."""
+    from .rfq_workspace import _context
+
+    replay = rfq.scope_definitions.filter(
+        idempotency_key=request.POST.get("idempotency_key", "")
+    ).first()
+    form = RFQItemConfigurationForm(
+        request.POST, rfq=rfq, definition=replay or definition
+    )
+    if form.is_valid():
+        try:
+            define_rfq_commercial_scope(
+                organization=request.organization,
+                actor=request.user,
+                rfq=rfq,
+                version_number=form.cleaned_data["version_number"],
+                scopes=form.entries,
+                expected_revision=form.cleaned_data["expected_revision"],
+                idempotency_key=form.cleaned_data["idempotency_key"],
+                expected_source_fingerprint=form.cleaned_data["source_fingerprint"],
+            )
+        except (PermissionDenied, ValidationError, ValueError) as exc:
+            form.add_error(None, preparation_error_text(exc))
+        else:
+            return redirect("procurement:rfq_detail", rfq_id=rfq.pk)
+    context = _context(request, rfq)
+    context.update(configuration_context(rfq, definition, form=form))
+    return render(request, "procurement/rfq_detail.html", context, status=400)
 
 
 @active_organization_required

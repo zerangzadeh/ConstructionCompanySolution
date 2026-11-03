@@ -267,7 +267,9 @@ def journey_list_context(request, records, key):
 
     prefix = "baseline__" if key == "progress_records" else ""
     if prefix:
-        records = records.select_related("baseline__contract", "baseline__project")
+        records = records.select_related(
+            "baseline__contract", "baseline__project", "baseline_item"
+        )
     contract = request.GET.get("contract")
     if contract:
         value = normalized_uuid(contract)
@@ -276,36 +278,53 @@ def journey_list_context(request, records, key):
             if value
             else records.none()
         )
+    if prefix and "line_key" in request.GET:
+        keys = request.GET.getlist("line_key")
+        records = (
+            records.filter(baseline_item__line_key=keys[0])
+            if len(keys) == 1
+            and 0 < len(keys[0]) <= 80
+            and len(request.GET.getlist("contract")) == 1
+            and normalized_uuid(contract)
+            else records.none()
+        )
+    # Resolve the selected line only from the same authorized measurement source.
+    # Keep its context even when a subsequent text search returns no rows.
+    selected_line_record = (
+        records.order_by("-created_at", "pk").first()
+        if prefix and request.GET.get("line_key")
+        else None
+    )
+    search_fields = tuple(
+        f"{prefix}{field}"
+        for field in ("contract__title", "contract__contract_number", "project__name")
+    )
+    if prefix:
+        search_fields += ("baseline_item__description",)
     records = apply_table_filters(
         records,
         request,
-        text_fields={
-            "q": tuple(
-                f"{prefix}{field}"
-                for field in (
-                    "contract__title",
-                    "contract__contract_number",
-                    "project__name",
-                )
-            )
-        },
+        text_fields={"q": search_fields},
     )
     page = paginate_table(
         records, request, sort_fields={}, default_ordering=("-created_at", "pk")
     )
     from .list_presentation import progress_filter_bar
 
+    selected_contract = breadcrumb_contract(request)
     return {
         key: page.object_list,
         "filter_bar": progress_filter_bar(request, page),
         "page_obj": page,
         "pagination_query": table_pagination_query(request),
         "pagination_rendered": True,
-        **contextual_list_filters(request, keys=("contract",)),
+        "selected_contract": selected_contract,
+        "selected_line_record": selected_line_record,
+        **contextual_list_filters(request, keys=("contract", "line_key")),
         "page_breadcrumbs": journey_breadcrumbs(
             request,
-            "پیشرفت کار" if prefix else "مبناهای اندازه‌گیری",
-            breadcrumb_contract(request),
+            "سوابق کارکرد" if prefix else "مبناهای اندازه‌گیری",
+            selected_contract,
         ),
     }
 
@@ -317,17 +336,25 @@ def progress_detail(request: HttpRequest, record_id: str) -> HttpResponse:
     record = _record(request, record_id)
     if record is None:
         return HttpResponseNotFound("رکورد پیشرفت یافت نشد.")
+    history_url = contextual_url(
+        "billing:progress_list",
+        contract=record.baseline.contract,
+        line_key=record.baseline_item.line_key,
+    )
+    breadcrumbs = journey_breadcrumbs(
+        request,
+        "جزئیات کارکرد ثبت‌شده",
+        record.baseline.contract,
+        collection=("سوابق کارکرد", "billing:progress_list"),
+    )
+    breadcrumbs[-2]["url"] = history_url
     return render(
         request,
         "billing/progress_detail.html",
         {
             "progress_record": record,
-            "page_breadcrumbs": journey_breadcrumbs(
-                request,
-                "جزئیات اندازه‌گیری",
-                record.baseline.contract,
-                collection=("پیشرفت کار", "billing:progress_list"),
-            ),
+            "history_url": history_url,
+            "page_breadcrumbs": breadcrumbs,
         },
     )
 
@@ -852,13 +879,31 @@ def payable_certificate_correct(
 @organization_permission_required(BusinessPermissionCode.PAYABLE_MEASUREMENTS_VIEW)
 @require_GET
 def payable_measurement_list(request: HttpRequest) -> HttpResponse:
+    from apps.organizations.form_scoping import normalized_uuid
+
+    measurements = get_payable_measurements(
+        actor=request.user, organization=request.organization
+    )
+    for key, field in (
+        ("contract", "contract_id"),
+        ("contract_item", "contract_item_id"),
+    ):
+        if key in request.GET:
+            values = request.GET.getlist(key)
+            identifier = normalized_uuid(values[0]) if len(values) == 1 else None
+            measurements = (
+                measurements.filter(**{field: identifier})
+                if identifier
+                else measurements.none()
+            )
     return render(
         request,
         "billing/payable_measurement_list.html",
         {
-            "measurements": get_payable_measurements(
-                actor=request.user, organization=request.organization
-            )
+            "measurements": measurements,
+            "page_breadcrumbs": journey_breadcrumbs(
+                request, "سوابق کارکرد", breadcrumb_contract(request)
+            ),
         },
     )
 
@@ -895,7 +940,7 @@ def payable_measurement_create(request: HttpRequest) -> HttpResponse:
     return render(
         request,
         "billing/payable_form.html",
-        {"form": form, "title": "ثبت اندازه‌گیری پیمان جزء"},
+        {"form": form, "title": "ثبت کارکرد پیمان جزء"},
     )
 
 

@@ -1,0 +1,21 @@
+.......F.                                                           [100%]
+================================== FAILURES ===================================
+_ RFQConfigurationUXTests.test_single_confirmation_multiple_rows_replays_and_issues_exactly _
+tests\test_rfq_configuration_ux.py:59: in test_single_confirmation_multiple_rows_replays_and_issues_exactly
+    self.assertEqual(
+E   AssertionError: 400 != 302
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-02T20:45:02.253332+00:00","event":"http.response","request_id":"b063b4ea-12ba-414f-a0bc-0075b0c18b08","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":425}
+
+{"timestamp":"2026-11-02T20:45:02.382331+00:00","event":"http.response","request_id":"4b741adc-ff54-478d-a098-5e7d9f13cb13","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":127}
+
+{"timestamp":"2026-11-02T20:45:02.882424+00:00","event":"http.response","request_id":"430bdb3f-4ab1-48dc-a343-cb7ae823fcd9","method":"POST","route":"procurement:rfq_scope_define","status_code":400,"duration_ms":498}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Bad Request: /procurement/rfqs/350fdc73-9371-4247-9f60-084c35d0e4b7/scope/
+=========================== short test summary info ===========================
+FAILED tests/test_rfq_configuration_ux.py::RFQConfigurationUXTests::test_single_confirmation_multiple_rows_replays_and_issues_exactly
+1 failed, 8 passed, 5 subtests passed in 36.98s

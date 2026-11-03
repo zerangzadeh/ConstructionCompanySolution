@@ -23,7 +23,7 @@ class RFQPreparationBrowserTests(CommercialScopeFixture, StaticLiveServerTestCas
     browser = chrome_fixture.ContractBillingBrowserTests.browser
     _fixture_teardown = chrome_fixture.ContractBillingBrowserTests._fixture_teardown
     browser_evidence_directory = (
-        Path(__file__).resolve().parents[2] / "output/mvp-04b1/browser"
+        Path(__file__).resolve().parents[2] / "output/mvp-04b-ux/preparation-browser"
     )
 
     def setUp(self):
@@ -165,7 +165,7 @@ class RFQPreparationBrowserTests(CommercialScopeFixture, StaticLiveServerTestCas
                             "formSelector": 'form[aria-label="استعلام جدید"]',
                             "clickSelector": "main button[type=submit]",
                             "afterPrefix": "/procurement/rfqs/",
-                            "mustText": "هنوز قلمی انتخاب نشده",
+                            "mustText": "ابتدا اقلام استعلام",
                         }
                     ],
                 ),
@@ -187,7 +187,7 @@ class RFQPreparationBrowserTests(CommercialScopeFixture, StaticLiveServerTestCas
                     detail,
                     width=w,
                     mobile=w == 390,
-                    mustText=["افزودن ردیف"],
+                    mustText=["انتخاب اقلام از درخواست خرید"],
                     steps=[
                         self.inspect(
                             "!document.querySelector('form[aria-label=\"صدور استعلام\"]')",
@@ -204,6 +204,7 @@ class RFQPreparationBrowserTests(CommercialScopeFixture, StaticLiveServerTestCas
                     status=400,
                     noHttpErrors=False,
                     steps=[
+                        {"toggleSelector": ".rfq-config__line-add > summary"},
                         {
                             "searchChoice": {
                                 "name": "purchase_request_item_id",
@@ -227,6 +228,7 @@ class RFQPreparationBrowserTests(CommercialScopeFixture, StaticLiveServerTestCas
                     "line-select-add",
                     detail,
                     steps=[
+                        {"toggleSelector": ".rfq-config__line-add > summary"},
                         {
                             "searchChoice": {
                                 "name": "purchase_request_item_id",
@@ -257,15 +259,16 @@ class RFQPreparationBrowserTests(CommercialScopeFixture, StaticLiveServerTestCas
                             "fill": {
                                 "scope_type": "line",
                                 "scope_code": "خرید سیمان",
+                                "select_0": True,
                                 "member_0": "7",
                                 "independently_awardable": "yes",
                                 "allows_split_award": "no",
                                 "allows_alternates": "no",
                             },
-                            "formSelector": 'form[aria-label="تعریف دامنه خرید"]',
+                            "formSelector": 'form[aria-label="تنظیم گروه خرید"]',
                             "clickSelector": "button[value=append]",
                             "afterPath": scope,
-                            "mustText": "دامنه‌های ثبت‌شده",
+                            "mustText": "تنظیمات نسخه جاری",
                         },
                         {"reload": True, "afterPath": scope},
                         {"clickHref": detail, "afterPath": detail},
@@ -340,7 +343,7 @@ class RFQPreparationBrowserTests(CommercialScopeFixture, StaticLiveServerTestCas
                             "formSelector": f'form[action="{issue}"]',
                             "clickSelector": f'form[action="{issue}"] button[type=submit]',
                             "afterPath": detail,
-                            "mustText": "دامنه تثبیت‌شده",
+                            "mustText": "تنظیمات نسخه جاری",
                         }
                     ],
                 ),
@@ -360,7 +363,7 @@ class RFQPreparationBrowserTests(CommercialScopeFixture, StaticLiveServerTestCas
                     detail,
                     width=w,
                     mobile=w == 390,
-                    mustText=["دامنه تثبیت‌شده", "تأمین مصالح پارس"],
+                    mustText=["تنظیمات نسخه جاری", "تأمین مصالح پارس"],
                     steps=[
                         self.inspect(
                             "!document.querySelector('form[aria-label=\"افزودن قلم استعلام\"]') && !document.querySelector('form[aria-label=\"صدور استعلام\"]')",
@@ -388,7 +391,7 @@ class RFQPreparationBrowserTests(CommercialScopeFixture, StaticLiveServerTestCas
                         {"history": "back"},
                         {"reload": True, "afterPath": detail},
                         self.inspect(
-                            "document.body.innerText.includes('دامنه تثبیت‌شده')",
+                            "document.body.innerText.includes('تنظیمات نسخه جاری')",
                             "Back and refresh preserve issued version",
                         ),
                     ],

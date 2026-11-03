@@ -1,0 +1,237 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ PurchaseRequestDetailVisualTests.test_detail_states_journeys_and_shared_frontend _
+
+self = <test_pr_detail_uiux.PurchaseRequestDetailVisualTests testMethod=test_detail_states_journeys_and_shared_frontend>
+
+    def test_detail_states_journeys_and_shared_frontend(self):
+        for row, name in (
+            (self.organization, "\u0634\u0631\u06a9\u062a \u0633\u0627\u062e\u062a\u0645\u0627\u0646\u06cc \u0646\u0645\u0648\u0646\u0647"),
+            (self.project, "\u0627\u062c\u0631\u0627\u06cc \u0633\u0627\u0632\u0647 \u0628\u062a\u0646\u06cc \u067e\u0631\u0648\u0698\u0647 \u0646\u0645\u0648\u0646\u0647"),
+            (self.material, "\u0633\u06cc\u0645\u0627\u0646 \u067e\u0631\u062a\u0644\u0646\u062f"),
+            (self.unit, "\u06a9\u06cc\u0633\u0647"),
+        ):
+            row.name = name
+            row.save(update_fields=["name"])
+        scenarios, drafts, reviews = [], [], []
+        for width in (1440, 1024, 390):
+            records = {}
+            for state in ("draft", "submitted", "approved"):
+                record = create_purchase_request(
+                    organization=self.organization,
+                    project=self.project,
+                    actor=self.owner,
+                    request_number=f"PR-UX-{state[:1].upper()}-{width}",
+                    title="\u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062a\u0623\u0645\u06cc\u0646 \u0633\u06cc\u0645\u0627\u0646 \u0627\u062c\u0631\u0627\u06cc \u0641\u0648\u0646\u062f\u0627\u0633\u06cc\u0648\u0646",
+                    required_by=date(2026, 11, 9),
+                )
+                add_purchase_request_item(
+                    organization=self.organization,
+                    actor=self.owner,
+                    purchase_request=record,
+                    material=self.material,
+                    quantity=Decimal(120),
+                    description="\u0645\u0635\u0627\u0644\u062d \u0645\u0648\u0631\u062f\u0646\u06cc\u0627\u0632 \u0627\u062c\u0631\u0627\u06cc \u0641\u0648\u0646\u062f\u0627\u0633\u06cc\u0648\u0646",
+                )
+                if state != "draft":
+                    submit_purchase_request(
+                        organization=self.organization,
+                        actor=self.owner,
+                        purchase_request=record,
+                    )
+                if state == "approved":
+                    approve_purchase_request(
+                        organization=self.organization,
+                        actor=self.owner,
+                        purchase_request=record,
+                        reason="\u0646\u06cc\u0627\u0632 \u067e\u0631\u0648\u0698\u0647 \u0628\u0631\u0631\u0633\u06cc \u0634\u062f",
+                    )
+                    record.refresh_from_db()
+                    when = timezone.now() + timedelta(days=5)
+                    rfq = create_rfq(
+                        organization=self.organization,
+                        actor=self.owner,
+                        project=self.project,
+                        purchase_request=record,
+                        rfq_number=f"RFQ-UX-{width}",
+                        title="\u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0633\u06cc\u0645\u0627\u0646 \u0641\u0648\u0646\u062f\u0627\u0633\u06cc\u0648\u0646",
+                        closing_at=when,
+                        earliest_opening_at=when,
+                    )
+                records[state] = record
+                self.login(self.owner)
+                response = self.client.get(self.url(record))
+                self.assertEqual(response.status_code, 200)
+                scenarios.append(
+                    {
+                        "name": f"{state}-{width}",
+                        "path": self.url(record),
+                        "state": state,
+                        "width": width,
+                        "actor": "owner",
+                        "material": str(self.material.pk),
+                        "expectedNavigation": [
+                            {"label": link.label, "url": reverse(link.route)}
+                            for group in response.context["product_navigation_groups"]
+                            for link in group.links
+                        ],
+                        "rfqPath": reverse("procurement:rfq_detail", args=[rfq.pk])
+                        if state == "approved"
+                        else "",
+                    }
+                )
+            drafts.append(records["draft"])
+            reviews.append(records["submitted"])
+        sessions = {}
+        for name, actor in (("owner", self.owner), ("viewer", self.viewer)):
+            self.client = Client()
+            self.login(actor)
+            sessions[name] = self.client.cookies["sessionid"].value
+        for state, record in records.items():
+            scenarios.append(
+                {
+                    "name": f"viewer-{state}-390",
+                    "path": self.url(record),
+                    "state": state,
+                    "width": 390,
+                    "actor": "viewer",
+                }
+            )
+        # Existing HTTP boundary evidence plus real browser denials in both scopes.
+        self.login(self.member)
+        membership = self.organization.memberships.get(user=self.member)
+        MembershipScopeGrant.objects.filter(membership=membership).update(
+            revoked_at=timezone.now()
+        )
+        allowed = Project.objects.create(
+            organization=self.organization,
+            name="\u067e\u0631\u0648\u0698\u0647 \u0645\u062c\u0627\u0632 \u062f\u06cc\u06af\u0631",
+            code="UX-OTHER",
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=membership,
+            scope_type="project",
+            project=allowed,
+            reason="Test",
+            source="test_fixture",
+        )
+        sessions["scoped"] = self.client.cookies["sessionid"].value
+        self.client = Client()
+        self.client.force_login(self.outsider)
+        from apps.organizations.services import set_active_organization
+    
+        session = self.client.session
+        set_active_organization(session, self.other_organization)
+        session.save()
+        sessions["outsider"] = self.client.cookies["sessionid"].value
+        for actor in ("scoped", "outsider"):
+            scenarios.append(
+                {
+                    "name": f"{actor}-denied",
+                    "path": self.url(records["approved"]),
+                    "width": 390,
+                    "actor": actor,
+                    "denied": True,
+                }
+            )
+        output = ROOT / "output/mvp-04a-uiux/browser"
+        output.mkdir(parents=True, exist_ok=True)
+        env = os.environ.copy()
+        env.update(
+            PR_UIUX_SCENARIOS=json.dumps(scenarios),
+            PR_UIUX_SESSIONS=json.dumps(sessions),
+        )
+        result = subprocess.run(
+            [
+                "node",
+                str(ROOT / "scripts/verification/pr_detail_uiux_browser.mjs"),
+                self.live_server_url,
+                str(output),
+            ],
+            env=env,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=420,
+            check=False,
+        )
+        (output / "command.txt").write_text(
+            f"exit={result.returncode}\n{result.stdout}\n{result.stderr}",
+            encoding="utf-8",
+        )
+>       self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-6000:])
+E       AssertionError: 1 != 0 : node:internal/modules/run_main:107
+E           triggerUncaughtException(
+E           ^
+E       
+E       Error: Page did not settle: location.pathname==="/procurement/requests/2963134f-cabb-469b-b6f2-06f54cf1550c/" && document.readyState==='complete'
+E           at waitFor (file:///E:/Construction_Company_Solution/scripts/verification/pr_detail_uiux_browser.mjs:75:11)
+E           at async file:///E:/Construction_Company_Solution/scripts/verification/pr_detail_uiux_browser.mjs:180:5
+E       
+E       Node.js v24.20.0
+
+tests\test_pr_detail_uiux.py:191: AssertionError
+---------------------------- Captured stderr setup ----------------------------
+Got an error creating the test database: database "test_bonira_f2_20261102" already exists
+
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-02T19:39:54.091410+00:00","event":"http.response","request_id":"440580e4-169c-4f3a-92e0-016729076737","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":545}
+
+{"timestamp":"2026-11-02T19:39:55.142870+00:00","event":"http.response","request_id":"491f0f47-ca5c-4922-b4b3-950816010c6d","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":414}
+
+{"timestamp":"2026-11-02T19:39:56.494349+00:00","event":"http.response","request_id":"6d155cc0-b542-402f-b5d3-881c7789982d","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":414}
+
+{"timestamp":"2026-11-02T19:39:57.122237+00:00","event":"http.response","request_id":"841fcf34-dd09-4855-a917-d94ac46e9d49","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":479}
+
+{"timestamp":"2026-11-02T19:39:58.438452+00:00","event":"http.response","request_id":"892fce03-cbd4-4096-9bd1-ace99f179916","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":697}
+
+{"timestamp":"2026-11-02T19:40:00.244299+00:00","event":"http.response","request_id":"cd1eed02-ee1e-4d4a-8717-32efe7ecda5d","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":516}
+
+{"timestamp":"2026-11-02T19:40:01.470577+00:00","event":"http.response","request_id":"6b232af6-2480-4ef7-a075-c0f65db06fb4","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":734}
+
+{"timestamp":"2026-11-02T19:40:03.324428+00:00","event":"http.response","request_id":"66c139bd-76dd-4a0c-9c90-55cedadcc3cd","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":881}
+
+{"timestamp":"2026-11-02T19:40:05.397975+00:00","event":"http.response","request_id":"010e0e45-15e7-44a0-bde8-c1f76a468291","method":"GET","route":"procurement:request_detail","status_code":200,"duration_ms":475}
+
+{"timestamp":"2026-11-02T19:40:06.968284+00:00","event":"http.response","request_id":"c3277020-059f-4431-9032-26759b9d3b39","method":"GET","route":"procurement:request_detail","status_code":302,"duration_ms":207}
+
+{"timestamp":"2026-11-02T19:40:07.226079+00:00","event":"http.response","request_id":"a79b2080-8ea8-446f-af1a-15bed58ef2da","method":"GET","route":"accounts:login","status_code":200,"duration_ms":235}
+
+{"timestamp":"2026-11-02T19:40:09.443501+00:00","event":"http.response","request_id":"4ba72c72-de4f-4991-a20f-0133e94347fd","method":"GET","route":null,"status_code":404,"duration_ms":22}
+
+[02/Nov/2026 23:10:29,890] - Broken pipe from ('127.0.0.1', 54599)
+
+[02/Nov/2026 23:10:29,890] - Broken pipe from ('127.0.0.1', 59131)
+
+[02/Nov/2026 23:10:29,891] - Broken pipe from ('127.0.0.1', 64957)
+
+[02/Nov/2026 23:10:29,891] - Broken pipe from ('127.0.0.1', 50653)
+
+[02/Nov/2026 23:10:29,891] - Broken pipe from ('127.0.0.1', 64778)
+
+[02/Nov/2026 23:10:29,891] - Broken pipe from ('127.0.0.1', 63647)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 54599)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 59131)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 64957)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 50653)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 64778)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 63647)
+=========================== short test summary info ===========================
+FAILED tests/test_pr_detail_uiux.py::PurchaseRequestDetailVisualTests::test_detail_states_journeys_and_shared_frontend
+1 failed in 2086.59s (0:34:46)

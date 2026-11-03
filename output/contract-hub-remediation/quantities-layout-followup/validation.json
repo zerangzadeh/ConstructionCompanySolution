@@ -1,0 +1,75 @@
+{
+  "product_files": [
+    "templates/contracts/detail.html",
+    "templates/contracts/hub_quantities.html",
+    "apps/contracts/static/contracts/detail.css"
+  ],
+  "source_hashes": {
+    "templates/contracts/detail.html": "ebba51d7c7c49c9226187f15b7c261878cf22156cbc22e60c148a0bdb813cc4e",
+    "templates/contracts/hub_quantities.html": "3d0cd0fd0a6466b1242b16145508cf895e199802bc16a680f74c81ad3a4ca5c7",
+    "apps/contracts/static/contracts/detail.css": "7a20c2d5592246277e10c56c4b91309eb880b2bc8e6916edfd8df55278ac129c",
+    "apps/contracts/test_hub.py": "6a68f4bb44ce9dd6687aa98996d1814d159b4d2280c10e9f31fba1178e03cd46"
+  },
+  "tests": {
+    "passed": 6,
+    "subtests_passed": 4,
+    "chrome_scenarios": 6,
+    "widths": [
+      1440,
+      1024,
+      390
+    ]
+  },
+  "shared_components_matching_entry": 43,
+  "shared_tracked_source_changes": [],
+  "checks": [
+    {
+      "command": [
+        "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "apps/contracts/test_hub.py"
+      ],
+      "exit_code": 0,
+      "output": "All checks passed!\n"
+    },
+    {
+      "command": [
+        "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "apps/contracts/test_hub.py"
+      ],
+      "exit_code": 0,
+      "output": "1 file already formatted\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "templates/contracts/detail.html",
+        "templates/contracts/hub_quantities.html",
+        "apps/contracts/static/contracts/detail.css"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+        "manage.py",
+        "check"
+      ],
+      "exit_code": 0,
+      "output": "System check identified no issues (0 silenced).\n"
+    }
+  ],
+  "asset_revision": "20261102-quantities-2",
+  "findings": "Served CSS already contained the prior quantities rules, while the prior URL still used v=1. Old client cache is a supported hypothesis, not a reproduced user-session root cause. New URLs prevent reuse of that old asset key.",
+  "product_scope": "Only quantity workspace styling/markup and Contract asset revision. No calculation, source selection, workflow or authorization changes."
+}

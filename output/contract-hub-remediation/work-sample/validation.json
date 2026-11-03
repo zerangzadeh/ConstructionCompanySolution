@@ -1,0 +1,112 @@
+{
+  "date": "2026-11-03",
+  "human_authority": "Explicit request: apply work-record terminology and register one sample contract with varied rows, quantities, large numbers and various claims in the local system.",
+  "head": "b97fcc45a92737b83e9c3ffb14b589cfdc4250d7",
+  "terminology_tests": {
+    "passed": 10,
+    "subtests_passed": 4
+  },
+  "dry_run": "PASS after correcting verifier to respect canonical monetary rounding; initial failed assertion rolled back in full",
+  "applied": true,
+  "contract": {
+    "number": "UAT-WORK-1405-01",
+    "title": "نمونه کنترل مقادیر، متره و کارکرد — سازه و تأسیسات باغستان",
+    "id": "931cc7d4-1a8a-408f-903f-9c6170504d2b",
+    "amount": "1269687618125.00",
+    "project": "مجتمع مسکونی باغستان",
+    "path": "/contracts/931cc7d4-1a8a-408f-903f-9c6170504d2b/"
+  },
+  "contract_lines": 6,
+  "work_records": 33,
+  "claims_and_revisions": 6,
+  "http_pages_passed": 44,
+  "chrome_cases_passed": 22,
+  "policy_unchanged": "c8e9de14-242d-4866-aa67-463f85a892f8",
+  "financial_counts_unchanged": {
+    "JournalEntry": 0,
+    "Obligation": 0,
+    "TreasuryMovement": 0,
+    "PaymentRequest": 16
+  },
+  "preexisting_scoped_rows_unchanged": true,
+  "checks": [
+    {
+      "command": [
+        "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "apps/billing/list_presentation.py",
+        "apps/billing/views.py",
+        "apps/contracts/test_hub.py",
+        "apps/billing/test_journey_content.py",
+        "apps/billing/test_journey_navigation.py",
+        "apps/billing/test_mvp03_remediation.py"
+      ],
+      "exit_code": 0,
+      "output": "All checks passed!\n"
+    },
+    {
+      "command": [
+        "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "apps/billing/list_presentation.py",
+        "apps/billing/views.py",
+        "apps/contracts/test_hub.py",
+        "apps/billing/test_journey_content.py",
+        "apps/billing/test_journey_navigation.py"
+      ],
+      "exit_code": 0,
+      "output": "5 files already formatted\n"
+    },
+    {
+      "command": [
+        "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+        "manage.py",
+        "check"
+      ],
+      "exit_code": 0,
+      "output": "System check identified no issues (0 silenced).\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "apps/billing/templates/billing/progress_list.html",
+        "apps/billing/templates/billing/progress_detail.html",
+        "apps/billing/templates/billing/journey_nav.html",
+        "apps/billing/list_presentation.py",
+        "apps/billing/views.py",
+        "templates/contracts/hub_quantities.html",
+        "templates/contracts/detail.html",
+        "apps/contracts/test_hub.py",
+        "apps/billing/test_journey_content.py",
+        "apps/billing/test_journey_navigation.py",
+        "apps/billing/test_mvp03_remediation.py"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "source_hashes": {
+    "apps/billing/templates/billing/progress_list.html": "3a85aaac44916f69914dc94cb4045d6f21deb0450154c6e35632b50ef211d04e",
+    "apps/billing/templates/billing/progress_detail.html": "023dcfe05ba89b4c7f94a47db069e3a9b3f0d4da744bd08d33b244a7b43881b8",
+    "apps/billing/templates/billing/journey_nav.html": "1ae66095d36fc89ce55a2bada3b99490737461a3447e334baea1121f57d6c48e",
+    "apps/billing/list_presentation.py": "eced136e771a15749207388b6919ff12d9301d99cd9dcf685cc6f4e8f4915a48",
+    "apps/billing/views.py": "c471b27171f4da2d2e3fcfec6be7c323495d6e46c63ab0c200c1a7bc0aa878fc",
+    "templates/contracts/hub_quantities.html": "3864eb18527bf4482008a80835d77a528abbe13afad58d4eaa27218e5c875af0",
+    "templates/contracts/detail.html": "7c0638185fe9fdfcace55ce2bf9f88f80a6b5384d8e4a00e1920dcce943da9f2",
+    "apps/contracts/test_hub.py": "f2f421250c36498e118884a13aa1b205a37675c4b849adce03a26913d90d0008",
+    "apps/billing/test_journey_content.py": "923b69619126923feebb1a26a0cdd2d78d8e4942e16b715494f6dad0e0385575",
+    "apps/billing/test_journey_navigation.py": "1b30ec5c06878926d244497c6a8f74be6eafab3993a88b2013489aee795c884d",
+    "apps/billing/test_mvp03_remediation.py": "5dcf85a6143e6afbc946bf523fb72fcd22bbc3eb8cf1f02f7b6fec94089189dd"
+  },
+  "schema_service_permissions_changes": "NONE",
+  "git_writes": "NONE",
+  "concurrent_shared_navigation_work": "Separately owned; this task does not edit or certify it."
+}

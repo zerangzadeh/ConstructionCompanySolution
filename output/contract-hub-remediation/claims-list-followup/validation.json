@@ -1,0 +1,50 @@
+{
+  "head": "b97fcc45a92737b83e9c3ffb14b589cfdc4250d7",
+  "source_hashes": {
+    "apps/billing/templates/billing/claim_list.html": "222a7b80a6ff6a7ddb0635d1f6d84c34b04c5ba5e93dbdd49e10c1817dab6fb0",
+    "apps/billing/test_journey_navigation.py": "c5f728c9c33fc703402838b83988d300534610a02997b83dbbe08c8135386ade",
+    "apps/billing/test_journey_content.py": "f4f87f2e4fd2ebbcbaab8f60272dc9f81b323408d0a5d1d4ab5ac8a4141b4162",
+    "apps/billing/test_mvp03_remediation.py": "687158c446bc225f2afe9ad6b679271243f6f7ec37bf2e4843d1ab58348a89be",
+    "apps/contracts/test_hub.py": "eecb132cbd6920f1c93030319e4a924a5066ea88749bf954f6a4e97293a75e41"
+  },
+  "checks": [
+    {
+      "command": [
+        ".venv/Scripts/python.exe",
+        "-m",
+        "ruff",
+        "check",
+        "apps/billing/test_journey_navigation.py",
+        "apps/billing/test_journey_content.py",
+        "apps/billing/test_mvp03_remediation.py",
+        "apps/contracts/test_hub.py"
+      ],
+      "exit_code": 0,
+      "output": "All checks passed!\n"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "apps/billing/templates/billing/claim_list.html",
+        "apps/billing/test_journey_navigation.py",
+        "apps/billing/test_journey_content.py",
+        "apps/billing/test_mvp03_remediation.py",
+        "apps/contracts/test_hub.py"
+      ],
+      "exit_code": 0,
+      "output": "warning: in the working copy of 'apps/billing/test_journey_navigation.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/billing/test_mvp03_remediation.py', LF will be replaced by CRLF the next time Git touches it\n"
+    }
+  ],
+  "tests_passed": 6,
+  "chrome_handoffs_passed": 3,
+  "widths": [
+    1440,
+    1024,
+    390
+  ],
+  "product_change": "Remove the sibling-workspace navigation include from Claims List only.",
+  "git_writes": "NONE"
+}

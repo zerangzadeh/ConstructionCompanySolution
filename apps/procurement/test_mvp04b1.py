@@ -294,7 +294,7 @@ class RFQPreparationTests(CommercialScopeFixture, TestCase):
         for flag in ("can_add_line", "can_submit", "can_issue"):
             self.assertFalse(response.context[flag])
         self.assertTrue(response.context["can_addendum"])
-        self.assertContains(response, "دامنه تثبیت‌شده")
+        self.assertContains(response, "تنظیمات نسخه جاری")
         self.assertContains(response, self.supplier.display_name)
         self.assertNotIn("quote_revisions", response.context)
         self.assertNotContains(response, "پیشنهادهای مهروموم‌شده")

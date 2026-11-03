@@ -29,20 +29,20 @@ def source_signature(lines):
 
 class ScopeDefinitionForm(forms.Form):
     scope_type = forms.ChoiceField(
-        label="ساختار دامنه خرید",
-        choices=[("", "انتخاب کنید"), ("line", "یک ردیف"), ("lot", "بسته‌ای از اقلام")],
+        label="نحوه مقایسه اقلام",
+        choices=[("", "انتخاب کنید"), ("line", "یک قلم"), ("lot", "گروه خرید")],
     )
-    scope_code = forms.CharField(label="عنوان یکتای ردیف یا بسته", max_length=80)
+    scope_code = forms.CharField(label="نام گروه خرید", max_length=80)
     required_quantity = forms.DecimalField(
-        label="مقدار حاکم بسته",
+        label="تعداد / مقدار گروه خرید",
         required=False,
         max_digits=18,
         decimal_places=4,
         min_value=Decimal("0.0001"),
-        help_text="فقط برای بسته؛ برای یک ردیف، مقدار همان قلمی که پایین وارد می‌کنید مبناست.",
+        help_text="مبنای مقایسه کل گروه را با واحد آن مشخص کنید؛ مقدار هر قلم جداگانه نمایش داده می‌شود.",
     )
     unit_of_measure = BusinessChoiceField(
-        label="واحد بسته", queryset=UnitOfMeasure.objects.none(), required=False
+        label="واحد گروه خرید", queryset=UnitOfMeasure.objects.none(), required=False
     )
     version_number = forms.IntegerField(widget=forms.HiddenInput())
     expected_revision = forms.IntegerField(widget=forms.HiddenInput())
@@ -51,7 +51,7 @@ class ScopeDefinitionForm(forms.Form):
         widget=forms.HiddenInput(), initial=lambda: uuid4().hex, max_length=128
     )
 
-    def __init__(self, *args, rfq, definition, **kwargs):
+    def __init__(self, *args, rfq, definition, edit_code=None, **kwargs):
         self.rfq = rfq
         self.definition = definition
         self.version_number = rfq.current_version_number + 1
@@ -63,40 +63,87 @@ class ScopeDefinitionForm(forms.Form):
             expected_revision=definition.revision_number if definition else 0,
             source_fingerprint=self.signature,
         )
+        self.edit_entry = (
+            next(
+                (
+                    entry
+                    for entry in definition.payload["scopes"]
+                    if entry["scope_code"] == edit_code
+                ),
+                None,
+            )
+            if definition
+            else None
+        )
+        if self.edit_entry:
+            self.initial.update(self.edit_entry)
+            self.initial["unit_of_measure"] = self.edit_entry["unit_of_measure_id"]
+        else:
+            self.initial["scope_type"] = "lot"
+        self.fields["scope_type"].widget = forms.HiddenInput()
+        self.is_line = bool(self.edit_entry and self.edit_entry["scope_type"] == "line")
+        if self.is_line:
+            self.fields["scope_code"].widget = forms.HiddenInput()
         self.fields["unit_of_measure"].queryset = UnitOfMeasure.objects.filter(
             organization=rfq.organization,
             is_active=True,
             archived_at__isnull=True,
         ).order_by("name")
-        self.fields["unit_of_measure"].empty_label = "انتخاب واحد بسته"
+        self.fields["unit_of_measure"].empty_label = "انتخاب واحد گروه"
         self.fields["unit_of_measure"].label_from_instance = lambda unit: (
             f"{unit.name} · {unit.symbol}"
         )
         self.members = []
+        chosen = (
+            {
+                entry["purchase_request_item_id"]: entry["quantity"]
+                for entry in self.edit_entry["lines"]
+            }
+            if self.edit_entry
+            else {}
+        )
         for index, row in enumerate(self.source_rows):
             name = f"member_{index}"
+            selector = f"select_{index}"
+            self.fields[selector] = forms.BooleanField(
+                label=f"انتخاب {row.material.name}",
+                required=False,
+                initial=str(row.purchase_request_item_id) in chosen,
+            )
             self.fields[name] = forms.DecimalField(
-                label=f"مقدار {row.material.name}",
+                label=f"مقدار استعلام · {row.material.name}",
                 required=False,
                 decimal_places=4,
                 max_digits=18,
                 min_value=Decimal("0.0001"),
                 max_value=row.quantity,
-                help_text=f"حداکثر {row.quantity} {row.unit_of_measure.name}؛ خالی یعنی خارج از این دامنه.",
+                initial=format(
+                    Decimal(
+                        chosen.get(str(row.purchase_request_item_id), row.quantity)
+                    ).normalize(),
+                    "f",
+                ),
+                help_text=f"حداکثر {row.quantity} {row.unit_of_measure.name}",
             )
-            self.members.append({"line": row, "field": self[name]})
+            self.members.append(
+                {"line": row, "field": self[name], "select": self[selector]}
+            )
         for name, label in (
-            ("independently_awardable", "امکان انتخاب مستقل تأمین‌کننده برای این دامنه"),
-            ("allows_split_award", "امکان تقسیم انتخاب بین چند تأمین‌کننده"),
-            ("allows_alternates", "امکان پیشنهاد جایگزین"),
+            ("independently_awardable", "انتخاب مستقل برای این گروه / قلم"),
+            ("allows_split_award", "امکان تقسیم خرید بین چند تأمین‌کننده"),
+            ("allows_alternates", "پذیرش پیشنهاد جایگزین"),
         ):
             self.fields[name] = forms.TypedChoiceField(
                 label=label,
                 choices=[("", "صریحاً انتخاب کنید"), ("yes", "بله"), ("no", "خیر")],
                 coerce=lambda value: value == "yes",
+                initial=("yes" if self.edit_entry[name] else "no")
+                if self.edit_entry
+                else ("yes" if name == "independently_awardable" else "no"),
             )
         for field in self.fields.values():
-            field.widget.attrs.setdefault("class", "erp-input w-full")
+            if not isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs.setdefault("class", "erp-input w-full")
 
     def clean(self):
         values = super().clean()
@@ -116,17 +163,20 @@ class ScopeDefinitionForm(forms.Form):
             }
             for member in self.members
             if values.get(member["field"].name) is not None
+            and (not self.data.get("selection_ui") or values.get(member["select"].name))
         ]
         kind = values.get("scope_type")
         if not selected or (kind == "line" and len(selected) != 1):
             raise forms.ValidationError(
-                "برای دامنه ردیف، مقدار یک قلم و برای بسته، مقدار اقلام عضو را وارد کنید."
+                "برای یک قلم، همان قلم و برای گروه خرید، اقلام عضو را انتخاب کنید."
             )
         if kind == "lot":
             if not values.get("required_quantity"):
-                self.add_error("required_quantity", "مقدار حاکم بسته را وارد کنید.")
+                self.add_error(
+                    "required_quantity", "تعداد / مقدار گروه خرید را وارد کنید."
+                )
             if not values.get("unit_of_measure"):
-                self.add_error("unit_of_measure", "واحد بسته را انتخاب کنید.")
+                self.add_error("unit_of_measure", "واحد گروه خرید را انتخاب کنید.")
         if (
             kind == "line"
             and values.get("allows_split_award")

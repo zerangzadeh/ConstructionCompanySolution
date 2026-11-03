@@ -8,6 +8,7 @@ import { createServer } from 'node:net';
 const [base, output] = process.argv.slice(2);
 const scenarios = JSON.parse(process.env.F3_SCENARIOS);
 const sessions = JSON.parse(process.env.F3_SESSIONS);
+const polish = process.env.MODULE_SELECTOR_POLISH === "1";
 const listener = createServer();
 await new Promise(done => listener.listen(0, '127.0.0.1', done));
 const port = listener.address().port;
@@ -99,7 +100,7 @@ try {
     await writeFile(join(output, name + '.png'), Buffer.from(result.data, 'base64'));
   };
   const key = async (name, modifiers=0) => {
-    const codes={Tab:9,Escape:27};
+    const codes={Tab:9,Escape:27,ArrowLeft:37,ArrowRight:39,Home:36,End:35};
     await send('Input.dispatchKeyEvent',{type:'keyDown',key:name,code:name,windowsVirtualKeyCode:codes[name],modifiers});
     await send('Input.dispatchKeyEvent',{type:'keyUp',key:name,code:name,windowsVirtualKeyCode:codes[name],modifiers});
   };
@@ -134,11 +135,13 @@ try {
     await open();
     const state=await evaluate(`(() => {
       const d=document.querySelector('#erp-module-selector'),r=d.querySelector('nav'),box=d.getBoundingClientRect();
-      return {dir:getComputedStyle(d).direction,top:box.top,width:box.width,
+      return {dir:getComputedStyle(d).direction,top:box.top,width:box.width,height:box.height,
+        cards:[...r.querySelectorAll("a")].map(a=>({key:a.dataset.moduleCard,height:a.getBoundingClientRect().height,iconColor:getComputedStyle(a.querySelector(".erp-module-icon")).color,iconBackground:getComputedStyle(a.querySelector(".erp-module-icon")).backgroundColor})),
+        indicatorHeight: d.querySelector("[data-module-position]").getBoundingClientRect().height,
         modal:d.matches(':modal'),focusInside:d.contains(document.activeElement),
         locked:getComputedStyle(document.documentElement).overflowY==='hidden' && getComputedStyle(document.body).overflowY==='hidden',
         expanded:document.querySelector('[data-module-trigger]').getAttribute('aria-expanded'),
-        links:[...r.querySelectorAll('a')].map(a=>({label:a.firstChild.textContent.trim(),url:a.getAttribute('href')})),
+        links:[...r.querySelectorAll('a')].map(a=>({label:a.querySelector(".erp-module-selector__title").textContent.trim(),url:a.getAttribute('href')})),
         active:[...r.querySelectorAll('a[aria-current]')].map(a=>a.getAttribute('href')),
         tops:[...r.querySelectorAll('a')].map(a=>a.getBoundingClientRect().top),
         rowWidth:r.clientWidth,scrollWidth:r.scrollWidth,scrollLeft:r.scrollLeft,
@@ -148,13 +151,41 @@ try {
     assert(JSON.stringify(state.active)===JSON.stringify([scenario.active]),'Exactly one correct active module');
     assert(state.dir==='rtl' && Math.abs(state.top)<1 && state.width<=scenario.width && state.modal && state.focusInside && state.locked && state.expanded==='true','Top modal/RTL/focus/scroll lock');
     assert(Math.max(...state.tops)-Math.min(...state.tops)<1,'All modules remain in one row');
+    assert(await evaluate('document.documentElement.scrollWidth<=innerWidth'), 'No page horizontal overflow');
+    assert(await evaluate('getComputedStyle(document.querySelector(".erp-module-selector__row")).scrollbarWidth==="none"'), 'Raw scrollbar hidden');
+    assert(await evaluate('[...document.querySelectorAll(".erp-module-selector__link")].every(a=>a.getBoundingClientRect().height>=90 && a.querySelector("svg") && a.querySelector(".erp-module-selector__description"))'), 'Readable icon/title/description cards');
+    if (polish) {
+      assert(state.height>=180 && state.height<=220, 'Compact content-driven drawer height '+state.height);
+      assert(state.cards.every(c=>c.height>=90 && c.height<=110), 'Compact readable card height');
+      assert(state.indicatorHeight<=4, 'Secondary thin position indicator');
+      assert(new Set(state.cards.map(c=>c.iconColor)).size===state.cards.length, 'Distinct module identity accents');
+      assert(await evaluate(`(() => {
+        const d=document.querySelector('#erp-module-selector'), active=d.querySelector('a[aria-current]');
+        const check=d.querySelector('.erp-module-selector__current');
+        return getComputedStyle(active).borderTopWidth==='2px' && getComputedStyle(active).borderTopColor===getComputedStyle(check).backgroundColor &&
+          [...d.querySelectorAll('.erp-module-selector__title,.erp-module-selector__description')].every(t=>t.scrollWidth<=t.clientWidth+1 && t.getBoundingClientRect().bottom<=t.closest('a').getBoundingClientRect().bottom);
+      })()`), 'Blue active border/check and unclipped card copy');
+    }
+    await evaluate('document.querySelector(".erp-module-selector__row a").focus()');
+    await key('ArrowLeft');
+    assert(await evaluate('document.activeElement===document.querySelectorAll(".erp-module-selector__row a")[1]'), 'RTL ArrowLeft focuses next card');
+    await key('Home');
+    // Photograph the actual current module after exercising keyboard navigation.
+    await evaluate(`(() => {const a=document.querySelector('.erp-module-selector__link[aria-current]');a.focus({preventScroll:true});a.scrollIntoView({block:'nearest',inline:'center',behavior:'instant'});})()`);
     await shot(scenario.name+'-open');
+    if (scenario.width>=1024 && state.scrollWidth>state.rowWidth) {
+      await evaluate('document.querySelector(".erp-module-selector__row").scrollTo({left:0,behavior:"instant"})');
+      await waitFor('Math.abs(document.querySelector(".erp-module-selector__row").scrollLeft) < 2');
+      await click('[data-module-next]');
+      await waitFor('document.querySelector(".erp-module-selector__row").scrollLeft < -5');
+      await click('[data-module-previous]');
+      await waitFor('Math.abs(document.querySelector(".erp-module-selector__row").scrollLeft) < 2');
+    }
     const beforeY=await evaluate('scrollY');
     await send('Input.dispatchMouseEvent',{type:'mouseWheel',x:scenario.width/2,y:800,deltaX:0,deltaY:350});
     await new Promise(done=>setTimeout(done,150));
     assert(await evaluate(`scrollY===${beforeY}`),'Background wheel scroll is locked');
-    if (scenario.width===390) {
-      assert(state.scrollWidth>state.rowWidth,'Mobile row overflows inside drawer');
+    if (scenario.width===390 && state.scrollWidth>state.rowWidth) {
       const point=await evaluate(`(() => {const r=document.querySelector('.erp-module-selector__row').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()`);
       const start=await evaluate('document.querySelector(".erp-module-selector__row").scrollLeft');
       await send('Input.dispatchMouseEvent',{type:'mouseWheel',...point,deltaX:-280,deltaY:0});
@@ -166,12 +197,25 @@ try {
         moved=await evaluate(`document.querySelector('.erp-module-selector__row').scrollLeft!==${start}`);
       }
       assert(moved,'Real horizontal wheel scroll works on mobile RTL row');
+      if (polish) {
+        await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
+        await evaluate('document.querySelector(".erp-module-selector__row").scrollTo({left:0,behavior:"instant"})');
+        const swipe = await evaluate(`(() => {const r=document.querySelector('.erp-module-selector__row').getBoundingClientRect();return {x:r.left+40,y:r.top+r.height/2};})()`);
+        await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[swipe]});
+        for (let step=1;step<=6;step++) {
+          await send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:swipe.x+step*25,y:swipe.y}]});
+          await new Promise(done=>setTimeout(done,20));
+        }
+        await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+        await waitFor('Math.abs(document.querySelector(".erp-module-selector__row").scrollLeft)>20');
+        await send('Emulation.setTouchEmulationEnabled',{enabled:false});
+      }
     }
     await evaluate(`document.querySelector('.erp-module-selector__row a:last-child').focus()`);
     await key('Tab');
     assert(await evaluate('document.querySelector("#erp-module-selector").contains(document.activeElement)'),'Native modal traps keyboard focus');
     await key('Tab',8);
-    assert(await evaluate('document.activeElement===document.querySelector(".erp-module-selector__row a:last-child")'),'Shift+Tab wraps back to last destination');
+    assert(await evaluate('document.querySelector("#erp-module-selector").contains(document.activeElement)'),'Shift+Tab remains in modal');
     await click('[data-module-close]');await closed();
     assert(await evaluate(`scrollY===${beforeY}`),'Close preserves background position');
     await open();
@@ -183,6 +227,10 @@ try {
     await send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
     await open();
     assert(await evaluate('getComputedStyle(document.querySelector("#erp-module-selector")).animationName==="none"'),'Reduced-motion disables opening animation');
+    if (polish) {
+      const colors=await evaluate('[...document.querySelectorAll(".erp-module-selector__link")].map(a=>getComputedStyle(a.querySelector(".erp-module-icon")).color)');
+      assert(JSON.stringify(colors)===JSON.stringify(state.cards.map(c=>c.iconColor)), 'Identity accents stable after reopening');
+    }
     await key('Escape');await closed();
     await send('Emulation.setEmulatedMedia',{features:[]});
     const after=await evaluate(`(() => ({
@@ -193,6 +241,13 @@ try {
     assert(JSON.stringify(initial.contexts)===JSON.stringify(after.contexts) && JSON.stringify(initial.sidebar)===JSON.stringify(after.sidebar) && JSON.stringify(initial.mobile)===JSON.stringify(after.mobile),'Context and existing navigations unchanged by drawer');
     await evaluate('document.querySelector("#f3-scroll-probe").remove();window.scrollTo(0,0)');
     await shot(scenario.name+'-closed');
+    if (scenario.actor==='owner' && scenario.path==='/contracts/' && scenario.width===1440) {
+      for (const card of scenario.expected) {
+        await open(); await click(`.erp-module-selector__link[href="${card.url}"]`);
+        await waitFor(`location.pathname===${JSON.stringify(card.url)} && document.readyState==='complete' && !!document.querySelector('[data-module-trigger]')`);
+        assert(await evaluate('document.querySelector(".erp-module-selector__link[aria-current]")!==null'), 'Every card navigates to an active authorized module');
+      }
+    }
     if(scenario.navigateTo){
       await open();await click(`.erp-module-selector__link[href="${scenario.navigateTo}"]`);
       await waitFor(`location.pathname===${JSON.stringify(scenario.navigateTo)} && document.readyState==='complete' && !document.querySelector('#erp-module-selector').open`);

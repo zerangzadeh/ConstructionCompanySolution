@@ -79,7 +79,9 @@ class RenderedForms(HTMLParser):
 
 
 class ConnectedJourneyFixture(InventoryJourneyFixture):
-    evidence_root = Path(__file__).resolve().parents[2] / "output/mvp-04f"
+    evidence_root = (
+        Path(__file__).resolve().parents[2] / "output/mvp-04b-ux/connected-journey"
+    )
 
     def setUp(self):
         super().setUp()
@@ -316,18 +318,16 @@ class ConnectedJourneyFixture(InventoryJourneyFixture):
         )
         self.act(
             self.owner,
-            reverse("procurement:rfq_scope_define", args=[self.rfq.pk]),
+            rfq_detail,
             {
-                "scope_type": "line",
-                "scope_code": "مصالح فونداسیون",
-                "member_0": "10",
-                "independently_awardable": "yes",
-                "allows_split_award": "yes" if suppliers == 2 else "no",
-                "allows_alternates": "no",
-                "operation": "append",
+                "quantity_0": "10",
+                "independently_awardable_0": "yes",
+                "allows_split_award_0": "yes" if suppliers == 2 else "no",
+                "allows_alternates_0": "no",
+                "operation": "configure_items",
             },
-            selector='form[aria-label="تعریف دامنه خرید"]',
-            button='button[value="append"]',
+            selector='form[aria-label="تنظیمات انتخاب تأمین‌کننده"]',
+            button='button[value="configure_items"]',
             name="define-explicit-scope",
         )
         self.act(

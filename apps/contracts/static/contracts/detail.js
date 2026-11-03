@@ -4,8 +4,10 @@
         const navigation = document.querySelector('.cd-journey');
         const updateNavigation = () => {
             const hash = location.hash || '#overview';
-            navigation?.querySelectorAll('a[href^="#"]').forEach(link => {
-                const current = link.getAttribute('href') === hash;
+            navigation?.querySelectorAll('a').forEach(link => {
+                const url = new URL(link.href, location.href);
+                if (!url.hash || url.pathname !== location.pathname || url.search !== location.search) return;
+                const current = url.hash === hash;
                 link.classList.toggle('is-current', current);
                 if (current) link.setAttribute('aria-current', 'location'); else link.removeAttribute('aria-current');
             });

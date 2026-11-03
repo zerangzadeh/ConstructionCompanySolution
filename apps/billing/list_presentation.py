@@ -10,13 +10,13 @@ from core.list_filters import build_filter_bar, contextual_list_filters
 def progress_filter_bar(request: HttpRequest, page: Page) -> dict:
     form = forms.Form(request.GET)
     form.fields["q"] = forms.CharField(
-        label="جست‌وجوی کارکرد",
+        label="جست‌وجوی سوابق کارکرد",
         required=False,
         widget=forms.TextInput(
             attrs={
                 "type": "search",
                 "class": "erp-input w-full",
-                "placeholder": "جست‌وجوی قرارداد یا پروژه…",
+                "placeholder": "شرح قلم کار، شماره قرارداد یا پروژه…",
             }
         ),
     )
@@ -25,7 +25,9 @@ def progress_filter_bar(request: HttpRequest, page: Page) -> dict:
         request,
         form=form,
         quick_fields=(),
-        context=contextual_list_filters(request, keys=("contract",))["filter_context"],
+        context=contextual_list_filters(request, keys=("contract", "line_key"))[
+            "filter_context"
+        ],
         result_count=page.paginator.count,
-        result_label="کارکرد",
+        result_label="ثبت کارکرد",
     )

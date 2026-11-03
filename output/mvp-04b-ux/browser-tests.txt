@@ -1,0 +1,195 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ RFQConfigurationBrowserTests.test_configuration_journey_responsive_offline_and_boundaries _
+tests\test_rfq_configuration_browser.py:233: in test_configuration_journey_responsive_offline_and_boundaries
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-6000:])
+E   AssertionError: 1 != 0 : node:internal/modules/run_main:107
+E       triggerUncaughtException(
+E       ^
+E   
+E   Error: Previous quantity available
+E       at assert (file:///E:/Construction_Company_Solution/scripts/verification/rfq_configuration_browser.mjs:96:58)
+E       at file:///E:/Construction_Company_Solution/scripts/verification/rfq_configuration_browser.mjs:185:9
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-02T20:51:07.261927+00:00","event":"http.response","request_id":"44b332e9-9dc4-42ab-a28c-698aa23d0918","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1362}
+
+{"timestamp":"2026-11-02T20:51:08.917810+00:00","event":"http.response","request_id":"d2e0169e-0697-4dd6-890b-17b0d4e0443d","method":"GET","route":null,"status_code":404,"duration_ms":495}
+
+{"timestamp":"2026-11-02T20:51:09.431999+00:00","event":"http.response","request_id":"ba68c479-369c-4caa-8725-344535178455","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":432}
+
+{"timestamp":"2026-11-02T20:51:10.240833+00:00","event":"http.response","request_id":"a3a940ad-d020-45d3-90d9-bf1b7f8c02ab","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":794}
+
+{"timestamp":"2026-11-02T20:51:11.642257+00:00","event":"http.response","request_id":"5239848d-c36b-4a4a-8455-3c8d9d478e2c","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":772}
+
+{"timestamp":"2026-11-02T20:51:12.651045+00:00","event":"http.response","request_id":"a9b9229e-456e-4455-8d0a-af455c406170","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":761}
+
+{"timestamp":"2026-11-02T20:51:13.761207+00:00","event":"http.response","request_id":"a7d9a522-fb00-47fb-96b4-6ab04d85c900","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":529}
+
+{"timestamp":"2026-11-02T20:51:14.632272+00:00","event":"http.response","request_id":"5a037d3d-93e4-4479-87b0-06cef56edce9","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":387}
+
+{"timestamp":"2026-11-02T20:51:15.285108+00:00","event":"http.response","request_id":"42f99931-658b-4d53-9b91-499c255f1bac","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":638}
+
+{"timestamp":"2026-11-02T20:51:16.586573+00:00","event":"http.response","request_id":"7f6f1393-0dc6-4fc2-a375-a2b04845f838","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":896}
+
+{"timestamp":"2026-11-02T20:51:18.332561+00:00","event":"http.response","request_id":"abba2a7d-d8c9-4162-b358-2937246e5da9","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1052}
+
+{"timestamp":"2026-11-02T20:51:19.505194+00:00","event":"http.response","request_id":"808aeb2b-ccec-4891-a5e4-e34faad72e37","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":604}
+
+{"timestamp":"2026-11-02T20:51:20.827000+00:00","event":"http.response","request_id":"c5578fd5-57d2-4031-84e6-15f5c3466035","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1304}
+
+{"timestamp":"2026-11-02T20:51:23.968049+00:00","event":"http.response","request_id":"6c2535b4-df28-48fe-a9b0-f7d7cd9a5735","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1679}
+
+{"timestamp":"2026-11-02T20:51:25.953374+00:00","event":"http.response","request_id":"0d1cf256-0353-4d1f-9b2c-26215e4296db","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1451}
+
+{"timestamp":"2026-11-02T20:51:28.155620+00:00","event":"http.response","request_id":"ad61bf7c-8061-4fc9-89ae-d8f27ab79590","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":1088}
+
+{"timestamp":"2026-11-02T20:51:29.708914+00:00","event":"http.response","request_id":"3949ccc4-5f4b-4c93-8188-d1d84ad118d6","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":528}
+
+{"timestamp":"2026-11-02T20:51:30.523479+00:00","event":"http.response","request_id":"b6270b55-1f12-429b-85bf-785812fc8aeb","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":800}
+
+{"timestamp":"2026-11-02T20:51:31.539757+00:00","event":"http.response","request_id":"f3ef9a21-6ad4-4c44-add8-64220fa67f75","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":805}
+
+{"timestamp":"2026-11-02T20:51:32.685216+00:00","event":"http.response","request_id":"f8cfd328-bb6f-4f60-aa21-81a42fa6af06","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":650}
+
+{"timestamp":"2026-11-02T20:51:33.610291+00:00","event":"http.response","request_id":"f1ec26b9-f028-4b6a-8fef-050cc32989e9","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":444}
+
+{"timestamp":"2026-11-02T20:51:34.427160+00:00","event":"http.response","request_id":"48a858c2-28c4-4678-bc39-90acf3ebc3d3","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":806}
+
+{"timestamp":"2026-11-02T20:51:35.793487+00:00","event":"http.response","request_id":"58c77682-c4a9-4ada-a3b2-764c19467957","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":823}
+
+{"timestamp":"2026-11-02T20:51:36.913204+00:00","event":"http.response","request_id":"18be7524-1740-46c0-89ae-0b91bd6626fa","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":826}
+
+{"timestamp":"2026-11-02T20:51:37.979711+00:00","event":"http.response","request_id":"881a3374-6c86-48b0-8f19-b32602c689b3","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":594}
+
+{"timestamp":"2026-11-02T20:51:38.880797+00:00","event":"http.response","request_id":"706f4910-7c10-4d5f-8db8-415ae01ce99f","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":429}
+
+{"timestamp":"2026-11-02T20:51:39.506984+00:00","event":"http.response","request_id":"4d3ed684-814c-4546-b4e5-a3b8190fce7b","method":"GET","route":"procurement:rfq_scope_define","status_code":200,"duration_ms":620}
+
+{"timestamp":"2026-11-02T20:51:40.524072+00:00","event":"http.response","request_id":"a5c4c289-3c0c-4c2f-ab67-b1fedd213bd0","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":792}
+
+{"timestamp":"2026-11-02T20:51:41.812351+00:00","event":"http.response","request_id":"d6335966-819a-4b21-9f9f-b960d37a7867","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":824}
+
+{"timestamp":"2026-11-02T20:51:42.814518+00:00","event":"http.response","request_id":"b521fcea-6870-4b51-a1bc-714b4ed0aa64","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":411}
+
+{"timestamp":"2026-11-02T20:51:43.643033+00:00","event":"http.response","request_id":"021093bc-88b1-41b4-b7b5-bcabb5f94d57","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":822}
+
+{"timestamp":"2026-11-02T20:51:45.326504+00:00","event":"http.response","request_id":"6a5daf33-00ae-4f1c-9118-7d8d216e1ace","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":1072}
+
+{"timestamp":"2026-11-02T20:51:46.398346+00:00","event":"http.response","request_id":"03534295-d15f-4728-8022-2ca083e891d8","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":784}
+
+{"timestamp":"2026-11-02T20:51:47.202777+00:00","event":"http.response","request_id":"5e90565a-fd88-44c5-b4dc-4233cd5cca16","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":346}
+
+{"timestamp":"2026-11-02T20:51:47.966089+00:00","event":"http.response","request_id":"9831e85a-8de3-45dc-8035-d152109bc081","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":750}
+
+{"timestamp":"2026-11-02T20:51:49.319118+00:00","event":"http.response","request_id":"4f5267c6-4228-4d79-9da1-f3dc43bf6402","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":809}
+
+{"timestamp":"2026-11-02T20:51:50.428133+00:00","event":"http.response","request_id":"50ad3396-347c-4cb6-bf34-1d36a4d54571","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":817}
+
+{"timestamp":"2026-11-02T20:51:51.462116+00:00","event":"http.response","request_id":"61e5fa0c-ee09-407b-8e03-858c72360b39","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":432}
+
+{"timestamp":"2026-11-02T20:51:52.277083+00:00","event":"http.response","request_id":"0b6c51a9-171c-4f27-8fd5-f2e905cf63e2","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":807}
+
+{"timestamp":"2026-11-02T20:51:53.725217+00:00","event":"http.response","request_id":"34cace1f-ff03-4336-9d97-cd5e1943d9f3","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":835}
+
+{"timestamp":"2026-11-02T20:51:54.751964+00:00","event":"http.response","request_id":"4252a206-de59-483b-a809-492c53990e87","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":754}
+
+{"timestamp":"2026-11-02T20:51:55.839199+00:00","event":"http.response","request_id":"66517b8c-75d8-4e0e-94c7-476212b99a35","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":393}
+
+{"timestamp":"2026-11-02T20:51:56.579046+00:00","event":"http.response","request_id":"fe804bc9-35af-4479-92d3-dfbf38b6714a","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":731}
+
+{"timestamp":"2026-11-02T20:51:58.040260+00:00","event":"http.response","request_id":"9e7bd311-cf15-481c-ad55-cbc7b08c3e51","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":826}
+
+{"timestamp":"2026-11-02T20:51:59.220073+00:00","event":"http.response","request_id":"cdc1986f-b84d-4024-864b-09152733cd27","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":797}
+
+{"timestamp":"2026-11-02T20:52:00.726833+00:00","event":"http.response","request_id":"abefed4e-381d-41f4-9bfc-eecc193e6c2c","method":"POST","route":"procurement:rfq_scope_define","status_code":400,"duration_ms":826}
+
+{"timestamp":"2026-11-02T20:52:01.668747+00:00","event":"http.response","request_id":"75d988c2-b8d2-401f-b809-73b581194b0b","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":419}
+
+{"timestamp":"2026-11-02T20:52:02.537695+00:00","event":"http.response","request_id":"0bb04b31-0faf-47d6-8261-5571728a56dc","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":842}
+
+{"timestamp":"2026-11-02T20:52:03.879216+00:00","event":"http.response","request_id":"8ff1e9a7-fbf1-4ef0-8257-a80ee2760fcf","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":912}
+
+{"timestamp":"2026-11-02T20:52:04.924073+00:00","event":"http.response","request_id":"0ba0c7fa-09a6-4347-b012-6c2097482842","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":759}
+
+{"timestamp":"2026-11-02T20:52:05.896224+00:00","event":"http.response","request_id":"5d58ef45-bae0-44ea-bf65-cd94d8bf66db","method":"POST","route":"procurement:rfq_scope_define","status_code":302,"duration_ms":393}
+
+{"timestamp":"2026-11-02T20:52:06.706389+00:00","event":"http.response","request_id":"574d41ce-90f2-4baa-99b6-669a3b89243a","method":"GET","route":"procurement:rfq_detail","status_code":200,"duration_ms":803}
+
+[03/Nov/2026 00:22:08,054] - Broken pipe from ('127.0.0.1', 64684)
+
+[03/Nov/2026 00:22:08,060] - Broken pipe from ('127.0.0.1', 65450)
+
+[03/Nov/2026 00:22:08,065] - Broken pipe from ('127.0.0.1', 52670)
+
+[03/Nov/2026 00:22:08,067] - Broken pipe from ('127.0.0.1', 53426)
+
+[03/Nov/2026 00:22:08,067] - Broken pipe from ('127.0.0.1', 62049)
+
+[03/Nov/2026 00:22:08,067] - Broken pipe from ('127.0.0.1', 54225)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Bad Request: /procurement/rfqs/18f3db70-3907-4510-a4ae-6d8de8065d29/scope/
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 64684)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 65450)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 52670)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 53426)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 62049)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 54225)
+=========================== short test summary info ===========================
+FAILED tests/test_rfq_configuration_browser.py::RFQConfigurationBrowserTests::test_configuration_journey_responsive_offline_and_boundaries
+1 failed in 162.78s (0:02:42)

@@ -1,0 +1,8 @@
+"E:\Construction_Company_Solution\.venv\Scripts\python.exe" scripts/verification/f2_validate.py tests/test_rfq_configuration_ux.py apps/procurement/test_mvp04b_scope.py::ExplicitScopeTests apps/procurement/test_mvp04b_scope.py::ScopeConcurrencyTests apps/procurement/test_mvp04b1.py apps/procurement/test_rfq.py apps/procurement/test_p5_s11_comparison_award.py apps/procurement/test_mvp04f.py::ConnectedJourneyTests tests/test_f3_module_selector.py::ModuleSelectorPresentationTests core/test_cep017_navigation.py core/test_product_surface.py::SurfacePolicyTests::test_navigation_permissions_empty_groups_and_operational_reports tests/test_rfq_configuration_browser.py apps/procurement/test_mvp04b_browser.py apps/procurement/test_mvp04b1_browser.py --reuse-db -q --tb=short --junitxml=output/mvp-04b-ux/final-tests.xml
+.venv/Scripts/python.exe -u scripts/verification/rfq_configuration_validate.py apps/procurement/test_mvp04b_scope.py::ScopeConcurrencyTests apps/procurement/test_rfq.py::RequestForQuotationConcurrencyTests tests/test_rfq_configuration_browser.py apps/procurement/test_mvp04b_browser.py apps/procurement/test_mvp04b1_browser.py --reuse-db -q --tb=short --junitxml=output/mvp-04b-ux/final-browser-concurrency.xml
+npm run build:css
+.venv/Scripts/python.exe manage.py check
+.venv/Scripts/python.exe manage.py makemigrations --check --dry-run
+.venv/Scripts/python.exe manage.py migrate --check
+.venv/Scripts/python.exe manage.py showmigrations --plan
+node --check scripts/verification/rfq_configuration_browser.mjs

@@ -1,0 +1,28 @@
+{
+  "tests_passed": 4,
+  "subtests_passed": 4,
+  "chrome_cases_passed": 6,
+  "widths": [
+    1440,
+    1024,
+    390
+  ],
+  "behavior": "Eight synthetic records across two lines and four measurement dates; description search, chip clear, line focus and all-line return. Source quantities/status are identical before/after browser navigation.",
+  "source_hashes_at_closeout": {
+    "apps/billing/templates/billing/progress_list.html": "f017a725d0eed00c4746b950a865f96d5522a9fedb26fea245c8a5f0d8386ce6",
+    "apps/billing/static/billing/journey_content.css": "f9b83c476ee1f60a2ca8832a6c3a00ba24984586fa52269f09881117e63d771f",
+    "apps/billing/list_presentation.py": "74b8bb8021946b88c0f6ef592347816b0b59206539673fe79dd82b28ddfae199",
+    "apps/billing/views.py": "7060aeb2c3f9c421131cd2328c3bd27610c414a42bcdfe68a71f6d9a5e5fdc13",
+    "apps/billing/test_journey_content.py": "43cc063a3685bff512f2865da2de5dd6c0ef27017d169eadaeaeede985374cdf",
+    "apps/contracts/test_hub.py": "362abb46a2cb2aca8b4a4af159fdbc54c0dc2c276cf1985033268134d8cef007"
+  },
+  "concurrent_shared_navigation_edits": [
+    "apps/accounts/static/css/erp_module_selector.css",
+    "apps/accounts/static/js/erp_module_selector.js",
+    "templates/components/module_selector.html",
+    "core/templatetags/product_surface.py"
+  ],
+  "attribution": "Concurrent module selector edits observed during browser run; this task did not edit those files or certify that separate remediation.",
+  "domain_schema_workflow_changes": "NONE",
+  "git_writes": "NONE"
+}

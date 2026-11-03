@@ -1,17 +1,29 @@
 {% load product_surface %}
-{% module_selector_links product_navigation_groups request.resolver_match.view_name request.path as module_links %}
-<button class="erp-module-trigger" type="button" data-module-trigger aria-label="انتخاب بخش سامانه" aria-haspopup="dialog" aria-controls="erp-module-selector" aria-expanded="false">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-    <span>بخش‌ها</span>
+{% module_selector_cards product_navigation_groups request.resolver_match.view_name request.path as module_cards %}
+<button class="erp-module-trigger" type="button" data-module-trigger aria-label="انتخاب ماژول" aria-haspopup="dialog" aria-controls="erp-module-selector" aria-expanded="false">
+    {% include "components/module_selector_icon.html" with icon="puzzle" only %}<span>ماژول‌ها</span>
 </button>
-<dialog id="erp-module-selector" class="erp-module-selector" aria-labelledby="erp-module-selector-title">
+<dialog id="erp-module-selector" class="erp-module-selector" aria-labelledby="erp-module-selector-title" aria-describedby="erp-module-selector-description">
     <div class="erp-module-selector__heading">
-        <h2 id="erp-module-selector-title">بخش‌های سامانه</h2>
-        <button class="erp-module-selector__close" type="button" data-module-close aria-label="بستن انتخاب بخش">بستن <span aria-hidden="true">×</span></button>
+        <div class="erp-module-selector__identity">
+            <span class="erp-module-selector__badge">{% include "components/module_selector_icon.html" with icon="grid" only %}</span>
+            <div><h2 id="erp-module-selector-title">ماژول‌های بنیرا</h2><p id="erp-module-selector-description">دسترسی سریع به ماژول‌های در دسترس شما</p></div>
+        </div>
+        <button class="erp-module-selector__close" type="button" data-module-close aria-label="بستن انتخاب ماژول">بستن <span aria-hidden="true">×</span></button>
     </div>
-    <nav class="erp-module-selector__row" aria-label="بخش‌های قابل دسترسی" tabindex="0">
-        {% for item in module_links %}
-        <a class="erp-module-selector__link" href="{{ item.url }}"{% if item.active %} aria-current="page"{% endif %}>{{ item.link.label }}{% if item.active %}<span class="erp-module-selector__current">بخش جاری</span>{% endif %}</a>
-        {% empty %}<p class="erp-module-selector__empty">بخشی برای نمایش در دسترس نیست.</p>{% endfor %}
-    </nav>
+    <div class="erp-module-selector__carousel">
+        <button class="erp-module-selector__arrow" type="button" data-module-previous aria-label="ماژول‌های قبلی" aria-controls="erp-module-cards" hidden><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+        <nav id="erp-module-cards" class="erp-module-selector__row" aria-label="ماژول‌های قابل دسترسی">
+            {% for item in module_cards %}
+            <a class="erp-module-selector__link" href="{{ item.url }}" data-module-card="{{ item.key }}"{% if item.active %} aria-current="page"{% endif %}>
+                {% include "components/module_selector_icon.html" with icon=item.icon only %}
+                <span class="erp-module-selector__title">{{ item.title }}</span>
+                <span class="erp-module-selector__description">{{ item.description }}</span>
+                {% if item.active %}<span class="erp-module-selector__current"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 10 3 3 7-7"/></svg><span class="sr-only">ماژول جاری</span></span>{% endif %}
+            </a>
+            {% empty %}<p class="erp-module-selector__empty">ماژولی برای نمایش در دسترس نیست.</p>{% endfor %}
+        </nav>
+        <button class="erp-module-selector__arrow" type="button" data-module-next aria-label="ماژول‌های بعدی" aria-controls="erp-module-cards" hidden><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
+    </div>
+    <div class="erp-module-selector__position" data-module-position hidden aria-hidden="true"><span></span></div>
 </dialog>

@@ -1,0 +1,62 @@
+/* RFQ comparison/award presentation only; canonical tokens and shared widgets. */
+.rfq-config__layout { display: grid; grid-template-columns: minmax(0,1fr) 14rem; gap: 1rem; margin-top: 1.25rem; align-items: start; }
+.rfq-config__panel { min-width: 0; border-radius: .875rem; overflow: hidden; }
+.rfq-config__heading { padding: 1rem 1.25rem; background: var(--color-primary-hover-overlay); border-bottom: 1px solid var(--color-border-subtle); }
+.rfq-config__heading > div, .rfq-config__group-action > div { display: flex; align-items: center; gap: .75rem; }
+.rfq-config__heading h2, .rfq-config__group-action h2 { font-size: .9375rem; font-weight: 700; color: var(--color-primary-strong); }
+.rfq-config__heading svg, .rfq-config__group-action svg { color: var(--color-primary); flex-shrink: 0; }
+.rfq-config__heading p, .rfq-config__group-action p { margin-top: .375rem; font-size: .75rem; line-height: 1.9; color: var(--color-text-secondary); }
+.rfq-config__table-wrap { padding: .75rem 1rem; overflow-x: auto; }
+.rfq-config__table { width: 100%; border-collapse: collapse; font-size: .8125rem; text-align: right; }
+.rfq-config__table thead { background: var(--color-bg-subtle); font-size: .6875rem; color: var(--color-text-secondary); }
+.rfq-config__table th, .rfq-config__table td { padding: .75rem .625rem; vertical-align: top; }
+.rfq-config__table tbody tr + tr { border-top: 1px solid var(--color-border-subtle); }
+.rfq-config__table th[scope=row] { min-width: 7rem; font-weight: 600; }
+.rfq-config__table th p { font-weight: 400; font-size: .75rem; margin-top: .25rem; color: var(--color-text-muted); }
+.rfq-config__table .erp-form-field > label { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.rfq-config__table td .erp-form-field input[type=number] { width: 7rem; min-width: 7rem; min-height: 2.5rem; text-align: right; font-variant-numeric: tabular-nums; }
+.rfq-config__mode { min-width: 12rem; }
+.rfq-config__advanced { margin-top: .625rem; font-size: .6875rem; color: var(--color-text-secondary); }
+.rfq-config__advanced summary { cursor: pointer; min-height: 1.5rem; color: var(--color-primary); }
+.rfq-config__table .rfq-config__advanced .erp-form-field > label { position: static; width: auto; height: auto; clip-path: none; white-space: normal; font-size: .75rem; margin-top: .5rem; }
+.rfq-config__footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; border-top: 1px solid var(--color-border-subtle); background: var(--color-bg-subtle); }
+.rfq-config__footer strong { font-size: .8125rem; }
+.rfq-config__footer p { margin-top: .25rem; color: var(--color-text-muted); font-size: .6875rem; }
+.rfq-config__footer button { flex-shrink: 0; }
+.rfq-config__help { padding: 1.25rem; background: var(--color-primary-hover-overlay); border: 1px solid var(--color-border-subtle); border-radius: .875rem; font-size: .75rem; line-height: 2; }
+.rfq-config__help h2 { font-weight: 700; color: var(--color-primary-strong); }
+.rfq-config__help section { margin-top: 1.5rem; }
+.rfq-config__help h3 { font-weight: 700; margin-bottom: .5rem; }
+.rfq-config__help p { color: var(--color-text-secondary); margin-top: .5rem; }
+.rfq-config__group-action { padding: 1rem 1.25rem; border-radius: .875rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1rem; }
+.rfq-config__group-action h2 span { font-weight: 400; font-size: .75rem; }
+.rfq-config__group-action > a { flex-shrink: 0; }
+.rfq-config__line-add, .rfq-config__history { padding: 1rem 1.25rem; margin-top: 1rem; border-radius: .875rem; }
+.rfq-config__line-add summary, .rfq-config__history summary { cursor: pointer; font-size: .8125rem; color: var(--color-primary); min-height: 1.75rem; }
+.rfq-config__line-fields { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; margin-block: 1rem; }
+.rfq-config__empty, .rfq-config__groups { padding: 1rem 1.25rem; font-size: .8125rem; }
+.rfq-config__saved { padding-block: .75rem; font-size: .8125rem; overflow-wrap: anywhere; }
+.rfq-config__saved + .rfq-config__saved { border-top: 1px solid var(--color-border-subtle); }
+.rfq-config__saved h3, .rfq-config__groups > h3, .rfq-config__history h3 { font-weight: 600; }
+.rfq-config__saved p, .rfq-config__saved ul { font-size: .75rem; line-height: 2; margin-top: .375rem; color: var(--color-text-secondary); }
+.rfq-config__saved a { display: inline-block; margin-top: .5rem; }
+.rfq-config__history > section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--color-border-subtle); }
+.rfq-config__steps { display: flex; flex-wrap: wrap; gap: .75rem 2rem; margin-block: 1rem; padding: .75rem 1rem; background: var(--color-bg-subtle); border: 1px solid var(--color-border-subtle); border-radius: .75rem; font-size: .75rem; color: var(--color-text-secondary); }
+.rfq-config__steps [aria-current=step] { color: var(--color-primary); font-weight: 700; }
+.rfq-config__group-form .rfq-config__table .erp-form-field > label { position: static; height: auto; width: auto; clip-path: none; white-space: normal; font-size: .75rem; }
+@media (max-width: 1199px) { .rfq-config__layout { grid-template-columns: minmax(0,1fr); } .rfq-config__help { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; } .rfq-config__help h2 { grid-column: 1 / -1; } .rfq-config__help section { margin-top: 0; } }
+@media (max-width: 639px) {
+ .rfq-config__table-wrap { padding: .5rem .75rem; overflow: visible; }
+ .rfq-config__table, .rfq-config__table tbody { display: block; }
+ .rfq-config__table thead { display: none; }
+ .rfq-config__table tbody tr { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: .625rem; padding-block: 1rem; }
+ .rfq-config__table th[scope=row] { grid-column: 1 / -1; min-width: 0; }
+ .rfq-config__table td, .rfq-config__table th { display: block; padding: 0; overflow-wrap: anywhere; }
+ .rfq-config__table td::before { content: attr(data-label); display: block; font-size: .6875rem; color: var(--color-text-muted); margin-bottom: .375rem; }
+ .rfq-config__table .rfq-config__mode { grid-column: 1 / -1; min-width: 0; }
+ .rfq-config__table td .erp-form-field input[type=number] { width: 100%; min-width: 0; min-height: 2.75rem; }
+ .rfq-config__table select { min-height: 2.75rem; }
+ .rfq-config__footer, .rfq-config__group-action { flex-direction: column; align-items: stretch; }
+ .rfq-config__help { display: block; } .rfq-config__help section { margin-top: 1rem; }
+ .rfq-config__line-fields { grid-template-columns: minmax(0,1fr); }
+}

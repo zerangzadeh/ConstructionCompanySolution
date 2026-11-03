@@ -152,9 +152,12 @@ class JourneyRemediationTests(RemediationFixture, TestCase):
                 self.assertEqual(
                     html.split("<title>")[1].split("</title>")[0], title + " | بنیرا"
                 )
-                nav = html.split("data-billing-navigation")[1].split("</nav>")[0]
-                self.assertEqual(nav.count("erp-btn--active"), 1)
-                self.assertEqual(nav.count('aria-current="page"'), 1)
+                if route in ("claim_list", "progress_list"):
+                    self.assertNotIn("data-billing-navigation", html)
+                else:
+                    nav = html.split("data-billing-navigation")[1].split("</nav>")[0]
+                    self.assertEqual(nav.count("erp-btn--active"), 1)
+                    self.assertEqual(nav.count('aria-current="page"'), 1)
                 self.assertEqual(BalancedMarkup(html).errors, [])
 
     def test_estimate_states_have_correct_copy_and_balanced_separate_forms(self):
@@ -339,7 +342,7 @@ class JourneyRemediationTests(RemediationFixture, TestCase):
         response = self.client.get(reverse("billing:progress_detail", args=[record.pk]))
         self.assertContains(
             response,
-            '<label class="block text-sm font-medium" for="progress-reject-reason">دلیل رد اندازه‌گیری</label>',
+            '<label class="block text-sm font-medium" for="progress-reject-reason">دلیل رد کارکرد</label>',
             html=True,
         )
         self.assertContains(response, 'id="progress-verify-reason"')

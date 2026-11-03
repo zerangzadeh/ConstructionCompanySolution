@@ -1,0 +1,81 @@
+[
+  {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "apps/contracts/hub.py",
+      "apps/contracts/test_hub.py",
+      "apps/contracts/templatetags",
+      "apps/contracts/views.py",
+      "apps/billing/views.py",
+      "apps/billing/list_presentation.py",
+      "apps/billing/test_journey_navigation.py",
+      "apps/billing/test_journey_content.py",
+      "scripts/verification/contract_hub_validate.py"
+    ],
+    "exit_code": 0,
+    "output": "All checks passed!\n"
+  },
+  {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "apps/contracts/hub.py",
+      "apps/contracts/test_hub.py",
+      "apps/contracts/templatetags",
+      "apps/contracts/views.py",
+      "apps/billing/views.py",
+      "apps/billing/list_presentation.py",
+      "apps/billing/test_journey_navigation.py",
+      "apps/billing/test_journey_content.py",
+      "scripts/verification/contract_hub_validate.py"
+    ],
+    "exit_code": 0,
+    "output": "10 files already formatted\n"
+  },
+  {
+    "command": [
+      "node",
+      "--check",
+      "scripts/verification/contract_hub_browser.mjs"
+    ],
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "node",
+      "--check",
+      "apps/contracts/static/contracts/detail.js"
+    ],
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+      "manage.py",
+      "check"
+    ],
+    "exit_code": 0,
+    "output": "System check identified no issues (0 silenced).\n"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check",
+      "--",
+      "apps/contracts",
+      "apps/billing",
+      "templates/contracts"
+    ],
+    "exit_code": 0,
+    "output": "warning: in the working copy of 'apps/billing/list_presentation.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/billing/test_journey_navigation.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/contracts/static/contracts/detail.css', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/contracts/static/contracts/detail.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'templates/contracts/detail_terms.html', LF will be replaced by CRLF the next time Git touches it\n"
+  }
+]

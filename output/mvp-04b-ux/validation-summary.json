@@ -1,0 +1,240 @@
+{
+  "distinct_tests": 56,
+  "affected_tests_pass": 47,
+  "baseline_fixture_failures": 9,
+  "targeted_final_tests_pass": 6,
+  "chrome": "Chrome/156.0.8078.48",
+  "chrome_cases_pass": 17,
+  "widths": [
+    1440,
+    1024,
+    390
+  ],
+  "tests": {
+    "tests.test_rfq_configuration_ux.RFQConfigurationUXTests.test_existing_false_flag_and_multiple_scopes_are_preserved": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "tests.test_rfq_configuration_ux.RFQConfigurationUXTests.test_forged_hidden_version_and_csrf_fail_closed": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "tests.test_rfq_configuration_ux.RFQConfigurationUXTests.test_get_prefills_existing_rows_and_never_persists": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "tests.test_rfq_configuration_ux.RFQConfigurationUXTests.test_group_members_prefill_select_and_replace_without_losing_lines": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "tests.test_rfq_configuration_ux.RFQConfigurationUXTests.test_invalid_quantity_flags_and_missing_fields_retain_bound_errors": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "tests.test_rfq_configuration_ux.RFQConfigurationUXTests.test_only_group_configuration_does_not_infer_independent_line_scopes": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "tests.test_rfq_configuration_ux.RFQConfigurationUXTests.test_read_only_project_tenant_and_suspended_boundaries": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "tests.test_rfq_configuration_ux.RFQConfigurationUXTests.test_single_confirmation_multiple_rows_replays_and_issues_exactly": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "tests.test_rfq_configuration_ux.RFQConfigurationUXTests.test_stale_revision_and_source_changes_fail_without_overwrite": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b_scope.ExplicitScopeTests.test_addendum_requires_explicit_next_definition_and_preserves_prior_scope": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b_scope.ExplicitScopeTests.test_http_explicit_form_validation_replay_and_issue": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b_scope.ExplicitScopeTests.test_invalid_source_quantities_flags_and_units_fail_closed": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b_scope.ExplicitScopeTests.test_line_partial_flags_pin_and_retry_are_exact_and_audited": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b_scope.ExplicitScopeTests.test_lot_retains_explicit_members_quantities_and_unit_without_allocations": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b_scope.ExplicitScopeTests.test_no_silent_default_and_issue_fails_atomically_without_definition": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b_scope.ExplicitScopeTests.test_permission_wrong_project_and_tenant_are_denied_in_service": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b_scope.ExplicitScopeTests.test_revision_optimism_idempotency_and_immutable_definition": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b_scope.ExplicitScopeTests.test_scope_issue_rolls_back_version_invitations_and_scope_on_failure": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b_scope.ExplicitScopeTests.test_source_drift_requires_new_explicit_definition": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b1.RFQPreparationTests.test_action_flags_project_scope_and_unauthorized_direct_posts": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b1.RFQPreparationTests.test_context_and_general_creation_keep_parent_and_validate_dates": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b1.RFQPreparationTests.test_forged_parent_line_supplier_and_internal_keys_fail_without_identifier_echo": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b1.RFQPreparationTests.test_forged_scope_unit_is_rejected_without_raw_uuid_error": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b1.RFQPreparationTests.test_issue_freeze_supplier_error_retention_and_preparation_only_read_model": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b1.RFQPreparationTests.test_line_selector_uses_source_and_excludes_already_selected": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b1.RFQPreparationTests.test_list_search_filters_sort_pagination_and_business_chips": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_rfq.RequestForQuotationServiceTests.test_addendum_cannot_move_opening_boundary_earlier": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_rfq.RequestForQuotationServiceTests.test_issue_is_idempotent_and_snapshots_are_immutable": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_rfq.RequestForQuotationServiceTests.test_read_scope_and_cross_tenant_project_are_denied": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_p5_s11_comparison_award.P5S11ComparisonAwardTests.test_no_award_is_explicit_has_no_allocations_and_does_not_mutate_downstream": {
+      "status": "BASELINE TEST DEBT",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_p5_s11_comparison_award.P5S11SelfFinalizationPolicyTests.test_tenant_policy_explicitly_allows_s11_comparison_and_award_self_finalization": {
+      "status": "BASELINE TEST DEBT",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_award_is_sourcing_only_conserves_quantity_and_self_finalization_is_policy_gated": {
+      "status": "BASELINE TEST DEBT",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_conflict_cannot_self_clear_and_blocks_evaluation_until_disposed": {
+      "status": "BASELINE TEST DEBT",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_exception_closed_catalogue_and_independent_lifecycle": {
+      "status": "BASELINE TEST DEBT",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_reproducible_asserted_input_lineage_and_immutable_finalization": {
+      "status": "BASELINE TEST DEBT",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_split_award_is_explicit_and_allocation_inputs_are_governing": {
+      "status": "BASELINE TEST DEBT",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests.test_tie_requires_explicit_resolution_and_split_award_retains_exact_revisions": {
+      "status": "BASELINE TEST DEBT",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04f.ConnectedJourneyTests.test_no_award_has_history_and_no_downstream_continuation": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04f.ConnectedJourneyTests.test_split_award_separate_supplier_orders_receipts_and_exact_lineage": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "apps.procurement.test_mvp04b_scope.ScopeConcurrencyTests.test_two_revisions_with_same_expected_revision_cannot_overwrite": {
+      "status": "PASS",
+      "evidence": "final-browser-concurrency.xml"
+    },
+    "apps.procurement.test_rfq.RequestForQuotationConcurrencyTests.test_concurrent_identical_issue_creates_one_version": {
+      "status": "PASS",
+      "evidence": "final-browser-concurrency.xml"
+    },
+    "apps.procurement.test_p5_s11_comparison_award.P5S11ConcurrencyTests.test_postgresql_finalization_contention_is_idempotent_and_conserves_award_quantity": {
+      "status": "BASELINE TEST DEBT",
+      "evidence": "final-tests.xml"
+    },
+    "tests.test_rfq_configuration_browser.RFQConfigurationBrowserTests.test_configuration_journey_responsive_offline_and_boundaries": {
+      "status": "PASS",
+      "evidence": "final-browser-concurrency.xml"
+    },
+    "apps.procurement.test_mvp04b_browser.ScopeBrowserTests.test_explicit_scope_issue_addendum_and_responsive_denials": {
+      "status": "PASS",
+      "evidence": "final-browser-concurrency.xml"
+    },
+    "apps.procurement.test_mvp04b1_browser.RFQPreparationBrowserTests.test_browser_denials_and_forged_context": {
+      "status": "PASS",
+      "evidence": "final-browser-concurrency.xml"
+    },
+    "apps.procurement.test_mvp04b1_browser.RFQPreparationBrowserTests.test_end_to_end_rfq_preparation_issue_and_responsive_history": {
+      "status": "PASS",
+      "evidence": "final-browser-concurrency.xml"
+    },
+    "tests.test_f3_module_selector.ModuleSelectorPresentationTests.test_cards_are_only_projections_of_authorized_destinations": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "tests.test_f3_module_selector.ModuleSelectorPresentationTests.test_current_route_alias_and_longest_authorized_parent_path": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "tests.test_f3_module_selector.ModuleSelectorPresentationTests.test_each_authorized_child_highlights_its_family": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "tests.test_f3_module_selector.ModuleSelectorPresentationTests.test_empty_navigation_has_no_fabricated_destination": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "tests.test_f3_module_selector.ModuleSelectorPresentationTests.test_only_canonical_filtered_links_and_labels_are_rendered": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "core.test_cep017_navigation.Cep017NavigationTemplateTests.test_canonical_navigation_register_is_complete_and_persian_first": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "core.test_cep017_navigation.Cep017NavigationTemplateTests.test_empty_groups_and_hidden_targets_are_not_placeholders": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "core.test_cep017_navigation.Cep017NavigationTemplateTests.test_rfq_navigation_renders_one_state_for_each_permission_variant": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "core.test_cep017_navigation.Cep017NavigationTemplateTests.test_shared_breadcrumb_and_mobile_close_contract_are_present": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    },
+    "core.test_product_surface.SurfacePolicyTests.test_navigation_permissions_empty_groups_and_operational_reports": {
+      "status": "PASS",
+      "evidence": "final-tests.xml"
+    }
+  },
+  "product_owner_visual_acceptance": "PENDING"
+}

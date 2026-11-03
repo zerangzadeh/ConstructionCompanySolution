@@ -26,7 +26,21 @@ from .rfq_services import get_organization_rfqs
 def preparation_error_text(exc):
     if "کلید یکتا" in str(exc):
         return "امکان ثبت این ارسال وجود ندارد؛ صفحه استعلام را تازه کنید و وضعیت فعلی را بررسی کنید."
-    return error_text(exc)
+    message = error_text(exc)
+    for old, new in (
+        (
+            "دامنه خرید و اقلام آن را صریحاً تعریف و ثبت کنید",
+            "مقدار و نحوه انتخاب تأمین‌کننده را تأیید و ذخیره کنید",
+        ),
+        ("نام دامنه", "نام گروه خرید"),
+        ("تعریف دامنه", "تنظیمات استعلام"),
+        ("دامنه خرید", "تنظیمات استعلام"),
+        ("دامنه ردیف", "تنظیمات قلم"),
+        ("اقلام دامنه", "اقلام استعلام"),
+        ("واحد معتبر بسته", "واحد معتبر گروه خرید"),
+    ):
+        message = message.replace(old, new)
+    return message
 
 
 def list_context(request):

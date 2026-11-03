@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="2086.525" timestamp="2026-11-02T22:35:49.557083+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_pr_detail_uiux.PurchaseRequestDetailVisualTests" name="test_detail_states_journeys_and_shared_frontend" time="2086.034"><failure message="AssertionError: 1 != 0 : node:internal/modules/run_main:107&#10;    triggerUncaughtException(&#10;    ^&#10;&#10;Error: Page did not settle: location.pathname===&quot;/procurement/requests/2963134f-cabb-469b-b6f2-06f54cf1550c/&quot; &amp;&amp; document.readyState==='complete'&#10;    at waitFor (file:///E:/Construction_Company_Solution/scripts/verification/pr_detail_uiux_browser.mjs:75:11)&#10;    at async file:///E:/Construction_Company_Solution/scripts/verification/pr_detail_uiux_browser.mjs:180:5&#10;&#10;Node.js v24.20.0">self = &lt;test_pr_detail_uiux.PurchaseRequestDetailVisualTests testMethod=test_detail_states_journeys_and_shared_frontend&gt;
+
+    def test_detail_states_journeys_and_shared_frontend(self):
+        for row, name in (
+            (self.organization, "شرکت ساختمانی نمونه"),
+            (self.project, "اجرای سازه بتنی پروژه نمونه"),
+            (self.material, "سیمان پرتلند"),
+            (self.unit, "کیسه"),
+        ):
+            row.name = name
+            row.save(update_fields=["name"])
+        scenarios, drafts, reviews = [], [], []
+        for width in (1440, 1024, 390):
+            records = {}
+            for state in ("draft", "submitted", "approved"):
+                record = create_purchase_request(
+                    organization=self.organization,
+                    project=self.project,
+                    actor=self.owner,
+                    request_number=f"PR-UX-{state[:1].upper()}-{width}",
+                    title="درخواست تأمین سیمان اجرای فونداسیون",
+                    required_by=date(2026, 11, 9),
+                )
+                add_purchase_request_item(
+                    organization=self.organization,
+                    actor=self.owner,
+                    purchase_request=record,
+                    material=self.material,
+                    quantity=Decimal(120),
+                    description="مصالح موردنیاز اجرای فونداسیون",
+                )
+                if state != "draft":
+                    submit_purchase_request(
+                        organization=self.organization,
+                        actor=self.owner,
+                        purchase_request=record,
+                    )
+                if state == "approved":
+                    approve_purchase_request(
+                        organization=self.organization,
+                        actor=self.owner,
+                        purchase_request=record,
+                        reason="نیاز پروژه بررسی شد",
+                    )
+                    record.refresh_from_db()
+                    when = timezone.now() + timedelta(days=5)
+                    rfq = create_rfq(
+                        organization=self.organization,
+                        actor=self.owner,
+                        project=self.project,
+                        purchase_request=record,
+                        rfq_number=f"RFQ-UX-{width}",
+                        title="استعلام سیمان فونداسیون",
+                        closing_at=when,
+                        earliest_opening_at=when,
+                    )
+                records[state] = record
+                self.login(self.owner)
+                response = self.client.get(self.url(record))
+                self.assertEqual(response.status_code, 200)
+                scenarios.append(
+                    {
+                        "name": f"{state}-{width}",
+                        "path": self.url(record),
+                        "state": state,
+                        "width": width,
+                        "actor": "owner",
+                        "material": str(self.material.pk),
+                        "expectedNavigation": [
+                            {"label": link.label, "url": reverse(link.route)}
+                            for group in response.context["product_navigation_groups"]
+                            for link in group.links
+                        ],
+                        "rfqPath": reverse("procurement:rfq_detail", args=[rfq.pk])
+                        if state == "approved"
+                        else "",
+                    }
+                )
+            drafts.append(records["draft"])
+            reviews.append(records["submitted"])
+        sessions = {}
+        for name, actor in (("owner", self.owner), ("viewer", self.viewer)):
+            self.client = Client()
+            self.login(actor)
+            sessions[name] = self.client.cookies["sessionid"].value
+        for state, record in records.items():
+            scenarios.append(
+                {
+                    "name": f"viewer-{state}-390",
+                    "path": self.url(record),
+                    "state": state,
+                    "width": 390,
+                    "actor": "viewer",
+                }
+            )
+        # Existing HTTP boundary evidence plus real browser denials in both scopes.
+        self.login(self.member)
+        membership = self.organization.memberships.get(user=self.member)
+        MembershipScopeGrant.objects.filter(membership=membership).update(
+            revoked_at=timezone.now()
+        )
+        allowed = Project.objects.create(
+            organization=self.organization,
+            name="پروژه مجاز دیگر",
+            code="UX-OTHER",
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=membership,
+            scope_type="project",
+            project=allowed,
+            reason="Test",
+            source="test_fixture",
+        )
+        sessions["scoped"] = self.client.cookies["sessionid"].value
+        self.client = Client()
+        self.client.force_login(self.outsider)
+        from apps.organizations.services import set_active_organization
+    
+        session = self.client.session
+        set_active_organization(session, self.other_organization)
+        session.save()
+        sessions["outsider"] = self.client.cookies["sessionid"].value
+        for actor in ("scoped", "outsider"):
+            scenarios.append(
+                {
+                    "name": f"{actor}-denied",
+                    "path": self.url(records["approved"]),
+                    "width": 390,
+                    "actor": actor,
+                    "denied": True,
+                }
+            )
+        output = ROOT / "output/mvp-04a-uiux/browser"
+        output.mkdir(parents=True, exist_ok=True)
+        env = os.environ.copy()
+        env.update(
+            PR_UIUX_SCENARIOS=json.dumps(scenarios),
+            PR_UIUX_SESSIONS=json.dumps(sessions),
+        )
+        result = subprocess.run(
+            [
+                "node",
+                str(ROOT / "scripts/verification/pr_detail_uiux_browser.mjs"),
+                self.live_server_url,
+                str(output),
+            ],
+            env=env,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=420,
+            check=False,
+        )
+        (output / "command.txt").write_text(
+            f"exit={result.returncode}\n{result.stdout}\n{result.stderr}",
+            encoding="utf-8",
+        )
+&gt;       self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-6000:])
+E       AssertionError: 1 != 0 : node:internal/modules/run_main:107
+E           triggerUncaughtException(
+E           ^
+E       
+E       Error: Page did not settle: location.pathname==="/procurement/requests/2963134f-cabb-469b-b6f2-06f54cf1550c/" &amp;&amp; document.readyState==='complete'
+E           at waitFor (file:///E:/Construction_Company_Solution/scripts/verification/pr_detail_uiux_browser.mjs:75:11)
+E           at async file:///E:/Construction_Company_Solution/scripts/verification/pr_detail_uiux_browser.mjs:180:5
+E       
+E       Node.js v24.20.0
+
+tests\test_pr_detail_uiux.py:191: AssertionError</failure></testcase></testsuite></testsuites>

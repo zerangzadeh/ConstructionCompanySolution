@@ -464,6 +464,9 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
         physical_empty=physical_empty,
     )
     present_workspace_dashboard(contract, workspace, dashboard)
+    from .hub import contract_hub
+
+    hub = contract_hub(request, contract, workspace, related_baselines)
     return render(
         request,
         "contracts/detail.html",
@@ -471,6 +474,7 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
             "contract": contract,
             "dashboard": dashboard,
             "workspace": workspace,
+            "hub": hub,
             "project_detail_url": reverse("projects:detail", args=[contract.project_id])
             if has_business_permission(
                 user=request.user,
@@ -511,6 +515,7 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
             ),
         },
     )
+
 
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.CONTRACTS_VIEW)

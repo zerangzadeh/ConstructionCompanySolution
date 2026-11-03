@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="6" time="113.429" timestamp="2026-11-03T00:12:19.829379+03:30" hostname="Zerangzadeh"><testcase classname="apps.billing.test_journey_content.JourneyContentTests" name="test_line_description_search_and_line_context_use_authorized_sources" time="21.032" /><testcase classname="apps.billing.test_journey_content.JourneyContentTests" name="test_measurement_detail_exposes_original_values_evidence_and_scoped_return" time="4.795"><failure message="Initial test incorrectly inspected unrelated shared-shell POST forms; corrected to the measurement-detail subtree.">self = &lt;apps.billing.test_journey_content.JourneyContentTests testMethod=test_measurement_detail_exposes_original_values_evidence_and_scoped_return&gt;
+
+    def test_measurement_detail_exposes_original_values_evidence_and_scoped_return(
+        self,
+    ):
+        self.make_fixture(persian=True)
+        record = self._verified_record()
+        self.login(self.owner)
+        response = self.client.get(reverse("billing:progress_detail", args=[record.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "data-billing-navigation")
+        for label in (
+            "کارکرد این ثبت",
+            "تجمعی تا این ثبت",
+            "مقدار مبنای قلم",
+            "زمان راستی‌آزمایی",
+            record.verification_reason,
+            record.source_reference,
+        ):
+            self.assertContains(response, label)
+        self.assertEqual(
+            response.context["progress_record"].period_quantity, record.period_quantity
+        )
+        self.assertEqual(
+            response.context["progress_record"].cumulative_quantity,
+            record.cumulative_quantity,
+        )
+        self.assertIn(f"contract={self.contract.pk}", response.context["history_url"])
+        self.assertIn("line_key=ITEM-01", response.context["history_url"])
+        self.assertEqual(
+            response.context["page_breadcrumbs"][-2]["url"],
+            response.context["history_url"],
+        )
+        from apps.projects.test_command_center import scoped_reader
+    
+        reader, _, _ = scoped_reader(
+            self.organization,
+            self.project,
+            ["progress.view"],
+            username="detail-only-reader",
+        )
+        self.login(reader)
+        independent = self.client.get(
+            reverse("billing:progress_detail", args=[record.pk])
+        )
+        self.assertEqual(independent.status_code, 200)
+&gt;       self.assertNotIn(
+            'method="post"',
+            independent.content.decode().split('class="measurement-detail"', 1)[1],
+        )
+E       AssertionError: 3 != 0 : 'method="post"' unexpectedly found in the following response
+
+apps\billing\test_journey_content.py:184: AssertionError</failure></testcase><testcase classname="apps.billing.test_journey_content.JourneyContentTests" name="test_progress_search_chips_and_clear_retain_contract" time="6.985" /><testcase classname="apps.billing.test_journey_navigation.JourneyNavigationTests" name="test_tab_permissions_remain_separate" time="7.123" /><testcase classname="apps.billing.test_journey_navigation.JourneyNavigationTests" name="test_zero_one_and_multiple_baseline_routing_and_all_tabs" time="10.747" /><testcase classname="apps.contracts.test_hub.ContractHubBrowserTests" name="test_measurement_detail_states_and_shared_decisions" time="62.079" /></testsuite></testsuites>

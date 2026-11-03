@@ -1,0 +1,49 @@
+{% load erp_format %}
+<div class="rfq-config__layout" id="supplier-selection">
+<div class="min-w-0">
+<section class="erp-surface rfq-config__panel" aria-labelledby="rfq-configuration-title">
+  <header class="rfq-config__heading">
+    <div>{% include "components/form_icon.html" with icon="layers" only %}<h2 id="rfq-configuration-title">نحوه استعلام و انتخاب تأمین‌کننده</h2></div>
+    <p>اقلام از درخواست خرید مبنا آمده‌اند؛ مقدار و نحوه انتخاب را بررسی و تأیید کنید.</p>
+  </header>
+  {% if can_manage_scope and not rfq.current_version_number %}
+  {% if configuration_form.rows %}
+  <form method="post" action="{% url 'procurement:rfq_scope_define' rfq.pk %}" novalidate aria-label="تنظیمات انتخاب تأمین‌کننده" data-item-configuration>
+    {% csrf_token %}{% for field in configuration_form.hidden_fields %}{{ field }}{% if field.errors %}<p role="alert" class="erp-field-error">اطلاعات فرم معتبر نیست؛ صفحه را دوباره باز کنید.</p>{% endif %}{% endfor %}
+    {% include "components/form_errors.html" with form=configuration_form only %}
+    <div class="rfq-config__table-wrap">
+    <table class="rfq-config__table"><caption class="sr-only">اقلام استعلام و تنظیمات مقایسه و انتخاب</caption>
+      <thead><tr><th scope="col">شرح کالا / خدمت</th><th scope="col">مقدار درخواست خرید</th><th scope="col">سقف قلم در استعلام</th><th scope="col">مقدار استعلام</th><th scope="col">واحد</th><th scope="col">نحوه انتخاب تأمین‌کننده</th></tr></thead>
+      <tbody>{% for row in configuration_form.rows %}<tr>
+        <th scope="row">{{ row.line.material.name }}{% if row.line.description and row.line.description != row.line.material.name %}<p>{{ row.line.description }}</p>{% endif %}</th>
+        <td data-label="مقدار درخواست خرید">{{ row.line.purchase_request_item.quantity|erp_number }}</td>
+        <td data-label="سقف قلم در استعلام">{{ row.line.quantity|erp_number }}</td>
+        <td data-label="مقدار استعلام">{% include "components/form_field.html" with field=row.quantity only %}</td>
+        <td data-label="واحد">{{ row.line.unit_of_measure.name }}</td>
+        <td class="rfq-config__mode" data-label="نحوه انتخاب تأمین‌کننده">
+          {% include "components/form_field.html" with field=row.independently_awardable only %}
+          <details class="rfq-config__advanced" {% if row.allows_split_award.errors or row.allows_alternates.errors or row.allows_split_award.value == 'yes' or row.allows_alternates.value == 'yes' %}open{% endif %}>
+            <summary>تقسیم خرید و پیشنهاد جایگزین</summary>
+            {% include "components/form_field.html" with field=row.allows_split_award only %}
+            {% include "components/form_field.html" with field=row.allows_alternates only %}
+          </details>
+        </td>
+      </tr>{% endfor %}</tbody>
+    </table></div>
+    <footer class="rfq-config__footer"><div><strong>{% if scope_ready %}تنظیمات نسخه جاری ثبت شده است{% elif rfq.commercial_scope_required %}تأیید تنظیمات برای صدور لازم است{% else %}تنظیمات را پس از بررسی ذخیره کنید{% endif %}</strong><p>تا انتخاب «تأیید و ذخیره تنظیمات» هیچ تنظیمی ثبت نمی‌شود.</p></div><button class="erp-btn erp-btn--primary" name="operation" value="configure_items" type="submit">تأیید و ذخیره تنظیمات</button></footer>
+  </form>
+  {% elif not selected_lines %}<p class="rfq-config__empty">ابتدا اقلام استعلام را از درخواست خرید انتخاب کنید.</p>{% endif %}
+  {% if purchase_groups %}<div class="rfq-config__groups"><h3>گروه‌های خرید ثبت‌شده</h3>{% include "procurement/configuration_entries.html" with entries=purchase_groups editable=True %}</div>{% endif %}
+  {% else %}
+    {% if configuration_entries %}<div class="rfq-config__groups"><h3>{% if prepared_scope %}تنظیمات نسخه بعدی{% else %}تنظیمات نسخه جاری{% endif %}</h3>{% include "procurement/configuration_entries.html" with entries=configuration_entries %}</div>
+    {% elif not rfq.current_version_number %}<p class="rfq-config__empty">تنظیمات انتخاب تأمین‌کننده هنوز تأیید نشده است.</p>{% endif %}
+    <div class="rfq-config__table-wrap"><table class="rfq-config__table"><thead><tr><th>شرح کالا / خدمت</th><th>مقدار درخواست خرید</th><th>مقدار قلم استعلام</th><th>واحد</th></tr></thead><tbody>{% for line in selected_lines %}<tr><th scope="row">{{ line.material.name }}</th><td data-label="مقدار درخواست خرید">{{ line.purchase_request_item.quantity|erp_number }}</td><td data-label="مقدار قلم استعلام">{{ line.quantity|erp_number }}</td><td data-label="واحد">{{ line.unit_of_measure.name }}</td></tr>{% endfor %}</tbody></table></div>
+  {% endif %}
+  {% if prepared_scope and not scope_ready %}<p class="rfq-config__empty" role="alert">اقلام مبنا تغییر کرده‌اند؛ تنظیمات را دوباره بررسی و تأیید کنید.</p>{% endif %}
+</section>
+{% if can_manage_scope %}<section class="erp-surface rfq-config__group-action"><div>{% include "components/form_icon.html" with icon="layers" only %}<div><h2>گروه‌بندی اقلام در گروه خرید <span>(اختیاری)</span></h2><p>برای مقایسه و انتخاب چند قلم به‌صورت یک مجموعه، اقلام موجود را انتخاب کنید.</p></div></div><a class="erp-btn erp-btn--secondary" data-scope-define href="{% url 'procurement:rfq_scope_define' rfq.pk %}">+ ایجاد گروه خرید</a></section>{% endif %}
+{% if can_add_line %}<details class="erp-surface rfq-config__line-add" {% if line_form.is_bound %}open{% endif %}><summary>{% if selected_lines %}انتخاب قلم دیگری از درخواست خرید{% else %}انتخاب اقلام از درخواست خرید{% endif %}</summary><form method="post" action="{% url 'procurement:rfq_line_add' rfq.pk %}" novalidate aria-label="افزودن قلم استعلام">{% csrf_token %}{% include "components/form_errors.html" with form=line_form only %}<div class="rfq-config__line-fields">{% for field in line_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}</div><button class="erp-btn erp-btn--secondary" type="submit">افزودن به اقلام استعلام</button></form></details>{% endif %}
+</div>
+<aside class="rfq-config__help" aria-labelledby="rfq-help-title"><h2 id="rfq-help-title">راهنمای این مرحله</h2><section><h3>مقدار استعلام</h3><p>مقدار درخواست خرید و سقف قلم استعلام نمایش داده می‌شود. مقدار مورد استعلام می‌تواند کمتر از سقف همان قلم باشد.</p></section><section><h3>نحوه مقایسه و انتخاب</h3><p><strong>انتخاب مستقل:</strong> هر قلم جداگانه مقایسه و انتخاب می‌شود.</p><p><strong>امکان تقسیم خرید:</strong> خرید بین چند تأمین‌کننده قابل تقسیم است.</p><p><strong>پیشنهاد جایگزین مجاز:</strong> تأمین‌کننده می‌تواند پیشنهاد جایگزین ارائه کند.</p></section><section><h3>گروه خرید</h3><p>چند قلم را آگاهانه برای مقایسه و انتخاب در یک مجموعه قرار دهید. ثبت گروه، تنظیمات قبلی را حذف نمی‌کند؛ برای تغییر گروه ثبت‌شده از «اصلاح تنظیمات گروه» استفاده کنید.</p></section></aside>
+</div>
+{% if configuration_history %}<details class="erp-surface rfq-config__history"><summary>نسخه‌های قبلی تنظیمات استعلام</summary>{% for item in configuration_history %}<section><h3>نسخه {{ item.definition.version_number|erp_number }} · {{ item.definition.created_at|jalali_datetime }}</h3>{% include "procurement/configuration_entries.html" with entries=item.entries %}</section>{% endfor %}</details>{% endif %}

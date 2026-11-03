@@ -1,0 +1,16 @@
+Focused existing PR HTTP:
+.venv/Scripts/python.exe scripts/verification/f2_validate.py apps/procurement/test_mvp04a.py --reuse-db -q --junitxml=output/mvp-04a-uiux/http-tests.xml
+
+Affected regression and 14-case browser run:
+.venv/Scripts/python.exe scripts/verification/f2_validate.py apps/procurement/test_mvp04a.py apps/procurement/test_cep079_workflow_scope.py apps/procurement/test_workflow.py::PurchaseRequestWorkflowPilotTests::test_compatibility_submit_and_self_approval_are_atomic apps/procurement/test_workflow.py::PurchaseRequestWorkflowPilotTests::test_reject_permission_candidacy_tenant_isolation_and_cancel apps/procurement/test_workflow.py::PurchaseRequestWorkflowPilotTests::test_domain_command_failure_rolls_back_claim_and_decision apps/procurement/test_workflow.py::PurchaseRequestWorkflowPilotTests::test_amount_condition_is_rejected_without_canonical_request_amount tests/test_f3_module_selector.py::ModuleSelectorPresentationTests core/test_cep017_navigation.py core/test_product_surface.py::SurfacePolicyTests::test_navigation_permissions_empty_groups_and_operational_reports tests/test_pr_detail_uiux.py::PurchaseRequestDetailVisualTests --reuse-db -q --junitxml=output/mvp-04a-uiux/final-tests.xml
+
+Final visual correction / explicit mobile table scrolling:
+.venv/Scripts/python.exe scripts/verification/f2_validate.py tests/test_pr_detail_uiux.py::PurchaseRequestDetailVisualTests --reuse-db -q --junitxml=output/mvp-04a-uiux/visual-final-tests.xml
+
+Static/checks:
+npm run build:css
+.venv/Scripts/python.exe manage.py check
+.venv/Scripts/python.exe -m ruff check tests/test_pr_detail_uiux.py
+.venv/Scripts/python.exe -m ruff format --check tests/test_pr_detail_uiux.py
+node --check scripts/verification/pr_detail_uiux_browser.mjs
+node scripts/verification/f1_assets.cjs output/mvp-04a-uiux/browser/results.json
