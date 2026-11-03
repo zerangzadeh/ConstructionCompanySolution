@@ -137,6 +137,16 @@ def equipment_list(request: HttpRequest) -> HttpResponse:
         },
         default_ordering=("name", "pk"),
     )
+    if request.GET.get("format") == "xlsx":
+        from core.xlsx import Sheet, download
+
+        from .xlsx_exports import EQUIPMENT_COLUMNS
+
+        return download(
+            "تجهیزات",
+            (Sheet("تجهیزات", EQUIPMENT_COLUMNS, page.paginator.object_list),),
+            timezone_name=request.organization.settings.timezone,
+        )
     return render(
         request,
         "equipment/list.html",
@@ -178,6 +188,32 @@ def operations_workbench(request: HttpRequest) -> HttpResponse:
     never bypasses the operation-specific permission checks.
     """
     organization = request.organization
+    if request.GET.get("format") == "xlsx":
+        from apps.organizations.authorization import scope_queryset
+        from core.xlsx import Sheet, download
+
+        from .xlsx_exports import USAGE_COLUMNS
+
+        # Operations evidence retains the existing project/site scope boundary.
+        records = (
+            scope_queryset(
+                EquipmentUsageLog.objects.filter(organization=organization),
+                membership=get_active_membership(
+                    user=request.user, organization=organization
+                ),
+                project_lookup="deployment__project_id",
+                site_lookup="deployment__site_id",
+            )
+            .select_related(
+                "equipment", "deployment__project", "deployment__site", "operator"
+            )
+            .order_by("-started_at", "pk")
+        )
+        return download(
+            "کارکرد تجهیزات",
+            (Sheet("کارکرد تجهیزات", USAGE_COLUMNS, records),),
+            timezone_name=organization.settings.timezone,
+        )
     return render(
         request,
         "equipment/operations_workbench.html",
@@ -760,6 +796,16 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
         },
         default_ordering=("-start_date", "pk"),
     )
+    if request.GET.get("format") == "xlsx":
+        from core.xlsx import Sheet, download
+
+        from .xlsx_exports import ASSIGNMENT_COLUMNS
+
+        return download(
+            "تخصیص تجهیزات",
+            (Sheet("تخصیص تجهیزات", ASSIGNMENT_COLUMNS, page.paginator.object_list),),
+            timezone_name=request.organization.settings.timezone,
+        )
     return render(
         request,
         "equipment/assignment_list.html",

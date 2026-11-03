@@ -123,6 +123,13 @@ def estimate_list(request: HttpRequest) -> HttpResponse:
         },
         default_ordering=("title", "pk"),
     )
+    if request.GET.get("format") == "xlsx":
+        from .xlsx_exports import estimates_download
+
+        return estimates_download(
+            page.paginator.object_list,
+            timezone_name=request.organization.settings.timezone,
+        )
     return render(
         request,
         "estimates/list.html",

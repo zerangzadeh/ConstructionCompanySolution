@@ -123,6 +123,12 @@ def workbench(request: HttpRequest) -> HttpResponse:
         include_employee=True,
     )
     data = history_context(request, context)
+    if request.GET.get("format") == "xlsx":
+        from .xlsx_exports import history_download
+
+        return history_download(
+            data, timezone_name=request.organization.settings.timezone
+        )
     from core.list_filters import build_filter_bar
 
     history_form = data["history_form"]

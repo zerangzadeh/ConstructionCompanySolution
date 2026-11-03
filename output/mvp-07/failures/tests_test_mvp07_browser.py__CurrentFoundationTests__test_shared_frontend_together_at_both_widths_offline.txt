@@ -1,0 +1,20 @@
+self = <test_mvp07_browser.CurrentFoundationTests testMethod=test_shared_frontend_together_at_both_widths_offline>
+
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-5000:])
+    results = json.loads(result.stdout)
+>   checks = []
+        ^^^^^^^^
+
+tests\test_mvp07_browser.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_f4_frontend_conformance.py:171: in test_shared_frontend_together_at_both_widths_offline
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-6000:])
+E   AssertionError: 1 != 0 : node:internal/modules/run_main:107
+E       triggerUncaughtException(
+E       ^
+E   
+E   Error: Exact server-authorized labels/routes, no extra or hidden destinations
+E       at assert (file:///E:/Construction_Company_Solution/scripts/verification/f4_browser.mjs:95:58)
+E       at file:///E:/Construction_Company_Solution/scripts/verification/f4_browser.mjs:170:5
+E   
+E   Node.js v24.20.0

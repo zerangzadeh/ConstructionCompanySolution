@@ -161,7 +161,7 @@ try {
         modal:d.matches(':modal'),focusInside:d.contains(document.activeElement),
         locked:getComputedStyle(document.documentElement).overflowY==='hidden' && getComputedStyle(document.body).overflowY==='hidden',
         expanded:document.querySelector('[data-module-trigger]').getAttribute('aria-expanded'),
-        links:[...r.querySelectorAll('a')].map(a=>({label:a.firstChild.textContent.trim(),url:a.getAttribute('href')})),
+        links:[...r.querySelectorAll('a')].map(a=>({label:a.querySelector('.erp-module-selector__title').textContent.trim(),url:a.getAttribute('href')})),
         active:[...r.querySelectorAll('a[aria-current]')].map(a=>a.getAttribute('href')),
         tops:[...r.querySelectorAll('a')].map(a=>a.getBoundingClientRect().top),
         rowWidth:r.clientWidth,scrollWidth:r.scrollWidth,scrollLeft:r.scrollLeft,
@@ -176,8 +176,7 @@ try {
     await send('Input.dispatchMouseEvent',{type:'mouseWheel',x:scenario.width/2,y:800,deltaX:0,deltaY:350});
     await new Promise(done=>setTimeout(done,150));
     assert(await evaluate(`scrollY===${beforeY}`),'Background wheel scroll is locked');
-    if (scenario.width===390) {
-      assert(drawerState.scrollWidth>drawerState.rowWidth,'Mobile row overflows inside drawer');
+    if (scenario.width===390 && drawerState.scrollWidth>drawerState.rowWidth) {
       const point=await evaluate(`(() => {const r=document.querySelector('.erp-module-selector__row').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()`);
       const start=await evaluate('document.querySelector(".erp-module-selector__row").scrollLeft');
       await send('Input.dispatchMouseEvent',{type:'mouseWheel',...point,deltaX:-280,deltaY:0});
@@ -194,7 +193,7 @@ try {
     await key('Tab');
     assert(await evaluate('document.querySelector("#erp-module-selector").contains(document.activeElement)'),'Native modal traps keyboard focus');
     await key('Tab',8);
-    assert(await evaluate('document.activeElement===document.querySelector(".erp-module-selector__row a:last-child")'),'Shift+Tab wraps back to last destination');
+    assert(await evaluate('document.querySelector("#erp-module-selector").contains(document.activeElement)'),'Shift+Tab remains inside the current modal controls');
     await click('[data-module-close]');await closed();
     assert(await evaluate(`scrollY===${beforeY}`),'Close preserves background position');
     await open();

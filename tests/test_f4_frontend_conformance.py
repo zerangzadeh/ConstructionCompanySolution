@@ -24,6 +24,7 @@ from apps.procurement.services import add_purchase_request_item, create_purchase
 from apps.procurement.test_mvp04d import ReceiptJourneyFixture
 from apps.workforce.test_mvp02 import make_field_fixture
 from core.product_surface import route_exposed, url_exposed
+from core.templatetags.product_surface import module_selector_cards
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -116,9 +117,10 @@ class SharedFrontendConformanceTests(ReceiptJourneyFixture, StaticLiveServerTest
                     response = self.client.get(path)
                     self.assertEqual(response.status_code, 200)
                     expected = [
-                        {"label": link.label, "url": reverse(link.route)}
-                        for group in response.context["product_navigation_groups"]
-                        for link in group.links
+                        {"label": card["title"], "url": card["url"]}
+                        for card in module_selector_cards(
+                            response.context["product_navigation_groups"], route, path
+                        )
                     ]
                     if actor_name == "restricted":
                         self.assertNotIn(

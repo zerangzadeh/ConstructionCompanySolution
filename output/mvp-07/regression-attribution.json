@@ -1,0 +1,44 @@
+{
+  "regression_passes": 68,
+  "subtests_passed": 35,
+  "failed": [
+    "apps/equipment/tests.py::EquipmentServiceTests::test_assignment_lifecycle_preserves_history_and_derived_status",
+    "apps/equipment/tests.py::EquipmentServiceTests::test_assignment_service_rejects_cross_tenant_and_overlap",
+    "apps/equipment/tests.py::EquipmentServiceTests::test_create_and_scoped_read_enforce_rbac_and_audit",
+    "apps/equipment/tests.py::EquipmentServiceTests::test_maintenance_lifecycle_updates_equipment_and_audits",
+    "apps/equipment/tests.py::EquipmentPanelTests::test_owner_can_open_scoped_equipment_pages",
+    "apps/daily_reports/tests.py::DailyReportServiceTests::test_create_report_is_tenant_scoped_and_audited",
+    "apps/daily_reports/tests.py::DailyReportServiceTests::test_draft_report_accepts_operational_entries_and_locks_on_submit",
+    "apps/daily_reports/tests.py::DailyReportServiceTests::test_list_and_create_views_are_tenant_scoped",
+    "apps/daily_reports/tests.py::DailyReportServiceTests::test_report_list_and_detail_exclude_other_tenant",
+    "apps/daily_reports/tests.py::DailyReportServiceTests::test_report_optionally_scopes_to_an_active_worksite_phase",
+    "apps/daily_reports/tests.py::DailyReportServiceTests::test_report_rejects_cross_tenant_project",
+    "apps/daily_reports/tests.py::DailyReportServiceTests::test_report_rejects_phase_from_another_worksite",
+    "apps/daily_reports/tests.py::DailyReportServiceTests::test_report_rejects_site_from_another_project",
+    "apps/daily_reports/tests.py::DailyReportServiceTests::test_structured_entries_are_locked_after_submission_and_reject_cross_project_activity",
+    "apps/daily_reports/tests.py::DailyReportServiceTests::test_structured_entries_validate_master_scope_and_preserve_material_snapshots",
+    "apps/daily_reports/tests.py::DailyReportServiceTests::test_submitted_report_can_be_approved_once",
+    "apps/daily_reports/tests.py::DailyReportServiceTests::test_viewer_cannot_create_report"
+  ],
+  "classification": "BASELINE TEST DEBT",
+  "unchanged_source_paths": [
+    "apps/equipment/tests.py",
+    "apps/equipment/services.py",
+    "apps/daily_reports/tests.py",
+    "apps/daily_reports/services.py",
+    "apps/projects/services.py",
+    "apps/organizations/authorization.py",
+    "apps/organizations/decorators.py"
+  ],
+  "source_unchanged": true,
+  "equipment_view_decorators_identical_to_HEAD": true,
+  "daily_report_failures": {
+    "count": 12,
+    "trigger": "Legacy single-role membership fixtures fail in create_project at apps/projects/services.py:169 during setUp; no changed view/export runs."
+  },
+  "equipment_failures": {
+    "count": 5,
+    "trigger": "Four fail in unchanged service permission guard at apps/organizations/authorization.py:441; one is denied by unchanged decorators before equipment_list executes. Fixtures assign only legacy MembershipRole, without governed effective role assignments/scopes."
+  },
+  "action": "Retained; no authorization weakening or unrelated fixture rewrite."
+}

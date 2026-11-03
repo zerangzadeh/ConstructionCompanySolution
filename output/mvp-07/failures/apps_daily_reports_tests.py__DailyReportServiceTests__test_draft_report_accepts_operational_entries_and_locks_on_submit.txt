@@ -1,0 +1,83 @@
+self = <apps.daily_reports.tests.DailyReportServiceTests testMethod=test_draft_report_accepts_operational_entries_and_locks_on_submit>
+
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="daily-report-owner",
+            password="test-password",
+        )
+        self.other_user = User.objects.create_user(
+            username="daily-report-other-user",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Daily Report Company",
+            slug="daily-report-company",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Daily Report Company",
+            slug="other-daily-report-company",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.organization.memberships.create(
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+        self.other_organization.memberships.create(
+            user=self.other_user,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+>       self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-DAILY",
+            name="Daily report project",
+        )
+
+apps\daily_reports\tests.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Daily Report Company>
+actor = <User: daily-report-owner>, code = 'P-DAILY'
+name = 'Daily report project', description = '', status = ProjectStatus.PLANNING
+start_date = None, end_date = None, estimated_budget = Decimal('0.00')
+actual_budget = Decimal('0.00')
+
+    @transaction.atomic
+    def create_project(
+        *,
+        organization: Organization,
+        actor: User,
+        code: str,
+        name: str,
+        description: str = "",
+        status: str = ProjectStatus.PLANNING,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        estimated_budget: Decimal = Decimal("0.00"),
+        actual_budget: Decimal = Decimal("0.00"),
+    ) -> Project:
+        """Create a project after validating organization scope and core rules."""
+    
+        if not actor.is_authenticated or not actor.is_active:
+            raise PermissionDenied("ورود به حساب کاربری الزامی است.")
+        if (
+            organization.status != OrganizationStatus.ACTIVE
+            or organization.deleted_at is not None
+        ):
+            raise PermissionDenied("سازمان فعال نیست.")
+        if not _has_project_permission(
+            actor, organization, BusinessPermissionCode.PROJECTS_CREATE
+        ):
+>           raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E           django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+
+apps\projects\services.py:169: PermissionDenied

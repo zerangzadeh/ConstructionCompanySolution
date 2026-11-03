@@ -1,0 +1,59 @@
+self = <apps.equipment.tests.EquipmentServiceTests testMethod=test_assignment_lifecycle_preserves_history_and_derived_status>
+
+    def test_assignment_lifecycle_preserves_history_and_derived_status(self) -> None:
+        equipment = self.make_equipment()
+>       assignment = assign_equipment(
+            organization=self.organization,
+            actor=self.owner,
+            equipment=equipment,
+            project=self.project,
+            site=self.site,
+            start_date=self.today,
+            purpose="عملیات خاکی",
+        )
+
+apps\equipment\tests.py:207: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\equipment\services.py:279: in assign_equipment
+    _require_permission(
+apps\equipment\services.py:74: in _require_permission
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: equipment-owner>, organization = <Organization: Equipment Co>
+permission = BusinessPermissionCode.EQUIPMENT_ASSIGNMENTS_CREATE
+message = 'اجازه مدیریت تجهیزات این شرکت را ندارید.'
+project = <Project: EQ-PROJ - Equipment Project>
+site = <ProjectSite: EQ-PROJ · MAIN - Main Site>, allow_any_scope = False
+allow_site_parent = True
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید.
+
+apps\organizations\authorization.py:441: PermissionDenied

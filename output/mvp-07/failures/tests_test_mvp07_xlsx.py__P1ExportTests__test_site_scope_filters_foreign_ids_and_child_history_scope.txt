@@ -1,0 +1,35 @@
+self = <test_mvp07_xlsx.P1ExportTests testMethod=test_site_scope_filters_foreign_ids_and_child_history_scope>
+
+    def test_site_scope_filters_foreign_ids_and_child_history_scope(self):
+        other = Project.objects.create(
+            organization=self.organization, code="OUT", name="خارج از دامنه"
+        )
+        site = ProjectSite.objects.create(
+            organization=self.organization, project=other, code="OUT", name="خارج"
+        )
+        codes = [
+            "daily_reports.view",
+            "estimates.view",
+            "attendance.view",
+            "timesheets.view",
+            "overtime.view",
+            "equipment_assignments.view",
+            "equipment_operations.view",
+        ]
+        actor = self.reader(codes, project=other, site=site)
+        self.login(actor)
+        for route in (
+            self.routes()[0],
+            self.routes()[1],
+            self.routes()[2],
+            self.routes()[4],
+            self.routes()[5],
+        ):
+>           wb = self.workbook(route, rows=0)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_mvp07_xlsx.py:407: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_mvp05_xlsx.py:27: in workbook
+    self.assertEqual(response.status_code, 200)
+E   AssertionError: 403 != 200

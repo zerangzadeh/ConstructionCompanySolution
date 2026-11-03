@@ -17,6 +17,7 @@
     <div class="erp-list-workspace">
         {% include "components/filter_bar.html" with bar=list_ui.bar reference_layout=True only %}
         {% include "components/reference_list_toolbar.html" %}
+        {% include "components/xlsx_action.html" %}
         <section class="erp-contracts-table overflow-x-auto" aria-label="فهرست برآوردها" tabindex="0">
             {% if estimates %}
             <table class="erp-responsive-list" aria-label="برآوردها">

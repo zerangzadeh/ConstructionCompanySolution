@@ -41,9 +41,15 @@ def daily_report_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
-    return render(
-        request, "daily_reports/list.html", daily_report_list_context(request, reports)
-    )
+    context = daily_report_list_context(request, reports)
+    if request.GET.get("format") == "xlsx":
+        from .xlsx_exports import reports_download
+
+        return reports_download(
+            context["page_obj"].paginator.object_list,
+            timezone_name=request.organization.settings.timezone,
+        )
+    return render(request, "daily_reports/list.html", context)
 
 
 @active_organization_required

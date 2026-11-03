@@ -1,0 +1,63 @@
+[
+  {
+    "command": ".venv/Scripts/ruff.exe check apps/daily_reports/views.py apps/equipment/views.py apps/estimates/views.py apps/timekeeping/views.py apps/daily_reports/xlsx_exports.py apps/equipment/xlsx_exports.py apps/estimates/xlsx_exports.py apps/timekeeping/xlsx_exports.py tests/test_mvp07_xlsx.py tests/test_mvp07_browser.py tests/test_f4_frontend_conformance.py scripts/verification/mvp07_validate.py scripts/verification/mvp07_audit.py",
+    "code": 0,
+    "stdout": "All checks passed!\n",
+    "stderr": ""
+  },
+  {
+    "command": ".venv/Scripts/ruff.exe format --check apps/daily_reports/views.py apps/equipment/views.py apps/estimates/views.py apps/timekeeping/views.py apps/daily_reports/xlsx_exports.py apps/equipment/xlsx_exports.py apps/estimates/xlsx_exports.py apps/timekeeping/xlsx_exports.py tests/test_mvp07_xlsx.py tests/test_mvp07_browser.py tests/test_f4_frontend_conformance.py scripts/verification/mvp07_validate.py scripts/verification/mvp07_audit.py",
+    "code": 0,
+    "stdout": "13 files already formatted\n",
+    "stderr": ""
+  },
+  {
+    "command": "node --check scripts/verification/mvp07_browser.mjs",
+    "code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": "node --check scripts/verification/f4_browser.mjs",
+    "code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": ".venv/Scripts/python.exe manage.py check",
+    "code": 0,
+    "stdout": "System check identified no issues (0 silenced).\n",
+    "stderr": ""
+  },
+  {
+    "command": ".venv/Scripts/python.exe manage.py makemigrations --check --dry-run",
+    "code": 0,
+    "stdout": "No changes detected\n",
+    "stderr": ""
+  },
+  {
+    "command": "git diff --check",
+    "code": 0,
+    "stdout": "",
+    "stderr": "warning: in the working copy of 'apps/equipment/views.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'templates/components/xlsx_action.html', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'tests/test_f4_frontend_conformance.py', LF will be replaced by CRLF the next time Git touches it\n"
+  },
+  {
+    "templates_compile": [
+      "components/empty_state.html",
+      "components/xlsx_action.html",
+      "daily_reports/list.html",
+      "estimates/list.html",
+      "timekeeping/workbench.html",
+      "equipment/list.html",
+      "equipment/assignment_list.html",
+      "equipment/operations_workbench.html"
+    ],
+    "code": 0
+  },
+  {
+    "final_test_audit_ruff_and_browser_syntax": "PASS",
+    "report_links": "PASS",
+    "post_report_whitespace": "PASS",
+    "code": 0
+  }
+]
