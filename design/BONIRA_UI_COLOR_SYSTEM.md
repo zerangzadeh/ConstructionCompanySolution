@@ -59,6 +59,15 @@
 
 ## 4. Canonical CSS Tokens
 
+### Excel and print actions
+
+Existing functional Excel and print controls use the shared output-action component.
+Their action-specific colors are `--bonira-output-excel: #168446` and
+`--bonira-output-print: #1764D8`, respectively, scoped to the component in
+`apps/accounts/static/css/erp_output_actions.css`. These tokens do not replace the
+brand or status palette. Both controls are 36px tall, with an 8px radius and an
+8px icon/text gap, and retain content-sized width on mobile.
+
 Use these variables globally.  
 Do not duplicate literal color values inside component CSS unless required by an external library.
 

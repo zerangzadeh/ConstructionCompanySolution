@@ -145,7 +145,10 @@ class BusinessBreadcrumbTests(JourneyFixture, TestCase):
             "billing:claim_list",
         ):
             self.assert_trail(
-                reverse(route) + f"?contract={self.contract.pk}", [project, contract]
+                reverse(route) + f"?contract={self.contract.pk}",
+                [reverse("contracts:list")]
+                if route == "billing:claim_list"
+                else [project, contract],
             )
         self.assert_trail(
             reverse("billing:claim_create") + f"?contract={self.contract.pk}",

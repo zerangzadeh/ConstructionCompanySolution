@@ -1,0 +1,112 @@
+{
+  "classification": "TEST_OR_FIXTURE_DEFECT requiring bounded authority clarification",
+  "blocker": "MVP08-RFQ-DEMO-DUTIES-UNASSIGNED",
+  "tenant": "mvp08-synthetic-demo",
+  "project": "MVP08-P01",
+  "memberships": [
+    {
+      "persona": "mvp08.admin",
+      "current_protected_duties": {
+        "rfqs.close_custody": false,
+        "rfqs.custody_sealed_evidence": false,
+        "rfq_quotes.open": false,
+        "rfq_quotes.approve_open": false,
+        "rfq_quotes.manage_confidential_access": false,
+        "rfq_quotes.view_confidential": false
+      }
+    },
+    {
+      "persona": "mvp08.buyer",
+      "current_protected_duties": {
+        "rfqs.close_custody": false,
+        "rfqs.custody_sealed_evidence": false,
+        "rfq_quotes.open": false,
+        "rfq_quotes.approve_open": false,
+        "rfq_quotes.manage_confidential_access": false,
+        "rfq_quotes.view_confidential": false
+      }
+    },
+    {
+      "persona": "mvp08.evaluator",
+      "current_protected_duties": {
+        "rfqs.close_custody": false,
+        "rfqs.custody_sealed_evidence": false,
+        "rfq_quotes.open": false,
+        "rfq_quotes.approve_open": false,
+        "rfq_quotes.manage_confidential_access": false,
+        "rfq_quotes.view_confidential": false
+      }
+    },
+    {
+      "persona": "mvp08.operator",
+      "current_protected_duties": {
+        "rfqs.close_custody": false,
+        "rfqs.custody_sealed_evidence": false,
+        "rfq_quotes.open": false,
+        "rfq_quotes.approve_open": false,
+        "rfq_quotes.manage_confidential_access": false,
+        "rfq_quotes.view_confidential": false
+      }
+    },
+    {
+      "persona": "mvp08.restricted",
+      "current_protected_duties": {
+        "rfqs.close_custody": false,
+        "rfqs.custody_sealed_evidence": false,
+        "rfq_quotes.open": false,
+        "rfq_quotes.approve_open": false,
+        "rfq_quotes.manage_confidential_access": false,
+        "rfq_quotes.view_confidential": false
+      }
+    },
+    {
+      "persona": "mvp08.reviewer",
+      "current_protected_duties": {
+        "rfqs.close_custody": false,
+        "rfqs.custody_sealed_evidence": false,
+        "rfq_quotes.open": false,
+        "rfq_quotes.approve_open": false,
+        "rfq_quotes.manage_confidential_access": false,
+        "rfq_quotes.view_confidential": false
+      }
+    },
+    {
+      "persona": "mvp08.site",
+      "current_protected_duties": {
+        "rfqs.close_custody": false,
+        "rfqs.custody_sealed_evidence": false,
+        "rfq_quotes.open": false,
+        "rfq_quotes.approve_open": false,
+        "rfq_quotes.manage_confidential_access": false,
+        "rfq_quotes.view_confidential": false
+      }
+    }
+  ],
+  "existing_roles": {
+    "rfq_custodian": [
+      "rfq_quotes.view_metadata",
+      "rfqs.close_custody",
+      "rfqs.custody_sealed_evidence",
+      "rfqs.view"
+    ],
+    "rfq_opener": [
+      "rfq_quotes.open",
+      "rfq_quotes.view_confidential",
+      "rfq_quotes.view_metadata",
+      "rfqs.view"
+    ],
+    "rfq_opening_approver": [
+      "rfq_quotes.approve_open",
+      "rfq_quotes.manage_confidential_access",
+      "rfq_quotes.view_metadata",
+      "rfqs.view"
+    ]
+  },
+  "mutations": "NONE: no permission, role, assignment or scope changed",
+  "retained_pr": [
+    {
+      "request_number": "PR-F",
+      "status": "draft"
+    }
+  ]
+}

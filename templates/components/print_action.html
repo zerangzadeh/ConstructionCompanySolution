@@ -1,1 +1,2 @@
-<a class="erp-btn erp-btn--secondary" href="{% querystring format='print' page=None %}" data-print-preview>چاپ</a>
+{% querystring format='print' page=None as print_href %}
+{% include "components/output_action.html" with kind="print" href=print_href only %}

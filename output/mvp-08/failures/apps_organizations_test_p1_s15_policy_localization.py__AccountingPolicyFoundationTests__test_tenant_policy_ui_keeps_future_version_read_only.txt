@@ -1,0 +1,16 @@
+self = <apps.organizations.test_p1_s15_policy_localization.AccountingPolicyFoundationTests testMethod=test_tenant_policy_ui_keeps_future_version_read_only>
+
+    def test_tenant_policy_ui_keeps_future_version_read_only(self) -> None:
+        future_version = self._published_policy_version(
+            effective_from=timezone.localdate() + timedelta(days=1)
+        )
+    
+        self._activate_client(self.tenant_admin)
+        tenant_page = self.client.get(
+            reverse("organizations:tenant_policy_configuration")
+        )
+    
+>       self.assertEqual(tenant_page.status_code, 200)
+E       AssertionError: 403 != 200
+
+apps\organizations\test_p1_s15_policy_localization.py:416: AssertionError

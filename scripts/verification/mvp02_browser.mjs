@@ -41,10 +41,20 @@ try {
   const documentStatuses = new Map();
   const requestURLs = new Map();
   let failedRequests = [];
+  let unexpectedExternal = [];
   const pending = new Map();
   socket.addEventListener('message', event => {
     const message = JSON.parse(event.data);
-    if (message.method === 'Network.requestWillBeSent') requestURLs.set(message.params.requestId,message.params.request.url);
+    if (message.method === 'Network.requestWillBeSent') {
+      const url = message.params.request.url;
+      requestURLs.set(message.params.requestId,url);
+      if (process.env.BONIRA_BROWSER_LOCAL_ONLY === '1' && /^https?:/.test(url) && new URL(url).origin !== new URL(base).origin) unexpectedExternal.push(url);
+    }
+    if (message.method === 'Fetch.requestPaused') {
+      const {requestId, request} = message.params;
+      const external = /^https?:/.test(request.url) && new URL(request.url).origin !== new URL(base).origin;
+      send(external ? 'Fetch.failRequest' : 'Fetch.continueRequest', external ? {requestId,errorReason:'BlockedByClient'} : {requestId});
+    }
     if (message.method === 'Network.loadingFailed') failedRequests.push({url:requestURLs.get(message.params.requestId),canceled:!!message.params.canceled,error:message.params.errorText});
     if (message.method === 'Runtime.exceptionThrown') jsErrors.push(message.params.exceptionDetails.text);
     if (message.method === 'Network.responseReceived' && message.params.response.status >= 400) {
@@ -68,6 +78,7 @@ try {
   await send('Network.enable');
   await send('Page.enable');
   await send('Runtime.enable');
+  if (process.env.BONIRA_BROWSER_LOCAL_ONLY === '1') await send('Fetch.enable', {patterns:[{urlPattern:'*',requestStage:'Request'}]});
   await send('Network.setCookie', { name: 'sessionid', value: cookie, url: base });
   await mkdir(outputDirectory, { recursive: true });
   const click = async selector => {
@@ -98,6 +109,7 @@ try {
     jsErrors = [];
     httpErrors = [];
     failedRequests = [];
+    unexpectedExternal = [];
     await send('Page.navigate', { url: new URL(scenario.path, base).href });
     let state;
     for (let i = 0; i < 300; i++) {
@@ -309,6 +321,12 @@ try {
       } else if (step.submit) {
         await evaluate(`document.querySelector(${JSON.stringify(step.formSelector || 'main form[method="post"]')}).requestSubmit()`);
       }
+      if (step.confirmIfShown) {
+        await new Promise(done=>setTimeout(done,200));
+        if (await evaluate("!!window.Swal?.isVisible() && !!document.querySelector('.swal2-confirm') && !document.querySelector('.swal2-toast')")) {
+          await click('.swal2-confirm');
+        }
+      }
       for(let i=0;i<200;i++) {
         await new Promise(done=>setTimeout(done,100));
         const settled=await evaluate(`({ready:document.readyState,path:location.pathname,text:document.body.innerText})`);
@@ -337,7 +355,12 @@ try {
     if (scenario.noJsErrors && jsErrors.length) throw new Error(scenario.name+': JS exceptions '+JSON.stringify(jsErrors));
     // The legacy shell's favicon is outside page asset validation.
     const pageHttpErrors = httpErrors.filter(item=>!item.url.endsWith('/favicon.ico'));
-    if (scenario.noHttpErrors && pageHttpErrors.length) throw new Error(scenario.name+': HTTP errors '+JSON.stringify(pageHttpErrors));
+    if (scenario.noHttpErrors && pageHttpErrors.length) {
+      await writeFile(join(outputDirectory,`${actor}-${scenario.name}-http-failure.json`),JSON.stringify({errors:pageHttpErrors,visibleText},null,2));
+      const failedShot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
+      await writeFile(join(outputDirectory,`${actor}-${scenario.name}-http-failure.png`),Buffer.from(failedShot.data,'base64'));
+      throw new Error(scenario.name+': HTTP errors '+JSON.stringify(pageHttpErrors));
+    }
     state.jsErrors = jsErrors;
     state.httpErrors = pageHttpErrors;
     if(!scenario.noJS && scenario.status===200) {
@@ -359,7 +382,8 @@ try {
       throw new Error(scenario.name+': horizontal overflow');
     }
     if (documentStatus !== scenario.status) throw new Error(`${scenario.name}: expected ${scenario.status}, got ${documentStatus}`);
-    if (state.exception || state.lang !== 'fa' || state.dir !== 'rtl') throw new Error(`${scenario.name}: unsafe or non-RTL page`);
+    const safePlainDenial = scenario.plainBusinessDenial && [403,404].includes(documentStatus) && /[\u0600-\u06ff]/.test(visibleText) && !/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}|Traceback|Django/i.test(visibleText);
+    if (state.exception || (!safePlainDenial && (state.lang !== 'fa' || state.dir !== 'rtl'))) throw new Error(`${scenario.name}: unsafe or non-RTL page`);
     for (const link of scenario.mustLinks || []) {
       if (!state.links.includes(link)) throw new Error(`${scenario.name}: missing ${link}`);
     }
@@ -400,7 +424,8 @@ try {
         await evaluate('window.scrollTo(0,0)');
       }
     }
-    results.push({ name: scenario.name, status: documentStatus, ...state, ...(navigationTrace ? {navigationTrace} : {}) });
+    if (unexpectedExternal.length) throw new Error(scenario.name+': unexpected external frontend dependency '+JSON.stringify(unexpectedExternal));
+    results.push({ name: scenario.name, status: documentStatus, ...state, ...(process.env.BONIRA_BROWSER_LOCAL_ONLY === '1' ? {unexpectedExternal} : {}), ...(navigationTrace ? {navigationTrace} : {}) });
   }
   await writeFile(join(outputDirectory, `${actor}-results.json`), JSON.stringify(results, null, 2));
   process.stdout.write(JSON.stringify(results));

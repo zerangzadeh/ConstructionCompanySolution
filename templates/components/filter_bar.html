@@ -1,6 +1,6 @@
 {% load static erp_format %}
 {{ bar.form.media }}
-<script src="{% static 'js/erp_filter_bar.js' %}?v=20261101-contract-micro-1" defer></script>
+<script src="{% static 'js/erp_filter_bar.js' %}?v=20261103-compact-options-1" defer></script>
 <section class="erp-list-filters" aria-label="جست‌وجو و فیلتر" data-filter-bar{% if reference_layout %} data-reference-layout{% endif %} data-table-filter-controls="list-filter-bar">
     <form id="list-filter-bar" method="get" data-table-filter-form data-filter-submit="explicit" aria-label="فیلتر فهرست">
         {% for name, value in bar.hidden.items %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
@@ -11,7 +11,7 @@
                 <button class="erp-btn erp-btn--primary erp-list-search__submit" type="submit">جست‌وجو</button>
                 {% for error in bar.search.errors %}<p class="erp-list-error" role="alert">{{ error }}</p>{% endfor %}
             </div>
-            <details class="erp-list-options" data-filter-options open>
+            <details class="erp-list-options" data-filter-options{% if compact_layout %} data-filter-options-expanded{% endif %} open>
                 <summary class="erp-list-options__summary">فیلترها ({{ bar.active_count|erp_number }})</summary>
                 <div class="erp-list-quick">
                     {% for field in bar.quick_fields %}{% include "components/filter_bar_field.html" with field=field only %}{% endfor %}

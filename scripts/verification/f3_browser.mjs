@@ -151,6 +151,17 @@ try {
     assert(JSON.stringify(state.active)===JSON.stringify([scenario.active]),'Exactly one correct active module');
     assert(state.dir==='rtl' && Math.abs(state.top)<1 && state.width<=scenario.width && state.modal && state.focusInside && state.locked && state.expanded==='true','Top modal/RTL/focus/scroll lock');
     assert(Math.max(...state.tops)-Math.min(...state.tops)<1,'All modules remain in one row');
+    if (process.env.MODULE_SELECTOR_ICON_ONLY === '1') {
+      assert(await evaluate(`(() => {
+        const trigger=document.querySelector('[data-module-trigger]'),d=document.querySelector('#erp-module-selector');
+        const close=d.querySelector('[data-module-close]'),c=close.getBoundingClientRect(),box=d.getBoundingClientRect(),row=d.querySelector('nav').getBoundingClientRect();
+        const cards=[...d.querySelectorAll('.erp-module-selector__link')].map(a=>a.getBoundingClientRect());
+        return !trigger.textContent.trim() && new Set([...trigger.querySelectorAll('path[fill]')].map(p=>p.getAttribute('fill'))).size===4 &&
+          !close.textContent.trim() && close.getAttribute('aria-label') && c.height>=44 && box.bottom-c.bottom<=5 &&
+          box.height<=211 && !cards.some(r=>c.left<Math.min(r.right,row.right) && c.right>Math.max(r.left,row.left) && c.top<r.bottom && c.bottom>r.top);
+      })()`), 'Four-color icon-only trigger, bottom iconic close without overlap or taller drawer');
+    }
+
     assert(await evaluate('document.documentElement.scrollWidth<=innerWidth'), 'No page horizontal overflow');
     assert(await evaluate('getComputedStyle(document.querySelector(".erp-module-selector__row")).scrollbarWidth==="none"'), 'Raw scrollbar hidden');
     assert(await evaluate('[...document.querySelectorAll(".erp-module-selector__link")].every(a=>a.getBoundingClientRect().height>=90 && a.querySelector("svg") && a.querySelector(".erp-module-selector__description"))'), 'Readable icon/title/description cards');

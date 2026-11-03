@@ -1,0 +1,123 @@
+{
+  "on_date": "2026-11-03",
+  "database": "test_bonira_mvp08_demo_20261103",
+  "policies": [
+    {
+      "policy_code": "rfq-admissibility-self-approval",
+      "old_version": 1,
+      "old_effective_from": "2026-10-22",
+      "old_effective_to": "2026-10-25",
+      "new_version": 2,
+      "new_effective_from": "2026-11-03",
+      "new_effective_to": null,
+      "parameters": {
+        "allow_self_approval": false
+      },
+      "publisher": "admin",
+      "tenant_selection": {
+        "tenant": "mvp08-synthetic-demo",
+        "version": 2,
+        "status": "active",
+        "applied_by": "mvp08.admin"
+      },
+      "reason": "MVP-08 Human Product Decision 2026-11-03: preserve independent RFQ decisions; allow_self_approval=false until explicitly superseded. Development/UAT only."
+    },
+    {
+      "policy_code": "rfq-comparison-self-finalization",
+      "old_version": 1,
+      "old_effective_from": "2026-10-24",
+      "old_effective_to": "2026-10-26",
+      "new_version": 2,
+      "new_effective_from": "2026-11-03",
+      "new_effective_to": null,
+      "parameters": {
+        "allow_self_approval": false
+      },
+      "publisher": "admin",
+      "tenant_selection": {
+        "tenant": "mvp08-synthetic-demo",
+        "version": 2,
+        "status": "active",
+        "applied_by": "mvp08.admin"
+      },
+      "reason": "MVP-08 Human Product Decision 2026-11-03: preserve independent RFQ decisions; allow_self_approval=false until explicitly superseded. Development/UAT only."
+    },
+    {
+      "policy_code": "rfq-sourcing-award-self-finalization",
+      "old_version": 1,
+      "old_effective_from": "2026-10-24",
+      "old_effective_to": "2026-10-26",
+      "new_version": 2,
+      "new_effective_from": "2026-11-03",
+      "new_effective_to": null,
+      "parameters": {
+        "allow_self_approval": false
+      },
+      "publisher": "admin",
+      "tenant_selection": {
+        "tenant": "mvp08-synthetic-demo",
+        "version": 2,
+        "status": "active",
+        "applied_by": "mvp08.admin"
+      },
+      "reason": "MVP-08 Human Product Decision 2026-11-03: preserve independent RFQ decisions; allow_self_approval=false until explicitly superseded. Development/UAT only."
+    }
+  ],
+  "preflight": [
+    {
+      "code": "rfq-admissibility-self-approval",
+      "version": 2,
+      "current": true,
+      "allow_self_approval": false
+    },
+    {
+      "code": "rfq-comparison-self-finalization",
+      "version": 2,
+      "current": true,
+      "allow_self_approval": false
+    },
+    {
+      "code": "rfq-sourcing-award-self-finalization",
+      "version": 2,
+      "current": true,
+      "allow_self_approval": false
+    }
+  ],
+  "historical_preservation": [
+    {
+      "model": "organizations.PlatformPolicyVersion",
+      "existing_count": 10,
+      "sha256_before": "b00df5186b55568703b6dd59898c2575546c06afc86ae3d08d40399c40e9f371",
+      "sha256_after": "b00df5186b55568703b6dd59898c2575546c06afc86ae3d08d40399c40e9f371",
+      "unchanged": true
+    },
+    {
+      "model": "organizations.TenantPolicySelection",
+      "existing_count": 6,
+      "sha256_before": "b79e52b37bee60d18d25fac6f477023f43830743b41d4d1d4953733ea65ca2ce",
+      "sha256_after": "b79e52b37bee60d18d25fac6f477023f43830743b41d4d1d4953733ea65ca2ce",
+      "unchanged": true
+    },
+    {
+      "model": "procurement.QuoteAdmissibilityDecision",
+      "existing_count": 2,
+      "sha256_before": "181867c88811b193bb986834211fb650f3a6666ca99ad2d317c708fab9358cbe",
+      "sha256_after": "181867c88811b193bb986834211fb650f3a6666ca99ad2d317c708fab9358cbe",
+      "unchanged": true
+    },
+    {
+      "model": "procurement.CommercialComparison",
+      "existing_count": 3,
+      "sha256_before": "d662a8cdb2348e5817ca69d1f84130f4b17b2848cbd0084941af403fdaa4e04a",
+      "sha256_after": "d662a8cdb2348e5817ca69d1f84130f4b17b2848cbd0084941af403fdaa4e04a",
+      "unchanged": true
+    },
+    {
+      "model": "procurement.SourcingAward",
+      "existing_count": 1,
+      "sha256_before": "29cc8b8fcb2f6237363014227a6d4f754c5cd7833f5dd3240974eb37e5a51c3c",
+      "sha256_after": "29cc8b8fcb2f6237363014227a6d4f754c5cd7833f5dd3240974eb37e5a51c3c",
+      "unchanged": true
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "initial": {
+    "passed": 6,
+    "failed": 16,
+    "command_log": "policy-sourcing-regression.log"
+  },
+  "attribution": [
+    {
+      "count": 2,
+      "classification": "BASELINE TEST DEBT / internal-profile assumption",
+      "seam": "core.product_surface_middleware denies technical policy administration under MVP before either view runs",
+      "qualified_recheck": "Same two methods, test-only FULL_ERP internal verification profile: 2 PASS; no customer switch or product change"
+    },
+    {
+      "count": 14,
+      "classification": "BASELINE TEST FIXTURE DEBT",
+      "seam": "setUp -> approve_quote_opening -> require_business_permission(RFQ_QUOTES_APPROVE_OPEN)",
+      "root": "S10/S11 _make_actor creates only a legacy role string; it does not establish effective role assignment and scope. _grant on role_definition cannot replace the effective authorization rows.",
+      "changed_behavior_reached": false,
+      "disposition": "Unchanged fixtures/authorization; not repaired or called PASS under this continuation"
+    }
+  ],
+  "unchanged_source_hashes": [
+    {
+      "path": "apps/procurement/test_p5_s10_admissibility.py",
+      "sha256": "569373cbc9fb3e6d19e17773661343e92e3e3e77e24d1a6c6573310b2131f80a",
+      "matches_HEAD_normalized_newlines": true
+    },
+    {
+      "path": "apps/procurement/test_p5_s11_comparison_award.py",
+      "sha256": "361e673b4d58de676782742a9688b806dfdb3494557e8441fbb1241b843bdf3b",
+      "matches_HEAD_normalized_newlines": true
+    },
+    {
+      "path": "apps/procurement/opening_services.py",
+      "sha256": "244d756318646f8784e829df57ba6830a7901b8c79b4b5e489fb56987b7c6ce7",
+      "matches_HEAD_normalized_newlines": true
+    },
+    {
+      "path": "apps/organizations/authorization.py",
+      "sha256": "6e261c33a812425d19675b293f09be0e5e48c4f19c4d56fe0aaa9b5354608780",
+      "matches_HEAD_normalized_newlines": true
+    },
+    {
+      "path": "core/product_surface_middleware.py",
+      "sha256": "718da5fde6b2904ac5dc724ff10dc56785d8867c088079e4874abcdf30d57983",
+      "matches_HEAD_normalized_newlines": true
+    }
+  ]
+}

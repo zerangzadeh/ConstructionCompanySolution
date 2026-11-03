@@ -1,0 +1,26 @@
+{
+  "baseline": "28a9896086faa50064bf6f8d53a66a4628657b22",
+  "branch": "main",
+  "initial_worktree": "clean",
+  "remote_main": "28a9896086faa50064bf6f8d53a66a4628657b22",
+  "request_sha256": "da4beff70873e4ff2340ce52b274883f81411fa0331ffa659ee5f43975a8ec52",
+  "authority": "Direct bounded Human MVP-08 request; not a CEP",
+  "intended_touch_set": [
+    "apps/accounts/management/commands/seed_mvp_demo.py",
+    "scripts/verification/mvp08_*.py",
+    "scripts/verification/mvp08_*.mjs",
+    "tests/test_mvp08_demo.py",
+    "docs/governance/mvp/MVP-08_*.md",
+    "output/mvp-08/"
+  ],
+  "conditional_touch": "Only browser-reproduced attributable bounded MVP defects",
+  "excluded": [
+    "schema/model/migration changes",
+    "global policies/rates/permission catalogs",
+    "CEP lifecycle",
+    "historical evidence",
+    "Git writes",
+    "production"
+  ],
+  "demo_decision": "Reuse domain services and existing Chrome journey driver/fixtures; bounded owned MVP demo command, not broad ERP seed. Preserve current configured term/policy provenance in isolated Development clone."
+}

@@ -68,6 +68,15 @@ def order_document(order: PurchaseOrder) -> Document:
                 ("نسخه استعلام", value(source.version_number)),
             ]
         )
+        currencies = sorted(
+            {
+                allocation.comparison_input.assertion.currency
+                for allocation in award.allocations.select_related(
+                    "comparison_input__assertion"
+                )
+            }
+        )
+        document.metadata.append(("ارز پیشنهاد مبنا", value("، ".join(currencies))))
     # The existing total property covers base items, not later amended versions.
     # Match the source detail's rule rather than manufacture a version total.
     if version is None or version.version_number == 1:

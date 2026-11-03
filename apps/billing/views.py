@@ -343,7 +343,7 @@ def progress_detail(request: HttpRequest, record_id: str) -> HttpResponse:
     )
     breadcrumbs = journey_breadcrumbs(
         request,
-        "جزئیات کارکرد ثبت‌شده",
+        "جزئیات کارکرد",
         record.baseline.contract,
         collection=("سوابق کارکرد", "billing:progress_list"),
     )

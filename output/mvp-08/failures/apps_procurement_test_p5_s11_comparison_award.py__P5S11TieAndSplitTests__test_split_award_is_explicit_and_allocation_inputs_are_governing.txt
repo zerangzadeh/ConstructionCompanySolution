@@ -1,0 +1,120 @@
+self = <apps.procurement.test_p5_s11_comparison_award.P5S11TieAndSplitTests testMethod=test_split_award_is_explicit_and_allocation_inputs_are_governing>
+
+    def setUp(self):
+        super().setUp()
+        self.preparer = self._make_actor("s11-two-preparer")
+        self.approver = self._make_actor("s11-two-approver")
+        self.supplier_two = BusinessParty.objects.create(
+            organization=self.organization,
+            display_name="Supplier two",
+            party_kind=PartyKind.COMPANY,
+        )
+        PartyRole.objects.create(
+            organization=self.organization,
+            party=self.supplier_two,
+            role=PartyRoleType.SUPPLIER,
+        )
+        revisions, self.manifest = self._closed_revision(
+            suppliers=[self.supplier, self.supplier_two]
+        )
+        self.revision_one, self.revision_two = revisions
+        self.revision = self.revision_one
+        self._grant(BusinessPermissionCode.RFQS_CUSTODY_SEALED_EVIDENCE)
+        for sequence, revision in enumerate(revisions, 1):
+            self._accept_original(revision, key=f"two-original-{sequence}")
+            for item in revision.evidence_items.select_related("document_version"):
+                DocumentProcessingAssessment.objects.create(
+                    organization=self.organization,
+                    version=item.document_version,
+                    sequence=1,
+                    verdict=DocumentProcessingVerdict.CLEAN,
+                    input_sha256=item.canonical_sha256,
+                    adapter_code="s11-two-scanner",
+                    adapter_version="1",
+                    recorded_by=self.owner,
+                )
+        self._grant(BusinessPermissionCode.RFQ_QUOTES_OPEN)
+        self._grant(BusinessPermissionCode.RFQ_QUOTES_APPROVE_OPEN, self.approver)
+        self._grant(BusinessPermissionCode.RFQ_QUOTES_MANAGE_CONFIDENTIAL_ACCESS)
+        for code in (
+            BusinessPermissionCode.RFQ_QUOTES_VIEW_CONFIDENTIAL,
+            BusinessPermissionCode.RFQ_QUOTES_PREPARE_ADMISSIBILITY,
+            BusinessPermissionCode.RFQ_QUOTES_PREPARE_COMPARISON,
+            BusinessPermissionCode.RFQ_QUOTES_EVALUATE_COMPARISON,
+            BusinessPermissionCode.RFQ_QUOTES_FINALIZE_COMPARISON,
+            BusinessPermissionCode.RFQ_QUOTES_PREPARE_SOURCING_AWARD,
+        ):
+            self._grant(code, self.preparer)
+        for code in (
+            BusinessPermissionCode.RFQ_QUOTES_VIEW_CONFIDENTIAL,
+            BusinessPermissionCode.RFQ_QUOTES_APPROVE_ADMISSIBILITY,
+            BusinessPermissionCode.RFQ_QUOTES_APPROVE_EXCEPTION,
+            BusinessPermissionCode.RFQ_QUOTES_FINALIZE_COMPARISON,
+            BusinessPermissionCode.RFQ_QUOTES_DISPOSE_CONFLICT,
+            BusinessPermissionCode.RFQ_QUOTES_FINALIZE_SOURCING_AWARD,
+        ):
+            self._grant(code, self.approver)
+        self._activate_policy("rfq-admissibility-self-approval", allow=False)
+        self._activate_policy("rfq-comparison-self-finalization", allow=False)
+        self._activate_policy("rfq-commercial-exception-self-approval", allow=False)
+        self._activate_policy("rfq-sourcing-award-self-finalization", allow=False)
+        for sequence, revision in enumerate(revisions, 1):
+            with patch(
+                "apps.procurement.opening_services.timezone.now",
+                return_value=revision.rfq_version.earliest_opening_at
+                + timedelta(seconds=1),
+            ):
+                opening = request_quote_opening(
+                    organization=self.organization,
+                    actor=self.owner,
+                    quote_revision=revision,
+                    reason="two-revision opening",
+                    idempotency_key=f"two-open-{sequence}",
+                )
+>               approve_quote_opening(
+                    organization=self.organization,
+                    actor=self.approver,
+                    opening_request=opening,
+                )
+
+apps\procurement\test_p5_s11_comparison_award.py:376: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\procurement\opening_services.py:450: in approve_quote_opening
+    revision, _ = _lock_target(
+apps\procurement\opening_services.py:193: in _lock_target
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: s11-two-approver>, organization = <Organization: Procurement Co>
+permission = BusinessPermissionCode.RFQ_QUOTES_APPROVE_OPEN
+message = 'اجازه انجام عملیات حفاظت\u200cشده پیشنهاد را ندارید.'
+project = <Project: PROC - Procurement Project>, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: اجازه انجام عملیات حفاظت‌شده پیشنهاد را ندارید.
+
+apps\organizations\authorization.py:441: PermissionDenied

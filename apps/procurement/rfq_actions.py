@@ -464,7 +464,10 @@ def buyer_action(request: HttpRequest, rfq_id: str, action: str) -> HttpResponse
             "rows": rows,
             "action": action,
             "action_title": title,
-            "context_objects": form.context_objects,
+            "context_objects": {
+                form.fields[name].label: value
+                for name, value in form.context_objects.items()
+            },
         },
         status=400 if request.method == "POST" else 200,
     )

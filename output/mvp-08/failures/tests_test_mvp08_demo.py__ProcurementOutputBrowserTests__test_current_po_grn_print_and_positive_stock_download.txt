@@ -1,0 +1,37 @@
+self = <test_mvp08_demo.ProcurementOutputBrowserTests testMethod=test_current_po_grn_print_and_positive_stock_download>
+
+    def test_current_po_grn_print_and_positive_stock_download(self):
+        # Independent OUTPUT regression fixture, not Journey 3 acceptance.
+        # No sourcing bypass is claimed as a substitute for the blocked journey.
+        order,receipt,_,_=self.sources()
+        self.assertEqual(self.post(receipt).status_code,302)
+        from apps.inventory.test_mvp04e import InventoryJourneyFixture
+    
+        source=receipt.items.get()
+        data=InventoryJourneyFixture.stock_payload(self,source)
+        response=self.client.post(reverse("inventory:transaction_create")+f"?goods_receipt_item={source.pk}",data)
+        self.assertEqual(response.status_code,302)
+        from apps.inventory.models import StockTransaction
+    
+        record=StockTransaction.objects.get(transaction_number="IN-001")
+        self.assertEqual(self.client.post(reverse("inventory:transaction_post",args=[record.pk])).status_code,302)
+        self.login(self.owner)
+        env=os.environ.copy()
+        env["MVP07_SESSION"]=self.client.cookies["sessionid"].value
+        env["MVP07_SCENARIOS"]=json.dumps([
+            {"name":"positive-po","path":reverse("procurement:order_detail",args=[order.pk])},
+            {"name":"positive-inventory","path":reverse("inventory:transaction_list")},
+        ])
+        directory=ROOT/"output/mvp-08/positive-output-regression"
+        result=subprocess.run(["node",str(ROOT/"scripts/verification/mvp07_browser.mjs"),self.live_server_url,str(directory)],env=env,capture_output=True,text=True,encoding="utf8",timeout=180)
+>       self.assertEqual(result.returncode,0,(result.stderr+result.stdout)[-2200:])
+E       AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp07_browser.mjs:72
+E           if(!scenario.observeOnly && actionCount!==(scenario.status===403?0:1)) throw Error(scenario.name+': expected one export action, found '+actionCount);
+E                                                                                        ^
+E       
+E       Error: positive-po: expected one export action, found 0
+E           at file:///E:/Construction_Company_Solution/scripts/verification/mvp07_browser.mjs:72:82
+E       
+E       Node.js v24.20.0
+
+tests\test_mvp08_demo.py:108: AssertionError

@@ -35,6 +35,23 @@ class ClaimsFixture(JourneyFixture):
 
 
 class ClaimsListTests(ClaimsFixture, TestCase):
+    def test_short_trail_retains_contract_context_and_return_link(self):
+        from apps.billing.test_mvp03_breadcrumbs import breadcrumb_markup
+
+        self._claim()
+        response = self.client.get(self.scoped)
+        trail = breadcrumb_markup(response)
+        contract_url = reverse("contracts:detail", args=[self.contract.pk])
+        self.assertEqual(trail.current, ["span"])
+        self.assertIn(reverse("contracts:list"), trail.links)
+        self.assertNotIn(contract_url, trail.links)
+        self.assertNotIn(
+            reverse("projects:detail", args=[self.project.pk]), trail.links
+        )
+        self.assertContains(response, f'href="{contract_url}"')
+        self.assertContains(response, self.project.name)
+        self.assertContains(response, self.contract.title, count=1)
+
     def test_filters_counts_context_and_stable_pagination(self):
         first = self.rows()
         response = self.client.get(self.url)

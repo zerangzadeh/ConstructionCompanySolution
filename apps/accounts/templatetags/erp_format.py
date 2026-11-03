@@ -136,6 +136,15 @@ def erp_number(value):
 
 
 @register.filter
+def erp_quantity_fa(value):
+    """Localize an exact quantity without quantizing or converting to float."""
+    formatted = erp_number(value)
+    if formatted in (None, ""):
+        return formatted
+    return str(formatted).translate(str.maketrans("0123456789,.", "۰۱۲۳۴۵۶۷۸۹٬٫"))
+
+
+@register.filter
 def rial(value):
     formatted = erp_number(value)
     return f"{formatted} ریال" if formatted not in (None, "") else formatted

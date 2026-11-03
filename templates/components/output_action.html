@@ -1,0 +1,6 @@
+{% if disabled %}<span class="erp-output-action erp-output-action--{{ kind }}" role="{% if print_document %}button{% else %}link{% endif %}" aria-disabled="true"{% if described_by %} aria-describedby="{{ described_by }}"{% endif %}>
+{% elif print_document %}<button type="button" class="erp-output-action erp-output-action--print" data-print-document{% if described_by %} aria-describedby="{{ described_by }}"{% endif %}>
+{% else %}<a class="erp-output-action erp-output-action--{{ kind }}" href="{{ href }}"{% if kind == "xlsx" %} data-xlsx-export{% else %} data-print-preview{% endif %}{% if described_by %} aria-describedby="{{ described_by }}"{% endif %}>
+{% endif %}
+  {% if kind == "xlsx" %}{% include "components/form_icon.html" with icon="file-spreadsheet" only %}<span>خروجی اکسل</span>{% else %}{% include "components/form_icon.html" with icon="printer" only %}<span>چاپ</span>{% endif %}
+{% if disabled %}</span>{% elif print_document %}</button>{% else %}</a>{% endif %}

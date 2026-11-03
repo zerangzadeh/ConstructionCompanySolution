@@ -1,0 +1,73 @@
+[
+  {
+    "command": [
+      ".venv/Scripts/python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "apps/accounts/management/commands/seed_mvp_demo.py",
+      "scripts/verification/mvp08_serve.py",
+      "scripts/verification/mvp08_validate.py",
+      "scripts/verification/mvp08_verify.py",
+      "tests/test_mvp08_demo.py"
+    ],
+    "exit": 0,
+    "output": "All checks passed!\n"
+  },
+  {
+    "command": [
+      ".venv/Scripts/python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "apps/accounts/management/commands/seed_mvp_demo.py",
+      "scripts/verification/mvp08_serve.py",
+      "scripts/verification/mvp08_validate.py",
+      "scripts/verification/mvp08_verify.py",
+      "tests/test_mvp08_demo.py"
+    ],
+    "exit": 0,
+    "output": "5 files already formatted\n"
+  },
+  {
+    "command": [
+      "node",
+      "--check",
+      "scripts/verification/mvp02_browser.mjs"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "node",
+      "--check",
+      "scripts/verification/mvp08_browser.mjs"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "check": "15 complete Human scenarios, 15 NOT_EXECUTED result rows, all local links",
+    "result": "PASS"
+  },
+  {
+    "check": "Successful current native browser scenarios",
+    "count": 54,
+    "unexpected_external_requests": 0
+  },
+  {
+    "check": "HEAD preserved",
+    "head": "28a9896086faa50064bf6f8d53a66a4628657b22"
+  }
+]

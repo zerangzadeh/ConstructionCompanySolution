@@ -1,0 +1,49 @@
+[
+  {
+    "command": [
+      ".venv/Scripts/python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "scripts/verification/mvp08_policy_successors.py",
+      "scripts/verification/mvp08_verify.py"
+    ],
+    "exit_code": 0,
+    "output": "All checks passed!\n"
+  },
+  {
+    "command": [
+      ".venv/Scripts/python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "scripts/verification/mvp08_policy_successors.py",
+      "scripts/verification/mvp08_verify.py"
+    ],
+    "exit_code": 0,
+    "output": "2 files already formatted\n"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "check": "Original report text preserved; all Human results NOT_EXECUTED; links valid",
+    "result": "PASS"
+  },
+  {
+    "check": "Prior qualified evidence",
+    "preserved_count": 196,
+    "regenerated": 0
+  },
+  {
+    "check": "HEAD unchanged; no Git writes",
+    "head": "28a9896086faa50064bf6f8d53a66a4628657b22"
+  }
+]

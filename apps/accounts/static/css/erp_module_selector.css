@@ -18,19 +18,20 @@
 .erp-module-trigger {
   box-sizing: border-box;
   min-height: 40px;
+  width: 40px;
   gap: .375rem;
   padding: .375rem .625rem;
   font-size: .8125rem;
   line-height: 1.5;
 }
 .erp-module-trigger > .erp-module-icon {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
   color: var(--erp-primary, #1563d6);
 }
 .erp-module-trigger:hover { border-color: var(--erp-primary, #1563d6); background: #f4f7fc; }
-.erp-module-trigger > span { display: none; }
+
 .erp-module-trigger:focus-visible,
 .erp-module-selector a:focus-visible,
 .erp-module-selector button:focus-visible,
@@ -119,13 +120,29 @@
 .erp-module-selector__arrow { display: grid; place-items: center; flex: 0 0 44px; height: 44px; border: 1px solid var(--erp-border, #e2e8f0); border-radius: 50%; background: var(--erp-surface, #fff); color: inherit; cursor: pointer; }
 .erp-module-selector__arrow[aria-disabled="true"] { opacity: .35; cursor: default; }
 .erp-module-selector__position { direction: rtl; display: flex; width: min(420px, 60%); height: 4px; margin: .5rem auto 0; border-radius: 99px; background: #f0f3f8; overflow: hidden; }
+/* The bottom close action occupies the carousel's existing edge gutter. */
+.erp-module-selector__close {
+  position: absolute;
+  inset-inline-end: 1.5rem;
+  bottom: .25rem;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--erp-text-muted, #64748b);
+}
+.erp-module-selector__close:hover { color: var(--erp-primary, #1563d6); background: #f4f7fc; }
 .erp-module-selector__position > span { display: block; height: 100%; border-radius: inherit; background: var(--erp-primary, #1563d6); }
 .erp-module-selector [hidden] { display: none; }
+/* Retain edge gutters even when a short module list needs no arrows. */
+.erp-module-selector__arrow[hidden] { display: grid; visibility: hidden; }
 .erp-module-selector__empty { padding: .75rem; font-size: .875rem; }
 .erp-module-selector-open,
 .erp-module-selector-open body { overflow: hidden; }
 @keyframes erp-module-enter { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-@media (min-width: 640px) { .erp-module-trigger > span { display: inline; } }
+
 @media (max-width: 639px) {
   .erp-module-trigger { min-width: 44px; min-height: 44px; }
   .erp-module-selector { padding: .75rem .75rem; }
@@ -135,7 +152,7 @@
   .erp-module-selector__badge svg { width: 24px; height: 24px; }
   .erp-module-selector__heading h2 { font-size: 1rem; }
   .erp-module-selector__heading p { font-size: .6875rem; }
-  .erp-module-selector__close { padding: .5rem; }
+  .erp-module-selector__close { inset-inline-end: .125rem; padding: 0; }
   .erp-module-selector__carousel { gap: .25rem; }
   .erp-module-selector__arrow { flex-basis: 32px; height: 44px; border-radius: .5rem; }
   .erp-module-selector__link { flex-basis: 168px; min-height: 108px; }

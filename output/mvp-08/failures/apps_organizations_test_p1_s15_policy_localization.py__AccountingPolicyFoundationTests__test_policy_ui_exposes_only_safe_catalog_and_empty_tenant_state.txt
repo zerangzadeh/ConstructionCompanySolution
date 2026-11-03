@@ -1,0 +1,18 @@
+self = <apps.organizations.test_p1_s15_policy_localization.AccountingPolicyFoundationTests testMethod=test_policy_ui_exposes_only_safe_catalog_and_empty_tenant_state>
+
+    def test_policy_ui_exposes_only_safe_catalog_and_empty_tenant_state(self) -> None:
+        self.client.force_login(self.owner)
+        self.assertEqual(
+            self.client.get(
+                reverse("organizations:platform_policy_catalog")
+            ).status_code,
+            403,
+        )
+        self.client.force_login(self.platform_admin)
+        platform_page = self.client.get(
+            reverse("organizations:platform_policy_catalog")
+        )
+>       self.assertEqual(platform_page.status_code, 200)
+E       AssertionError: 403 != 200
+
+apps\organizations\test_p1_s15_policy_localization.py:381: AssertionError

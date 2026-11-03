@@ -1,4 +1,5 @@
 <div class="my-3 flex flex-wrap items-center gap-3">
-  <a class="erp-btn erp-btn--secondary" href="{% querystring format='xlsx' page=None attendance_page=None timesheet_page=None overtime_page=None leave_page=None correction_page=None %}" data-xlsx-export>خروجی Excel</a>
+  {% querystring format='xlsx' page=None attendance_page=None timesheet_page=None overtime_page=None leave_page=None correction_page=None as export_href %}
+  {% include "components/output_action.html" with kind="xlsx" href=export_href only %}
   <span class="text-xs text-slate-500">{% if export_description %}{{ export_description }}{% elif export_detail %}همین صورت‌وضعیت و ردیف‌های آن{% else %}همه نتایج مجاز با فیلترهای فعلی{% endif %} · تاریخ‌ها به میلادی</span>
 </div>

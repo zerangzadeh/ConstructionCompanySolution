@@ -1,0 +1,40 @@
+{
+  "checks": [
+    "components/xlsx_action.html: exact filter/pagination URL preserved",
+    "components/print_action.html: exact filter/pagination URL preserved",
+    "billing/claim_list.html: exact URL and accessible help preserved",
+    "billing/claim_detail.html: exact URL and accessible help preserved",
+    "xlsx: disabled has no actionable URL or event hook",
+    "print: disabled has no actionable URL or event hook",
+    "print/document.html: original print hook and return link preserved",
+    "all 20 existing placements compile (14 Excel, 6 print including toolbar)"
+  ],
+  "inventory": {
+    "xlsx": [
+      "templates/daily_reports/list.html",
+      "templates/equipment/assignment_list.html",
+      "templates/equipment/list.html",
+      "templates/equipment/operations_workbench.html",
+      "templates/estimates/list.html",
+      "templates/expenses/list.html",
+      "templates/inventory/transaction_list.html",
+      "templates/procurement/order_list.html",
+      "templates/procurement/receipt_list.html",
+      "templates/procurement/request_list.html",
+      "templates/procurement/rfq_list.html",
+      "templates/timekeeping/workbench.html",
+      "apps/billing/templates/billing/claim_detail.html",
+      "apps/billing/templates/billing/claim_list.html"
+    ],
+    "print": [
+      "templates/daily_reports/detail.html",
+      "templates/expenses/list.html",
+      "templates/print/document.html",
+      "templates/procurement/order_detail.html",
+      "templates/procurement/receipt_detail.html",
+      "apps/billing/templates/billing/claim_detail.html"
+    ]
+  },
+  "database": "not accessed",
+  "migrations": "not executed"
+}

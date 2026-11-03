@@ -368,9 +368,9 @@ class ContractHubBrowserTests(HubFixture, StaticLiveServerTestCase):
                         "noJsErrors": True,
                         "noHttpErrors": True,
                         "mustText": [
-                            "جزئیات کارکرد ثبت‌شده",
-                            "مقدار کارکرد دوره",
-                            "کارکرد تجمعی تا این تاریخ",
+                            "جزئیات کارکرد",
+                            "کارکرد این ثبت",
+                            "کارکرد تجمعی تا این ثبت",
                             "مقدار مبنای قلم",
                             "نتیجه بررسی",
                         ],

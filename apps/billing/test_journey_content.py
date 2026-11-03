@@ -147,10 +147,10 @@ class JourneyContentTests(JourneyFixture, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "data-billing-navigation")
         for label in (
-            "مقدار کارکرد دوره",
-            "کارکرد تجمعی تا این تاریخ",
+            "کارکرد این ثبت",
+            "کارکرد تجمعی تا این ثبت",
             "مقدار مبنای قلم",
-            "زمان راستی‌آزمایی",
+            "زمان بررسی",
             record.verification_reason,
             record.source_reference,
         ):

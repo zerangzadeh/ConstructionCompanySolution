@@ -49,7 +49,7 @@
   drawer.querySelector('[data-module-close]').addEventListener('click', () => drawer.close());
   drawer.addEventListener('keydown', event => {
     if (event.key !== 'Tab') return;
-    const controls = [...drawer.querySelectorAll('button:not([disabled]), a[href], [tabindex="0"]')].filter(control => control.getClientRects().length);
+    const controls = [...drawer.querySelectorAll('button:not([disabled]), a[href], [tabindex="0"]')].filter(control => control.getClientRects().length && getComputedStyle(control).visibility !== 'hidden');
     const first = controls[0], last = controls.at(-1);
     if ((!event.shiftKey && document.activeElement === last) ||
         (event.shiftKey && document.activeElement === first)) {

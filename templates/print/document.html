@@ -6,11 +6,12 @@
   <title>{{ document.title }}{% if document.reference %} · {{ document.reference }}{% endif %} | بنیرا</title>
   <link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}">
   <link rel="stylesheet" href="{% static 'css/erp_print.css' %}">
+  <link rel="stylesheet" href="{% static 'css/erp_output_actions.css' %}">
   <script src="{% static 'js/erp_print.js' %}" defer></script>
 </head>
 <body>
   <div class="print-toolbar" aria-label="عملیات چاپ">
-    <button type="button" data-print-document>چاپ</button>
+    {% include "components/output_action.html" with kind="print" print_document=True only %}
     <a href="{{ print_back_url }}">بازگشت</a>
     <span>کاغذ A4 · عمودی · تاریخ‌ها شمسی · سربرگ و پابرگ مرورگر خاموش</span>
   </div>

@@ -6,7 +6,7 @@
         document.querySelectorAll('[data-filter-options]').forEach(panel => {
             if (panel.dataset.responsiveBound) return;
             panel.dataset.responsiveBound = 'true';
-            const desktop = window.matchMedia('(min-width: 1280px)');
+            const desktop = window.matchMedia(panel.hasAttribute('data-filter-options-expanded') ? '(min-width: 0px)' : '(min-width: 1280px)');
             const bar = panel.closest('[data-filter-bar]');
             const more = bar.querySelector('[data-more-filters]');
             const toggle = bar.querySelector('[data-more-toggle]');

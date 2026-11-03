@@ -1,0 +1,49 @@
+{
+  "preflight": [
+    {
+      "code": "rfq-admissibility-self-approval",
+      "version": 2,
+      "current": true,
+      "allow_self_approval": false
+    },
+    {
+      "code": "rfq-comparison-self-finalization",
+      "version": 2,
+      "current": true,
+      "allow_self_approval": false
+    },
+    {
+      "code": "rfq-sourcing-award-self-finalization",
+      "version": 2,
+      "current": true,
+      "allow_self_approval": false
+    }
+  ],
+  "preservation": [
+    {
+      "model": "organizations.PlatformPolicyVersion",
+      "old_rows_unchanged": true,
+      "count": 10
+    },
+    {
+      "model": "organizations.TenantPolicySelection",
+      "old_rows_unchanged": true,
+      "count": 6
+    },
+    {
+      "model": "procurement.QuoteAdmissibilityDecision",
+      "old_rows_unchanged": true,
+      "count": 2
+    },
+    {
+      "model": "procurement.CommercialComparison",
+      "old_rows_unchanged": true,
+      "count": 3
+    },
+    {
+      "model": "procurement.SourcingAward",
+      "old_rows_unchanged": true,
+      "count": 1
+    }
+  ]
+}
