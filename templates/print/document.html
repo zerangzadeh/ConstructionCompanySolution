@@ -1,0 +1,34 @@
+{% load static %}<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ document.title }}{% if document.reference %} · {{ document.reference }}{% endif %} | بنیرا</title>
+  <link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/erp_print.css' %}">
+  <script src="{% static 'js/erp_print.js' %}" defer></script>
+</head>
+<body>
+  <div class="print-toolbar" aria-label="عملیات چاپ">
+    <button type="button" data-print-document>چاپ</button>
+    <a href="{{ print_back_url }}">بازگشت</a>
+    <span>کاغذ A4 · عمودی · تاریخ‌ها شمسی · سربرگ و پابرگ مرورگر خاموش</span>
+  </div>
+  <main class="print-document">
+    {% include "print/header.html" %}
+    {% if document.metadata %}<dl class="print-metadata">
+      {% for label, cell in document.metadata %}<div><dt>{{ label }}</dt><dd>{% include "print/value.html" %}</dd></div>{% endfor %}
+    </dl>{% endif %}
+    {% for label, text in document.introduction %}{% include "print/note.html" %}{% endfor %}
+    {% for table in document.tables %}{% include "print/table.html" %}{% endfor %}
+    {% if document.totals %}<section class="print-totals" aria-label="جمع مبالغ"><h2>جمع مبالغ</h2><dl>
+      {% for label, cell in document.totals %}<div><dt>{{ label }}</dt><dd>{% include "print/value.html" %}</dd></div>{% endfor %}
+    </dl></section>{% endif %}
+    {% for label, text in document.notes %}{% include "print/note.html" %}{% endfor %}
+    {% if document.approvals %}<section class="print-approvals"><h2>اطلاعات تأیید ثبت‌شده</h2><dl class="print-metadata">
+      {% for label, cell in document.approvals %}<div><dt>{{ label }}</dt><dd>{% include "print/value.html" %}</dd></div>{% endfor %}
+    </dl></section>{% endif %}
+    <footer class="print-footer">بنیرا · {{ document.title }}{% if document.reference %} · <bdi>{{ document.reference }}</bdi>{% endif %}</footer>
+  </main>
+</body>
+</html>

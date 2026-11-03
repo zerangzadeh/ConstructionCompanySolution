@@ -494,6 +494,15 @@ def claim_list(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.CLAIMS_VIEW)
 @require_GET
 def claim_detail(request: HttpRequest, claim_id: str) -> HttpResponse:
+    if request.GET.get("format") == "print":
+        from core.printing import print_response
+
+        from .print_outputs import claim_document
+
+        claim = _claim(request, claim_id)
+        if claim is None:
+            return HttpResponseNotFound("صورت‌وضعیت یافت نشد.")
+        return print_response(request, claim_document(claim))
     if request.GET.get("format") == "xlsx":
         from .xlsx_exports import claims_download
 

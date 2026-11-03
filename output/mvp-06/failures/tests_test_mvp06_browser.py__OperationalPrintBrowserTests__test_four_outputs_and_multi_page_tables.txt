@@ -1,0 +1,30 @@
+self = <test_mvp06_browser.OperationalPrintBrowserTests testMethod=test_four_outputs_and_multi_page_tables>
+
+    def test_four_outputs_and_multi_page_tables(self):
+        sources = self.sources()
+        _order, _receipt, report, _expense = sources
+        scenarios = [
+            {"name": name, "path": path, "mobile": index % 2 == 1}
+            for index, (name, path) in enumerate(
+                zip(
+                    [
+                        "po-one-page",
+                        "grn-one-page",
+                        "daily-one-page",
+                        "expenses-one-page",
+                    ],
+                    self.routes(sources),
+                )
+            )
+        ]
+        scenarios[0]["one"] = True
+        scenarios[1]["one"] = True
+        scenarios[2]["one"] = True
+        scenarios[3]["one"] = True
+>       self.renders("operational", scenarios)
+
+tests\test_mvp06_browser.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_mvp06_browser.py:71: in renders
+    self.assertEqual(pages, 1)
+E   AssertionError: 2 != 1

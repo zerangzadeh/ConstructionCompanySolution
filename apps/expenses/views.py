@@ -105,6 +105,42 @@ def expense_list(request: HttpRequest) -> HttpResponse:
             page.paginator.object_list, organization=request.organization
         )
 
+    if request.GET.get("format") == "print" and request.method == "GET":
+        from core.list_filters import parse_user_date
+        from core.printing import day, print_response
+
+        from .print_outputs import expense_document
+
+        filters = [
+            (label, request.GET[name].strip())
+            for name, label in (
+                ("description", "جست‌وجوی شرح / فروشنده / رسید"),
+                ("project", "جست‌وجوی پروژه / فاز"),
+            )
+            if request.GET.get(name, "").strip()
+        ]
+        group = PlatformExpenseGroup.objects.filter(
+            is_active=True,
+            archived_at__isnull=True,
+            code=request.GET.get("category", ""),
+        ).first()
+        if group:
+            filters.append(("گروه هزینه", group.name))
+        for suffix, label in (("from", "از تاریخ هزینه"), ("to", "تا تاریخ هزینه")):
+            selected_date = parse_user_date(
+                request.GET.get(f"incurred_on_{suffix}", "")
+            )
+            if selected_date:
+                filters.append((label, day(selected_date).text))
+        return print_response(
+            request,
+            expense_document(
+                page.paginator.object_list,
+                organization=request.organization,
+                filters=filters,
+            ),
+        )
+
     return render(
         request,
         "expenses/list.html",

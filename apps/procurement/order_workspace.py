@@ -181,6 +181,12 @@ def order_list(request):
 @require_GET
 def order_detail(request, order_id):
     order = _order(request, order_id)
+    if request.GET.get("format") == "print":
+        from core.printing import print_response
+
+        from .print_outputs import order_document
+
+        return print_response(request, order_document(order))
     return render(
         request, "procurement/order_detail.html", _detail_context(request, order)
     )

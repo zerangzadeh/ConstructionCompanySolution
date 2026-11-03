@@ -1,0 +1,20 @@
+self = <test_mvp06_print.BillingPrintTests testMethod=test_submitted_revision_print_uses_snapshot_even_after_in_memory_changes>
+
+    def test_submitted_revision_print_uses_snapshot_even_after_in_memory_changes(self):
+        from apps.billing.print_outputs import claim_document
+    
+        claim = self._claim()
+        submit_progress_claim(
+            organization=self.organization, actor=self.owner, claim=claim
+        )
+        claim.refresh_from_db()
+        saved = claim.submission_snapshot
+        claim.net_amount = Decimal(9999)
+        claim.items.get()  # Do not mutate the immutable database history.
+        document = claim_document(claim)
+>       self.assertEqual(document.totals[-1][1].text, "54")
+E       AssertionError: '60' != '54'
+E       - 60
+E       + 54
+
+tests\test_mvp06_print.py:87: AssertionError

@@ -1,0 +1,68 @@
+/* Isolated document surface. Domain data never supplies styles. */
+@font-face {
+  font-family: Vazirmatn;
+  src: url('../fonts/vazirmatn/Vazirmatn[wght].woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@page {
+  size: A4 portrait;
+  margin: 14mm 12mm 16mm;
+  @bottom-left { content: counter(page) " / " counter(pages); direction: ltr; unicode-bidi: isolate; font-family: Vazirmatn, sans-serif; font-size: 8pt; }
+  @bottom-right { content: "بنیرا"; font-family: Vazirmatn, sans-serif; font-size: 8pt; }
+}
+* { box-sizing: border-box; }
+html { direction: rtl; font-family: Vazirmatn, sans-serif; color: var(--bonira-ink); }
+body { margin: 0; background: var(--bonira-soft); font-size: 10pt; line-height: 1.7; }
+.print-toolbar { max-width: 210mm; margin: 14px auto; padding: 0 12mm; display: flex; align-items: center; gap: 16px; }
+.print-toolbar button, .print-toolbar a { font: inherit; padding: 6px 18px; border: 1px solid var(--bonira-border); border-radius: 6px; background: var(--bonira-white); color: var(--bonira-deep-navy); text-decoration: none; cursor: pointer; }
+.print-toolbar button { background: var(--bonira-royal-blue); color: var(--bonira-white); }
+.print-toolbar span { font-size: 9pt; color: var(--bonira-slate); }
+.print-document { width: 210mm; max-width: 100%; margin: 0 auto 24px; padding: 14mm 12mm 16mm; background: var(--bonira-white); }
+.print-header { display: flex; justify-content: space-between; gap: 8mm; border-bottom: 2px solid var(--bonira-deep-navy); padding-bottom: 5mm; margin-bottom: 5mm; break-inside: avoid; }
+.print-header > div:first-child { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.print-organization { margin: 0 0 2mm; font-weight: 600; }
+h1 { font-size: 20pt; line-height: 1.5; margin: 0; font-weight: 750; }
+.print-identity { text-align: left; min-width: 30mm; max-width: 40%; overflow-wrap: anywhere; }
+.print-identity > span { font-weight: 750; color: var(--bonira-deep-navy); }
+.print-identity p { margin: 1mm 0; font-size: 8pt; color: var(--bonira-slate); }
+.print-identity strong { font-size: 12pt; }
+.print-logo { max-width: 24mm; max-height: 15mm; float: right; margin-left: 4mm; object-fit: contain; }
+.print-metadata { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2mm 7mm; margin: 0 0 5mm; padding-bottom: 4mm; border-bottom: 1px solid var(--bonira-border); }
+.print-metadata div { display: flex; align-items: baseline; gap: 2mm; min-width: 0; }
+dt { color: var(--bonira-slate); font-size: 8.5pt; }
+dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+h2, caption { font-size: 11pt; font-weight: 700; text-align: right; margin: 0 0 2mm; break-after: avoid; }
+.print-section { margin-bottom: 5mm; }
+table { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: 8.5pt; }
+caption { padding-top: 1mm; }
+th, td { padding: 2mm 1.5mm; text-align: right; vertical-align: top; border: 1px solid var(--bonira-border); overflow-wrap: anywhere; }
+th { font-size: 8pt; font-weight: 700; border-top: 1.5px solid var(--bonira-slate); border-bottom: 1.5px solid var(--bonira-slate); }
+thead { display: table-header-group; }
+tr { break-inside: avoid; page-break-inside: avoid; }
+.print-wide-first th:first-child { width: 27%; }
+.print-number { font-variant-numeric: tabular-nums; unicode-bidi: isolate; }
+td:has(> .print-number) { text-align: left; }
+.print-empty { color: var(--bonira-slate); text-align: center; padding: 5mm; }
+.print-totals { margin: 0 0 5mm; padding: 3mm 0; border-top: 2px solid var(--bonira-slate); break-inside: avoid; }
+.print-totals dl { margin: 0 0 0 auto; width: 80mm; max-width: 100%; }
+.print-totals dl > div { display: flex; justify-content: space-between; gap: 6mm; }
+.print-totals dl > div:last-child { font-weight: 750; padding-top: 2mm; border-top: 1px solid var(--bonira-border); }
+.print-note { margin: 0 0 4mm; }
+.print-note p { white-space: pre-line; overflow-wrap: anywhere; margin: 0; orphans: 3; widows: 3; }
+.print-approvals { break-inside: avoid; margin-top: 5mm; }
+.print-footer { border-top: 1px solid var(--bonira-border); margin-top: 6mm; padding-top: 2mm; font-size: 8pt; color: var(--bonira-slate); break-inside: avoid; }
+@media screen and (max-width: 600px) {
+  .print-toolbar { flex-wrap: wrap; padding: 0 12px; }
+  .print-document { padding: 16px 12px; }
+  .print-header { gap: 10px; }
+  h1 { font-size: 17pt; }
+  .print-metadata { grid-template-columns: 1fr; }
+  th, td { padding: 5px 3px; }
+}
+@media print {
+  html, body { background: var(--bonira-white); }
+  .print-toolbar { display: none !important; }
+  .print-document { width: auto; max-width: none; margin: 0; padding: 0; }
+  .print-footer { display: none; }
+}

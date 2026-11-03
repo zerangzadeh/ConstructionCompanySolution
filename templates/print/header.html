@@ -1,0 +1,4 @@
+<header class="print-header">
+  <div>{% if print_logo %}<img class="print-logo" src="{{ print_logo }}" alt="لوگوی سازمان">{% endif %}<p class="print-organization">{{ print_organization.name }}</p><h1>{{ document.title }}</h1></div>
+  <div class="print-identity"><span>بنیرا</span>{% if document.reference %}<p>شماره / مرجع</p><strong><bdi>{{ document.reference }}</bdi></strong>{% endif %}</div>
+</header>

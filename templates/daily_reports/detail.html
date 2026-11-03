@@ -3,6 +3,7 @@
 {% block title %}گزارش روزانه | سامانه مدیریت ساخت{% endblock %}
 
 {% block content %}
+{% include "components/print_action.html" %}
 {% load field_journey %}
 {% field_journey report.project report.site %}
     <div dir="rtl">

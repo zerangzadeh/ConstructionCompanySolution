@@ -1,0 +1,21 @@
+self = <test_mvp06_print.BillingPrintTests testMethod=test_draft_persisted_quantities_and_totals_without_calculation>
+
+    def test_draft_persisted_quantities_and_totals_without_calculation(self):
+        claim = self._claim()
+        with patch(
+            "apps.billing.services.recalculate_progress_claim",
+            side_effect=AssertionError("read only"),
+        ):
+            response = self.output(reverse("billing:claim_detail", args=[claim.pk]))
+        document = response.context["document"]
+        self.assertEqual(str(document.reference), str(claim.claim_number))
+        self.assertEqual(document.tables[0].rows[0][-1].text, "60")
+        self.assertContains(response, claim.contract.title)
+        self.assertContains(response, "ناخالص")
+        self.assertEqual(len(document.totals), 3)
+>       self.assertEqual(document.totals[-1][1].text, "54")
+E       AssertionError: '60' != '54'
+E       - 60
+E       + 54
+
+tests\test_mvp06_print.py:71: AssertionError

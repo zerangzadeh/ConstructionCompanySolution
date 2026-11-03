@@ -1,0 +1,171 @@
+self = <test_mvp06_browser.BillingPrintBrowserTests testMethod=test_claim_print_media>
+
+    def test_claim_print_media(self):
+        self.make_fixture(persian=True)
+        self.organization.name = "شرکت پیمانکاری سازه نمونه"
+        self.organization.save(update_fields=["name"])
+        self.project.name = "پروژه مجتمع نمونه"
+        self.project.save(update_fields=["name"])
+        self.manager.first_name = "بازبین"
+        self.manager.last_name = "نمونه"
+        self.manager.save(update_fields=["first_name", "last_name"])
+        from apps.billing import services as billing
+        from apps.contracts.services import (
+            approve_contract_term_version,
+            create_contract_term_version,
+        )
+    
+        term = create_contract_term_version(
+            organization=self.organization,
+            actor=self.owner,
+            contract=self.contract,
+            effective_from=date(2026, 9, 1),
+            reason="Synthetic print fixture only",
+            insurance_classification=self.insurance_classification,
+            retention_rate=Decimal(10),
+            retention_cap=Decimal(12),
+        )
+        approve_contract_term_version(
+            organization=self.organization,
+            actor=self.manager,
+            term_version=term,
+            reason="Independent synthetic print fixture review",
+        )
+        claim = self._claim()
+        billing.submit_progress_claim(
+            organization=self.organization, actor=self.owner, claim=claim
+        )
+        billing.approve_progress_claim(
+            organization=self.organization,
+            actor=self.manager,
+            claim=claim,
+            reason="تأیید مستقل نمونه",
+        )
+        self.renders(
+            "billing",
+            [
+                {
+                    "name": "claim-one-page",
+                    "path": reverse("billing:claim_detail", args=[claim.pk]),
+                    "one": True,
+                }
+            ],
+        )
+        baseline = self._baseline(total=Decimal(84))
+        for i in range(36):
+            billing.add_baseline_item(
+                organization=self.organization,
+                actor=self.owner,
+                baseline=baseline,
+                line_key=f"LONG-{i:03d}",
+                description=f"عملیات آرماتوربندی و اجرای سازه قطعه {i + 1} بر اساس نقشه‌های مصوب کارگاه با توضیح تکمیلی فارسی",
+                unit="متر مکعب",
+                planned_quantity=Decimal(1),
+                unit_rate=Decimal(1),
+                sort_order=i + 1,
+            )
+        billing.request_project_baseline_approval(
+            organization=self.organization, actor=self.owner, baseline=baseline
+        )
+        baseline = billing.approve_project_baseline(
+            organization=self.organization,
+            actor=self.manager,
+            baseline=baseline,
+            reason="مبنای نمونه تأیید شد",
+        )
+        for item in baseline.items.all():
+            record = billing.create_progress_record(
+                organization=self.organization,
+                actor=self.owner,
+                baseline=baseline,
+                baseline_item=item,
+                period_start=date(2026, 10, 1),
+                period_end=date(2026, 10, 31),
+                measured_on=date(2026, 10, 19),
+                source_type="site_report",
+                source_reference="DR-PRINT",
+                period_quantity=Decimal("0.5"),
+                cumulative_quantity=Decimal(1)
+                if item.line_key == "ITEM-01"
+                else Decimal("0.5"),
+                evidence="Synthetic signed site report",
+            )
+            billing.request_progress_verification(
+>               organization=self.organization, actor=self.owner, record=record
+            )
+
+tests\test_mvp06_browser.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\services.py:1067: in verify_progress_record
+    return verify_progress_record_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:890: in verify_progress_record_with_workflow
+    return _complete_progress_work_item(
+apps\billing\workflow.py:874: in _complete_progress_work_item
+    complete_work_item(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\workflows\runtime.py:1488: in complete_work_item
+    command.executor(
+apps\billing\workflow.py:227: in _verify_progress_command
+    return _verify_progress_record_domain(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: شرکت پیمانکاری سازه نمونه>
+actor = <User: f61-manager>
+record = <ProgressRecord: ProgressRecord object (32af91ba-e872-4c0d-a7e9-b0794aab0b97)>
+reason = 'کنترل اندازه\u200cگیری نمونه'
+
+    @transaction.atomic
+    def _verify_progress_record_domain(
+        *, organization: Organization, actor: User, record: ProgressRecord, reason: str
+    ) -> ProgressRecord:
+        _require_progress_permission(
+            actor=actor,
+            organization=organization,
+            permission=BusinessPermissionCode.PROGRESS_VERIFY,
+        )
+        if not reason.strip():
+            raise ValidationError("دلیل راستی‌آزمایی الزامی است.")
+        locked = _locked_progress_record(organization=organization, record=record)
+        if locked.status != ProgressRecordStatus.SUBMITTED:
+            raise ValidationError("فقط رکورد ارسال‌شده قابل راستی‌آزمایی است.")
+        _, item = _locked_progress_baseline_item(
+            organization=organization,
+            baseline=locked.baseline,
+            item=locked.baseline_item,
+            allow_superseded=bool(locked.corrects_id),
+        )
+        latest = _latest_verified_progress_locked(organization=organization, item=item)
+        if locked.corrects_id:
+            if latest is None or latest.pk != locked.corrects_id:
+                raise ValidationError(
+                    "اصلاح فقط آخرین رکورد راستی‌آزمایی‌شده را جایگزین می‌کند."
+                )
+            previous_cumulative = latest.previous_cumulative_quantity
+        else:
+            previous_cumulative = (
+                latest.cumulative_quantity if latest is not None else Decimal("0.0000")
+            )
+            if latest is not None and locked.measured_on < latest.measured_on:
+                raise ValidationError(
+                    "اندازه‌گیری عادی نمی‌تواند از آخرین منبع تأییدشده قدیمی‌تر باشد."
+                )
+        if locked.cumulative_quantity < previous_cumulative:
+            raise ValidationError("مقدار تجمعی نمی‌تواند از تجمعی تأییدشده پیشین کمتر باشد.")
+        if locked.cumulative_quantity > item.planned_quantity:
+            raise ValidationError("مقدار تجمعی از مقدار مبنای تأییدشده بیشتر است.")
+        period_quantity = (locked.cumulative_quantity - previous_cumulative).quantize(
+            QUANTITY_QUANTUM
+        )
+        if locked.period_quantity != period_quantity:
+>           raise ValidationError("مقدار دوره باید با اختلاف تجمعی منبع پیشین برابر باشد.")
+E           django.core.exceptions.ValidationError: ['مقدار دوره باید با اختلاف تجمعی منبع پیشین برابر باشد.']
+
+apps\billing\services.py:977: ValidationError

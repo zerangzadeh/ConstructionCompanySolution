@@ -90,6 +90,12 @@ def daily_report_detail(request: HttpRequest, report_id: str) -> HttpResponse:
         organization=request.organization,
         report_id=report_id,
     )
+    if request.GET.get("format") == "print":
+        from core.printing import print_response
+
+        from .print_outputs import daily_document
+
+        return print_response(request, daily_document(report))
     return render(
         request,
         "daily_reports/detail.html",

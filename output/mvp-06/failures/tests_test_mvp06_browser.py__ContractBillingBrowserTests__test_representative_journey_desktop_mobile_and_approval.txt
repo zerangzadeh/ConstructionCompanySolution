@@ -1,0 +1,198 @@
+self = <apps.billing.test_mvp03_browser.ContractBillingBrowserTests testMethod=test_representative_journey_desktop_mobile_and_approval>
+
+    def test_representative_journey_desktop_mobile_and_approval(self):
+        self.make_fixture(persian=True)
+        self.project.name = "پروژه نمونه سازه"
+        self.project.save()
+        term = create_contract_term_version(
+            organization=self.organization,
+            actor=self.owner,
+            contract=self.contract,
+            effective_from=date(2026, 9, 1),
+            reason="Synthetic browser fixture only",
+            insurance_classification=self.insurance_classification,
+            retention_rate=Decimal(10),
+            retention_cap=Decimal(12),
+        )
+        approve_contract_term_version(
+            organization=self.organization,
+            actor=self.manager,
+            term_version=term,
+            reason="Independent synthetic fixture review",
+        )
+        record = self._verified_record()
+        estimate = create_estimate(
+            organization=self.organization,
+            project=self.project,
+            contract=self.contract,
+            actor=self.owner,
+            estimate_number="MVP03-BOQ",
+            title="برآورد سازه بتنی",
+        )
+        Contract.objects.bulk_create(
+            [
+                Contract(
+                    organization=self.organization,
+                    project=self.project,
+                    party=self.party,
+                    contract_number=f"SEARCH-{i:03}",
+                    title=f"قرارداد نمونه جستجو {i:03}",
+                    counterparty_name=self.party.display_name,
+                    direction="receivable",
+                    status="active",
+                )
+                for i in range(45)
+            ]
+        )
+        target = Contract.objects.get(
+            organization=self.organization, contract_number="SEARCH-044"
+        )
+        create = reverse("billing:claim_create")
+        contract_url = reverse("contracts:detail", args=[self.contract.pk])
+        create_context = f"{create}?contract={self.contract.pk}"
+        dates = {
+            "period_start": format_jalali(date(2026, 9, 1)),
+            "period_end": format_jalali(date(2026, 9, 30)),
+            "measurement_cutoff": format_jalali(date(2026, 9, 30)),
+        }
+        base = {
+            "status": 200,
+            "screenshot": True,
+            "absentText": [
+                "ClaimAdjustment",
+                "contract_term.retention",
+                "idempotency",
+                "در AR",
+            ],
+        }
+    
+        def scenario(name, path, **kwargs):
+            return {**base, "name": name, "path": path, **kwargs}
+    
+        self.browser(
+            self.owner,
+            [
+                scenario(
+                    "A-estimate-contract-handoff",
+                    reverse("estimates:detail", args=[estimate.pk]),
+                    steps=[
+                        {
+                            "clickHref": contract_url + f"?estimate={estimate.pk}",
+                            "afterPath": contract_url,
+                        }
+                    ],
+                    mustText=["اجرای سازه بتنی", "برآورد سازه بتنی"],
+                ),
+                scenario(
+                    "B-contract-claim-context",
+                    contract_url,
+                    steps=[
+                        {"clickHref": create_context, "afterPath": create},
+                        {
+                            "inspect": f"document.querySelector('[name=contract]').value==='{self.contract.pk}' && document.querySelector('[name=baseline]').value==='{record.baseline_id}'",
+                            "description": "contract and baseline context retained",
+                        },
+                    ],
+                ),
+                scenario(
+                    "C-selector-pagination-search",
+                    create,
+                    steps=[
+                        {
+                            "searchChoice": {
+                                "name": "contract",
+                                "query": "SEARCH-044",
+                                "value": str(target.pk),
+                            }
+                        },
+                        {
+                            "inspect": "document.querySelector('[name=baseline]').value===''",
+                            "description": "parent change clears baseline",
+                        },
+                        {"emptyLookup": "baseline"},
+                    ],
+                ),
+                scenario(
+                    "D-invalid-form",
+                    create_context,
+                    steps=[{"submit": True, "mustText": "این فیلد را تکمیل کنید"}],
+                    mustText=["این فیلد را تکمیل کنید"],
+                ),
+                scenario(
+                    "E-create-claim",
+                    create_context,
+                    steps=[
+                        {
+                            "fill": dates,
+                            "submit": True,
+                            "afterPrefix": "/billing/claims/",
+                            "mustText": "پیش‌نویس صورت‌وضعیت",
+                        }
+                    ],
+                    mustText=["کسور تضمین", "وضعیت و اقدام بعدی"],
+                ),
+            ],
+        )
+        claim = ProgressClaim.objects.get(organization=self.organization)
+        self.assertEqual(claim.adjustments.get().amount, Decimal(-6))
+        detail = reverse("billing:claim_detail", args=[claim.pk])
+>       self.browser(
+            self.owner,
+            [
+                scenario(
+                    "F-mobile-claim-deductions",
+                    detail,
+                    mobile=True,
+                    mustText=["کسور تضمین", "تاریخ نهایی اندازه‌گیری"],
+                ),
+                scenario(
+                    "G-refresh-deductions",
+                    detail,
+                    steps=[
+                        {
+                            "clickSelector": "form[action$='/recalculate/'] button",
+                            "afterPath": detail,
+                            "mustText": "مقادیر و کسور پیش‌نویس به‌روز شد",
+                        }
+                    ],
+                ),
+                scenario(
+                    "H-submit-for-approval",
+                    detail,
+                    steps=[
+                        {
+                            "clickSelector": "form[action$='/submit/'] button",
+                            "afterPath": detail,
+                            "mustText": "در انتظار بررسی",
+                        }
+                    ],
+                    mustText=["تصمیم‌گیری بر اساس مسئولیت بررسی"],
+                ),
+                scenario(
+                    "I-filter-empty-state",
+                    "/billing/claims/?q=no-such-contract",
+                    mustText=["با فیلترهای فعلی نتیجه‌ای یافت نشد"],
+                ),
+                scenario("J-mobile-create-form", create_context, mobile=True),
+                scenario(
+                    "K-baseline-detail",
+                    reverse("billing:baseline_detail", args=[record.baseline_id]),
+                ),
+                scenario(
+                    "L-progress-list", f"/billing/progress/?contract={self.contract.pk}"
+                ),
+            ],
+        )
+
+apps\billing\test_mvp03_browser.py:380: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:316
+E           if(i===199) throw new Error(scenario.name+': interaction did not settle '+JSON.stringify(settled));
+E                             ^
+E   
+E   Error: G-refresh-deductions: interaction did not settle {"ready":"complete","path":"/billing/claims/655b1031-bc21-42a9-a422-bb772d4b93be/actions/recalculate/","text":"Server Error (500)"}
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:316:27
+E   
+E   Node.js v24.20.0

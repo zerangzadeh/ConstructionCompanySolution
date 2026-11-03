@@ -220,10 +220,17 @@ def receipt_create(request):
 @never_cache
 @require_GET
 def receipt_detail(request, receipt_id):
+    receipt = _receipt(request, receipt_id)
+    if request.GET.get("format") == "print":
+        from core.printing import print_response
+
+        from .print_outputs import receipt_document
+
+        return print_response(request, receipt_document(receipt))
     return render(
         request,
         "procurement/receipt_detail.html",
-        _detail(request, _receipt(request, receipt_id)),
+        _detail(request, receipt),
     )
 
 

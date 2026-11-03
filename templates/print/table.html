@@ -1,0 +1,7 @@
+<section class="print-section">
+  <table{% if table.wide_first %} class="print-wide-first"{% endif %}>
+    <caption>{{ table.title }}</caption>
+    <thead><tr>{% for heading in table.headings %}<th scope="col">{{ heading }}</th>{% endfor %}</tr></thead>
+    <tbody>{% for row in table.rows %}<tr>{% for cell in row %}<td>{% include "print/value.html" %}</td>{% endfor %}</tr>{% empty %}<tr><td colspan="{{ table.headings|length }}" class="print-empty">موردی ثبت نشده است.</td></tr>{% endfor %}</tbody>
+  </table>
+</section>

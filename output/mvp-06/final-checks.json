@@ -1,0 +1,112 @@
+[
+  {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "core/printing.py",
+      "apps/billing/print_outputs.py",
+      "apps/procurement/print_outputs.py",
+      "apps/daily_reports/print_outputs.py",
+      "apps/expenses/print_outputs.py",
+      "apps/billing/views.py",
+      "apps/procurement/order_workspace.py",
+      "apps/procurement/receipt_workspace.py",
+      "apps/daily_reports/views.py",
+      "apps/expenses/views.py",
+      "tests/test_mvp06_print.py",
+      "tests/test_mvp06_browser.py",
+      "scripts/verification/mvp06_validate.py",
+      "scripts/verification/mvp06_pdf_audit.py"
+    ],
+    "exit_code": 0,
+    "stdout": "All checks passed!\n",
+    "stderr": "",
+    "seconds": 0.45
+  },
+  {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "core/printing.py",
+      "apps/billing/print_outputs.py",
+      "apps/procurement/print_outputs.py",
+      "apps/daily_reports/print_outputs.py",
+      "apps/expenses/print_outputs.py",
+      "apps/billing/views.py",
+      "apps/procurement/order_workspace.py",
+      "apps/procurement/receipt_workspace.py",
+      "apps/daily_reports/views.py",
+      "apps/expenses/views.py",
+      "tests/test_mvp06_print.py",
+      "tests/test_mvp06_browser.py",
+      "scripts/verification/mvp06_validate.py",
+      "scripts/verification/mvp06_pdf_audit.py"
+    ],
+    "exit_code": 0,
+    "stdout": "14 files already formatted\n",
+    "stderr": "",
+    "seconds": 1.26
+  },
+  {
+    "command": [
+      "node",
+      "--check",
+      "scripts/verification/mvp06_browser.mjs"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "seconds": 0.14
+  },
+  {
+    "command": [
+      "node",
+      "--check",
+      "apps/accounts/static/js/erp_print.js"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "",
+    "seconds": 0.14
+  },
+  {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+      "manage.py",
+      "check"
+    ],
+    "exit_code": 0,
+    "stdout": "System check identified no issues (0 silenced).\n",
+    "stderr": "",
+    "seconds": 5.2
+  },
+  {
+    "command": [
+      "E:\\Construction_Company_Solution\\.venv\\Scripts\\python.exe",
+      "manage.py",
+      "makemigrations",
+      "--check",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "stdout": "No changes detected\n",
+    "stderr": "",
+    "seconds": 9.78
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "warning: in the working copy of 'output/mvp-03/remediation-20261030/browser/batch-A-estimate-contract-handoff.json', LF will be replaced by CRLF the next time Git touches it\n",
+    "seconds": 0.16
+  }
+]
