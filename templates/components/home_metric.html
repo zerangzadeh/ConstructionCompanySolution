@@ -1,0 +1,6 @@
+{% load erp_format %}
+<a class="home-metric" data-home-metric="{{ metric.route }}" href="{% url metric.route %}">
+  <div class="home-metric__heading"><span class="home-icon home-tone-{{ metric.tone }}">{% include "components/form_icon.html" with icon=metric.icon only %}</span><h2>{{ metric.label }}</h2></div>
+  <strong class="home-metric__value" data-value="{{ metric.value }}">{{ metric.value|erp_number }}</strong>
+  {% if metric.note %}<small>{{ metric.note }}</small>{% endif %}
+</a>

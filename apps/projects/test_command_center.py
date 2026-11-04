@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.billing.test_mvp03 import JourneyFixture
@@ -91,6 +92,76 @@ class CommandCenterTests(JourneyFixture, TestCase):
         self.project.start_date = date(2026, 10, 1)
         self.project.save()
         self.detail = reverse("projects:detail", args=[self.project.pk])
+
+    def test_status_summary_uses_all_authorized_projects_before_filter_and_pagination(
+        self,
+    ):
+        listing = reverse("projects:list")
+        Project.objects.bulk_create(
+            [
+                Project(
+                    organization=self.organization,
+                    code=f"PAGE-{i}",
+                    name=f"پروژه {i}",
+                    status="active",
+                )
+                for i in range(30)
+            ]
+        )
+        for status in ("on_hold", "completed", "cancelled"):
+            Project.objects.create(
+                organization=self.organization, code=status, name=status, status=status
+            )
+        Project.objects.create(
+            organization=self.organization,
+            code="DELETED",
+            name="حذف‌شده",
+            status="active",
+            deleted_at=timezone.now(),
+        )
+        other = Organization.objects.create(name="Other", slug="summary-other")
+        Project.objects.create(
+            organization=other, code="FOREIGN", name="بیگانه", status="active"
+        )
+        response = self.client.get(listing)
+        expected = {
+            "planning": "1",
+            "active": "30",
+            "on_hold": "1",
+            "completed": "1",
+            "cancelled": "1",
+        }
+        rows = response.context["project_status_rows"]
+        self.assertEqual({row["status"]: row["value"] for row in rows}, expected)
+        self.assertEqual(response.context["project_total"], 34)
+        self.assertLess(len(response.context["projects"]), 34)
+        payload = chart_payload(response)
+        self.assertEqual(payload[0]["rows"], rows)
+        filtered = self.client.get(
+            listing, {"q": "no-match", "status": "completed", "page": "2"}
+        )
+        self.assertEqual(filtered.context["project_total"], 34)
+        self.assertEqual(chart_payload(filtered), payload)
+        self.assertNotContains(response, "خروجی اکسل")
+        self.assertNotContains(response, ">چاپ<")
+        user, _, _ = scoped_reader(self.organization, self.project, ["projects.view"])
+        self.login(user)
+        response = self.client.get(listing)
+        self.assertEqual(response.context["project_total"], 1)
+        self.assertEqual(
+            {
+                row["status"]: row["value"]
+                for row in response.context["project_status_rows"]
+            },
+            {**dict.fromkeys(expected, "0"), "planning": "1"},
+        )
+        self.project.deleted_at = timezone.now()
+        self.project.save(update_fields=["deleted_at"])
+        response = self.client.get(listing)
+        self.assertEqual(response.context["project_total"], 0)
+        self.assertEqual(chart_payload(response), [])
+        self.assertNotContains(response, '<canvas id="projects-status-chart"')
+        self.assertContains(response, "هنوز پروژه‌ای برای نمایش نمودار وجود ندارد.")
 
     def test_list_search_chips_dates_and_scope(self):
         listing = reverse("projects:list")
@@ -260,6 +331,21 @@ class CostEvidenceFixture:
 class CommandCenterCostTests(CostEvidenceFixture, TestCase):
     def setUp(self):
         self.make_cost_fixture()
+
+    def test_commitment_evidence_does_not_fabricate_a_zero_actual_cost(self):
+        source = self._contract(ProjectCostMeasure.COMMITMENT)
+        self._fact(
+            source,
+            ProjectCostFactKind.COMMITMENT_AUTHORIZED,
+            "50.00",
+            "CENTER-COMMITMENT",
+        )
+        response = self.client.get(reverse("projects:detail", args=[self.project.pk]))
+        self.assertFalse(response.context["dashboard"]["cost_comparable"])
+        self.assertNotIn(
+            "project-cost-chart", [chart["id"] for chart in chart_payload(response)]
+        )
+        self.assertIsNone(response.context["dashboard"]["kpis"][1]["value"])
 
     def test_exact_projection_and_currency_guard_without_legacy_budget_substitution(
         self,

@@ -1,0 +1,66 @@
+Found 32 test(s).
+Using existing test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+test_all_linked_contexts_must_be_authorized (apps.documents.test_related_documents.RelatedDocumentsTests.test_all_linked_contexts_must_be_authorized) ... ok
+test_archived_expired_sealed_and_deleted_source_documents_are_absent (apps.documents.test_related_documents.RelatedDocumentsTests.test_archived_expired_sealed_and_deleted_source_documents_are_absent) ... ok
+test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) ... {"timestamp":"2026-11-03T21:06:22.833853+00:00","event":"http.response","request_id":"eb735905-3046-48bc-a57a-19d0e0074c30","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1343}
+{"timestamp":"2026-11-03T21:06:24.026674+00:00","event":"http.response","request_id":"90bbd453-5d2e-4f7b-a4f0-c53ea1acce4e","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1181}
+{"timestamp":"2026-11-03T21:06:24.766710+00:00","event":"http.response","request_id":"f5fd4acd-3a44-40ff-9cab-59c29d4464a0","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":727}
+{"timestamp":"2026-11-03T21:06:25.339603+00:00","event":"http.response","request_id":"352fac1e-4034-4a48-af37-915d7edf7246","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":560}
+{"timestamp":"2026-11-03T21:06:26.030150+00:00","event":"http.response","request_id":"035c0dc3-5e57-47ba-9390-edfef9a7afbd","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":683}
+ok
+test_daily_report_site_scope_does_not_expand_to_another_site (apps.documents.test_related_documents.RelatedDocumentsTests.test_daily_report_site_scope_does_not_expand_to_another_site) ... ok
+test_denied_dms_permission_hides_panel_and_count (apps.documents.test_related_documents.RelatedDocumentsTests.test_denied_dms_permission_hides_panel_and_count) ... ok
+test_document_detail_shows_real_source_return_without_new_mutation_flows (apps.documents.test_related_documents.RelatedDocumentsTests.test_document_detail_shows_real_source_return_without_new_mutation_flows) ... {"timestamp":"2026-11-03T21:06:27.566658+00:00","event":"http.response","request_id":"3659b81e-8918-493f-acda-5029784bb80f","method":"GET","route":"documents:detail","status_code":200,"duration_ms":652}
+ok
+test_download_requires_its_own_permission_and_exact_clean_version (apps.documents.test_related_documents.RelatedDocumentsTests.test_download_requires_its_own_permission_and_exact_clean_version) ... ok
+test_estimate_return_does_not_require_unauthorized_project_context (apps.documents.test_related_documents.RelatedDocumentsTests.test_estimate_return_does_not_require_unauthorized_project_context) ... ok
+test_five_sources_deduplicate_mirrors_and_generate_safe_roundtrips (apps.documents.test_related_documents.RelatedDocumentsTests.test_five_sources_deduplicate_mirrors_and_generate_safe_roundtrips) ... ok
+test_forged_return_context_never_produces_a_url (apps.documents.test_related_documents.RelatedDocumentsTests.test_forged_return_context_never_produces_a_url) ... ok
+test_missing_compatibility_parity_hides_document (apps.documents.test_related_documents.RelatedDocumentsTests.test_missing_compatibility_parity_hides_document) ... ok
+test_missing_source_permission_and_foreign_target_fail_closed (apps.documents.test_related_documents.RelatedDocumentsTests.test_missing_source_permission_and_foreign_target_fail_closed) ... ok
+test_only_direct_entity_links_are_projected (apps.documents.test_related_documents.RelatedDocumentsTests.test_only_direct_entity_links_are_projected) ... ok
+test_read_projection_does_not_record_a_download_or_change_links (apps.documents.test_related_documents.RelatedDocumentsTests.test_read_projection_does_not_record_a_download_or_change_links) ... ok
+test_add_link_supports_an_existing_financial_entity_and_audits (apps.documents.tests.DocumentServiceTests.test_add_link_supports_an_existing_financial_entity_and_audits) ... ok
+test_archive_preserves_versions_and_links_and_removes_active_listing (apps.documents.tests.DocumentServiceTests.test_archive_preserves_versions_and_links_and_removes_active_listing) ... ok
+test_create_document_records_first_version_link_metadata_and_audit (apps.documents.tests.DocumentServiceTests.test_create_document_records_first_version_link_metadata_and_audit) ... ok
+test_document_access_requires_linked_context_permission (apps.documents.tests.DocumentServiceTests.test_document_access_requires_linked_context_permission) ... ok
+test_document_link_requires_exactly_one_same_tenant_target (apps.documents.tests.DocumentServiceTests.test_document_link_requires_exactly_one_same_tenant_target) ... ok
+test_download_audit_is_version_specific_and_rechecks_access (apps.documents.tests.DocumentServiceTests.test_download_audit_is_version_specific_and_rechecks_access) ... ok
+test_endpoints_reject_cross_tenant_document_uuid (apps.documents.tests.DocumentServiceTests.test_endpoints_reject_cross_tenant_document_uuid) ... {"timestamp":"2026-11-03T21:06:45.683954+00:00","event":"http.response","request_id":"541b4a6b-7608-4c84-a472-53e220ccac63","method":"GET","route":"documents:detail","status_code":403,"duration_ms":197}
+{"timestamp":"2026-11-03T21:06:45.849767+00:00","event":"http.response","request_id":"8acc5a7e-c1d1-4b76-9d9f-34addd6cb640","method":"GET","route":"documents:download","status_code":403,"duration_ms":164}
+{"timestamp":"2026-11-03T21:06:46.033033+00:00","event":"http.response","request_id":"dd32d84f-8ebd-449b-8e3e-082d5cb3c488","method":"POST","route":"documents:archive","status_code":403,"duration_ms":182}
+ok
+test_new_version_is_numbered_immutable_and_becomes_current (apps.documents.tests.DocumentServiceTests.test_new_version_is_numbered_immutable_and_becomes_current) ... ok
+test_partner_evidence_document_keeps_tenant_and_domain_permission (apps.documents.tests.DocumentServiceTests.test_partner_evidence_document_keeps_tenant_and_domain_permission) ... ok
+test_partner_evidence_document_resolves_registered_link_model (apps.documents.tests.DocumentServiceTests.test_partner_evidence_document_resolves_registered_link_model) ... ok
+test_upload_validation_rejects_mismatched_type_and_signature (apps.documents.tests.DocumentServiceTests.test_upload_validation_rejects_mismatched_type_and_signature) ... ok
+test_views_create_add_version_and_secure_download (apps.documents.tests.DocumentServiceTests.test_views_create_add_version_and_secure_download) ... {"timestamp":"2026-11-03T21:06:53.205329+00:00","event":"http.response","request_id":"ea7f614a-7eb6-424f-9f72-67b1f5cce4b5","method":"POST","route":"documents:upload","status_code":302,"duration_ms":358}
+{"timestamp":"2026-11-03T21:06:54.290810+00:00","event":"http.response","request_id":"df604585-c220-43b9-a4e1-22fd63fc1a0b","method":"GET","route":"documents:detail","status_code":200,"duration_ms":1083}
+{"timestamp":"2026-11-03T21:06:54.627530+00:00","event":"http.response","request_id":"4bd18586-5443-47cd-b57d-1f34a90f9fea","method":"POST","route":"documents:version-add","status_code":302,"duration_ms":336}
+{"timestamp":"2026-11-03T21:06:55.529772+00:00","event":"http.response","request_id":"08432a6f-3d4d-4c13-9c94-14bf467b949f","method":"GET","route":"documents:detail","status_code":200,"duration_ms":901}
+{"timestamp":"2026-11-03T21:06:55.948740+00:00","event":"http.response","request_id":"d824311c-89b5-4acd-8ea3-85de3c9aabc6","method":"GET","route":"documents:download","status_code":403,"duration_ms":415}
+{"timestamp":"2026-11-03T21:06:56.510606+00:00","event":"http.response","request_id":"fab238ca-96db-4dd9-b0e0-342944bad779","method":"GET","route":"documents:download","status_code":200,"duration_ms":536}
+ok
+test_inactive_membership_fails_closed (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_inactive_membership_fails_closed) ... ok
+test_linked_contract_choices_intersect_source_project (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_linked_contract_choices_intersect_source_project) ... ok
+test_missing_permission_cannot_reveal_choices (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_missing_permission_cannot_reveal_choices) ... ok
+test_organization_grant_remains_tenant_filtered (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_organization_grant_remains_tenant_filtered) ... ok
+test_project_reader_has_exact_allowed_choices_and_valid_target (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_project_reader_has_exact_allowed_choices_and_valid_target) ... ok
+test_ungranted_and_foreign_targets_cannot_be_selected (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_ungranted_and_foreign_targets_cannot_be_selected) ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 39.293s
+
+OK
+Preserving test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+

@@ -49,6 +49,7 @@ def incident_list(request: HttpRequest) -> HttpResponse:
     incidents = get_organization_safety_incidents(
         user=request.user, organization=request.organization
     )
+    scoped_has_records = incidents.exists()
     incidents = apply_table_filters(
         incidents,
         request,
@@ -81,6 +82,8 @@ def incident_list(request: HttpRequest) -> HttpResponse:
         "safety/list.html",
         {
             "incidents": page.object_list,
+            "scoped_has_records": scoped_has_records,
+            "list_profile": "safety",
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(

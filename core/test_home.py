@@ -32,7 +32,7 @@ class HomeTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse("accounts:login"), response.url)
 
-    def test_normal_home_has_context_and_only_links_not_business_facts(self) -> None:
+    def test_normal_home_has_context_and_truthful_empty_workspace(self) -> None:
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'data-home-state="normal"')
@@ -44,6 +44,8 @@ class HomeTests(TestCase):
         self.assertContains(response, 'href="/"')
         self.assertNotContains(response, "تعداد پروژه‌ها")
         self.assertNotContains(response, "جمع هزینه")
+        self.assertEqual(response.context["workspace"]["project_total"], 0)
+        self.assertFalse(response.context["workspace"]["charts"])
 
     def test_invalid_selected_organization_is_unauthorized_without_leak(self) -> None:
         session = self.client.session
@@ -63,7 +65,7 @@ class HomeTests(TestCase):
         response = self.client.get("/")
         self.assertContains(response, 'data-home-state="empty"')
         self.assertNotContains(response, "Home Company")
-        self.assertNotContains(response, reverse("projects:list"))
+        self.assertNotContains(response, f'href="{reverse("projects:list")}"')
 
     def test_multiple_memberships_without_active_context(self) -> None:
         other = create_organization_with_owner(

@@ -1,0 +1,1 @@
+{% if user.profile_image %}<img class="{{ avatar_classes }} rounded-full border border-slate-200 object-cover" src="{% url 'accounts:profile-image' %}" alt="">{% else %}<span class="{{ avatar_classes }} grid shrink-0 place-items-center rounded-full bg-blue-700 text-sm font-semibold text-white" aria-hidden="true">{{ user.username|first|upper }}</span>{% endif %}

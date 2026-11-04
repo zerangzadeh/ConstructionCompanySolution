@@ -1,0 +1,9 @@
+<nav class="cd-journey" aria-label="مسیر قرارداد" data-contract-hub-navigation>
+  <a href="{{ hub.root }}#overview"{% if not hub.quantities %} class="is-current" aria-current="location"{% endif %}>{% include "contracts/detail_icon.html" with icon="home" only %}نمای کلی</a>
+  <a href="{{ hub.url }}"{% if hub.quantities %} class="is-current" aria-current="page"{% endif %}>{% include "contracts/detail_icon.html" with icon="layers" only %}مقادیر و بهای قرارداد</a>
+  {% if workspace.show_billing %}<a href="{{ dashboard.billing_nav_url }}">{% include "contracts/detail_icon.html" with icon="document" only %}صورت‌وضعیت‌ها</a>{% endif %}
+  {% if workspace.show_progress or workspace.show_financial %}<a href="{{ hub.root }}#progress">{% include "contracts/detail_icon.html" with icon="target" only %}وضعیت پیشرفت</a>{% endif %}
+  {% if dashboard.show_estimates %}<a href="{{ hub.root }}#estimates">{% include "contracts/detail_icon.html" with icon="layers" only %}برآوردها</a>{% endif %}
+  {% if workspace.supports_terms or term_versions or contract.amendments.all %}<a href="{{ hub.root }}#terms">{% include "contracts/detail_icon.html" with icon="document" only %}شرایط و تغییرات قرارداد</a>{% endif %}
+  <a href="{{ hub.root }}#recent">{% include "contracts/detail_icon.html" with icon="history" only %}سوابق و فعالیت‌ها</a>
+</nav>

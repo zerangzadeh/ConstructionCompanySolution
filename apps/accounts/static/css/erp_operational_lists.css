@@ -1,0 +1,20 @@
+/* Domain-neutral adaptations; Contracts remains the shared visual authority. */
+.erp-operational-list .erp-list-options { flex: 1 1 480px; }
+.erp-operational-list .erp-list-quick > div { flex: 1 1 140px; min-width: 0; }
+.erp-operational-list .erp-list-quick > .erp-list-filter-actions { flex: 0 0 auto; }
+.erp-operational-list .erp-list-navigation { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 12px; font-size: 12px; color: var(--bonira-royal-blue); }
+.erp-operational-list .erp-responsive-list th { width: auto; }
+.erp-operational-list .erp-responsive-list th:last-child { width: 5%; }
+.erp-operational-list .erp-list-title { overflow-wrap: anywhere; }
+.erp-operational-list .erp-list-output-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 12px; }
+.erp-operational-list .erp-list-output-actions > span { font-size: 11px; color: var(--bonira-muted); }
+.erp-operational-list .erp-list-output-actions .erp-output-action { min-height: 34px; padding: 6px 12px; font-size: 12px; }
+@media (min-width: 768px) {
+    .erp-operational-list .erp-responsive-list { min-width: 860px; }
+    .erp-operational-list .erp-responsive-list :is(th, td) { text-align: start; }
+    .erp-operational-list .erp-responsive-list .erp-list-amount { text-align: end; }
+}
+@media (max-width: 767px) {
+    .erp-operational-list .erp-list-quick > div:not(.erp-list-filter-actions) { flex-basis: 100%; }
+    .erp-operational-list .erp-list-identifier { overflow-wrap: anywhere; }
+}

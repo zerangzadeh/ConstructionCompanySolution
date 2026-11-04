@@ -1,8 +1,9 @@
-{% extends "base.html" %}{% load static erp_format field_journey product_surface %}
+{% extends "base.html" %}{% load static erp_format field_journey product_surface related_documents %}
 {% block title %}{{ estimate.title }} | جزئیات برآورد{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}"><link rel="stylesheet" href="{% static 'estimates/detail.css' %}">{% prepare_native_choices item_form %}{{ item_form.media.css }}{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}"><link rel="stylesheet" href="{% static 'estimates/detail.css' %}"><link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% prepare_native_choices item_form %}{{ item_form.media.css }}{% endblock %}
 {% block extra_scripts %}{{ item_form.media.js }}{% endblock %}
 {% block content %}
+{% related_documents estimate as related_documents %}
 <div class="estimate-detail" dir="rtl" data-estimate-state="{{ estimate.status }}">
     {% include "components/breadcrumbs.html" with page_breadcrumbs=page_breadcrumbs only %}
     {% with current_items=estimate.current_revision.items.all total_amount=estimate.total_amount %}
@@ -33,6 +34,7 @@
             {% endif %}
         </div>
     </header>
+    {% if related_documents != None %}<nav class="erp-related-documents-shortcut" aria-label="اسناد برآورد">{% include "components/related_documents_nav.html" %}</nav>{% endif %}
     {% if not estimate.contract_id %}<p class="ed-contract-note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-11v2"/></svg>این برآورد به قراردادی متصل نشده است.</p>{% endif %}
     {% if estimate.status == "approved" %}<p class="ed-state-note" role="status">این برآورد تأیید شده و امکان افزودن یا ویرایش ردیف‌ها وجود ندارد.</p>
     {% elif estimate.status == "revised" %}<p class="ed-state-note" role="status">این برآورد بازنگری شده است؛ افزودن ردیف فقط در وضعیت پیش‌نویس امکان‌پذیر است.</p>
@@ -55,6 +57,7 @@
             {% if estimate.contract %}<div><dt>قرارداد مرتبط با این برآورد</dt><dd>{% if related_contract_url and related_contract_url|surface_url_exposed %}<a href="{{ related_contract_url }}">{{ estimate.contract.title }} · <bdi dir="ltr">{{ estimate.contract.contract_number }}</bdi></a>{% else %}<bdi dir="ltr">{{ estimate.contract.contract_number }}</bdi>{% endif %}</dd></div>{% endif %}
         </dl>
     </section>
+    {% include "components/related_documents.html" with source_label="برآورد" %}
     <section class="ed-panel ed-items" aria-labelledby="estimate-items-heading">
         <h2 class="ed-panel-heading" id="estimate-items-heading">{% include "contracts/detail_icon.html" with icon="layers" only %}اقلام برآورد</h2>
         <p class="ed-table-hint sm:hidden">برای مشاهده همه ستون‌ها، جدول را افقی حرکت دهید.</p>

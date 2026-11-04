@@ -1,0 +1,6 @@
+<section class="erp-surface erp-document-association-context" aria-label="سابقه مرتبط">
+  <h2>{{ association_context.source.label }} مرتبط</h2>
+  <p><strong>{{ association_context.source.title }}</strong>{% if association_context.number %} · <bdi dir="ltr">{{ association_context.number }}</bdi>{% endif %}</p>
+  <dl><div><dt>پروژه</dt><dd>{{ association_context.project_title }} · <bdi dir="ltr">{{ association_context.project_number }}</bdi></dd></div>{% if association_context.contract_title %}<div><dt>قرارداد</dt><dd>{{ association_context.contract_title }} · <bdi dir="ltr">{{ association_context.contract_number }}</bdi></dd></div>{% endif %}</dl>
+  <p class="erp-document-association-note">سند فقط به این {{ association_context.source.label }} پیوند می‌خورد.</p>
+</section>

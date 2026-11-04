@@ -1,8 +1,9 @@
-{% extends "base.html" %}{% load static erp_format product_surface %}
+{% extends "base.html" %}{% load static erp_format product_surface related_documents %}
 {% block title %}{{ contract.contract_number }} | جزئیات قرارداد{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}"><link rel="stylesheet" href="{% static 'contracts/detail.css' %}?v=20261102-quantities-2">{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}"><link rel="stylesheet" href="{% static 'contracts/detail.css' %}?v=20261102-quantities-2"><link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% endblock %}
 {% block working_context %}{% endblock %}
 {% block content %}
+{% related_documents contract as related_documents %}
 <div class="contract-detail" dir="rtl" id="overview" data-contract-state="{{ contract.status }}">
     {% include "components/breadcrumbs.html" with page_breadcrumbs=page_breadcrumbs only %}
     <header class="cd-heading">
@@ -18,7 +19,7 @@
         <div>{% include "contracts/detail_icon.html" with icon="calendar" only %}<span>تاریخ شروع</span><strong><bdi dir="ltr">{{ contract.start_date|jalali_date|default:"—" }}</bdi></strong></div>
         <div>{% include "contracts/detail_icon.html" with icon="calendar" only %}<span>تاریخ پایان</span><strong><bdi dir="ltr">{{ contract.end_date|jalali_date|default:"—" }}</bdi></strong></div>
     </section>
-    {% if not workspace.is_draft or hub.quantities %}{% include "contracts/hub_navigation.html" %}{% endif %}
+    {% if not workspace.is_draft or hub.quantities %}{% include "contracts/hub_navigation.html" %}{% elif related_documents != None %}<nav class="cd-journey" aria-label="اسناد قرارداد">{% include "components/related_documents_nav.html" %}</nav>{% endif %}
     {% if hub.quantities %}
       {% include "contracts/hub_quantities.html" %}
     {% else %}
@@ -46,6 +47,7 @@
     <section id="items" class="erp-surface mt-5 overflow-hidden rounded-xl"><div class="erp-panel-header"><h2 class="text-sm font-semibold text-slate-900">ردیف‌های قرارداد</h2><span class="text-xs text-slate-500">{{ contract.items.all|length }} ردیف</span></div>{% if contract.items.all %}<div class="erp-table-wrap"><table class="w-full min-w-[640px] text-right text-sm"><thead><tr><th class="border-b border-slate-200 px-4 py-3">شرح</th><th class="border-b border-slate-200 px-4 py-3">مقدار</th><th class="border-b border-slate-200 px-4 py-3 text-left">قیمت واحد</th><th class="border-b border-slate-200 px-4 py-3 text-left">جمع</th></tr></thead><tbody class="divide-y divide-slate-100">{% for item in contract.items.all %}<tr><td class="px-4 py-3 text-slate-900">{{ item.description }}</td><td class="px-4 py-3 text-slate-600">{{ item.quantity|erp_number }} {{ item.unit_of_measure.symbol|default:item.unit }}</td><td class="px-4 py-3 text-left tabular-nums" dir="ltr">{{ item.unit_price|erp_number }}</td><td class="px-4 py-3 text-left font-semibold tabular-nums" dir="ltr">{{ item.line_total|erp_number }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="cd-empty-note">هنوز ردیفی ثبت نشده است.{% if workspace.can_add_item %} ردیف‌های قرارداد را در فرم زیر وارد کنید.{% endif %}</p>{% endif %}{% if workspace.item_form %}{% include "contracts/detail_item_editor.html" %}{% endif %}</section>
     {% endif %}
     {% endif %}
+{% include "components/related_documents.html" with source_label="قرارداد" %}
 {{ dashboard.chart_rows|json_script:"contract-financial-data" }}
 </div>
 {% endblock %}

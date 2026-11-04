@@ -1,0 +1,209 @@
+Found 53 test(s).
+Using existing test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+test_all_context_document_permissions_and_metadata_are_filtered (apps.documents.test_contextual_association.ContextualAssociationTests.test_all_context_document_permissions_and_metadata_are_filtered) ... {"timestamp":"2026-11-04T17:09:53.820101+00:00","event":"http.response","request_id":"0bc5956b-a669-47f6-b69f-502903083ce3","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":252}
+{"timestamp":"2026-11-04T17:09:54.194749+00:00","event":"http.response","request_id":"96d9226f-1a78-4bd2-959d-f89fcc989876","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":374}
+{"timestamp":"2026-11-04T17:09:54.605103+00:00","event":"http.response","request_id":"5981e17c-b1cf-4d4a-9a63-bab6b72d01d8","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":404}
+ok
+test_archived_expired_and_sealed_documents_never_enter_picker (apps.documents.test_contextual_association.ContextualAssociationTests.test_archived_expired_and_sealed_documents_never_enter_picker) ... {"timestamp":"2026-11-04T17:09:55.691154+00:00","event":"http.response","request_id":"5857b9d0-7100-4fc5-b12b-8a145c1f96c4","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":537}
+ok
+test_authority_is_rechecked_inside_upload_transaction (apps.documents.test_contextual_association.ContextualAssociationTests.test_authority_is_rechecked_inside_upload_transaction) ... {"timestamp":"2026-11-04T17:09:56.481910+00:00","event":"http.response","request_id":"5168d9aa-bbba-4ec2-90e9-74649a8b4bde","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":693}
+{"timestamp":"2026-11-04T17:09:57.069331+00:00","event":"http.response","request_id":"80469ded-1bf5-4bbd-b6d5-3e90f267d618","method":"POST","route":"documents:contextual-upload","status_code":403,"duration_ms":567}
+ok
+test_candidate_pages_search_and_selected_value_retention (apps.documents.test_contextual_association.ContextualAssociationTests.test_candidate_pages_search_and_selected_value_retention) ... {"timestamp":"2026-11-04T17:10:04.937931+00:00","event":"http.response","request_id":"fca7d4b0-c986-43c1-82d1-bbc57bd76c40","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":5239}
+{"timestamp":"2026-11-04T17:10:10.206957+00:00","event":"http.response","request_id":"5885ac54-9199-41e1-80e3-309eb5c9867a","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":5268}
+{"timestamp":"2026-11-04T17:10:10.983858+00:00","event":"http.response","request_id":"b3e0cd96-0b11-4d7f-9b10-0ceb87d99fb1","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":776}
+{"timestamp":"2026-11-04T17:10:17.117176+00:00","event":"http.response","request_id":"e746844e-5bef-4c57-ad99-894ae26de621","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":6132}
+{"timestamp":"2026-11-04T17:10:23.769613+00:00","event":"http.response","request_id":"4e44f23f-fa9b-4da5-967b-3f2b363b6996","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":6644}
+ok
+test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) ... {"timestamp":"2026-11-04T17:10:24.476539+00:00","event":"http.response","request_id":"3fd565a7-3d65-4ce5-a416-bf17ce070768","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":559}
+{"timestamp":"2026-11-04T17:10:25.979632+00:00","event":"http.response","request_id":"654568ba-6f4c-4a39-a9ff-4a7d07d2e2df","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1485}
+{"timestamp":"2026-11-04T17:10:26.467710+00:00","event":"http.response","request_id":"9fc1755d-24a2-4c38-98cb-4e10c1e59160","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":483}
+{"timestamp":"2026-11-04T17:10:27.303094+00:00","event":"http.response","request_id":"f1381d8c-f72e-43c6-a3d9-b73eb6e74c96","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":828}
+{"timestamp":"2026-11-04T17:10:28.833136+00:00","event":"http.response","request_id":"33d6ab9c-2466-46f5-8ea9-a3b6b0af827d","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1525}
+{"timestamp":"2026-11-04T17:10:29.223569+00:00","event":"http.response","request_id":"eaa0d514-3beb-4186-bb1d-84b114c1c429","method":"GET","route":"documents:download","status_code":403,"duration_ms":386}
+{"timestamp":"2026-11-04T17:10:29.819246+00:00","event":"http.response","request_id":"3d8f5bdd-fb17-437e-97d0-aff20f64f0a5","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":604}
+{"timestamp":"2026-11-04T17:10:31.159824+00:00","event":"http.response","request_id":"8005b04e-bee8-4f1a-b9bc-18650b113806","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1307}
+{"timestamp":"2026-11-04T17:10:31.789359+00:00","event":"http.response","request_id":"2ca0cf1c-0f2d-41c4-83b7-4074cb8add35","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":627}
+{"timestamp":"2026-11-04T17:10:32.445347+00:00","event":"http.response","request_id":"8fb8cef4-91ac-456f-bc38-f9cada5c2075","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":637}
+{"timestamp":"2026-11-04T17:10:33.719063+00:00","event":"http.response","request_id":"6758a581-dcd0-4ab1-a578-97d3f409b7cf","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1265}
+{"timestamp":"2026-11-04T17:10:34.112872+00:00","event":"http.response","request_id":"e8be5b22-f212-46b7-82f9-17d5a3a882ab","method":"GET","route":"documents:download","status_code":403,"duration_ms":396}
+{"timestamp":"2026-11-04T17:10:34.653846+00:00","event":"http.response","request_id":"01c98ab2-7423-4399-a017-a99f973340a9","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":536}
+{"timestamp":"2026-11-04T17:10:35.800612+00:00","event":"http.response","request_id":"785d6bad-7cb4-4073-8fbc-c0afa2730993","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":1130}
+{"timestamp":"2026-11-04T17:10:36.568206+00:00","event":"http.response","request_id":"f8d6a9a8-50cf-4170-be47-d09766ada2a2","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":760}
+{"timestamp":"2026-11-04T17:10:37.370033+00:00","event":"http.response","request_id":"ae22133a-7458-4f91-98ee-441354df5110","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":787}
+{"timestamp":"2026-11-04T17:10:38.586864+00:00","event":"http.response","request_id":"48625e7a-4109-46e0-9edf-63c7a17e6ae4","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":1205}
+{"timestamp":"2026-11-04T17:10:38.989103+00:00","event":"http.response","request_id":"c41ee810-d32a-4838-af1e-17506fc1c242","method":"GET","route":"documents:download","status_code":403,"duration_ms":407}
+{"timestamp":"2026-11-04T17:10:39.586172+00:00","event":"http.response","request_id":"dceef219-abe0-4aee-bcbb-35ef537cafd5","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":588}
+{"timestamp":"2026-11-04T17:10:40.256841+00:00","event":"http.response","request_id":"200c5c1c-01d0-432f-9ab7-db0c3a331a4a","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":647}
+{"timestamp":"2026-11-04T17:10:40.777889+00:00","event":"http.response","request_id":"903569e0-ce64-4fa9-8e57-080cf841efcb","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":523}
+{"timestamp":"2026-11-04T17:10:41.410728+00:00","event":"http.response","request_id":"30ad05bb-3f78-47a0-9a9f-8aefee689d38","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":620}
+{"timestamp":"2026-11-04T17:10:42.249656+00:00","event":"http.response","request_id":"a37d021e-5ede-435f-a435-462c346f4541","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":828}
+{"timestamp":"2026-11-04T17:10:42.749054+00:00","event":"http.response","request_id":"5f0d3861-3ab0-4d6c-a88e-a2fe57d612bc","method":"GET","route":"documents:download","status_code":403,"duration_ms":495}
+{"timestamp":"2026-11-04T17:10:43.410271+00:00","event":"http.response","request_id":"1df6aae5-093b-4263-920b-379734344a7a","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":668}
+{"timestamp":"2026-11-04T17:10:44.465479+00:00","event":"http.response","request_id":"93b1e058-62ec-4794-b80f-80fea5a55484","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":1034}
+{"timestamp":"2026-11-04T17:10:45.018977+00:00","event":"http.response","request_id":"a3b0d978-fcfd-4830-af74-95462ff88c6b","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":561}
+{"timestamp":"2026-11-04T17:10:45.682287+00:00","event":"http.response","request_id":"b0be7b3e-2427-4a55-9bdc-2ff3022dfedc","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":639}
+{"timestamp":"2026-11-04T17:10:46.719536+00:00","event":"http.response","request_id":"5fbf53c6-f706-43ab-a269-6513f4161380","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":1030}
+{"timestamp":"2026-11-04T17:10:47.139269+00:00","event":"http.response","request_id":"2a17358a-2de9-4dae-87d6-8ecb509ab31b","method":"GET","route":"documents:download","status_code":403,"duration_ms":417}
+ok
+test_csrf_is_required_for_both_actions (apps.documents.test_contextual_association.ContextualAssociationTests.test_csrf_is_required_for_both_actions) ... {"timestamp":"2026-11-04T17:10:47.227360+00:00","event":"http.response","request_id":"279551eb-e63b-4ed0-aecf-30e9965d1e04","method":"POST","route":"documents:contextual-upload","status_code":403,"duration_ms":8}
+{"timestamp":"2026-11-04T17:10:47.238895+00:00","event":"http.response","request_id":"241b9d7e-3b8a-4070-b12c-9eee5f84d8eb","method":"POST","route":"documents:contextual-link","status_code":403,"duration_ms":10}
+{"timestamp":"2026-11-04T17:10:47.784439+00:00","event":"http.response","request_id":"84db271d-e6ef-4429-8874-1723256303d7","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":540}
+{"timestamp":"2026-11-04T17:10:48.440993+00:00","event":"http.response","request_id":"ecbefb98-88ec-4f31-ac9d-f7603b11d0f1","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":645}
+ok
+test_document_view_and_upload_permissions_are_separate_from_download (apps.documents.test_contextual_association.ContextualAssociationTests.test_document_view_and_upload_permissions_are_separate_from_download) ... {"timestamp":"2026-11-04T17:10:48.760887+00:00","event":"http.response","request_id":"fe4467c3-2452-44f6-a3e2-f12a06e324b5","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":226}
+{"timestamp":"2026-11-04T17:10:49.097293+00:00","event":"http.response","request_id":"e91ca41f-f4c7-4536-a8d4-34405901d28a","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":338}
+{"timestamp":"2026-11-04T17:10:49.192083+00:00","event":"http.response","request_id":"e959e7ff-6923-4f54-9c6b-b85586488b42","method":"GET","route":"documents:download","status_code":403,"duration_ms":73}
+ok
+test_duplicate_associations_and_retry_do_not_add_rows (apps.documents.test_contextual_association.ContextualAssociationTests.test_duplicate_associations_and_retry_do_not_add_rows) ... {"timestamp":"2026-11-04T17:10:50.895445+00:00","event":"http.response","request_id":"7db8de87-d0b8-4cde-bc35-0485142fe3cb","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1380}
+{"timestamp":"2026-11-04T17:10:52.780077+00:00","event":"http.response","request_id":"02782e49-df85-4c2d-bb45-29b427af8159","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":1876}
+{"timestamp":"2026-11-04T17:10:54.116475+00:00","event":"http.response","request_id":"ac72784f-e5e4-4b86-a766-139bf7a8c66d","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1335}
+ok
+test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) ... {"timestamp":"2026-11-04T17:10:56.178000+00:00","event":"http.response","request_id":"2fa6fc37-061a-4a41-b374-58c3793c3e1e","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1495}
+{"timestamp":"2026-11-04T17:10:57.447133+00:00","event":"http.response","request_id":"aa31cc87-ed54-4315-8a1d-f79fdd5e1cf7","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1262}
+{"timestamp":"2026-11-04T17:10:58.884038+00:00","event":"http.response","request_id":"67206591-4c30-4512-9ed3-98c3c2406d57","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1434}
+{"timestamp":"2026-11-04T17:11:00.972063+00:00","event":"http.response","request_id":"dfb8ed87-e5bb-4e56-a4f8-2a75ee1155ee","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2078}
+{"timestamp":"2026-11-04T17:11:02.484521+00:00","event":"http.response","request_id":"94ecbfff-706e-4aa8-b131-b007b8548efc","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1505}
+{"timestamp":"2026-11-04T17:11:03.570746+00:00","event":"http.response","request_id":"51e4bd7a-771f-4f70-873f-11c3ea516625","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1071}
+{"timestamp":"2026-11-04T17:11:05.128608+00:00","event":"http.response","request_id":"74fa4c2c-1391-466d-958c-f7207aec7742","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1560}
+{"timestamp":"2026-11-04T17:11:07.238828+00:00","event":"http.response","request_id":"92f758bc-13fd-4acf-8486-51a1dae15835","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2095}
+{"timestamp":"2026-11-04T17:11:09.000554+00:00","event":"http.response","request_id":"99438ea0-2b1c-444b-b5c1-c6800b663016","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1756}
+{"timestamp":"2026-11-04T17:11:09.895542+00:00","event":"http.response","request_id":"43d0791a-3c0a-4817-9560-022110a5db7b","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":886}
+{"timestamp":"2026-11-04T17:11:11.807103+00:00","event":"http.response","request_id":"fe51cd49-1e33-43d5-90e1-8d6504db2e18","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1908}
+{"timestamp":"2026-11-04T17:11:14.590650+00:00","event":"http.response","request_id":"08847068-d139-48c0-bec9-f3e478001198","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2770}
+{"timestamp":"2026-11-04T17:11:16.294179+00:00","event":"http.response","request_id":"e6cee4e9-ef06-4ed4-adda-68cbd15b2e12","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1699}
+{"timestamp":"2026-11-04T17:11:17.098195+00:00","event":"http.response","request_id":"26d82a49-9adc-44b9-b913-75bb240b8c8d","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":806}
+{"timestamp":"2026-11-04T17:11:18.591499+00:00","event":"http.response","request_id":"7a4fcc2d-b3da-4408-bc58-386f6353b2b2","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1477}
+{"timestamp":"2026-11-04T17:11:21.097236+00:00","event":"http.response","request_id":"5dd1659e-2577-4aad-b390-7fc2188218c2","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2508}
+{"timestamp":"2026-11-04T17:11:22.852419+00:00","event":"http.response","request_id":"b99d46c8-d2cd-46f8-962e-d39ef46fa9ca","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1744}
+{"timestamp":"2026-11-04T17:11:23.746731+00:00","event":"http.response","request_id":"27f7af1b-4fce-4888-bec9-1557200519eb","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":871}
+{"timestamp":"2026-11-04T17:11:25.728712+00:00","event":"http.response","request_id":"b5c2abc1-8063-4f59-b1ba-fb20331515ca","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1980}
+{"timestamp":"2026-11-04T17:11:28.279342+00:00","event":"http.response","request_id":"3c7cfcb2-234a-484b-9219-042f3c5078d4","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2540}
+ok
+test_expired_context_keeps_source_and_refreshes_form_intent (apps.documents.test_contextual_association.ContextualAssociationTests.test_expired_context_keeps_source_and_refreshes_form_intent) ... {"timestamp":"2026-11-04T15:11:28.371610+00:00","event":"http.response","request_id":"f7e93395-95d2-40b8-9ca1-08e4362b15bf","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":609}
+{"timestamp":"2026-11-04T17:11:29.622010+00:00","event":"http.response","request_id":"ff003722-8fc8-4a20-89e2-0a98e65ba553","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":625}
+{"timestamp":"2026-11-04T17:11:30.174763+00:00","event":"http.response","request_id":"03185b2e-aedd-4cd3-8252-a3299e1a2283","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":549}
+ok
+test_file_and_required_field_errors_keep_source_and_cancel (apps.documents.test_contextual_association.ContextualAssociationTests.test_file_and_required_field_errors_keep_source_and_cancel) ... {"timestamp":"2026-11-04T17:11:30.891212+00:00","event":"http.response","request_id":"501d2bba-9184-4729-96d5-c4c6d7f18f77","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":660}
+{"timestamp":"2026-11-04T17:11:31.504834+00:00","event":"http.response","request_id":"e1895a7c-2576-44b1-87a5-23c091d30493","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":603}
+{"timestamp":"2026-11-04T17:11:32.176498+00:00","event":"http.response","request_id":"91b048df-8c82-49e3-bf61-c029b46ec493","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":670}
+ok
+test_foreign_targets_and_unsafe_navigation_are_denied (apps.documents.test_contextual_association.ContextualAssociationTests.test_foreign_targets_and_unsafe_navigation_are_denied) ... {"timestamp":"2026-11-04T17:11:32.607923+00:00","event":"http.response","request_id":"58231616-26c7-49ac-8442-b0a43c9f1d55","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":338}
+{"timestamp":"2026-11-04T17:11:32.809909+00:00","event":"http.response","request_id":"ce0b61fb-ace4-4545-b371-a28722f59d89","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":200}
+{"timestamp":"2026-11-04T17:11:33.020905+00:00","event":"http.response","request_id":"2009538d-36d1-4673-92a0-0c5dae3aa4b8","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":220}
+{"timestamp":"2026-11-04T17:11:33.246109+00:00","event":"http.response","request_id":"5d2c7534-bbb7-4216-be8a-94b4f8b51935","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":216}
+{"timestamp":"2026-11-04T17:11:33.595386+00:00","event":"http.response","request_id":"3691789e-3e57-4c9f-bfc0-2cb249d5213d","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":346}
+{"timestamp":"2026-11-04T17:11:33.801468+00:00","event":"http.response","request_id":"48176a51-de1d-4b2a-a7c2-f3e80c769b57","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":218}
+{"timestamp":"2026-11-04T17:11:34.015017+00:00","event":"http.response","request_id":"9994c5a6-43bf-4505-9d83-2ec89c359ce1","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":207}
+{"timestamp":"2026-11-04T17:11:34.224169+00:00","event":"http.response","request_id":"e299c0e9-6145-4c3e-8d79-ffd2af9964d4","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":201}
+{"timestamp":"2026-11-04T17:11:34.529484+00:00","event":"http.response","request_id":"f602f50a-c9d6-4b19-a527-66907ebc3881","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":306}
+{"timestamp":"2026-11-04T17:11:34.786819+00:00","event":"http.response","request_id":"132a4951-9ec5-416b-884d-5d8943ed3f19","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":255}
+{"timestamp":"2026-11-04T17:11:35.061652+00:00","event":"http.response","request_id":"50a85914-d2e6-4eb4-94ba-1ad7b312742e","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":272}
+{"timestamp":"2026-11-04T17:11:35.305565+00:00","event":"http.response","request_id":"816b9882-2768-4d59-8509-6f731ae5aa8a","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":242}
+ok
+test_forged_target_token_and_additional_relationships_are_rejected (apps.documents.test_contextual_association.ContextualAssociationTests.test_forged_target_token_and_additional_relationships_are_rejected) ... {"timestamp":"2026-11-04T17:11:35.940310+00:00","event":"http.response","request_id":"de68ea05-67f4-4911-a985-ac59d453cb18","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":561}
+{"timestamp":"2026-11-04T17:11:36.702232+00:00","event":"http.response","request_id":"05e4a8a4-dfe2-4fd4-a046-49d73304e68b","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":747}
+{"timestamp":"2026-11-04T17:11:37.486523+00:00","event":"http.response","request_id":"40419890-2ee3-4e1f-8073-dcd1ceff915f","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":780}
+{"timestamp":"2026-11-04T17:11:38.201692+00:00","event":"http.response","request_id":"33b4202b-0104-4ab7-a31d-f04cb73e8ccb","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":713}
+{"timestamp":"2026-11-04T17:11:38.731508+00:00","event":"http.response","request_id":"de43845a-1c77-4d9b-9e3b-ffbe3414c08e","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":527}
+{"timestamp":"2026-11-04T17:11:39.376385+00:00","event":"http.response","request_id":"4fed00c7-f769-4e1a-94cb-e5733beaea8a","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":643}
+{"timestamp":"2026-11-04T17:11:39.940652+00:00","event":"http.response","request_id":"893cf45f-7e63-4efd-ad76-e2b847f26d6d","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":566}
+{"timestamp":"2026-11-04T17:11:40.807533+00:00","event":"http.response","request_id":"82174100-f439-4f98-9a3c-b6a4e51bca20","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":860}
+ok
+test_link_rollback_preserves_typed_legacy_atomicity (apps.documents.test_contextual_association.ContextualAssociationTests.test_link_rollback_preserves_typed_legacy_atomicity) ... {"timestamp":"2026-11-04T17:11:42.754008+00:00","event":"http.response","request_id":"9d4368a8-db74-4241-b6fe-730f7a9a20f6","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1723}
+{"timestamp":"2026-11-04T17:11:45.238899+00:00","event":"http.response","request_id":"ca29457c-1a64-477d-b16f-2fd45f23798a","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":2468}
+ok
+test_picker_search_excludes_duplicates_and_foreign_documents (apps.documents.test_contextual_association.ContextualAssociationTests.test_picker_search_excludes_duplicates_and_foreign_documents) ... {"timestamp":"2026-11-04T17:11:46.647226+00:00","event":"http.response","request_id":"dda0f89b-1ded-4f69-b09f-a82c481f513b","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":1042}
+{"timestamp":"2026-11-04T17:11:47.597188+00:00","event":"http.response","request_id":"e25e2b4d-97ba-4a4a-adc3-8870abdbe82a","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":950}
+{"timestamp":"2026-11-04T17:11:49.435487+00:00","event":"http.response","request_id":"d6c37e21-b985-4381-9a73-6534101dd731","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1835}
+{"timestamp":"2026-11-04T17:11:51.074185+00:00","event":"http.response","request_id":"380fffb0-147c-46b0-9f40-043d4f11316e","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1627}
+ok
+test_project_and_site_scope_are_rechecked (apps.documents.test_contextual_association.ContextualAssociationTests.test_project_and_site_scope_are_rechecked) ... {"timestamp":"2026-11-04T17:11:51.238754+00:00","event":"http.response","request_id":"f780b3ba-9782-4683-8848-af6acfceec84","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":86}
+{"timestamp":"2026-11-04T17:11:51.355145+00:00","event":"http.response","request_id":"e4bcd89e-1c40-4369-ae6e-b502303a7924","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":103}
+{"timestamp":"2026-11-04T17:11:51.527470+00:00","event":"http.response","request_id":"6f85c302-8534-47b8-82f9-5c647b32dd02","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":171}
+ok
+test_site_scoped_daily_report_upload_and_denied_other_site (apps.documents.test_contextual_association.ContextualAssociationTests.test_site_scoped_daily_report_upload_and_denied_other_site) ... {"timestamp":"2026-11-04T17:11:51.971903+00:00","event":"http.response","request_id":"7f0ceb2a-970b-47c3-a3df-ae9202148ec6","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":263}
+{"timestamp":"2026-11-04T17:11:52.299753+00:00","event":"http.response","request_id":"6d965224-65b4-4675-8aba-b014e5a39c05","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":326}
+{"timestamp":"2026-11-04T17:11:52.425108+00:00","event":"http.response","request_id":"acac2db9-b796-44db-be0a-f0a3b2a50657","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":111}
+{"timestamp":"2026-11-04T17:11:52.556548+00:00","event":"http.response","request_id":"7a271c8f-a0ad-46f0-8b1b-cca97dc72a41","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":125}
+{"timestamp":"2026-11-04T17:11:52.734554+00:00","event":"http.response","request_id":"6281b7ad-8dd4-41b9-b53f-7e4a3ebe8771","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":176}
+ok
+test_stale_compatibility_mapping_cannot_be_selected (apps.documents.test_contextual_association.ContextualAssociationTests.test_stale_compatibility_mapping_cannot_be_selected) ... {"timestamp":"2026-11-04T17:11:53.871325+00:00","event":"http.response","request_id":"53565edb-40d6-4a95-8610-a0a53b8f76f9","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":863}
+{"timestamp":"2026-11-04T17:11:55.378798+00:00","event":"http.response","request_id":"0cdefec8-8fb3-4727-818d-4b1433fb40e5","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1506}
+{"timestamp":"2026-11-04T17:11:57.154701+00:00","event":"http.response","request_id":"95e6555f-4755-4f28-b9ee-faf36bbd7213","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1766}
+ok
+test_upload_only_persona_cannot_read_picker_or_contextual_forms (apps.documents.test_contextual_association.ContextualAssociationTests.test_upload_only_persona_cannot_read_picker_or_contextual_forms) ... {"timestamp":"2026-11-04T17:11:57.327554+00:00","event":"http.response","request_id":"c538fb5a-7821-472f-a92c-a49ccae224aa","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":75}
+{"timestamp":"2026-11-04T17:11:57.418071+00:00","event":"http.response","request_id":"87388256-ee95-4a6d-8eb7-8cac821b8f49","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":88}
+{"timestamp":"2026-11-04T17:11:57.504188+00:00","event":"http.response","request_id":"07914cdb-e82b-4629-b9e4-71f0c0697616","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":85}
+ok
+test_upload_rollback_removes_only_the_new_binary (apps.documents.test_contextual_association.ContextualAssociationTests.test_upload_rollback_removes_only_the_new_binary) ... {"timestamp":"2026-11-04T17:11:58.270420+00:00","event":"http.response","request_id":"935295e4-b6fd-4737-ad33-288ec33e3f5c","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":685}
+{"timestamp":"2026-11-04T17:11:59.113642+00:00","event":"http.response","request_id":"a78240f9-69fd-464f-86b5-99a90937b610","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":835}
+ok
+test_viewer_has_no_contextual_mutation_actions_or_endpoints (apps.documents.test_contextual_association.ContextualAssociationTests.test_viewer_has_no_contextual_mutation_actions_or_endpoints) ... {"timestamp":"2026-11-04T17:11:59.347364+00:00","event":"http.response","request_id":"e3a3718b-fd87-4616-a74d-1f166b0ef460","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":51}
+{"timestamp":"2026-11-04T17:11:59.441243+00:00","event":"http.response","request_id":"da4a04fb-314e-4f4b-b9fa-7197bb995533","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":93}
+{"timestamp":"2026-11-04T17:11:59.513757+00:00","event":"http.response","request_id":"7423e894-77b1-4079-86a4-21bebadfeab2","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":70}
+ok
+test_all_linked_contexts_must_be_authorized (apps.documents.test_related_documents.RelatedDocumentsTests.test_all_linked_contexts_must_be_authorized) ... ok
+test_archived_expired_sealed_and_deleted_source_documents_are_absent (apps.documents.test_related_documents.RelatedDocumentsTests.test_archived_expired_sealed_and_deleted_source_documents_are_absent) ... ok
+test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) ... {"timestamp":"2026-11-04T17:12:04.425930+00:00","event":"http.response","request_id":"0c96083f-03a0-4690-96a0-c7d1a8cc8d2c","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1494}
+{"timestamp":"2026-11-04T17:12:05.756589+00:00","event":"http.response","request_id":"64fb38b9-b54e-401a-a748-adcdc39e17b2","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1324}
+{"timestamp":"2026-11-04T17:12:06.920617+00:00","event":"http.response","request_id":"96a1ae4d-f116-43c5-a58d-997c0f571d74","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":1136}
+{"timestamp":"2026-11-04T17:12:07.987767+00:00","event":"http.response","request_id":"b8e84edb-ccdf-45f1-bd27-cb2c3c305fd7","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":1057}
+{"timestamp":"2026-11-04T17:12:09.102601+00:00","event":"http.response","request_id":"05ad5c94-6654-41ba-8399-cefb4177bd43","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":1106}
+ok
+test_daily_report_site_scope_does_not_expand_to_another_site (apps.documents.test_related_documents.RelatedDocumentsTests.test_daily_report_site_scope_does_not_expand_to_another_site) ... ok
+test_denied_dms_permission_hides_panel_and_count (apps.documents.test_related_documents.RelatedDocumentsTests.test_denied_dms_permission_hides_panel_and_count) ... ok
+test_document_detail_shows_real_source_return_without_new_mutation_flows (apps.documents.test_related_documents.RelatedDocumentsTests.test_document_detail_shows_real_source_return_without_new_mutation_flows) ... {"timestamp":"2026-11-04T17:12:11.083772+00:00","event":"http.response","request_id":"3bfe9e8b-3d2f-432c-8ce6-d33dde0e0a23","method":"GET","route":"documents:detail","status_code":200,"duration_ms":846}
+ok
+test_download_requires_its_own_permission_and_exact_clean_version (apps.documents.test_related_documents.RelatedDocumentsTests.test_download_requires_its_own_permission_and_exact_clean_version) ... ok
+test_estimate_return_does_not_require_unauthorized_project_context (apps.documents.test_related_documents.RelatedDocumentsTests.test_estimate_return_does_not_require_unauthorized_project_context) ... ok
+test_five_sources_deduplicate_mirrors_and_generate_safe_roundtrips (apps.documents.test_related_documents.RelatedDocumentsTests.test_five_sources_deduplicate_mirrors_and_generate_safe_roundtrips) ... ok
+test_forged_return_context_never_produces_a_url (apps.documents.test_related_documents.RelatedDocumentsTests.test_forged_return_context_never_produces_a_url) ... ok
+test_missing_compatibility_parity_hides_document (apps.documents.test_related_documents.RelatedDocumentsTests.test_missing_compatibility_parity_hides_document) ... ok
+test_missing_source_permission_and_foreign_target_fail_closed (apps.documents.test_related_documents.RelatedDocumentsTests.test_missing_source_permission_and_foreign_target_fail_closed) ... ok
+test_only_direct_entity_links_are_projected (apps.documents.test_related_documents.RelatedDocumentsTests.test_only_direct_entity_links_are_projected) ... ok
+test_read_projection_does_not_record_a_download_or_change_links (apps.documents.test_related_documents.RelatedDocumentsTests.test_read_projection_does_not_record_a_download_or_change_links) ... ok
+test_add_link_supports_an_existing_financial_entity_and_audits (apps.documents.tests.DocumentServiceTests.test_add_link_supports_an_existing_financial_entity_and_audits) ... ok
+test_archive_preserves_versions_and_links_and_removes_active_listing (apps.documents.tests.DocumentServiceTests.test_archive_preserves_versions_and_links_and_removes_active_listing) ... ok
+test_create_document_records_first_version_link_metadata_and_audit (apps.documents.tests.DocumentServiceTests.test_create_document_records_first_version_link_metadata_and_audit) ... ok
+test_document_access_requires_linked_context_permission (apps.documents.tests.DocumentServiceTests.test_document_access_requires_linked_context_permission) ... ok
+test_document_link_requires_exactly_one_same_tenant_target (apps.documents.tests.DocumentServiceTests.test_document_link_requires_exactly_one_same_tenant_target) ... ok
+test_download_audit_is_version_specific_and_rechecks_access (apps.documents.tests.DocumentServiceTests.test_download_audit_is_version_specific_and_rechecks_access) ... ok
+test_endpoints_reject_cross_tenant_document_uuid (apps.documents.tests.DocumentServiceTests.test_endpoints_reject_cross_tenant_document_uuid) ... {"timestamp":"2026-11-04T17:12:33.659947+00:00","event":"http.response","request_id":"62aaaf31-9c3e-47d6-a7ca-95a4a564be1a","method":"GET","route":"documents:detail","status_code":403,"duration_ms":227}
+{"timestamp":"2026-11-04T17:12:33.846965+00:00","event":"http.response","request_id":"eaf73f21-18b9-40fe-9cbe-731bde19a966","method":"GET","route":"documents:download","status_code":403,"duration_ms":183}
+{"timestamp":"2026-11-04T17:12:34.113451+00:00","event":"http.response","request_id":"33a15870-44ad-464d-be8d-16d80306b7df","method":"POST","route":"documents:archive","status_code":403,"duration_ms":262}
+ok
+test_new_version_is_numbered_immutable_and_becomes_current (apps.documents.tests.DocumentServiceTests.test_new_version_is_numbered_immutable_and_becomes_current) ... ok
+test_partner_evidence_document_keeps_tenant_and_domain_permission (apps.documents.tests.DocumentServiceTests.test_partner_evidence_document_keeps_tenant_and_domain_permission) ... ok
+test_partner_evidence_document_resolves_registered_link_model (apps.documents.tests.DocumentServiceTests.test_partner_evidence_document_resolves_registered_link_model) ... ok
+test_upload_validation_rejects_mismatched_type_and_signature (apps.documents.tests.DocumentServiceTests.test_upload_validation_rejects_mismatched_type_and_signature) ... ok
+test_views_create_add_version_and_secure_download (apps.documents.tests.DocumentServiceTests.test_views_create_add_version_and_secure_download) ... {"timestamp":"2026-11-04T17:12:41.717048+00:00","event":"http.response","request_id":"36a3e532-1006-4e57-9cbe-bda96f44e8c2","method":"POST","route":"documents:upload","status_code":302,"duration_ms":301}
+{"timestamp":"2026-11-04T17:12:42.530807+00:00","event":"http.response","request_id":"60bb7c87-5359-4880-85ad-cd17d7d0e95b","method":"GET","route":"documents:detail","status_code":200,"duration_ms":799}
+{"timestamp":"2026-11-04T17:12:42.801112+00:00","event":"http.response","request_id":"75a06853-bef0-4b2a-b77e-055a8ab2cc04","method":"POST","route":"documents:version-add","status_code":302,"duration_ms":276}
+{"timestamp":"2026-11-04T17:12:43.733905+00:00","event":"http.response","request_id":"e5b6624c-05cd-4520-a242-b6b1c180ca29","method":"GET","route":"documents:detail","status_code":200,"duration_ms":924}
+{"timestamp":"2026-11-04T17:12:44.145371+00:00","event":"http.response","request_id":"7e4a8ca4-a7c3-4c4f-afb3-c498634f40a1","method":"GET","route":"documents:download","status_code":403,"duration_ms":418}
+{"timestamp":"2026-11-04T17:12:44.818001+00:00","event":"http.response","request_id":"4c027b73-16ea-43f2-a5b0-bba4eb62a6f2","method":"GET","route":"documents:download","status_code":200,"duration_ms":637}
+ok
+test_inactive_membership_fails_closed (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_inactive_membership_fails_closed) ... ok
+test_linked_contract_choices_intersect_source_project (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_linked_contract_choices_intersect_source_project) ... ok
+test_missing_permission_cannot_reveal_choices (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_missing_permission_cannot_reveal_choices) ... ok
+test_organization_grant_remains_tenant_filtered (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_organization_grant_remains_tenant_filtered) ... ok
+test_project_reader_has_exact_allowed_choices_and_valid_target (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_project_reader_has_exact_allowed_choices_and_valid_target) ... ok
+test_ungranted_and_foreign_targets_cannot_be_selected (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_ungranted_and_foreign_targets_cannot_be_selected) ... ok
+
+----------------------------------------------------------------------
+Ran 53 tests in 173.430s
+
+OK
+Preserving test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+

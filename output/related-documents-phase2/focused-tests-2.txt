@@ -1,0 +1,158 @@
+Found 19 test(s).
+Using existing test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+test_all_context_document_permissions_and_metadata_are_filtered (apps.documents.test_contextual_association.ContextualAssociationTests.test_all_context_document_permissions_and_metadata_are_filtered) ... {"timestamp":"2026-11-04T17:00:18.758215+00:00","event":"http.response","request_id":"cf685800-a265-4954-a6d5-908b25a57ba5","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":172}
+{"timestamp":"2026-11-04T17:00:19.066979+00:00","event":"http.response","request_id":"73d5f41b-4560-4176-bfb1-adc338102774","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":307}
+{"timestamp":"2026-11-04T17:00:19.496035+00:00","event":"http.response","request_id":"04d43dd3-718c-45d6-8c1e-3e7149e1d520","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":423}
+ok
+test_archived_expired_and_sealed_documents_never_enter_picker (apps.documents.test_contextual_association.ContextualAssociationTests.test_archived_expired_and_sealed_documents_never_enter_picker) ... {"timestamp":"2026-11-04T17:00:20.297729+00:00","event":"http.response","request_id":"95526518-17df-4364-b2f1-58c2d198c31c","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":435}
+ok
+test_candidate_pages_search_and_selected_value_retention (apps.documents.test_contextual_association.ContextualAssociationTests.test_candidate_pages_search_and_selected_value_retention) ... {"timestamp":"2026-11-04T17:00:30.238197+00:00","event":"http.response","request_id":"3936e03f-1d69-4130-a548-a3ed7a5298b5","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":6841}
+{"timestamp":"2026-11-04T17:00:36.863902+00:00","event":"http.response","request_id":"c2e0d419-3c91-4f9d-9dec-01243df87235","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":6625}
+{"timestamp":"2026-11-04T17:00:37.633949+00:00","event":"http.response","request_id":"25ba9657-4b29-4409-9ed4-f7c69c77a837","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":768}
+FAIL
+test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) ... {"timestamp":"2026-11-04T17:00:38.256367+00:00","event":"http.response","request_id":"66959d2b-1299-4a70-b79b-a6a079bffec7","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":475}
+{"timestamp":"2026-11-04T17:00:38.990266+00:00","event":"http.response","request_id":"62f01f55-a467-4bb0-ba10-d42d5687261a","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":716}
+{"timestamp":"2026-11-04T17:00:39.326845+00:00","event":"http.response","request_id":"d6a5b31b-0a31-4c75-966b-a98949c3d553","method":"GET","route":"documents:download","status_code":403,"duration_ms":327}
+{"timestamp":"2026-11-04T17:00:39.968177+00:00","event":"http.response","request_id":"5401d595-073b-4339-8f1e-c1d16699529e","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":640}
+{"timestamp":"2026-11-04T17:00:40.737023+00:00","event":"http.response","request_id":"6490dcd1-b64b-4426-ba8a-2b73bd47ca3a","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":749}
+{"timestamp":"2026-11-04T17:00:41.106255+00:00","event":"http.response","request_id":"261147da-1dad-4209-bd04-9e73d05153a5","method":"GET","route":"documents:download","status_code":403,"duration_ms":356}
+{"timestamp":"2026-11-04T17:00:41.634017+00:00","event":"http.response","request_id":"c27a32a6-0bf8-4fb9-b94e-e98e3c551d7e","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":527}
+{"timestamp":"2026-11-04T17:00:42.369591+00:00","event":"http.response","request_id":"94e34e4e-ce89-4694-aeb3-4a7552d3fb28","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":725}
+{"timestamp":"2026-11-04T17:00:42.723455+00:00","event":"http.response","request_id":"0f64fcbe-01b7-43a1-8bb7-81fbb3ab7484","method":"GET","route":"documents:download","status_code":403,"duration_ms":349}
+{"timestamp":"2026-11-04T17:00:43.200137+00:00","event":"http.response","request_id":"03e2928e-c509-41c8-8aec-4f04dde513c9","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":476}
+{"timestamp":"2026-11-04T17:00:43.647285+00:00","event":"http.response","request_id":"650e16bd-7616-407f-9f34-11589197e6d0","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":433}
+{"timestamp":"2026-11-04T17:00:43.998265+00:00","event":"http.response","request_id":"9811f4b9-d229-4278-8d45-66c7352fd5fc","method":"GET","route":"documents:download","status_code":403,"duration_ms":342}
+{"timestamp":"2026-11-04T17:00:44.479136+00:00","event":"http.response","request_id":"97377989-fcf7-4c7a-9808-feafcca6fb8c","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":480}
+{"timestamp":"2026-11-04T17:00:44.945835+00:00","event":"http.response","request_id":"52bec943-9433-48b8-a6e9-7c5985ee9ddd","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":457}
+{"timestamp":"2026-11-04T17:00:45.251955+00:00","event":"http.response","request_id":"26bd8ecb-f505-4c96-997e-97a1edd272a2","method":"GET","route":"documents:download","status_code":403,"duration_ms":301}
+ok
+test_csrf_is_required_for_both_actions (apps.documents.test_contextual_association.ContextualAssociationTests.test_csrf_is_required_for_both_actions) ... {"timestamp":"2026-11-04T17:00:45.340951+00:00","event":"http.response","request_id":"3a295361-3711-4c95-9584-9294a47bbf57","method":"POST","route":"documents:contextual-upload","status_code":403,"duration_ms":6}
+{"timestamp":"2026-11-04T17:00:45.354186+00:00","event":"http.response","request_id":"02914428-2de5-4887-9961-16b097b9443e","method":"POST","route":"documents:contextual-link","status_code":403,"duration_ms":12}
+{"timestamp":"2026-11-04T17:00:45.846132+00:00","event":"http.response","request_id":"c9826dbd-ef49-4d81-bb9d-6ad251b585c0","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":490}
+{"timestamp":"2026-11-04T17:00:46.402533+00:00","event":"http.response","request_id":"a192efcf-4ed2-4886-827c-61b40436e97b","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":551}
+ok
+test_document_view_and_upload_permissions_are_separate_from_download (apps.documents.test_contextual_association.ContextualAssociationTests.test_document_view_and_upload_permissions_are_separate_from_download) ... {"timestamp":"2026-11-04T17:00:46.747985+00:00","event":"http.response","request_id":"6110b954-5f89-4dae-ac0a-52748574970b","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":258}
+{"timestamp":"2026-11-04T17:00:47.073688+00:00","event":"http.response","request_id":"803f6064-0351-4bc9-87a0-e00b90e92479","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":321}
+{"timestamp":"2026-11-04T17:00:47.156366+00:00","event":"http.response","request_id":"de59a3d8-7261-42d9-9948-4f3b9afd174c","method":"GET","route":"documents:download","status_code":403,"duration_ms":73}
+ok
+test_duplicate_associations_and_retry_do_not_add_rows (apps.documents.test_contextual_association.ContextualAssociationTests.test_duplicate_associations_and_retry_do_not_add_rows) ... {"timestamp":"2026-11-04T17:00:49.054488+00:00","event":"http.response","request_id":"6b63f5c4-3ebf-43ba-8d06-a31c47dc69ca","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1326}
+{"timestamp":"2026-11-04T17:00:51.341160+00:00","event":"http.response","request_id":"360372a4-fb7e-415f-86b7-94b3a65d729b","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2281}
+{"timestamp":"2026-11-04T17:00:52.662391+00:00","event":"http.response","request_id":"0dc3f144-6be3-4cc2-9f5c-41ce108b066c","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1319}
+ok
+test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) ... {"timestamp":"2026-11-04T17:00:55.099123+00:00","event":"http.response","request_id":"030d7578-3859-41de-97f8-cf0485b21d0a","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1670}
+{"timestamp":"2026-11-04T17:00:57.689982+00:00","event":"http.response","request_id":"2b0f2565-53ce-4f20-8a00-689b3276c0fa","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2584}
+{"timestamp":"2026-11-04T17:00:59.671762+00:00","event":"http.response","request_id":"c1cec415-2e46-4023-9c07-139684943b88","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1974}
+{"timestamp":"2026-11-04T17:01:02.492686+00:00","event":"http.response","request_id":"4cd8dd26-5002-4af2-88bd-5182d75f4f53","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2805}
+{"timestamp":"2026-11-04T17:01:04.176142+00:00","event":"http.response","request_id":"a0e49e28-7489-4fb0-bdb5-5f1945c98e47","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1677}
+{"timestamp":"2026-11-04T17:01:07.066547+00:00","event":"http.response","request_id":"4356a8ce-90bc-4e61-9214-24668a1008ba","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2884}
+{"timestamp":"2026-11-04T17:01:08.821704+00:00","event":"http.response","request_id":"aa121beb-8bd7-4797-99ae-8db2296953c9","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1750}
+{"timestamp":"2026-11-04T17:01:11.836951+00:00","event":"http.response","request_id":"e8a1a37e-5bbf-4c7c-aab1-3d296db6339f","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":3008}
+{"timestamp":"2026-11-04T17:01:13.753553+00:00","event":"http.response","request_id":"d98ba0bb-da23-41bf-8e71-e5fa6f736e6e","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1907}
+{"timestamp":"2026-11-04T17:01:16.824027+00:00","event":"http.response","request_id":"79a463ec-fbf8-40c0-9331-c1fa5b5bb614","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":3063}
+ok
+test_expired_context_keeps_source_and_refreshes_form_intent (apps.documents.test_contextual_association.ContextualAssociationTests.test_expired_context_keeps_source_and_refreshes_form_intent) ... {"timestamp":"2026-11-04T15:01:16.908952+00:00","event":"http.response","request_id":"1f67d0ab-b6d2-42fd-a98e-f66f3d9c041f","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":462}
+{"timestamp":"2026-11-04T17:01:17.919281+00:00","event":"http.response","request_id":"af53760c-c53c-47d3-95dd-64a9f177bf0c","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":539}
+{"timestamp":"2026-11-04T17:01:18.635269+00:00","event":"http.response","request_id":"ca8bb0ee-6261-427b-aa3a-bcf4cd98719b","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":706}
+ok
+test_file_and_required_field_errors_keep_source_and_cancel (apps.documents.test_contextual_association.ContextualAssociationTests.test_file_and_required_field_errors_keep_source_and_cancel) ... {"timestamp":"2026-11-04T17:01:19.316187+00:00","event":"http.response","request_id":"a0e24e8e-7035-409c-928a-19830312909b","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":597}
+ERROR
+test_foreign_targets_and_unsafe_navigation_are_denied (apps.documents.test_contextual_association.ContextualAssociationTests.test_foreign_targets_and_unsafe_navigation_are_denied) ... {"timestamp":"2026-11-04T17:01:19.745989+00:00","event":"http.response","request_id":"b8d2417f-b3ab-46de-a927-29a1a0205169","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":342}
+{"timestamp":"2026-11-04T17:01:19.971525+00:00","event":"http.response","request_id":"cd835558-faa8-417d-b918-4fbfeac4dd9a","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":224}
+{"timestamp":"2026-11-04T17:01:20.158525+00:00","event":"http.response","request_id":"a108072a-25ca-42ec-a61d-a5e9797ceaee","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":185}
+{"timestamp":"2026-11-04T17:01:20.375964+00:00","event":"http.response","request_id":"b86b0790-b5a4-470f-934f-4f775511e774","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":217}
+{"timestamp":"2026-11-04T17:01:20.630573+00:00","event":"http.response","request_id":"062c721d-54c0-44e7-8951-896023f2f6b1","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":254}
+{"timestamp":"2026-11-04T17:01:20.793695+00:00","event":"http.response","request_id":"06f0f19f-f42d-4bd5-bb62-27176bc29553","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":162}
+{"timestamp":"2026-11-04T17:01:20.939808+00:00","event":"http.response","request_id":"52a1f9c2-ea87-41e3-ad76-29ca9a42ea98","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":145}
+{"timestamp":"2026-11-04T17:01:21.098364+00:00","event":"http.response","request_id":"e3fc812a-f1a2-4df7-b15b-f9a8a6089bcf","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":158}
+{"timestamp":"2026-11-04T17:01:21.297851+00:00","event":"http.response","request_id":"34a82e87-ed48-41d9-a709-ac6e469cebba","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":198}
+{"timestamp":"2026-11-04T17:01:21.474885+00:00","event":"http.response","request_id":"8600e4bd-6a4b-4c67-ab3c-9c1d903ed660","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":176}
+{"timestamp":"2026-11-04T17:01:21.649307+00:00","event":"http.response","request_id":"960a7603-54c8-4166-83c0-78bdd1a549e7","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":173}
+{"timestamp":"2026-11-04T17:01:21.804250+00:00","event":"http.response","request_id":"4d195ed7-74ff-41a5-ab9c-373f05949a47","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":154}
+ok
+test_forged_target_token_and_additional_relationships_are_rejected (apps.documents.test_contextual_association.ContextualAssociationTests.test_forged_target_token_and_additional_relationships_are_rejected) ... {"timestamp":"2026-11-04T17:01:22.403079+00:00","event":"http.response","request_id":"4a27a258-b23a-4f5f-8d92-7928976c97fd","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":544}
+{"timestamp":"2026-11-04T17:01:22.816481+00:00","event":"http.response","request_id":"4bde06f7-e4a3-4569-9730-657197661da7","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":403}
+{"timestamp":"2026-11-04T17:01:23.204318+00:00","event":"http.response","request_id":"ecd3750d-f2ba-4198-b96a-e414cea65f2f","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":386}
+{"timestamp":"2026-11-04T17:01:23.545654+00:00","event":"http.response","request_id":"e4edc669-9f46-44e9-892f-10565ce1efc0","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":339}
+{"timestamp":"2026-11-04T17:01:23.933686+00:00","event":"http.response","request_id":"3d5ca8f7-68c2-483b-886f-c1f728dcfbb4","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":387}
+{"timestamp":"2026-11-04T17:01:24.405921+00:00","event":"http.response","request_id":"18f85ef6-fdb3-41b8-b51b-884dbb95be5a","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":470}
+{"timestamp":"2026-11-04T17:01:24.800540+00:00","event":"http.response","request_id":"70044c3f-0156-4551-9092-cbed57c737a8","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":392}
+{"timestamp":"2026-11-04T17:01:25.196761+00:00","event":"http.response","request_id":"9291b02b-f71a-4c4a-9719-0a210ff075ec","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":395}
+ok
+test_link_rollback_preserves_typed_legacy_atomicity (apps.documents.test_contextual_association.ContextualAssociationTests.test_link_rollback_preserves_typed_legacy_atomicity) ... {"timestamp":"2026-11-04T17:01:26.420116+00:00","event":"http.response","request_id":"07df42fc-b648-48b3-8c0c-5a1d08c92e9d","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1021}
+{"timestamp":"2026-11-04T17:01:28.287602+00:00","event":"http.response","request_id":"67afd31d-b80a-45ea-821a-b4793fa06a4a","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1862}
+ok
+test_picker_search_excludes_duplicates_and_foreign_documents (apps.documents.test_contextual_association.ContextualAssociationTests.test_picker_search_excludes_duplicates_and_foreign_documents) ... {"timestamp":"2026-11-04T17:01:29.167470+00:00","event":"http.response","request_id":"064f143b-6513-4cfd-9a9d-f97412f56cee","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":590}
+{"timestamp":"2026-11-04T17:01:29.746331+00:00","event":"http.response","request_id":"8098197c-d56d-4d07-9ae3-a0fb4eaaf587","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":578}
+{"timestamp":"2026-11-04T17:01:30.762753+00:00","event":"http.response","request_id":"dbae1c48-5ae5-45f7-a3a7-583a13b477ae","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1016}
+{"timestamp":"2026-11-04T17:01:31.859681+00:00","event":"http.response","request_id":"dd5b9001-09ad-4989-a3e0-e33f02418e35","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1092}
+ok
+test_project_and_site_scope_are_rechecked (apps.documents.test_contextual_association.ContextualAssociationTests.test_project_and_site_scope_are_rechecked) ... ERROR
+test_stale_compatibility_mapping_cannot_be_selected (apps.documents.test_contextual_association.ContextualAssociationTests.test_stale_compatibility_mapping_cannot_be_selected) ... {"timestamp":"2026-11-04T17:01:32.756771+00:00","event":"http.response","request_id":"4b3dcad5-6667-4016-9dc4-95f74bde47d3","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":616}
+{"timestamp":"2026-11-04T17:01:33.798502+00:00","event":"http.response","request_id":"6f31f1a8-dca7-401f-b6ae-2ba1dabeae97","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1040}
+{"timestamp":"2026-11-04T17:01:34.876041+00:00","event":"http.response","request_id":"07d17cc0-f28b-4040-ab1d-2aaa6690701d","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1074}
+ok
+test_upload_only_persona_cannot_read_picker_or_contextual_forms (apps.documents.test_contextual_association.ContextualAssociationTests.test_upload_only_persona_cannot_read_picker_or_contextual_forms) ... {"timestamp":"2026-11-04T17:01:34.983068+00:00","event":"http.response","request_id":"65c28582-7a87-4312-bfd2-9556f2895589","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":38}
+{"timestamp":"2026-11-04T17:01:35.024002+00:00","event":"http.response","request_id":"95783043-6ddb-4865-9d87-3c5d623e78ae","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":40}
+{"timestamp":"2026-11-04T17:01:35.068444+00:00","event":"http.response","request_id":"ff9d1b6e-b47a-4d2e-9e0d-6677fd033734","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":44}
+ok
+test_upload_rollback_removes_only_the_new_binary (apps.documents.test_contextual_association.ContextualAssociationTests.test_upload_rollback_removes_only_the_new_binary) ... {"timestamp":"2026-11-04T17:01:35.512303+00:00","event":"http.response","request_id":"5e2d6067-db1f-4425-8dbf-cffa2e3fd2c4","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":395}
+{"timestamp":"2026-11-04T17:01:36.048687+00:00","event":"http.response","request_id":"1836ddfd-a9b9-434f-af32-594d70226306","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":530}
+ok
+test_viewer_has_no_contextual_mutation_actions_or_endpoints (apps.documents.test_contextual_association.ContextualAssociationTests.test_viewer_has_no_contextual_mutation_actions_or_endpoints) ... {"timestamp":"2026-11-04T17:01:36.222492+00:00","event":"http.response","request_id":"75fc7758-60e0-431c-85a1-4d692f572d91","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":48}
+{"timestamp":"2026-11-04T17:01:36.274729+00:00","event":"http.response","request_id":"a423f529-64b2-467e-88b6-1fa4019a89f6","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":51}
+{"timestamp":"2026-11-04T17:01:36.339266+00:00","event":"http.response","request_id":"a5f6ebe8-31e6-47f5-a9bf-e55aeda60638","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":63}
+ok
+
+======================================================================
+ERROR: test_file_and_required_field_errors_keep_source_and_cancel (apps.documents.test_contextual_association.ContextualAssociationTests.test_file_and_required_field_errors_keep_source_and_cancel)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 183, in test_file_and_required_field_errors_keep_source_and_cancel
+    source = response.context["association_context"].source
+             ^^^^^^^^
+NameError: name 'response' is not defined
+
+======================================================================
+ERROR: test_project_and_site_scope_are_rechecked (apps.documents.test_contextual_association.ContextualAssociationTests.test_project_and_site_scope_are_rechecked)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 343, in test_project_and_site_scope_are_rechecked
+    self.assertFalse(panel.upload_url)
+                     ^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'upload_url'
+
+======================================================================
+FAIL: test_candidate_pages_search_and_selected_value_retention (apps.documents.test_contextual_association.ContextualAssociationTests.test_candidate_pages_search_and_selected_value_retention)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 492, in test_candidate_pages_search_and_selected_value_retention
+    self.assertEqual([row["value"] for row in found], [str(document.pk)])
+AssertionError: Lists differ: ['ea1f6c96-75f5-450d-8bb1-fe6f0d31e266', '526fcad6-23ad-46e5-ac36-932ce2d0d578'] != ['526fcad6-23ad-46e5-ac36-932ce2d0d578']
+
+First differing element 0:
+'ea1f6c96-75f5-450d-8bb1-fe6f0d31e266'
+'526fcad6-23ad-46e5-ac36-932ce2d0d578'
+
+First list contains 1 additional elements.
+First extra element 1:
+'526fcad6-23ad-46e5-ac36-932ce2d0d578'
+
+- ['ea1f6c96-75f5-450d-8bb1-fe6f0d31e266', '526fcad6-23ad-46e5-ac36-932ce2d0d578']
++ ['526fcad6-23ad-46e5-ac36-932ce2d0d578']
+
+----------------------------------------------------------------------
+Ran 19 tests in 78.793s
+
+FAILED (failures=1, errors=2)
+Preserving test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+

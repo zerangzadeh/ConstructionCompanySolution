@@ -1,0 +1,14 @@
+{% load erp_format %}
+{% if related_documents != None %}
+<section id="related-documents" class="erp-surface erp-related-documents" aria-labelledby="related-documents-heading" tabindex="-1">
+  <div class="erp-panel-header erp-related-documents-header"><h2 id="related-documents-heading">{% include "components/form_icon.html" with icon="document" only %}اسناد مرتبط <span class="erp-related-documents-count">{{ related_documents.count|erp_number }}</span></h2><p>اسناد قابل مشاهده مرتبط با این {{ source_label }}</p></div>
+  {% if related_documents.upload_url or related_documents.link_url %}<div class="erp-related-documents-context-actions" aria-label="افزودن سند مرتبط">
+    {% if related_documents.upload_url %}<a class="erp-btn erp-btn--secondary" href="{{ related_documents.upload_url }}">{% include "components/form_icon.html" with icon="document" only %}بارگذاری سند جدید</a>{% endif %}
+    {% if related_documents.link_url %}<a class="erp-btn erp-btn--secondary" href="{{ related_documents.link_url }}">{% include "components/form_icon.html" with icon="document" only %}پیوند سند موجود</a>{% endif %}
+  </div>{% endif %}
+  {% if related_documents.count %}
+    {% include "components/related_document_rows.html" with rows=related_documents.first_rows only %}
+    {% if related_documents.remaining_rows %}<details class="erp-related-documents-more"><summary>نمایش {{ related_documents.remaining_rows|length|erp_number }} سند دیگر</summary>{% include "components/related_document_rows.html" with rows=related_documents.remaining_rows only %}</details>{% endif %}
+  {% else %}<p class="erp-related-documents-empty" role="status">سند مرتبط قابل مشاهده‌ای برای این {{ source_label }} وجود ندارد.</p>{% endif %}
+</section>
+{% endif %}

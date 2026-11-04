@@ -68,6 +68,7 @@ def expense_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
+    scoped_has_records = expenses.exists()
     expenses = apply_table_filters(
         expenses,
         request,
@@ -146,6 +147,8 @@ def expense_list(request: HttpRequest) -> HttpResponse:
         "expenses/list.html",
         {
             "expenses": page.object_list,
+            "scoped_has_records": scoped_has_records,
+            "list_profile": "expenses",
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(

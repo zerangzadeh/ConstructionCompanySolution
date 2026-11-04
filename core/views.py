@@ -12,6 +12,7 @@ from django.views.decorators.http import require_GET
 from apps.organizations.decorators import active_organization_required
 from apps.organizations.services import get_valid_memberships
 from core.home import authorized_home_links
+from core.home_workspace import build_home_workspace
 from core.product_surface import NAVIGATION_GROUPS, NavigationGroup
 from core.search import search_active_organization
 
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 @require_GET
 @never_cache
 def home(request: HttpRequest) -> HttpResponse:
-    """Present authorized destinations without querying domain business facts."""
+    """Present a read-only workspace under the existing source selectors."""
 
     if getattr(request, "organization_access_denied", False):
         return render(request, "home.html", {"home_state": "unauthorized"}, status=403)
@@ -37,6 +38,12 @@ def home(request: HttpRequest) -> HttpResponse:
     try:
         workspaces, assigned_work, alerts = authorized_home_links(
             user=request.user, organization=organization
+        )
+        workspace = build_home_workspace(
+            user=request.user,
+            organization=organization,
+            links=workspaces,
+            assigned_work=assigned_work,
         )
     except PermissionDenied:
         return render(request, "home.html", {"home_state": "unauthorized"}, status=403)
@@ -67,6 +74,7 @@ def home(request: HttpRequest) -> HttpResponse:
             "home_assigned_work": assigned_work,
             "home_alerts": alerts,
             "home_groups": groups,
+            "workspace": workspace,
         },
     )
 

@@ -1,0 +1,2 @@
+{% load erp_format %}
+{% if related_documents != None %}<a class="erp-related-documents-nav" href="#related-documents" data-related-documents-nav>{% include "components/form_icon.html" with icon="document" only %}<span>اسناد مرتبط</span><span class="erp-related-documents-count">{{ related_documents.count|erp_number }}</span></a>{% endif %}

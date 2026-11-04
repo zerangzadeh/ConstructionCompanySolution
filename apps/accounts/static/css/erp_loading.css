@@ -1,0 +1,45 @@
+/* Absolute positioning reserves no space and follows the existing sticky header. */
+:root { --bonira-royal-blue: #1563D6; }
+.erp-global-loading {
+    position: absolute;
+    /* The shared header has a 1px bottom border outside its padding box. */
+    inset-block-start: calc(100% + 1px);
+    inset-inline: 0;
+    height: 3px;
+    overflow: hidden;
+    pointer-events: none;
+}
+.erp-global-loading[hidden] { display: none; }
+.erp-global-loading__bar {
+    display: block;
+    height: 100%;
+    background: var(--bonira-royal-blue);
+    transform-origin: right;
+    transition: transform 180ms ease-out;
+}
+[dir="ltr"] .erp-global-loading__bar { transform-origin: left; }
+.erp-global-loading[data-mode="indeterminate"] .erp-global-loading__bar {
+    width: 30%;
+    animation: erp-global-loading 1.6s ease-in-out infinite;
+}
+[dir="ltr"] .erp-global-loading[data-mode="indeterminate"] .erp-global-loading__bar {
+    animation-direction: reverse;
+}
+.erp-global-loading[data-state="complete"] .erp-global-loading__bar {
+    width: 100%;
+    animation: none;
+    transform: scaleX(1) !important;
+}
+@keyframes erp-global-loading {
+    from { transform: translateX(110%); }
+    to { transform: translateX(-340%); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .erp-global-loading__bar { transition: none; }
+    .erp-global-loading[data-mode="indeterminate"] .erp-global-loading__bar {
+        animation: none;
+        width: 100%;
+        opacity: .65;
+    }
+}
+@media print { .erp-global-loading { display: none !important; } }

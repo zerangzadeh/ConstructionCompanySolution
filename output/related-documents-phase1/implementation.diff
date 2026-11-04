@@ -1,0 +1,1025 @@
+--- before/templates/projects/detail.html
++++ after/templates/projects/detail.html
+@@ -1,8 +1,9 @@
+-{% extends "base.html" %}{% load static erp_format product_surface %}
++{% extends "base.html" %}{% load static erp_format product_surface related_documents %}
+ {% block title %}{{ project.name }} | مرکز کنترل پروژه{% endblock %}
+-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}?v=20261103-projects"><link rel="stylesheet" href="{% static 'projects/workspace.css' %}?v=20261103">{% endblock %}
++{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}?v=20261103-projects"><link rel="stylesheet" href="{% static 'projects/workspace.css' %}?v=20261103"><link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% endblock %}
+ {% block working_context %}{% endblock %}
+ {% block content %}
++{% related_documents project as related_documents %}
+ <div class="erp-command-center erp-reference-list">
+     {% url 'projects:list' as list_url %}{% breadcrumb_trail project.name 'پروژه‌ها' list_url as breadcrumbs %}
+     {% include "components/breadcrumbs.html" with page_breadcrumbs=breadcrumbs only %}
+@@ -10,7 +11,7 @@
+         <div class="erp-project-heading__copy"><span class="erp-project-heading__icon">{% include "components/form_icon.html" with icon="layers" only %}</span><div class="erp-project-heading__identity"><h1>{{ project.name }}</h1>{% include "components/status_badge.html" with status=project.status label=project.get_status_display only %}</div><div class="erp-project-meta"><span>مرکز کنترل پروژه</span><bdi dir="ltr">{{ project.code }}</bdi><span>{{ request.organization.name }}</span><span>شروع: <bdi dir="ltr">{{ project.start_date|jalali_date|default:"—" }}</bdi></span><span>پایان: <bdi dir="ltr">{{ project.end_date|jalali_date|default:"—" }}</bdi></span></div></div>
+         <a class="erp-btn erp-btn--secondary" href="{{ list_url }}">همه پروژه‌ها ←</a>
+     </header>
+-    <nav class="erp-project-tabs" aria-label="بخش‌های پروژه"><a class="is-current" href="#overview" aria-current="location">داشبورد</a><a href="#information">اطلاعات اصلی</a>{% if dashboard.can_controls %}<a href="#progress">برنامه و پیشرفت</a>{% endif %}{% for item in commercial_summary %}<a href="{{ item.list_url }}">{{ item.label }}</a>{% endfor %}{% for link in dashboard.quick_links %}{% if link.label == "کارگاه‌ها" %}<a href="{{ link.url }}">کارگاه‌ها</a>{% endif %}{% endfor %}{% if cost_projection %}<a href="#costs">هزینه‌ها</a>{% endif %}<a href="#recent">آخرین ثبت‌ها</a>{% for link in dashboard.quick_links %}{% if link.label == 'اسناد و گالری' %}<a href="{{ link.url }}">اسناد و گالری</a>{% endif %}{% endfor %}</nav>
++    <nav class="erp-project-tabs" aria-label="بخش‌های پروژه"><a class="is-current" href="#overview" aria-current="location">داشبورد</a><a href="#information">اطلاعات اصلی</a>{% if dashboard.can_controls %}<a href="#progress">برنامه و پیشرفت</a>{% endif %}{% for item in commercial_summary %}<a href="{{ item.list_url }}">{{ item.label }}</a>{% endfor %}{% for link in dashboard.quick_links %}{% if link.label == "کارگاه‌ها" %}<a href="{{ link.url }}">کارگاه‌ها</a>{% endif %}{% endfor %}{% if cost_projection %}<a href="#costs">هزینه‌ها</a>{% endif %}<a href="#recent">آخرین ثبت‌ها</a>{% include "components/related_documents_nav.html" %}{% for link in dashboard.quick_links %}{% if link.label == 'اسناد و گالری' %}<a href="{{ link.url }}">گالری تصاویر</a>{% endif %}{% endfor %}</nav>
+     <section id="overview" class="erp-project-kpis" aria-label="شاخص‌های پروژه">
+         {% for kpi in dashboard.kpis %}<article data-kpi-tone="{{ kpi.tone }}"><div class="erp-project-kpi-label">{% include "components/form_icon.html" with icon=kpi.icon only %}<p>{{ kpi.label }}</p></div><div class="erp-project-kpi-value"><bdi dir="ltr">{{ kpi.value|erp_number|default_if_none:"—" }}</bdi><span>{{ kpi.unit }}</span></div><small>{{ kpi.note }}</small>{% if kpi.url %}<a href="{{ kpi.url }}" aria-label="مشاهده {{ kpi.label }}">مشاهده ←</a>{% endif %}</article>{% endfor %}
+     </section>
+@@ -27,8 +28,9 @@
+     <div class="erp-project-operations">
+         {% include "projects/commercial_summary.html" %}
+         <section id="recent" class="erp-project-panel erp-project-recent"><div class="erp-project-section-heading">{% include "components/form_icon.html" with icon="clock" only %}<h2>آخرین موارد ثبت‌شده</h2><p>آخرین سوابق قابل مشاهده؛ به ترتیب زمان ثبت</p></div><ul>{% for item in dashboard.recent %}<li><div><span class="erp-project-record-kind">{{ item.kind }}</span><a href="{{ item.url }}">{{ item.title }}</a><time>{{ item.date|jalali_datetime }}</time></div>{% include "components/status_badge.html" with status=item.status label=item.status_label only %}</li>{% empty %}<li class="erp-project-note">هنوز مورد قابل مشاهده‌ای برای نمایش وجود ندارد.</li>{% endfor %}</ul></section>
+-        {% if dashboard.quick_links %}<section class="erp-project-panel"><div class="erp-project-section-heading">{% include "components/form_icon.html" with icon="bolt" only %}<h2>دسترسی سریع</h2><p>عملیات همین پروژه در محدوده دسترسی شما</p></div><div class="erp-project-quick">{% for link in dashboard.quick_links %}<a href="{{ link.url }}">{% if link.label == "کارگاه‌ها" %}{% include "components/form_icon.html" with icon="hard-hat" only %}{% elif link.label == "اسناد و گالری" %}{% include "components/form_icon.html" with icon="notes" only %}{% elif link.label == "حضور و کارکرد" %}{% include "components/form_icon.html" with icon="clock" only %}{% else %}{% include "components/form_icon.html" with icon="document" only %}{% endif %}{{ link.label }} <span aria-hidden="true">←</span></a>{% endfor %}</div></section>{% endif %}
++        {% if dashboard.quick_links %}<section class="erp-project-panel"><div class="erp-project-section-heading">{% include "components/form_icon.html" with icon="bolt" only %}<h2>دسترسی سریع</h2><p>عملیات همین پروژه در محدوده دسترسی شما</p></div><div class="erp-project-quick">{% for link in dashboard.quick_links %}<a href="{{ link.url }}">{% if link.label == "کارگاه‌ها" %}{% include "components/form_icon.html" with icon="hard-hat" only %}{% elif link.label == "اسناد و گالری" %}{% include "components/form_icon.html" with icon="notes" only %}{% elif link.label == "حضور و کارکرد" %}{% include "components/form_icon.html" with icon="clock" only %}{% else %}{% include "components/form_icon.html" with icon="document" only %}{% endif %}{% if link.label == "اسناد و گالری" %}گالری تصاویر{% else %}{{ link.label }}{% endif %} <span aria-hidden="true">←</span></a>{% endfor %}</div></section>{% endif %}
+     </div>
++    {% include "components/related_documents.html" with source_label="پروژه" %}
+     <section id="information" class="erp-project-panel erp-project-information"><div class="erp-project-section-heading">{% include "components/form_icon.html" with icon="notes" only %}<h2>اطلاعات اصلی</h2><p>مشخصات و بودجه‌های ثبت‌شده پروژه</p></div><dl><div><dt>کد پروژه</dt><dd><bdi dir="ltr">{{ project.code }}</bdi></dd></div><div><dt>شرکت</dt><dd>{{ request.organization.name }}</dd></div><div><dt>تاریخ شروع</dt><dd><bdi dir="ltr">{{ project.start_date|jalali_date|default:"—" }}</bdi></dd></div><div><dt>تاریخ پایان</dt><dd><bdi dir="ltr">{{ project.end_date|jalali_date|default:"—" }}</bdi></dd></div><div><dt>بودجه تخمینی</dt><dd><bdi dir="ltr">{{ project.estimated_budget|erp_number }}</bdi> {{ request.organization.currency }}</dd></div><div><dt>بودجه واقعی</dt><dd><bdi dir="ltr">{{ project.actual_budget|erp_number }}</bdi> {{ request.organization.currency }}</dd></div></dl><div id="description"><h3>توضیحات</h3><p>{{ project.description|default:"توضیحی برای این پروژه ثبت نشده است."|linebreaksbr }}</p></div>    {% if dashboard.can_controls %}<section id="progress" class="erp-project-progress"><div><h2>برنامه و پیشرفت</h2><p>پیشرفت برنامه‌ای و واقعی قابل اتکای پروژه ثبت نشده است؛ نمودار پیشرفت ارائه نمی‌شود.</p></div><a href="{% url 'projects:controls' project.pk %}">ساختار شکست و فعالیت‌ها ←</a></section>{% endif %}{% if dashboard.can_archive %}<form id="management" method="post" action="{% url 'projects:archive' project.pk %}">{% csrf_token %}<button class="erp-project-archive" type="submit">بایگانی پروژه</button></form>{% endif %}</section>
+     {{ dashboard.charts|json_script:"project-dashboard-data" }}
+ </div>
+--- before/templates/contracts/detail.html
++++ after/templates/contracts/detail.html
+@@ -1,8 +1,9 @@
+-{% extends "base.html" %}{% load static erp_format product_surface %}
++{% extends "base.html" %}{% load static erp_format product_surface related_documents %}
+ {% block title %}{{ contract.contract_number }} | جزئیات قرارداد{% endblock %}
+-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}"><link rel="stylesheet" href="{% static 'contracts/detail.css' %}?v=20261102-quantities-2">{% endblock %}
++{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}"><link rel="stylesheet" href="{% static 'contracts/detail.css' %}?v=20261102-quantities-2"><link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% endblock %}
+ {% block working_context %}{% endblock %}
+ {% block content %}
++{% related_documents contract as related_documents %}
+ <div class="contract-detail" dir="rtl" id="overview" data-contract-state="{{ contract.status }}">
+     {% include "components/breadcrumbs.html" with page_breadcrumbs=page_breadcrumbs only %}
+     <header class="cd-heading">
+@@ -18,7 +19,7 @@
+         <div>{% include "contracts/detail_icon.html" with icon="calendar" only %}<span>تاریخ شروع</span><strong><bdi dir="ltr">{{ contract.start_date|jalali_date|default:"—" }}</bdi></strong></div>
+         <div>{% include "contracts/detail_icon.html" with icon="calendar" only %}<span>تاریخ پایان</span><strong><bdi dir="ltr">{{ contract.end_date|jalali_date|default:"—" }}</bdi></strong></div>
+     </section>
+-    {% if not workspace.is_draft or hub.quantities %}{% include "contracts/hub_navigation.html" %}{% endif %}
++    {% if not workspace.is_draft or hub.quantities %}{% include "contracts/hub_navigation.html" %}{% elif related_documents != None %}<nav class="cd-journey" aria-label="اسناد قرارداد">{% include "components/related_documents_nav.html" %}</nav>{% endif %}
+     {% if hub.quantities %}
+       {% include "contracts/hub_quantities.html" %}
+     {% else %}
+@@ -46,6 +47,7 @@
+     <section id="items" class="erp-surface mt-5 overflow-hidden rounded-xl"><div class="erp-panel-header"><h2 class="text-sm font-semibold text-slate-900">ردیف‌های قرارداد</h2><span class="text-xs text-slate-500">{{ contract.items.all|length }} ردیف</span></div>{% if contract.items.all %}<div class="erp-table-wrap"><table class="w-full min-w-[640px] text-right text-sm"><thead><tr><th class="border-b border-slate-200 px-4 py-3">شرح</th><th class="border-b border-slate-200 px-4 py-3">مقدار</th><th class="border-b border-slate-200 px-4 py-3 text-left">قیمت واحد</th><th class="border-b border-slate-200 px-4 py-3 text-left">جمع</th></tr></thead><tbody class="divide-y divide-slate-100">{% for item in contract.items.all %}<tr><td class="px-4 py-3 text-slate-900">{{ item.description }}</td><td class="px-4 py-3 text-slate-600">{{ item.quantity|erp_number }} {{ item.unit_of_measure.symbol|default:item.unit }}</td><td class="px-4 py-3 text-left tabular-nums" dir="ltr">{{ item.unit_price|erp_number }}</td><td class="px-4 py-3 text-left font-semibold tabular-nums" dir="ltr">{{ item.line_total|erp_number }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="cd-empty-note">هنوز ردیفی ثبت نشده است.{% if workspace.can_add_item %} ردیف‌های قرارداد را در فرم زیر وارد کنید.{% endif %}</p>{% endif %}{% if workspace.item_form %}{% include "contracts/detail_item_editor.html" %}{% endif %}</section>
+     {% endif %}
+     {% endif %}
++{% include "components/related_documents.html" with source_label="قرارداد" %}
+ {{ dashboard.chart_rows|json_script:"contract-financial-data" }}
+ </div>
+ {% endblock %}
+--- before/templates/contracts/hub_navigation.html
++++ after/templates/contracts/hub_navigation.html
+@@ -5,5 +5,6 @@
+   {% if workspace.show_progress or workspace.show_financial %}<a href="{{ hub.root }}#progress">{% include "contracts/detail_icon.html" with icon="target" only %}وضعیت پیشرفت</a>{% endif %}
+   {% if dashboard.show_estimates %}<a href="{{ hub.root }}#estimates">{% include "contracts/detail_icon.html" with icon="layers" only %}برآوردها</a>{% endif %}
+   {% if workspace.supports_terms or term_versions or contract.amendments.all %}<a href="{{ hub.root }}#terms">{% include "contracts/detail_icon.html" with icon="document" only %}شرایط و تغییرات قرارداد</a>{% endif %}
++  {% include "components/related_documents_nav.html" %}
+   <a href="{{ hub.root }}#recent">{% include "contracts/detail_icon.html" with icon="history" only %}سوابق و فعالیت‌ها</a>
+ </nav>
+--- before/templates/estimates/detail.html
++++ after/templates/estimates/detail.html
+@@ -1,8 +1,9 @@
+-{% extends "base.html" %}{% load static erp_format field_journey product_surface %}
++{% extends "base.html" %}{% load static erp_format field_journey product_surface related_documents %}
+ {% block title %}{{ estimate.title }} | جزئیات برآورد{% endblock %}
+-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}"><link rel="stylesheet" href="{% static 'estimates/detail.css' %}">{% prepare_native_choices item_form %}{{ item_form.media.css }}{% endblock %}
++{% block extra_head %}<link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}"><link rel="stylesheet" href="{% static 'estimates/detail.css' %}"><link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% prepare_native_choices item_form %}{{ item_form.media.css }}{% endblock %}
+ {% block extra_scripts %}{{ item_form.media.js }}{% endblock %}
+ {% block content %}
++{% related_documents estimate as related_documents %}
+ <div class="estimate-detail" dir="rtl" data-estimate-state="{{ estimate.status }}">
+     {% include "components/breadcrumbs.html" with page_breadcrumbs=page_breadcrumbs only %}
+     {% with current_items=estimate.current_revision.items.all total_amount=estimate.total_amount %}
+@@ -33,6 +34,7 @@
+             {% endif %}
+         </div>
+     </header>
++    {% if related_documents != None %}<nav class="erp-related-documents-shortcut" aria-label="اسناد برآورد">{% include "components/related_documents_nav.html" %}</nav>{% endif %}
+     {% if not estimate.contract_id %}<p class="ed-contract-note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-11v2"/></svg>این برآورد به قراردادی متصل نشده است.</p>{% endif %}
+     {% if estimate.status == "approved" %}<p class="ed-state-note" role="status">این برآورد تأیید شده و امکان افزودن یا ویرایش ردیف‌ها وجود ندارد.</p>
+     {% elif estimate.status == "revised" %}<p class="ed-state-note" role="status">این برآورد بازنگری شده است؛ افزودن ردیف فقط در وضعیت پیش‌نویس امکان‌پذیر است.</p>
+@@ -55,6 +57,7 @@
+             {% if estimate.contract %}<div><dt>قرارداد مرتبط با این برآورد</dt><dd>{% if related_contract_url and related_contract_url|surface_url_exposed %}<a href="{{ related_contract_url }}">{{ estimate.contract.title }} · <bdi dir="ltr">{{ estimate.contract.contract_number }}</bdi></a>{% else %}<bdi dir="ltr">{{ estimate.contract.contract_number }}</bdi>{% endif %}</dd></div>{% endif %}
+         </dl>
+     </section>
++    {% include "components/related_documents.html" with source_label="برآورد" %}
+     <section class="ed-panel ed-items" aria-labelledby="estimate-items-heading">
+         <h2 class="ed-panel-heading" id="estimate-items-heading">{% include "contracts/detail_icon.html" with icon="layers" only %}اقلام برآورد</h2>
+         <p class="ed-table-hint sm:hidden">برای مشاهده همه ستون‌ها، جدول را افقی حرکت دهید.</p>
+--- before/templates/expenses/detail.html
++++ after/templates/expenses/detail.html
+@@ -1,6 +1,8 @@
+-{% extends "base.html" %}{% load erp_format %}
++{% extends "base.html" %}{% load static erp_format related_documents %}
+ {% block title %}جزئیات هزینه | سامانه مدیریت ساخت{% endblock %}
++{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% endblock %}
+ {% block content %}
++{% related_documents expense as related_documents %}
+ <div class="mx-auto max-w-5xl">
+   <a class="text-sm font-semibold text-blue-700" href="{% url 'expenses:list' %}">بازگشت به هزینه‌ها</a>
+   <section class="erp-surface mt-4 rounded-xl p-6">
+@@ -8,13 +10,15 @@
+       <div><p class="text-xs text-slate-500">{{ expense.source_reference }}</p><h1 class="mt-1 text-2xl font-bold">{{ expense.description }}</h1><p class="mt-2 text-sm text-slate-600">{{ expense.project.name }} · {{ expense.get_classification_display }}</p></div>
+       <div class="text-left"><p class="text-xl font-bold" dir="ltr">{{ expense.amount|erp_number }} {{ request.organization.currency }}</p><span class="mt-2 inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold">{{ expense.get_status_display }}</span></div>
+     </div>
+-    <div class="mt-5 flex flex-wrap gap-2 border-t pt-5">
++    <div class="mt-5 flex flex-wrap items-center gap-2 border-t pt-5">
++      {% include "components/related_documents_nav.html" %}
+       {% if expense.status == "draft" or expense.status == "returned" %}{% if "expenses.submit" in business_permission_codes %}<form method="post" action="{% url 'expenses:submit' expense.pk %}">{% csrf_token %}<button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">ارسال برای تأیید</button></form>{% endif %}{% endif %}
+       {% if expense.status == "submitted" %}{% if "expenses.approve" in business_permission_codes %}<form method="post" action="{% url 'expenses:approve' expense.pk %}">{% csrf_token %}<button class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white">تأیید مستقل</button></form>{% endif %}{% endif %}
+       {% if expense.status != "void" and "expenses.void" in business_permission_codes %}<form class="flex gap-2" method="post" action="{% url 'expenses:void' expense.pk %}">{% csrf_token %}<input name="reason" required placeholder="دلیل ابطال"><button class="rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-700">ابطال</button></form>{% endif %}
+     </div>
+     {% if expense.status == "submitted" and "expenses.return" in business_permission_codes %}<form class="mt-4 flex gap-2" method="post" action="{% url 'expenses:return' expense.pk %}">{% csrf_token %}<input class="flex-1" name="reason" required placeholder="دلیل بازگشت برای اصلاح"><button class="rounded-lg border px-4 py-2 text-sm font-semibold">بازگردانی</button></form>{% endif %}
+   </section>
++  {% include "components/related_documents.html" with source_label="هزینه" %}
+   <section class="erp-surface mt-6 rounded-xl p-6">
+     <h2 class="text-lg font-bold">تخصیص و کدگذاری</h2>
+     <div class="mt-4 space-y-2">{% for allocation in expense.allocations.all %}<div class="rounded-lg bg-slate-50 p-3 text-sm"><span dir="ltr">{{ allocation.amount|erp_number }}</span> · {{ allocation.project.name }} · WBS {{ allocation.wbs_node.code }} · CBS {{ allocation.cbs_node.code }}{% if allocation.cost_center %} · {{ allocation.cost_center.code }}{% endif %}</div>{% empty %}<p class="text-sm text-slate-500">هنوز تخصیصی ثبت نشده است.</p>{% endfor %}</div>
+--- before/templates/daily_reports/detail.html
++++ after/templates/daily_reports/detail.html
+@@ -1,8 +1,10 @@
+-{% extends "base.html" %}{% load erp_format %}
++{% extends "base.html" %}{% load static erp_format related_documents %}
+ 
+ {% block title %}گزارش روزانه | سامانه مدیریت ساخت{% endblock %}
+ 
++{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% endblock %}
+ {% block content %}
++{% related_documents report as related_documents %}
+ {% include "components/print_action.html" %}
+ {% load field_journey %}
+ {% field_journey report.project report.site %}
+@@ -11,10 +13,11 @@
+ {% include "components/breadcrumbs.html" with page_breadcrumb_label="گزارش‌های روزانه" page_breadcrumb_url=breadcrumb_parent_url page_title=report.reporting_date only %}
+         <div class="mt-5 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+             <div class="min-w-0"><p class="truncate text-sm font-medium text-blue-600">{{ report.project.name }} · {{ report.site.name }}{% if report.phase %} · {{ report.phase.name }}{% endif %}</p><h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">گزارش روزانه <span class="text-slate-400" aria-hidden="true">·</span> <span dir="ltr" class="inline-block">{{ report.reporting_date }}</span></h1><p class="mt-1 text-sm text-slate-500">نویسنده: <span class="inline-block" dir="ltr">{{ report.created_by.username|default:"—" }}</span> · {{ request.organization.name }}</p></div>
+-            <div class="flex flex-wrap items-center gap-3">{% if report.status == "approved" %}<span class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">تأییدشده</span>{% elif report.status == "submitted" %}<span class="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">ارسال‌شده</span>{% else %}<span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">پیش‌نویس</span>{% endif %}<a class="text-sm font-semibold text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="{% url 'daily_reports:list' %}">بازگشت به گزارش‌ها</a></div>
++            <div class="flex flex-wrap items-center gap-3">{% include "components/related_documents_nav.html" %}{% if report.status == "approved" %}<span class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">تأییدشده</span>{% elif report.status == "submitted" %}<span class="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">ارسال‌شده</span>{% else %}<span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">پیش‌نویس</span>{% endif %}<a class="text-sm font-semibold text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="{% url 'daily_reports:list' %}">بازگشت به گزارش‌ها</a></div>
+         </div>
+         <div class="mt-6 grid gap-3 md:grid-cols-2"><div class="erp-surface rounded-xl p-4"><p class="text-sm text-slate-500">تاریخ گزارش</p><p class="mt-3 text-lg font-semibold text-slate-900" dir="ltr">{{ report.reporting_date }}</p></div><div class="erp-surface rounded-xl p-4"><p class="text-sm text-slate-500">نیروی انسانی در کارگاه</p><p class="mt-3 text-2xl font-bold text-slate-900" dir="ltr">{{ report.labor_count }} <span class="text-base font-medium text-slate-500" dir="rtl">نفر</span></p></div></div>
+         <div class="mt-5 grid gap-5 md:grid-cols-2"><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold text-slate-900">فعالیت کارگاه</h2><dl class="mt-5 space-y-4 text-sm"><div class="flex justify-between gap-4"><dt class="text-slate-500">پروژه</dt><dd class="text-left font-medium text-slate-900">{{ report.project.name }}</dd></div><div class="flex justify-between gap-4"><dt class="text-slate-500">کارگاه</dt><dd class="text-left font-medium text-slate-900">{{ report.site.name }}</dd></div>{% if report.phase %}<div class="flex justify-between gap-4"><dt class="text-slate-500">فاز</dt><dd class="text-left font-medium text-slate-900">{{ report.phase.name }}</dd></div>{% endif %}<div class="flex justify-between gap-4"><dt class="text-slate-500">آب‌وهوا</dt><dd class="text-left font-medium text-slate-900">{{ report.weather_conditions|default:"—" }}</dd></div></dl><h3 class="mt-6 text-sm font-semibold text-slate-900">کار انجام‌شده</h3><p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{{ report.work_performed }}</p><h3 class="mt-6 text-sm font-semibold text-slate-900">خلاصه پیشرفت</h3><p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{{ report.progress_summary|default:"خلاصه پیشرفتی ثبت نشده است." }}</p></section><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold text-slate-900">کنترل‌ها و مشاهدات</h2><h3 class="mt-5 text-sm font-semibold text-slate-900">مسائل و تأخیرها</h3><p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{{ report.issues_and_delays|default:"موردی ثبت نشده است." }}</p><h3 class="mt-5 text-sm font-semibold text-slate-900">ایمنی</h3><p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{{ report.safety_notes|default:"موردی ثبت نشده است." }}</p><h3 class="mt-5 text-sm font-semibold text-slate-900">کیفیت</h3><p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{{ report.quality_notes|default:"موردی ثبت نشده است." }}</p></section></div>
++        {% include "components/related_documents.html" with source_label="گزارش روزانه" %}
+         <div class="mt-5 grid gap-5 lg:grid-cols-3">
+             <section class="erp-surface rounded-xl p-5"><div class="flex items-center justify-between gap-3"><h2 class="font-semibold text-slate-900">نیروی انسانی</h2><span class="text-xs text-slate-500">{{ report.labor_entries.count }} مورد</span></div><div class="mt-4 space-y-3 text-sm">{% for entry in report.labor_entries.all %}<div class="border-b border-slate-100 pb-3"><p class="font-medium text-slate-900">{{ entry.team_name }}</p><p class="mt-1 text-slate-500"><span dir="ltr">{{ entry.worker_count }}</span> نفر · <span dir="ltr">{{ entry.hours_worked|floatformat:2 }}</span> ساعت</p>{% if entry.notes %}<p class="mt-1 whitespace-pre-line text-slate-500">{{ entry.notes }}</p>{% endif %}</div>{% empty %}<p class="text-slate-500">نیروی انسانی ثبت نشده است.</p>{% endfor %}</div>{% if report.status == "draft" and "daily_reports.add_labor" in business_permission_codes %}<form class="mt-5 space-y-4 border-t border-slate-100 pt-5" method="post" action="{% url 'daily_reports:labor_add' report.id %}">{% csrf_token %}{% for field in labor_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="inline-flex rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" type="submit">افزودن نیروی انسانی</button></form>{% endif %}</section>
+             <section class="erp-surface rounded-xl p-5"><div class="flex items-center justify-between gap-3"><h2 class="font-semibold text-slate-900">تجهیزات</h2><span class="text-xs text-slate-500">{{ report.equipment_entries.count }} مورد</span></div><div class="mt-4 space-y-3 text-sm">{% for entry in report.equipment_entries.all %}<div class="border-b border-slate-100 pb-3"><p class="font-medium text-slate-900">{{ entry.equipment_name }}</p><p class="mt-1 text-slate-500"><span dir="ltr">{{ entry.hours_used|floatformat:2 }}</span> ساعت</p>{% if entry.notes %}<p class="mt-1 whitespace-pre-line text-slate-500">{{ entry.notes }}</p>{% endif %}</div>{% empty %}<p class="text-slate-500">تجهیزاتی ثبت نشده است.</p>{% endfor %}</div>{% if report.status == "draft" and "daily_reports.add_equipment" in business_permission_codes %}<form class="mt-5 space-y-4 border-t border-slate-100 pt-5" method="post" action="{% url 'daily_reports:equipment_add' report.id %}">{% csrf_token %}{% for field in equipment_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="inline-flex rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" type="submit">افزودن تجهیزات</button></form>{% endif %}</section>
+--- before/templates/documents/detail.html
++++ after/templates/documents/detail.html
+@@ -1,11 +1,13 @@
+-{% extends "base.html" %}
++{% extends "base.html" %}{% load static %}
+ {% block title %}{{ document.title }} | سامانه مدیریت ساخت{% endblock %}
++{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% endblock %}
+ {% block content %}
+ <nav class="text-xs text-slate-400"><a href="{% url 'documents:list' %}">اسناد</a> / <span>{{ document.title }}</span></nav>
++{% if document_return_source %}<a class="erp-document-return" href="{{ document_return_source.url }}">{% include "components/form_icon.html" with icon="document" only %}<span>بازگشت به اسناد مرتبط {{ document_return_source.label }}: {{ document_return_source.title }}</span></a>{% endif %}
+ <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div class="min-w-0"><p class="text-xs font-semibold text-blue-600">{{ document.get_document_type_display }} · {{ document.get_confidentiality_display }} · نسخه {{ document.current_version.version_number }}</p><h1 class="mt-1 truncate text-2xl font-bold text-slate-950 sm:text-3xl">{{ document.title }}</h1><p class="mt-1 text-xs text-slate-500" dir="ltr">{{ document.document_number }}{% if document.reference %} · {{ document.reference }}{% endif %}</p>{% if document.current_version.is_available %}<p class="mt-1 text-xs font-semibold text-emerald-700">نسخه جاری قابل استفاده است.</p>{% else %}<p class="mt-1 text-xs font-semibold text-amber-700">نسخه جاری قرنطینه یا ارزیابی‌نشده است.</p>{% endif %}</div>{% if "documents.download" in business_permission_codes and document.current_version.is_available %}<a class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold leading-10 text-white" href="{% url 'documents:download' document.id %}">دریافت نسخه جاری</a>{% endif %}</div>
+ {% if document.description %}<p class="erp-surface mt-5 rounded-xl p-4 text-sm text-slate-600">{{ document.description }}</p>{% endif %}
+ <div class="mt-5 grid gap-5 lg:grid-cols-2">
+-  <section class="erp-surface rounded-xl p-5"><h2 class="text-sm font-bold">ارتباط‌های سند</h2><ul class="mt-4 divide-y divide-slate-100 text-sm">{% for link in document.links.all %}<li class="flex justify-between gap-4 py-3"><span class="text-slate-500">{{ link.target_type }}</span><span>{{ link.target }}</span></li>{% endfor %}</ul></section>
++  <section class="erp-surface rounded-xl p-5"><h2 class="text-sm font-bold">ارتباط‌های سند</h2><ul class="mt-4 erp-document-sources">{% for source in document_sources %}<li><span>{{ source.label }}</span><a href="{{ source.url }}">{{ source.title }}</a></li>{% endfor %}{% for link in document.links.all %}{% if link.target_type == "payment" %}<li><span>شاهد تاریخی پرداخت</span>سابقه پرداخت محفوظ است.</li>{% endif %}{% endfor %}</ul></section>
+   <section class="erp-surface rounded-xl p-5"><h2 class="text-sm font-bold">تاریخچه نسخه‌ها</h2><div class="mt-4 divide-y divide-slate-100">{% for version in document.versions.all %}<div class="flex items-center justify-between gap-4 py-3 text-sm"><div><p class="font-semibold" dir="ltr">v{{ version.version_number }} · {{ version.original_file_name }}</p><p class="mt-1 text-[11px] text-slate-500"><span dir="ltr">{{ version.file_size }}</span> بایت · {{ version.created_at }}</p>{% if version.is_available %}<p class="mt-1 text-[11px] font-semibold text-emerald-700">قابل استفاده</p>{% else %}<p class="mt-1 text-[11px] font-semibold text-amber-700">غیرقابل استفاده تا ارزیابی پاک</p>{% endif %}</div>{% if "documents.download" in business_permission_codes and version.is_available %}<a class="text-xs font-semibold text-blue-700" href="{% url 'documents:version-download' document.id version.id %}">دریافت</a>{% endif %}</div>{% endfor %}</div></section>
+ </div>
+ <div class="mt-5 grid gap-5 lg:grid-cols-2"><section class="erp-surface rounded-xl p-5"><h2 class="text-sm font-bold">تعهدهای نگهداری</h2><ul class="mt-3 space-y-2 text-xs text-slate-600">{% for item in document.retention_applications.all %}<li>{{ item.policy_version.policy.name }} · {% if item.retention_until %}تا {{ item.retention_until }}{% else %}مدت نامشخص؛ غیرقابل امحا{% endif %}</li>{% empty %}<li>سیاست نگهداری اعمال نشده؛ امحا مسدود است.</li>{% endfor %}</ul></section><section class="erp-surface rounded-xl p-5"><h2 class="text-sm font-bold">نگهداری حقوقی</h2><ul class="mt-3 space-y-2 text-xs text-slate-600">{% for hold in document.legal_holds.all %}<li>{{ hold.reason }} · {% if hold.released_at %}آزادشده{% else %}فعال{% endif %}</li>{% empty %}<li>نگهداری حقوقی ثبت نشده است.</li>{% endfor %}</ul></section></div>
+--- before/apps/documents/views.py
++++ after/apps/documents/views.py
+@@ -14,6 +14,7 @@
+     DocumentVersionForm,
+ )
+ from apps.documents.models import DocumentConfidentiality, DocumentType
++from apps.documents.presentation import document_return_source, document_sources_for
+ from apps.documents.services import (
+     add_document_link,
+     add_document_version,
+@@ -40,8 +41,13 @@
+ 
+ 
+ def _detail_context(request: HttpRequest, document: object, **extra: object) -> dict:
++    sources = document_sources_for(
++        user=request.user, organization=request.organization, document=document
++    )
+     context = {
+         "document": document,
++        "document_sources": sources,
++        "document_return_source": document_return_source(request, sources),
+         "archive_form": DocumentArchiveForm(),
+         "version_form": DocumentVersionForm(),
+         "link_form": DocumentLinkForm(
+--- /dev/null
++++ after/apps/documents/presentation.py
+@@ -0,0 +1,255 @@
++"""Read-only projections of existing DMS links for five business Detail pages.
++
++The DMS and source-domain read services remain the authorization authorities.
++Return context is an allowlisted source identity, never a client-supplied URL.
++"""
++
++from dataclasses import dataclass
++from typing import TYPE_CHECKING
++from urllib.parse import urlencode
++from uuid import UUID
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.urls import reverse
++
++from apps.documents.link_registry import registered_link_type
++from apps.documents.services import (
++    get_document_version_for_download,
++    get_organization_document,
++    get_organization_documents,
++)
++from core.jalali import format_jalali
++from core.product_surface import route_exposed
++
++if TYPE_CHECKING:
++    from django.db.models import Model, QuerySet
++    from django.http import HttpRequest
++
++    from apps.accounts.models import User
++    from apps.documents.models import Document
++    from apps.organizations.models import Organization
++
++
++# These are existing source routes and relationships, not a new link registry.
++SOURCE_ROUTES = {
++    "project": ("projects:detail", "project_id", "پروژه"),
++    "contract": ("contracts:detail", "contract_id", "قرارداد"),
++    "estimate": ("estimates:detail", "estimate_id", "برآورد"),
++    "expense": ("expenses:detail", "expense_id", "هزینه"),
++    "daily_report": ("daily_reports:detail", "report_id", "گزارش روزانه"),
++}
++
++
++@dataclass(frozen=True)
++class DocumentSource:
++    kind: str
++    identifier: UUID
++    label: str
++    title: str
++    url: str
++
++    @property
++    def query(self) -> str:
++        return urlencode({"related_to": self.kind, "related_id": self.identifier})
++
++
++@dataclass(frozen=True)
++class RelatedDocumentRow:
++    title: str
++    type_label: str
++    version_number: int
++    available: bool
++    detail_url: str
++    download_url: str
++
++
++@dataclass(frozen=True)
++class RelatedDocuments:
++    rows: tuple[RelatedDocumentRow, ...]
++
++    @property
++    def count(self) -> int:
++        return len(self.rows)
++
++    @property
++    def first_rows(self) -> tuple[RelatedDocumentRow, ...]:
++        return self.rows[:5]
++
++    @property
++    def remaining_rows(self) -> tuple[RelatedDocumentRow, ...]:
++        return self.rows[5:]
++
++
++def _sources(*, kind: str, user: "User", organization: "Organization") -> "QuerySet":
++    from apps.contracts.services import get_organization_contracts
++    from apps.daily_reports.services import get_organization_daily_reports
++    from apps.estimates.services import get_organization_estimates
++    from apps.expenses.services import get_organization_expenses
++    from apps.projects.services import get_organization_projects
++
++    return {
++        "project": get_organization_projects,
++        "contract": get_organization_contracts,
++        "estimate": get_organization_estimates,
++        "expense": get_organization_expenses,
++        "daily_report": get_organization_daily_reports,
++    }[kind](user=user, organization=organization)
++
++
++def _source(
++    *, kind: str, target: "Model", user: "User", organization: "Organization"
++) -> DocumentSource:
++    route, parameter, label = SOURCE_ROUTES[kind]
++    url = reverse(route, kwargs={parameter: target.pk})
++    if kind == "estimate":
++        # Project-aware Estimate URLs require their own Project read authority.
++        try:
++            project_visible = (
++                _sources(kind="project", user=user, organization=organization)
++                .filter(pk=target.project_id)
++                .exists()
++            )
++        except PermissionDenied:
++            project_visible = False
++        if project_visible:
++            url += "?" + urlencode({"project_id": target.project_id})
++    if kind == "project":
++        title = target.name
++    elif kind == "expense":
++        title = target.description
++    elif kind == "daily_report":
++        title = f"{target.site.name} · {format_jalali(target.reporting_date)}"
++    else:
++        title = target.title
++    return DocumentSource(kind, target.pk, label, title, url + "#related-documents")
++
++
++def related_documents_for(
++    *, user: "User", organization: "Organization", target: "Model"
++) -> RelatedDocuments | None:
++    """Project direct typed links through the existing exact DMS read boundary.
++
++    Compatibility mirrors never add rows. A denied document contributes neither
++    metadata nor a count. None means the section itself is not authorized.
++    """
++    kind = next(
++        (
++            key
++            for key in SOURCE_ROUTES
++            if isinstance(
++                target,
++                registered_link_type(key).model._meta.get_field(key).remote_field.model,
++            )
++        ),
++        None,
++    )
++    if (
++        kind is None
++        or organization is None
++        or getattr(target, "organization_id", None) != organization.pk
++        or not route_exposed("documents:detail")
++        or not route_exposed(SOURCE_ROUTES[kind][0])
++    ):
++        return None
++    try:
++        authorized_target = (
++            _sources(kind=kind, user=user, organization=organization)
++            .filter(pk=target.pk)
++            .first()
++        )
++        if authorized_target is None:
++            return None
++        source = _source(
++            kind=kind, target=authorized_target, user=user, organization=organization
++        )
++        links = registered_link_type(kind).model.objects.filter(
++            organization=organization, **{kind: authorized_target}
++        )
++        candidates = get_organization_documents(
++            user=user, organization=organization
++        ).filter(pk__in=links.values("document_id"))
++        identifiers = list(candidates.values_list("pk", flat=True))
++    except PermissionDenied:
++        return None
++
++    rows = []
++    for identifier in identifiers:
++        try:
++            # The list service alone does not check compatibility parity or all
++            # deleted-source conditions. Use the very same read as DMS Detail.
++            document = get_organization_document(
++                user=user, organization=organization, document_id=str(identifier)
++            )
++        except PermissionDenied:
++            continue
++        version = document.current_version
++        available = version.is_available
++        download_url = ""
++        if available and route_exposed("documents:version-download"):
++            try:
++                get_document_version_for_download(
++                    document=document, version_id=str(version.pk), actor=user
++                )
++            except PermissionDenied:
++                pass
++            else:
++                download_url = reverse(
++                    "documents:version-download", args=[document.pk, version.pk]
++                )
++        rows.append(
++            RelatedDocumentRow(
++                title=document.title,
++                type_label=document.get_document_type_display(),
++                version_number=version.version_number,
++                available=available,
++                detail_url=reverse("documents:detail", args=[document.pk])
++                + "?"
++                + source.query,
++                download_url=download_url,
++            )
++        )
++    return RelatedDocuments(tuple(rows))
++
++
++def document_sources_for(
++    *, user: "User", organization: "Organization", document: "Document"
++) -> tuple[DocumentSource, ...]:
++    """Return only authorized, exposed, actually persisted supported sources."""
++    sources = []
++    for kind, (route, _, _) in SOURCE_ROUTES.items():
++        if not route_exposed(route):
++            continue
++        link_type = registered_link_type(kind)
++        identifiers = link_type.model.objects.filter(
++            organization=organization, document=document
++        ).values_list(f"{kind}_id", flat=True)
++        try:
++            targets = _sources(kind=kind, user=user, organization=organization).filter(
++                pk__in=identifiers
++            )
++            sources.extend(
++                _source(kind=kind, target=target, user=user, organization=organization)
++                for target in targets
++            )
++        except PermissionDenied:
++            continue
++    return tuple(sources)
++
++
++def document_return_source(
++    request: "HttpRequest", sources: tuple[DocumentSource, ...]
++) -> DocumentSource | None:
++    """Ignore forged/unrelated return context; never follow an arbitrary URL."""
++    try:
++        identifier = UUID(request.GET.get("related_id", ""))
++    except (ValueError, TypeError, ValidationError):
++        return None
++    return next(
++        (
++            source
++            for source in sources
++            if source.kind == request.GET.get("related_to")
++            and source.identifier == identifier
++        ),
++        None,
++    )
+--- /dev/null
++++ after/apps/documents/templatetags/related_documents.py
+@@ -0,0 +1,15 @@
++"""Presentation-only integration; the business view has already read its object."""
++
++from django import template
++
++from apps.documents.presentation import related_documents_for
++
++register = template.Library()
++
++
++@register.simple_tag(takes_context=True)
++def related_documents(context, target):
++    request = context["request"]
++    return related_documents_for(
++        user=request.user, organization=request.organization, target=target
++    )
+--- /dev/null
++++ after/apps/documents/test_related_documents.py
+@@ -0,0 +1,350 @@
++"""Read projections must preserve the existing DMS and source boundaries."""
++
++from datetime import date, timedelta
++from html.parser import HTMLParser
++from urllib.parse import parse_qs, urlsplit
++
++from django.template.loader import render_to_string
++from django.test import RequestFactory, TestCase, override_settings
++from django.urls import reverse
++from django.utils import timezone
++
++from apps.audit.models import AuditEvent
++from apps.contracts.models import Contract
++from apps.daily_reports.models import DailyReport
++from apps.documents import tests as dms_fixture
++from apps.documents.models import DocumentLink, DocumentProcessingAssessment
++from apps.documents.presentation import (
++    document_return_source,
++    document_sources_for,
++    related_documents_for,
++)
++from apps.documents.services import add_document_link, add_document_version
++from apps.estimates.services import create_estimate
++from apps.expenses.models import Expense
++from apps.organizations.models import (
++    BusinessPermission,
++    MembershipRoleAssignment,
++    MembershipScopeGrant,
++    OrganizationMembership,
++    OrganizationRole,
++)
++from apps.projects.models import Project, ProjectSite
++
++
++class _RelatedSectionParser(HTMLParser):
++    def __init__(self):
++        super().__init__()
++        self.depth = 0
++        self.controls = []
++
++    def handle_starttag(self, tag, attrs):
++        if tag == "section" and (
++            self.depth or dict(attrs).get("id") == "related-documents"
++        ):
++            self.depth += 1
++        if self.depth and tag in {"form", "input", "button"}:
++            self.controls.append(tag)
++
++    def handle_endtag(self, tag):
++        if tag == "section" and self.depth:
++            self.depth -= 1
++
++
++@override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
++class RelatedDocumentsTests(TestCase):
++    setUp = dms_fixture.DocumentServiceTests.setUp
++    _pdf_upload = staticmethod(dms_fixture.DocumentServiceTests._pdf_upload)
++    _create_document = dms_fixture.DocumentServiceTests._create_document
++
++    def panel(self, target=None, user=None):
++        return related_documents_for(
++            user=user or self.owner,
++            organization=self.organization,
++            target=target or self.project,
++        )
++
++    def reader(self, permissions, *, project=None, site=None):
++        from apps.accounts.models import User
++
++        user = User.objects.create_user(username="related-documents-reader")
++        role = OrganizationRole.objects.create(
++            organization=self.organization, code="related-reader", name="Reader"
++        )
++        role.permissions.set(BusinessPermission.objects.filter(code__in=permissions))
++        membership = OrganizationMembership.objects.create(
++            organization=self.organization,
++            user=user,
++            status="active",
++            role_definition=role,
++        )
++        MembershipRoleAssignment.objects.create(
++            organization=self.organization,
++            membership=membership,
++            role=role,
++            reason="Explicit isolated read-projection test",
++        )
++        MembershipScopeGrant.objects.create(
++            organization=self.organization,
++            membership=membership,
++            scope_type="site" if site else "project" if project else "organization",
++            project=site.project if site else project,
++            site=site,
++            reason="Explicit isolated read-projection scope",
++        )
++        return user
++
++    def sources(self, document, user=None):
++        return document_sources_for(
++            user=user or self.owner,
++            organization=self.organization,
++            document=document,
++        )
++
++    def clean_version(self, version):
++        return DocumentProcessingAssessment.objects.create(
++            organization=self.organization,
++            version=version,
++            sequence=1,
++            verdict="clean",
++            input_sha256=version.sha256,
++            adapter_code="isolated-fixture",
++            recorded_by=self.owner,
++        )
++
++    def targets(self):
++        contract = Contract.objects.create(
++            organization=self.organization,
++            project=self.project,
++            contract_number="RELATED-C",
++            title="قرارداد مرجع",
++            counterparty_name="طرف نمونه",
++            direction="receivable",
++        )
++        estimate = create_estimate(
++            organization=self.organization,
++            actor=self.owner,
++            project=self.project,
++            contract=contract,
++            estimate_number="RELATED-E",
++            title="برآورد مرجع",
++        )
++        expense = Expense.objects.create(
++            organization=self.organization,
++            project=self.project,
++            description="هزینه مرجع",
++            incurred_on=date(2026, 11, 1),
++            amount="100",
++        )
++        site = ProjectSite.objects.create(
++            organization=self.organization,
++            project=self.project,
++            code="RELATED-S",
++            name="کارگاه مرجع",
++        )
++        report = DailyReport.objects.create(
++            organization=self.organization,
++            project=self.project,
++            site=site,
++            reporting_date=date(2026, 11, 1),
++            work_performed="فعالیت مرجع",
++        )
++        return [self.project, contract, estimate, expense, report]
++
++    def test_five_sources_deduplicate_mirrors_and_generate_safe_roundtrips(self):
++        for index, target in enumerate(self.targets()):
++            with self.subTest(source=type(target).__name__):
++                document = self._create_document(
++                    target=target, reference=f"RELATED-{index}"
++                )
++                panel = self.panel(target)
++                self.assertEqual(panel.count, 1)
++                self.assertEqual(panel.rows[0].version_number, 1)
++                self.assertFalse(panel.rows[0].available)
++                self.assertFalse(panel.rows[0].download_url)
++                source = self.sources(document)[0]
++                query = parse_qs(urlsplit(panel.rows[0].detail_url).query)
++                request = RequestFactory().get(
++                    "/documents/", {key: values[0] for key, values in query.items()}
++                )
++                self.assertEqual(document_return_source(request, (source,)), source)
++                self.assertTrue(source.url.endswith("#related-documents"))
++                self.assertFalse(source.url.startswith("//"))
++
++    def test_only_direct_entity_links_are_projected(self):
++        contract = self.targets()[1]
++        self._create_document(target=contract)
++        self.assertEqual(self.panel().count, 0)
++        self.assertEqual(self.panel(contract).count, 1)
++
++    def test_denied_dms_permission_hides_panel_and_count(self):
++        self._create_document()
++        reader = self.reader(["projects.view"])
++        self.assertIsNone(self.panel(user=reader))
++        html = render_to_string(
++            "components/related_documents.html",
++            {"related_documents": self.panel(user=reader), "source_label": "پروژه"},
++        )
++        self.assertNotIn("related-documents-heading", html)
++
++    def test_missing_source_permission_and_foreign_target_fail_closed(self):
++        reader = self.reader(["documents.view"])
++        self.assertIsNone(self.panel(user=reader))
++        foreign = Project.objects.create(
++            organization=self.other_organization, code="RELATED-X", name="Foreign"
++        )
++        self.assertIsNone(self.panel(foreign))
++
++    def test_all_linked_contexts_must_be_authorized(self):
++        document = self._create_document()
++        denied = Project.objects.create(
++            organization=self.organization, code="RELATED-DENIED", name="Denied"
++        )
++        add_document_link(document=document, actor=self.owner, target=denied)
++        reader = self.reader(["projects.view", "documents.view"], project=self.project)
++        self.assertEqual(self.panel(user=reader).count, 0)
++        self.assertEqual(self.panel().count, 1)
++
++    def test_missing_compatibility_parity_hides_document(self):
++        document = self._create_document()
++        other = Project.objects.create(
++            organization=self.organization, code="PARITY-X", name="Other source"
++        )
++        # A candidate still has a valid typed link, but an extra unmatched
++        # compatibility row must make the detail-equivalent projection deny it.
++        DocumentLink.objects.create(
++            organization=self.organization, document=document, project=other
++        )
++        self.assertEqual(self.panel().count, 0)
++
++    def test_daily_report_site_scope_does_not_expand_to_another_site(self):
++        report = self.targets()[-1]
++        self._create_document(target=report)
++        other_site = ProjectSite.objects.create(
++            organization=self.organization,
++            project=self.project,
++            code="OTHER-SITE",
++            name="Other site",
++        )
++        denied = DailyReport.objects.create(
++            organization=self.organization,
++            project=self.project,
++            site=other_site,
++            reporting_date=date(2026, 11, 1),
++            work_performed="Other site activity",
++        )
++        self._create_document(target=denied, reference="DENIED-SITE")
++        reader = self.reader(["daily_reports.view", "documents.view"], site=report.site)
++        self.assertEqual(self.panel(report, user=reader).count, 1)
++        self.assertIsNone(self.panel(denied, user=reader))
++
++    def test_archived_expired_sealed_and_deleted_source_documents_are_absent(self):
++        document = self._create_document()
++        for field, value in (
++            ("archived_at", timezone.now()),
++            ("access_expires_at", timezone.now() - timedelta(seconds=1)),
++            ("retention_classification", "sealed_supplier_quote_evidence"),
++        ):
++            original = getattr(document, field)
++            setattr(document, field, value)
++            document.save()
++            self.assertEqual(self.panel().count, 0)
++            setattr(document, field, original)
++            document.save()
++        self.project.deleted_at = timezone.now()
++        self.project.save()
++        self.assertIsNone(self.panel())
++
++    def test_download_requires_its_own_permission_and_exact_clean_version(self):
++        document = self._create_document()
++        self.clean_version(document.current_version)
++        owner_row = self.panel().rows[0]
++        self.assertTrue(owner_row.available)
++        self.assertIn(str(document.current_version_id), owner_row.download_url)
++        reader = self.reader(["projects.view", "documents.view"])
++        self.assertTrue(self.panel(user=reader).rows[0].available)
++        self.assertFalse(self.panel(user=reader).rows[0].download_url)
++        add_document_version(
++            document=document, actor=self.owner, upload=self._pdf_upload("new.pdf")
++        )
++        row = self.panel().rows[0]
++        self.assertEqual(row.version_number, 2)
++        self.assertFalse(row.available)
++        self.assertFalse(row.download_url)
++
++    def test_read_projection_does_not_record_a_download_or_change_links(self):
++        document = self._create_document()
++        self.clean_version(document.current_version)
++        before = (AuditEvent.objects.count(), DocumentLink.objects.count())
++        self.assertTrue(self.panel().rows[0].download_url)
++        self.assertEqual(len(self.sources(document)), 1)
++        self.assertEqual(
++            (AuditEvent.objects.count(), DocumentLink.objects.count()), before
++        )
++        document.refresh_from_db()
++        self.assertEqual(document.current_version.version_number, 1)
++
++    def test_forged_return_context_never_produces_a_url(self):
++        document = self._create_document()
++        sources = self.sources(document)
++        for query in (
++            {"related_to": "project", "related_id": "https://evil.example"},
++            {"related_to": "treasury_movement", "related_id": str(self.project.pk)},
++            {"related_to": "project", "related_id": str(self.other_organization.pk)},
++            {"next": "//evil.example"},
++        ):
++            self.assertIsNone(
++                document_return_source(
++                    RequestFactory().get("/documents/", query), sources
++                )
++            )
++
++    def test_estimate_return_does_not_require_unauthorized_project_context(self):
++        estimate = self.targets()[2]
++        document = self._create_document(target=estimate)
++        reader = self.reader(["estimates.view", "documents.view"])
++        source = self.sources(document, user=reader)[0]
++        self.assertNotIn("project_id=", source.url)
++
++    def test_business_templates_have_one_navigation_and_one_read_only_section(self):
++        self.client.force_login(self.owner)
++        session = self.client.session
++        session["active_organization_id"] = str(self.organization.pk)
++        session.save()
++        routes = [
++            "projects:detail",
++            "contracts:detail",
++            "estimates:detail",
++            "expenses:detail",
++            "daily_reports:detail",
++        ]
++        for route, target in zip(routes, self.targets(), strict=True):
++            with self.subTest(route=route):
++                response = self.client.get(reverse(route, args=[target.pk]))
++                self.assertEqual(response.status_code, 200)
++                html = response.content.decode()
++                self.assertEqual(html.count("data-related-documents-nav"), 1)
++                self.assertEqual(html.count('id="related-documents"'), 1)
++                self.assertContains(response, "سند مرتبط قابل مشاهده‌ای")
++                self.assertNotIn("اسناد و گالری", html)
++                # New section is read-only even on existing mutable business pages.
++                parser = _RelatedSectionParser()
++                parser.feed(html)
++                self.assertFalse(parser.controls)
++
++    def test_document_detail_shows_real_source_return_without_new_mutation_flows(self):
++        document = self._create_document()
++        self.client.force_login(self.owner)
++        session = self.client.session
++        session["active_organization_id"] = str(self.organization.pk)
++        session.save()
++        response = self.client.get(
++            reverse("documents:detail", args=[document.pk]),
++            {"related_to": "project", "related_id": str(self.project.pk)},
++        )
++        self.assertEqual(response.status_code, 200)
++        self.assertContains(response, "بازگشت به اسناد مرتبط پروژه")
++        self.assertContains(
++            response,
++            reverse("projects:detail", args=[self.project.pk]) + "#related-documents",
++        )
+--- /dev/null
++++ after/apps/documents/static/documents/related_documents.css
+@@ -0,0 +1,35 @@
++/* Shared read-only DMS section; uses the existing ERP surface and color tokens. */
++.erp-related-documents { margin-block: 20px; min-width: 0; overflow: hidden; border-radius: var(--erp-radius-card, 12px); scroll-margin-block-start: 24px; }
++.erp-related-documents:focus { outline: 2px solid var(--erp-primary); outline-offset: 3px; }
++.erp-related-documents-header { flex-wrap: wrap; gap: 6px 16px; }
++.erp-related-documents-header h2 { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--erp-text); }
++.erp-related-documents-header p { font-size: 12px; color: var(--erp-text-muted); }
++.erp-related-documents .erp-form-icon, a.erp-related-documents-nav .erp-form-icon { width: 18px; height: 18px; flex-shrink: 0; }
++.erp-related-documents-count { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; padding: 1px 6px; border-radius: 5px; background: var(--erp-surface-subtle); color: var(--erp-text-muted); font-size: 11px; font-weight: 500; }
++a.erp-related-documents-nav { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; white-space: nowrap; }
++a.erp-related-documents-nav:hover, a.erp-related-documents-nav[aria-current] { color: var(--erp-primary); }
++a.erp-related-documents-nav:focus-visible, .erp-related-documents a:focus-visible, .erp-related-documents summary:focus-visible, a.erp-document-return:focus-visible, .erp-document-sources a:focus-visible { outline: 2px solid var(--erp-primary); outline-offset: 3px; border-radius: 4px; }
++.erp-related-documents-shortcut { margin-block: 12px; display: flex; flex-wrap: wrap; gap: 8px; border-block-end: 1px solid var(--erp-border); }
++.erp-related-documents-shortcut > a { padding: 10px 4px; border-block-end: 2px solid transparent; color: var(--erp-text-muted); font-size: 12px; }
++.erp-related-documents-shortcut > a:hover, .erp-related-documents-shortcut > a[aria-current] { border-color: var(--erp-primary); }
++.erp-related-documents-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 12px 20px; padding: 12px 20px; border-block-start: 1px solid var(--erp-border); font-size: 13px; }
++.erp-related-documents-name { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--erp-primary); }
++.erp-related-documents-name a { overflow-wrap: anywhere; color: var(--erp-text); font-weight: 500; }
++.erp-related-documents a:hover { color: var(--erp-primary-hover); text-decoration: underline; }
++.erp-related-documents-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 12px; color: var(--erp-text-muted); }
++.erp-related-documents-actions { display: flex; align-items: center; gap: 14px; color: var(--erp-primary); font-size: 12px; font-weight: 600; }
++.erp-related-documents-actions a { display: inline-flex; align-items: center; min-height: 36px; }
++.erp-related-documents-empty { padding: 18px 20px; font-size: 13px; color: var(--erp-text-muted); }
++.erp-related-documents-more > summary { padding: 12px 20px; border-block-start: 1px solid var(--erp-border); font-size: 12px; color: var(--erp-primary); cursor: pointer; }
++.erp-document-return { display: inline-flex; align-items: center; gap: 7px; margin-block: 12px 0; color: var(--erp-primary); font-size: 13px; font-weight: 600; }
++.erp-document-return svg { width: 18px; height: 18px; flex-shrink: 0; }
++.erp-document-sources li { padding-block: 10px; border-block-end: 1px solid var(--erp-border); font-size: 13px; }
++.erp-document-sources li > span { display: block; margin-block-end: 4px; color: var(--erp-text-muted); font-size: 12px; }
++.erp-document-sources a { color: var(--erp-primary); overflow-wrap: anywhere; }
++@media (max-width: 767px) {
++  .erp-related-documents-row { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 12px 16px; }
++  .erp-related-documents-meta, .erp-related-documents-actions { padding-inline-start: 26px; }
++  .erp-related-documents-actions a { min-height: 40px; }
++  .erp-document-return { align-items: flex-start; }
++  .erp-document-return span { min-width: 0; overflow-wrap: anywhere; }
++}
+--- /dev/null
++++ after/apps/documents/static/documents/related_documents.js
+@@ -0,0 +1,19 @@
++/* Hash navigation only; document access is always resolved on the server. */
++(() => {
++    const update = () => {
++        const active = location.hash === '#related-documents';
++        document.querySelectorAll('[data-related-documents-nav]').forEach(link => {
++            if (active) link.setAttribute('aria-current', 'location');
++            else link.removeAttribute('aria-current');
++            link.classList.toggle('is-current', active);
++        });
++        if (active) {
++            document.querySelectorAll('.erp-project-tabs a[href="#overview"], .cd-journey a[href$="#overview"]').forEach(link => {
++                link.removeAttribute('aria-current');
++                link.classList.remove('is-current');
++            });
++        }
++    };
++    update();
++    window.addEventListener('hashchange', update);
++})();
+--- /dev/null
++++ after/templates/components/related_documents_nav.html
+@@ -0,0 +1,2 @@
++{% load erp_format %}
++{% if related_documents != None %}<a class="erp-related-documents-nav" href="#related-documents" data-related-documents-nav>{% include "components/form_icon.html" with icon="document" only %}<span>اسناد مرتبط</span><span class="erp-related-documents-count">{{ related_documents.count|erp_number }}</span></a>{% endif %}
+--- /dev/null
++++ after/templates/components/related_documents.html
+@@ -0,0 +1,10 @@
++{% load erp_format %}
++{% if related_documents != None %}
++<section id="related-documents" class="erp-surface erp-related-documents" aria-labelledby="related-documents-heading" tabindex="-1">
++  <div class="erp-panel-header erp-related-documents-header"><h2 id="related-documents-heading">{% include "components/form_icon.html" with icon="document" only %}اسناد مرتبط <span class="erp-related-documents-count">{{ related_documents.count|erp_number }}</span></h2><p>اسناد قابل مشاهده مرتبط با این {{ source_label }}</p></div>
++  {% if related_documents.count %}
++    {% include "components/related_document_rows.html" with rows=related_documents.first_rows only %}
++    {% if related_documents.remaining_rows %}<details class="erp-related-documents-more"><summary>نمایش {{ related_documents.remaining_rows|length|erp_number }} سند دیگر</summary>{% include "components/related_document_rows.html" with rows=related_documents.remaining_rows only %}</details>{% endif %}
++  {% else %}<p class="erp-related-documents-empty" role="status">سند مرتبط قابل مشاهده‌ای برای این {{ source_label }} وجود ندارد.</p>{% endif %}
++</section>
++{% endif %}
+--- /dev/null
++++ after/templates/components/related_document_rows.html
+@@ -0,0 +1,8 @@
++{% load erp_format %}
++<ul class="erp-related-documents-rows">
++  {% for row in rows %}<li class="erp-related-documents-row">
++    <div class="erp-related-documents-name">{% include "components/form_icon.html" with icon="document" only %}<a href="{{ row.detail_url }}">{{ row.title }}</a></div>
++    <div class="erp-related-documents-meta"><span>{{ row.type_label }}</span><span>نسخه {{ row.version_number|erp_number }}</span><span class="erp-badge {% if row.available %}erp-badge--success{% else %}erp-badge--warning{% endif %}">{% if row.available %}قابل استفاده{% else %}قرنطینه یا ارزیابی‌نشده{% endif %}</span></div>
++    <div class="erp-related-documents-actions"><a href="{{ row.detail_url }}" aria-label="مشاهده سند {{ row.title }}">مشاهده</a>{% if row.download_url %}<a href="{{ row.download_url }}" aria-label="دریافت سند {{ row.title }}، نسخه {{ row.version_number|erp_number }}">دریافت</a>{% endif %}</div>
++  </li>{% endfor %}
++</ul>
+--- /dev/null
++++ after/docs/validation/related-documents-phase1.md
+@@ -0,0 +1,102 @@
++# Related Documents — Phase 1
++
++**Status:** Implementation and focused automated validation complete; required
++Chrome verification BLOCKED. Product Owner visual acceptance pending.
++
++## Scope and result
++
++The Project, Contract, Estimate, Expense and Daily Report Detail templates now
++use one shared read-only «اسناد مرتبط» section and the same existing document
++icon. Navigation follows each page's current structure:
++
++| Page | Navigation placement | Section placement |
++|---|---|---|
++| Project | Existing project section navigation | After operational related records, before project information |
++| Contract | Existing contract contextual navigation, including draft/quantities views | Full-width section following the contract workspace |
++| Estimate | Compact contextual row beside the identity/related-record area | Between estimate information and items |
++| Expense | Existing detail/action group | Before allocations |
++| Daily Report | Existing report header/action area | After report details/observations, before supporting entries |
++
++Project's photo entry is labelled «گالری تصاویر» separately. Each page has one
++Related Documents navigation entry. The shared section displays title, type,
++version, processing availability and authorized view/download actions. It shows
++five rows initially and uses native disclosure for additional authorized rows.
++
++The read adapter uses existing typed links and source-domain/DMS read services.
++Legacy mirrors do not add rows. DMS Detail authorization is rechecked before a
++document contributes metadata or a count. Download links resolve an exact clean
++version through the existing secure service; rendering does not record a download.
++
++Documents Detail now links back to the five supported persisted sources. Return
++context is an allowlisted source type/UUID checked against actual authorized
++links, never an arbitrary return URL. Estimate's project context is included only
++when its Project read authority also permits it. Retired Payment evidence retains
++a non-actionable Persian historical label.
++
++No new upload/link/unlink controls, routes, domain relationships, schema,
++permissions or financial/business transitions were introduced. Existing DMS
++mutation forms remain unchanged. Hidden capabilities are not activated.
++
++## Validation
++
++- Django system checks: PASS.
++- Affected templates: 10/10 compile.
++- Ruff check and format validation: PASS.
++- JavaScript syntax check: PASS.
++- Focused authorization/read-only UI tests: 14/14 PASS. This includes actual
++  Django responses for all five Detail pages, one navigation entry/section each,
++  empty states, exact clean-version actions, all-context/project/site/tenant
++  boundaries, compatibility parity, safe return context and no projection writes.
++- Existing DMS service and form-scope regressions: 18/18 PASS.
++- Combined final run: **32/32 PASS**, 39.293 seconds after isolated schema setup.
++- Two additional existing processing tests fail in their unchanged `setUp` at
++  `create_project`, before any changed presentation code or test body runs. The
++  fixture creates only a legacy owner membership, without explicit role/scope
++  grants. Classification: **BASELINE TEST DEBT**. The test, project/DMS services
++  and authorization module were verified unchanged from HEAD; evidence is in
++  `baseline-test-debt.json`. These tests were not edited or counted as PASS.
++- Required Chrome screenshots and responsive/usability checks: blocked by the
++  Work setting disabling local browser access. Re-enabling was requested; no
++  browser-access bypass or substitute screenshot claim was made.
++
++| Chrome page | 1440 px | 1024 px | 390 px |
++|---|---|---|---|
++| Project | NOT EXECUTED | NOT EXECUTED | NOT EXECUTED |
++| Contract | NOT EXECUTED | NOT EXECUTED | NOT EXECUTED |
++| Estimate | NOT EXECUTED | NOT EXECUTED | NOT EXECUTED |
++| Expense | NOT EXECUTED | NOT EXECUTED | NOT EXECUTED |
++| Daily Report | NOT EXECUTED | NOT EXECUTED | NOT EXECUTED |
++
++The exact pre-change working-tree templates and SHA-256 baseline were saved in
++`output/related-documents-phase1/baseline/` and `baseline.json`, with a source diff
++in `implementation.diff`. These are **not screenshots**. The local preview helper
++`serve_preview.py before` serves those original templates on port 8012; `after`
++serves the current implementation on port 8011. This supports faithful before/after
++Chrome capture once access is available, without reverting concurrent changes.
++Neither preview server was started during the blocked browser verification.
++
++Evidence: `output/related-documents-phase1/final-tests.txt`, `lint.txt` and
++`baseline-test-debt.json`. `verification-tests.txt` retains the earlier run,
++including test-helper/fixture errors corrected in the new tests before the final
++run; no dependency was installed and no production authorization was weakened.
++The tests use a dedicated test database, separate from the application's database.
++No migrations were authored or run against the application database.
++
++## Preservation and handoff
++
++Baseline HEAD: `560bc3c9f136a3b76c6816dc127a80d74bcb7a1d`, branch `main`.
++Existing uncommitted work was retained; the five business views and existing DMS
++services/models were not edited. The pre-existing Project template changes were
++extended only at the relevant navigation/section seams. No Tailwind rebuild,
++dependency installation, migration files, commits or pushes.
++
++The read projection deliberately retains canonical per-document authorization
++calls. Large related-document sets therefore retain the existing DMS validator's
++per-document query cost; no persistent authorization cache or weakened shortcut
++was introduced. Existing unrelated DMS list/form technical labels are outside
++this Phase 1 integration.
++
++**Remaining:** Complete the 15 Chrome viewport checks, populated/empty and
++permission-persona journeys, safe source roundtrips, exact-version downloads and
++before/after screenshots; then obtain Product Owner visual acceptance. Visual
++acceptance, Human Sign-off and production authorization have not been issued.

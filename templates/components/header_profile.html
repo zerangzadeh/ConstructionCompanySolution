@@ -1,0 +1,20 @@
+<div class="mr-auto shrink-0" data-header-profile>
+    <a class="hidden items-center gap-2 rounded-lg border-r border-slate-200 py-1 pr-3 transition hover:bg-slate-50 md:flex" href="{% url 'accounts:settings' %}" data-header-profile-desktop>
+        {% include "components/user_avatar.html" with user=request.user avatar_classes="h-14 w-14" only %}
+        <span class="block max-w-28 text-right lg:max-w-40">
+            {% include "components/user_identity_labels.html" with user=request.user identity=header_identity compact=True only %}
+            <span class="block text-[11px] leading-4 text-blue-700 underline underline-offset-2">تنظیمات شخصی</span>
+        </span>
+    </a>
+    <details class="relative md:hidden" data-header-profile-mobile>
+        <summary class="grid h-10 w-10 list-none place-items-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600" aria-label="اطلاعات کاربر و تنظیمات شخصی">
+            {% include "components/user_avatar.html" with user=request.user avatar_classes="h-10 w-10" only %}
+        </summary>
+        <div class="absolute left-0 top-full z-40 mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-slate-200 bg-white p-4 text-right shadow-lg">
+            <div class="break-words" data-header-profile-mobile-labels>
+                {% include "components/user_identity_labels.html" with user=request.user identity=header_identity only %}
+            </div>
+            <a class="mt-3 flex min-h-11 items-center border-t border-slate-200 pt-2 text-xs font-medium text-blue-700 underline" href="{% url 'accounts:settings' %}">تنظیمات شخصی</a>
+        </div>
+    </details>
+</div>

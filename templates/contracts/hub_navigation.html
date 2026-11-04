@@ -5,5 +5,6 @@
   {% if workspace.show_progress or workspace.show_financial %}<a href="{{ hub.root }}#progress">{% include "contracts/detail_icon.html" with icon="target" only %}وضعیت پیشرفت</a>{% endif %}
   {% if dashboard.show_estimates %}<a href="{{ hub.root }}#estimates">{% include "contracts/detail_icon.html" with icon="layers" only %}برآوردها</a>{% endif %}
   {% if workspace.supports_terms or term_versions or contract.amendments.all %}<a href="{{ hub.root }}#terms">{% include "contracts/detail_icon.html" with icon="document" only %}شرایط و تغییرات قرارداد</a>{% endif %}
+  {% include "components/related_documents_nav.html" %}
   <a href="{{ hub.root }}#recent">{% include "contracts/detail_icon.html" with icon="history" only %}سوابق و فعالیت‌ها</a>
 </nav>

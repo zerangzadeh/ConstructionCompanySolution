@@ -53,6 +53,7 @@ def issue_list(request: HttpRequest) -> HttpResponse:
     issues = get_organization_quality_issues(
         user=request.user, organization=request.organization
     )
+    scoped_has_records = issues.exists()
     issues = apply_table_filters(
         issues,
         request,
@@ -85,6 +86,8 @@ def issue_list(request: HttpRequest) -> HttpResponse:
         "quality/list.html",
         {
             "issues": page.object_list,
+            "scoped_has_records": scoped_has_records,
+            "list_profile": "quality",
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(

@@ -15,7 +15,7 @@ from apps.expenses.services import get_organization_expenses
 from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import BusinessPermissionCode as P
 from apps.projects.business_hub import project_commercial_summary
-from apps.projects.models import Project
+from apps.projects.models import Project, ProjectCostFactKind
 from apps.projects.services import (
     get_organization_project_sites,
     get_project_cost_projection,
@@ -54,6 +54,8 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
             "value": project.estimated_budget,
             "unit": request.organization.currency,
             "note": "مبلغ ثبت‌شده در مشخصات پروژه",
+            "icon": "layers",
+            "tone": "budget",
         }
     ]
     projection = None
@@ -67,7 +69,17 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
         # Existing projection may include legacy currencies. Never relabel or
         # combine them with the Organization's budget unit for a dashboard chart.
         currencies = {fact.currency for fact in projection.facts}
-        comparable = currencies == {request.organization.currency}
+        has_actual_evidence = any(
+            fact.kind
+            in {
+                ProjectCostFactKind.ACTUAL_RECOGNIZED,
+                ProjectCostFactKind.ACTUAL_REVERSAL,
+            }
+            for fact in projection.facts
+        )
+        comparable = has_actual_evidence and currencies == {
+            request.organization.currency
+        }
         cost_rows = [{"label": "بودجه تخمینی", "value": str(project.estimated_budget)}]
         if comparable:
             cost_rows.append(
@@ -81,6 +93,8 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
                 "note": "پوشش ناقص؛ کل هزینه پروژه نیست"
                 if comparable
                 else "شواهد هم‌ارز کافی ثبت نشده است",
+                "icon": "coins",
+                "tone": "cost",
             }
         )
         if comparable:
@@ -102,6 +116,8 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
                 "unit": "قرارداد",
                 "note": "از قراردادهای قابل مشاهده پروژه",
                 "url": contracts.list_url,
+                "icon": "document",
+                "tone": "contracts",
             }
         )
         counts = dict(
@@ -140,6 +156,8 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
                 "unit": "کارگاه",
                 "note": "در محدوده دسترسی شما",
                 "url": url,
+                "icon": "hard-hat",
+                "tone": "sites",
             }
         )
         links.append({"label": "کارگاه‌ها", "url": url})
@@ -166,6 +184,8 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
                     "value": reports_count,
                     "unit": "گزارش",
                     "note": "سوابق قابل مشاهده پروژه",
+                    "icon": "calendar",
+                    "tone": "reports",
                 }
             )
         for record in records.order_by("-created_at", "pk")[:3]:
@@ -215,6 +235,7 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
             "cost_rows": cost_rows,
             "cost_comparable": comparable,
             "contract_rows": contract_rows,
+            "contract_total": contracts.total if contracts else 0,
             "has_contracts_access": contracts is not None,
             "recent": sorted(recent, key=lambda item: item["date"], reverse=True)[:6],
             "quick_links": links,

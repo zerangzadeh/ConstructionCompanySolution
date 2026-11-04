@@ -1,0 +1,8 @@
+{% load erp_format %}
+<ul class="erp-related-documents-rows">
+  {% for row in rows %}<li class="erp-related-documents-row">
+    <div class="erp-related-documents-name">{% include "components/form_icon.html" with icon="document" only %}<a href="{{ row.detail_url }}">{{ row.title }}</a></div>
+    <div class="erp-related-documents-meta"><span>{{ row.type_label }}</span><span>نسخه {{ row.version_number|erp_number }}</span><span class="erp-badge {% if row.available %}erp-badge--success{% else %}erp-badge--warning{% endif %}">{% if row.available %}قابل استفاده{% else %}قرنطینه یا ارزیابی‌نشده{% endif %}</span></div>
+    <div class="erp-related-documents-actions"><a href="{{ row.detail_url }}" aria-label="مشاهده سند {{ row.title }}">مشاهده</a>{% if row.download_url %}<a href="{{ row.download_url }}" aria-label="دریافت سند {{ row.title }}، نسخه {{ row.version_number|erp_number }}">دریافت</a>{% endif %}</div>
+  </li>{% endfor %}
+</ul>

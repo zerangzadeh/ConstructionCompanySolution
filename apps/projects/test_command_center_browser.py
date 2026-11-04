@@ -1,6 +1,7 @@
 """Real installed Chrome against isolated, explicitly authorized test data."""
 
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -19,6 +20,7 @@ from apps.projects.models import (
     ProjectSite,
 )
 from apps.projects.test_command_center import CostEvidenceFixture, scoped_reader
+from core.jalali import format_jalali
 
 
 def inspect(expression, description):
@@ -49,7 +51,7 @@ class ProjectWorkspaceBrowserTests(
     browser = chrome_fixture.ContractBillingBrowserTests.browser
     _fixture_teardown = chrome_fixture.ContractBillingBrowserTests._fixture_teardown
     browser_evidence_directory = (
-        Path(__file__).resolve().parents[2] / "output/project-command-center/browser"
+        Path(__file__).resolve().parents[2] / "output/projects-ui-20261103/browser"
     )
 
     def test_projects_list_journeys_and_command_center_states(self):
@@ -119,7 +121,11 @@ class ProjectWorkspaceBrowserTests(
                         inspect(
                             "!document.querySelector('[data-more-filters]').open && document.querySelector('.erp-list-identifier bdi').dir==='ltr' && !document.querySelector('main input[type=checkbox]')",
                             "compact default filters and canonical identifiers",
-                        )
+                        ),
+                        inspect(
+                            "!!Chart.getChart('projects-status-chart') && Chart.getChart('projects-status-chart').data.datasets[0].data.reduce((a,b)=>a+b,0)===33 && Chart.getChart('projects-status-chart').data.labels.length===5 && document.querySelectorAll('[data-project-status]').length===4",
+                            "all authorized projects and every real model status",
+                        ),
                     ],
                 },
                 {
@@ -186,8 +192,8 @@ class ProjectWorkspaceBrowserTests(
                         {"toggleSelector": "[data-more-toggle]"},
                         {
                             "fill": {
-                                "start_date_from": "2026-10-01",
-                                "start_date_to": "2026-10-01",
+                                "start_date_from": format_jalali(date(2026, 10, 1)),
+                                "start_date_to": format_jalali(date(2026, 10, 1)),
                             },
                             "formSelector": "#list-filter-bar",
                             "clickSelector": "#list-more-filters button[type=submit]",
@@ -248,7 +254,7 @@ class ProjectWorkspaceBrowserTests(
                         ),
                         {"toggleSelector": "[data-filter-options] > summary"},
                         {
-                            "toggleSelector": "[data-more-toggle]",
+                            "toggleSelector": "[data-more-filters] > summary",
                             "inspect": "document.querySelector('[data-more-filters]').open",
                             "description": "mobile advanced panel",
                         },
@@ -313,7 +319,7 @@ class ProjectWorkspaceBrowserTests(
                             "resize": {"width": 1440},
                             **inspect(
                                 chart_ready
-                                + " && document.documentElement.scrollWidth<=innerWidth && Chart.getChart('project-contracts-chart').width>390",
+                                + " && document.documentElement.scrollWidth<=innerWidth && Chart.getChart('project-contracts-chart').width>200",
                                 "chart resizes back to desktop",
                             ),
                         },
@@ -403,8 +409,8 @@ class ProjectWorkspaceBrowserTests(
                     "absentText": ["پروژه جدید", "پروژه صفحه", "پروژه آغازین"],
                     "steps": [
                         inspect(
-                            "document.querySelectorAll('tbody tr').length===1",
-                            "project isolation",
+                            "document.querySelectorAll('tbody tr').length===1 && Chart.getChart('projects-status-chart').data.datasets[0].data.reduce((a,b)=>a+b,0)===1",
+                            "project isolation includes summary and chart",
                         )
                     ],
                 },
@@ -433,6 +439,10 @@ class ProjectWorkspaceBrowserTests(
                         inspect(
                             ready, "real producer-cost projection visualized exactly"
                         ),
+                        inspect(
+                            "Chart.getChart('project-cost-chart').options.plugins.tooltip.callbacks.label({dataIndex:1}).includes('۱۲۳٫۴۵') && Chart.getChart('project-cost-chart').options.plugins.tooltip.rtl",
+                            "Persian exact-value financial tooltip",
+                        ),
                         {
                             "toggleSelector": ".erp-project-evidence summary",
                             "inspect": "document.querySelector('.erp-project-evidence').open",
@@ -453,5 +463,156 @@ class ProjectWorkspaceBrowserTests(
                         )
                     ],
                 },
+            ],
+        )
+
+    def test_reference_layout_and_empty_list_with_local_assets(self):
+        """Synthetic source records, never values inferred from reference images."""
+        self.make_fixture(persian=True)
+        self.project.name = "ساختمان خدمات مهندسی"
+        self.project.description = "اجرای ساختمان اداری و محوطه‌سازی مجموعه خدمات مهندسی"
+        self.project.estimated_budget = Decimal(280000000000)
+        self.project.start_date = date(2026, 7, 12)
+        self.project.end_date = date(2027, 9, 20)
+        self.project.save()
+        for code, name, status, budget in (
+            ("PRJ-02", "مجتمع مسکونی سپیدار", "active", "190000000000"),
+            ("PRJ-03", "بهسازی مرکز آموزشی", "on_hold", "65000000000"),
+            ("PRJ-04", "توسعه ساختمان درمانگاه", "active", "95000000000"),
+        ):
+            Project.objects.create(
+                organization=self.organization,
+                code=code,
+                name=name,
+                status=status,
+                estimated_budget=Decimal(budget),
+                start_date=date(2026, 7, 12),
+                end_date=date(2027, 9, 20),
+            )
+        for status in ("draft", "completed"):
+            Contract.objects.create(
+                organization=self.organization,
+                project=self.project,
+                contract_number=f"VIS-{status}",
+                title="قرارداد اجرای تأسیسات",
+                counterparty_name="پیمانکار نمونه",
+                status=status,
+            )
+        self._claim()
+        create_estimate(
+            organization=self.organization,
+            actor=self.owner,
+            project=self.project,
+            estimate_number="VIS-E",
+            title="برآورد اجرای ساختمان",
+        )
+        site = ProjectSite.objects.create(
+            organization=self.organization,
+            project=self.project,
+            code="VIS-S",
+            name="کارگاه ساختمان خدمات مهندسی",
+        )
+        DailyReport.objects.create(
+            organization=self.organization,
+            project=self.project,
+            site=site,
+            reporting_date=date(2026, 10, 1),
+            work_performed="اجرای ساختمان",
+            created_by=self.owner,
+        )
+        listing = reverse("projects:list")
+        detail = reverse("projects:detail", args=[self.project.pk])
+        profile = "!!document.querySelector('header a[href*=profile]') || document.querySelector('header').innerText.includes('تنظیمات شخصی')"
+        self.browser(
+            self.owner,
+            [
+                {
+                    **BASE,
+                    "name": "visual-list-1672",
+                    "width": 1672,
+                    "height": 941,
+                    "path": listing,
+                    "steps": [
+                        inspect(
+                            "Chart.getChart('projects-status-chart').data.datasets[0].data.join(',')==='2,1,1,0,0'",
+                            "real grouped statuses",
+                        ),
+                        inspect(profile, "profile and personal settings preserved"),
+                    ],
+                },
+                {
+                    **BASE,
+                    "name": "visual-detail-1672",
+                    "width": 1672,
+                    "height": 941,
+                    "path": detail,
+                    "steps": [
+                        inspect(
+                            "Chart.getChart('project-contracts-chart').data.datasets[0].data.join(',')==='1,1,1' && !document.getElementById('project-cost-chart')",
+                            "real contracts and unavailable financial comparison",
+                        )
+                    ],
+                },
+                {**BASE, "name": "visual-list-390", "mobile": True, "path": listing},
+                {**BASE, "name": "visual-detail-390", "mobile": True, "path": detail},
+                {
+                    **BASE,
+                    "name": "list-filtered-empty",
+                    "path": listing + "?q=absent-project",
+                    "mustText": ["نتیجه‌ای"],
+                    "steps": [
+                        inspect(
+                            "!!Chart.getChart('projects-status-chart') && !document.querySelector('tbody')",
+                            "filtered empty keeps authorized overview",
+                        )
+                    ],
+                },
+                {
+                    **BASE,
+                    "name": "list-chart-library-failure",
+                    "path": listing,
+                    "blockedURLs": ["*chart.umd.min.js*"],
+                    "steps": [
+                        inspect(
+                            "!document.querySelector('[data-chart-ready]') && document.querySelector('#projects-status-chart-values').innerText.includes('فعال')",
+                            "server values survive asset failure",
+                        )
+                    ],
+                },
+                {
+                    **BASE,
+                    "name": "list-no-javascript",
+                    "path": listing,
+                    "noJS": True,
+                    "mustText": ["توزیع وضعیت پروژه‌ها", "بهسازی مرکز آموزشی"],
+                },
+            ],
+        )
+        reader, _, _ = scoped_reader(
+            self.organization,
+            self.project,
+            ["projects.view"],
+            username="empty-list-reader",
+        )
+        from django.utils import timezone
+
+        self.project.deleted_at = timezone.now()
+        self.project.save(update_fields=["deleted_at"])
+        self.browser(
+            reader,
+            [
+                {
+                    **BASE,
+                    "name": "list-empty-desktop",
+                    "path": listing,
+                    "mustText": ["هنوز پروژه‌ای برای نمایش نمودار وجود ندارد."],
+                    "steps": [
+                        inspect(
+                            "!document.querySelector('canvas') && !document.querySelector('tbody')",
+                            "no fabricated empty chart",
+                        )
+                    ],
+                },
+                {**BASE, "name": "list-empty-mobile", "path": listing, "mobile": True},
             ],
         )

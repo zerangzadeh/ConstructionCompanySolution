@@ -1,65 +1,68 @@
 {% extends "base.html" %}
-
-{% block title %}خانه | بنیرا{% endblock %}
-
+{% load static erp_format product_surface tz %}
+{% block title %}میز کار من | بنیرا{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}">
+<link rel="stylesheet" href="{% static 'projects/workspace.css' %}">
+<link rel="stylesheet" href="{% static 'css/erp_home.css' %}">
+{% endblock %}
 {% block content %}
-<div class="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6 lg:px-8" data-home-state="{{ home_state }}">
-    <header class="border-b border-slate-200 pb-4 space-y-2">
-        <h1 class="text-2xl font-semibold text-slate-900">خانه</h1>
-        <p class="text-sm text-slate-600">شروع کار با وظایف ارجاع‌شده و فضاهای کاری مجاز شما</p>
-    </header>
-
-    {% if home_state == "unauthorized" %}
-    <section class="rounded-xl border border-amber-200 bg-amber-50 p-5" role="alert">
-        <h2 class="font-semibold text-amber-900">دسترسی مجاز نیست</h2>
-        <p class="mt-2 text-sm text-amber-800">زمینه سازمانی انتخاب‌شده معتبر نیست. سازمان مجاز خود را دوباره انتخاب کنید.</p>
-        <a class="mt-3 inline-block text-sm font-medium text-blue-700 underline" href="{% url 'organizations:select' %}">انتخاب سازمان</a>
-    </section>
-    {% elif home_state == "no_context" %}
-    <section class="rounded-xl border border-slate-200 bg-white p-5">
-        <h2 class="font-semibold">سازمان فعالی انتخاب نشده است</h2>
-        <p class="mt-2 text-sm text-slate-600">برای ورود به فضای کاری، یکی از سازمان‌های مجاز خود را انتخاب کنید.</p>
-        <a class="mt-3 inline-block text-sm font-medium text-blue-700 underline" href="{% url 'organizations:select' %}">انتخاب سازمان</a>
-    </section>
-    {% elif home_state == "empty" %}
-    <section class="rounded-xl border border-slate-200 bg-white p-5">
-        <h2 class="font-semibold">فضای کاری در دسترس نیست</h2>
-        <p class="mt-2 text-sm text-slate-600">در حال حاضر عضویت فعال در سازمانی ندارید.</p>
-        <a class="mt-3 inline-block text-sm font-medium text-blue-700 underline" href="{% url 'accounts:connection_requests' %}">درخواست‌های اتصال</a>
-    </section>
-    {% elif home_state == "error" %}
-    <section class="rounded-xl border border-red-200 bg-red-50 p-5" role="alert">
-        <h2 class="font-semibold text-red-900">بارگذاری خانه ممکن نیست</h2>
-        <p class="mt-2 text-sm text-red-800">لطفاً دوباره تلاش کنید یا سازمان مجاز خود را انتخاب کنید.</p>
-        <a class="mt-3 inline-block text-sm font-medium text-blue-700 underline" href="{% url 'organizations:select' %}">انتخاب سازمان</a>
-    </section>
-    {% else %}
-    <section class="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-50 p-4 text-sm" aria-label="سازمان فعال">
-        <p class="text-xs text-slate-500">سازمان فعال</p>
-        <p class="mt-1 font-semibold">{{ home_organization.name }}</p>
-        <a class="mt-2 inline-block text-sm text-blue-700 underline" href="{% url 'organizations:select' %}">تغییر سازمان</a>
-    </section>
-
-    {% if home_state == "no_workspace" %}
-    <section class="rounded-xl border border-slate-200 bg-white p-5">
-        <h2 class="font-semibold">فضای کاری در دسترس نیست</h2>
-        <p class="mt-2 text-sm text-slate-600">برای دسترسی، از مسیرهای حساب کاربری یا درخواست اتصال استفاده کنید.</p>
-        <a class="mt-3 inline-block text-sm text-blue-700 underline" href="{% url 'accounts:connection_requests' %}">درخواست‌های اتصال</a>
-    </section>
-    {% else %}
-    {% for group in home_groups %}
-    <section aria-labelledby="home-{{ group.key }}" data-home-group="{{ group.key }}">
-        <h2 id="home-{{ group.key }}" class="mb-3 text-lg font-semibold">{{ group.label }}</h2>
-        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {% for link in group.links %}
-            <a class="erp-surface flex items-center justify-between gap-3 rounded-xl p-4 text-sm font-medium text-slate-700 hover:border-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600" href="{% url link.route %}"><span>{{ link.label }}</span><span class="text-blue-700" aria-hidden="true">←</span></a>
-            {% endfor %}
-        </div>
-    </section>
-    {% endfor %}
-    {% endif %}
-    {% endif %}
-
-    <a class="inline-block text-sm text-blue-700 underline" href="{% url 'accounts:settings' %}">تنظیمات حساب کاربری</a>
+<div class="bonira-home" data-home-state="{{ home_state }}">
+<header class="home-hero">
+  <div class="home-hero__copy">
+    <div class="home-hero__heading"><span class="home-icon home-tone-blue">{% include "components/form_icon.html" with icon="company" only %}</span><div><h1>میز کار من</h1><p>{% if request.user.first_name %}{{ request.user.first_name }}، {% endif %}به بنیرا خوش آمدید</p></div></div>
+    {% if home_organization %}<div class="home-hero__context"><span>{% include "components/form_icon.html" with icon="company" only %}{{ home_organization.name }}</span><a href="{% url 'organizations:select' %}">تغییر سازمان ←</a></div>{% endif %}
+  </div>
+  <div class="home-hero__art" aria-hidden="true"><svg viewBox="0 0 400 170" fill="none"><path d="M0 160h400M60 160V65h92v95M75 65V42h62v23M167 160V95h99v65M281 160V73h67v87M79 84h56M79 105h56M79 126h56M183 114h67M183 135h67M297 94h34M297 115h34M297 136h34M106 65v95M216 95v65M316 73v87M35 160V27h6v133M10 27h208L38 7 10 27Zm171 0v47m-7 0h14M38 7v20"/><path d="m55 160 47-47 48 47m22 0 43-43 48 43M0 168h400"/></svg></div>
+</header>
+{% if home_state == "unauthorized" %}
+<section class="home-panel home-state" role="alert"><h2>دسترسی مجاز نیست</h2><p>زمینه سازمانی انتخاب‌شده معتبر نیست. سازمان مجاز خود را دوباره انتخاب کنید.</p><a class="erp-btn erp-btn--secondary" href="{% url 'organizations:select' %}">انتخاب سازمان</a></section>
+{% elif home_state == "no_context" %}
+<section class="home-panel home-state"><h2>سازمان فعالی انتخاب نشده است</h2><p>برای ورود به فضای کاری، یکی از سازمان‌های مجاز خود را انتخاب کنید.</p><a class="erp-btn erp-btn--secondary" href="{% url 'organizations:select' %}">انتخاب سازمان</a></section>
+{% elif home_state == "empty" %}
+<section class="home-panel home-state"><h2>فضای کاری در دسترس نیست</h2><p>در حال حاضر عضویت فعال در سازمانی ندارید.</p><a class="erp-btn erp-btn--secondary" href="{% url 'accounts:connection_requests' %}">درخواست‌های اتصال</a></section>
+{% elif home_state == "error" %}
+<section class="home-panel home-state" role="alert"><h2>بارگذاری خانه ممکن نیست</h2><p>لطفاً دوباره تلاش کنید یا سازمان مجاز خود را انتخاب کنید.</p><a class="erp-btn erp-btn--secondary" href="{% url 'organizations:select' %}">انتخاب سازمان</a></section>
+{% elif home_state == "no_workspace" %}
+<section class="home-panel home-state"><h2>فضای کاری در دسترس نیست</h2><p>برای دسترسی، از مسیرهای حساب کاربری یا درخواست اتصال استفاده کنید.</p><a class="erp-btn erp-btn--secondary" href="{% url 'accounts:connection_requests' %}">درخواست‌های اتصال</a></section>
+{% else %}
+{% if workspace.kpis %}
+<section class="home-kpis" aria-label="شاخص‌های عملیاتی">{% for metric in workspace.kpis %}{% include "components/home_metric.html" with metric=metric only %}{% endfor %}</section>
+<p class="home-scope-note">آمار این صفحه مربوط به رکوردهای قابل مشاهده شما در سازمان فعال و همه پروژه‌های مجاز است.</p>
+{% endif %}
+<div class="home-workspace-grid">
+  {% if workspace.quick_links %}<section class="home-panel home-quick" aria-labelledby="home-quick-title">
+    <div class="home-panel__heading"><h2 id="home-quick-title">{% include "components/form_icon.html" with icon="bolt" only %}دسترسی سریع</h2></div>
+    <div class="home-quick__grid">{% for item in workspace.quick_links %}<a class="home-quick__link home-tone-{{ item.tone }}" href="{% url item.link.route %}"><span class="home-icon">{% include "components/form_icon.html" with icon=item.icon only %}</span><span>{{ item.link.label }}</span></a>{% endfor %}</div>
+  </section>{% endif %}
+  <section class="home-panel home-recent" aria-labelledby="home-recent-title">
+    <div class="home-panel__heading"><h2 id="home-recent-title">{% include "components/form_icon.html" with icon="clock" only %}آخرین فعالیت‌ها</h2></div>
+    <p class="home-panel__hint">آخرین ویرایش رکوردهای قابل مشاهده؛ زمان ثبت‌شده در منبع</p>
+    {% if workspace.recent %}<ul class="home-recent__list">{% for item in workspace.recent %}<li><a href="{{ item.url }}"><span class="home-icon home-tone-blue">{% include "components/form_icon.html" with icon=item.icon only %}</span><span class="home-record"><small>{{ item.family }}</small><strong>{{ item.title }}</strong></span><time datetime="{{ item.at|date:'c' }}">{% timezone home_organization.settings.timezone %}{{ item.at|jalali_datetime }}{% endtimezone %}</time></a></li>{% endfor %}</ul>
+    {% else %}<div class="home-empty">{% include "components/form_icon.html" with icon="clock" only %}<p>رکوردی برای نمایش وجود ندارد.</p><small>فعالیت‌های این بخش پس از ثبت رکوردهای مجاز نمایش داده می‌شوند.</small></div>{% endif %}
+  </section>
+  <div class="home-focus">
+    {% if workspace.tasks != None %}<section class="home-panel home-attention" aria-labelledby="home-attention-title">
+      <div class="home-panel__heading"><h2 id="home-attention-title">{% include "components/form_icon.html" with icon="check-circle" only %}اقدامات نیازمند توجه</h2><a href="{% url 'workflows:workbench' %}">کارتابل ←</a></div>
+      {% if workspace.tasks %}<ul class="home-tasks">{% for item in workspace.tasks %}<li><a href="{% if item.source_url|surface_url_exposed %}{{ item.source_url }}{% else %}{% url 'workflows:workbench' %}{% endif %}"><span class="home-task__copy"><strong>{{ item.subject_title }}</strong><small>{{ item.step_instance.step_definition.name }}</small></span><span class="home-task__priority">{{ item.workbench_priority_label }}</span><span class="home-chevron" aria-hidden="true">‹</span></a></li>{% endfor %}</ul>
+      {% else %}<div class="home-empty home-empty--compact">{% include "components/form_icon.html" with icon="check-circle" only %}<p>کاری در انتظار اقدام شما نیست.</p></div>{% endif %}
+    </section>{% endif %}
+    {% if workspace.status_rows != None %}<section class="home-panel home-status" aria-label="وضعیت پروژه‌ها">
+      {% include "components/dashboard_chart.html" with chart_id="home-project-status" title="وضعیت پروژه‌ها" description="توزیع پروژه‌های قابل مشاهده" rows=workspace.status_rows empty_message="پروژه‌ای برای نمایش وجود ندارد." unit="پروژه" ring=True total=workspace.project_total icon="layers" only %}
+    </section>{% endif %}
+  </div>
+</div>
+{% if workspace.summaries %}<section class="home-panel home-domains" aria-labelledby="home-domains-title">
+  <div class="home-panel__heading"><h2 id="home-domains-title">{% include "components/form_icon.html" with icon="layers" only %}مرور حوزه‌ها</h2><span>تعداد کل رکوردهای قابل مشاهده</span></div>
+  <div class="home-domains__grid">{% for group in workspace.summaries %}<section class="home-domain home-domain--{{ group.key }}"><h3>{{ group.label }}</h3><dl>{% for row in group.rows %}<div><dt><a href="{% url row.route %}">{{ row.label }}</a></dt><dd>{{ row.value|erp_number }} <span aria-hidden="true">‹</span></dd></div>{% endfor %}</dl></section>{% endfor %}</div>
+</section>{% endif %}
+{% if not workspace.quick_links and not workspace.kpis and workspace.tasks == None %}<section class="home-panel home-state"><h2>فضاهای کاری شما</h2><p>از انتخاب‌گر فضای کاری در بالای صفحه به دسترسی‌های مجاز خود بروید.</p></section>{% endif %}
+{% endif %}
+<footer class="home-footer"><span>بنیرا · فضای کاری شخصی شما</span><a href="{% url 'accounts:settings' %}">تنظیمات شخصی</a></footer>
 </div>
 {% endblock %}
+{% block extra_scripts %}{% if workspace.charts %}
+{{ workspace.charts|json_script:"project-dashboard-data" }}
+<script src="{% static 'projects/vendor/chartjs-4.6.1/chart.umd.min.js' %}" defer></script>
+<script src="{% static 'projects/dashboard_charts.js' %}" defer></script>
+{% endif %}{% endblock %}

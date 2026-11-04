@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}پیوند سند موجود | بنیرا{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{{ form.media.css }}{% endblock %}
+{% block extra_scripts %}{{ form.media.js }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-4xl">
+  {% include "components/breadcrumbs.html" with page_breadcrumb_label=association_context.source.label page_breadcrumb_url=association_context.source.url page_title="پیوند سند موجود" only %}
+  <h1 class="mt-4 text-2xl font-bold">پیوند سند موجود</h1>
+  {% include "documents/association_context.html" %}
+  <form class="erp-surface mt-5 space-y-5 rounded-xl p-5" method="post" aria-label="پیوند سند موجود">{% csrf_token %}
+    {% include "components/form_errors.html" with form=form only %}
+    {% for field in form.hidden_fields %}{{ field }}{% if field.errors %}<p class="text-sm text-red-700" role="alert">زمینه فرم معتبر نیست؛ دوباره تلاش کنید.</p>{% endif %}{% endfor %}
+    {% include "components/form_field.html" with field=form.document only %}
+    <p class="text-sm text-slate-500">اصل سند و تاریخچه نسخه‌های آن حفظ می‌شود. دسترسی سند به مجوز مشاهده همه ارتباط‌های آن وابسته است.</p>
+    <div class="erp-document-association-footer"><a class="erp-btn erp-btn--secondary" href="{{ association_context.source.url }}">انصراف</a><button class="erp-btn erp-btn--primary" type="submit">ثبت پیوند سند</button></div>
+  </form>
+</div>
+{% endblock %}

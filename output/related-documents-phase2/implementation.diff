@@ -1,0 +1,1627 @@
+--- phase1/apps/documents/presentation.py
++++ phase2/apps/documents/presentation.py
+@@ -14,10 +14,13 @@
+ 
+ from apps.documents.link_registry import registered_link_type
+ from apps.documents.services import (
++    _validate_target_access,
+     get_document_version_for_download,
+     get_organization_document,
+     get_organization_documents,
+ )
++from apps.organizations.authorization import has_business_permission
++from apps.organizations.models import BusinessPermissionCode
+ from core.jalali import format_jalali
+ from core.product_surface import route_exposed
+ 
+@@ -66,6 +69,8 @@
+ @dataclass(frozen=True)
+ class RelatedDocuments:
+     rows: tuple[RelatedDocumentRow, ...]
++    upload_url: str = ""
++    link_url: str = ""
+ 
+     @property
+     def count(self) -> int:
+@@ -208,7 +213,28 @@
+                 download_url=download_url,
+             )
+         )
+-    return RelatedDocuments(tuple(rows))
++    can_associate = has_business_permission(
++        user=user,
++        organization=organization,
++        permission=BusinessPermissionCode.DOCUMENTS_UPLOAD,
++        allow_any_scope=True,
++    )
++    if can_associate:
++        try:
++            _validate_target_access(
++                actor=user, organization=organization, target=authorized_target
++            )
++        except PermissionDenied:
++            can_associate = False
++    return RelatedDocuments(
++        tuple(rows),
++        upload_url=reverse("documents:contextual-upload", args=[kind, target.pk])
++        if can_associate and route_exposed("documents:contextual-upload")
++        else "",
++        link_url=reverse("documents:contextual-link", args=[kind, target.pk])
++        if can_associate and route_exposed("documents:contextual-link")
++        else "",
++    )
+ 
+ 
+ def document_sources_for(
+--- phase1/apps/documents/forms.py
++++ phase2/apps/documents/forms.py
+@@ -21,6 +21,7 @@
+ from apps.organizations.models import BusinessPermissionCode
+ from apps.projects.models import Project
+ from apps.treasury.models import TreasuryMovement
++from core.forms import JalaliDateMixin
+ 
+ TARGET_FIELDS = (
+     "project",
+@@ -227,3 +228,174 @@
+     reason = forms.CharField(
+         label="دلیل بایگانی", widget=forms.Textarea, max_length=1000
+     )
++
++
++class _ContextualIntentForm(forms.Form):
++    """Bind a form to the server-resolved source, actor and tenant."""
++
++    context_token = forms.CharField(widget=forms.HiddenInput)
++
++    def bind_context(self, *, context, user, organization):
++        from django.core import signing
++
++        from core.business_choices import InheritedParentInput, inherit_business_parent
++
++        self.association_context = context
++        self.actor = user
++        self.organization = organization
++        kind = context.source.kind
++        self.intent = {
++            "kind": kind,
++            "target": str(context.target.pk),
++            "user": str(user.pk),
++            "organization": str(organization.pk),
++        }
++        self.fields["context_token"].widget = InheritedParentInput(
++            signing.dumps(self.intent, salt="documents.contextual-association.v1")
++        )
++        self.fields["context_token"].required = True
++        self.fields["context_token"].error_messages["required"] = (
++            "زمینه فرم معتبر نیست؛ صفحه را دوباره باز کنید."
++        )
++        from apps.documents.presentation import SOURCE_ROUTES
++
++        inherit_business_parent(
++            self, kind, context.target, detail_route=SOURCE_ROUTES[kind][0]
++        )
++
++    def clean(self):
++        from django.core import signing
++
++        cleaned = super().clean()
++        kind = self.association_context.source.kind
++        forbidden = set(TARGET_FIELDS) - {kind}
++        forbidden |= {
++            "payment",
++            "project_site",
++            "organization",
++            "organization_id",
++            "related_to",
++            "related_id",
++            "target_type",
++            "target_id",
++            "next",
++            "return_url",
++            "return_to",
++        }
++        if any(self.data.get(name) for name in forbidden) or any(
++            len(self.data.getlist(name)) != 1
++            for name in (kind, "context_token")
++            if hasattr(self.data, "getlist")
++        ):
++            raise forms.ValidationError("زمینه ارسالی با این فرم هم‌خوان نیست.")
++        try:
++            intent = signing.loads(
++                cleaned.get("context_token", ""),
++                salt="documents.contextual-association.v1",
++                max_age=3600,
++            )
++        except signing.BadSignature as exc:
++            raise forms.ValidationError(
++                "زمینه فرم معتبر نیست یا مهلت آن پایان یافته است؛ دوباره تلاش کنید."
++            ) from exc
++        if intent != self.intent:
++            raise forms.ValidationError("زمینه ارسالی با این فرم هم‌خوان نیست.")
++        return cleaned
++
++
++class ContextualDocumentCreateForm(
++    _ContextualIntentForm, JalaliDateMixin, DocumentCreateForm
++):
++    def __init__(self, *args, context, user, organization, **kwargs):
++        super().__init__(*args, user=user, organization=organization, **kwargs)
++        for name in TARGET_FIELDS:
++            if name != context.source.kind:
++                self.fields.pop(name)
++        self.bind_context(context=context, user=user, organization=organization)
++
++    def clean_file(self):
++        from apps.documents.services import _validate_uploaded_file
++
++        upload = self.cleaned_data["file"]
++        try:
++            _validate_uploaded_file(upload)
++        except ValueError as exc:
++            raise forms.ValidationError(str(exc)) from exc
++        return upload
++
++
++class ContextualDocumentLinkForm(_ContextualIntentForm):
++    document = forms.ModelChoiceField(
++        label="سند موجود",
++        queryset=None,
++        error_messages={
++            "invalid_choice": "سند انتخاب‌شده قابل پیوند نیست یا قبلاً پیوند خورده است.",
++            "required": "یک سند را انتخاب کنید.",
++        },
++    )
++
++    def __init__(self, *args, context, user, organization, **kwargs):
++        from django.urls import reverse
++
++        from apps.documents.association import (
++            association_candidates,
++            association_choices,
++            document_choice_label,
++        )
++        from apps.documents.presentation import _sources
++        from core.business_choices import SearchChoiceSelect
++
++        super().__init__(*args, **kwargs)
++        kind = context.source.kind
++        self.fields[kind] = forms.ModelChoiceField(
++            label=context.source.label,
++            queryset=_sources(kind=kind, user=user, organization=organization),
++        )
++        self.bind_context(context=context, user=user, organization=organization)
++        field = self.fields["document"]
++        field.queryset = association_candidates(
++            user=user, organization=organization, context=context
++        )
++        field.label_from_instance = document_choice_label
++        rows, _ = association_choices(
++            user=user, organization=organization, context=context
++        )
++        selected = self.data.get("document") if self.is_bound else None
++        if selected and all(str(row.pk) != selected for row in rows):
++            try:
++                chosen = field.clean(selected)
++                from apps.documents.association import authorized_association_document
++
++                chosen = authorized_association_document(
++                    user=user, organization=organization, identifier=chosen.pk
++                )
++            except (forms.ValidationError, PermissionDenied, ValueError):
++                pass
++            else:
++                rows.insert(0, chosen)
++        field.widget = SearchChoiceSelect(
++            attrs={
++                "data-options-url": reverse(
++                    "documents:contextual-choices", args=[kind, context.target.pk]
++                ),
++                "data-business-choice": "document",
++                "data-business-names-primary": "true",
++                "data-placeholder": "جست‌وجو با عنوان یا شماره سند…",
++                "dir": "rtl",
++            },
++            choices=[("", "انتخاب سند")]
++            + [(str(row.pk), document_choice_label(row)) for row in rows],
++        )
++
++    def clean_document(self):
++        from apps.documents.association import authorized_association_document
++
++        document = self.cleaned_data["document"]
++        try:
++            return authorized_association_document(
++                user=self.actor, organization=self.organization, identifier=document.pk
++            )
++        except PermissionDenied as exc:
++            raise forms.ValidationError(
++                self.fields["document"].error_messages["invalid_choice"]
++            ) from exc
+--- phase1/apps/documents/urls.py
++++ phase2/apps/documents/urls.py
+@@ -1,10 +1,25 @@
+ from django.urls import path
+ 
+-from apps.documents import views
++from apps.documents import contextual_views, views
+ 
+ app_name = "documents"
+ 
+ urlpatterns = [
++    path(
++        "context/<slug:target_type>/<uuid:target_id>/upload/",
++        contextual_views.contextual_upload,
++        name="contextual-upload",
++    ),
++    path(
++        "context/<slug:target_type>/<uuid:target_id>/link/",
++        contextual_views.contextual_link,
++        name="contextual-link",
++    ),
++    path(
++        "context/<slug:target_type>/<uuid:target_id>/choices/",
++        contextual_views.contextual_choices,
++        name="contextual-choices",
++    ),
+     path("", views.document_list, name="list"),
+     path("mine/", views.employee_document_list, name="employee-list"),
+     path(
+--- phase1/templates/components/related_documents.html
++++ phase2/templates/components/related_documents.html
+@@ -2,6 +2,10 @@
+ {% if related_documents != None %}
+ <section id="related-documents" class="erp-surface erp-related-documents" aria-labelledby="related-documents-heading" tabindex="-1">
+   <div class="erp-panel-header erp-related-documents-header"><h2 id="related-documents-heading">{% include "components/form_icon.html" with icon="document" only %}اسناد مرتبط <span class="erp-related-documents-count">{{ related_documents.count|erp_number }}</span></h2><p>اسناد قابل مشاهده مرتبط با این {{ source_label }}</p></div>
++  {% if related_documents.upload_url or related_documents.link_url %}<div class="erp-related-documents-context-actions" aria-label="افزودن سند مرتبط">
++    {% if related_documents.upload_url %}<a class="erp-btn erp-btn--secondary" href="{{ related_documents.upload_url }}">{% include "components/form_icon.html" with icon="document" only %}بارگذاری سند جدید</a>{% endif %}
++    {% if related_documents.link_url %}<a class="erp-btn erp-btn--secondary" href="{{ related_documents.link_url }}">{% include "components/form_icon.html" with icon="document" only %}پیوند سند موجود</a>{% endif %}
++  </div>{% endif %}
+   {% if related_documents.count %}
+     {% include "components/related_document_rows.html" with rows=related_documents.first_rows only %}
+     {% if related_documents.remaining_rows %}<details class="erp-related-documents-more"><summary>نمایش {{ related_documents.remaining_rows|length|erp_number }} سند دیگر</summary>{% include "components/related_document_rows.html" with rows=related_documents.remaining_rows only %}</details>{% endif %}
+--- phase1/templates/documents/upload.html
++++ phase2/templates/documents/upload.html
+@@ -1,11 +1,16 @@
+-{% extends "base.html" %}
+-{% block title %}ایجاد سند | سامانه مدیریت ساخت{% endblock %}
++{% extends "base.html" %}{% load static %}
++{% block title %}{% if association_context %}بارگذاری سند جدید{% else %}ایجاد سند{% endif %} | سامانه مدیریت ساخت{% endblock %}
++{% block extra_head %}{% if association_context %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{{ form.media.css }}{% endif %}{% endblock %}
++{% block extra_scripts %}{% if association_context %}{{ form.media.js }}{% endif %}{% endblock %}
+ {% block content %}
+-<div class="mx-auto max-w-4xl"><p class="text-xs font-semibold text-blue-600">اسناد</p><h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">ایجاد سند</h1><p class="mt-1 text-sm text-slate-500">فایل خصوصی PDF، JPEG یا PNG تا ۱۰ مگابایت به‌عنوان نسخه اول ذخیره می‌شود.</p>
+-<form class="erp-surface mt-6 space-y-6 rounded-xl p-5 sm:p-6" method="post" enctype="multipart/form-data">{% csrf_token %}{% include "components/form_errors.html" with form=form only %}
++<div class="mx-auto max-w-4xl"><p class="text-xs font-semibold text-blue-600">اسناد</p><h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">{% if association_context %}بارگذاری سند جدید{% else %}ایجاد سند{% endif %}</h1><p class="mt-1 text-sm text-slate-500">فایل خصوصی PDF، JPEG یا PNG تا ۱۰ مگابایت به‌عنوان نسخه اول ذخیره می‌شود.</p>
++{% if association_context %}{% include "documents/association_context.html" %}{% endif %}
++<form class="erp-surface mt-6 space-y-6 rounded-xl p-5 sm:p-6" method="post" enctype="multipart/form-data" aria-label="{% if association_context %}بارگذاری سند جدید{% else %}ایجاد سند{% endif %}">{% csrf_token %}{% include "components/form_errors.html" with form=form only %}
++  {% if association_context %}{% for field in form.hidden_fields %}{{ field }}{% if field.errors %}<p class="text-sm text-red-700" role="alert">زمینه فرم معتبر نیست؛ دوباره تلاش کنید.</p>{% endif %}{% endfor %}{% endif %}
+   <section><h2 class="text-sm font-bold">مشخصات سند</h2><div class="mt-4 grid gap-4 md:grid-cols-2">{% include "components/form_field.html" with field=form.document_type only %}{% include "components/form_field.html" with field=form.title only %}{% include "components/form_field.html" with field=form.category only %}{% include "components/form_field.html" with field=form.confidentiality only %}{% include "components/form_field.html" with field=form.access_expires_at only %}{% include "components/form_field.html" with field=form.reference only %}</div><div class="mt-4">{% include "components/form_field.html" with field=form.description only %}</div></section>
+-  <section class="border-t border-slate-100 pt-5"><h2 class="text-sm font-bold">موجودیت مرتبط</h2><p class="mt-1 text-xs text-slate-500">دقیقاً یکی را انتخاب کنید؛ پس از ایجاد می‌توان ارتباط‌های بیشتری افزود.</p><div class="mt-4 grid gap-4 md:grid-cols-2">{% include "components/form_field.html" with field=form.project only %}{% include "components/form_field.html" with field=form.contract only %}{% include "components/form_field.html" with field=form.estimate only %}{% include "components/form_field.html" with field=form.expense only %}{% include "components/form_field.html" with field=form.treasury_movement only %}{% include "components/form_field.html" with field=form.daily_report only %}</div></section>
++  {% if not association_context %}<section class="border-t border-slate-100 pt-5"><h2 class="text-sm font-bold">موجودیت مرتبط</h2><p class="mt-1 text-xs text-slate-500">دقیقاً یکی را انتخاب کنید؛ پس از ایجاد می‌توان ارتباط‌های بیشتری افزود.</p><div class="mt-4 grid gap-4 md:grid-cols-2">{% include "components/form_field.html" with field=form.project only %}{% include "components/form_field.html" with field=form.contract only %}{% include "components/form_field.html" with field=form.estimate only %}{% include "components/form_field.html" with field=form.expense only %}{% include "components/form_field.html" with field=form.treasury_movement only %}{% include "components/form_field.html" with field=form.daily_report only %}</div></section>{% endif %}
+   <section class="border-t border-slate-100 pt-5"><h2 class="text-sm font-bold">نسخه اول</h2><div class="mt-4">{% include "components/form_field.html" with field=form.file only %}</div></section>
+-  <div class="flex flex-col-reverse gap-2 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end"><a class="h-10 px-4 text-center text-sm font-semibold leading-10 text-slate-600" href="{% url 'documents:list' %}">انصراف</a><button class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white" type="submit">ایجاد سند</button></div>
++  {% if association_context %}<p class="text-sm text-slate-500">دریافت فایل پس از ارزیابی ایمنی امکان‌پذیر است. در صورت خطا، فایل را دوباره انتخاب کنید.</p>{% endif %}
++  <div class="flex flex-col-reverse gap-2 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end"><a class="h-10 px-4 text-center text-sm font-semibold leading-10 text-slate-600" href="{% if association_context %}{{ association_context.source.url }}{% else %}{% url 'documents:list' %}{% endif %}">انصراف</a><button class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white" type="submit">{% if association_context %}بارگذاری سند جدید{% else %}ایجاد سند{% endif %}</button></div>
+ </form></div>
+ {% endblock %}
+--- phase1/apps/documents/static/documents/related_documents.css
++++ phase2/apps/documents/static/documents/related_documents.css
+@@ -1,4 +1,13 @@
+-/* Shared read-only DMS section; uses the existing ERP surface and color tokens. */
++/* Shared DMS section and contextual forms; uses existing ERP design tokens. */
++.erp-related-documents-context-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 20px; border-block-start: 1px solid var(--erp-border); }
++.erp-related-documents-context-actions .erp-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; font-size: 12px; }
++.erp-document-association-context { margin-block-start: 20px; padding: 16px 20px; border-radius: var(--erp-radius-card); }
++.erp-document-association-context h2 { font-size: 12px; font-weight: 500; color: var(--erp-text-muted); margin-block-end: 6px; }
++.erp-document-association-context p, .erp-document-association-context dl { font-size: 13px; overflow-wrap: anywhere; }
++.erp-document-association-context dl { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-block: 12px; }
++.erp-document-association-context dt { color: var(--erp-text-muted); font-size: 12px; }
++.erp-document-association-note { color: var(--erp-text-muted); }
++.erp-document-association-footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; border-block-start: 1px solid var(--erp-border); padding-block-start: 16px; }
+ .erp-related-documents { margin-block: 20px; min-width: 0; overflow: hidden; border-radius: var(--erp-radius-card, 12px); scroll-margin-block-start: 24px; }
+ .erp-related-documents:focus { outline: 2px solid var(--erp-primary); outline-offset: 3px; }
+ .erp-related-documents-header { flex-wrap: wrap; gap: 6px 16px; }
+--- /dev/null
++++ phase2/apps/documents/association.py
+@@ -0,0 +1,277 @@
++"""Bounded orchestration of existing DMS association services for five sources."""
++
++from __future__ import annotations
++
++from dataclasses import dataclass
++from itertools import islice
++from typing import TYPE_CHECKING, Any
++from uuid import UUID
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import transaction
++from django.db.models import Q
++
++from apps.documents.link_registry import registered_link_type
++from apps.documents.models import Document, DocumentLink
++from apps.documents.presentation import SOURCE_ROUTES, DocumentSource, _source, _sources
++from apps.documents.services import (
++    _validate_access,
++    _validate_document_context_access,
++    _validate_target_access,
++    add_document_link,
++    create_document,
++    get_organization_document,
++    get_organization_documents,
++)
++from apps.documents.storage import document_storage
++from apps.organizations.models import BusinessPermissionCode as P
++from core.forms import normalize_jalali_digits
++from core.product_surface import route_exposed
++
++if TYPE_CHECKING:
++    from django.db.models import Model, QuerySet
++
++    from apps.accounts.models import User
++    from apps.organizations.models import Organization
++
++CONTEXT_DENIED = "اجازه انجام این عملیات را ندارید یا سابقه مرتبط در دسترس نیست."
++DOCUMENT_DENIED = "سند انتخاب‌شده قابل پیوند نیست یا قبلاً به این سابقه پیوند خورده است."
++CHOICE_PAGE_SIZE = 20
++
++
++@dataclass(frozen=True)
++class AssociationContext:
++    target: Model
++    source: DocumentSource
++    number: str
++    project_title: str
++    project_number: str
++    contract_title: str = ""
++    contract_number: str = ""
++
++
++def require_association_access(*, user: User, organization: Organization) -> None:
++    for permission in (P.DOCUMENTS_VIEW, P.DOCUMENTS_UPLOAD):
++        _validate_access(user=user, organization=organization, permission=permission)
++
++
++def resolve_association_context(
++    *,
++    user: User,
++    organization: Organization,
++    kind: str,
++    identifier: UUID | str,
++    lock: bool = False,
++) -> AssociationContext:
++    """Resolve from domain authority; URL identities never grant access."""
++    if kind not in SOURCE_ROUTES or not route_exposed(SOURCE_ROUTES[kind][0]):
++        raise PermissionDenied(CONTEXT_DENIED)
++    try:
++        identifier = UUID(str(identifier))
++    except (ValueError, TypeError, AttributeError) as exc:
++        raise PermissionDenied(CONTEXT_DENIED) from exc
++    require_association_access(user=user, organization=organization)
++    records = _sources(kind=kind, user=user, organization=organization)
++    target = records.filter(pk=identifier).first()
++    if target is None:
++        raise PermissionDenied(CONTEXT_DENIED)
++    if lock:
++        # A no-key lock permits ordinary FK key-share checks. Scope selectors
++        # may use DISTINCT, which cannot itself be SELECT FOR UPDATE in PG.
++        type(target).objects.select_for_update(no_key=True).get(
++            pk=target.pk, organization=organization
++        )
++        target = (
++            _sources(kind=kind, user=user, organization=organization)
++            .filter(pk=identifier)
++            .first()
++        )
++        if target is None:
++            raise PermissionDenied(CONTEXT_DENIED)
++    _validate_target_access(actor=user, organization=organization, target=target)
++    source = _source(kind=kind, target=target, user=user, organization=organization)
++    project = target if kind == "project" else target.project
++    contract = target if kind == "contract" else getattr(target, "contract", None)
++    if contract is not None:
++        try:
++            visible_contract = (
++                _sources(kind="contract", user=user, organization=organization)
++                .filter(pk=contract.pk)
++                .exists()
++            )
++        except PermissionDenied:
++            visible_contract = False
++        if not visible_contract:
++            contract = None
++    return AssociationContext(
++        target=target,
++        source=source,
++        number=getattr(target, "contract_number", "")
++        or getattr(target, "estimate_number", "")
++        or getattr(target, "code", ""),
++        project_title=project.name,
++        project_number=project.code,
++        contract_title=contract.title if contract else "",
++        contract_number=contract.contract_number if contract else "",
++    )
++
++
++def association_candidates(
++    *,
++    user: User,
++    organization: Organization,
++    context: AssociationContext,
++    query: str = "",
++) -> QuerySet[Document]:
++    """Canonical list candidates, excluding both direct-link representations."""
++    kind = context.source.kind
++    typed_ids = (
++        registered_link_type(kind)
++        .model.objects.filter(organization=organization, **{kind: context.target})
++        .values("document_id")
++    )
++    legacy_ids = DocumentLink.objects.filter(
++        organization=organization, **{kind: context.target}
++    ).values("document_id")
++    documents = (
++        get_organization_documents(user=user, organization=organization)
++        .exclude(pk__in=typed_ids)
++        .exclude(pk__in=legacy_ids)
++    )
++    query = query.strip()
++    if query:
++        normalized = normalize_jalali_digits(query).replace("ي", "ی").replace("ك", "ک")
++        documents = documents.filter(
++            Q(title__icontains=query)
++            | Q(reference__icontains=query)
++            | Q(title__icontains=normalized)
++            | Q(document_number__icontains=normalized)
++            | Q(reference__icontains=normalized)
++        )
++    return documents.order_by("title", "pk")
++
++
++def authorized_association_document(
++    *,
++    user: User,
++    organization: Organization,
++    identifier: UUID | str,
++) -> Document:
++    document = get_organization_document(
++        user=user, organization=organization, document_id=str(identifier)
++    )
++    _validate_document_context_access(
++        document=document, actor=user, permission=P.DOCUMENTS_UPLOAD
++    )
++    return document
++
++
++def association_choices(
++    *,
++    user: User,
++    organization: Organization,
++    context: AssociationContext,
++    query: str = "",
++    page: int = 1,
++) -> tuple[list[Document], bool]:
++    def visible():
++        identifiers = (
++            association_candidates(
++                user=user, organization=organization, context=context, query=query
++            )
++            .prefetch_related(None)
++            .values_list("pk", flat=True)
++        )
++        for identifier in identifiers.iterator(chunk_size=200):
++            try:
++                yield authorized_association_document(
++                    user=user, organization=organization, identifier=identifier
++                )
++            except PermissionDenied:
++                continue
++
++    # Page over authorized results, not raw rows or an unauthorized total.
++    rows = list(
++        islice(visible(), (page - 1) * CHOICE_PAGE_SIZE, page * CHOICE_PAGE_SIZE + 1)
++    )
++    return rows[:CHOICE_PAGE_SIZE], len(rows) > CHOICE_PAGE_SIZE
++
++
++def document_choice_label(document: Document) -> str:
++    return (
++        f"{document.title} · {document.document_number} · "
++        f"{document.get_document_type_display()} · "
++        f"نسخه {document.current_version.version_number}"
++    )
++
++
++def upload_in_context(
++    *,
++    user: User,
++    organization: Organization,
++    kind: str,
++    identifier: UUID | str,
++    values: dict[str, Any],
++) -> tuple[AssociationContext, Document]:
++    stored_names = []
++    try:
++        with transaction.atomic():
++            context = resolve_association_context(
++                user=user,
++                organization=organization,
++                kind=kind,
++                identifier=identifier,
++                lock=True,
++            )
++            document = create_document(
++                organization=organization,
++                actor=user,
++                target=context.target,
++                stored_names=stored_names,
++                **values,
++            )
++        return context, document
++    except Exception:
++        # The canonical service tracks only names it generated for this upload.
++        for name in stored_names:
++            document_storage.delete(name)
++        raise
++
++
++@transaction.atomic
++def link_in_context(
++    *,
++    user: User,
++    organization: Organization,
++    kind: str,
++    identifier: UUID | str,
++    document_id: UUID | str,
++) -> tuple[AssociationContext, Document]:
++    # Match the canonical association service's document serialization boundary.
++    locked = (
++        Document.objects.select_for_update()
++        .filter(pk=document_id, organization=organization)
++        .first()
++    )
++    if locked is None:
++        raise PermissionDenied(DOCUMENT_DENIED)
++    context = resolve_association_context(
++        user=user,
++        organization=organization,
++        kind=kind,
++        identifier=identifier,
++        lock=True,
++    )
++    document = authorized_association_document(
++        user=user, organization=organization, identifier=locked.pk
++    )
++    link_type = registered_link_type(kind)
++    if (
++        link_type.model.objects.filter(
++            organization=organization, document=document, **{kind: context.target}
++        ).exists()
++        or document.links.filter(**{kind: context.target}).exists()
++    ):
++        raise ValidationError(DOCUMENT_DENIED)
++    add_document_link(document=document, actor=user, target=context.target)
++    return context, document
+--- /dev/null
++++ phase2/apps/documents/contextual_views.py
+@@ -0,0 +1,198 @@
++"""Contextual UI for existing DMS creation and additive association only."""
++
++from urllib.parse import urlencode
++
++from django.contrib import messages
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import IntegrityError
++from django.http import JsonResponse
++from django.shortcuts import redirect, render
++from django.views.decorators.cache import never_cache
++from django.views.decorators.http import require_GET, require_http_methods
++
++from apps.documents.association import (
++    CONTEXT_DENIED,
++    DOCUMENT_DENIED,
++    association_choices,
++    document_choice_label,
++    link_in_context,
++    resolve_association_context,
++    upload_in_context,
++)
++from apps.documents.forms import (
++    TARGET_FIELDS,
++    ContextualDocumentCreateForm,
++    ContextualDocumentLinkForm,
++)
++from apps.documents.models import DocumentConfidentiality
++from apps.organizations.decorators import (
++    active_organization_required,
++    organization_permission_required,
++)
++from apps.organizations.models import BusinessPermissionCode as P
++
++
++def _context(request, target_type, target_id):
++    if any(
++        request.GET.get(name)
++        for name in (
++            "next",
++            "return_url",
++            "return_to",
++            "organization",
++            "organization_id",
++            "related_to",
++            "related_id",
++            "target_type",
++            "target_id",
++        )
++    ):
++        raise PermissionDenied(CONTEXT_DENIED)
++    for name in TARGET_FIELDS:
++        if name in request.GET and (
++            len(request.GET.getlist(name)) != 1
++            or (
++                request.GET[name]
++                and (name != target_type or request.GET[name] != str(target_id))
++            )
++        ):
++            raise PermissionDenied(CONTEXT_DENIED)
++    return resolve_association_context(
++        user=request.user,
++        organization=request.organization,
++        kind=target_type,
++        identifier=target_id,
++    )
++
++
++@active_organization_required
++@organization_permission_required(P.DOCUMENTS_VIEW)
++@organization_permission_required(P.DOCUMENTS_UPLOAD)
++@never_cache
++@require_http_methods(["GET", "POST"])
++def contextual_upload(request, target_type, target_id):
++    context = _context(request, target_type, target_id)
++    form = ContextualDocumentCreateForm(
++        request.POST if request.method == "POST" else None,
++        request.FILES if request.method == "POST" else None,
++        context=context,
++        user=request.user,
++        organization=request.organization,
++    )
++    if request.method == "POST" and form.is_valid():
++        data = form.cleaned_data
++        values = {
++            name: data[name]
++            for name in (
++                "document_type",
++                "title",
++                "category",
++                "reference",
++                "description",
++                "access_expires_at",
++            )
++        }
++        values["confidentiality"] = (
++            data["confidentiality"] or DocumentConfidentiality.INTERNAL
++        )
++        values["upload"] = data["file"]
++        try:
++            context, _ = upload_in_context(
++                user=request.user,
++                organization=request.organization,
++                kind=target_type,
++                identifier=target_id,
++                values=values,
++            )
++        except PermissionDenied as exc:
++            raise PermissionDenied(CONTEXT_DENIED) from exc
++        except (ValidationError, IntegrityError, ValueError):
++            form.add_error(
++                None,
++                "اطلاعات سند را بررسی کنید؛ ممکن است شماره مرجع قبلاً ثبت شده باشد.",
++            )
++        except OSError:
++            form.add_error(None, "ذخیره فایل انجام نشد؛ دوباره تلاش کنید.")
++        else:
++            messages.success(
++                request,
++                "سند ثبت و پیوند شد. دریافت فایل پس از ارزیابی ایمنی امکان‌پذیر است.",
++            )
++            return redirect(context.source.url)
++    return render(
++        request,
++        "documents/upload.html",
++        {"form": form, "association_context": context},
++        status=400 if request.method == "POST" else 200,
++    )
++
++
++@active_organization_required
++@organization_permission_required(P.DOCUMENTS_VIEW)
++@organization_permission_required(P.DOCUMENTS_UPLOAD)
++@never_cache
++@require_http_methods(["GET", "POST"])
++def contextual_link(request, target_type, target_id):
++    context = _context(request, target_type, target_id)
++    form = ContextualDocumentLinkForm(
++        request.POST if request.method == "POST" else None,
++        context=context,
++        user=request.user,
++        organization=request.organization,
++    )
++    if request.method == "POST" and form.is_valid():
++        try:
++            context, _ = link_in_context(
++                user=request.user,
++                organization=request.organization,
++                kind=target_type,
++                identifier=target_id,
++                document_id=form.cleaned_data["document"].pk,
++            )
++        except PermissionDenied as exc:
++            raise PermissionDenied(CONTEXT_DENIED) from exc
++        except (ValidationError, IntegrityError, ValueError):
++            form.add_error("document", DOCUMENT_DENIED)
++        else:
++            messages.success(request, "سند انتخاب‌شده به این سابقه پیوند شد.")
++            return redirect(context.source.url)
++    return render(
++        request,
++        "documents/contextual_link.html",
++        {"form": form, "association_context": context},
++        status=400 if request.method == "POST" else 200,
++    )
++
++
++@active_organization_required
++@organization_permission_required(P.DOCUMENTS_VIEW)
++@organization_permission_required(P.DOCUMENTS_UPLOAD)
++@never_cache
++@require_GET
++def contextual_choices(request, target_type, target_id):
++    context = _context(request, target_type, target_id)
++    query = request.GET.get("q", "").strip()[:200]
++    try:
++        page = max(1, min(int(request.GET.get("page", 1)), 100000))
++    except (ValueError, TypeError):
++        page = 1
++    rows, more = association_choices(
++        user=request.user,
++        organization=request.organization,
++        context=context,
++        query=query,
++        page=page,
++    )
++    response = JsonResponse(
++        {
++            "results": [
++                {"value": str(row.pk), "label": document_choice_label(row)}
++                for row in rows
++            ],
++            "next": request.path + "?" + urlencode({"q": query, "page": page + 1})
++            if more
++            else None,
++        }
++    )
++    response["Cache-Control"] = "private, no-store"
++    return response
+--- /dev/null
++++ phase2/apps/documents/test_contextual_association.py
+@@ -0,0 +1,589 @@
++"""HTTP and transactional evidence for contextual association of five sources."""
++
++from html.parser import HTMLParser
++from pathlib import Path
++from unittest.mock import patch
++
++from django.core.exceptions import ValidationError
++from django.test import Client, TestCase, override_settings
++from django.urls import reverse
++from django.utils import timezone
++
++from apps.documents import test_related_documents as phase1
++from apps.documents import tests as dms_fixture
++from apps.documents.association import CHOICE_PAGE_SIZE, link_in_context
++from apps.documents.models import Document, DocumentLink, DocumentVersion
++from apps.documents.presentation import SOURCE_ROUTES, related_documents_for
++from apps.documents.services import add_document_link
++from apps.projects.models import Project, ProjectSite
++
++
++class _Page(HTMLParser):
++    def __init__(self, html):
++        super().__init__()
++        self.hidden = {}
++        self.text = []
++        self.document_form = False
++        self.feed(html)
++
++    def handle_starttag(self, tag, attrs):
++        data = dict(attrs)
++        if tag == "form":
++            self.document_form = data.get("aria-label") in {
++                "بارگذاری سند جدید",
++                "پیوند سند موجود",
++            }
++        if self.document_form and tag == "input" and data.get("type") == "hidden":
++            self.hidden[data["name"]] = data.get("value", "")
++
++    def handle_endtag(self, tag):
++        if tag == "form":
++            self.document_form = False
++
++    def handle_data(self, data):
++        self.text.append(data)
++
++
++@override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
++class ContextualAssociationTests(TestCase):
++    setUp = dms_fixture.DocumentServiceTests.setUp
++    _pdf_upload = staticmethod(dms_fixture.DocumentServiceTests._pdf_upload)
++    _create_document = dms_fixture.DocumentServiceTests._create_document
++    targets = phase1.RelatedDocumentsTests.targets
++    reader = phase1.RelatedDocumentsTests.reader
++    clean_version = phase1.RelatedDocumentsTests.clean_version
++
++    def login(self, user=None, client=None):
++        client = client or self.client
++        client.force_login(user or self.owner)
++        session = client.session
++        session["active_organization_id"] = str(self.organization.pk)
++        session.save()
++        return client
++
++    def url(self, action, kind="project", target=None):
++        return reverse(
++            "documents:contextual-" + action,
++            args=[kind, (target or self.project).pk],
++        )
++
++    def get_form(self, action, kind="project", target=None, client=None):
++        response = (client or self.client).get(self.url(action, kind, target))
++        self.assertEqual(response.status_code, 200)
++        return response, _Page(response.content.decode()).hidden
++
++    def upload_data(self, hidden, *, reference="CONTEXT-NEW"):
++        return {
++            **hidden,
++            "document_type": "general",
++            "title": "سند زمینه‌ای مرجع",
++            "reference": reference,
++            "description": "سند آزمون زمینه‌ای",
++            "category": "",
++            "confidentiality": "internal",
++            "access_expires_at": "",
++            "file": self._pdf_upload(),
++        }
++
++    def test_contextual_upload_for_all_five_sources(self):
++        self.login()
++        for index, (kind, target) in enumerate(
++            zip(SOURCE_ROUTES, self.targets(), strict=True)
++        ):
++            with self.subTest(kind=kind):
++                response, hidden = self.get_form("upload", kind, target)
++                context = response.context["association_context"]
++                self.assertEqual(hidden[kind], str(target.pk))
++                self.assertEqual(
++                    response.context["form"].fields[kind].widget.input_type, "hidden"
++                )
++                self.assertContains(response, context.project_title)
++                self.assertContains(
++                    response, f'href="{context.source.url.replace("&", "&amp;")}"'
++                )
++                visible = " ".join(_Page(response.content.decode()).text)
++                self.assertNotIn(str(target.pk), visible)
++                self.assertNotContains(
++                    response, "id_contract" if kind != "contract" else "id_project"
++                )
++                before = (Document.objects.count(), DocumentLink.objects.count())
++                cancelled = self.client.get(context.source.url)
++                self.assertEqual(cancelled.status_code, 200)
++                self.assertEqual(
++                    (Document.objects.count(), DocumentLink.objects.count()), before
++                )
++                invalid = self.upload_data(hidden, reference=f"CONTEXT-UP-{index}")
++                invalid["title"] = ""
++                errors = self.client.post(self.url("upload", kind, target), invalid)
++                self.assertEqual(errors.status_code, 400)
++                self.assertContains(errors, context.source.title, status_code=400)
++                self.assertContains(
++                    errors, context.source.url.replace("&", "&amp;"), status_code=400
++                )
++                hidden = _Page(errors.content.decode()).hidden
++                result = self.client.post(
++                    self.url("upload", kind, target),
++                    self.upload_data(hidden, reference=f"CONTEXT-UP-{index}"),
++                )
++                self.assertRedirects(
++                    result, context.source.url, fetch_redirect_response=False
++                )
++                document = Document.objects.get(reference=f"CONTEXT-UP-{index}")
++                self.assertEqual(document.links.count(), 1)
++                self.assertEqual(document.links.get().target, target)
++                self.assertEqual(document.versions.count(), 1)
++                self.assertFalse(document.current_version.is_available)
++                self.assertEqual(document.retention_classification, "standard_document")
++                returned = self.client.get(context.source.url)
++                self.assertContains(returned, document.title)
++                self.assertEqual(
++                    self.client.get(
++                        reverse("documents:download", args=[document.pk])
++                    ).status_code,
++                    403,
++                )
++
++    def test_existing_document_for_all_five_sources_preserves_identity_versions(self):
++        self.login()
++        origin = Project.objects.create(
++            organization=self.organization, code="ORIGIN", name="پروژه منبع"
++        )
++        document = self._create_document(target=origin)
++        version_id = document.current_version_id
++        for kind, target in zip(SOURCE_ROUTES, self.targets(), strict=True):
++            with self.subTest(kind=kind):
++                response, hidden = self.get_form("link", kind, target)
++                context = response.context["association_context"]
++                self.assertContains(response, document.title)
++                self.assertContains(response, document.document_number)
++                self.assertContains(response, "جست‌وجو با عنوان یا شماره سند")
++                before = document.links.count()
++                self.assertEqual(self.client.get(context.source.url).status_code, 200)
++                self.assertEqual(document.links.count(), before)
++                errors = self.client.post(
++                    self.url("link", kind, target), {**hidden, "document": ""}
++                )
++                self.assertEqual(errors.status_code, 400)
++                self.assertContains(errors, context.source.title, status_code=400)
++                self.assertContains(
++                    errors, context.source.url.replace("&", "&amp;"), status_code=400
++                )
++                hidden = _Page(errors.content.decode()).hidden
++                result = self.client.post(
++                    self.url("link", kind, target),
++                    {**hidden, "document": str(document.pk)},
++                )
++                self.assertRedirects(
++                    result, context.source.url, fetch_redirect_response=False
++                )
++                document.refresh_from_db()
++                self.assertEqual(document.current_version_id, version_id)
++                self.assertEqual(document.versions.count(), 1)
++                self.assertEqual(Document.objects.count(), 1)
++                self.assertEqual(document.links.filter(**{kind: target}).count(), 1)
++        self.assertEqual(document.links.count(), 6)
++
++    def test_duplicate_associations_and_retry_do_not_add_rows(self):
++        self.login()
++        origin = Project.objects.create(
++            organization=self.organization, code="RETRY", name="Retry origin"
++        )
++        document = self._create_document(target=origin)
++        _, hidden = self.get_form("link")
++        data = {**hidden, "document": str(document.pk)}
++        self.assertEqual(self.client.post(self.url("link"), data).status_code, 302)
++        before = document.links.count()
++        self.assertEqual(self.client.post(self.url("link"), data).status_code, 400)
++        self.assertEqual(document.links.count(), before)
++        self.assertEqual(document.versions.count(), 1)
++        with self.assertRaises(ValidationError):
++            link_in_context(
++                user=self.owner,
++                organization=self.organization,
++                kind="project",
++                identifier=self.project.pk,
++                document_id=document.pk,
++            )
++        self.assertEqual(document.links.count(), before)
++
++    def test_file_and_required_field_errors_keep_source_and_cancel(self):
++        self.login()
++        response, hidden = self.get_form("upload")
++        source = response.context["association_context"].source
++        data = self.upload_data(hidden)
++        data["title"] = ""
++        data["file"] = self._pdf_upload()
++        result = self.client.post(self.url("upload"), data)
++        self.assertEqual(result.status_code, 400)
++        self.assertContains(result, self.project.name, status_code=400)
++        self.assertContains(result, source.url, status_code=400)
++        self.assertEqual(Document.objects.count(), 0)
++        bad = self.upload_data(_Page(result.content.decode()).hidden)
++        bad["file"] = self._pdf_upload()
++        bad["file"].file.seek(0)
++        bad["file"].file.truncate(0)
++        bad["file"].file.write(b"not-a-pdf")
++        bad["file"].file.seek(0)
++        result = self.client.post(self.url("upload"), bad)
++        self.assertEqual(result.status_code, 400)
++        self.assertContains(
++            result, "محتوای فایل بارگذاری‌شده معتبر نیست", status_code=400
++        )
++        self.assertEqual(Document.objects.count(), 0)
++
++    def test_forged_target_token_and_additional_relationships_are_rejected(self):
++        self.login()
++        _, hidden = self.get_form("upload")
++        other = Project.objects.create(
++            organization=self.organization, code="OTHER", name="Other project"
++        )
++        for overrides, endpoint in (
++            ({"project": str(other.pk)}, self.url("upload")),
++            ({}, self.url("upload", target=other)),
++            ({"project": str(other.pk)}, self.url("upload", target=other)),
++            ({"contract": str(other.pk)}, self.url("upload")),
++            ({"organization": str(self.other_organization.pk)}, self.url("upload")),
++            ({"context_token": "forged"}, self.url("upload")),
++            ({"next": "https://evil.example"}, self.url("upload")),
++        ):
++            with self.subTest(overrides=tuple(overrides)):
++                result = self.client.post(
++                    endpoint, {**self.upload_data(hidden), **overrides}
++                )
++                self.assertEqual(result.status_code, 400)
++                self.assertEqual(Document.objects.count(), 0)
++
++    def test_foreign_targets_and_unsafe_navigation_are_denied(self):
++        self.login()
++        foreign = Project.objects.create(
++            organization=self.other_organization, code="FOREIGN", name="Foreign hidden"
++        )
++        for action in ("upload", "link", "choices"):
++            self.assertEqual(
++                self.client.get(self.url(action, target=foreign)).status_code, 403
++            )
++            self.assertEqual(
++                self.client.get(
++                    self.url(action), {"next": "//evil.example"}
++                ).status_code,
++                403,
++            )
++            self.assertEqual(
++                self.client.get(
++                    self.url(action), {"project": str(foreign.pk)}
++                ).status_code,
++                403,
++            )
++            self.assertEqual(
++                self.client.get(self.url(action, kind="inspection")).status_code, 403
++            )
++
++    def test_picker_search_excludes_duplicates_and_foreign_documents(self):
++        self.login()
++        origin = Project.objects.create(
++            organization=self.organization, code="FIND", name="Find origin"
++        )
++        document = self._create_document(target=origin, title="قابل جستجو سند مرجع")
++        linked = self._create_document(
++            target=self.project, title="Already linked", reference="LINKED"
++        )
++        foreign = self._create_document(
++            organization=self.other_organization,
++            actor=self.other_user,
++            target=Project.objects.create(
++                organization=self.other_organization, code="F", name="Foreign"
++            ),
++            reference="FOREIGN-DOC",
++            title="Foreign hidden title",
++        )
++        result = self.client.get(self.url("choices"), {"q": document.document_number})
++        self.assertEqual(result.status_code, 200)
++        self.assertEqual(
++            [row["value"] for row in result.json()["results"]], [str(document.pk)]
++        )
++        label = result.json()["results"][0]["label"]
++        for value in (document.title, document.document_number, "عمومی", "نسخه 1"):
++            self.assertIn(value, label)
++        self.assertNotIn(str(document.pk), label)
++        result = self.client.get(self.url("choices"))
++        self.assertNotIn(str(linked.pk), str(result.json()))
++        self.assertNotIn(foreign.title, str(result.json()))
++        self.assertIn("no-store", result["Cache-Control"])
++        _, hidden = self.get_form("link")
++        self.assertEqual(
++            self.client.post(
++                self.url("link"), {**hidden, "document": str(foreign.pk)}
++            ).status_code,
++            400,
++        )
++
++    def test_document_view_and_upload_permissions_are_separate_from_download(self):
++        reader = self.reader(["projects.view", "documents.view", "documents.upload"])
++        self.login(reader)
++        _response, hidden = self.get_form("upload")
++        result = self.client.post(self.url("upload"), self.upload_data(hidden))
++        self.assertEqual(result.status_code, 302)
++        document = Document.objects.get(reference="CONTEXT-NEW")
++        self.clean_version(document.current_version)
++        self.assertEqual(
++            self.client.get(
++                reverse("documents:download", args=[document.pk])
++            ).status_code,
++            403,
++        )
++        panel = related_documents_for(
++            user=reader, organization=self.organization, target=self.project
++        )
++        self.assertTrue(panel.upload_url)
++        self.assertTrue(panel.link_url)
++        self.assertFalse(panel.rows[0].download_url)
++
++    def test_viewer_has_no_contextual_mutation_actions_or_endpoints(self):
++        reader = self.reader(["projects.view", "documents.view"])
++        self.login(reader)
++        panel = related_documents_for(
++            user=reader, organization=self.organization, target=self.project
++        )
++        self.assertTrue(panel is None or not panel.upload_url)
++        self.assertFalse(panel.link_url)
++        for action in ("upload", "link", "choices"):
++            self.assertEqual(self.client.get(self.url(action)).status_code, 403)
++
++    def test_upload_only_persona_cannot_read_picker_or_contextual_forms(self):
++        reader = self.reader(["projects.view", "documents.upload"])
++        self.login(reader)
++        for action in ("upload", "link", "choices"):
++            self.assertEqual(self.client.get(self.url(action)).status_code, 403)
++
++    def test_project_and_site_scope_are_rechecked(self):
++        site = ProjectSite.objects.create(
++            organization=self.organization,
++            project=self.project,
++            code="ONLY-SITE",
++            name="Scoped site",
++        )
++        reader = self.reader(
++            ["projects.view", "documents.view", "documents.upload"], site=site
++        )
++        self.login(reader)
++        panel = related_documents_for(
++            user=reader, organization=self.organization, target=self.project
++        )
++        self.assertTrue(panel is None or not panel.upload_url)
++        for action in ("upload", "link", "choices"):
++            self.assertEqual(self.client.get(self.url(action)).status_code, 403)
++
++    def test_site_scoped_daily_report_upload_and_denied_other_site(self):
++        report = self.targets()[-1]
++        reader = self.reader(
++            ["daily_reports.view", "documents.view", "documents.upload"],
++            site=report.site,
++        )
++        self.login(reader)
++        _, hidden = self.get_form("upload", "daily_report", report)
++        result = self.client.post(
++            self.url("upload", "daily_report", report), self.upload_data(hidden)
++        )
++        self.assertEqual(result.status_code, 302)
++        document = Document.objects.get(reference="CONTEXT-NEW")
++        self.assertEqual(document.links.get().daily_report, report)
++        other_site = ProjectSite.objects.create(
++            organization=self.organization,
++            project=self.project,
++            code="OTHER-SITE",
++            name="Other site",
++        )
++        from apps.daily_reports.models import DailyReport
++
++        denied = DailyReport.objects.create(
++            organization=self.organization,
++            project=self.project,
++            site=other_site,
++            reporting_date=report.reporting_date,
++            work_performed="Other site report",
++        )
++        for action in ("upload", "link", "choices"):
++            self.assertEqual(
++                self.client.get(self.url(action, "daily_report", denied)).status_code,
++                403,
++            )
++
++    def test_authority_is_rechecked_inside_upload_transaction(self):
++        self.login()
++        _, hidden = self.get_form("upload")
++        from apps.documents.association import upload_in_context
++
++        def revoke_then_upload(**kwargs):
++            self.organization.memberships.filter(user=self.owner).update(
++                status="suspended"
++            )
++            return upload_in_context(**kwargs)
++
++        with patch(
++            "apps.documents.contextual_views.upload_in_context",
++            side_effect=revoke_then_upload,
++        ):
++            result = self.client.post(self.url("upload"), self.upload_data(hidden))
++        self.assertEqual(result.status_code, 403)
++        self.assertEqual(Document.objects.count(), 0)
++
++    def test_all_context_document_permissions_and_metadata_are_filtered(self):
++        targets = self.targets()
++        denied = Project.objects.create(
++            organization=self.organization, code="DENIED", name="Denied project"
++        )
++        document = self._create_document(title="All context secret")
++        add_document_link(document=document, actor=self.owner, target=denied)
++        reader = self.reader(
++            ["projects.view", "contracts.view", "documents.view", "documents.upload"],
++            project=self.project,
++        )
++        self.login(reader)
++        endpoint = self.url("choices", "contract", targets[1])
++        self.assertEqual(self.client.get(endpoint).json()["results"], [])
++        _, hidden = self.get_form("link", "contract", targets[1])
++        result = self.client.post(
++            self.url("link", "contract", targets[1]),
++            {**hidden, "document": str(document.pk)},
++        )
++        self.assertEqual(result.status_code, 400)
++        self.assertNotContains(result, document.title, status_code=400)
++        self.assertFalse(document.links.filter(contract=targets[1]).exists())
++
++    def test_stale_compatibility_mapping_cannot_be_selected(self):
++        self.login()
++        contract = self.targets()[1]
++        document = self._create_document(title="Hidden stale mapping")
++        extra = Project.objects.create(
++            organization=self.organization, code="MISMATCH", name="Mismatch"
++        )
++        DocumentLink.objects.create(
++            organization=self.organization, document=document, project=extra
++        )
++        self.assertEqual(
++            self.client.get(self.url("choices", "contract", contract)).json()[
++                "results"
++            ],
++            [],
++        )
++        _, hidden = self.get_form("link", "contract", contract)
++        result = self.client.post(
++            self.url("link", "contract", contract),
++            {**hidden, "document": str(document.pk)},
++        )
++        self.assertEqual(result.status_code, 400)
++        self.assertNotContains(result, document.title, status_code=400)
++
++    def test_link_rollback_preserves_typed_legacy_atomicity(self):
++        self.login()
++        contract = self.targets()[1]
++        document = self._create_document()
++        _, hidden = self.get_form("link", "contract", contract)
++        with patch(
++            "apps.documents.services.create_typed_link",
++            side_effect=ValidationError("INTERNAL_MODEL_ERROR"),
++        ):
++            result = self.client.post(
++                self.url("link", "contract", contract),
++                {**hidden, "document": str(document.pk)},
++            )
++        self.assertEqual(result.status_code, 400)
++        self.assertFalse(document.links.filter(contract=contract).exists())
++        self.assertEqual(document.links.count(), 1)
++        self.assertEqual(document.versions.count(), 1)
++        self.assertNotContains(result, "INTERNAL_MODEL_ERROR", status_code=400)
++
++    def test_upload_rollback_removes_only_the_new_binary(self):
++        self.login()
++        _, hidden = self.get_form("upload")
++
++        def files():
++            return {
++                p for p in Path(self.media_directory.name).rglob("*") if p.is_file()
++            }
++
++        before = files()
++        with patch(
++            "apps.documents.services.record_audit_event",
++            side_effect=ValidationError("INTERNAL_ERROR"),
++        ):
++            result = self.client.post(self.url("upload"), self.upload_data(hidden))
++        self.assertEqual(result.status_code, 400)
++        self.assertEqual(Document.objects.count(), 0)
++        self.assertEqual(DocumentVersion.objects.count(), 0)
++        self.assertEqual(files(), before)
++        self.assertNotContains(result, "INTERNAL_ERROR", status_code=400)
++
++    def test_expired_context_keeps_source_and_refreshes_form_intent(self):
++        self.login()
++        with patch(
++            "django.core.signing.time.time",
++            return_value=timezone.now().timestamp() - 7200,
++        ):
++            _, hidden = self.get_form("upload")
++        result = self.client.post(self.url("upload"), self.upload_data(hidden))
++        self.assertEqual(result.status_code, 400)
++        self.assertContains(result, self.project.name, status_code=400)
++        refreshed = _Page(result.content.decode()).hidden
++        self.assertNotEqual(refreshed["context_token"], hidden["context_token"])
++        result = self.client.post(self.url("upload"), self.upload_data(refreshed))
++        self.assertEqual(result.status_code, 302)
++
++    def test_csrf_is_required_for_both_actions(self):
++        client = self.login(client=Client(enforce_csrf_checks=True))
++        for action in ("upload", "link"):
++            self.assertEqual(client.post(self.url(action), {}).status_code, 403)
++        _, hidden = self.get_form("upload", client=client)
++        result = client.post(self.url("upload"), self.upload_data(hidden))
++        self.assertEqual(result.status_code, 302)
++
++    def test_archived_expired_and_sealed_documents_never_enter_picker(self):
++        self.login()
++        contract = self.targets()[1]
++        for index, (field, value) in enumerate(
++            (
++                ("archived_at", timezone.now()),
++                ("access_expires_at", timezone.now()),
++                ("retention_classification", "sealed_supplier_quote_evidence"),
++            )
++        ):
++            document = self._create_document(reference=f"EXCLUDE-{index}")
++            setattr(document, field, value)
++            document.save()
++        self.assertEqual(
++            self.client.get(self.url("choices", "contract", contract)).json()[
++                "results"
++            ],
++            [],
++        )
++
++    def test_candidate_pages_search_and_selected_value_retention(self):
++        self.login()
++        contract = self.targets()[1]
++        for index in range(CHOICE_PAGE_SIZE + 1):
++            document = self._create_document(
++                reference=f"PAGE-{index}", title=f"Document {index:02}"
++            )
++        endpoint = self.url("choices", "contract", contract)
++        first = self.client.get(endpoint).json()
++        self.assertEqual(len(first["results"]), CHOICE_PAGE_SIZE)
++        self.assertTrue(first["next"])
++        second = self.client.get(first["next"]).json()
++        self.assertEqual(len(second["results"]), 1)
++        self.assertIsNone(second["next"])
++        found = self.client.get(
++            endpoint, {"q": f"Document {CHOICE_PAGE_SIZE:02}"}
++        ).json()["results"]
++        self.assertEqual([row["value"] for row in found], [str(document.pk)])
++        _, hidden = self.get_form("link", "contract", contract)
++        result = self.client.post(
++            self.url("link", "contract", contract),
++            {
++                **hidden,
++                "document": str(document.pk),
++                "context_token": "expired",
++            },
++        )
++        self.assertEqual(result.status_code, 400)
++        self.assertContains(result, "selected", status_code=400)
++        self.assertContains(result, document.title, status_code=400)
+--- /dev/null
++++ phase2/templates/documents/association_context.html
+@@ -0,0 +1,6 @@
++<section class="erp-surface erp-document-association-context" aria-label="سابقه مرتبط">
++  <h2>{{ association_context.source.label }} مرتبط</h2>
++  <p><strong>{{ association_context.source.title }}</strong>{% if association_context.number %} · <bdi dir="ltr">{{ association_context.number }}</bdi>{% endif %}</p>
++  <dl><div><dt>پروژه</dt><dd>{{ association_context.project_title }} · <bdi dir="ltr">{{ association_context.project_number }}</bdi></dd></div>{% if association_context.contract_title %}<div><dt>قرارداد</dt><dd>{{ association_context.contract_title }} · <bdi dir="ltr">{{ association_context.contract_number }}</bdi></dd></div>{% endif %}</dl>
++  <p class="erp-document-association-note">سند فقط به این {{ association_context.source.label }} پیوند می‌خورد.</p>
++</section>
+--- /dev/null
++++ phase2/templates/documents/contextual_link.html
+@@ -0,0 +1,18 @@
++{% extends "base.html" %}{% load static %}
++{% block title %}پیوند سند موجود | بنیرا{% endblock %}
++{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{{ form.media.css }}{% endblock %}
++{% block extra_scripts %}{{ form.media.js }}{% endblock %}
++{% block content %}
++<div class="mx-auto max-w-4xl">
++  {% include "components/breadcrumbs.html" with page_breadcrumb_label=association_context.source.label page_breadcrumb_url=association_context.source.url page_title="پیوند سند موجود" only %}
++  <h1 class="mt-4 text-2xl font-bold">پیوند سند موجود</h1>
++  {% include "documents/association_context.html" %}
++  <form class="erp-surface mt-5 space-y-5 rounded-xl p-5" method="post" aria-label="پیوند سند موجود">{% csrf_token %}
++    {% include "components/form_errors.html" with form=form only %}
++    {% for field in form.hidden_fields %}{{ field }}{% if field.errors %}<p class="text-sm text-red-700" role="alert">زمینه فرم معتبر نیست؛ دوباره تلاش کنید.</p>{% endif %}{% endfor %}
++    {% include "components/form_field.html" with field=form.document only %}
++    <p class="text-sm text-slate-500">اصل سند و تاریخچه نسخه‌های آن حفظ می‌شود. دسترسی سند به مجوز مشاهده همه ارتباط‌های آن وابسته است.</p>
++    <div class="erp-document-association-footer"><a class="erp-btn erp-btn--secondary" href="{{ association_context.source.url }}">انصراف</a><button class="erp-btn erp-btn--primary" type="submit">ثبت پیوند سند</button></div>
++  </form>
++</div>
++{% endblock %}
+--- /dev/null
++++ phase2/docs/validation/related-documents-phase2.md
+@@ -0,0 +1,197 @@
++# Related Documents — Phase 2
++
++**Status:** Contextual association implemented; automated validation PASS.
++Required actual-Chrome verification and screenshots **BLOCKED** by disabled
++local browser access in Work settings. Product Owner review pending. Neither
++Phase 1 nor Phase 2 has Human visual acceptance.
++
++## Implemented behavior
++
++The existing shared «اسناد مرتبط» section now has two connected, permission-aware
++actions: «بارگذاری سند جدید» and «پیوند سند موجود». Both reuse the existing
++document icon, ERP buttons, RTL styles and page-specific Phase 1 placement.
++The actions are available for an authorized empty section as well as a populated
++one. Existing navigation, authorized counts, document details and protected
++exact-version downloads remain in place.
++
++| Source | New upload | Existing document | Success / cancellation destination |
++|---|---|---|---|
++| Project | PASS, exact Project only | PASS, same Document identity | Project Detail, Related Documents section |
++| Contract | PASS, exact Contract only | PASS, same Document identity | Contract Detail, Related Documents section |
++| Estimate | PASS, exact Estimate only | PASS, same Document identity | Estimate Detail, Related Documents section; authorized Project URL context retained |
++| Expense | PASS, exact Expense only | PASS, same Document identity | Expense Detail, Related Documents section |
++| Daily Report | PASS, exact Daily Report only | PASS, same Document identity | Daily Report Detail, Related Documents section |
++
++PASS in this table describes isolated Django request/service tests, **not browser
++or visual verification**. Each action has required-field validation, safe cancel
++navigation and a successful submission tested for each of the five sources.
++
++The upload path reuses the existing DMS upload template and creation service.
++The source is resolved server-side and displayed using its business title/number,
++Project name/code and applicable authorized Contract title/number. The source is
++a restricted hidden field, never a repeated Project/Contract selector. Context
++display does not create parent Project/Contract links. Only the explicitly chosen
++source is associated.
++
++The existing-document form reuses the shared searchable selector and its existing
++Tom Select assets, with authorized title, document number, Persian type and current
++version labels. Search accepts titles, numbers and references, including normalized
++Persian/Arabic digits. Results use pages of 20 authorized documents and remote
++search/pagination. A selected authorized result beyond the initial page survives
++validation errors. No document or binary is copied when adding an association.
++
++Successful submissions and cancellation use a canonical, server-generated source
++URL ending in `#related-documents`. Validation errors retain the source, safe
++cancel link and entered metadata; browsers require reselecting an upload after
++an error. An expired form intent produces a Persian error and a refreshed intent
++for retry. Contextual forms return HTTP 400 for invalid submissions and HTTP 403
++for denied access; success uses the normal redirect and Persian message flow.
++
++## Authorization, integrity and lifecycle
++
++- Contextual forms, the picker and writes require both existing DMS view and
++  upload authority, plus the exact source-domain and Project/Site scope. Download
++  remains a separate permission. A view-only persona receives no mutation actions;
++  an upload-only persona cannot use these contextual read-and-associate forms.
++- Source identities are allowlisted to the five existing relationships and
++  reloaded through canonical tenant/scope selectors and DMS target validation.
++  Neither a URL nor its hidden field grants access. A signed, one-hour form intent
++  binds actor, tenant, source type and source identity; permissions are still
++  checked independently and rechecked inside the write transaction.
++- Arbitrary return URLs, tenant inputs, additional target associations, mismatched
++  hidden sources and forged intent are rejected. Navigation is generated from
++  approved source routes. CSRF middleware remains enforced for both POST actions.
++- The picker starts from the canonical DMS list selector, then executes canonical
++  detail and association authorization before rendering each label. Every linked
++  context must be authorized; compatibility-parity failures are excluded. Hidden
++  candidates contribute no labels, counts or pagination totals. JSON is private,
++  no-store; page offsets apply to authorized results only.
++- Both typed and legacy direct links are checked for existing associations.
++  Writes serialize on the existing Document row and execute the canonical
++  `add_document_link` service atomically. Target scope is re-read under a target
++  row lock. A retry cannot add duplicate links or change the current version.
++  Database constraints remain authoritative for competing writes.
++- Uploads execute canonical `create_document` in an atomic wrapper and retain
++  canonical file validation, numbering, audit and typed/legacy creation. On
++  rollback, only binary names tracked by that upload are cleaned up. No existing
++  file, Document or version history is deduplicated or deleted.
++- New versions retain their canonical quarantine/processing state. Success text
++  explicitly says file delivery awaits safety evaluation. Phase 1 exposes no
++  download action until the existing exact-version secure-download service allows
++  it; direct delivery is also denied while quarantined. Adding a link does not
++  mark any version clean or add a version.
++- Archived, expired and sealed supplier-evidence documents are excluded by the
++  existing authorities. Specialized pinned-version/RFQ evidence paths are
++  untouched. Confidentiality classification is preserved; as recorded in the
++  assessment, it does not introduce a new clearance ACL. No additional clearance
++  policy or permissions are claimed by this work.
++- Expected validation/database failures receive bounded Persian errors. Ordinary
++  form labels and messages contain no UUIDs, model names, permission codes or raw
++  database errors. IDs remain transport values in scoped URLs/hidden controls.
++
++## Changed files
++
++| File | Phase 2 change |
++|---|---|
++| `apps/documents/association.py` | New bounded orchestration around existing source and DMS services; authorized choices and atomic association |
++| `apps/documents/contextual_views.py` | Upload, existing-document form and authorized-choice request handlers |
++| `apps/documents/forms.py` | Context-bound subclasses of existing forms; signed intent and shared searchable selector |
++| `apps/documents/urls.py` | Three contextual routes within the existing Documents namespace |
++| `apps/documents/presentation.py` | Permission-aware contextual action URLs on the Phase 1 read projection |
++| `templates/components/related_documents.html` | Two actions in the existing section |
++| `templates/documents/upload.html` | Reuse upload form with fixed source context and source return |
++| `templates/documents/association_context.html` | Shared business-context presentation |
++| `templates/documents/contextual_link.html` | Compact existing-document form using shared components |
++| `apps/documents/static/documents/related_documents.css` | Section actions and responsive context/form styles using existing ERP tokens |
++| `apps/documents/test_contextual_association.py` | 21 focused request/service tests, including five-source subtests |
++| `docs/validation/related-documents-phase2.md` | This completion report |
++
++No five-source business view/template edits were needed in Phase 2. Existing
++Phase 1 integrations consume the shared component. No models, migrations,
++permission definitions, dependencies, relationship registry changes, workflow
++changes, unlink/reassignment controls or Product Surface expansion were added.
++Canonical DMS services and specialized evidence workflows were not edited.
++
++## Automated verification
++
++Final combined suite: **53/53 PASS in 173.430 seconds**, using a dedicated,
++retained PostgreSQL test database, separate from the application's database:
++
++- Phase 2 contextual tests: **21/21 PASS**.
++- Phase 1 related-document regressions: **14/14 PASS**.
++- Existing DMS service regressions: **12/12 PASS**.
++- Existing DMS target-scope regressions: **6/6 PASS**.
++
++Coverage includes all ten contextual success paths, per-source validation/cancel,
++exact-one association, duplicate retry, foreign targets/documents, forged context,
++unsafe return URLs, view/upload/download separation, project/site restrictions,
++transaction-time authority revocation, all-linked-context filtering, legacy/typed
++parity, paginated search, selected-value retention, expired intent, real CSRF,
++quarantine/secure delivery, unchanged version identity, and atomic database/file
++rollback. Phase 1 tests continue to exercise all five Detail responses, navigation,
++empty states, source roundtrips, authorized counts and exact clean-version actions.
++
++Django system checks, affected template compilation, Ruff check/format and
++whitespace validation: PASS. No new JavaScript was introduced.
++
++The two pre-existing processing tests identified in the Phase 1 report remain
++**BASELINE TEST DEBT**, not PASS: their unchanged legacy-role fixture fails at
++Project creation before reaching processing assertions. They were not changed
++or included in the 53 passing tests. The final run covers quarantine refusal and
++authorized clean-version delivery through working fixtures and canonical services.
++See Phase 1 `baseline-test-debt.json` for the earlier attribution evidence.
++
++Evidence under `output/related-documents-phase2/`:
++
++- `verification.txt`: final combined run.
++- `checks.txt`: final lint, system and template checks.
++- `baseline.json`, `baseline/`: exact Phase 1 starting bytes and Git grounding.
++- `implementation.diff`, `touch-set.json`: Phase 2-only changes and final hashes.
++- `browser-verification.json`: browser blocker and pending viewport matrix.
++
++Earlier `focused-tests*.txt` retain development failures corrected before the
++final run: iterator/prefetch use, search matching and test-helper assumptions.
++They are not final verification results.
++
++## Browser verification and screenshots
++
++The actual Chrome tool was attempted and rechecked. It reports local browser use
++disabled in Work settings. No native/CLI browser bypass, substitute browser
++assertions or fabricated screenshots were used.
++
++| Source page and both contextual forms | 1440 px | 1024 px | 390 px |
++|---|---|---|---|
++| Project | BLOCKED | BLOCKED | BLOCKED |
++| Contract | BLOCKED | BLOCKED | BLOCKED |
++| Estimate | BLOCKED | BLOCKED | BLOCKED |
++| Expense | BLOCKED | BLOCKED | BLOCKED |
++| Daily Report | BLOCKED | BLOCKED | BLOCKED |
++
++**Screenshots:** none captured. Before/after source snapshots are available in
++the evidence directories; they are not screenshots. Responsive wrapping, actual
++selector search/scroll, keyboard/focus behavior, visual placement, messages and
++real-browser upload/download/cancellation journeys remain unverified.
++
++When Chrome is enabled, verify each page's two actions at all three widths with
++isolated non-production records: populated/empty sections, permission personas,
++fixed context, long titles, search and additional pages, validation/retry,
++cancellation, success return, duplicate retry and quarantined delivery refusal.
++Capture before/after screenshots and confirm Phase 1 navigation remains usable.
++Then request Product Owner visual review; no visual acceptance is presumed.
++
++## Preservation and limitations
++
++Starting branch `main`, HEAD/upstream
++`560bc3c9f136a3b76c6816dc127a80d74bcb7a1d`. Existing uncommitted work was retained.
++No commit, push, new dependency, application-database migration or production
++operation was performed. Tests use isolated non-production data.
++
++Canonical per-document authorization is deliberately retained for picker options
++and Phase 1 rows. Large candidate sets and later authorized pages can incur
++repeated validation/query cost; no persistent permission cache or weakened
++authorization shortcut was introduced. Remote picker search/pagination requires
++the existing JavaScript enhancement; without it, the native fallback exposes only
++the initial authorized page (plus an authorized retained selection on retry).
++
++Implementation stops here for Product Owner review, with the browser gate
++explicitly BLOCKED and Human visual acceptance still pending.

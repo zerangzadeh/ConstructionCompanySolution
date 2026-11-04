@@ -1,6 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest
 
+from apps.accounts.header_identity import membership_header_identity
 from apps.organizations.authorization import (
     get_active_membership,
     is_platform_admin,
@@ -57,6 +58,7 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
     my_requests_workspace_available = False
     manager_workspace_entry_available = False
     compliance_workspace_available = False
+    header_identity = None
     if organization is not None and request.user.is_authenticated:
         try:
             membership = get_active_membership(
@@ -66,6 +68,7 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
         except PermissionDenied:
             pass
         else:
+            header_identity = membership_header_identity(membership=membership)
             permission_codes = {
                 code
                 for code in membership_permission_codes(membership)
@@ -116,6 +119,7 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
     )
 
     return {
+        "header_identity": header_identity,
         "product_navigation_groups": groups,
         "business_permission_codes": permission_codes,
         "compliance_workspace_available": compliance_workspace_available,

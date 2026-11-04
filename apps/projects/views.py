@@ -2,6 +2,7 @@ from pathlib import Path
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -75,7 +76,22 @@ def project_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
-    scoped_has_records = projects.exists()
+    # Summaries describe the entire authorized scope, independently of filters
+    # and pagination. The existing read service remains the scope authority.
+    counts = dict(
+        projects.order_by()
+        .values("status")
+        .annotate(total=Count("pk"))
+        .values_list("status", "total")
+    )
+    status_rows = [
+        {"label": label, "value": str(counts.get(status, 0)), "status": status}
+        for status, label in sorted(
+            ProjectStatus.choices, key=lambda choice: choice[0] != ProjectStatus.ACTIVE
+        )
+    ]
+    project_total = sum(counts.values())
+    scoped_has_records = bool(project_total)
     filter_form = ProjectListFilterForm(request.GET)
     valid_filters = filter_form.is_valid()
     projects = apply_table_filters(
@@ -135,7 +151,23 @@ def project_list(request: HttpRequest) -> HttpResponse:
             "filter_bar": filter_bar,
             "clear_filters_url": filter_bar["clear_url"],
             "scoped_has_records": scoped_has_records,
+            "project_total": project_total,
+            "project_status_rows": status_rows,
+            "project_charts": [
+                {
+                    "id": "projects-status-chart",
+                    "type": "doughnut",
+                    "rows": status_rows,
+                    "unit": "پروژه",
+                }
+            ]
+            if project_total
+            else [],
             "list_sort": {
+                "key": sort_key,
+                "options": [
+                    {"key": key, "label": label} for key, label in sort_labels.items()
+                ],
                 "label": sort_labels.get(sort_key, "نام پروژه"),
                 "descending": sort_key in sort_labels
                 and request.GET.get("direction", "asc").strip().lower() == "desc",

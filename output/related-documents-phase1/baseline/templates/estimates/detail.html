@@ -1,0 +1,94 @@
+{% extends "base.html" %}{% load static erp_format field_journey product_surface %}
+{% block title %}{{ estimate.title }} | جزئیات برآورد{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}"><link rel="stylesheet" href="{% static 'estimates/detail.css' %}">{% prepare_native_choices item_form %}{{ item_form.media.css }}{% endblock %}
+{% block extra_scripts %}{{ item_form.media.js }}{% endblock %}
+{% block content %}
+<div class="estimate-detail" dir="rtl" data-estimate-state="{{ estimate.status }}">
+    {% include "components/breadcrumbs.html" with page_breadcrumbs=page_breadcrumbs only %}
+    {% with current_items=estimate.current_revision.items.all total_amount=estimate.total_amount %}
+    <header class="ed-heading">
+        <div class="flex min-w-0 items-center gap-3">
+            <span class="ed-title-icon">{% include "contracts/detail_icon.html" with icon="document" only %}</span>
+            <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <h1 id="erp-page-title" class="text-xl font-bold leading-8">{{ estimate.title }}</h1>
+                    {% include "components/status_badge.html" with status=estimate.status label=estimate.get_status_display only %}
+                </div>
+                <div class="ed-subtitle"><bdi dir="ltr">{{ estimate.estimate_number }}</bdi><span>{% if project_detail_url %}<a href="{{ project_detail_url }}">{{ estimate.project.name }}</a>{% else %}{{ estimate.project.name }}{% endif %}</span></div>
+            </div>
+        </div>
+        <div class="ed-actions">
+            {% if estimate.status == "draft" and "estimates.approve" in business_permission_codes and has_current_items %}
+            <form method="post" action="{{ approve_url }}">{% csrf_token %}<button class="erp-btn erp-btn--primary" type="submit"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>تأیید برآورد</button></form>
+            {% endif %}
+            {% if project_detail_url or related_contract_url or estimate.notes %}
+            <details class="ed-menu">
+                <summary class="ed-more" aria-label="عملیات بیشتر برآورد"><span aria-hidden="true">⋮</span></summary>
+                <div class="ed-menu-links">
+                    {% if project_detail_url %}<a href="{{ project_detail_url }}">مشاهده پروژه</a>{% endif %}
+                    {% if related_contract_url and related_contract_url|surface_url_exposed %}<a href="{{ related_contract_url }}">مشاهده قرارداد مرتبط</a>{% endif %}
+                    {% if estimate.notes %}<a href="#estimate-notes">یادداشت‌های برآورد</a>{% endif %}
+                </div>
+            </details>
+            {% endif %}
+        </div>
+    </header>
+    {% if not estimate.contract_id %}<p class="ed-contract-note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-11v2"/></svg>این برآورد به قراردادی متصل نشده است.</p>{% endif %}
+    {% if estimate.status == "approved" %}<p class="ed-state-note" role="status">این برآورد تأیید شده و امکان افزودن یا ویرایش ردیف‌ها وجود ندارد.</p>
+    {% elif estimate.status == "revised" %}<p class="ed-state-note" role="status">این برآورد بازنگری شده است؛ افزودن ردیف فقط در وضعیت پیش‌نویس امکان‌پذیر است.</p>
+    {% elif estimate.status == "archived" %}<p class="ed-state-note" role="status">این برآورد بایگانی شده است و برای مشاهده سوابق نگهداری می‌شود.</p>
+    {% elif estimate.status == "draft" and "estimates.approve" in business_permission_codes and not has_current_items %}<p class="ed-state-note" role="status">{{ empty_approval_message }}</p>{% endif %}
+    <section class="ed-summary" aria-label="خلاصه برآورد">
+        <article class="ed-kpi ed-kpi-total"><span class="ed-kpi-icon">{% include "contracts/detail_icon.html" with icon="coins" only %}</span><div><h2>مبلغ کل برآورد</h2><p><span class="ed-money"><bdi dir="ltr">{{ total_amount|erp_number }}</bdi><small>{% include "estimates/detail_currency.html" %}</small></span></p></div></article>
+        <article class="ed-kpi"><span class="ed-kpi-icon">{% include "contracts/detail_icon.html" with icon="layers" only %}</span><div><h2>تعداد ردیف‌ها</h2><p>{{ current_items|length|erp_number }}</p></div></article>
+        <article class="ed-kpi"><span class="ed-kpi-icon">{% include "contracts/detail_icon.html" with icon="project" only %}</span><div><h2>پروژه</h2><p class="ed-kpi-text">{% if project_detail_url %}<a href="{{ project_detail_url }}">{{ estimate.project.name }}</a>{% else %}{{ estimate.project.name }}{% endif %}</p></div></article>
+        <article class="ed-kpi"><span class="ed-kpi-icon">{% include "contracts/detail_icon.html" with icon="document" only %}</span><div><h2>وضعیت</h2><p>{% include "components/status_badge.html" with status=estimate.status label=estimate.get_status_display only %}</p></div></article>
+    </section>
+    <section class="ed-panel" aria-labelledby="estimate-info-heading">
+        <h2 class="ed-panel-heading" id="estimate-info-heading">{% include "contracts/detail_icon.html" with icon="document" only %}اطلاعات برآورد</h2>
+        <dl class="ed-info">
+            <div><dt>شماره برآورد</dt><dd><bdi dir="ltr">{{ estimate.estimate_number }}</bdi></dd></div>
+            <div><dt>پروژه</dt><dd>{% if project_detail_url %}<a href="{{ project_detail_url }}">{{ estimate.project.name }}</a>{% else %}{{ estimate.project.name }}{% endif %}</dd></div>
+            {% if estimate.created_at %}<div><dt>تاریخ ایجاد</dt><dd><bdi dir="ltr">{{ estimate.created_at|jalali_date }}</bdi></dd></div>{% endif %}
+            {% if estimate.created_by %}<div><dt>ایجادکننده</dt><dd>{{ estimate.created_by.get_full_name|default:estimate.created_by.get_username }}</dd></div>{% endif %}
+            {% if estimate.phase %}<div><dt>فاز</dt><dd>{{ estimate.phase.name }}</dd></div>{% endif %}
+            {% if estimate.contract %}<div><dt>قرارداد مرتبط با این برآورد</dt><dd>{% if related_contract_url and related_contract_url|surface_url_exposed %}<a href="{{ related_contract_url }}">{{ estimate.contract.title }} · <bdi dir="ltr">{{ estimate.contract.contract_number }}</bdi></a>{% else %}<bdi dir="ltr">{{ estimate.contract.contract_number }}</bdi>{% endif %}</dd></div>{% endif %}
+        </dl>
+    </section>
+    <section class="ed-panel ed-items" aria-labelledby="estimate-items-heading">
+        <h2 class="ed-panel-heading" id="estimate-items-heading">{% include "contracts/detail_icon.html" with icon="layers" only %}اقلام برآورد</h2>
+        <p class="ed-table-hint sm:hidden">برای مشاهده همه ستون‌ها، جدول را افقی حرکت دهید.</p>
+        <div class="ed-table-wrap" tabindex="0" role="region" aria-label="جدول اقلام برآورد؛ پیمایش افقی">
+            <table class="ed-table">
+                <caption class="sr-only">اقلام بازنگری جاری برآورد {{ estimate.estimate_number }}؛ مبالغ به {% include "estimates/detail_currency.html" %}</caption>
+                <thead><tr><th scope="col">ردیف</th><th scope="col">شرح</th><th scope="col">واحد</th><th scope="col">مقدار</th><th scope="col">قیمت واحد</th><th scope="col">مبلغ</th><th scope="col">عملیات</th></tr></thead>
+                <tbody>
+                    {% for item in current_items %}
+                    <tr>
+                        <td class="ed-row-number">{{ forloop.counter|erp_number }}</td><th scope="row" class="ed-description">{{ item.description }}</th><td>{{ item.unit_of_measure.name|default:item.unit }}</td><td class="ed-number"><bdi dir="ltr">{{ item.quantity|erp_number }}</bdi></td>
+                        <td class="ed-number"><span class="ed-money"><bdi dir="ltr">{{ item.unit_price|erp_number }}</bdi><small>{% include "estimates/detail_currency.html" %}</small></span></td>
+                        <td class="ed-number ed-line-total"><span class="ed-money"><bdi dir="ltr">{{ item.line_total|erp_number }}</bdi><small>{% include "estimates/detail_currency.html" %}</small></span></td>
+                        <td class="ed-no-actions"><span aria-hidden="true">—</span><span class="sr-only">عملیاتی برای این ردیف در دسترس نیست.</span></td>
+                    </tr>
+                    {% empty %}<tr><td colspan="7" class="ed-empty"><strong>هنوز ردیفی ثبت نشده است.</strong>{% if estimate.status == "draft" and "estimate_items.add" in business_permission_codes %}<p>برای شروع، یک ردیف به برآورد اضافه کنید.</p>{% endif %}</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <footer class="ed-items-total" aria-label="جمع اقلام برآورد"><div><span>مبلغ کل برآورد</span><strong class="ed-money"><bdi dir="ltr">{{ total_amount|erp_number }}</bdi><small>{% include "estimates/detail_currency.html" %}</small></strong></div></footer>
+        {% if estimate.status == "draft" and "estimate_items.add" in business_permission_codes %}
+        <details class="erp-surface ed-item-editor" id="estimate-item-editor" {% if item_form.errors %}open{% endif %}>
+            <summary class="erp-btn erp-btn--primary"><span aria-hidden="true">＋</span> افزودن ردیف</summary>
+            <form class="ed-item-form" method="post" novalidate>
+                {% csrf_token %}<div><h3 class="font-semibold">افزودن ردیف برآورد</h3><p class="mt-1 text-xs text-slate-500">یک ردیف قیمت‌گذاری‌شده به این برآورد پیش‌نویس اضافه کنید.</p></div>
+                {% include "components/form_errors.html" with form=item_form only %}
+                <div class="grid gap-4 sm:grid-cols-2">{% for field in item_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}</div>
+                <div><button class="erp-btn erp-btn--primary" type="submit">افزودن ردیف</button></div>
+                {% include "workforce/_native_choices.html" with choice_form=item_form %}
+            </form>
+        </details>
+        {% endif %}
+    </section>
+    {% if estimate.notes %}<section class="ed-panel" id="estimate-notes" aria-labelledby="estimate-notes-heading"><h2 class="ed-panel-heading" id="estimate-notes-heading">یادداشت‌های برآورد</h2><p class="whitespace-pre-line px-4 py-3 text-sm leading-7 text-slate-600">{{ estimate.notes }}</p></section>{% endif %}
+    {% endwith %}
+</div>
+{% endblock %}

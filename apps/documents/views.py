@@ -14,6 +14,7 @@ from apps.documents.forms import (
     DocumentVersionForm,
 )
 from apps.documents.models import DocumentConfidentiality, DocumentType
+from apps.documents.presentation import document_return_source, document_sources_for
 from apps.documents.services import (
     add_document_link,
     add_document_version,
@@ -40,8 +41,13 @@ from core.list_filters import (
 
 
 def _detail_context(request: HttpRequest, document: object, **extra: object) -> dict:
+    sources = document_sources_for(
+        user=request.user, organization=request.organization, document=document
+    )
     context = {
         "document": document,
+        "document_sources": sources,
+        "document_return_source": document_return_source(request, sources),
         "archive_form": DocumentArchiveForm(),
         "version_form": DocumentVersionForm(),
         "link_form": DocumentLinkForm(

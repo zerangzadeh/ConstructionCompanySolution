@@ -1,0 +1,23 @@
+COMMAND: E:\Construction_Company_Solution\.venv\Scripts\python.exe -m ruff check apps/documents/association.py apps/documents/contextual_views.py apps/documents/forms.py apps/documents/presentation.py apps/documents/urls.py apps/documents/test_contextual_association.py
+All checks passed!
+
+EXIT: 0
+
+COMMAND: E:\Construction_Company_Solution\.venv\Scripts\python.exe -m ruff format --check apps/documents/association.py apps/documents/contextual_views.py apps/documents/forms.py apps/documents/presentation.py apps/documents/urls.py apps/documents/test_contextual_association.py
+6 files already formatted
+
+EXIT: 0
+
+COMMAND: E:\Construction_Company_Solution\.venv\Scripts\python.exe manage.py check
+System check identified no issues (0 silenced).
+
+EXIT: 0
+
+COMMAND: git diff --check -- apps/documents/association.py apps/documents/contextual_views.py apps/documents/forms.py apps/documents/presentation.py apps/documents/urls.py apps/documents/test_contextual_association.py templates/documents/upload.html
+warning: in the working copy of 'apps/documents/forms.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/documents/urls.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'templates/documents/upload.html', LF will be replaced by CRLF the next time Git touches it
+
+EXIT: 0
+
+Affected templates: 13/13 compile PASS

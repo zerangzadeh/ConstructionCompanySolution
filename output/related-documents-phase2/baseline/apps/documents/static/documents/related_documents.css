@@ -1,0 +1,35 @@
+/* Shared read-only DMS section; uses the existing ERP surface and color tokens. */
+.erp-related-documents { margin-block: 20px; min-width: 0; overflow: hidden; border-radius: var(--erp-radius-card, 12px); scroll-margin-block-start: 24px; }
+.erp-related-documents:focus { outline: 2px solid var(--erp-primary); outline-offset: 3px; }
+.erp-related-documents-header { flex-wrap: wrap; gap: 6px 16px; }
+.erp-related-documents-header h2 { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--erp-text); }
+.erp-related-documents-header p { font-size: 12px; color: var(--erp-text-muted); }
+.erp-related-documents .erp-form-icon, a.erp-related-documents-nav .erp-form-icon { width: 18px; height: 18px; flex-shrink: 0; }
+.erp-related-documents-count { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; padding: 1px 6px; border-radius: 5px; background: var(--erp-surface-subtle); color: var(--erp-text-muted); font-size: 11px; font-weight: 500; }
+a.erp-related-documents-nav { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; white-space: nowrap; }
+a.erp-related-documents-nav:hover, a.erp-related-documents-nav[aria-current] { color: var(--erp-primary); }
+a.erp-related-documents-nav:focus-visible, .erp-related-documents a:focus-visible, .erp-related-documents summary:focus-visible, a.erp-document-return:focus-visible, .erp-document-sources a:focus-visible { outline: 2px solid var(--erp-primary); outline-offset: 3px; border-radius: 4px; }
+.erp-related-documents-shortcut { margin-block: 12px; display: flex; flex-wrap: wrap; gap: 8px; border-block-end: 1px solid var(--erp-border); }
+.erp-related-documents-shortcut > a { padding: 10px 4px; border-block-end: 2px solid transparent; color: var(--erp-text-muted); font-size: 12px; }
+.erp-related-documents-shortcut > a:hover, .erp-related-documents-shortcut > a[aria-current] { border-color: var(--erp-primary); }
+.erp-related-documents-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 12px 20px; padding: 12px 20px; border-block-start: 1px solid var(--erp-border); font-size: 13px; }
+.erp-related-documents-name { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--erp-primary); }
+.erp-related-documents-name a { overflow-wrap: anywhere; color: var(--erp-text); font-weight: 500; }
+.erp-related-documents a:hover { color: var(--erp-primary-hover); text-decoration: underline; }
+.erp-related-documents-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 12px; color: var(--erp-text-muted); }
+.erp-related-documents-actions { display: flex; align-items: center; gap: 14px; color: var(--erp-primary); font-size: 12px; font-weight: 600; }
+.erp-related-documents-actions a { display: inline-flex; align-items: center; min-height: 36px; }
+.erp-related-documents-empty { padding: 18px 20px; font-size: 13px; color: var(--erp-text-muted); }
+.erp-related-documents-more > summary { padding: 12px 20px; border-block-start: 1px solid var(--erp-border); font-size: 12px; color: var(--erp-primary); cursor: pointer; }
+.erp-document-return { display: inline-flex; align-items: center; gap: 7px; margin-block: 12px 0; color: var(--erp-primary); font-size: 13px; font-weight: 600; }
+.erp-document-return svg { width: 18px; height: 18px; flex-shrink: 0; }
+.erp-document-sources li { padding-block: 10px; border-block-end: 1px solid var(--erp-border); font-size: 13px; }
+.erp-document-sources li > span { display: block; margin-block-end: 4px; color: var(--erp-text-muted); font-size: 12px; }
+.erp-document-sources a { color: var(--erp-primary); overflow-wrap: anywhere; }
+@media (max-width: 767px) {
+  .erp-related-documents-row { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 12px 16px; }
+  .erp-related-documents-meta, .erp-related-documents-actions { padding-inline-start: 26px; }
+  .erp-related-documents-actions a { min-height: 40px; }
+  .erp-document-return { align-items: flex-start; }
+  .erp-document-return span { min-width: 0; overflow-wrap: anywhere; }
+}

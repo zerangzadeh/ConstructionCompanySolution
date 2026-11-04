@@ -1,0 +1,5 @@
+<strong class="block {% if compact %}truncate{% else %}break-words{% endif %} text-sm font-semibold leading-5 text-slate-800">{{ user.get_full_name|default:user.username }}</strong>
+{% if identity %}
+<span class="block {% if compact %}truncate{% else %}break-words{% endif %} text-xs leading-4 text-slate-600" title="{{ identity.role_label|default:'نقش فعالی ثبت نشده' }}">{{ identity.role_label|default:"نقش فعالی ثبت نشده" }}</span>
+{% if identity.position_title %}<span class="block {% if compact %}truncate{% else %}break-words{% endif %} text-xs leading-4 text-slate-500" title="{{ identity.position_title }}">{{ identity.position_title }}</span>{% endif %}
+{% endif %}

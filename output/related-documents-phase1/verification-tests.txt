@@ -1,0 +1,390 @@
+Using existing test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+
+Found 33 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying accounting.0002_openingbalanceimport_openingbalanceimportline_and_more... OK
+  Applying accounting.0003_fiscalperiod_fiscal_period_no_year_overlap_and_more... OK
+  Applying accounting.0004_journalline_source_line_uuid... OK
+  Applying accounting.0005_reconciliationrun_reconciliationexceptionsnapshot_and_more... OK
+  Applying accounting.0006_reconciliationtieoutsnapshot... OK
+  Applying accounting.0007_reconciliationexceptiondisposition... OK
+  Applying accounting.0008_reconciliationreview... OK
+  Applying accounting.0009_financial_statements_close_adjustments... OK
+  Applying accounting.0010_submitted_policy_versions_required... OK
+  Applying accounting.0011_remove_journalentry_journal_opening_cutoff_consistent_and_more... OK
+  Applying accounting.0012_controlaccountmappingversion... OK
+  Applying accounting.0013_cep042_recognition_mapping... OK
+  Applying accounting.0014_fiscal_year_closing... OK
+  Applying accounting.0015_fiscal_year_closing_controls... OK
+  Applying accounting.0016_fiscal_year_zero_entry_references... OK
+  Applying accounts.0002_alter_user_options_alter_user_created_at_and_more... OK
+  Applying accounts.0003_user_blocked_at... OK
+  Applying accounts.0004_user_national_id... OK
+  Applying accounts.0005_loginpagesettings... OK
+  Applying accounts.0006_user_profile_image... OK
+  Applying accounts.0007_login_page_settings_panel_image... OK
+  Applying accounts.0008_optional_login_panel_messages... OK
+  Applying accounts.0009_user_must_change_password... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying workforce.0009_cep010_person_workrelationship... OK
+  Applying documents.0010_photometadata... OK
+  Applying documents.0011_documentcategory_employee_current_visible_and_more... OK
+  Applying workforce.0010_workrelationshipdocumentlink... OK
+  Applying treasury.0001_initial... OK
+  Applying treasury.0002_chequeinstrument_treasury_cheque_cash_effect_consistent_and_more... OK
+  Applying treasury.0003_account_transition_requester_and_identifier_uniqueness... OK
+  Applying treasury.0004_advancesettlement_advancesettlementreversal_and_more... OK
+  Applying treasury.0005_bankstatementimport_bankreconciliationrun_and_more... OK
+  Applying treasury.0006_bankstatementimport_treasury_stmt_import_positive_bounds_and_more... OK
+  Applying treasury.0007_treasuryglreconciliationreview... OK
+  Applying treasury.0008_bankreconciliationruninvalidation_and_more... OK
+  Applying projects.0009_projectsitedocumentlink... OK
+  Applying expenses.0005_p4_s26_s30_expense_controls... OK
+  Applying expenses.0006_platformexpensegroup_expensecategory_primary_group... OK
+  Applying expenses.0007_expense_primary_group... OK
+  Applying expenses.0008_protect_expense_primary_group... OK
+  Applying expenses.0009_expense_reimbursement_employee_expense_replaces_and_more... OK
+  Applying treasury.0009_remove_paymentrequest_treasury_request_beneficiary_consistent_and_more... OK
+  Applying projects.0010_projectforecastreview_projectforecasttransition_and_more... OK
+  Applying contracts.0005_contracttermversion... OK
+  Applying contracts.0006_p6_s07_s13_payment_due_days... OK
+  Applying contracts.0007_p6_s21_s25_retention_release_terms... OK
+  Applying billing.0001_initial... OK
+  Applying billing.0002_progressrecord... OK
+  Applying billing.0003_progressclaim_claimadjustment_progressclaimitem_and_more... OK
+  Applying billing.0004_f64_claim_approval... OK
+  Applying billing.0005_claimsettlementallocation... OK
+  Applying billing.0006_tenantbillingconfiguration_and_more... OK
+  Applying billing.0007_progressclaim_contract_term_version_and_more... OK
+  Applying billing.0008_p6_s01_s06_seed_reset_and_required_snapshots... OK
+  Applying billing.0009_p6_s07_s13_claim_corrections... OK
+  Applying billing.0010_p6_s07_s13_correction_revision_lineage... OK
+  Applying billing.0011_payablecertificate_payablecertificateadjustment_and_more... OK
+  Applying billing.0012_p6_s21_s25_commercial_controls... OK
+  Applying billing.0013_contractorcomplianceassessment_and_more... OK
+  Applying billing.0014_p6_s26_s32_contractor_submission_snapshot... OK
+  Applying billing.0015_p6_s26_s32_taxpayer_submission_snapshot... OK
+  Applying contracts.0008_contractualrecord_contractualrecordevidence_and_more... OK
+  Applying contracts.0009_p6_s33_s38_immutable_history... OK
+  Applying billing.0016_cep036_indexation... OK
+  Applying billing.0017_cep037_variation_billing_eligibility... OK
+  Applying documents.0012_legacy_payment_reference_preparation... OK
+  Applying treasury.0010_legacy_payment_reference_preparation... OK
+  Applying billing.0018_retire_legacy_claim_settlements... OK
+  Applying commercial.0001_initial... OK
+  Applying commercial.0002_tenderbidactivation... OK
+  Applying commercial.0003_alter_tenderbidrevision_previous_revision... OK
+  Applying compliance.0001_initial... OK
+  Applying contracts.0010_contracttermversion_insurance_classification... OK
+  Applying daily_reports.0005_fieldobservation_fielddownstreamproposal_and_more... OK
+  Applying daily_reports.0006_alter_fieldobservationevidencelink_operation_key_and_more... OK
+  Applying procurement.0001_initial... OK
+  Applying inventory.0001_initial... OK
+  Applying inventory.0002_inventorycount_inventoryreservation_and_more... OK
+  Applying inventory.0003_inventoryvaluationevent_downstreamcostsourceenvelope_and_more... OK
+  Applying inventory.0004_inventoryvaluationevent_average_cost_after_and_more... OK
+  Applying inventory.0005_inventoryvaluationexception... OK
+  Applying equipment.0002_equipmentmeter_equipmentusagelog_fuellog_and_more... OK
+  Applying equipment.0003_maintenanceworkorderevidence... OK
+  Applying equipment.0004_maintenancesparepartreference_quantity_snapshot_precision... OK
+  Applying equipment.0005_equipmentcostpolicyversion_equipmentcostrate_and_more... OK
+  Applying equipment.0006_equipment_handoff_source_uniqueness... OK
+  Applying estimates.0006_cep035_price_book_version_mapping... OK
+  Applying fixed_assets.0001_initial... OK
+  Applying fixed_assets.0002_depreciationrun_depreciation_one_final_book_period_uq_and_more... OK
+  Applying fixed_assets.0003_depreciation_reversal_reason... OK
+  Applying fixed_assets.0004_asset_transfer_dimensions... OK
+  Applying fixed_assets.0005_asset_transfer_source_dimensions... OK
+  Applying fixed_assets.0006_fixed_asset_handoff_source_uniqueness... OK
+  Applying inventory.0006_inventory_handoff_source_uniqueness... OK
+  Applying knowledge.0001_initial... OK
+  Applying knowledge.0002_knowledge_lifecycle_completion... OK
+  Applying organizations.0125_mvp02_field_workforce_permission... OK
+  Applying partner_qualification.0001_p9_s12_s15_partner_qualification... OK
+  Applying payments.0007_retire_legacy_payment... OK
+  Applying workflows.0001_initial... OK
+  Applying workflows.0002_workflowtransitiondefinition_domain_command... OK
+  Applying workflows.0003_workflowtransitiondefinition_required_permission... OK
+  Applying workflows.0004_seed_workflow_catalog... OK
+  Applying workflows.0005_alter_workflowcondition_configuration_and_more... OK
+  Applying workflows.0006_alter_workflowcondition_options_and_more... OK
+  Applying workflows.0007_postgresql_tenant_and_immutability_guards... OK
+  Applying workflows.0008_workflowinstance_workflowstepinstance_workitem_and_more... OK
+  Applying workflows.0009_runtime_tenant_and_immutability_guards... OK
+  Applying procurement.0002_alter_goodsreceipt_options_and_more... OK
+  Applying workflows.0010_procurement_pilot_compatibility... OK
+  Applying workflows.0011_purchase_request_canonical_scope... OK
+  Applying workflows.0012_daily_report_compatibility_catalog... OK
+  Applying safety.0001_initial... OK
+  Applying workflows.0013_safety_compatibility_catalog... OK
+  Applying quality.0001_initial... OK
+  Applying workflows.0014_quality_compatibility_catalog... OK
+  Applying workflows.0015_estimate_contract_amendment_compatibility_catalog... OK
+  Applying workflows.0016_inventory_stock_transaction_compatibility_catalog... OK
+  Applying workflows.0017_equipment_maintenance_compatibility_catalog... OK
+  Applying workflows.0018_project_baseline_compatibility_catalog... OK
+  Applying workflows.0019_progress_verification_compatibility_catalog... OK
+  Applying workflows.0020_progress_claim_approval_compatibility_catalog... OK
+  Applying workflows.0021_p1_1_unresolved_work... OK
+  Applying workflows.0022_p1_1_routing_policy... OK
+  Applying workflows.0023_p1_1_remove_deferred_self_approval... OK
+  Applying workflows.0024_p6_s14_s20_payable_certificate_catalog... OK
+  Applying workflows.0025_p6_s21_s25_commercial_control_catalog... OK
+  Applying workflows.0026_p6_s26_s32_statutory_catalog... OK
+  Applying workflows.0027_p6_s33_s38_contractual_record_catalog... OK
+  Applying workforce.0011_cep055_personal_data_change... OK
+  Applying workforce.0012_cep056_certificate_framework... OK
+  Applying workforce.0013_cep022_employment_lifecycle... OK
+  Applying timekeeping.0002_attendancecorrectionrequest... OK
+  Applying timekeeping.0003_cep022_employment_lifecycle... OK
+  Applying workforce.0014_cep023_leave_authority... OK
+  Applying workforce.0015_cep029_identity_migration... OK
+  Applying payroll.0004_p7_s27_statutory_identity_evidence... OK
+  Applying payroll.0005_financialhandoffproposal_financialhandoffline_and_more... OK
+  Applying payroll.0006_cep025_operational_cumulative_ytd... OK
+  Applying payroll.0007_statutorysourcepackage... OK
+  Applying payroll.0008_cep054_payroll_inquiry... OK
+  Applying payroll.0009_cep058_external_opening_provenance... OK
+  Applying payroll.0010_cep069_reviewed_statutory_context... OK
+  Applying procurement.0003_p5_s05_rfq_foundation... OK
+  Applying procurement.0004_p5_s06_sealed_quote_capture... OK
+  Applying procurement.0005_p5_s07_rfq_close_manifest... OK
+  Applying procurement.0006_quoterevisionevidence... OK
+  Applying procurement.0007_quoteconfidentialaccessgrant_and_more... OK
+  Applying procurement.0008_p5_s09_package_count_constraint... OK
+  Applying procurement.0009_p5_s10_admissibility... OK
+  Applying procurement.0010_p5_s11_comparison_award... OK
+  Applying procurement.0011_p5_s11_conflict_lineage... OK
+  Applying procurement.0012_p5_s11_comparison_input_lineage... OK
+  Applying procurement.0013_p5_s11_normalization_precision... OK
+  Applying procurement.0014_purchaseorder_source_award_and_more... OK
+  Applying procurement.0015_p5_s18_s22_supplier_portal_foundation... OK
+  Applying procurement.0016_external_portal_original_evidence... OK
+  Applying procurement.0017_mvp04b_explicit_rfq_scope... OK
+  Applying projects.0011_cep065_cashflow_evidence... OK
+  Applying quality.0002_qualityissue_review_status_qualityreviewrevision_and_more... OK
+  Applying reporting.0001_initial... OK
+  Applying reporting.0002_seed_approved_metric_catalogue... OK
+  Applying reporting.0003_p10_s07_s13_reconciliation_controls... OK
+  Applying reporting.0004_seed_p10_s07_s13_reconciliation_pairs... OK
+  Applying reporting.0005_projectcloseoutprofiledefinition_and_more... OK
+  Applying reporting.0006_seed_p10_s14_s17_project_closeout_profile... OK
+  Applying safety.0002_safetyincident_review_status_safetyreviewrevision_and_more... OK
+  Applying sessions.0001_initial... OK
+  Applying subledgers.0001_initial... OK
+  Applying subledgers.0002_subledgerreconciliationreview... OK
+  Applying subledgers.0003_matchtolerancepolicy_supplierinvoice_and_more... OK
+  Applying subledgers.0004_obligation_control_account_and_more... OK
+  Applying subledgers.0005_supplierinvoiceapreversal... OK
+  Applying subledgers.0006_cep043_payroll_ap... OK
+  Applying subledgers.0007_cep044_writeoff_correction_lineage... OK
+  Applying subledgers.0008_cep044_writeoff_actions... OK
+  Applying support.0001_p9_s16_s20_support... OK
+  Applying support.0002_p9_s16_s20_evidence... OK
+  Applying treasury.0011_cep061_payroll_lineage... OK
+  Applying timekeeping.0004_cep062_mission_effect_lineage... OK
+  Applying workforce.0016_mvp02_person_national_id... OK
+  Applying workforce.0017_mvp02_assignment_planned_end... OK
+System check identified no issues (0 silenced).
+test_all_linked_contexts_must_be_authorized (apps.documents.test_related_documents.RelatedDocumentsTests.test_all_linked_contexts_must_be_authorized) ... ok
+test_archived_expired_sealed_and_deleted_source_documents_are_absent (apps.documents.test_related_documents.RelatedDocumentsTests.test_archived_expired_sealed_and_deleted_source_documents_are_absent) ... ok
+test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) ... {"timestamp":"2026-11-03T21:04:23.005080+00:00","event":"http.response","request_id":"e01c2ddc-4aa9-48b4-bf46-9fda7b8bdeb7","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1797}
+
+  test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) (route='projects:detail') ... ERROR
+{"timestamp":"2026-11-03T21:04:24.131472+00:00","event":"http.response","request_id":"94412a0f-266b-4f04-964e-500f56444f41","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1122}
+  test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) (route='contracts:detail') ... ERROR
+{"timestamp":"2026-11-03T21:04:24.890745+00:00","event":"http.response","request_id":"53a709db-5715-407f-a7d6-ccd42e36db42","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":757}
+  test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) (route='estimates:detail') ... ERROR
+{"timestamp":"2026-11-03T21:04:25.549927+00:00","event":"http.response","request_id":"39b01094-961b-47b3-a5b6-0dbc605ee6f7","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":657}
+  test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) (route='expenses:detail') ... ERROR
+{"timestamp":"2026-11-03T21:04:26.587786+00:00","event":"http.response","request_id":"d5a8c786-fd5f-48b0-9246-53dfb9ba2e1a","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":1033}
+  test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) (route='daily_reports:detail') ... ERROR
+test_daily_report_site_scope_does_not_expand_to_another_site (apps.documents.test_related_documents.RelatedDocumentsTests.test_daily_report_site_scope_does_not_expand_to_another_site) ... ERROR
+test_denied_dms_permission_hides_panel_and_count (apps.documents.test_related_documents.RelatedDocumentsTests.test_denied_dms_permission_hides_panel_and_count) ... ok
+test_document_detail_shows_real_source_return_without_new_mutation_flows (apps.documents.test_related_documents.RelatedDocumentsTests.test_document_detail_shows_real_source_return_without_new_mutation_flows) ... {"timestamp":"2026-11-03T21:04:28.532629+00:00","event":"http.response","request_id":"0efa8054-f3d8-47ca-b4fe-6c65ee71a380","method":"GET","route":"documents:detail","status_code":200,"duration_ms":995}
+ok
+test_download_requires_its_own_permission_and_exact_clean_version (apps.documents.test_related_documents.RelatedDocumentsTests.test_download_requires_its_own_permission_and_exact_clean_version) ... ok
+test_estimate_return_does_not_require_unauthorized_project_context (apps.documents.test_related_documents.RelatedDocumentsTests.test_estimate_return_does_not_require_unauthorized_project_context) ... ok
+test_five_sources_deduplicate_mirrors_and_generate_safe_roundtrips (apps.documents.test_related_documents.RelatedDocumentsTests.test_five_sources_deduplicate_mirrors_and_generate_safe_roundtrips) ... ok
+test_forged_return_context_never_produces_a_url (apps.documents.test_related_documents.RelatedDocumentsTests.test_forged_return_context_never_produces_a_url) ... ok
+test_missing_compatibility_parity_hides_document (apps.documents.test_related_documents.RelatedDocumentsTests.test_missing_compatibility_parity_hides_document) ... ok
+test_missing_source_permission_and_foreign_target_fail_closed (apps.documents.test_related_documents.RelatedDocumentsTests.test_missing_source_permission_and_foreign_target_fail_closed) ... ok
+test_only_direct_entity_links_are_projected (apps.documents.test_related_documents.RelatedDocumentsTests.test_only_direct_entity_links_are_projected) ... ok
+test_add_link_supports_an_existing_financial_entity_and_audits (apps.documents.tests.DocumentServiceTests.test_add_link_supports_an_existing_financial_entity_and_audits) ... ok
+test_archive_preserves_versions_and_links_and_removes_active_listing (apps.documents.tests.DocumentServiceTests.test_archive_preserves_versions_and_links_and_removes_active_listing) ... ok
+test_create_document_records_first_version_link_metadata_and_audit (apps.documents.tests.DocumentServiceTests.test_create_document_records_first_version_link_metadata_and_audit) ... ok
+test_document_access_requires_linked_context_permission (apps.documents.tests.DocumentServiceTests.test_document_access_requires_linked_context_permission) ... ok
+test_document_link_requires_exactly_one_same_tenant_target (apps.documents.tests.DocumentServiceTests.test_document_link_requires_exactly_one_same_tenant_target) ... ok
+test_download_audit_is_version_specific_and_rechecks_access (apps.documents.tests.DocumentServiceTests.test_download_audit_is_version_specific_and_rechecks_access) ... ok
+test_endpoints_reject_cross_tenant_document_uuid (apps.documents.tests.DocumentServiceTests.test_endpoints_reject_cross_tenant_document_uuid) ... {"timestamp":"2026-11-03T21:04:49.307820+00:00","event":"http.response","request_id":"a8469949-a2ef-4c12-ae0b-f00c0ef871fb","method":"GET","route":"documents:detail","status_code":403,"duration_ms":188}
+{"timestamp":"2026-11-03T21:04:49.498226+00:00","event":"http.response","request_id":"5e989724-8c39-424d-b697-87c7f407048f","method":"GET","route":"documents:download","status_code":403,"duration_ms":189}
+{"timestamp":"2026-11-03T21:04:49.699626+00:00","event":"http.response","request_id":"430b1008-81d6-448c-be79-81d67dd2bda8","method":"POST","route":"documents:archive","status_code":403,"duration_ms":200}
+ok
+test_new_version_is_numbered_immutable_and_becomes_current (apps.documents.tests.DocumentServiceTests.test_new_version_is_numbered_immutable_and_becomes_current) ... ok
+test_partner_evidence_document_keeps_tenant_and_domain_permission (apps.documents.tests.DocumentServiceTests.test_partner_evidence_document_keeps_tenant_and_domain_permission) ... ok
+test_partner_evidence_document_resolves_registered_link_model (apps.documents.tests.DocumentServiceTests.test_partner_evidence_document_resolves_registered_link_model) ... ok
+test_upload_validation_rejects_mismatched_type_and_signature (apps.documents.tests.DocumentServiceTests.test_upload_validation_rejects_mismatched_type_and_signature) ... ok
+test_views_create_add_version_and_secure_download (apps.documents.tests.DocumentServiceTests.test_views_create_add_version_and_secure_download) ... {"timestamp":"2026-11-03T21:04:57.235493+00:00","event":"http.response","request_id":"b6b418fa-b71b-495c-8830-e8e1187516a6","method":"POST","route":"documents:upload","status_code":302,"duration_ms":278}
+{"timestamp":"2026-11-03T21:04:58.192006+00:00","event":"http.response","request_id":"3ad52add-9746-4b82-94d5-acb467b691bc","method":"GET","route":"documents:detail","status_code":200,"duration_ms":954}
+{"timestamp":"2026-11-03T21:04:58.498960+00:00","event":"http.response","request_id":"a529a430-2897-403d-9d21-b5899f19e67c","method":"POST","route":"documents:version-add","status_code":302,"duration_ms":306}
+{"timestamp":"2026-11-03T21:04:59.331747+00:00","event":"http.response","request_id":"4d9a9687-058b-40f7-9f0c-bcbb647819b7","method":"GET","route":"documents:detail","status_code":200,"duration_ms":831}
+{"timestamp":"2026-11-03T21:04:59.826001+00:00","event":"http.response","request_id":"8a19664a-35dc-47a4-b8dd-059f56939ece","method":"GET","route":"documents:download","status_code":403,"duration_ms":490}
+{"timestamp":"2026-11-03T21:05:00.382412+00:00","event":"http.response","request_id":"07f1e772-cdc8-44c3-8d1a-085ca12622b5","method":"GET","route":"documents:download","status_code":200,"duration_ms":532}
+ok
+test_inactive_membership_fails_closed (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_inactive_membership_fails_closed) ... ok
+test_linked_contract_choices_intersect_source_project (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_linked_contract_choices_intersect_source_project) ... ok
+test_missing_permission_cannot_reveal_choices (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_missing_permission_cannot_reveal_choices) ... ok
+test_organization_grant_remains_tenant_filtered (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_organization_grant_remains_tenant_filtered) ... ok
+test_project_reader_has_exact_allowed_choices_and_valid_target (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_project_reader_has_exact_allowed_choices_and_valid_target) ... ok
+test_ungranted_and_foreign_targets_cannot_be_selected (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_ungranted_and_foreign_targets_cannot_be_selected) ... ok
+test_permission_scoped_search_compare_and_signature_boundary (apps.documents.test_p1_s21_processing.P1S21DocumentProcessingTests.test_permission_scoped_search_compare_and_signature_boundary) ... ERROR
+test_unknown_and_latest_non_clean_assessment_fail_closed (apps.documents.test_p1_s21_processing.P1S21DocumentProcessingTests.test_unknown_and_latest_non_clean_assessment_fail_closed) ... ERROR
+
+======================================================================
+ERROR: test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) (route='projects:detail')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_related_documents.py", line 298, in test_business_templates_have_one_navigation_and_one_read_only_section
+    RequestFactory().get("/documents/", query), sources
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'bs4'
+
+======================================================================
+ERROR: test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) (route='contracts:detail')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_related_documents.py", line 298, in test_business_templates_have_one_navigation_and_one_read_only_section
+    RequestFactory().get("/documents/", query), sources
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'bs4'
+
+======================================================================
+ERROR: test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) (route='estimates:detail')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_related_documents.py", line 298, in test_business_templates_have_one_navigation_and_one_read_only_section
+    RequestFactory().get("/documents/", query), sources
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'bs4'
+
+======================================================================
+ERROR: test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) (route='expenses:detail')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_related_documents.py", line 298, in test_business_templates_have_one_navigation_and_one_read_only_section
+    RequestFactory().get("/documents/", query), sources
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'bs4'
+
+======================================================================
+ERROR: test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) (route='daily_reports:detail')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_related_documents.py", line 298, in test_business_templates_have_one_navigation_and_one_read_only_section
+    RequestFactory().get("/documents/", query), sources
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'bs4'
+
+======================================================================
+ERROR: test_daily_report_site_scope_does_not_expand_to_another_site (apps.documents.test_related_documents.RelatedDocumentsTests.test_daily_report_site_scope_does_not_expand_to_another_site)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.CheckViolation: new row for relation "organizations_membershipscopegrant" violates check constraint "membership_scope_grant_shape"
+DETAIL:  Failing row contains (e3d7bece-f58d-4c2e-a170-a5dfc8edb9b3, 2026-11-03 21:04:26.914335+00, 2026-11-03 21:04:26.914335+00, site, 2026-11-03 21:04:26.914335+00, null, Explicit isolated read-projection scope, manual, null, , null, null, f90b5f0e-2438-4801-b0fb-2621692579fb, d157470a-1187-4252-b294-6f08d3fa8c8f, null, null, 5db46c46-6410-4c6a-a561-24f523f3963b).
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_related_documents.py", line 216, in test_daily_report_site_scope_does_not_expand_to_another_site
+    organization=self.organization, document=document, project=other
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\test_related_documents.py", line 66, in reader
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 902, in save
+    self.save_base(
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1008, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1169, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1210, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 1873, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1882, in execute_sql
+    cursor.execute(sql, params)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+django.db.utils.IntegrityError: new row for relation "organizations_membershipscopegrant" violates check constraint "membership_scope_grant_shape"
+DETAIL:  Failing row contains (e3d7bece-f58d-4c2e-a170-a5dfc8edb9b3, 2026-11-03 21:04:26.914335+00, 2026-11-03 21:04:26.914335+00, site, 2026-11-03 21:04:26.914335+00, null, Explicit isolated read-projection scope, manual, null, , null, null, f90b5f0e-2438-4801-b0fb-2621692579fb, d157470a-1187-4252-b294-6f08d3fa8c8f, null, null, 5db46c46-6410-4c6a-a561-24f523f3963b).
+
+======================================================================
+ERROR: test_permission_scoped_search_compare_and_signature_boundary (apps.documents.test_p1_s21_processing.P1S21DocumentProcessingTests.test_permission_scoped_search_compare_and_signature_boundary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_p1_s21_processing.py", line 52, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_unknown_and_latest_non_clean_assessment_fail_closed (apps.documents.test_p1_s21_processing.P1S21DocumentProcessingTests.test_unknown_and_latest_non_clean_assessment_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_p1_s21_processing.py", line 52, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+----------------------------------------------------------------------
+Ran 33 tests in 43.890s
+
+FAILED (errors=8)
+Preserving test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+

@@ -12,6 +12,7 @@
         const styles = getComputedStyle(document.documentElement);
         const color = token => styles.getPropertyValue('--bonira-' + token).trim();
         const palette = ['royal-blue', 'deep-navy', 'muted', 'light-gray'].map(color);
+        const statusColors = {planning: 'royal-blue', active: 'success', on_hold: 'warning', completed: 'deep-navy', cancelled: 'danger'};
         let configs;
         try { configs = JSON.parse(source.textContent); } catch { return; }
         for (const config of configs) {
@@ -28,17 +29,18 @@
                         datasets: [{
                             label: config.unit,
                             data: config.rows.map(row => Number(row.value)),
-                            backgroundColor: palette,
-                            borderWidth: 0,
+                            backgroundColor: config.rows.map((row, index) => row.status ? color(statusColors[row.status] || 'muted') : palette[index % palette.length]),
+                            borderColor: color('white'),
+                            borderWidth: config.type === 'doughnut' ? 2 : 0,
                             borderRadius: config.type === 'bar' ? 5 : 0,
-                            maxBarThickness: 36,
+                            maxBarThickness: 94,
                         }],
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false, animation: false,
                         locale: 'fa-IR',
                         font: {family: 'Vazirmatn'},
-                        cutout: config.type === 'doughnut' ? '72%' : undefined,
+                        cutout: config.type === 'doughnut' ? '70%' : undefined,
                         plugins: {
                             legend: {display: false},
                             tooltip: {
@@ -49,7 +51,7 @@
                         },
                         scales: config.type === 'bar' ? {
                             x: {grid: {display: false}, ticks: {color: color('slate'), font: {family: 'Vazirmatn', size: 11}}},
-                            y: {beginAtZero: true, ticks: {color: color('muted'), font: {family: 'Vazirmatn', size: 10}, callback: value => new Intl.NumberFormat('fa-IR', {notation: 'compact'}).format(value)}, grid: {color: color('light-gray')}},
+                            y: {beginAtZero: true, title: {display: true, text: config.unit, color: color('muted'), font: {family: 'Vazirmatn', size: 10}}, ticks: {color: color('muted'), font: {family: 'Vazirmatn', size: 10}, callback: value => new Intl.NumberFormat('fa-IR', {notation: 'compact'}).format(value)}, grid: {color: color('light-gray')}},
                         } : undefined,
                     },
                 });
@@ -64,4 +66,16 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);
     else mount();
     document.addEventListener('htmx:afterSwap', mount);
+    const updateTabs = () => {
+        const current = location.hash || '#overview';
+        document.querySelectorAll('.erp-project-tabs a[href^="#"]').forEach(link => {
+            const active = link.hash === current;
+            link.classList.toggle('is-current', active);
+            if (active) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+        });
+    };
+    addEventListener('hashchange', updateTabs);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateTabs);
+    else updateTabs();
 })();

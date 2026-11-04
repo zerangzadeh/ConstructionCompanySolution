@@ -1,0 +1,882 @@
+Found 19 test(s).
+Using existing test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+test_all_context_document_permissions_and_metadata_are_filtered (apps.documents.test_contextual_association.ContextualAssociationTests.test_all_context_document_permissions_and_metadata_are_filtered) ... {"timestamp":"2026-11-04T16:57:42.396267+00:00","event":"http.response","request_id":"4f22b7c2-be93-4d66-81a6-14216b85e486","method":"GET","route":"documents:contextual-choices","status_code":500,"duration_ms":220}
+ERROR
+test_archived_expired_and_sealed_documents_never_enter_picker (apps.documents.test_contextual_association.ContextualAssociationTests.test_archived_expired_and_sealed_documents_never_enter_picker) ... {"timestamp":"2026-11-04T16:57:43.549448+00:00","event":"http.response","request_id":"1dfef196-23ad-40d9-a9c6-3b4bd731f476","method":"GET","route":"documents:contextual-choices","status_code":500,"duration_ms":594}
+ERROR
+test_candidate_pages_search_and_selected_value_retention (apps.documents.test_contextual_association.ContextualAssociationTests.test_candidate_pages_search_and_selected_value_retention) ... {"timestamp":"2026-11-04T16:57:47.083847+00:00","event":"http.response","request_id":"9e7cd05e-3121-4d6e-b9f3-36827123fdcc","method":"GET","route":"documents:contextual-choices","status_code":500,"duration_ms":426}
+ERROR
+test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) ... {"timestamp":"2026-11-04T16:57:47.744099+00:00","event":"http.response","request_id":"9b682d64-ed82-4f69-add4-2eb8dbdf9b7d","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":521}
+{"timestamp":"2026-11-04T16:57:48.162493+00:00","event":"http.response","request_id":"983d4022-2680-4664-824c-f0b0b1b59bda","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":409}
+
+  test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) (kind='project') ... FAIL
+{"timestamp":"2026-11-04T16:57:48.540716+00:00","event":"http.response","request_id":"7dca9a00-36c8-474c-b074-4ec382885bd9","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":376}
+{"timestamp":"2026-11-04T16:57:49.074482+00:00","event":"http.response","request_id":"5328a77b-bd10-4d8f-ac5a-d3a246765751","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":526}
+  test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) (kind='contract') ... FAIL
+{"timestamp":"2026-11-04T16:57:49.518134+00:00","event":"http.response","request_id":"61ad1bc4-69d2-4045-a066-38ae89e81e5d","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":442}
+{"timestamp":"2026-11-04T16:57:49.980616+00:00","event":"http.response","request_id":"d6231720-3a05-45ee-9f50-38b173fbaf33","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":452}
+  test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) (kind='estimate') ... FAIL
+{"timestamp":"2026-11-04T16:57:50.389902+00:00","event":"http.response","request_id":"8fd27989-6791-4a7f-8778-b2f48744015c","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":407}
+{"timestamp":"2026-11-04T16:57:50.947113+00:00","event":"http.response","request_id":"4747c55f-5f9b-4b1f-9dc5-e1e14053be6c","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":543}
+  test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) (kind='expense') ... FAIL
+{"timestamp":"2026-11-04T16:57:51.362830+00:00","event":"http.response","request_id":"adbedd47-2bde-467c-a87d-6230cb960e74","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":414}
+{"timestamp":"2026-11-04T16:57:51.786160+00:00","event":"http.response","request_id":"4e6f6cbe-3651-4787-b856-523040793344","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":414}
+  test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) (kind='daily_report') ... FAIL
+test_csrf_is_required_for_both_actions (apps.documents.test_contextual_association.ContextualAssociationTests.test_csrf_is_required_for_both_actions) ... {"timestamp":"2026-11-04T16:57:51.853230+00:00","event":"http.response","request_id":"28a7c650-667a-458c-8306-ef290d45caf9","method":"POST","route":"documents:contextual-upload","status_code":403,"duration_ms":12}
+{"timestamp":"2026-11-04T16:57:51.861232+00:00","event":"http.response","request_id":"7e149d43-4af2-48ae-935e-be66147f83b7","method":"POST","route":"documents:contextual-link","status_code":403,"duration_ms":7}
+{"timestamp":"2026-11-04T16:57:52.263927+00:00","event":"http.response","request_id":"ceb50bc1-8242-4c65-ac01-10c932323fd2","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":402}
+{"timestamp":"2026-11-04T16:57:52.672093+00:00","event":"http.response","request_id":"211d36c8-8769-4540-838e-f261b3e5bca7","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":402}
+FAIL
+test_document_view_and_upload_permissions_are_separate_from_download (apps.documents.test_contextual_association.ContextualAssociationTests.test_document_view_and_upload_permissions_are_separate_from_download) ... {"timestamp":"2026-11-04T16:57:52.887053+00:00","event":"http.response","request_id":"0e7ae689-78c1-4441-8233-d6a69d0dc278","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":143}
+{"timestamp":"2026-11-04T16:57:53.102481+00:00","event":"http.response","request_id":"c9775218-eea6-4153-a558-3e1023c2a560","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":211}
+FAIL
+test_duplicate_associations_and_retry_do_not_add_rows (apps.documents.test_contextual_association.ContextualAssociationTests.test_duplicate_associations_and_retry_do_not_add_rows) ... {"timestamp":"2026-11-04T16:57:54.005552+00:00","event":"http.response","request_id":"73a9c85e-c348-4503-9142-be8d4644bb4e","method":"GET","route":"documents:contextual-link","status_code":500,"duration_ms":790}
+ERROR
+test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) ... {"timestamp":"2026-11-04T16:57:55.102077+00:00","event":"http.response","request_id":"f4f1744e-e9eb-4f0a-ab43-25fa028afb7b","method":"GET","route":"documents:contextual-link","status_code":500,"duration_ms":906}
+
+  test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) (kind='project') ... ERROR
+{"timestamp":"2026-11-04T16:57:55.867944+00:00","event":"http.response","request_id":"b7e5155c-7d04-4e73-bc5a-819cc3413031","method":"GET","route":"documents:contextual-link","status_code":500,"duration_ms":763}
+  test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) (kind='contract') ... ERROR
+{"timestamp":"2026-11-04T16:57:56.712122+00:00","event":"http.response","request_id":"d41e28d9-6c7b-41c2-b691-6197338eccf8","method":"GET","route":"documents:contextual-link","status_code":500,"duration_ms":842}
+  test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) (kind='estimate') ... ERROR
+{"timestamp":"2026-11-04T16:57:57.464823+00:00","event":"http.response","request_id":"ad3c9842-0aa5-4e70-a3e7-b25ef6120c02","method":"GET","route":"documents:contextual-link","status_code":500,"duration_ms":751}
+  test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) (kind='expense') ... ERROR
+{"timestamp":"2026-11-04T16:57:58.157378+00:00","event":"http.response","request_id":"23020db8-11d5-4356-9b62-7286a51ec2eb","method":"GET","route":"documents:contextual-link","status_code":500,"duration_ms":691}
+  test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) (kind='daily_report') ... ERROR
+test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) ... FAIL
+test_expired_context_keeps_source_and_refreshes_form_intent (apps.documents.test_contextual_association.ContextualAssociationTests.test_expired_context_keeps_source_and_refreshes_form_intent) ... {"timestamp":"2026-11-04T14:57:58.209287+00:00","event":"http.response","request_id":"d72431f6-20d1-4636-9c3c-24b1af24776a","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":551}
+{"timestamp":"2026-11-04T16:57:59.116400+00:00","event":"http.response","request_id":"5d21c869-0860-4193-973d-59edab97696e","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":349}
+{"timestamp":"2026-11-04T16:57:59.527701+00:00","event":"http.response","request_id":"d17c518f-9eaf-4773-bdbc-5c20179965ba","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":406}
+FAIL
+test_file_and_required_field_errors_keep_source_and_cancel (apps.documents.test_contextual_association.ContextualAssociationTests.test_file_and_required_field_errors_keep_source_and_cancel) ... {"timestamp":"2026-11-04T16:57:59.976821+00:00","event":"http.response","request_id":"63fe3fc6-a3bb-4136-8e78-00646e64acca","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":398}
+{"timestamp":"2026-11-04T16:58:00.402771+00:00","event":"http.response","request_id":"8a857adb-cf68-4221-ba4c-8a5cd6233718","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":420}
+{"timestamp":"2026-11-04T16:58:00.803575+00:00","event":"http.response","request_id":"c8b66102-45c8-4ca2-890d-0e0d04f0cc99","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":393}
+ok
+test_foreign_targets_and_unsafe_navigation_are_denied (apps.documents.test_contextual_association.ContextualAssociationTests.test_foreign_targets_and_unsafe_navigation_are_denied) ... {"timestamp":"2026-11-04T16:58:01.064054+00:00","event":"http.response","request_id":"7c6e9bb2-fe49-4230-9375-ce44e6b66075","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":198}
+{"timestamp":"2026-11-04T16:58:01.218696+00:00","event":"http.response","request_id":"c860b791-0b5d-4456-96a1-a05764d92548","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":154}
+{"timestamp":"2026-11-04T16:58:01.367243+00:00","event":"http.response","request_id":"41c8463a-7908-483b-ab86-3877c1eccd6b","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":147}
+{"timestamp":"2026-11-04T16:58:01.474956+00:00","event":"http.response","request_id":"8cc003fe-298e-4d2a-a72c-92c7ae6d89be","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":107}
+{"timestamp":"2026-11-04T16:58:01.660857+00:00","event":"http.response","request_id":"4b189bc2-8b9a-4b48-8ce1-bbc60a52eeb8","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":185}
+{"timestamp":"2026-11-04T16:58:01.822334+00:00","event":"http.response","request_id":"15022e07-4fd5-46bf-a199-9114d3c10d31","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":161}
+{"timestamp":"2026-11-04T16:58:01.953968+00:00","event":"http.response","request_id":"d0b054de-b4a1-419c-a069-d6eed191b4e9","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":130}
+{"timestamp":"2026-11-04T16:58:02.102253+00:00","event":"http.response","request_id":"c7c3edb6-5f59-4615-b142-5ebca20a335b","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":147}
+{"timestamp":"2026-11-04T16:58:02.310454+00:00","event":"http.response","request_id":"97fc1ec6-7fe4-40ee-812c-ec8b7a0593ae","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":207}
+{"timestamp":"2026-11-04T16:58:02.477548+00:00","event":"http.response","request_id":"e75c8a03-7195-4fb6-9a93-3b4c4825ceb5","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":165}
+{"timestamp":"2026-11-04T16:58:02.622824+00:00","event":"http.response","request_id":"e07ead59-6cbd-4558-af96-0e2cc4a68dfc","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":144}
+{"timestamp":"2026-11-04T16:58:02.776393+00:00","event":"http.response","request_id":"616dca3e-040c-4992-b244-7100630f1ca2","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":153}
+ok
+test_forged_target_token_and_additional_relationships_are_rejected (apps.documents.test_contextual_association.ContextualAssociationTests.test_forged_target_token_and_additional_relationships_are_rejected) ... {"timestamp":"2026-11-04T16:58:03.179511+00:00","event":"http.response","request_id":"6a22f943-8d36-40d8-a205-b3678e345e50","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":349}
+{"timestamp":"2026-11-04T16:58:03.530007+00:00","event":"http.response","request_id":"8e35325b-d627-4f79-b61f-31778688c7f2","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":343}
+{"timestamp":"2026-11-04T16:58:03.936914+00:00","event":"http.response","request_id":"f7603a14-0afc-4a61-a549-b24392d92947","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":405}
+{"timestamp":"2026-11-04T16:58:04.313528+00:00","event":"http.response","request_id":"647f4f1a-5e1e-49de-94fc-ce4ab4d9e72b","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":374}
+{"timestamp":"2026-11-04T16:58:04.779521+00:00","event":"http.response","request_id":"5ce62adc-d2a5-4bcd-921e-2a82c7e03067","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":465}
+{"timestamp":"2026-11-04T16:58:05.195045+00:00","event":"http.response","request_id":"acf562ba-a598-48f3-9819-4c74efa44e84","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":414}
+{"timestamp":"2026-11-04T16:58:05.555288+00:00","event":"http.response","request_id":"b7de2e57-357a-4aca-9355-764db0e5f50e","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":358}
+{"timestamp":"2026-11-04T16:58:05.912155+00:00","event":"http.response","request_id":"e4df0f6c-1da9-4b3a-af79-d7756b612407","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":356}
+ok
+test_link_rollback_preserves_typed_legacy_atomicity (apps.documents.test_contextual_association.ContextualAssociationTests.test_link_rollback_preserves_typed_legacy_atomicity) ... {"timestamp":"2026-11-04T16:58:06.835430+00:00","event":"http.response","request_id":"fb79e8c8-4a92-4a62-9ff4-a97e9d5cdd7e","method":"GET","route":"documents:contextual-link","status_code":500,"duration_ms":781}
+ERROR
+test_picker_search_excludes_duplicates_and_foreign_documents (apps.documents.test_contextual_association.ContextualAssociationTests.test_picker_search_excludes_duplicates_and_foreign_documents) ... {"timestamp":"2026-11-04T16:58:07.468217+00:00","event":"http.response","request_id":"dbe56f29-8f9f-4cdc-88e7-d9acb24570f9","method":"GET","route":"documents:contextual-choices","status_code":500,"duration_ms":389}
+ERROR
+test_project_and_site_scope_are_rechecked (apps.documents.test_contextual_association.ContextualAssociationTests.test_project_and_site_scope_are_rechecked) ... ERROR
+test_stale_compatibility_mapping_cannot_be_selected (apps.documents.test_contextual_association.ContextualAssociationTests.test_stale_compatibility_mapping_cannot_be_selected) ... {"timestamp":"2026-11-04T16:58:08.225653+00:00","event":"http.response","request_id":"8efc3112-be8d-4456-be13-48118547954e","method":"GET","route":"documents:contextual-choices","status_code":500,"duration_ms":463}
+ERROR
+test_upload_only_persona_cannot_read_picker_or_contextual_forms (apps.documents.test_contextual_association.ContextualAssociationTests.test_upload_only_persona_cannot_read_picker_or_contextual_forms) ... {"timestamp":"2026-11-04T16:58:08.357993+00:00","event":"http.response","request_id":"4163328e-d48c-409a-b72d-00fac8afd9f8","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":73}
+{"timestamp":"2026-11-04T16:58:08.409117+00:00","event":"http.response","request_id":"2038cc20-78d8-4fab-b9ef-41e78d798c14","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":51}
+{"timestamp":"2026-11-04T16:58:08.449343+00:00","event":"http.response","request_id":"3a105689-2497-4979-a527-035ddc7e90d3","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":38}
+ok
+test_upload_rollback_removes_only_the_new_binary (apps.documents.test_contextual_association.ContextualAssociationTests.test_upload_rollback_removes_only_the_new_binary) ... {"timestamp":"2026-11-04T16:58:08.885367+00:00","event":"http.response","request_id":"7a0c5935-5859-4925-ad16-f44a232d8673","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":391}
+{"timestamp":"2026-11-04T16:58:09.255507+00:00","event":"http.response","request_id":"8e73f2a9-1917-44bd-9546-c230a0a7979f","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":359}
+ok
+test_viewer_has_no_contextual_mutation_actions_or_endpoints (apps.documents.test_contextual_association.ContextualAssociationTests.test_viewer_has_no_contextual_mutation_actions_or_endpoints) ... {"timestamp":"2026-11-04T16:58:09.453798+00:00","event":"http.response","request_id":"e74c483d-9789-42d1-9e18-2e10f0b4377b","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":60}
+{"timestamp":"2026-11-04T16:58:09.506459+00:00","event":"http.response","request_id":"d643a18b-c313-43ca-9b7a-66dbf87f890d","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":52}
+{"timestamp":"2026-11-04T16:58:09.554082+00:00","event":"http.response","request_id":"0577dfaa-374c-482e-941d-84bd85473800","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":46}
+ok
+
+======================================================================
+ERROR: test_all_context_document_permissions_and_metadata_are_filtered (apps.documents.test_contextual_association.ContextualAssociationTests.test_all_context_document_permissions_and_metadata_are_filtered)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 350, in test_all_context_document_permissions_and_metadata_are_filtered
+    self.assertEqual(self.client.get(endpoint).json()["results"], [])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1127, in get
+    response = super().get(
+               ^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 475, in get
+    return self.generic(
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\contextual_views.py", line 179, in contextual_choices
+    rows, more = association_choices(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 153, in association_choices
+    rows = list(islice(visible(), (page - 1) * 40, page * 40 + 1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 144, in visible
+    for identifier in identifiers.iterator():
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 520, in iterator
+    raise ValueError(
+ValueError: chunk_size must be provided when using QuerySet.iterator() after prefetch_related().
+
+======================================================================
+ERROR: test_archived_expired_and_sealed_documents_never_enter_picker (apps.documents.test_contextual_association.ContextualAssociationTests.test_archived_expired_and_sealed_documents_never_enter_picker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 461, in test_archived_expired_and_sealed_documents_never_enter_picker
+    self.client.get(self.url("choices", "contract", contract)).json()[
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1127, in get
+    response = super().get(
+               ^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 475, in get
+    return self.generic(
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\contextual_views.py", line 179, in contextual_choices
+    rows, more = association_choices(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 153, in association_choices
+    rows = list(islice(visible(), (page - 1) * 40, page * 40 + 1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 144, in visible
+    for identifier in identifiers.iterator():
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 520, in iterator
+    raise ValueError(
+ValueError: chunk_size must be provided when using QuerySet.iterator() after prefetch_related().
+
+======================================================================
+ERROR: test_candidate_pages_search_and_selected_value_retention (apps.documents.test_contextual_association.ContextualAssociationTests.test_candidate_pages_search_and_selected_value_retention)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 475, in test_candidate_pages_search_and_selected_value_retention
+    first = self.client.get(endpoint).json()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1127, in get
+    response = super().get(
+               ^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 475, in get
+    return self.generic(
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\contextual_views.py", line 179, in contextual_choices
+    rows, more = association_choices(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 153, in association_choices
+    rows = list(islice(visible(), (page - 1) * 40, page * 40 + 1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 144, in visible
+    for identifier in identifiers.iterator():
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 520, in iterator
+    raise ValueError(
+ValueError: chunk_size must be provided when using QuerySet.iterator() after prefetch_related().
+
+======================================================================
+ERROR: test_duplicate_associations_and_retry_do_not_add_rows (apps.documents.test_contextual_association.ContextualAssociationTests.test_duplicate_associations_and_retry_do_not_add_rows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 153, in test_duplicate_associations_and_retry_do_not_add_rows
+    _, hidden = self.get_form("link")
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 61, in get_form
+    response = (client or self.client).get(self.url(action, kind, target))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1127, in get
+    response = super().get(
+               ^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 475, in get
+    return self.generic(
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\contextual_views.py", line 137, in contextual_link
+    form = ContextualDocumentLinkForm(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\forms.py", line 360, in __init__
+    rows, _ = association_choices(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 153, in association_choices
+    rows = list(islice(visible(), (page - 1) * 40, page * 40 + 1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 144, in visible
+    for identifier in identifiers.iterator():
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 520, in iterator
+    raise ValueError(
+ValueError: chunk_size must be provided when using QuerySet.iterator() after prefetch_related().
+
+======================================================================
+ERROR: test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) (kind='project')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 128, in test_existing_document_for_all_five_sources_preserves_identity_versions
+    response, hidden = self.get_form("link", kind, target)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 61, in get_form
+    response = (client or self.client).get(self.url(action, kind, target))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1127, in get
+    response = super().get(
+               ^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 475, in get
+    return self.generic(
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\contextual_views.py", line 137, in contextual_link
+    form = ContextualDocumentLinkForm(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\forms.py", line 360, in __init__
+    rows, _ = association_choices(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 153, in association_choices
+    rows = list(islice(visible(), (page - 1) * 40, page * 40 + 1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 144, in visible
+    for identifier in identifiers.iterator():
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 520, in iterator
+    raise ValueError(
+ValueError: chunk_size must be provided when using QuerySet.iterator() after prefetch_related().
+
+======================================================================
+ERROR: test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) (kind='contract')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 128, in test_existing_document_for_all_five_sources_preserves_identity_versions
+    response, hidden = self.get_form("link", kind, target)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 61, in get_form
+    response = (client or self.client).get(self.url(action, kind, target))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1127, in get
+    response = super().get(
+               ^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 475, in get
+    return self.generic(
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\contextual_views.py", line 137, in contextual_link
+    form = ContextualDocumentLinkForm(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\forms.py", line 360, in __init__
+    rows, _ = association_choices(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 153, in association_choices
+    rows = list(islice(visible(), (page - 1) * 40, page * 40 + 1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 144, in visible
+    for identifier in identifiers.iterator():
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 520, in iterator
+    raise ValueError(
+ValueError: chunk_size must be provided when using QuerySet.iterator() after prefetch_related().
+
+======================================================================
+ERROR: test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) (kind='estimate')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 128, in test_existing_document_for_all_five_sources_preserves_identity_versions
+    response, hidden = self.get_form("link", kind, target)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 61, in get_form
+    response = (client or self.client).get(self.url(action, kind, target))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1127, in get
+    response = super().get(
+               ^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 475, in get
+    return self.generic(
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\contextual_views.py", line 137, in contextual_link
+    form = ContextualDocumentLinkForm(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\forms.py", line 360, in __init__
+    rows, _ = association_choices(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 153, in association_choices
+    rows = list(islice(visible(), (page - 1) * 40, page * 40 + 1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 144, in visible
+    for identifier in identifiers.iterator():
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 520, in iterator
+    raise ValueError(
+ValueError: chunk_size must be provided when using QuerySet.iterator() after prefetch_related().
+
+======================================================================
+ERROR: test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) (kind='expense')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 128, in test_existing_document_for_all_five_sources_preserves_identity_versions
+    response, hidden = self.get_form("link", kind, target)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 61, in get_form
+    response = (client or self.client).get(self.url(action, kind, target))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1127, in get
+    response = super().get(
+               ^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 475, in get
+    return self.generic(
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\contextual_views.py", line 137, in contextual_link
+    form = ContextualDocumentLinkForm(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\forms.py", line 360, in __init__
+    rows, _ = association_choices(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 153, in association_choices
+    rows = list(islice(visible(), (page - 1) * 40, page * 40 + 1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 144, in visible
+    for identifier in identifiers.iterator():
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 520, in iterator
+    raise ValueError(
+ValueError: chunk_size must be provided when using QuerySet.iterator() after prefetch_related().
+
+======================================================================
+ERROR: test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) (kind='daily_report')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 128, in test_existing_document_for_all_five_sources_preserves_identity_versions
+    response, hidden = self.get_form("link", kind, target)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 61, in get_form
+    response = (client or self.client).get(self.url(action, kind, target))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1127, in get
+    response = super().get(
+               ^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 475, in get
+    return self.generic(
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\contextual_views.py", line 137, in contextual_link
+    form = ContextualDocumentLinkForm(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\forms.py", line 360, in __init__
+    rows, _ = association_choices(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 153, in association_choices
+    rows = list(islice(visible(), (page - 1) * 40, page * 40 + 1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 144, in visible
+    for identifier in identifiers.iterator():
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 520, in iterator
+    raise ValueError(
+ValueError: chunk_size must be provided when using QuerySet.iterator() after prefetch_related().
+
+======================================================================
+ERROR: test_link_rollback_preserves_typed_legacy_atomicity (apps.documents.test_contextual_association.ContextualAssociationTests.test_link_rollback_preserves_typed_legacy_atomicity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 388, in test_link_rollback_preserves_typed_legacy_atomicity
+    _, hidden = self.get_form("link", "contract", contract)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 61, in get_form
+    response = (client or self.client).get(self.url(action, kind, target))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1127, in get
+    response = super().get(
+               ^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 475, in get
+    return self.generic(
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\contextual_views.py", line 137, in contextual_link
+    form = ContextualDocumentLinkForm(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\forms.py", line 360, in __init__
+    rows, _ = association_choices(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 153, in association_choices
+    rows = list(islice(visible(), (page - 1) * 40, page * 40 + 1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 144, in visible
+    for identifier in identifiers.iterator():
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 520, in iterator
+    raise ValueError(
+ValueError: chunk_size must be provided when using QuerySet.iterator() after prefetch_related().
+
+======================================================================
+ERROR: test_picker_search_excludes_duplicates_and_foreign_documents (apps.documents.test_contextual_association.ContextualAssociationTests.test_picker_search_excludes_duplicates_and_foreign_documents)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 260, in test_picker_search_excludes_duplicates_and_foreign_documents
+    result = self.client.get(self.url("choices"), {"q": document.document_number})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1127, in get
+    response = super().get(
+               ^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 475, in get
+    return self.generic(
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\contextual_views.py", line 179, in contextual_choices
+    rows, more = association_choices(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 153, in association_choices
+    rows = list(islice(visible(), (page - 1) * 40, page * 40 + 1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 144, in visible
+    for identifier in identifiers.iterator():
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 520, in iterator
+    raise ValueError(
+ValueError: chunk_size must be provided when using QuerySet.iterator() after prefetch_related().
+
+======================================================================
+ERROR: test_project_and_site_scope_are_rechecked (apps.documents.test_contextual_association.ContextualAssociationTests.test_project_and_site_scope_are_rechecked)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 333, in test_project_and_site_scope_are_rechecked
+    self.assertFalse(panel.upload_url)
+                     ^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'upload_url'
+
+======================================================================
+ERROR: test_stale_compatibility_mapping_cannot_be_selected (apps.documents.test_contextual_association.ContextualAssociationTests.test_stale_compatibility_mapping_cannot_be_selected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 371, in test_stale_compatibility_mapping_cannot_be_selected
+    self.client.get(self.url("choices", "contract", contract)).json()[
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1127, in get
+    response = super().get(
+               ^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 475, in get
+    return self.generic(
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\contextual_views.py", line 179, in contextual_choices
+    rows, more = association_choices(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 153, in association_choices
+    rows = list(islice(visible(), (page - 1) * 40, page * 40 + 1))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\association.py", line 144, in visible
+    for identifier in identifiers.iterator():
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 520, in iterator
+    raise ValueError(
+ValueError: chunk_size must be provided when using QuerySet.iterator() after prefetch_related().
+
+======================================================================
+FAIL: test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) (kind='project')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 103, in test_contextual_upload_for_all_five_sources
+    self.assertRedirects(
+AssertionError: 400 != 302 : Response didn't redirect as expected: Response code was 400 (expected 302)
+
+======================================================================
+FAIL: test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) (kind='contract')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 103, in test_contextual_upload_for_all_five_sources
+    self.assertRedirects(
+AssertionError: 400 != 302 : Response didn't redirect as expected: Response code was 400 (expected 302)
+
+======================================================================
+FAIL: test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) (kind='estimate')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 103, in test_contextual_upload_for_all_five_sources
+    self.assertRedirects(
+AssertionError: 400 != 302 : Response didn't redirect as expected: Response code was 400 (expected 302)
+
+======================================================================
+FAIL: test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) (kind='expense')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 103, in test_contextual_upload_for_all_five_sources
+    self.assertRedirects(
+AssertionError: 400 != 302 : Response didn't redirect as expected: Response code was 400 (expected 302)
+
+======================================================================
+FAIL: test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) (kind='daily_report')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 103, in test_contextual_upload_for_all_five_sources
+    self.assertRedirects(
+AssertionError: 400 != 302 : Response didn't redirect as expected: Response code was 400 (expected 302)
+
+======================================================================
+FAIL: test_csrf_is_required_for_both_actions (apps.documents.test_contextual_association.ContextualAssociationTests.test_csrf_is_required_for_both_actions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 445, in test_csrf_is_required_for_both_actions
+    self.assertEqual(result.status_code, 302)
+AssertionError: 400 != 302
+
+======================================================================
+FAIL: test_document_view_and_upload_permissions_are_separate_from_download (apps.documents.test_contextual_association.ContextualAssociationTests.test_document_view_and_upload_permissions_are_separate_from_download)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 286, in test_document_view_and_upload_permissions_are_separate_from_download
+    self.assertEqual(result.status_code, 302)
+AssertionError: 400 != 302
+
+======================================================================
+FAIL: test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 145, in test_existing_document_for_all_five_sources_preserves_identity_versions
+    self.assertEqual(document.links.count(), 6)
+AssertionError: 1 != 6
+
+======================================================================
+FAIL: test_expired_context_keeps_source_and_refreshes_form_intent (apps.documents.test_contextual_association.ContextualAssociationTests.test_expired_context_keeps_source_and_refreshes_form_intent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_contextual_association.py", line 437, in test_expired_context_keeps_source_and_refreshes_form_intent
+    self.assertEqual(result.status_code, 302)
+AssertionError: 400 != 302
+
+----------------------------------------------------------------------
+Ran 19 tests in 29.085s
+
+FAILED (failures=9, errors=13)
+Preserving test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+

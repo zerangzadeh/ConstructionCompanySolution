@@ -21,6 +21,7 @@ from apps.organizations.authorization import (
 from apps.organizations.models import BusinessPermissionCode
 from apps.projects.models import Project
 from apps.treasury.models import TreasuryMovement
+from core.forms import JalaliDateMixin
 
 TARGET_FIELDS = (
     "project",
@@ -227,3 +228,174 @@ class DocumentArchiveForm(forms.Form):
     reason = forms.CharField(
         label="دلیل بایگانی", widget=forms.Textarea, max_length=1000
     )
+
+
+class _ContextualIntentForm(forms.Form):
+    """Bind a form to the server-resolved source, actor and tenant."""
+
+    context_token = forms.CharField(widget=forms.HiddenInput)
+
+    def bind_context(self, *, context, user, organization):
+        from django.core import signing
+
+        from core.business_choices import InheritedParentInput, inherit_business_parent
+
+        self.association_context = context
+        self.actor = user
+        self.organization = organization
+        kind = context.source.kind
+        self.intent = {
+            "kind": kind,
+            "target": str(context.target.pk),
+            "user": str(user.pk),
+            "organization": str(organization.pk),
+        }
+        self.fields["context_token"].widget = InheritedParentInput(
+            signing.dumps(self.intent, salt="documents.contextual-association.v1")
+        )
+        self.fields["context_token"].required = True
+        self.fields["context_token"].error_messages["required"] = (
+            "زمینه فرم معتبر نیست؛ صفحه را دوباره باز کنید."
+        )
+        from apps.documents.presentation import SOURCE_ROUTES
+
+        inherit_business_parent(
+            self, kind, context.target, detail_route=SOURCE_ROUTES[kind][0]
+        )
+
+    def clean(self):
+        from django.core import signing
+
+        cleaned = super().clean()
+        kind = self.association_context.source.kind
+        forbidden = set(TARGET_FIELDS) - {kind}
+        forbidden |= {
+            "payment",
+            "project_site",
+            "organization",
+            "organization_id",
+            "related_to",
+            "related_id",
+            "target_type",
+            "target_id",
+            "next",
+            "return_url",
+            "return_to",
+        }
+        if any(self.data.get(name) for name in forbidden) or any(
+            len(self.data.getlist(name)) != 1
+            for name in (kind, "context_token")
+            if hasattr(self.data, "getlist")
+        ):
+            raise forms.ValidationError("زمینه ارسالی با این فرم هم‌خوان نیست.")
+        try:
+            intent = signing.loads(
+                cleaned.get("context_token", ""),
+                salt="documents.contextual-association.v1",
+                max_age=3600,
+            )
+        except signing.BadSignature as exc:
+            raise forms.ValidationError(
+                "زمینه فرم معتبر نیست یا مهلت آن پایان یافته است؛ دوباره تلاش کنید."
+            ) from exc
+        if intent != self.intent:
+            raise forms.ValidationError("زمینه ارسالی با این فرم هم‌خوان نیست.")
+        return cleaned
+
+
+class ContextualDocumentCreateForm(
+    _ContextualIntentForm, JalaliDateMixin, DocumentCreateForm
+):
+    def __init__(self, *args, context, user, organization, **kwargs):
+        super().__init__(*args, user=user, organization=organization, **kwargs)
+        for name in TARGET_FIELDS:
+            if name != context.source.kind:
+                self.fields.pop(name)
+        self.bind_context(context=context, user=user, organization=organization)
+
+    def clean_file(self):
+        from apps.documents.services import _validate_uploaded_file
+
+        upload = self.cleaned_data["file"]
+        try:
+            _validate_uploaded_file(upload)
+        except ValueError as exc:
+            raise forms.ValidationError(str(exc)) from exc
+        return upload
+
+
+class ContextualDocumentLinkForm(_ContextualIntentForm):
+    document = forms.ModelChoiceField(
+        label="سند موجود",
+        queryset=None,
+        error_messages={
+            "invalid_choice": "سند انتخاب‌شده قابل پیوند نیست یا قبلاً پیوند خورده است.",
+            "required": "یک سند را انتخاب کنید.",
+        },
+    )
+
+    def __init__(self, *args, context, user, organization, **kwargs):
+        from django.urls import reverse
+
+        from apps.documents.association import (
+            association_candidates,
+            association_choices,
+            document_choice_label,
+        )
+        from apps.documents.presentation import _sources
+        from core.business_choices import SearchChoiceSelect
+
+        super().__init__(*args, **kwargs)
+        kind = context.source.kind
+        self.fields[kind] = forms.ModelChoiceField(
+            label=context.source.label,
+            queryset=_sources(kind=kind, user=user, organization=organization),
+        )
+        self.bind_context(context=context, user=user, organization=organization)
+        field = self.fields["document"]
+        field.queryset = association_candidates(
+            user=user, organization=organization, context=context
+        )
+        field.label_from_instance = document_choice_label
+        rows, _ = association_choices(
+            user=user, organization=organization, context=context
+        )
+        selected = self.data.get("document") if self.is_bound else None
+        if selected and all(str(row.pk) != selected for row in rows):
+            try:
+                chosen = field.clean(selected)
+                from apps.documents.association import authorized_association_document
+
+                chosen = authorized_association_document(
+                    user=user, organization=organization, identifier=chosen.pk
+                )
+            except (forms.ValidationError, PermissionDenied, ValueError):
+                pass
+            else:
+                rows.insert(0, chosen)
+        field.widget = SearchChoiceSelect(
+            attrs={
+                "data-options-url": reverse(
+                    "documents:contextual-choices", args=[kind, context.target.pk]
+                ),
+                "data-business-choice": "document",
+                "data-business-names-primary": "true",
+                "data-placeholder": "جست‌وجو با عنوان یا شماره سند…",
+                "dir": "rtl",
+            },
+            choices=[("", "انتخاب سند")]
+            + [(str(row.pk), document_choice_label(row)) for row in rows],
+        )
+
+    def clean_document(self):
+        from apps.documents.association import authorized_association_document
+
+        document = self.cleaned_data["document"]
+        try:
+            return authorized_association_document(
+                user=self.actor, organization=self.organization, identifier=document.pk
+            )
+        except PermissionDenied as exc:
+            raise forms.ValidationError(
+                self.fields["document"].error_messages["invalid_choice"]
+            ) from exc
