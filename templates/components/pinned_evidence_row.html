@@ -1,0 +1,6 @@
+{% load erp_format %}
+<div class="space-y-2 border-t border-slate-100 p-4 text-sm">
+  <div class="erp-related-documents-name">{% include "components/form_icon.html" with icon="document" only %}{% if detail_mode %}<strong>{{ row.title }}</strong>{% else %}<a href="{{ row.view_url }}">{{ row.title }}</a>{% endif %}</div>
+  <div class="erp-related-documents-meta"><bdi>{{ row.number }}</bdi><span>{{ row.type_label }}</span><span>نسخه شاهد {{ row.version|erp_number }}</span>{% if row.version != row.current_version %}<span>نسخه جاری سند {{ row.current_version|erp_number }}</span>{% endif %}<span>{{ row.status }}</span><span>{% if row.available %}نسخه شاهد آماده دریافت{% else %}نسخه شاهد قرنطینه یا ارزیابی‌نشده{% endif %}</span></div>
+  <div class="erp-related-documents-actions flex-wrap">{% if not detail_mode %}<a href="{{ row.view_url }}">مشاهده شاهد</a>{% endif %}{% if row.download_url %}<a href="{{ row.download_url }}">دریافت نسخه شاهد {{ row.version|erp_number }}</a>{% endif %}</div>
+</div>

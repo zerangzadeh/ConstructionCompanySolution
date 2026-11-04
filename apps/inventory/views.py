@@ -3,12 +3,18 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+from django.http import HttpRequest, HttpResponse, HttpResponseNotFound, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
-from apps.inventory.forms import ReversalForm, StockTransactionForm, WarehouseForm
+from apps.inventory.forms import (
+    ReversalForm,
+    StockTransactionForm,
+    WarehouseForm,
+    WarehouseListFilters,
+)
 from apps.inventory.models import (
     StockTransaction,
     StockTransactionStatus,
@@ -33,7 +39,10 @@ from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
 )
+from apps.organizations.form_scoping import normalized_uuid
 from apps.organizations.models import BusinessPermissionCode
+from apps.projects.models import Project
+from core.business_choices import business_label
 from core.list_filters import (
     apply_table_filters,
     build_table_filters,
@@ -70,15 +79,48 @@ def warehouse_list(request: HttpRequest) -> HttpResponse:
     warehouses = get_organization_warehouses(
         user=request.user, organization=request.organization
     )
-    warehouses = apply_table_filters(
-        warehouses,
-        request,
-        text_fields={
-            "warehouse": ("code", "name"),
-            "project": ("project__name",),
-            "location": ("location",),
-        },
+    projects = Project.objects.filter(
+        organization=request.organization, pk__in=warehouses.values("project_id")
+    ).order_by("name", "pk")
+    locations = (
+        warehouses.exclude(location="")
+        .order_by("location")
+        .values_list("location", flat=True)
+        .distinct()
     )
+    filter_options = request.GET.get("filter_options")
+    if filter_options in ("project", "location"):
+        query = request.GET.get("q", "").strip()[:200]
+        if filter_options == "project":
+            options = Paginator(
+                projects.filter(Q(name__icontains=query) | Q(code__icontains=query)), 40
+            ).get_page(request.GET.get("page"))
+            results = [
+                {"value": str(project.pk), "label": business_label(project)}
+                for project in options
+            ]
+        else:
+            options = Paginator(
+                locations.filter(location__icontains=query), 40
+            ).get_page(request.GET.get("page"))
+            results = [{"value": location, "label": location} for location in options]
+        next_url = None
+        if options.has_next():
+            params = request.GET.copy()
+            params["page"] = options.next_page_number()
+            next_url = f"{request.path}?{params.urlencode()}"
+        return JsonResponse(
+            {"results": results, "next": next_url},
+            headers={"Cache-Control": "private, no-store"},
+        )
+
+    project_id = normalized_uuid(request.GET.get("project", "").strip())
+    text_fields = {"warehouse": ("code", "name"), "location": ("location",)}
+    if project_id is None:
+        text_fields["project"] = ("project__name",)
+    else:
+        warehouses = warehouses.filter(project_id=project_id)
+    warehouses = apply_table_filters(warehouses, request, text_fields=text_fields)
     page = paginate_table(
         warehouses,
         request,
@@ -97,6 +139,13 @@ def warehouse_list(request: HttpRequest) -> HttpResponse:
             "warehouses": page.object_list,
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
+            "list_filter_form": WarehouseListFilters(
+                request.GET,
+                projects=projects,
+                project_id=project_id,
+                locations=locations,
+                list_url=request.path,
+            ),
             "filters": build_table_filters(
                 request,
                 [

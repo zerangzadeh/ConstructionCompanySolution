@@ -1,0 +1,378 @@
+Found 14 test(s).
+Using existing test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+test_all_three_commercial_witnesses_use_exact_version_and_no_uuid_labels (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_all_three_commercial_witnesses_use_exact_version_and_no_uuid_labels) ... {"timestamp":"2026-11-04T17:52:06.851010+00:00","event":"http.response","request_id":"0f3de07d-726d-4b9f-bf8c-2ae3fc452844","method":"GET","route":"billing:guarantee_detail","status_code":200,"duration_ms":3095}
+{"timestamp":"2026-11-04T17:52:07.947118+00:00","event":"http.response","request_id":"b7fdc11f-feb2-4b9e-8f9f-1141de784263","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1061}
+{"timestamp":"2026-11-04T17:52:11.288922+00:00","event":"http.response","request_id":"34c40793-13da-4a55-bd2a-b07e09f6e0fa","method":"GET","route":"billing:compliance_evidence_detail","status_code":200,"duration_ms":2631}
+{"timestamp":"2026-11-04T17:52:12.471088+00:00","event":"http.response","request_id":"054716f0-c351-4852-b8ac-03e39c78b0ca","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1159}
+{"timestamp":"2026-11-04T17:52:16.348343+00:00","event":"http.response","request_id":"c4524504-f6ea-4204-9b9f-1a5b78e0fab6","method":"GET","route":"billing:retention_release_detail","status_code":200,"duration_ms":3141}
+{"timestamp":"2026-11-04T17:52:17.472016+00:00","event":"http.response","request_id":"21b60c88-f332-4b1f-85e9-9f438652f9a1","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1095}
+ok
+test_archive_expiry_and_sealed_witnesses_expose_no_metadata (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_archive_expiry_and_sealed_witnesses_expose_no_metadata) ... {"timestamp":"2026-11-04T17:52:20.773392+00:00","event":"http.response","request_id":"f2575e09-5619-48f8-8048-800a53e19e0d","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2326}
+{"timestamp":"2026-11-04T17:52:24.446582+00:00","event":"http.response","request_id":"3f922660-fa45-415f-be55-889b9b2d4298","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":3651}
+{"timestamp":"2026-11-04T17:52:25.152301+00:00","event":"http.response","request_id":"6e4f9687-6520-40a2-a6a2-08c010a0b0d4","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":691}
+{"timestamp":"2026-11-04T17:52:27.593303+00:00","event":"http.response","request_id":"3ebffb29-39bb-458b-80fe-552cd17a440e","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2204}
+{"timestamp":"2026-11-04T17:52:31.072453+00:00","event":"http.response","request_id":"ab074918-71db-4da2-b3fb-0388c9420313","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":3452}
+{"timestamp":"2026-11-04T17:52:31.756062+00:00","event":"http.response","request_id":"356407a7-e664-4f8a-b0a2-8adf2c7ed21c","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":681}
+{"timestamp":"2026-11-04T17:52:34.224757+00:00","event":"http.response","request_id":"9d91077a-c55e-492b-b2f2-a12b7782e206","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2219}
+{"timestamp":"2026-11-04T17:52:38.147847+00:00","event":"http.response","request_id":"50a19d05-e602-4115-a92b-b304c83dd246","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":3901}
+{"timestamp":"2026-11-04T17:52:38.801453+00:00","event":"http.response","request_id":"0e4f9b4e-767e-47b1-aa69-c67ed58cf14c","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":648}
+ok
+test_commercial_create_and_revision_pickers_are_scoped_searchable_exact_versions (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_commercial_create_and_revision_pickers_are_scoped_searchable_exact_versions) ... {"timestamp":"2026-11-04T17:52:45.694360+00:00","event":"http.response","request_id":"b9c61681-3155-4990-9e2d-1074d208ea3e","method":"GET","route":"billing:guarantee_create","status_code":200,"duration_ms":2271}
+{"timestamp":"2026-11-04T17:52:47.676107+00:00","event":"http.response","request_id":"85eeda1d-c698-4956-9c37-8afb509c1d97","method":"GET","route":"documents:commercial-evidence-choices","status_code":200,"duration_ms":1974}
+{"timestamp":"2026-11-04T17:52:49.403158+00:00","event":"http.response","request_id":"5516ebc4-36c6-4678-8b2e-352dacac7c62","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":1723}
+{"timestamp":"2026-11-04T17:52:51.803086+00:00","event":"http.response","request_id":"fef7b0ec-87f6-41ea-8832-7c62e54a25e3","method":"GET","route":"billing:compliance_evidence_create","status_code":200,"duration_ms":2397}
+{"timestamp":"2026-11-04T17:52:53.703812+00:00","event":"http.response","request_id":"acd99ca3-4f29-4c3f-918d-c902321c4d9c","method":"GET","route":"documents:commercial-evidence-choices","status_code":200,"duration_ms":1894}
+{"timestamp":"2026-11-04T17:52:55.532770+00:00","event":"http.response","request_id":"17036690-6f02-4b1f-824b-98ccba53a5c8","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":1827}
+{"timestamp":"2026-11-04T17:52:57.785469+00:00","event":"http.response","request_id":"daac3661-2bd4-4781-8b4f-0d2382b3b4a8","method":"GET","route":"billing:retention_release_create","status_code":200,"duration_ms":2249}
+{"timestamp":"2026-11-04T17:52:59.755592+00:00","event":"http.response","request_id":"f881215e-9bed-4aaa-9530-89ecf78241d2","method":"GET","route":"documents:commercial-evidence-choices","status_code":200,"duration_ms":1967}
+{"timestamp":"2026-11-04T17:53:01.791105+00:00","event":"http.response","request_id":"04223546-6071-4466-8061-d38dca651c2a","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":2037}
+ok
+test_contractual_witness_is_draft_only_and_survives_submission (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_contractual_witness_is_draft_only_and_survives_submission) ... {"timestamp":"2026-11-04T17:53:06.829956+00:00","event":"http.response","request_id":"b28b6c68-c6e9-436d-b6b1-7181edf30e45","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":4068}
+{"timestamp":"2026-11-04T17:53:10.983169+00:00","event":"http.response","request_id":"d039ce74-01b5-4752-8607-71696d85a235","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4128}
+ERROR
+test_cross_tenant_sources_unsafe_returns_and_unpersisted_versions_denied (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_cross_tenant_sources_unsafe_returns_and_unpersisted_versions_denied) ... {"timestamp":"2026-11-04T17:53:14.568123+00:00","event":"http.response","request_id":"0f53f635-1432-4b86-8f73-1f72e9715c12","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":658}
+{"timestamp":"2026-11-04T17:53:15.065524+00:00","event":"http.response","request_id":"e775f547-4c50-4614-b08e-c920ef4a303b","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":495}
+{"timestamp":"2026-11-04T17:53:15.551460+00:00","event":"http.response","request_id":"6f76deb4-1f31-43f6-8e73-cecac2598bc6","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":485}
+{"timestamp":"2026-11-04T17:53:16.132888+00:00","event":"http.response","request_id":"fe3d6de2-61ae-4972-a1ab-aa3e4706be4b","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":561}
+{"timestamp":"2026-11-04T17:53:17.010399+00:00","event":"http.response","request_id":"56b4b374-50c8-4f40-9353-e60fd2c80911","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":882}
+ok
+test_csrf_and_transactional_authority_recheck (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_csrf_and_transactional_authority_recheck) ... {"timestamp":"2026-11-04T17:53:18.292665+00:00","event":"http.response","request_id":"95712a39-f792-49c4-82ce-2f8597d0e9fa","method":"POST","route":"documents:evidence-register","status_code":403,"duration_ms":23}
+{"timestamp":"2026-11-04T17:53:20.250320+00:00","event":"http.response","request_id":"b1844d03-2084-4830-9cc1-b52c309ddcc1","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1930}
+{"timestamp":"2026-11-04T17:53:21.865024+00:00","event":"http.response","request_id":"56fd5a10-f8ef-40d2-a60f-e8898445b7e5","method":"POST","route":"documents:evidence-register","status_code":403,"duration_ms":1589}
+ok
+test_material_existing_exact_version_has_navigation_without_new_mutation (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_material_existing_exact_version_has_navigation_without_new_mutation) ... ERROR
+test_observation_draft_picker_preserves_pin_and_idempotency (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_observation_draft_picker_preserves_pin_and_idempotency) ... {"timestamp":"2026-11-04T17:53:24.971122+00:00","event":"http.response","request_id":"9acb3103-78e0-4e65-9e23-50761e81a815","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2244}
+{"timestamp":"2026-11-04T17:53:29.351359+00:00","event":"http.response","request_id":"40ccc8ff-1529-4d76-aa82-da3666b7b2f0","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4360}
+{"timestamp":"2026-11-04T17:53:33.774706+00:00","event":"http.response","request_id":"406d36ab-3b33-4e1c-a7d1-cb76969ff0bf","method":"POST","route":"documents:evidence-register","status_code":500,"duration_ms":4420}
+ERROR
+test_picker_filters_foreign_denied_project_and_all_context_documents (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_picker_filters_foreign_denied_project_and_all_context_documents) ... {"timestamp":"2026-11-04T17:53:37.368514+00:00","event":"http.response","request_id":"19cb4c33-54c1-4d04-b26d-29e47cfa6a1e","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":1046}
+{"timestamp":"2026-11-04T17:53:38.353598+00:00","event":"http.response","request_id":"ea166806-19ba-4972-b021-cd2fd618cdc4","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":984}
+{"timestamp":"2026-11-04T17:53:39.255612+00:00","event":"http.response","request_id":"cd1ce326-faae-49bf-af73-3c411c2e7e54","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":518}
+{"timestamp":"2026-11-04T17:53:40.387918+00:00","event":"http.response","request_id":"ff602cec-6da3-4185-a339-12998587c5aa","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1122}
+{"timestamp":"2026-11-04T17:53:41.351101+00:00","event":"http.response","request_id":"e2c4c367-7c4e-4154-adc7-09558909cf7b","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":945}
+ok
+test_picker_has_no_authority_without_submission_permission (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_picker_has_no_authority_without_submission_permission) ... {"timestamp":"2026-11-04T17:53:43.601347+00:00","event":"http.response","request_id":"ae108af2-0004-42c1-a160-84416ff3c360","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":435}
+{"timestamp":"2026-11-04T17:53:44.091747+00:00","event":"http.response","request_id":"7f3737d0-075b-4772-bd6b-aacca5bdbc1c","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":487}
+ok
+test_quarantine_is_visible_to_review_but_never_delivered_or_field_selectable (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_quarantine_is_visible_to_review_but_never_delivered_or_field_selectable) ... {"timestamp":"2026-11-04T17:53:48.721282+00:00","event":"http.response","request_id":"79b71318-3c88-414d-9ddb-66e6a7c3d0bf","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2846}
+{"timestamp":"2026-11-04T17:53:52.904887+00:00","event":"http.response","request_id":"ba8056ad-07c2-40cd-a704-c6af2ac50ad1","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4155}
+{"timestamp":"2026-11-04T17:53:54.625350+00:00","event":"http.response","request_id":"b57e0ca7-d2d6-44ea-b4aa-7613f1af6aff","method":"GET","route":"documents:version-download","status_code":403,"duration_ms":993}
+{"timestamp":"2026-11-04T17:53:56.504501+00:00","event":"http.response","request_id":"0135ae22-c520-4178-ac83-67530a6337ee","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":1753}
+ok
+test_safety_and_quality_submit_revision_evidence_and_keep_v1_after_v2 (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_safety_and_quality_submit_revision_evidence_and_keep_v1_after_v2) ... {"timestamp":"2026-11-04T17:54:02.722434+00:00","event":"http.response","request_id":"ce9757c1-c1b9-4ce5-a33d-ffe155e1ef17","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2413}
+{"timestamp":"2026-11-04T17:54:08.006461+00:00","event":"http.response","request_id":"ee0ecfeb-b6b3-4595-913f-d8f0262fcdff","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":5261}
+{"timestamp":"2026-11-04T17:54:09.876275+00:00","event":"http.response","request_id":"bd3517bf-6710-4c45-8ce2-ba6ad6b6f0f6","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":683}
+{"timestamp":"2026-11-04T17:54:12.875009+00:00","event":"http.response","request_id":"528f7ae4-8fef-47d8-92eb-8c9b25609dc7","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2991}
+{"timestamp":"2026-11-04T17:54:17.632210+00:00","event":"http.response","request_id":"402b1109-d841-4645-b501-4f81e9074152","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4725}
+{"timestamp":"2026-11-04T17:54:19.031674+00:00","event":"http.response","request_id":"e312f9ce-bf2c-460f-857b-faa23de4ca5b","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":632}
+{"timestamp":"2026-11-04T17:54:21.340102+00:00","event":"http.response","request_id":"50c77451-be4a-453d-9402-3a8438114c7e","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1267}
+{"timestamp":"2026-11-04T17:54:22.711365+00:00","event":"http.response","request_id":"c79cf150-e78d-4b30-9a04-12fd817f29c9","method":"GET","route":"documents:version-download","status_code":200,"duration_ms":1349}
+ERROR
+test_unauthorized_personas_cannot_read_titles_or_register (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_unauthorized_personas_cannot_read_titles_or_register) ... ERROR
+test_validation_cancel_and_forged_intent_preserve_context_without_writes (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_validation_cancel_and_forged_intent_preserve_context_without_writes) ... ERROR
+
+======================================================================
+ERROR: test_contractual_witness_is_draft_only_and_survives_submission (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_contractual_witness_is_draft_only_and_survives_submission)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_evidence_integration.py", line 303, in test_contractual_witness_is_draft_only_and_survives_submission
+    submit_contractual_record(
+  File "E:\Construction_Company_Solution\apps\contracts\contractual_services.py", line 584, in submit_contractual_record
+    return submit(organization=organization, actor=actor, record=record)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\contracts\contractual_workflow.py", line 377, in submit_contractual_record
+    raise WorkflowConflict("\u0627\u0631\u0633\u0627\u0644 \u0628\u062f\u0648\u0646 \u06a9\u0627\u0631 \u0641\u0639\u0627\u0644 \u0642\u0627\u0628\u0644 \u062b\u0628\u062a \u0646\u06cc\u0633\u062a.")
+apps.workflows.runtime.WorkflowConflict: ['\u0627\u0631\u0633\u0627\u0644 \u0628\u062f\u0648\u0646 \u06a9\u0627\u0631 \u0641\u0639\u0627\u0644 \u0642\u0627\u0628\u0644 \u062b\u0628\u062a \u0646\u06cc\u0633\u062a.']
+
+======================================================================
+ERROR: test_material_existing_exact_version_has_navigation_without_new_mutation (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_material_existing_exact_version_has_navigation_without_new_mutation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_evidence_integration.py", line 316, in test_material_existing_exact_version_has_navigation_without_new_mutation
+    material = self.material()
+               ^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\test_evidence_integration.py", line 129, in material
+    unit = UnitOfMeasure.objects.create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\apps\materials\models.py", line 197, in save
+    self.full_clean()
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'category': ['\u0627\u06cc\u0646 \u0641\u06cc\u0644\u062f \u0646\u0645\u06cc \u062a\u0648\u0627\u0646\u062f \u062e\u0627\u0644\u06cc \u0628\u0627\u0634\u062f.']}
+
+======================================================================
+ERROR: test_observation_draft_picker_preserves_pin_and_idempotency (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_observation_draft_picker_preserves_pin_and_idempotency)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_evidence_integration.py", line 275, in test_observation_draft_picker_preserves_pin_and_idempotency
+    self.assertEqual(self.client.post(endpoint, data).status_code, 302)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1156, in post
+    response = super().post(
+               ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 499, in post
+    return self.generic(
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 1090, in request
+    self.check_exception(response)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\views\decorators\http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\evidence_views.py", line 212, in evidence_register
+    source = _register(
+             ^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\evidence_views.py", line 178, in _register
+    attach_field_evidence(
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\daily_reports\field_services.py", line 408, in attach_field_evidence
+    if existing.observation_id != observation.pk or existing.payload_hash != payload_hash:
+       ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'FieldObservationEvidenceLink' object has no attribute 'observation_id'
+
+======================================================================
+ERROR: test_safety_and_quality_submit_revision_evidence_and_keep_v1_after_v2 (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_safety_and_quality_submit_revision_evidence_and_keep_v1_after_v2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\base.py", line 298, in _cursor
+    return self._prepare_cursor(self.create_cursor(name))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\postgresql\base.py", line 429, in create_cursor
+    cursor = self.connection.cursor()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\connection.py", line 240, in cursor
+    self._check_connection_ok()
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\_connection_base.py", line 541, in _check_connection_ok
+    raise e.OperationalError("the connection is closed")
+psycopg.OperationalError: the connection is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\test_evidence_integration.py", line 252, in test_safety_and_quality_submit_revision_evidence_and_keep_v1_after_v2
+    row = self.panel(kind, target).rows[0]
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\test_evidence_integration.py", line 214, in panel
+    return evidence_panel(
+           ^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\evidence.py", line 297, in evidence_panel
+    source = resolve_evidence_source(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\documents\evidence.py", line 148, in resolve_evidence_source
+    require_business_permission(
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 431, in require_business_permission
+    membership = get_active_membership(user=user, organization=organization)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 120, in get_active_membership
+    .get(
+     ^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 631, in get
+    num = len(clone)
+          ^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 368, in __len__
+    self._fetch_all()
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 1954, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 93, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1621, in execute_sql
+    cursor = self.connection.cursor()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\base.py", line 320, in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\base.py", line 297, in _cursor
+    with self.wrap_database_errors:
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\base.py", line 298, in _cursor
+    return self._prepare_cursor(self.create_cursor(name))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\postgresql\base.py", line 429, in create_cursor
+    cursor = self.connection.cursor()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\connection.py", line 240, in cursor
+    self._check_connection_ok()
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\_connection_base.py", line 541, in _check_connection_ok
+    raise e.OperationalError("the connection is closed")
+django.db.utils.OperationalError: the connection is closed
+
+======================================================================
+ERROR: test_unauthorized_personas_cannot_read_titles_or_register (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_unauthorized_personas_cannot_read_titles_or_register)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\base.py", line 298, in _cursor
+    return self._prepare_cursor(self.create_cursor(name))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\postgresql\base.py", line 429, in create_cursor
+    cursor = self.connection.cursor()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\connection.py", line 240, in cursor
+    self._check_connection_ok()
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\_connection_base.py", line 541, in _check_connection_ok
+    raise e.OperationalError("the connection is closed")
+psycopg.OperationalError: the connection is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\tests.py", line 53, in setUp
+    self.owner = User.objects.create_user(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\accounts\models.py", line 155, in create_user
+    user.save(using=self._db)
+  File "E:\Construction_Company_Solution\apps\accounts\models.py", line 253, in save
+    with identity_write_lock():
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\workforce\identity_integrity.py", line 148, in identity_write_lock
+    with connection.cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\base.py", line 320, in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\base.py", line 297, in _cursor
+    with self.wrap_database_errors:
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\base.py", line 298, in _cursor
+    return self._prepare_cursor(self.create_cursor(name))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\postgresql\base.py", line 429, in create_cursor
+    cursor = self.connection.cursor()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\connection.py", line 240, in cursor
+    self._check_connection_ok()
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\_connection_base.py", line 541, in _check_connection_ok
+    raise e.OperationalError("the connection is closed")
+django.db.utils.OperationalError: the connection is closed
+
+======================================================================
+ERROR: test_validation_cancel_and_forged_intent_preserve_context_without_writes (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_validation_cancel_and_forged_intent_preserve_context_without_writes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\base.py", line 298, in _cursor
+    return self._prepare_cursor(self.create_cursor(name))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\postgresql\base.py", line 429, in create_cursor
+    cursor = self.connection.cursor()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\connection.py", line 240, in cursor
+    self._check_connection_ok()
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\_connection_base.py", line 541, in _check_connection_ok
+    raise e.OperationalError("the connection is closed")
+psycopg.OperationalError: the connection is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\documents\tests.py", line 53, in setUp
+    self.owner = User.objects.create_user(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\accounts\models.py", line 155, in create_user
+    user.save(using=self._db)
+  File "E:\Construction_Company_Solution\apps\accounts\models.py", line 253, in save
+    with identity_write_lock():
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\workforce\identity_integrity.py", line 148, in identity_write_lock
+    with connection.cursor() as cursor:
+         ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\base.py", line 320, in cursor
+    return self._cursor()
+           ^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\base.py", line 297, in _cursor
+    with self.wrap_database_errors:
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\base.py", line 298, in _cursor
+    return self._prepare_cursor(self.create_cursor(name))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\utils\asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\postgresql\base.py", line 429, in create_cursor
+    cursor = self.connection.cursor()
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\connection.py", line 240, in cursor
+    self._check_connection_ok()
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\_connection_base.py", line 541, in _check_connection_ok
+    raise e.OperationalError("the connection is closed")
+django.db.utils.OperationalError: the connection is closed
+
+----------------------------------------------------------------------
+Ran 14 tests in 147.163s
+
+FAILED (errors=6)
+Preserving test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+

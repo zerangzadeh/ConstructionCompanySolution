@@ -1,0 +1,396 @@
+Found 101 test(s).
+Using existing test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+test_all_three_commercial_witnesses_use_exact_version_and_no_uuid_labels (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_all_three_commercial_witnesses_use_exact_version_and_no_uuid_labels) ... {"timestamp":"2026-11-04T19:02:24.438879+00:00","event":"http.response","request_id":"6d9fb528-72c9-4b97-a9fe-f5132e1bdca9","method":"GET","route":"billing:guarantee_detail","status_code":200,"duration_ms":3095}
+{"timestamp":"2026-11-04T19:02:25.518280+00:00","event":"http.response","request_id":"d851f7b9-be51-4fc1-a52b-d5da86d39543","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1053}
+{"timestamp":"2026-11-04T19:02:29.211387+00:00","event":"http.response","request_id":"a9d790e4-f50b-40dd-be53-ff892db399fb","method":"GET","route":"billing:compliance_evidence_detail","status_code":200,"duration_ms":3029}
+{"timestamp":"2026-11-04T19:02:30.401719+00:00","event":"http.response","request_id":"21e6989f-7ddb-4ad5-844d-319f5e8dfbca","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1145}
+{"timestamp":"2026-11-04T19:02:34.191627+00:00","event":"http.response","request_id":"7b2d8b06-8779-4c9d-b243-1f8d8bd3bb13","method":"GET","route":"billing:retention_release_detail","status_code":200,"duration_ms":3097}
+{"timestamp":"2026-11-04T19:02:35.326672+00:00","event":"http.response","request_id":"08b9a375-0d21-4b77-b51f-c705923f2570","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1113}
+ok
+test_archive_expiry_and_sealed_witnesses_expose_no_metadata (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_archive_expiry_and_sealed_witnesses_expose_no_metadata) ... {"timestamp":"2026-11-04T19:02:37.268334+00:00","event":"http.response","request_id":"9b8ecd28-e647-46a7-86ef-e6d97945688e","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1036}
+{"timestamp":"2026-11-04T19:02:38.978089+00:00","event":"http.response","request_id":"122aa20f-3caa-4053-8767-d40df0206b92","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":1694}
+{"timestamp":"2026-11-04T19:02:39.300251+00:00","event":"http.response","request_id":"53000983-32c3-4303-b444-0299cece4e82","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":324}
+{"timestamp":"2026-11-04T19:02:40.881845+00:00","event":"http.response","request_id":"f8ae3a94-649c-49ef-8c59-a5f1a509a203","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1459}
+{"timestamp":"2026-11-04T19:02:43.660907+00:00","event":"http.response","request_id":"5208b355-4d76-4a73-8fb5-c21ad4432a22","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":2770}
+{"timestamp":"2026-11-04T19:02:44.444844+00:00","event":"http.response","request_id":"36035d39-e1ce-4c54-8702-a8bbd51844e3","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":781}
+{"timestamp":"2026-11-04T19:02:46.692984+00:00","event":"http.response","request_id":"63f68458-8dc0-4134-875a-e77e5b7a569c","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2060}
+{"timestamp":"2026-11-04T19:02:49.125098+00:00","event":"http.response","request_id":"8716cb69-7e41-485c-8dc9-ea36d570ea07","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":2423}
+{"timestamp":"2026-11-04T19:02:50.076576+00:00","event":"http.response","request_id":"fbbe89ca-c11c-4e76-b8aa-ca1d4c487d74","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":945}
+ok
+test_commercial_create_and_revision_pickers_are_scoped_searchable_exact_versions (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_commercial_create_and_revision_pickers_are_scoped_searchable_exact_versions) ... {"timestamp":"2026-11-04T19:02:54.547566+00:00","event":"http.response","request_id":"74419a8e-be2b-4944-95f6-0a37988893c5","method":"GET","route":"billing:guarantee_create","status_code":200,"duration_ms":1333}
+{"timestamp":"2026-11-04T19:02:55.690755+00:00","event":"http.response","request_id":"a3d2d729-517d-490e-a4a2-74ea9f9d641c","method":"GET","route":"documents:commercial-evidence-choices","status_code":200,"duration_ms":1141}
+{"timestamp":"2026-11-04T19:02:56.737820+00:00","event":"http.response","request_id":"28fae898-7f93-4d04-a2aa-e8360ec06a3f","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":1043}
+{"timestamp":"2026-11-04T19:02:57.963707+00:00","event":"http.response","request_id":"d66cce85-5e96-4fe0-a3bc-a1e703ed37c6","method":"GET","route":"billing:compliance_evidence_create","status_code":200,"duration_ms":1224}
+{"timestamp":"2026-11-04T19:02:59.035261+00:00","event":"http.response","request_id":"7a08c62c-fb25-428c-a2db-980b85814a96","method":"GET","route":"documents:commercial-evidence-choices","status_code":200,"duration_ms":1071}
+{"timestamp":"2026-11-04T19:02:59.825808+00:00","event":"http.response","request_id":"f1e203c8-6836-458a-a318-5180a56fde6a","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":787}
+{"timestamp":"2026-11-04T19:03:01.050797+00:00","event":"http.response","request_id":"0937feff-e237-453f-a363-936686c5c038","method":"GET","route":"billing:retention_release_create","status_code":200,"duration_ms":1224}
+{"timestamp":"2026-11-04T19:03:02.486206+00:00","event":"http.response","request_id":"62a587d4-6452-4ece-8ab9-741e18c4a5d2","method":"GET","route":"documents:commercial-evidence-choices","status_code":200,"duration_ms":1432}
+{"timestamp":"2026-11-04T19:03:03.337815+00:00","event":"http.response","request_id":"a5a49e10-c0ec-41ff-8bfc-29bf5656d379","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":852}
+ok
+test_commercial_create_posts_preserve_selected_exact_version (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_commercial_create_posts_preserve_selected_exact_version) ... {"timestamp":"2026-11-04T19:03:07.674348+00:00","event":"http.response","request_id":"48d17b90-769f-4b81-9c27-b4dde6ef099d","method":"POST","route":"billing:guarantee_create","status_code":302,"duration_ms":1378}
+{"timestamp":"2026-11-04T19:03:09.043351+00:00","event":"http.response","request_id":"e8e4dab9-c616-4147-8cae-cbba198ac331","method":"POST","route":"billing:compliance_evidence_create","status_code":302,"duration_ms":946}
+{"timestamp":"2026-11-04T19:03:11.208364+00:00","event":"http.response","request_id":"176513e1-f63a-43e5-91fa-030eed430c71","method":"POST","route":"billing:retention_release_create","status_code":302,"duration_ms":1763}
+ok
+test_commercial_revision_posts_keep_original_witness_and_finalized_history (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_commercial_revision_posts_keep_original_witness_and_finalized_history) ... {"timestamp":"2026-11-04T19:03:17.138336+00:00","event":"http.response","request_id":"db2ffc50-0937-41f6-851b-0c825a1bd57a","method":"POST","route":"billing:guarantee_revise","status_code":302,"duration_ms":1132}
+{"timestamp":"2026-11-04T19:03:20.723871+00:00","event":"http.response","request_id":"fb0b0e7a-e8e1-4cdc-9a35-ba00c784cf1e","method":"POST","route":"billing:compliance_evidence_revise","status_code":302,"duration_ms":1025}
+{"timestamp":"2026-11-04T19:03:23.840214+00:00","event":"http.response","request_id":"885867b4-44c8-4944-9810-63b9cf46c251","method":"POST","route":"billing:retention_release_correct","status_code":302,"duration_ms":1029}
+ok
+test_contractual_witness_is_draft_only_and_survives_submission (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_contractual_witness_is_draft_only_and_survives_submission) ... {"timestamp":"2026-11-04T19:03:26.142534+00:00","event":"http.response","request_id":"798aba67-38b5-494f-acb7-45ab94c84d22","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1072}
+{"timestamp":"2026-11-04T19:03:28.156315+00:00","event":"http.response","request_id":"0fc8d505-e028-4637-912c-e26443ea4cb3","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":2009}
+{"timestamp":"2026-11-04T19:03:29.775038+00:00","event":"http.response","request_id":"825f662e-8e6e-49fd-a116-5df72ad9f2fc","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":332}
+ok
+test_cross_tenant_sources_unsafe_returns_and_unpersisted_versions_denied (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_cross_tenant_sources_unsafe_returns_and_unpersisted_versions_denied) ... {"timestamp":"2026-11-04T19:03:31.131862+00:00","event":"http.response","request_id":"50ab6584-cb9f-454e-b712-fb550467148f","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":336}
+{"timestamp":"2026-11-04T19:03:31.343227+00:00","event":"http.response","request_id":"b802c893-0428-4a27-9fac-159c0209d753","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":206}
+{"timestamp":"2026-11-04T19:03:31.526222+00:00","event":"http.response","request_id":"8ba3a33e-97ed-41e9-9d85-541cc1ccb909","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":187}
+{"timestamp":"2026-11-04T19:03:31.837095+00:00","event":"http.response","request_id":"3a450d14-cdf8-44b5-9266-30f1c97cdf1d","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":293}
+{"timestamp":"2026-11-04T19:03:32.055609+00:00","event":"http.response","request_id":"e002d051-5b85-47da-affb-f45960c0cf2b","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":217}
+ok
+test_csrf_and_transactional_authority_recheck (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_csrf_and_transactional_authority_recheck) ... {"timestamp":"2026-11-04T19:03:33.358234+00:00","event":"http.response","request_id":"69491e8d-c390-4bb1-b05b-a59a55f1bacb","method":"POST","route":"documents:evidence-register","status_code":403,"duration_ms":20}
+{"timestamp":"2026-11-04T19:03:35.438863+00:00","event":"http.response","request_id":"d1708939-1a60-4370-b247-89a696ca2b8d","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2047}
+{"timestamp":"2026-11-04T19:03:36.981246+00:00","event":"http.response","request_id":"fef1fc2c-195d-41ab-8f10-99232cc596ad","method":"POST","route":"documents:evidence-register","status_code":403,"duration_ms":1520}
+ok
+test_download_permission_is_rechecked_separately_from_evidence_view (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_download_permission_is_rechecked_separately_from_evidence_view) ... {"timestamp":"2026-11-04T19:03:40.663631+00:00","event":"http.response","request_id":"ae66cc55-bf87-4b2d-adf4-02a335ab3591","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2028}
+{"timestamp":"2026-11-04T19:03:44.265790+00:00","event":"http.response","request_id":"37b2a72b-03dd-4692-b625-09948037a06f","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":3577}
+{"timestamp":"2026-11-04T19:03:45.150264+00:00","event":"http.response","request_id":"93014dbd-173c-4516-a848-73567edca0ad","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":557}
+{"timestamp":"2026-11-04T19:03:45.341805+00:00","event":"http.response","request_id":"0e84c101-0caa-42a2-a045-84786faf22a4","method":"GET","route":"documents:version-download","status_code":403,"duration_ms":189}
+ok
+test_material_existing_exact_version_navigation_keeps_pin_after_v2 (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_material_existing_exact_version_navigation_keeps_pin_after_v2) ... {"timestamp":"2026-11-04T19:03:48.869976+00:00","event":"http.response","request_id":"9eb15bed-4838-4391-8d24-53843dcb72f1","method":"GET","route":"materials:material_detail","status_code":200,"duration_ms":1584}
+{"timestamp":"2026-11-04T19:03:51.250336+00:00","event":"http.response","request_id":"824dfb12-c671-47eb-a7a7-d383b108bbff","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2374}
+ok
+test_material_registration_rechecks_version_after_form_validation (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_material_registration_rechecks_version_after_form_validation) ... {"timestamp":"2026-11-04T19:03:53.742578+00:00","event":"http.response","request_id":"68bce366-9291-45fb-a226-e17054e4e712","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2144}
+{"timestamp":"2026-11-04T19:03:58.015649+00:00","event":"http.response","request_id":"ed2ab283-87f7-46f9-bd79-042ad90004a3","method":"POST","route":"documents:evidence-register","status_code":403,"duration_ms":4247}
+ok
+test_material_registration_rejects_current_version_drift_and_keeps_exact_pin (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_material_registration_rejects_current_version_drift_and_keeps_exact_pin) ... {"timestamp":"2026-11-04T19:04:00.625779+00:00","event":"http.response","request_id":"9d78c6d8-fa7a-434d-ae5c-5f6fb5af66f0","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2242}
+{"timestamp":"2026-11-04T19:04:03.228077+00:00","event":"http.response","request_id":"f9791438-ac09-4e46-bf3d-e5d15d7247f0","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":2316}
+{"timestamp":"2026-11-04T19:04:05.608084+00:00","event":"http.response","request_id":"2eb0e867-8e8f-4e06-8f13-c74508a08dc5","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2377}
+{"timestamp":"2026-11-04T19:04:10.101557+00:00","event":"http.response","request_id":"bd09ee62-666e-41f5-8d57-c32057e1523a","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4465}
+{"timestamp":"2026-11-04T19:04:12.475383+00:00","event":"http.response","request_id":"3d6bc27d-e28f-4b2c-a326-34615d06a963","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":2370}
+ok
+test_observation_draft_picker_preserves_pin_and_idempotency (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_observation_draft_picker_preserves_pin_and_idempotency) ... {"timestamp":"2026-11-04T19:04:17.992239+00:00","event":"http.response","request_id":"39a042ea-203b-4bc2-b06c-e309c98d5a3a","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":3155}
+{"timestamp":"2026-11-04T19:04:23.144304+00:00","event":"http.response","request_id":"4539949b-f0a6-45bc-b988-912bc1a06d12","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":5116}
+{"timestamp":"2026-11-04T19:04:29.334862+00:00","event":"http.response","request_id":"8e07a112-c982-457b-aae4-66fe579e12cd","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":6188}
+{"timestamp":"2026-11-04T19:04:32.287922+00:00","event":"http.response","request_id":"bdb7968d-4ec9-4bff-ab60-ca8d43756683","method":"POST","route":"documents:evidence-register","status_code":403,"duration_ms":633}
+{"timestamp":"2026-11-04T19:04:34.428358+00:00","event":"http.response","request_id":"ee2ea8b1-a1f3-4845-90b6-bbaae5af734c","method":"GET","route":"daily_reports:field_observation_detail","status_code":200,"duration_ms":2142}
+ok
+test_picker_filters_foreign_denied_project_and_all_context_documents (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_picker_filters_foreign_denied_project_and_all_context_documents) ... {"timestamp":"2026-11-04T19:04:38.254123+00:00","event":"http.response","request_id":"ed079d75-b7bc-4794-b663-0e84187ecb7f","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":1235}
+{"timestamp":"2026-11-04T19:04:39.176343+00:00","event":"http.response","request_id":"90f47786-97eb-40a4-890e-e7c10afbf02a","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":920}
+{"timestamp":"2026-11-04T19:04:40.253383+00:00","event":"http.response","request_id":"b1e98782-7f5c-482e-87b6-f5b7f81a9cfa","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":708}
+{"timestamp":"2026-11-04T19:04:41.532650+00:00","event":"http.response","request_id":"e8e6ab5a-cc7b-46c0-9b7f-988fbfb7dcb1","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1277}
+{"timestamp":"2026-11-04T19:04:42.659109+00:00","event":"http.response","request_id":"ab8314e4-e6d9-457d-be57-5f53737ab422","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":1056}
+ok
+test_picker_has_no_authority_without_submission_permission (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_picker_has_no_authority_without_submission_permission) ... {"timestamp":"2026-11-04T19:04:44.710184+00:00","event":"http.response","request_id":"5cd6a954-e100-4716-ada4-07b9e72a5814","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":481}
+{"timestamp":"2026-11-04T19:04:45.178062+00:00","event":"http.response","request_id":"afd09b1a-f4e6-4e35-9820-7e89b14778da","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":465}
+ok
+test_quarantine_is_visible_to_review_but_never_delivered_or_field_selectable (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_quarantine_is_visible_to_review_but_never_delivered_or_field_selectable) ... {"timestamp":"2026-11-04T19:04:49.470319+00:00","event":"http.response","request_id":"de43334a-664b-43de-81c1-63d57d35d27c","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2462}
+{"timestamp":"2026-11-04T19:04:53.853569+00:00","event":"http.response","request_id":"d141ef70-0ced-482c-b83a-1d254ac9064c","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4367}
+{"timestamp":"2026-11-04T19:04:55.757210+00:00","event":"http.response","request_id":"e2a565fa-0e77-456e-85fa-8c5736dbfe74","method":"GET","route":"documents:version-download","status_code":403,"duration_ms":1104}
+{"timestamp":"2026-11-04T19:04:58.144088+00:00","event":"http.response","request_id":"67258bd6-5089-4638-a5bd-b60c90994307","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":2254}
+ok
+test_review_registration_rolls_back_on_domain_audit_failure (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_review_registration_rolls_back_on_domain_audit_failure) ... {"timestamp":"2026-11-04T19:05:02.773976+00:00","event":"http.response","request_id":"5c325cdc-bd00-482c-9ee2-da953438da14","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2566}
+{"timestamp":"2026-11-04T19:05:07.795571+00:00","event":"http.response","request_id":"91b33e4f-4d54-4e76-8cbf-991d97b854ff","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":5000}
+ok
+test_safety_and_quality_submit_revision_evidence_and_keep_v1_after_v2 (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_safety_and_quality_submit_revision_evidence_and_keep_v1_after_v2) ... {"timestamp":"2026-11-04T19:05:15.058712+00:00","event":"http.response","request_id":"a1e30078-7498-4b87-ac6d-f4dbd9b3c038","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2616}
+{"timestamp":"2026-11-04T19:05:21.662599+00:00","event":"http.response","request_id":"f8bb7284-379a-4051-9939-b9591d16ef70","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":6588}
+{"timestamp":"2026-11-04T19:05:23.336232+00:00","event":"http.response","request_id":"d93aaf25-f12b-4f57-bad1-b893c04c84fc","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":744}
+{"timestamp":"2026-11-04T19:05:26.656849+00:00","event":"http.response","request_id":"bed45a00-21c9-4785-be4a-6bc66f1db642","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":3318}
+{"timestamp":"2026-11-04T19:05:31.676410+00:00","event":"http.response","request_id":"17d8d7e8-50fe-49be-a79b-c3d5a0727a4a","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4997}
+{"timestamp":"2026-11-04T19:05:32.924369+00:00","event":"http.response","request_id":"3d12b211-2426-4414-8e9f-4831d9cb9f0a","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":589}
+{"timestamp":"2026-11-04T19:05:35.252196+00:00","event":"http.response","request_id":"702df343-e673-4648-bee0-ae9fbef1297e","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1163}
+{"timestamp":"2026-11-04T19:05:36.423225+00:00","event":"http.response","request_id":"6a6dfb1d-6c1f-43c0-98f3-43a5ab942258","method":"GET","route":"documents:version-download","status_code":200,"duration_ms":1146}
+{"timestamp":"2026-11-04T19:05:38.243364+00:00","event":"http.response","request_id":"3eb3637b-86a9-4d1e-a92a-1d7d365e3906","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1103}
+{"timestamp":"2026-11-04T19:05:39.201409+00:00","event":"http.response","request_id":"deee8505-df4e-4423-aa90-1c2713dd92ca","method":"GET","route":"documents:version-download","status_code":200,"duration_ms":929}
+ok
+test_site_scope_picker_is_available_only_for_own_observation (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_site_scope_picker_is_available_only_for_own_observation) ... {"timestamp":"2026-11-04T19:05:40.458480+00:00","event":"http.response","request_id":"4e75834e-196a-4585-87a3-049b06bb98c5","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":583}
+{"timestamp":"2026-11-04T19:05:40.709912+00:00","event":"http.response","request_id":"e06dd512-6bc4-4fa8-97a9-6884aa03dda6","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":252}
+{"timestamp":"2026-11-04T19:05:41.022702+00:00","event":"http.response","request_id":"0af22e99-706c-4f92-907d-935b60402ed9","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":309}
+ok
+test_unauthorized_personas_cannot_read_titles_or_register (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_unauthorized_personas_cannot_read_titles_or_register) ... {"timestamp":"2026-11-04T19:05:45.429214+00:00","event":"http.response","request_id":"e87afd8a-ca12-4f90-ae3f-3678d5795f71","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2258}
+{"timestamp":"2026-11-04T19:05:49.454616+00:00","event":"http.response","request_id":"f08e6d1b-fcdf-4a3e-b679-2cd478c85f85","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4009}
+{"timestamp":"2026-11-04T19:05:49.659921+00:00","event":"http.response","request_id":"8fc8b4a2-37bd-40e3-8aa7-bd5008fc557d","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":152}
+{"timestamp":"2026-11-04T19:05:50.019196+00:00","event":"http.response","request_id":"ffdddbdc-bea6-4d2e-aea8-9f2221fb5fcd","method":"GET","route":"quality:detail","status_code":200,"duration_ms":360}
+ok
+test_validation_cancel_and_forged_intent_preserve_context_without_writes (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_validation_cancel_and_forged_intent_preserve_context_without_writes) ... {"timestamp":"2026-11-04T19:05:53.213819+00:00","event":"http.response","request_id":"8574a305-341e-4731-b906-f8547f89921a","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1935}
+{"timestamp":"2026-11-04T19:05:53.889457+00:00","event":"http.response","request_id":"ea77fc6a-a2ea-4965-9647-79320b7b21d0","method":"GET","route":"safety:detail","status_code":200,"duration_ms":659}
+{"timestamp":"2026-11-04T19:05:55.704803+00:00","event":"http.response","request_id":"ec9678c5-ac46-4f94-bf0d-12899a2197cf","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":1817}
+{"timestamp":"2026-11-04T19:05:57.389561+00:00","event":"http.response","request_id":"bc773b98-8ec0-44dc-ba11-87cee7a60835","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":1677}
+ok
+test_all_context_document_permissions_and_metadata_are_filtered (apps.documents.test_contextual_association.ContextualAssociationTests.test_all_context_document_permissions_and_metadata_are_filtered) ... {"timestamp":"2026-11-04T19:05:59.258979+00:00","event":"http.response","request_id":"3c912cc8-daf9-4abf-8455-9d32447b8577","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":521}
+{"timestamp":"2026-11-04T19:06:00.190177+00:00","event":"http.response","request_id":"14426653-ef06-486a-a63c-3cee2f95e630","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":924}
+{"timestamp":"2026-11-04T19:06:01.394359+00:00","event":"http.response","request_id":"d0865220-29ff-40a1-ac69-37c5da451643","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1188}
+ok
+test_archived_expired_and_sealed_documents_never_enter_picker (apps.documents.test_contextual_association.ContextualAssociationTests.test_archived_expired_and_sealed_documents_never_enter_picker) ... {"timestamp":"2026-11-04T19:06:03.925294+00:00","event":"http.response","request_id":"297fadbe-c58b-43a3-a98b-88bf8168826e","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":1487}
+ok
+test_authority_is_rechecked_inside_upload_transaction (apps.documents.test_contextual_association.ContextualAssociationTests.test_authority_is_rechecked_inside_upload_transaction) ... {"timestamp":"2026-11-04T19:06:05.465701+00:00","event":"http.response","request_id":"631cb9d9-6c93-48f0-af92-d0e6fffc6713","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":1395}
+{"timestamp":"2026-11-04T19:06:06.374394+00:00","event":"http.response","request_id":"9b432ad0-a27e-44d7-8e46-3f0b0dd049af","method":"POST","route":"documents:contextual-upload","status_code":403,"duration_ms":889}
+ok
+test_candidate_pages_search_and_selected_value_retention (apps.documents.test_contextual_association.ContextualAssociationTests.test_candidate_pages_search_and_selected_value_retention) ... {"timestamp":"2026-11-04T19:06:24.149259+00:00","event":"http.response","request_id":"d2a5ae12-496d-46fc-b00a-e774514f05bf","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":12521}
+{"timestamp":"2026-11-04T19:06:36.780654+00:00","event":"http.response","request_id":"bd754ec5-707c-489c-a017-91d3cc0b59d0","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":12631}
+{"timestamp":"2026-11-04T19:06:38.813204+00:00","event":"http.response","request_id":"ac6f7ad8-f8e2-493e-9aa0-c0a88eda600c","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":2034}
+{"timestamp":"2026-11-04T19:06:51.978941+00:00","event":"http.response","request_id":"c1b6437e-c2ac-47b3-90f8-c03b0513e70c","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":13160}
+{"timestamp":"2026-11-04T19:07:06.858988+00:00","event":"http.response","request_id":"f4524fb3-3fd4-462b-8510-da87b752cf8d","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":14855}
+ok
+test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) ... {"timestamp":"2026-11-04T19:07:09.290852+00:00","event":"http.response","request_id":"e1b68ce3-f6c9-4241-912f-b6f80e6bae72","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":2035}
+{"timestamp":"2026-11-04T19:07:28.609757+00:00","event":"http.response","request_id":"9bc1dd5a-bff2-456a-a3c2-aeea7a361749","method":"GET","route":"projects:detail","status_code":200,"duration_ms":19257}
+{"timestamp":"2026-11-04T19:07:38.320737+00:00","event":"http.response","request_id":"489ee222-3b33-403a-bd65-4849b508a07a","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":9648}
+{"timestamp":"2026-11-04T19:07:46.749850+00:00","event":"http.response","request_id":"083653a5-1eff-4bb3-8fa0-6d0ceaf5c9b1","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":8187}
+{"timestamp":"2026-11-04T19:08:04.557525+00:00","event":"http.response","request_id":"67b09dc5-ec8d-4666-9a47-1bac9826b104","method":"GET","route":"projects:detail","status_code":200,"duration_ms":17741}
+{"timestamp":"2026-11-04T19:08:06.968687+00:00","event":"http.response","request_id":"b99ca648-8ee2-4013-95c6-85bbe064a86e","method":"GET","route":"documents:download","status_code":403,"duration_ms":2399}
+{"timestamp":"2026-11-04T19:08:08.455067+00:00","event":"http.response","request_id":"7bedd33b-c018-4b7c-bea1-b4af1dacadb9","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":1486}
+{"timestamp":"2026-11-04T19:08:10.768287+00:00","event":"http.response","request_id":"b98e3938-15f0-4fb5-9acb-a2ced30fb162","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":2291}
+{"timestamp":"2026-11-04T19:08:11.697508+00:00","event":"http.response","request_id":"a95da883-93e8-4e65-ad2e-41548d792fed","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":925}
+{"timestamp":"2026-11-04T19:08:12.972895+00:00","event":"http.response","request_id":"d553bcda-f99b-4a97-b544-2eecd9aa09e5","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":1265}
+{"timestamp":"2026-11-04T19:08:15.889184+00:00","event":"http.response","request_id":"0ba05a51-6b44-44c3-b913-256df11c0f8d","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":2899}
+{"timestamp":"2026-11-04T19:08:16.612491+00:00","event":"http.response","request_id":"e07129be-3709-40ec-83f5-f0e6bee11768","method":"GET","route":"documents:download","status_code":403,"duration_ms":720}
+{"timestamp":"2026-11-04T19:08:18.448662+00:00","event":"http.response","request_id":"f4c1d73f-f60d-461a-bb0a-490bd09b7fdd","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":1834}
+{"timestamp":"2026-11-04T19:08:21.224404+00:00","event":"http.response","request_id":"bf471aa4-2e11-4cfb-910a-a276991f0ea9","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":2739}
+{"timestamp":"2026-11-04T19:08:23.445177+00:00","event":"http.response","request_id":"bbdb2068-c89d-402f-9062-50f5a7d3d3df","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":2216}
+{"timestamp":"2026-11-04T19:08:25.686571+00:00","event":"http.response","request_id":"8889ae25-3bbc-4149-8ed4-1c241c2aca75","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":2228}
+{"timestamp":"2026-11-04T19:08:29.529118+00:00","event":"http.response","request_id":"43d49288-e319-47fb-b064-e6f6ad9f1aa2","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":3822}
+{"timestamp":"2026-11-04T19:08:30.518267+00:00","event":"http.response","request_id":"349051d8-f9a4-4836-bfb9-433cfb27f048","method":"GET","route":"documents:download","status_code":403,"duration_ms":986}
+{"timestamp":"2026-11-04T19:08:31.437624+00:00","event":"http.response","request_id":"77837011-6914-42e3-a232-b657c00375b6","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":917}
+{"timestamp":"2026-11-04T19:08:32.875468+00:00","event":"http.response","request_id":"bc8a38d0-8e75-416c-b221-2e95137fd5a2","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":1413}
+{"timestamp":"2026-11-04T19:08:33.956335+00:00","event":"http.response","request_id":"2f5845cc-e3d4-466c-a827-8a5d77dd24db","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":1075}
+{"timestamp":"2026-11-04T19:08:36.082291+00:00","event":"http.response","request_id":"0e0accf1-611c-4187-8acd-0ad7695c9950","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":2114}
+{"timestamp":"2026-11-04T19:08:37.741583+00:00","event":"http.response","request_id":"b5965a6e-0ad0-41e7-a204-ee6ab591d688","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":1640}
+{"timestamp":"2026-11-04T19:08:38.454046+00:00","event":"http.response","request_id":"26d69938-3426-4ccd-9458-15975b8805b3","method":"GET","route":"documents:download","status_code":403,"duration_ms":711}
+{"timestamp":"2026-11-04T19:08:39.500930+00:00","event":"http.response","request_id":"5d6e26b4-9dd4-4f28-b931-1de4b298efa9","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":1046}
+{"timestamp":"2026-11-04T19:08:41.191547+00:00","event":"http.response","request_id":"98747f95-3fa6-4fd0-9aa5-e5fea3068e12","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":1668}
+{"timestamp":"2026-11-04T19:08:42.073724+00:00","event":"http.response","request_id":"fc4bb33c-af18-4f81-b30e-01bfe4d86599","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":877}
+{"timestamp":"2026-11-04T19:08:43.236178+00:00","event":"http.response","request_id":"da819c55-df73-4d3e-a949-1339b49ac6e0","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":1150}
+{"timestamp":"2026-11-04T19:08:45.087098+00:00","event":"http.response","request_id":"b2d95c14-0c73-4c32-b64e-63fa71412de9","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":1832}
+{"timestamp":"2026-11-04T19:08:45.702132+00:00","event":"http.response","request_id":"0688b014-66fc-4793-988c-0707b032e63d","method":"GET","route":"documents:download","status_code":403,"duration_ms":613}
+ok
+test_csrf_is_required_for_both_actions (apps.documents.test_contextual_association.ContextualAssociationTests.test_csrf_is_required_for_both_actions) ... {"timestamp":"2026-11-04T19:08:45.842232+00:00","event":"http.response","request_id":"fbfb4ed9-0a77-426b-b02f-f9dd7bef263f","method":"POST","route":"documents:contextual-upload","status_code":403,"duration_ms":10}
+{"timestamp":"2026-11-04T19:08:45.854318+00:00","event":"http.response","request_id":"5c826080-2005-487e-9309-1563331e8b55","method":"POST","route":"documents:contextual-link","status_code":403,"duration_ms":12}
+{"timestamp":"2026-11-04T19:08:46.616761+00:00","event":"http.response","request_id":"bf5b99aa-126c-44b4-ac40-57e4b98c1248","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":765}
+{"timestamp":"2026-11-04T19:08:47.503949+00:00","event":"http.response","request_id":"0ee4e3c9-0707-432a-a072-4ab88e1679a2","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":873}
+ok
+test_document_view_and_upload_permissions_are_separate_from_download (apps.documents.test_contextual_association.ContextualAssociationTests.test_document_view_and_upload_permissions_are_separate_from_download) ... {"timestamp":"2026-11-04T19:08:47.977864+00:00","event":"http.response","request_id":"141ea097-7836-4e4a-93a7-f744d5e140b8","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":339}
+{"timestamp":"2026-11-04T19:08:48.420756+00:00","event":"http.response","request_id":"ae5daec7-4316-4a71-ad82-a85b483b281f","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":436}
+{"timestamp":"2026-11-04T19:08:48.552629+00:00","event":"http.response","request_id":"87aadcf7-2eb2-4ba6-8715-1b67bea0a471","method":"GET","route":"documents:download","status_code":403,"duration_ms":115}
+ok
+test_duplicate_associations_and_retry_do_not_add_rows (apps.documents.test_contextual_association.ContextualAssociationTests.test_duplicate_associations_and_retry_do_not_add_rows) ... {"timestamp":"2026-11-04T19:08:51.654187+00:00","event":"http.response","request_id":"a0b22b05-22af-4280-af55-92817d589332","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":2114}
+{"timestamp":"2026-11-04T19:08:55.854373+00:00","event":"http.response","request_id":"518d0d5f-e7bd-4a49-959a-3af8cfc1f1db","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":4190}
+{"timestamp":"2026-11-04T19:08:58.013264+00:00","event":"http.response","request_id":"5dc71098-0191-443e-becd-22ebbd2f3d51","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":2156}
+ok
+test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) ... {"timestamp":"2026-11-04T19:09:01.719986+00:00","event":"http.response","request_id":"351304c3-5df9-4d4d-ad73-61af2f2bba76","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":2116}
+{"timestamp":"2026-11-04T19:09:04.385508+00:00","event":"http.response","request_id":"9ced1429-cc56-459f-bb78-55f2f234bff9","method":"GET","route":"projects:detail","status_code":200,"duration_ms":2654}
+{"timestamp":"2026-11-04T19:09:06.613616+00:00","event":"http.response","request_id":"00007cdf-47eb-4b16-b7d2-f5a71b562c17","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":2224}
+{"timestamp":"2026-11-04T19:09:09.822222+00:00","event":"http.response","request_id":"0a801580-e45b-4038-8529-7547dadbd51f","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":3198}
+{"timestamp":"2026-11-04T19:09:12.136205+00:00","event":"http.response","request_id":"e5ed2048-13f9-4791-ab04-8ffa8b70417f","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":2308}
+{"timestamp":"2026-11-04T19:09:13.645242+00:00","event":"http.response","request_id":"315b4fcb-2d1d-4539-b3cb-b90d9d0db67d","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1496}
+{"timestamp":"2026-11-04T19:09:15.726154+00:00","event":"http.response","request_id":"a7da3654-f48a-43c9-9ac4-ca245b92f8b1","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":2077}
+{"timestamp":"2026-11-04T19:09:18.331281+00:00","event":"http.response","request_id":"060fec4e-1798-4e00-a126-b77646eb5617","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2596}
+{"timestamp":"2026-11-04T19:09:20.209230+00:00","event":"http.response","request_id":"73f539c6-3e14-485c-9a54-1c7ff4521fbb","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1873}
+{"timestamp":"2026-11-04T19:09:21.266483+00:00","event":"http.response","request_id":"387ea5ea-7919-435e-ace5-483fe0500c75","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":1047}
+{"timestamp":"2026-11-04T19:09:23.043958+00:00","event":"http.response","request_id":"25202a3d-7f79-48ba-90d7-8f90ef651bee","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1774}
+{"timestamp":"2026-11-04T19:09:25.925992+00:00","event":"http.response","request_id":"4ce2e817-bb03-43eb-93b2-46472a0cbd57","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2876}
+{"timestamp":"2026-11-04T19:09:27.786418+00:00","event":"http.response","request_id":"4b82022a-2c85-4ce3-bccd-d557137b1fd1","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1852}
+{"timestamp":"2026-11-04T19:09:28.932185+00:00","event":"http.response","request_id":"403d4903-045d-4618-9aa9-6aeb3b2cb79e","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":1142}
+{"timestamp":"2026-11-04T19:09:31.007259+00:00","event":"http.response","request_id":"633978c4-a161-480e-afd7-8c3ef10ab597","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":2070}
+{"timestamp":"2026-11-04T19:09:33.947593+00:00","event":"http.response","request_id":"daa6bc42-fcec-49e5-9fdc-6bae4413b03f","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2933}
+{"timestamp":"2026-11-04T19:09:36.134108+00:00","event":"http.response","request_id":"da5753ee-c79d-4955-a97e-21072e589678","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":2178}
+{"timestamp":"2026-11-04T19:09:37.551928+00:00","event":"http.response","request_id":"b0d616a9-4746-47c4-a7ad-e86e6e9982f0","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":1398}
+{"timestamp":"2026-11-04T19:09:40.279687+00:00","event":"http.response","request_id":"18b5ace7-c8fc-454d-9569-1dc973c9511d","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":2724}
+{"timestamp":"2026-11-04T19:09:44.543132+00:00","event":"http.response","request_id":"920b4f67-79c5-4626-b96d-743f402e1080","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":4255}
+ok
+test_expired_context_keeps_source_and_refreshes_form_intent (apps.documents.test_contextual_association.ContextualAssociationTests.test_expired_context_keeps_source_and_refreshes_form_intent) ... {"timestamp":"2026-11-04T17:09:44.725634+00:00","event":"http.response","request_id":"a97edc4b-776b-40b1-904e-4847449cf21c","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":788}
+{"timestamp":"2026-11-04T19:09:46.398072+00:00","event":"http.response","request_id":"8dc61ee5-2919-4fc8-8d79-98e625bc95de","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":875}
+{"timestamp":"2026-11-04T19:09:47.424930+00:00","event":"http.response","request_id":"d0dc3041-414e-45a1-9cea-d2863b35e2c4","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":1017}
+ok
+test_file_and_required_field_errors_keep_source_and_cancel (apps.documents.test_contextual_association.ContextualAssociationTests.test_file_and_required_field_errors_keep_source_and_cancel) ... {"timestamp":"2026-11-04T19:09:48.284531+00:00","event":"http.response","request_id":"3478a033-0b4f-45dc-b322-07e87c944674","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":743}
+{"timestamp":"2026-11-04T19:09:49.162328+00:00","event":"http.response","request_id":"3188512f-031e-42b0-8518-d59ee9739d17","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":871}
+{"timestamp":"2026-11-04T19:09:49.926147+00:00","event":"http.response","request_id":"88e0713b-9882-47c3-a25c-a086b1e2a833","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":753}
+ok
+test_foreign_targets_and_unsafe_navigation_are_denied (apps.documents.test_contextual_association.ContextualAssociationTests.test_foreign_targets_and_unsafe_navigation_are_denied) ... {"timestamp":"2026-11-04T19:09:50.605788+00:00","event":"http.response","request_id":"89ac3e16-7399-4ac0-a80b-0c684fa50c27","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":568}
+{"timestamp":"2026-11-04T19:09:50.893134+00:00","event":"http.response","request_id":"4ada9580-411e-4a5b-a5aa-85432c645bbd","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":287}
+{"timestamp":"2026-11-04T19:09:51.185934+00:00","event":"http.response","request_id":"3a5c36de-2f5f-49e2-a02e-fba62014f69e","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":291}
+{"timestamp":"2026-11-04T19:09:51.486751+00:00","event":"http.response","request_id":"9eb0fda8-32a7-4984-b59b-7b0ded5536dd","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":300}
+{"timestamp":"2026-11-04T19:09:51.847543+00:00","event":"http.response","request_id":"d53593cf-e14b-465e-ae53-bf9d9dba0b12","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":362}
+{"timestamp":"2026-11-04T19:09:52.085491+00:00","event":"http.response","request_id":"10b6cd20-2e76-413d-a373-170de77821cd","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":238}
+{"timestamp":"2026-11-04T19:09:52.344471+00:00","event":"http.response","request_id":"db940697-d85d-4556-9045-df86cad15e0c","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":254}
+{"timestamp":"2026-11-04T19:09:52.613181+00:00","event":"http.response","request_id":"a7fd0ce9-0cac-4d0f-a687-b7344b6701f3","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":267}
+{"timestamp":"2026-11-04T19:09:53.043805+00:00","event":"http.response","request_id":"c0a6f323-2a88-4a9b-a7ad-e32cc23ae258","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":429}
+{"timestamp":"2026-11-04T19:09:53.351261+00:00","event":"http.response","request_id":"d7eba468-a38b-4219-96e5-387ef16b8f1b","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":305}
+{"timestamp":"2026-11-04T19:09:53.620579+00:00","event":"http.response","request_id":"dbae49ae-579a-418f-ab04-3775285e2fda","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":269}
+{"timestamp":"2026-11-04T19:09:53.880791+00:00","event":"http.response","request_id":"88325a13-ca7c-4152-a94b-27a61eea26ab","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":258}
+ok
+test_forged_target_token_and_additional_relationships_are_rejected (apps.documents.test_contextual_association.ContextualAssociationTests.test_forged_target_token_and_additional_relationships_are_rejected) ... {"timestamp":"2026-11-04T19:09:55.098721+00:00","event":"http.response","request_id":"07baf778-3932-48af-8347-5c7b4bb46916","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":1110}
+{"timestamp":"2026-11-04T19:09:55.847120+00:00","event":"http.response","request_id":"b9a57f9b-d909-4fb5-94f6-0cbd4b7788e2","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":734}
+{"timestamp":"2026-11-04T19:09:56.682106+00:00","event":"http.response","request_id":"7e53fcba-ca49-4d11-8cc9-b3705dd165c2","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":832}
+{"timestamp":"2026-11-04T19:09:57.810039+00:00","event":"http.response","request_id":"d3d0e198-d2f1-48cf-bb03-91b67878f68a","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":1124}
+{"timestamp":"2026-11-04T19:09:58.697688+00:00","event":"http.response","request_id":"e8d24765-2be0-4bb9-9b25-d237fff62840","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":883}
+{"timestamp":"2026-11-04T19:09:59.454369+00:00","event":"http.response","request_id":"d9c108ac-c959-4f51-a9a6-a8b864ab6651","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":756}
+{"timestamp":"2026-11-04T19:10:00.289976+00:00","event":"http.response","request_id":"d60077d6-2ba7-4791-bc4a-2f3888613bf0","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":832}
+{"timestamp":"2026-11-04T19:10:01.391515+00:00","event":"http.response","request_id":"edfbb335-902a-468f-ac75-306dc005ba8f","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":1099}
+ok
+test_link_rollback_preserves_typed_legacy_atomicity (apps.documents.test_contextual_association.ContextualAssociationTests.test_link_rollback_preserves_typed_legacy_atomicity) ... {"timestamp":"2026-11-04T19:10:04.223236+00:00","event":"http.response","request_id":"d9eda953-2f2e-48ed-a8ae-91620659a264","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":2501}
+{"timestamp":"2026-11-04T19:10:09.196327+00:00","event":"http.response","request_id":"eaa70bf6-8bf6-4aed-b928-5da96ce822c6","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":4962}
+ok
+test_picker_search_excludes_duplicates_and_foreign_documents (apps.documents.test_contextual_association.ContextualAssociationTests.test_picker_search_excludes_duplicates_and_foreign_documents) ... {"timestamp":"2026-11-04T19:10:11.104969+00:00","event":"http.response","request_id":"00c7b2f4-4a7d-49fd-b2b8-559e35c1486c","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":1371}
+{"timestamp":"2026-11-04T19:10:12.365549+00:00","event":"http.response","request_id":"c5a966df-7b16-49ea-a6df-b26b656930a8","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":1260}
+{"timestamp":"2026-11-04T19:10:15.493825+00:00","event":"http.response","request_id":"2ec7eed6-f71c-4adb-af72-e51f364fbfff","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":3127}
+{"timestamp":"2026-11-04T19:10:18.333746+00:00","event":"http.response","request_id":"a8cf8474-0f75-45a8-9c0b-218a5ccd3b8b","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":2829}
+ok
+test_project_and_site_scope_are_rechecked (apps.documents.test_contextual_association.ContextualAssociationTests.test_project_and_site_scope_are_rechecked) ... {"timestamp":"2026-11-04T19:10:18.785831+00:00","event":"http.response","request_id":"ffae431f-9332-4589-a094-75e7adddbc9f","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":207}
+{"timestamp":"2026-11-04T19:10:18.984026+00:00","event":"http.response","request_id":"0d70cea0-3cae-4073-8717-4708dab053a1","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":198}
+{"timestamp":"2026-11-04T19:10:19.186022+00:00","event":"http.response","request_id":"7aea8104-dae9-4571-95c1-56afa30cf0d2","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":199}
+ok
+test_site_scoped_daily_report_upload_and_denied_other_site (apps.documents.test_contextual_association.ContextualAssociationTests.test_site_scoped_daily_report_upload_and_denied_other_site) ... {"timestamp":"2026-11-04T19:10:19.846848+00:00","event":"http.response","request_id":"47203a62-5537-4182-9f62-8d8ba6c93551","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":431}
+{"timestamp":"2026-11-04T19:10:20.685755+00:00","event":"http.response","request_id":"711be433-e7b6-465f-8036-5e26872bc069","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":834}
+{"timestamp":"2026-11-04T19:10:20.931416+00:00","event":"http.response","request_id":"9e27d97e-7b79-4a81-be03-d36ed841bead","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":227}
+{"timestamp":"2026-11-04T19:10:21.162926+00:00","event":"http.response","request_id":"f2015911-de62-4d70-85f3-f5a33f0a3064","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":231}
+{"timestamp":"2026-11-04T19:10:21.432300+00:00","event":"http.response","request_id":"7668f224-398a-45a7-a0b5-dd270f3e7c87","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":268}
+ok
+test_stale_compatibility_mapping_cannot_be_selected (apps.documents.test_contextual_association.ContextualAssociationTests.test_stale_compatibility_mapping_cannot_be_selected) ... {"timestamp":"2026-11-04T19:10:23.700413+00:00","event":"http.response","request_id":"10449383-b876-44e4-967c-e1cc6f37f98f","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":1859}
+{"timestamp":"2026-11-04T19:10:27.074705+00:00","event":"http.response","request_id":"3ef48d0d-8e97-45fb-b555-7a65c6f72292","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":3373}
+{"timestamp":"2026-11-04T19:10:30.727769+00:00","event":"http.response","request_id":"741e7877-7dc3-443e-a4f3-b815940aac10","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":3639}
+ok
+test_upload_only_persona_cannot_read_picker_or_contextual_forms (apps.documents.test_contextual_association.ContextualAssociationTests.test_upload_only_persona_cannot_read_picker_or_contextual_forms) ... {"timestamp":"2026-11-04T19:10:31.129035+00:00","event":"http.response","request_id":"51f82b42-305e-43a4-9f4a-b3b239d32d27","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":220}
+{"timestamp":"2026-11-04T19:10:31.397509+00:00","event":"http.response","request_id":"63d91288-7190-4383-b6c3-9b3b4a19b514","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":266}
+{"timestamp":"2026-11-04T19:10:31.617760+00:00","event":"http.response","request_id":"6109a1f2-d443-4c57-ab06-aa2a6c75bd73","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":219}
+ok
+test_upload_rollback_removes_only_the_new_binary (apps.documents.test_contextual_association.ContextualAssociationTests.test_upload_rollback_removes_only_the_new_binary) ... {"timestamp":"2026-11-04T19:10:32.757871+00:00","event":"http.response","request_id":"f690dc65-5e2e-49d4-b83d-cb2e6851722b","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":988}
+{"timestamp":"2026-11-04T19:10:34.591829+00:00","event":"http.response","request_id":"23de299c-1564-44b2-a14b-dd80c8dbd6a1","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":1815}
+ok
+test_viewer_has_no_contextual_mutation_actions_or_endpoints (apps.documents.test_contextual_association.ContextualAssociationTests.test_viewer_has_no_contextual_mutation_actions_or_endpoints) ... {"timestamp":"2026-11-04T19:10:35.233509+00:00","event":"http.response","request_id":"ce91c85f-1a26-414b-a891-61bd9c7f5e89","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":176}
+{"timestamp":"2026-11-04T19:10:35.379802+00:00","event":"http.response","request_id":"19fe8964-c50f-4799-95e5-dfc9fe5b90c8","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":146}
+{"timestamp":"2026-11-04T19:10:35.516428+00:00","event":"http.response","request_id":"59c4deca-4c58-411e-bca8-209a8d0d9ee0","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":134}
+ok
+test_all_linked_contexts_must_be_authorized (apps.documents.test_related_documents.RelatedDocumentsTests.test_all_linked_contexts_must_be_authorized) ... ok
+test_archived_expired_sealed_and_deleted_source_documents_are_absent (apps.documents.test_related_documents.RelatedDocumentsTests.test_archived_expired_sealed_and_deleted_source_documents_are_absent) ... ok
+test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) ... {"timestamp":"2026-11-04T19:10:44.440405+00:00","event":"http.response","request_id":"f9dc7ba3-4ebd-4316-86c3-b3db7f27047f","method":"GET","route":"projects:detail","status_code":200,"duration_ms":3284}
+{"timestamp":"2026-11-04T19:10:46.318237+00:00","event":"http.response","request_id":"f369800d-a254-4632-b643-27457793b23d","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1867}
+{"timestamp":"2026-11-04T19:10:47.877248+00:00","event":"http.response","request_id":"178c7c73-2afc-4c86-b03a-2f7465193b12","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":1543}
+{"timestamp":"2026-11-04T19:10:49.452106+00:00","event":"http.response","request_id":"3f753204-a06f-46c9-b2d1-e38617d168e3","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":1561}
+{"timestamp":"2026-11-04T19:10:51.075626+00:00","event":"http.response","request_id":"0fe4d702-b43a-44a8-8122-575d5635b440","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":1612}
+ok
+test_daily_report_site_scope_does_not_expand_to_another_site (apps.documents.test_related_documents.RelatedDocumentsTests.test_daily_report_site_scope_does_not_expand_to_another_site) ... ok
+test_denied_dms_permission_hides_panel_and_count (apps.documents.test_related_documents.RelatedDocumentsTests.test_denied_dms_permission_hides_panel_and_count) ... ok
+test_document_detail_shows_real_source_return_without_new_mutation_flows (apps.documents.test_related_documents.RelatedDocumentsTests.test_document_detail_shows_real_source_return_without_new_mutation_flows) ... {"timestamp":"2026-11-04T19:10:54.277427+00:00","event":"http.response","request_id":"f5318d93-91b3-48e1-acb0-4f4ff69089f6","method":"GET","route":"documents:detail","status_code":200,"duration_ms":1394}
+ok
+test_download_requires_its_own_permission_and_exact_clean_version (apps.documents.test_related_documents.RelatedDocumentsTests.test_download_requires_its_own_permission_and_exact_clean_version) ... ok
+test_estimate_return_does_not_require_unauthorized_project_context (apps.documents.test_related_documents.RelatedDocumentsTests.test_estimate_return_does_not_require_unauthorized_project_context) ... ok
+test_five_sources_deduplicate_mirrors_and_generate_safe_roundtrips (apps.documents.test_related_documents.RelatedDocumentsTests.test_five_sources_deduplicate_mirrors_and_generate_safe_roundtrips) ... ok
+test_forged_return_context_never_produces_a_url (apps.documents.test_related_documents.RelatedDocumentsTests.test_forged_return_context_never_produces_a_url) ... ok
+test_missing_compatibility_parity_hides_document (apps.documents.test_related_documents.RelatedDocumentsTests.test_missing_compatibility_parity_hides_document) ... ok
+test_missing_source_permission_and_foreign_target_fail_closed (apps.documents.test_related_documents.RelatedDocumentsTests.test_missing_source_permission_and_foreign_target_fail_closed) ... ok
+test_only_direct_entity_links_are_projected (apps.documents.test_related_documents.RelatedDocumentsTests.test_only_direct_entity_links_are_projected) ... ok
+test_read_projection_does_not_record_a_download_or_change_links (apps.documents.test_related_documents.RelatedDocumentsTests.test_read_projection_does_not_record_a_download_or_change_links) ... ok
+test_add_link_supports_an_existing_financial_entity_and_audits (apps.documents.tests.DocumentServiceTests.test_add_link_supports_an_existing_financial_entity_and_audits) ... ok
+test_archive_preserves_versions_and_links_and_removes_active_listing (apps.documents.tests.DocumentServiceTests.test_archive_preserves_versions_and_links_and_removes_active_listing) ... ok
+test_create_document_records_first_version_link_metadata_and_audit (apps.documents.tests.DocumentServiceTests.test_create_document_records_first_version_link_metadata_and_audit) ... ok
+test_document_access_requires_linked_context_permission (apps.documents.tests.DocumentServiceTests.test_document_access_requires_linked_context_permission) ... ok
+test_document_link_requires_exactly_one_same_tenant_target (apps.documents.tests.DocumentServiceTests.test_document_link_requires_exactly_one_same_tenant_target) ... ok
+test_download_audit_is_version_specific_and_rechecks_access (apps.documents.tests.DocumentServiceTests.test_download_audit_is_version_specific_and_rechecks_access) ... ok
+test_endpoints_reject_cross_tenant_document_uuid (apps.documents.tests.DocumentServiceTests.test_endpoints_reject_cross_tenant_document_uuid) ... {"timestamp":"2026-11-04T19:11:29.979983+00:00","event":"http.response","request_id":"2ff96120-4d32-4157-bf71-f9d92e01d8ea","method":"GET","route":"documents:detail","status_code":403,"duration_ms":289}
+{"timestamp":"2026-11-04T19:11:30.258053+00:00","event":"http.response","request_id":"f21ec612-925d-4db4-b9c4-688805a1cb54","method":"GET","route":"documents:download","status_code":403,"duration_ms":277}
+{"timestamp":"2026-11-04T19:11:30.510271+00:00","event":"http.response","request_id":"feb36962-9257-4543-b4d1-daf4e89d406d","method":"POST","route":"documents:archive","status_code":403,"duration_ms":250}
+ok
+test_new_version_is_numbered_immutable_and_becomes_current (apps.documents.tests.DocumentServiceTests.test_new_version_is_numbered_immutable_and_becomes_current) ... ok
+test_partner_evidence_document_keeps_tenant_and_domain_permission (apps.documents.tests.DocumentServiceTests.test_partner_evidence_document_keeps_tenant_and_domain_permission) ... ok
+test_partner_evidence_document_resolves_registered_link_model (apps.documents.tests.DocumentServiceTests.test_partner_evidence_document_resolves_registered_link_model) ... ok
+test_upload_validation_rejects_mismatched_type_and_signature (apps.documents.tests.DocumentServiceTests.test_upload_validation_rejects_mismatched_type_and_signature) ... ok
+test_views_create_add_version_and_secure_download (apps.documents.tests.DocumentServiceTests.test_views_create_add_version_and_secure_download) ... {"timestamp":"2026-11-04T19:11:39.620436+00:00","event":"http.response","request_id":"61c6bfe9-475f-45b9-81b3-3d8908062c1f","method":"POST","route":"documents:upload","status_code":302,"duration_ms":774}
+{"timestamp":"2026-11-04T19:11:41.126937+00:00","event":"http.response","request_id":"32590818-5dd2-45ee-9840-dd18fe54af51","method":"GET","route":"documents:detail","status_code":200,"duration_ms":1504}
+{"timestamp":"2026-11-04T19:11:41.484874+00:00","event":"http.response","request_id":"d189798e-2097-463a-8051-368a2fb65f75","method":"POST","route":"documents:version-add","status_code":302,"duration_ms":358}
+{"timestamp":"2026-11-04T19:11:42.433629+00:00","event":"http.response","request_id":"6a4dd2d9-1c3a-4b48-8b1a-eb14967644d0","method":"GET","route":"documents:detail","status_code":200,"duration_ms":946}
+{"timestamp":"2026-11-04T19:11:42.954244+00:00","event":"http.response","request_id":"9e2f318f-784d-4234-abb9-1f4cf15fe6b3","method":"GET","route":"documents:download","status_code":403,"duration_ms":516}
+{"timestamp":"2026-11-04T19:11:43.463632+00:00","event":"http.response","request_id":"a429e6c9-a6a0-460b-bdc1-0403c4b0e533","method":"GET","route":"documents:download","status_code":200,"duration_ms":482}
+ok
+test_inactive_membership_fails_closed (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_inactive_membership_fails_closed) ... ok
+test_linked_contract_choices_intersect_source_project (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_linked_contract_choices_intersect_source_project) ... ok
+test_missing_permission_cannot_reveal_choices (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_missing_permission_cannot_reveal_choices) ... ok
+test_organization_grant_remains_tenant_filtered (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_organization_grant_remains_tenant_filtered) ... ok
+test_project_reader_has_exact_allowed_choices_and_valid_target (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_project_reader_has_exact_allowed_choices_and_valid_target) ... ok
+test_ungranted_and_foreign_targets_cannot_be_selected (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_ungranted_and_foreign_targets_cannot_be_selected) ... ok
+test_domain_closure_requires_record_approval (apps.safety.test_cep027_review.SafetyRecordReviewTests.test_domain_closure_requires_record_approval) ... ok
+test_evidence_pins_exact_dms_version (apps.safety.test_cep027_review.SafetyRecordReviewTests.test_evidence_pins_exact_dms_version) ... ok
+test_permissions_tenant_and_policy_absence_fail_closed (apps.safety.test_cep027_review.SafetyRecordReviewTests.test_permissions_tenant_and_policy_absence_fail_closed) ... ok
+test_return_correction_resubmit_approval_and_history (apps.safety.test_cep027_review.SafetyRecordReviewTests.test_return_correction_resubmit_approval_and_history) ... ok
+test_submitted_source_cannot_be_silently_edited (apps.safety.test_cep027_review.SafetyRecordReviewTests.test_submitted_source_cannot_be_silently_edited) ... ok
+test_domain_closure_requires_record_approval (apps.quality.test_cep027_review.QualityRecordReviewTests.test_domain_closure_requires_record_approval) ... ok
+test_evidence_pins_exact_dms_version (apps.quality.test_cep027_review.QualityRecordReviewTests.test_evidence_pins_exact_dms_version) ... ok
+test_permissions_tenant_and_invalid_evidence_fail_closed (apps.quality.test_cep027_review.QualityRecordReviewTests.test_permissions_tenant_and_invalid_evidence_fail_closed) ... ok
+test_return_correction_resubmit_approval_and_history (apps.quality.test_cep027_review.QualityRecordReviewTests.test_return_correction_resubmit_approval_and_history) ... ok
+test_submitted_source_cannot_be_silently_edited (apps.quality.test_cep027_review.QualityRecordReviewTests.test_submitted_source_cannot_be_silently_edited) ... ok
+test_financial_shortcuts_preserve_expenses_and_remove_cash_workspace (core.test_product_surface.ProductSurfaceHttpTests.test_financial_shortcuts_preserve_expenses_and_remove_cash_workspace) ... ok
+test_hidden_http_get_post_and_htmx_fail_without_calling_domain_view (core.test_product_surface.ProductSurfaceHttpTests.test_hidden_http_get_post_and_htmx_fail_without_calling_domain_view) ... {"timestamp":"2026-11-04T19:12:33.192184+00:00","event":"http.response","request_id":"c5999900-320f-4cd2-96b8-f9c088be51b7","method":"GET","route":"treasury:workbench","status_code":403,"duration_ms":643}
+{"timestamp":"2026-11-04T19:12:33.712734+00:00","event":"http.response","request_id":"6179c947-6d97-4ef4-a8cd-8d909d544dcc","method":"GET","route":"accounting:dashboard","status_code":403,"duration_ms":503}
+{"timestamp":"2026-11-04T19:12:34.193894+00:00","event":"http.response","request_id":"9a4de87d-559f-43ec-acef-3bbadd0210eb","method":"GET","route":"subledgers:workbench","status_code":403,"duration_ms":473}
+{"timestamp":"2026-11-04T19:12:34.660466+00:00","event":"http.response","request_id":"508506ed-96e3-4c24-86a1-43f32729fce8","method":"GET","route":"financials:dashboard","status_code":403,"duration_ms":463}
+{"timestamp":"2026-11-04T19:12:35.143287+00:00","event":"http.response","request_id":"e72a4f48-a261-435a-8d06-b15016baccb2","method":"GET","route":"fixed_assets:workbench","status_code":403,"duration_ms":470}
+{"timestamp":"2026-11-04T19:12:35.676028+00:00","event":"http.response","request_id":"b5a81d90-36aa-4579-b935-273f5823a702","method":"GET","route":"payroll:workbench","status_code":403,"duration_ms":513}
+{"timestamp":"2026-11-04T19:12:36.223896+00:00","event":"http.response","request_id":"5bfe4e91-6ca6-41e1-94ad-6f0c254dbafe","method":"GET","route":"workforce:foundation","status_code":403,"duration_ms":545}
+{"timestamp":"2026-11-04T19:12:36.839968+00:00","event":"http.response","request_id":"0894215c-4b9e-4fac-8d1a-ec8c7e0395a4","method":"GET","route":"workforce:ess_dashboard","status_code":403,"duration_ms":613}
+{"timestamp":"2026-11-04T19:12:37.359600+00:00","event":"http.response","request_id":"9449e65a-c7f8-4852-989e-dfc018f21617","method":"GET","route":"workforce:employment_manage","status_code":403,"duration_ms":517}
+{"timestamp":"2026-11-04T19:12:37.803007+00:00","event":"http.response","request_id":"e5f4ccb1-2cae-40c7-ac79-b496b93391ec","method":"GET","route":"reporting:reconciliation_workbench","status_code":403,"duration_ms":440}
+{"timestamp":"2026-11-04T19:12:38.243071+00:00","event":"http.response","request_id":"3204e504-b817-49f9-8d83-8fdf2a5e45e4","method":"GET","route":"reporting:project_closeout_workbench","status_code":403,"duration_ms":437}
+{"timestamp":"2026-11-04T19:12:38.738834+00:00","event":"http.response","request_id":"2b74dbe7-e79a-418c-9108-529bc443c3d5","method":"GET","route":"organizations:reference_personas","status_code":403,"duration_ms":493}
+{"timestamp":"2026-11-04T19:12:39.198687+00:00","event":"http.response","request_id":"c2195f7d-9e03-4bd5-9c18-54516f1f02ad","method":"GET","route":"organizations:platform_role_catalog","status_code":403,"duration_ms":458}
+{"timestamp":"2026-11-04T19:12:39.660820+00:00","event":"http.response","request_id":"c00f849b-93cb-4755-987c-3e7fcac4e1ed","method":"GET","route":"expenses:platform_group_list","status_code":403,"duration_ms":459}
+{"timestamp":"2026-11-04T19:12:40.229847+00:00","event":"http.response","request_id":"5845ffaa-e57d-47a8-8aa6-fe25d00a1526","method":"GET","route":"treasury:workbench","status_code":403,"duration_ms":564}
+{"timestamp":"2026-11-04T19:12:40.704449+00:00","event":"http.response","request_id":"542172a7-959f-475d-a046-a361cc5067d7","method":"POST","route":"treasury:workbench","status_code":403,"duration_ms":473}
+ok
+test_hidden_workflow_proxy_cannot_invoke_runtime (core.test_product_surface.ProductSurfaceHttpTests.test_hidden_workflow_proxy_cannot_invoke_runtime) ... {"timestamp":"2026-11-04T19:12:40.910617+00:00","event":"http.response","request_id":"ab836890-d31b-431b-83c6-b5f86d9cf74c","method":"POST","route":"workflows:work_item_action","status_code":302,"duration_ms":161}
+ok
+test_home_desktop_mobile_and_admin_navigation_share_five_groups (core.test_product_surface.ProductSurfaceHttpTests.test_home_desktop_mobile_and_admin_navigation_share_five_groups) ... {"timestamp":"2026-11-04T19:12:43.223778+00:00","event":"http.response","request_id":"d847f756-f461-4c55-89e4-ad61f4756d81","method":"GET","route":"home","status_code":200,"duration_ms":2255}
+ok
+test_home_keeps_own_requests_without_backoffice_permissions (core.test_product_surface.ProductSurfaceHttpTests.test_home_keeps_own_requests_without_backoffice_permissions) ... {"timestamp":"2026-11-04T19:12:43.619146+00:00","event":"http.response","request_id":"9ac80d58-4cb0-4461-a72d-0350b49761d9","method":"GET","route":"home","status_code":200,"duration_ms":240}
+{"timestamp":"2026-11-04T19:12:43.941172+00:00","event":"http.response","request_id":"f04776b5-8e5f-469f-9852-56cfacd5ab0f","method":"GET","route":"workflows:my_requests","status_code":200,"duration_ms":319}
+ok
+test_internal_profile_reaches_original_authorized_hidden_view (core.test_product_surface.ProductSurfaceHttpTests.test_internal_profile_reaches_original_authorized_hidden_view) ... {"timestamp":"2026-11-04T19:12:44.872356+00:00","event":"http.response","request_id":"829d1bc1-aa09-48bf-91f2-827eee40b4b7","method":"GET","route":"treasury:workbench","status_code":200,"duration_ms":889}
+{"timestamp":"2026-11-04T19:12:45.452489+00:00","event":"http.response","request_id":"b5613160-9795-423d-af17-8627521a3fb7","method":"GET","route":"treasury:workbench","status_code":403,"duration_ms":578}
+ok
+test_own_timekeeping_status_preserves_identity_and_source_ownership (core.test_product_surface.ProductSurfaceHttpTests.test_own_timekeeping_status_preserves_identity_and_source_ownership) ... {"timestamp":"2026-11-04T19:12:47.356385+00:00","event":"http.response","request_id":"d065cb65-a5c2-42e2-b30f-f17233c264fe","method":"GET","route":"workforce:ess_request_status","status_code":200,"duration_ms":1764}
+{"timestamp":"2026-11-04T19:12:48.112650+00:00","event":"http.response","request_id":"e995d4da-bef3-41ed-98a4-2c06d6502e37","method":"GET","route":"workflows:my_requests","status_code":200,"duration_ms":752}
+{"timestamp":"2026-11-04T19:12:48.326720+00:00","event":"http.response","request_id":"9196dfb6-d28f-458f-a2d5-9d79c5ae06ab","method":"GET","route":"workforce:ess_request_status","status_code":403,"duration_ms":212}
+{"timestamp":"2026-11-04T19:12:48.939692+00:00","event":"http.response","request_id":"f5ba02ae-24b7-40f9-90fb-d92fff621f97","method":"GET","route":"workforce:ess_request_status","status_code":403,"duration_ms":612}
+{"timestamp":"2026-11-04T19:12:49.560575+00:00","event":"http.response","request_id":"ff34d7c1-9575-4b87-bb0c-56da68c34de8","method":"GET","route":"workforce:ess_request_status","status_code":403,"duration_ms":619}
+{"timestamp":"2026-11-04T19:12:49.629092+00:00","event":"http.response","request_id":"05f06077-8dcf-4c2d-8631-58290df9cbd2","method":"GET","route":"workforce:ess_request_status","status_code":403,"duration_ms":62}
+ok
+test_permission_and_exposure_are_intersections (core.test_product_surface.ProductSurfaceHttpTests.test_permission_and_exposure_are_intersections) ... {"timestamp":"2026-11-04T19:12:49.940662+00:00","event":"http.response","request_id":"71b1c6b5-4db4-4739-a7f8-d22dd8fd833c","method":"GET","route":"home","status_code":200,"duration_ms":255}
+{"timestamp":"2026-11-04T19:12:50.257347+00:00","event":"http.response","request_id":"e34116fb-6f2a-4c05-9e53-9a4ed1198ac2","method":"GET","route":"projects:list","status_code":403,"duration_ms":313}
+{"timestamp":"2026-11-04T19:12:51.854348+00:00","event":"http.response","request_id":"e51d2f1c-c464-4a16-9dfa-fe7287284fac","method":"GET","route":"expenses:list","status_code":200,"duration_ms":1595}
+{"timestamp":"2026-11-04T19:12:52.078323+00:00","event":"http.response","request_id":"7b110ae5-5169-4b23-b8de-dc820c6f1e04","method":"GET","route":"treasury:workbench","status_code":403,"duration_ms":222}
+ok
+test_reporting_filters_retained_cash_projection_after_authorization (core.test_product_surface.ProductSurfaceHttpTests.test_reporting_filters_retained_cash_projection_after_authorization) ... {"timestamp":"2026-11-04T19:12:52.142091+00:00","event":"http.response","request_id":"91f963c4-11ae-437e-a8bb-c5f708235463","method":"GET","route":"reporting:dashboard","status_code":200,"duration_ms":26}
+ok
+test_revoked_membership_and_superuser_do_not_bypass_product_boundary (core.test_product_surface.ProductSurfaceHttpTests.test_revoked_membership_and_superuser_do_not_bypass_product_boundary) ... {"timestamp":"2026-11-04T19:12:52.847478+00:00","event":"http.response","request_id":"e7b8caf9-15c8-4ce0-9510-62c40b168b6d","method":"GET","route":"treasury:workbench","status_code":403,"duration_ms":666}
+{"timestamp":"2026-11-04T19:12:52.869481+00:00","event":"http.response","request_id":"feb528d4-7481-4fd2-b4ff-66bb3dea7a78","method":"GET","route":"expenses:list","status_code":302,"duration_ms":15}
+ok
+test_tenant_switch_object_reads_and_writes_fail_closed (core.test_product_surface.ProductSurfaceHttpTests.test_tenant_switch_object_reads_and_writes_fail_closed) ... {"timestamp":"2026-11-04T19:12:53.597471+00:00","event":"http.response","request_id":"5efe5e87-4ddb-404f-9d65-f6835a9ce96b","method":"GET","route":"projects:detail","status_code":403,"duration_ms":698}
+{"timestamp":"2026-11-04T19:12:54.271012+00:00","event":"http.response","request_id":"18a8f9ec-36a2-45b2-91ab-cb34ed80ddb0","method":"GET","route":"workforce:employee_detail","status_code":404,"duration_ms":670}
+{"timestamp":"2026-11-04T19:12:54.439483+00:00","event":"http.response","request_id":"a1939206-05f2-4ee7-917a-92f6170d142e","method":"POST","route":"workforce:employee_status_change","status_code":404,"duration_ms":166}
+{"timestamp":"2026-11-04T19:12:54.483937+00:00","event":"http.response","request_id":"651da348-d57e-4b43-a732-536b24b28b17","method":"GET","route":"projects:list","status_code":403,"duration_ms":31}
+ok
+test_visible_operations_and_workforce_detail_keep_existing_guards (core.test_product_surface.ProductSurfaceHttpTests.test_visible_operations_and_workforce_detail_keep_existing_guards) ... {"timestamp":"2026-11-04T19:12:55.564804+00:00","event":"http.response","request_id":"1c9f86fe-2956-4642-a8dc-5f7a30a90757","method":"GET","route":"projects:list","status_code":200,"duration_ms":1051}
+{"timestamp":"2026-11-04T19:12:56.196981+00:00","event":"http.response","request_id":"bc67c46f-cf58-4c0f-9352-9f9222dd62ac","method":"GET","route":"expenses:list","status_code":200,"duration_ms":630}
+{"timestamp":"2026-11-04T19:12:57.714286+00:00","event":"http.response","request_id":"74ab2341-d866-4806-be75-d78607d1af0a","method":"GET","route":"workforce:employee_list","status_code":200,"duration_ms":1516}
+{"timestamp":"2026-11-04T19:12:59.485337+00:00","event":"http.response","request_id":"69a96f2b-bb51-49b2-8a23-34522e1dc6ea","method":"GET","route":"timekeeping:workbench","status_code":200,"duration_ms":1769}
+{"timestamp":"2026-11-04T19:13:01.095798+00:00","event":"http.response","request_id":"a6d58389-1beb-49c9-af01-18ccaa2bb40d","method":"GET","route":"reporting:dashboard","status_code":200,"duration_ms":1608}
+{"timestamp":"2026-11-04T19:13:01.996503+00:00","event":"http.response","request_id":"066fd3c9-d75e-4cec-9420-f1089eee0d05","method":"GET","route":"organizations:settings","status_code":200,"duration_ms":898}
+{"timestamp":"2026-11-04T19:13:03.494344+00:00","event":"http.response","request_id":"f32ff79b-8f25-468a-b52b-8d02eb0052ec","method":"GET","route":"workforce:employee_detail","status_code":200,"duration_ms":1486}
+ok
+test_capabilities_are_unique_and_unknown_fails_closed (core.test_product_surface.SurfacePolicyTests.test_capabilities_are_unique_and_unknown_fails_closed) ... ok
+test_dynamic_shared_links_use_central_resolver_and_keep_plain_labels (core.test_product_surface.SurfacePolicyTests.test_dynamic_shared_links_use_central_resolver_and_keep_plain_labels) ... ok
+test_internal_profile_is_explicit_and_grants_no_unknown_capability (core.test_product_surface.SurfacePolicyTests.test_internal_profile_is_explicit_and_grants_no_unknown_capability) ... ok
+test_mixed_capabilities_share_namespaces_without_sharing_exposure (core.test_product_surface.SurfacePolicyTests.test_mixed_capabilities_share_namespaces_without_sharing_exposure) ... ok
+test_navigation_permissions_empty_groups_and_operational_reports (core.test_product_surface.SurfacePolicyTests.test_navigation_permissions_empty_groups_and_operational_reports) ... ok
+
+----------------------------------------------------------------------
+Ran 101 tests in 649.330s
+
+OK
+Preserving test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+

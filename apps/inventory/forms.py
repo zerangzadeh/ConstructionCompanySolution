@@ -7,6 +7,7 @@ from apps.organizations.authorization import scope_queryset
 from apps.organizations.models import OrganizationMembership
 from apps.procurement.models import GoodsReceiptItem, GoodsReceiptStatus
 from apps.projects.models import Project
+from core.business_choices import SearchChoiceSelect, business_label
 from core.forms import JalaliDateMixin
 
 
@@ -52,6 +53,68 @@ class WarehouseForm(_StyledForm):
             membership=membership,
             project_lookup="pk",
         ).order_by("name")
+
+
+class WarehouseListFilters(forms.Form):
+    """Search scoped projects and locations while retaining bookmarked text filters."""
+
+    def __init__(self, data, *, projects, project_id, locations, list_url):
+        data = data.copy()
+        for name in ("project", "location"):
+            if name in data:
+                data[name] = data[name].strip()
+        super().__init__(data)
+        value = data.get("project", "")
+        choices = [("", "همه پروژه‌ها")]
+        if value and project_id is None:
+            choices.append((value, f"نام پروژه: {value}"))
+        rows = list(projects[:40])
+        if project_id and all(row.pk != project_id for row in rows):
+            selected = projects.filter(pk=project_id).first()
+            if selected:
+                rows.insert(0, selected)
+        choices.extend(
+            (value if row.pk == project_id else str(row.pk), business_label(row))
+            for row in rows
+        )
+        self.fields["project"] = forms.ChoiceField(
+            label="پروژه",
+            required=False,
+            choices=choices,
+            error_messages={"invalid_choice": "پروژه معتبر و مجاز را انتخاب کنید."},
+            widget=SearchChoiceSelect(
+                attrs={
+                    "class": "erp-input w-full",
+                    "data-business-choice": "project",
+                    "data-business-names-primary": "true",
+                    "data-options-url": f"{list_url}?filter_options=project",
+                    "data-placeholder": "همه پروژه‌ها",
+                    "dir": "rtl",
+                }
+            ),
+        )
+        location = data.get("location", "")
+        location_choices = list(locations[:40])
+        # Retain selected locations outside the first page and old partial searches.
+        if location and location not in location_choices:
+            location_choices.insert(0, location)
+        self.fields["location"] = forms.ChoiceField(
+            label="محل انبار",
+            required=False,
+            choices=[
+                ("", "همه محل‌ها"),
+                *((value, value) for value in location_choices),
+            ],
+            widget=SearchChoiceSelect(
+                attrs={
+                    "class": "erp-input w-full",
+                    "data-business-choice": "location",
+                    "data-options-url": f"{list_url}?filter_options=location",
+                    "data-placeholder": "همه محل‌ها",
+                    "dir": "rtl",
+                }
+            ),
+        )
 
 
 class StockTransactionForm(_StyledForm):

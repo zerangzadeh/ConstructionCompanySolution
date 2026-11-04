@@ -1120,7 +1120,11 @@ def guarantee_detail(request: HttpRequest, guarantee_id: str) -> HttpResponse:
             "kind": "guarantee",
             "record": guarantee,
             "title": "ضمانت‌نامه قراردادی",
-            "revision_form": GuaranteeRevisionForm(organization=request.organization),
+            "revision_form": GuaranteeRevisionForm(
+                organization=request.organization,
+                actor=request.user,
+                source_id=guarantee.pk,
+            ),
         },
     )
 
@@ -1132,7 +1136,12 @@ def guarantee_revise(request: HttpRequest, guarantee_id: str) -> HttpResponse:
     guarantee = _commercial_record(request, guarantee_id, "guarantee")
     if guarantee is None:
         return HttpResponseNotFound("ضمانت‌نامه یافت نشد.")
-    form = GuaranteeRevisionForm(request.POST, organization=request.organization)
+    form = GuaranteeRevisionForm(
+        request.POST,
+        organization=request.organization,
+        actor=request.user,
+        source_id=guarantee.pk,
+    )
     if form.is_valid():
         try:
             revised = create_guarantee_revision(
@@ -1286,7 +1295,9 @@ def compliance_evidence_detail(request: HttpRequest, evidence_id: str) -> HttpRe
             "record": evidence,
             "title": "شاهد بیمه یا مفاصاحساب",
             "revision_form": ComplianceEvidenceRevisionForm(
-                organization=request.organization
+                organization=request.organization,
+                actor=request.user,
+                source_id=evidence.pk,
             ),
         },
     )
@@ -1300,7 +1311,10 @@ def compliance_evidence_revise(request: HttpRequest, evidence_id: str) -> HttpRe
     if evidence is None:
         return HttpResponseNotFound("شاهد قراردادی یافت نشد.")
     form = ComplianceEvidenceRevisionForm(
-        request.POST, organization=request.organization
+        request.POST,
+        organization=request.organization,
+        actor=request.user,
+        source_id=evidence.pk,
     )
     if form.is_valid():
         try:
@@ -1389,7 +1403,9 @@ def retention_release_detail(request: HttpRequest, release_id: str) -> HttpRespo
             "record": release,
             "title": "آزادسازی کسور تضمین",
             "revision_form": RetentionReleaseCorrectionForm(
-                organization=request.organization
+                organization=request.organization,
+                actor=request.user,
+                source_id=release.pk,
             ),
         },
     )
@@ -1403,7 +1419,10 @@ def retention_release_correct(request: HttpRequest, release_id: str) -> HttpResp
     if release is None:
         return HttpResponseNotFound("آزادسازی یافت نشد.")
     form = RetentionReleaseCorrectionForm(
-        request.POST, organization=request.organization
+        request.POST,
+        organization=request.organization,
+        actor=request.user,
+        source_id=release.pk,
     )
     if form.is_valid():
         data = form.cleaned_data

@@ -1,0 +1,157 @@
+{
+  "unchanged_from_head": {
+    "apps/daily_reports/test_p9_s01_s05.py": true,
+    "apps/contracts/test_contractual_records.py": true,
+    "apps/billing/test_commercial_controls.py": true,
+    "apps/projects/services.py": true,
+    "apps/organizations/authorization.py": true,
+    "apps/organizations/models.py": true
+  },
+  "fixture_errors": [
+    {
+      "test": "apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_capture_permission_project_site_scope_and_minimized_location",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_create_is_idempotent_and_cross_tenant_is_denied",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_dms_version_hash_is_pinned_and_submission_blocks_new_attachment",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_draft_revision_and_immutable_review_lineage",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_responsive_rtl_workbench_is_accessible_to_authorized_user",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_reviewed_proposal_does_not_create_downstream_fact",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.contracts.test_contractual_records.ContractualRecordTests.test_approved_correction_and_cancellation_preserve_final_history",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.contracts.test_contractual_records.ContractualRecordTests.test_audit_failure_rolls_back_approval",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.contracts.test_contractual_records.ContractualRecordTests.test_commercial_review_fails_closed_for_cross_tenant_contract",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.contracts.test_contractual_records.ContractualRecordTests.test_commercial_review_includes_permitted_billing_references_and_permissions",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.contracts.test_contractual_records.ContractualRecordTests.test_governed_approval_records_explicit_facts_and_no_source_effects",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.contracts.test_contractual_records.ContractualRecordTests.test_project_control_evidence_is_linked_without_mutating_source",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.contracts.test_contractual_records.ContractualRecordTests.test_read_only_commercial_review_orders_evidence_and_marks_advisory_gap",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.contracts.test_contractual_records.ContractualRecordTests.test_rtl_operational_views_are_tenant_scoped",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.contracts.test_contractual_records.ContractualRecordTests.test_submitted_withdrawal_closes_workflow_atomically",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.contracts.test_contractual_records.ContractualRecordTests.test_withdrawal_idempotency_tenant_and_permission_isolation",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.contracts.test_contractual_records.ContractualRecordTests.test_workflow_sod_and_returned_revision_lineage",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_audit_records_lifecycle_without_financial_side_effect",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_clearance_requirement_is_explicit_and_effective_dated",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_expiry_and_compliance_renewal_preserve_history",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_guarantee_workflow_exposure_release_and_immutable_history",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_missing_contract_authority_unsafe_evidence_and_tenant_scope_fail_closed",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_retention_release_calculation_correction_and_fail_closed_cap",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_rtl_operational_dashboard_is_tenant_scoped",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    },
+    {
+      "test": "apps.billing.test_commercial_controls.CommercialControlTests.test_workflow_domain_and_audit_failure_roll_back_atomically",
+      "phase": "setUp",
+      "cause": "Legacy membership fixture lacks effective role/scope grants; create_project denies before changed code."
+    }
+  ],
+  "run_counts": {
+    "apps.documents.test_evidence_integration": 21,
+    "apps.documents.test_contextual_association": 21,
+    "apps.documents.test_related_documents": 14,
+    "apps.documents.tests": 12,
+    "apps.documents.test_cep079_form_scope": 6,
+    "apps.safety.test_cep027_review": 5,
+    "apps.quality.test_cep027_review": 5,
+    "apps.daily_reports.test_p9_s01_s05": 6,
+    "apps.contracts.test_contractual_records": 11,
+    "apps.billing.test_commercial_controls": 8,
+    "core.test_product_surface": 17
+  },
+  "attempted": 126,
+  "passed": 101,
+  "fixture_errors_count": 25,
+  "passing_changed_scope_tests": 21,
+  "phase1_phase2_regressions": 53,
+  "safety_quality_review_regressions": 10,
+  "product_surface_regressions": 17
+}

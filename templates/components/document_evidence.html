@@ -1,0 +1,7 @@
+{% if evidence_panel != None %}
+<section id="document-evidence" class="erp-surface erp-related-documents" aria-labelledby="document-evidence-heading" tabindex="-1">
+  <div class="erp-panel-header erp-related-documents-header"><h2 id="document-evidence-heading">{% include "components/form_icon.html" with icon="document" only %}شواهد و مستندات</h2><p>نسخه‌های شاهد قابل مشاهده این {{ evidence_panel.source.label }}</p></div>
+  {% if evidence_panel.register_url %}<div class="erp-related-documents-context-actions"><a class="erp-btn erp-btn--secondary" href="{{ evidence_panel.register_url }}">{% include "components/form_icon.html" with icon="document" only %}{{ evidence_panel.register_label }}</a></div>{% endif %}
+  {% for row in evidence_panel.rows %}{% include "components/pinned_evidence_row.html" with row=row only %}{% empty %}<p class="erp-related-documents-empty" role="status">شاهد قابل مشاهده‌ای در دسترس نیست.</p>{% endfor %}
+</section>
+{% endif %}

@@ -1,10 +1,30 @@
 from django.urls import path
 
-from apps.documents import contextual_views, views
+from apps.documents import contextual_views, evidence_views, views
 
 app_name = "documents"
 
 urlpatterns = [
+    path(
+        "evidence/choices/<slug:kind>/",
+        evidence_views.evidence_choices,
+        name="commercial-evidence-choices",
+    ),
+    path(
+        "evidence/<slug:kind>/<uuid:source_id>/choices/",
+        evidence_views.evidence_choices,
+        name="evidence-choices",
+    ),
+    path(
+        "evidence/<slug:kind>/<uuid:source_id>/register/",
+        evidence_views.evidence_register,
+        name="evidence-register",
+    ),
+    path(
+        "evidence/<slug:kind>/<uuid:source_id>/<uuid:version_id>/",
+        evidence_views.evidence_detail,
+        name="evidence-detail",
+    ),
     path(
         "context/<slug:target_type>/<uuid:target_id>/upload/",
         contextual_views.contextual_upload,

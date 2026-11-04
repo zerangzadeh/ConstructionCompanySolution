@@ -9,6 +9,11 @@
 .erp-document-association-note { color: var(--erp-text-muted); }
 .erp-document-association-footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; border-block-start: 1px solid var(--erp-border); padding-block-start: 16px; }
 .erp-related-documents { margin-block: 20px; min-width: 0; overflow: hidden; border-radius: var(--erp-radius-card, 12px); scroll-margin-block-start: 24px; }
+/* Keep the Phase 3 heading below the sticky BONIRA header after an anchor jump. */
+#document-evidence { scroll-margin-block-start: calc(60px + 1rem); }
+@media (min-width: 768px) {
+  #document-evidence { scroll-margin-block-start: calc(88px + 1rem); }
+}
 .erp-related-documents:focus { outline: 2px solid var(--erp-primary); outline-offset: 3px; }
 .erp-related-documents-header { flex-wrap: wrap; gap: 6px 16px; }
 .erp-related-documents-header h2 { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--erp-text); }

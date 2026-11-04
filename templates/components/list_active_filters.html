@@ -5,5 +5,5 @@
         <span><span class="erp-list-chip__label">{{ chip.label }}:</span> <bdi{% if chip.name == 'number' %} dir="ltr"{% endif %}>{{ chip.value }}</bdi></span><span aria-hidden="true">×</span>
     </a>
     {% endfor %}
-    {% if bar.chips or bar.form.errors %}<a class="erp-list-clear" href="{{ bar.clear_url }}" data-table-filter-clear data-context-preserving-clear>{% if reference_layout %}<span aria-hidden="true">×</span> پاک کردن همه{% else %}پاک‌کردن فیلترها{% endif %}</a>{% endif %}
+    {% if not hide_clear %}{% if bar.chips or bar.form.errors %}<a class="erp-list-clear" href="{{ bar.clear_url }}" data-table-filter-clear data-context-preserving-clear>{% if reference_layout %}<span aria-hidden="true">×</span> پاک کردن همه{% else %}پاک‌کردن فیلترها{% endif %}</a>{% endif %}{% endif %}
 </div>

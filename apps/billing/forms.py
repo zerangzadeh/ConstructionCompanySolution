@@ -12,10 +12,6 @@ from apps.contracts.models import (
     ContractType,
 )
 from apps.documents.models import DocumentVersion
-from apps.documents.services import (
-    get_organization_document,
-    get_organization_documents,
-)
 from apps.organizations.authorization import scope_queryset
 from apps.organizations.models import Organization, OrganizationMembership
 from apps.treasury.models import (
@@ -61,36 +57,14 @@ class _CommercialEvidenceForm(JalaliDateMixin, forms.Form):
             or membership.user_id != actor.pk
         ):
             return
-        self._configure(organization)
+        self._configure(organization, actor=actor)
         self.fields["contract"].queryset = scope_queryset(
             self.fields["contract"].queryset,
             membership=membership,
             project_lookup="project_id",
         )
-        visible_document_ids = []
-        try:
-            candidates = get_organization_documents(
-                user=actor, organization=organization
-            )
-            for document_id in candidates.values_list("pk", flat=True):
-                try:
-                    get_organization_document(
-                        user=actor,
-                        organization=organization,
-                        document_id=str(document_id),
-                    )
-                except PermissionDenied:
-                    continue
-                visible_document_ids.append(document_id)
-        except PermissionDenied:
-            pass
-        for name in ("document_version", "evidence_document_version"):
-            if name in self.fields:
-                self.fields[name].queryset = self.fields[name].queryset.filter(
-                    document_id__in=visible_document_ids
-                )
 
-    def _configure(self, organization) -> None:
+    def _configure(self, organization, *, actor=None, source_id=None) -> None:
         if "contract" in self.fields:
             self.fields["contract"].queryset = Contract.objects.filter(
                 organization=organization,
@@ -98,15 +72,22 @@ class _CommercialEvidenceForm(JalaliDateMixin, forms.Form):
                 deleted_at__isnull=True,
                 party__isnull=False,
             ).select_related("project", "party")
+        from apps.documents.evidence_forms import configure_version_picker
+
         for name in ("document_version", "evidence_document_version"):
             if name in self.fields:
-                self.fields[name].queryset = DocumentVersion.objects.filter(
+                configure_version_picker(
+                    self,
+                    name,
+                    user=actor,
                     organization=organization,
-                    document__archived_at__isnull=True,
-                ).select_related("document")
+                    kind=self.evidence_picker_kind,
+                    identifier=source_id,
+                )
 
 
 class GuaranteeForm(_CommercialEvidenceForm):
+    evidence_picker_kind = "guarantee"
     contract = forms.ModelChoiceField(label="قرارداد", queryset=Contract.objects.none())
     guarantee_type = forms.ChoiceField(
         label="نوع ضمانت‌نامه", choices=GuaranteeType.choices
@@ -144,6 +125,7 @@ class GuaranteeForm(_CommercialEvidenceForm):
 
 
 class GuaranteeRevisionForm(_CommercialEvidenceForm):
+    evidence_picker_kind = "guarantee"
     revision_action = forms.ChoiceField(
         label="نوع اقدام",
         choices=[
@@ -186,12 +168,13 @@ class GuaranteeRevisionForm(_CommercialEvidenceForm):
         label="دلیل اقدام", widget=forms.Textarea(attrs={"rows": 3})
     )
 
-    def __init__(self, *args, organization, **kwargs):
+    def __init__(self, *args, organization, actor=None, source_id=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self._configure(organization)
+        self._configure(organization, actor=actor, source_id=source_id)
 
 
 class ComplianceEvidenceForm(_CommercialEvidenceForm):
+    evidence_picker_kind = "compliance"
     contract = forms.ModelChoiceField(label="قرارداد", queryset=Contract.objects.none())
     evidence_kind = forms.ChoiceField(
         label="نوع شاهد", choices=ComplianceEvidenceKind.choices
@@ -214,7 +197,9 @@ class ComplianceEvidenceForm(_CommercialEvidenceForm):
     )
     reason = forms.CharField(label="دلیل ثبت", widget=forms.Textarea(attrs={"rows": 3}))
 
-    def __init__(self, *args, organization, membership=None, actor=None, **kwargs):
+    def __init__(
+        self, *args, organization, membership=None, actor=None, source_id=None, **kwargs
+    ):
         super().__init__(*args, **kwargs)
         if "contract" in self.fields:
             self._configure_create(
@@ -222,7 +207,7 @@ class ComplianceEvidenceForm(_CommercialEvidenceForm):
             )
         else:
             # Revision forms inherit this initializer behind their existing reader gate.
-            self._configure(organization)
+            self._configure(organization, actor=actor, source_id=source_id)
 
 
 class ComplianceEvidenceRevisionForm(ComplianceEvidenceForm):
@@ -238,6 +223,7 @@ class ComplianceEvidenceRevisionForm(ComplianceEvidenceForm):
 
 
 class RetentionReleaseForm(_CommercialEvidenceForm):
+    evidence_picker_kind = "release"
     contract = forms.ModelChoiceField(
         label="پیمان جزء", queryset=Contract.objects.none()
     )
@@ -265,6 +251,9 @@ class RetentionReleaseForm(_CommercialEvidenceForm):
         self.fields[
             "clearance_evidence"
         ].queryset = ContractComplianceEvidence.objects.none()
+        self.fields["clearance_evidence"].label_from_instance = lambda record: (
+            f"{record.reference} · نسخه {record.version}"
+        )
         if (
             not isinstance(membership, OrganizationMembership)
             or membership.organization_id != organization.pk
@@ -283,6 +272,7 @@ class RetentionReleaseForm(_CommercialEvidenceForm):
 
 
 class RetentionReleaseCorrectionForm(_CommercialEvidenceForm):
+    evidence_picker_kind = "release"
     correction_kind = forms.ChoiceField(
         label="نوع اصلاح",
         choices=[
@@ -305,16 +295,24 @@ class RetentionReleaseCorrectionForm(_CommercialEvidenceForm):
         label="دلیل اصلاح", widget=forms.Textarea(attrs={"rows": 3})
     )
 
-    def __init__(self, *args, organization, **kwargs):
+    def __init__(self, *args, organization, actor=None, source_id=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self._configure(organization)
+        self._configure(organization, actor=actor, source_id=source_id)
         self.fields[
             "clearance_evidence"
-        ].queryset = ContractComplianceEvidence.objects.filter(
-            organization=organization,
-            evidence_kind=ComplianceEvidenceKind.CLEARANCE,
-            status="approved",
+        ].queryset = ContractComplianceEvidence.objects.none()
+        self.fields["clearance_evidence"].label_from_instance = lambda record: (
+            f"{record.reference} · نسخه {record.version}"
         )
+        if actor is not None:
+            try:
+                self.fields["clearance_evidence"].queryset = get_compliance_evidence(
+                    actor=actor, organization=organization
+                ).filter(
+                    evidence_kind=ComplianceEvidenceKind.CLEARANCE, status="approved"
+                )
+            except PermissionDenied:
+                pass
 
 
 class TaxpayerInvoiceForm(forms.Form):

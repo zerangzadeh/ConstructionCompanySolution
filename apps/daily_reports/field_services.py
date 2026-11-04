@@ -405,7 +405,7 @@ def attach_field_evidence(*, organization: Organization, actor: User, observatio
     existing = FieldObservationEvidenceLink.objects.filter(organization=organization, created_by=actor, operation_key=operation_key).first()
     payload_hash = _sha({"observation": str(observation.pk), "document_version": str(version.pk), "sha256": version.sha256})
     if existing:
-        if existing.observation_id != observation.pk or existing.payload_hash != payload_hash:
+        if existing.field_observation_id != observation.pk or existing.payload_hash != payload_hash:
             raise ValidationError("کلید تکرار با داده متفاوت استفاده شده است.")
         return existing
     return FieldObservationEvidenceLink.objects.create(

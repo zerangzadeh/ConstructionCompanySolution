@@ -1,0 +1,163 @@
+--- before/docs/validation/related-documents-phase3.md
++++ after/docs/validation/related-documents-phase3.md
+@@ -1,13 +1,116 @@
+ # Related Documents — Phase 3
+ 
+-**Status:** Implementation complete; 21 focused tests PASS. Broader run:
+-101 PASS and 25 baseline fixture errors out of 126 attempted tests. Actual Chrome
+-verification/screenshots BLOCKED by disabled local browser access in Work settings.
+-Phase 3 Product Owner review remains pending.
++**Current status.** Chrome detail layout checks passed for all eight surfaces at
++1440, 1024 and 390 px after the anchor correction. Two Phase 3 presentation
++defects were corrected. Live interaction verification is partial because Chrome
++repeatedly detached or timed out. Phase 3 Product Owner visual acceptance is pending.
+ 
+ The Phase 3 request confirms Product Owner visual acceptance of Phases 1/2.
+ Their accepted implementation is preserved. Their dated validation reports were
+ not rewritten, and this report does not grant Phase 3 Human visual acceptance.
++
++## Final UX verification follow-up — 2026-11-04
++
++Chrome was initially disabled in Work settings. It became available after the
++user asked to continue. Verification used actual Chrome against an isolated
++loopback preview seeded with synthetic records in a clone of the retained test
++database. The CSS and form-label changes apply to the Phase 3 evidence experience.
++
++### Reproduced defects and corrections
++
++| Defect observed in Chrome | Correction | Retest |
++|---|---|---|
++| The sticky header covered «شواهد و مستندات» after navigating to the evidence anchor. On Guarantee, the heading began about 39 px from the top at all three widths, beneath the 60/88 px header. | The shared stylesheet gives only `#document-evidence` a responsive scroll margin based on the existing header heights. | Heading visible at all 24 Detail/width combinations. On Guarantee, the heading begins about 91 px on mobile and 119 px at tablet/desktop widths. |
++| The Contractual Record picker reported options ready for a reference query but displayed «گزینه‌ای یافت نشد». The server matched the document reference while the picker scored only the label. | Authorized Phase 3 version labels include the business reference when present. UUID- and SHA-256-shaped references are omitted from labels. | At 390 px, `UX-PINNED` displayed v1 and v2. Enter selected the clean v1 with its title and version visible in the control. |
++
++### Chrome verification matrix
++
++The three width columns cover populated Detail pages. At each width, Chrome
++confirmed one evidence navigation link, the visible anchored heading, the shared
++document icon, RTL, pinned and current version labels, and zero page-level
++horizontal overflow. The synthetic records displayed no raw UUID or hash in
++main content. Form columns report separate live coverage. A limited check does
++not close a row's remaining interaction or persona scenarios.
++
++| Surface | 1440 px Detail | 1024 px Detail | 390 px Detail | Observed browser interactions |
++|---|---|---|---|---|
++| Safety Incident | PASS | PASS | PASS | Mobile anchor click, submitted review and quarantine display, authorized witness view and return. Chrome delivered clean v1 bytes while v2 was quarantined. Draft multiselect rendered at 390 px. |
++| Quality Issue | PASS | PASS | PASS | Mobile quarantined witness view and return. Download action absent for that witness. Draft multiselect rendered at 390 px. |
++| Material | PASS | PASS | PASS | Mobile authorized witness view and return. Registration form rendered at 390 px with current version choices and stale-version guidance. |
++| Field Observation | PASS | PASS | PASS | Mobile authorized witness view and return. Draft clean-version picker rendered at 390 px. |
++| Contractual Record | PASS | PASS | PASS | Mobile reference search and keyboard choice of v1 passed. Browser POST returned 400 for a blank-after-trimming label. |
++| Contract Guarantee | PASS | PASS | PASS | Finalized witness and governed revision section visible. Create picker rendered at 390 px. |
++| Contract Compliance Evidence | PASS | PASS | PASS | Mobile authorized witness view and return. Create picker rendered at 390 px. |
++| Retention Release | PASS | PASS | PASS | Finalized witness and governed correction section visible. Create picker rendered at 390 px. |
++
++**Screenshots.** The before/after pairs are in
++[Chrome captures](../../output/related-documents-phase3/final-ux-verification/chrome/).
++Use the `before-<surface>-<width>.jpg` and `verified-<surface>-<width>.jpg`
++pairs. The desktop Guarantee pair shows the heading moving below the header.
++The reference-search screenshot records the matching exact versions. Captures
++show synthetic records. The paired views are from the same fixture database.
++
++- [Guarantee before, 1440 px](../../output/related-documents-phase3/final-ux-verification/chrome/before-guarantee-1440.jpg)
++- [Guarantee after, 1440 px](../../output/related-documents-phase3/final-ux-verification/chrome/verified-guarantee-1440.jpg)
++- [Contractual reference picker, 390 px](../../output/related-documents-phase3/final-ux-verification/chrome/verified-reference-search-390.jpg)
++
++### Regression and remaining verification
++
++The selected non-browser run passed **101/101 in 541.147 seconds** before the
++fixes and **101/101 in 649.330 seconds** afterward. It covered 14 Phase 1,
++21 Phase 2, 21 Phase 3, 18 DMS service and target-scope, 10 Safety/Quality record
++review and 17 Product Surface tests. Ruff, Django system checks, whitespace
++validation and 12 affected template compilations also passed. The 25 inherited setup errors remain separately documented
++baseline debt from the original broad run. Those classes were outside the
++selected reruns and are excluded from the passing count.
++
++The preview was derived from the current test schema without applying migrations.
++Both preview servers were stopped and the disposable database clone was removed.
++The evidence directory
++`output/related-documents-phase3/final-ux-verification/` contains Chrome
++measurements, screenshots, regression logs and the follow-up diff. Local
++`main` started at `06bcee2ffd31302091388b3738eca38f840500a6` with earlier
++Phase 3 and unrelated warehouse work already present. The follow-up changes two
++presentation files, this report and its evidence. Git integration and production
++operations were outside this package.
++
++Chrome intermittently lost control of the preview and timed out during follow-up
++interactions. The latest retry reached the synthetic restricted account but timed
++out before collecting its Detail state. The full width-by-form and role matrix remains incomplete. Use the
++checklist below for remaining live validation and record a separate result for
++each scenario. Phase 1/2 acceptance carries forward. **Phase 3 Product Owner
++visual acceptance is NOT ISSUED.**
++
++### Manual visual UAT checklist
++
++Use isolated synthetic records at **1440, 1024 and 390 px**. Compare with the
++accepted BONIRA section, form and button styles. For each scenario record the
++persona, width, result and screenshot. Use N/A where a lifecycle action does not
++exist.
++
++- [ ] Open the contextual navigation. Verify the evidence heading clears the
++  sticky header, the document icon and Vazirmatn are consistent, and long text,
++  dropdown menus and action buttons stay inside the page at 100% zoom.
++- [ ] Open the exact witness and return to the owning section. Download clean
++  pinned v1 with v2 present. Check a user with view but no download authority,
++  and verify expired, archived, sealed, quarantined and cross-tenant behavior.
++- [ ] Check empty and restricted views. Confirm no hidden title, count, ID or file
++  metadata. Inspect form labels, messages and visible options for raw UUIDs,
++  hashes, model names and permission codes.
++- [ ] Tab through each applicable picker. Search by title, number and business
++  reference. Use arrows, Enter and Escape. Verify chosen version, error
++  presentation, cancellation, safe return and finalized-state restrictions.
++
++| Surface | Remaining journey to complete across the three widths |
++|---|---|
++| Safety Incident | Draft multi-select and submit, then verify the resulting review revision and immutable submitted evidence. |
++| Quality Issue | Draft multi-select, validation, cancel and review submission with the same evidence boundaries. |
++| Material | Verify current-version-only submission and stale-selection rejection while keeping existing historical pins visible. |
++| Field Observation | Attach a clean exact version as a permitted draft actor and verify replay and submitted-state restrictions. |
++| Contractual Record | Verify the rendered Persian validation and cancel path, then register a labelled draft witness. Check non-document lineage separately. |
++| Contract Guarantee | Test authorized create/revision pickers and return. Confirm original finalized witness stays pinned. |
++| Contract Compliance Evidence | Test create/revision pickers, validation and return with the permitted commercial role. |
++| Retention Release | Test create/correction pickers, authorized clearance links, validation and return. Confirm original release history stays pinned. |
+ 
+ ## Domain verification and implementation matrix
+ 
+@@ -31,7 +134,8 @@
+ Rows use the existing document icon, ERP surfaces/buttons and Persian RTL styles.
+ They show authorized title, document number, Persian type, exact «نسخه شاهد»,
+ owner/review status and processing availability. «نسخه جاری سند» appears separately
+-when different. The row layout wraps inside narrow supporting-record columns.
++when different. The row markup uses wrapping utilities; actual fit inside narrow
++supporting-record columns remains visually unverified.
+ 
+ Evidence view is a read-only, source-bound DMS projection using the same pinned
+ row and canonical delivery service. Its return link resolves to the owning record's
+@@ -127,7 +231,7 @@
+ Their routes remain intact. Canonical DMS services, models, link registry, storage,
+ review services, commercial calculations and approval workflows were not changed.
+ 
+-## Verification results
++## Original implementation verification results
+ 
+ Final broad run: **126 attempted, 101 PASS, 25 ERROR**, 415.183 seconds.
+ This is **not a full regression PASS**.
+@@ -178,10 +282,10 @@
+ - `focused-tests*.txt`: development runs, including corrected new-fixture/streaming
+   harness errors and the observed retry defect; these do not replace the final run.
+ 
+-## Chrome and visual verification
+-
+-Actual Chrome access was attempted through the browser tool. Local browser use is
+-disabled in Work settings. No native/CLI bypass or substitute visual PASS is claimed.
++## Original implementation browser result
++
++At implementation time Chrome was disabled in Work settings. The follow-up
++above supersedes this historical browser status for the checks it completed.
+ 
+ | Detail page and applicable selection/revision forms | 1440 px | 1024 px | 390 px |
+ |---|---|---|---|
+@@ -234,4 +338,4 @@
+ uncommitted. No commit, push, dependency installation, new migration, production
+ operation, unsupported relation or hidden HR/financial/RFQ workflow activation.
+ 
+-**Stopped for Product Owner review. Phase 3 Human visual acceptance is not issued.**
++**Stopped for Product Owner review. Phase 3 visual acceptance is pending.**

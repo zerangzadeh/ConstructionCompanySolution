@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}{{ row.title }} | نسخه شاهد{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{% endblock %}
+{% block content %}
+{% include "components/breadcrumbs.html" with page_breadcrumb_label=source.label page_breadcrumb_url=source.url page_title="نسخه شاهد" only %}
+<h1 class="mt-5 text-2xl font-bold">نسخه شاهد: {{ row.title }}</h1>
+<a class="erp-document-return" href="{{ source.url }}">{% include "components/form_icon.html" with icon="document" only %}بازگشت به {{ source.label }}: {{ source.title }}</a>
+<section class="erp-surface erp-related-documents" aria-label="نسخه دقیق شاهد">{% include "components/pinned_evidence_row.html" with row=row detail_mode=True only %}</section>
+<p class="text-sm text-slate-500">این شاهد به نسخه ثبت‌شده ارجاع دارد؛ ایجاد نسخه جدید سند، شاهد تاریخی را تغییر نمی‌دهد.</p>
+{% endblock %}

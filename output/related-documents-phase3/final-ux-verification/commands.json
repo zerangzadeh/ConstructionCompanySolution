@@ -1,0 +1,26 @@
+{
+  "settings": "config.settings.development",
+  "test_database": "test_bonira_related_documents_phase1_20261104",
+  "schema_preflight": "MigrationExecutor migration plan must be empty; abort otherwise",
+  "test_options": {
+    "verbosity": 2,
+    "interactive": false,
+    "keepdb": true
+  },
+  "protected_storage": "TemporaryDirectory override for DOCUMENT_PROTECTED_ROOT and MEDIA_ROOT",
+  "test_modules": [
+    "apps.documents.test_evidence_integration",
+    "apps.documents.test_contextual_association",
+    "apps.documents.test_related_documents",
+    "apps.documents.tests",
+    "apps.documents.test_cep079_form_scope",
+    "apps.safety.test_cep027_review",
+    "apps.quality.test_cep027_review",
+    "core.test_product_surface"
+  ],
+  "baseline_debt_not_rerun": [
+    "apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests",
+    "apps.contracts.test_contractual_records.ContractualRecordTests",
+    "apps.billing.test_commercial_controls.CommercialControlTests"
+  ]
+}

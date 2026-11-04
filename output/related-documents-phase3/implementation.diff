@@ -1,0 +1,2665 @@
+--- phase2/apps/documents/urls.py
++++ phase3/apps/documents/urls.py
+@@ -1,10 +1,30 @@
+ from django.urls import path
+ 
+-from apps.documents import contextual_views, views
++from apps.documents import contextual_views, evidence_views, views
+ 
+ app_name = "documents"
+ 
+ urlpatterns = [
++    path(
++        "evidence/choices/<slug:kind>/",
++        evidence_views.evidence_choices,
++        name="commercial-evidence-choices",
++    ),
++    path(
++        "evidence/<slug:kind>/<uuid:source_id>/choices/",
++        evidence_views.evidence_choices,
++        name="evidence-choices",
++    ),
++    path(
++        "evidence/<slug:kind>/<uuid:source_id>/register/",
++        evidence_views.evidence_register,
++        name="evidence-register",
++    ),
++    path(
++        "evidence/<slug:kind>/<uuid:source_id>/<uuid:version_id>/",
++        evidence_views.evidence_detail,
++        name="evidence-detail",
++    ),
+     path(
+         "context/<slug:target_type>/<uuid:target_id>/upload/",
+         contextual_views.contextual_upload,
+--- phase2/apps/billing/forms.py
++++ phase3/apps/billing/forms.py
+@@ -12,10 +12,6 @@
+     ContractType,
+ )
+ from apps.documents.models import DocumentVersion
+-from apps.documents.services import (
+-    get_organization_document,
+-    get_organization_documents,
+-)
+ from apps.organizations.authorization import scope_queryset
+ from apps.organizations.models import Organization, OrganizationMembership
+ from apps.treasury.models import (
+@@ -61,36 +57,14 @@
+             or membership.user_id != actor.pk
+         ):
+             return
+-        self._configure(organization)
++        self._configure(organization, actor=actor)
+         self.fields["contract"].queryset = scope_queryset(
+             self.fields["contract"].queryset,
+             membership=membership,
+             project_lookup="project_id",
+         )
+-        visible_document_ids = []
+-        try:
+-            candidates = get_organization_documents(
+-                user=actor, organization=organization
+-            )
+-            for document_id in candidates.values_list("pk", flat=True):
+-                try:
+-                    get_organization_document(
+-                        user=actor,
+-                        organization=organization,
+-                        document_id=str(document_id),
+-                    )
+-                except PermissionDenied:
+-                    continue
+-                visible_document_ids.append(document_id)
+-        except PermissionDenied:
+-            pass
+-        for name in ("document_version", "evidence_document_version"):
+-            if name in self.fields:
+-                self.fields[name].queryset = self.fields[name].queryset.filter(
+-                    document_id__in=visible_document_ids
+-                )
+-
+-    def _configure(self, organization) -> None:
++
++    def _configure(self, organization, *, actor=None, source_id=None) -> None:
+         if "contract" in self.fields:
+             self.fields["contract"].queryset = Contract.objects.filter(
+                 organization=organization,
+@@ -98,15 +72,22 @@
+                 deleted_at__isnull=True,
+                 party__isnull=False,
+             ).select_related("project", "party")
++        from apps.documents.evidence_forms import configure_version_picker
++
+         for name in ("document_version", "evidence_document_version"):
+             if name in self.fields:
+-                self.fields[name].queryset = DocumentVersion.objects.filter(
++                configure_version_picker(
++                    self,
++                    name,
++                    user=actor,
+                     organization=organization,
+-                    document__archived_at__isnull=True,
+-                ).select_related("document")
++                    kind=self.evidence_picker_kind,
++                    identifier=source_id,
++                )
+ 
+ 
+ class GuaranteeForm(_CommercialEvidenceForm):
++    evidence_picker_kind = "guarantee"
+     contract = forms.ModelChoiceField(label="قرارداد", queryset=Contract.objects.none())
+     guarantee_type = forms.ChoiceField(
+         label="نوع ضمانت‌نامه", choices=GuaranteeType.choices
+@@ -144,6 +125,7 @@
+ 
+ 
+ class GuaranteeRevisionForm(_CommercialEvidenceForm):
++    evidence_picker_kind = "guarantee"
+     revision_action = forms.ChoiceField(
+         label="نوع اقدام",
+         choices=[
+@@ -186,12 +168,13 @@
+         label="دلیل اقدام", widget=forms.Textarea(attrs={"rows": 3})
+     )
+ 
+-    def __init__(self, *args, organization, **kwargs):
+-        super().__init__(*args, **kwargs)
+-        self._configure(organization)
++    def __init__(self, *args, organization, actor=None, source_id=None, **kwargs):
++        super().__init__(*args, **kwargs)
++        self._configure(organization, actor=actor, source_id=source_id)
+ 
+ 
+ class ComplianceEvidenceForm(_CommercialEvidenceForm):
++    evidence_picker_kind = "compliance"
+     contract = forms.ModelChoiceField(label="قرارداد", queryset=Contract.objects.none())
+     evidence_kind = forms.ChoiceField(
+         label="نوع شاهد", choices=ComplianceEvidenceKind.choices
+@@ -214,7 +197,9 @@
+     )
+     reason = forms.CharField(label="دلیل ثبت", widget=forms.Textarea(attrs={"rows": 3}))
+ 
+-    def __init__(self, *args, organization, membership=None, actor=None, **kwargs):
++    def __init__(
++        self, *args, organization, membership=None, actor=None, source_id=None, **kwargs
++    ):
+         super().__init__(*args, **kwargs)
+         if "contract" in self.fields:
+             self._configure_create(
+@@ -222,7 +207,7 @@
+             )
+         else:
+             # Revision forms inherit this initializer behind their existing reader gate.
+-            self._configure(organization)
++            self._configure(organization, actor=actor, source_id=source_id)
+ 
+ 
+ class ComplianceEvidenceRevisionForm(ComplianceEvidenceForm):
+@@ -238,6 +223,7 @@
+ 
+ 
+ class RetentionReleaseForm(_CommercialEvidenceForm):
++    evidence_picker_kind = "release"
+     contract = forms.ModelChoiceField(
+         label="پیمان جزء", queryset=Contract.objects.none()
+     )
+@@ -265,6 +251,9 @@
+         self.fields[
+             "clearance_evidence"
+         ].queryset = ContractComplianceEvidence.objects.none()
++        self.fields["clearance_evidence"].label_from_instance = lambda record: (
++            f"{record.reference} · نسخه {record.version}"
++        )
+         if (
+             not isinstance(membership, OrganizationMembership)
+             or membership.organization_id != organization.pk
+@@ -283,6 +272,7 @@
+ 
+ 
+ class RetentionReleaseCorrectionForm(_CommercialEvidenceForm):
++    evidence_picker_kind = "release"
+     correction_kind = forms.ChoiceField(
+         label="نوع اصلاح",
+         choices=[
+@@ -305,16 +295,24 @@
+         label="دلیل اصلاح", widget=forms.Textarea(attrs={"rows": 3})
+     )
+ 
+-    def __init__(self, *args, organization, **kwargs):
+-        super().__init__(*args, **kwargs)
+-        self._configure(organization)
++    def __init__(self, *args, organization, actor=None, source_id=None, **kwargs):
++        super().__init__(*args, **kwargs)
++        self._configure(organization, actor=actor, source_id=source_id)
+         self.fields[
+             "clearance_evidence"
+-        ].queryset = ContractComplianceEvidence.objects.filter(
+-            organization=organization,
+-            evidence_kind=ComplianceEvidenceKind.CLEARANCE,
+-            status="approved",
+-        )
++        ].queryset = ContractComplianceEvidence.objects.none()
++        self.fields["clearance_evidence"].label_from_instance = lambda record: (
++            f"{record.reference} · نسخه {record.version}"
++        )
++        if actor is not None:
++            try:
++                self.fields["clearance_evidence"].queryset = get_compliance_evidence(
++                    actor=actor, organization=organization
++                ).filter(
++                    evidence_kind=ComplianceEvidenceKind.CLEARANCE, status="approved"
++                )
++            except PermissionDenied:
++                pass
+ 
+ 
+ class TaxpayerInvoiceForm(forms.Form):
+--- phase2/apps/billing/views.py
++++ phase3/apps/billing/views.py
+@@ -1120,7 +1120,11 @@
+             "kind": "guarantee",
+             "record": guarantee,
+             "title": "ضمانت‌نامه قراردادی",
+-            "revision_form": GuaranteeRevisionForm(organization=request.organization),
++            "revision_form": GuaranteeRevisionForm(
++                organization=request.organization,
++                actor=request.user,
++                source_id=guarantee.pk,
++            ),
+         },
+     )
+ 
+@@ -1132,7 +1136,12 @@
+     guarantee = _commercial_record(request, guarantee_id, "guarantee")
+     if guarantee is None:
+         return HttpResponseNotFound("ضمانت‌نامه یافت نشد.")
+-    form = GuaranteeRevisionForm(request.POST, organization=request.organization)
++    form = GuaranteeRevisionForm(
++        request.POST,
++        organization=request.organization,
++        actor=request.user,
++        source_id=guarantee.pk,
++    )
+     if form.is_valid():
+         try:
+             revised = create_guarantee_revision(
+@@ -1286,7 +1295,9 @@
+             "record": evidence,
+             "title": "شاهد بیمه یا مفاصاحساب",
+             "revision_form": ComplianceEvidenceRevisionForm(
+-                organization=request.organization
++                organization=request.organization,
++                actor=request.user,
++                source_id=evidence.pk,
+             ),
+         },
+     )
+@@ -1300,7 +1311,10 @@
+     if evidence is None:
+         return HttpResponseNotFound("شاهد قراردادی یافت نشد.")
+     form = ComplianceEvidenceRevisionForm(
+-        request.POST, organization=request.organization
++        request.POST,
++        organization=request.organization,
++        actor=request.user,
++        source_id=evidence.pk,
+     )
+     if form.is_valid():
+         try:
+@@ -1389,7 +1403,9 @@
+             "record": release,
+             "title": "آزادسازی کسور تضمین",
+             "revision_form": RetentionReleaseCorrectionForm(
+-                organization=request.organization
++                organization=request.organization,
++                actor=request.user,
++                source_id=release.pk,
+             ),
+         },
+     )
+@@ -1403,7 +1419,10 @@
+     if release is None:
+         return HttpResponseNotFound("آزادسازی یافت نشد.")
+     form = RetentionReleaseCorrectionForm(
+-        request.POST, organization=request.organization
++        request.POST,
++        organization=request.organization,
++        actor=request.user,
++        source_id=release.pk,
+     )
+     if form.is_valid():
+         data = form.cleaned_data
+--- phase2/templates/safety/detail.html
++++ phase3/templates/safety/detail.html
+@@ -1,8 +1,11 @@
+-{% extends "base.html" %}
++{% extends "base.html" %}{% load static document_evidence %}
+ {% block title %}حادثه {{ incident.incident_number }} | سامانه مدیریت ساخت{% endblock %}
+-{% block content %}
++{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{% endblock %}
++{% block content %}{% document_evidence "safety" incident as evidence_panel %}
+ <nav class="text-xs text-slate-400"><a href="{% url 'safety:list' %}">حوادث ایمنی</a> / <span dir="ltr">{{ incident.incident_number }}</span></nav>
+ <div class="mt-5 flex flex-wrap items-end justify-between gap-4"><div><p class="text-sm font-medium text-blue-600">{{ incident.project.name }}{% if incident.site %} · {{ incident.site.name }}{% endif %}</p><h1 class="mt-1 text-2xl font-bold text-slate-950">حادثه <span dir="ltr">{{ incident.incident_number }}</span></h1></div>{% include "components/status_badge.html" with status=incident.status label=incident.get_status_display only %}</div>
++{% include "components/evidence_nav.html" %}
+ <div class="mt-6 grid gap-5 lg:grid-cols-2"><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold">مشخصات و شرح</h2><dl class="mt-4 space-y-3 text-sm"><div class="flex justify-between gap-4"><dt class="text-slate-500">نوع</dt><dd>{{ incident.get_incident_type_display }}</dd></div><div class="flex justify-between gap-4"><dt class="text-slate-500">شدت</dt><dd>{{ incident.get_severity_display }}</dd></div><div class="flex justify-between gap-4"><dt class="text-slate-500">زمان وقوع</dt><dd dir="ltr">{{ incident.occurred_at|jalali_datetime }}</dd></div>{% if incident.phase %}<div class="flex justify-between gap-4"><dt class="text-slate-500">فاز</dt><dd>{{ incident.phase.name }}</dd></div>{% endif %}{% if incident.activity %}<div class="flex justify-between gap-4"><dt class="text-slate-500">فعالیت</dt><dd>{{ incident.activity }}</dd></div>{% endif %}{% if incident.daily_report %}<div class="flex justify-between gap-4"><dt class="text-slate-500">گزارش روزانه</dt><dd><a class="text-blue-700" href="{% url 'daily_reports:detail' incident.daily_report.id %}">{{ incident.daily_report.reporting_date|jalali_date }}</a></dd></div>{% endif %}</dl><h3 class="mt-5 text-sm font-semibold">شرح</h3><p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{{ incident.description }}</p><h3 class="mt-5 text-sm font-semibold">اقدام فوری</h3><p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{{ incident.immediate_action|default:"ثبت نشده" }}</p></section><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold">پیگیری و اختتام</h2><dl class="mt-4 space-y-3 text-sm"><div class="flex justify-between gap-4"><dt class="text-slate-500">مهلت</dt><dd dir="ltr">{{ incident.due_date|jalali_date|default:"—" }}</dd></div><div class="flex justify-between gap-4"><dt class="text-slate-500">کاربر مسئول</dt><dd>{{ incident.responsible_user|default:"—" }}</dd></div><div class="flex justify-between gap-4"><dt class="text-slate-500">کارمند مسئول</dt><dd>{{ incident.responsible_employee|default:"—" }}</dd></div><div class="flex justify-between gap-4"><dt class="text-slate-500">طرف مسئول</dt><dd>{{ incident.responsible_party|default:"—" }}</dd></div></dl><h3 class="mt-5 text-sm font-semibold">اقدام اصلاحی</h3><p class="mt-2 whitespace-pre-line text-sm text-slate-600">{{ incident.corrective_action|default:"ثبت نشده" }}</p><h3 class="mt-5 text-sm font-semibold">شرح رفع</h3><p class="mt-2 whitespace-pre-line text-sm text-slate-600">{{ incident.resolution_summary|default:"ثبت نشده" }}</p><h3 class="mt-5 text-sm font-semibold">جمع‌بندی بستن</h3><p class="mt-2 whitespace-pre-line text-sm text-slate-600">{{ incident.closure_summary|default:"ثبت نشده" }}</p></section></div>
++{% include "components/document_evidence.html" %}
+ <section class="erp-surface mt-5 rounded-xl p-5"><h2 class="font-semibold">اقدام بعدی</h2><div class="mt-4">{% if incident.status == "reported" and "safety_incidents.review" in business_permission_codes %}<form method="post" action="{% url 'safety:review' incident.id %}">{% csrf_token %}<button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">شروع بررسی</button></form>{% elif incident.status == "under_review" and "safety_incidents.review" in business_permission_codes %}<form class="grid gap-4 md:grid-cols-2" method="post" action="{% url 'safety:assign' incident.id %}">{% csrf_token %}{% for field in assignment_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<div class="md:col-span-2"><button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">تخصیص</button></div></form>{% elif incident.status == "assigned" and "safety_incidents.manage" in business_permission_codes %}<form class="space-y-4" method="post" action="{% url 'safety:corrective_action' incident.id %}">{% csrf_token %}{% for field in corrective_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">آغاز اقدام اصلاحی</button></form>{% elif incident.status == "action_in_progress" and "safety_incidents.manage" in business_permission_codes %}<form class="space-y-4" method="post" action="{% url 'safety:resolve' incident.id %}">{% csrf_token %}{% for field in resolution_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">ثبت رفع</button></form>{% elif incident.status == "resolved" and "safety_incidents.close" in business_permission_codes %}<form class="space-y-4" method="post" action="{% url 'safety:close' incident.id %}">{% csrf_token %}{% for field in closure_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">بستن حادثه</button></form>{% elif incident.status == "closed" %}<p class="text-sm font-medium text-emerald-700">این حادثه بسته‌شده و غیرقابل ویرایش است.</p>{% else %}<p class="text-sm text-slate-500">اقدامی برای نقش فعلی در دسترس نیست.</p>{% endif %}</div></section>
+ {% endblock %}
+--- phase2/templates/quality/detail.html
++++ phase3/templates/quality/detail.html
+@@ -1,8 +1,11 @@
+-{% extends "base.html" %}
++{% extends "base.html" %}{% load static document_evidence %}
+ {% block title %}مسئله {{ issue.issue_number }} | سامانه مدیریت ساخت{% endblock %}
+-{% block content %}
++{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{% endblock %}
++{% block content %}{% document_evidence "quality" issue as evidence_panel %}
+ <nav class="text-xs text-slate-400"><a href="{% url 'quality:list' %}">مسائل کیفیت</a> / <span dir="ltr">{{ issue.issue_number }}</span></nav>
+ <div class="mt-5 flex flex-wrap items-end justify-between gap-4"><div><p class="text-sm font-medium text-blue-600">{{ issue.project.name }}{% if issue.site %} · {{ issue.site.name }}{% endif %}</p><h1 class="mt-1 text-2xl font-bold text-slate-950">مسئله <span dir="ltr">{{ issue.issue_number }}</span></h1></div>{% include "components/status_badge.html" with status=issue.status label=issue.get_status_display only %}</div>
++{% include "components/evidence_nav.html" %}
+ <div class="mt-6 grid gap-5 lg:grid-cols-2"><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold">مشخصات و شرح</h2><dl class="mt-4 space-y-3 text-sm"><div class="flex justify-between gap-4"><dt class="text-slate-500">نوع</dt><dd>{{ issue.get_issue_type_display }}</dd></div><div class="flex justify-between gap-4"><dt class="text-slate-500">شدت</dt><dd>{{ issue.get_severity_display }}</dd></div><div class="flex justify-between gap-4"><dt class="text-slate-500">زمان شناسایی</dt><dd dir="ltr">{{ issue.identified_at|jalali_datetime }}</dd></div>{% if issue.phase %}<div class="flex justify-between gap-4"><dt class="text-slate-500">فاز</dt><dd>{{ issue.phase.name }}</dd></div>{% endif %}{% if issue.activity %}<div class="flex justify-between gap-4"><dt class="text-slate-500">فعالیت</dt><dd>{{ issue.activity }}</dd></div>{% endif %}{% if issue.daily_report %}<div class="flex justify-between gap-4"><dt class="text-slate-500">گزارش روزانه</dt><dd><a class="text-blue-700" href="{% url 'daily_reports:detail' issue.daily_report.id %}">{{ issue.daily_report.reporting_date|jalali_date }}</a></dd></div>{% endif %}</dl><h3 class="mt-5 text-sm font-semibold">شرح</h3><p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{{ issue.description }}</p><h3 class="mt-5 text-sm font-semibold">مشخصات یا مرجع</h3><p class="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{{ issue.specification_reference|default:"ثبت نشده" }}</p></section><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold">پیگیری، راستی‌آزمایی و اختتام</h2><dl class="mt-4 space-y-3 text-sm"><div class="flex justify-between gap-4"><dt class="text-slate-500">مهلت</dt><dd dir="ltr">{{ issue.due_date|jalali_date|default:"—" }}</dd></div><div class="flex justify-between gap-4"><dt class="text-slate-500">کاربر مسئول</dt><dd>{{ issue.responsible_user|default:"—" }}</dd></div><div class="flex justify-between gap-4"><dt class="text-slate-500">کارمند مسئول</dt><dd>{{ issue.responsible_employee|default:"—" }}</dd></div><div class="flex justify-between gap-4"><dt class="text-slate-500">طرف مسئول</dt><dd>{{ issue.responsible_party|default:"—" }}</dd></div></dl><h3 class="mt-5 text-sm font-semibold">اقدام اصلاحی</h3><p class="mt-2 whitespace-pre-line text-sm text-slate-600">{{ issue.corrective_action|default:"ثبت نشده" }}</p><h3 class="mt-5 text-sm font-semibold">نتیجه اقدام</h3><p class="mt-2 whitespace-pre-line text-sm text-slate-600">{{ issue.corrective_action_result|default:"ثبت نشده" }}</p><h3 class="mt-5 text-sm font-semibold">نتیجه راستی‌آزمایی</h3><p class="mt-2 whitespace-pre-line text-sm text-slate-600">{{ issue.verification_summary|default:"ثبت نشده" }}</p><h3 class="mt-5 text-sm font-semibold">جمع‌بندی بستن</h3><p class="mt-2 whitespace-pre-line text-sm text-slate-600">{{ issue.closure_summary|default:"ثبت نشده" }}</p></section></div>
++{% include "components/document_evidence.html" %}
+ <section class="erp-surface mt-5 rounded-xl p-5"><h2 class="font-semibold">اقدام بعدی</h2><div class="mt-4">{% if issue.status == "reported" and "quality_issues.review" in business_permission_codes %}<form method="post" action="{% url 'quality:review' issue.id %}">{% csrf_token %}<button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">شروع بررسی</button></form>{% elif issue.status == "under_review" and "quality_issues.review" in business_permission_codes %}<form class="grid gap-4 md:grid-cols-2" method="post" action="{% url 'quality:assign' issue.id %}">{% csrf_token %}{% for field in assignment_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<div class="md:col-span-2"><button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">تخصیص</button></div></form>{% elif issue.status == "assigned" and "quality_issues.manage" in business_permission_codes %}<form class="space-y-4" method="post" action="{% url 'quality:corrective_action' issue.id %}">{% csrf_token %}{% for field in corrective_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">آغاز اقدام اصلاحی</button></form>{% elif issue.status == "action_in_progress" and "quality_issues.manage" in business_permission_codes %}<form class="space-y-4" method="post" action="{% url 'quality:submit_for_verification' issue.id %}">{% csrf_token %}{% for field in submission_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">ارسال برای راستی‌آزمایی</button></form>{% elif issue.status == "awaiting_verification" and "quality_issues.verify" in business_permission_codes %}<form class="space-y-4" method="post" action="{% url 'quality:verify' issue.id %}">{% csrf_token %}{% for field in verification_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">ثبت راستی‌آزمایی</button></form>{% elif issue.status == "verified" and "quality_issues.close" in business_permission_codes %}<form class="space-y-4" method="post" action="{% url 'quality:close' issue.id %}">{% csrf_token %}{% for field in closure_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">بستن مسئله</button></form>{% elif issue.status == "closed" %}<p class="text-sm font-medium text-emerald-700">این مسئله بسته‌شده و غیرقابل ویرایش است.</p>{% else %}<p class="text-sm text-slate-500">اقدامی برای نقش فعلی در دسترس نیست.</p>{% endif %}</div></section>
+ {% endblock %}
+--- phase2/templates/materials/material_form.html
++++ phase3/templates/materials/material_form.html
+@@ -1 +1,3 @@
+-{% extends "base.html" %}{% block title %}{% if material %}ویرایش مصالح{% else %}افزودن مصالح{% endif %} | سامانه مدیریت ساخت{% endblock %}{% block content %}<div class="max-w-2xl"><p class="text-xs font-semibold text-blue-600">اطلاعات پایه</p><h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">{% if material %}ویرایش مصالح{% else %}افزودن مصالح{% endif %}</h1><form class="erp-surface mt-6 space-y-5 rounded-xl p-5 sm:p-6" method="post">{% csrf_token %}{% include "components/form_errors.html" with form=form %}{% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}{% if not material or "materials.change" in business_permission_codes %}<div class="flex justify-end border-t border-slate-100 pt-5"><button class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white" type="submit">ذخیره مصالح</button></div>{% endif %}</form></div>{% endblock %}
++{% extends "base.html" %}{% load static document_evidence %}{% block title %}{% if material %}ویرایش مصالح{% else %}افزودن مصالح{% endif %} | سامانه مدیریت ساخت{% endblock %}{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{% endblock %}
++{% block content %}{% document_evidence "material" material as evidence_panel %}<div class="max-w-2xl"><p class="text-xs font-semibold text-blue-600">اطلاعات پایه</p><h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">{% if material %}ویرایش مصالح{% else %}افزودن مصالح{% endif %}</h1>{% include "components/evidence_nav.html" %}
++<form class="erp-surface mt-6 space-y-5 rounded-xl p-5 sm:p-6" method="post">{% csrf_token %}{% include "components/form_errors.html" with form=form %}{% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}{% if not material or "materials.change" in business_permission_codes %}<div class="flex justify-end border-t border-slate-100 pt-5"><button class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white" type="submit">ذخیره مصالح</button></div>{% endif %}</form>{% include "components/document_evidence.html" %}</div>{% endblock %}
+--- phase2/templates/daily_reports/field_observation_detail.html
++++ phase3/templates/daily_reports/field_observation_detail.html
+@@ -1,11 +1,13 @@
+-{% extends "base.html" %}
++{% extends "base.html" %}{% load static document_evidence %}
+ {% block title %}مشاهده میدانی | سامانه مدیریت ساخت{% endblock %}
+-{% block content %}
++{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{% endblock %}
++{% block content %}{% document_evidence "field_observation" observation as evidence_panel %}
+ <div dir="rtl">
+   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><a class="text-xs text-slate-500 hover:text-blue-700" href="{% url 'daily_reports:field_observation_list' %}">مشاهدات میدانی</a><h1 class="mt-2 text-2xl font-bold text-slate-950">{{ observation.title }}</h1><p class="mt-1 text-sm text-slate-500">{{ observation.project.name }}{% if observation.site %} · {{ observation.site.name }}{% endif %} · {{ observation.get_kind_display }}</p></div><span class="rounded-full bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-700">{{ observation.get_status_display }}</span></div>
+-  <div class="mt-6 grid gap-5 lg:grid-cols-3"><section class="erp-surface rounded-xl p-5 lg:col-span-2"><h2 class="font-semibold text-slate-900">متن و زمینه</h2><p class="mt-4 whitespace-pre-line text-sm leading-7 text-slate-700">{{ observation.summary|default:"بدون توضیح" }}</p><dl class="mt-5 grid gap-3 text-sm sm:grid-cols-2"><div><dt class="text-slate-500">ایجادکننده</dt><dd class="font-medium">{{ observation.created_by.username }}</dd></div><div><dt class="text-slate-500">ثبت سرور</dt><dd dir="ltr">{{ observation.created_at|date:"Y-m-d H:i" }}</dd></div><div><dt class="text-slate-500">زمان اثر</dt><dd dir="ltr">{{ observation.effective_at|date:"Y-m-d H:i"|default:"—" }}</dd></div><div><dt class="text-slate-500">هش نهایی</dt><dd class="truncate font-mono text-xs" dir="ltr">{{ observation.canonical_hash|default:"پیش‌نویس" }}</dd></div></dl>{% if can_view_location %}<div class="mt-5 rounded-lg bg-slate-50 p-3 text-sm"><p class="font-semibold">مکان دستگاه (شاهد غیرقابل‌اعتماد)</p><p class="mt-1" dir="ltr">{% if observation.latitude %}{{ observation.latitude }}, {{ observation.longitude }} · دقت {{ observation.horizontal_accuracy_meters }} m{% else %}ثبت نشده / مجوز: {{ observation.get_location_permission_display }}{% endif %}</p>{% if observation.location_mismatch_note %}<p class="mt-1 text-amber-700">پرچم مغایرت: {{ observation.location_mismatch_note }}</p>{% endif %}</div>{% endif %}</section><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold text-slate-900">چرخه evidence</h2><ol class="mt-4 space-y-3 text-sm">{% for transition in observation.transitions.all %}<li class="border-b border-slate-100 pb-3"><p class="font-medium">{{ transition.from_status }} → {{ transition.to_status }}</p><p class="mt-1 text-slate-500">{{ transition.actor.username }} · <span dir="ltr">{{ transition.created_at|date:"Y-m-d H:i" }}</span></p>{% if transition.reason %}<p class="mt-1 text-slate-600">{{ transition.reason }}</p>{% endif %}</li>{% empty %}<li class="text-slate-500">هنوز انتقالی ثبت نشده است.</li>{% endfor %}</ol></section></div>
+-  <div class="mt-5 grid gap-5 lg:grid-cols-2"><section class="erp-surface rounded-xl p-5"><div class="flex items-center justify-between"><h2 class="font-semibold">شواهد DMS</h2><span class="text-xs text-slate-500">{{ observation.evidence_links.count }} نسخه</span></div><ul class="mt-4 space-y-2 text-sm">{% for link in observation.evidence_links.all %}<li class="rounded-lg bg-slate-50 p-3"><span class="font-mono text-xs" dir="ltr">{{ link.document_version_id }}</span><span class="mx-2 text-slate-400">·</span><span class="font-mono text-xs" dir="ltr">{{ link.sha256 }}</span></li>{% empty %}<li class="text-slate-500">نسخه‌ای پیوند نخورده است.</li>{% endfor %}</ul>{% if can_capture and observation.status == "draft" %}<form class="mt-4 border-t border-slate-100 pt-4" method="post" action="{% url 'daily_reports:field_observation_evidence_add' observation.id %}">{% csrf_token %}{% for field in evidence_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="mt-3 rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white" type="submit">پیوند نسخه DMS</button></form>{% endif %}</section><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold">پیشنهادهای تحویل</h2><ul class="mt-4 space-y-3 text-sm">{% for proposal in observation.proposals.all %}<li class="rounded-lg border border-slate-200 p-3"><p class="font-semibold">{{ proposal.get_family_display }} · {{ proposal.get_status_display }}</p><p class="mt-1 text-xs text-slate-500">{{ proposal.created_by.username }} · {{ proposal.lines|length }} سطر</p>{% if proposal.status == "draft" %}<form class="mt-2" method="post" action="{% url 'daily_reports:field_proposal_submit' observation.id proposal.id %}">{% csrf_token %}<input type="hidden" name="operation_key" value="{{ proposal.create_operation_key }}"><button class="rounded bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white" type="submit">ارسال برای بررسی</button></form>{% endif %}</li>{% empty %}<li class="text-slate-500">پیشنهادی ثبت نشده است.</li>{% endfor %}</ul></section></div>
+-  <div class="mt-5 flex flex-wrap gap-3">{% if can_capture and observation.status == "draft" %}<a class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold" href="{% url 'daily_reports:field_observation_detail' observation.id %}#edit">ویرایش پیش‌نویس</a>{% endif %}{% if can_submit and observation.status == "draft" %}<form method="post" action="{% url 'daily_reports:field_observation_submit' observation.id %}">{% csrf_token %}<input type="hidden" name="operation_key" value="{{ observation.create_operation_key }}"><button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white" type="submit">ارسال برای بررسی</button></form>{% endif %}{% if can_review and observation.status == "submitted" %}<form method="post" action="{% url 'daily_reports:field_observation_review_start' observation.id %}">{% csrf_token %}<input type="hidden" name="operation_key" value="{{ observation.create_operation_key }}"><button class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white" type="submit">آغاز بررسی</button></form>{% endif %}{% if can_review and observation.status == "in_review" %}<form method="post" action="{% url 'daily_reports:field_observation_review_decide' observation.id 'accept' %}">{% csrf_token %}{% for field in review_form %}{% if field.name == "operation_key" %}{{ field }}{% endif %}{% endfor %}<button class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white" type="submit">پذیرش</button></form><form method="post" action="{% url 'daily_reports:field_observation_review_decide' observation.id 'reject' %}">{% csrf_token %}{% for field in review_form %}{{ field }}{% endfor %}<button class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white" type="submit">رد evidence</button></form>{% endif %}</div>
++{% include "components/evidence_nav.html" %}
++  <div class="mt-6 grid gap-5 lg:grid-cols-3"><section class="erp-surface rounded-xl p-5 lg:col-span-2"><h2 class="font-semibold text-slate-900">متن و زمینه</h2><p class="mt-4 whitespace-pre-line text-sm leading-7 text-slate-700">{{ observation.summary|default:"بدون توضیح" }}</p><dl class="mt-5 grid gap-3 text-sm sm:grid-cols-2"><div><dt class="text-slate-500">ایجادکننده</dt><dd class="font-medium">{{ observation.created_by.username }}</dd></div><div><dt class="text-slate-500">ثبت سرور</dt><dd dir="ltr">{{ observation.created_at|date:"Y-m-d H:i" }}</dd></div><div><dt class="text-slate-500">زمان اثر</dt><dd dir="ltr">{{ observation.effective_at|date:"Y-m-d H:i"|default:"—" }}</dd></div><div><dt class="text-slate-500">سابقه شاهد</dt><dd>{% if observation.canonical_hash %}ثبت نهایی سابقه محفوظ است{% else %}پیش‌نویس{% endif %}</dd></div></dl>{% if can_view_location %}<div class="mt-5 rounded-lg bg-slate-50 p-3 text-sm"><p class="font-semibold">مکان دستگاه (شاهد غیرقابل‌اعتماد)</p><p class="mt-1" dir="ltr">{% if observation.latitude %}{{ observation.latitude }}, {{ observation.longitude }} · دقت {{ observation.horizontal_accuracy_meters }} m{% else %}ثبت نشده / مجوز: {{ observation.get_location_permission_display }}{% endif %}</p>{% if observation.location_mismatch_note %}<p class="mt-1 text-amber-700">پرچم مغایرت: {{ observation.location_mismatch_note }}</p>{% endif %}</div>{% endif %}</section><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold text-slate-900">چرخه بررسی</h2><ol class="mt-4 space-y-3 text-sm">{% for transition in observation.transitions.all %}<li class="border-b border-slate-100 pb-3"><p class="font-medium">{{ transition.get_from_status_display }} → {{ transition.get_to_status_display }}</p><p class="mt-1 text-slate-500">{{ transition.actor.username }} · <span dir="ltr">{{ transition.created_at|date:"Y-m-d H:i" }}</span></p>{% if transition.reason %}<p class="mt-1 text-slate-600">{{ transition.reason }}</p>{% endif %}</li>{% empty %}<li class="text-slate-500">هنوز انتقالی ثبت نشده است.</li>{% endfor %}</ol></section></div>
++  <div class="mt-5 grid gap-5 lg:grid-cols-2"><div class="min-w-0">{% include "components/document_evidence.html" %}</div><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold">پیشنهادهای تحویل</h2><ul class="mt-4 space-y-3 text-sm">{% for proposal in observation.proposals.all %}<li class="rounded-lg border border-slate-200 p-3"><p class="font-semibold">{{ proposal.get_family_display }} · {{ proposal.get_status_display }}</p><p class="mt-1 text-xs text-slate-500">{{ proposal.created_by.username }} · {{ proposal.lines|length }} سطر</p>{% if proposal.status == "draft" %}<form class="mt-2" method="post" action="{% url 'daily_reports:field_proposal_submit' observation.id proposal.id %}">{% csrf_token %}<input type="hidden" name="operation_key" value="{{ proposal.create_operation_key }}"><button class="rounded bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white" type="submit">ارسال برای بررسی</button></form>{% endif %}</li>{% empty %}<li class="text-slate-500">پیشنهادی ثبت نشده است.</li>{% endfor %}</ul></section></div>
++  <div class="mt-5 flex flex-wrap gap-3">{% if can_capture and observation.status == "draft" %}<a class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold" href="{% url 'daily_reports:field_observation_detail' observation.id %}#edit">ویرایش پیش‌نویس</a>{% endif %}{% if can_submit and observation.status == "draft" %}<form method="post" action="{% url 'daily_reports:field_observation_submit' observation.id %}">{% csrf_token %}<input type="hidden" name="operation_key" value="{{ observation.create_operation_key }}"><button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white" type="submit">ارسال برای بررسی</button></form>{% endif %}{% if can_review and observation.status == "submitted" %}<form method="post" action="{% url 'daily_reports:field_observation_review_start' observation.id %}">{% csrf_token %}<input type="hidden" name="operation_key" value="{{ observation.create_operation_key }}"><button class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white" type="submit">آغاز بررسی</button></form>{% endif %}{% if can_review and observation.status == "in_review" %}<form method="post" action="{% url 'daily_reports:field_observation_review_decide' observation.id 'accept' %}">{% csrf_token %}{% for field in review_form %}{% if field.name == "operation_key" %}{{ field }}{% endif %}{% endfor %}<button class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white" type="submit">پذیرش</button></form><form method="post" action="{% url 'daily_reports:field_observation_review_decide' observation.id 'reject' %}">{% csrf_token %}{% for field in review_form %}{{ field }}{% endfor %}<button class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white" type="submit">رد شاهد</button></form>{% endif %}</div>
+   {% if can_capture and observation.status == "draft" %}<section id="edit" class="erp-surface mt-5 max-w-4xl rounded-xl p-5"><h2 class="font-semibold">ویرایش پیش‌نویس</h2><form class="mt-4 space-y-4" method="post" action="{% url 'daily_reports:field_observation_save' observation.id %}">{% csrf_token %}{% for field in observation_form %}{% if not field.is_hidden %}{% include "components/form_field.html" with field=field only %}{% endif %}{% endfor %}{% for field in observation_form.hidden_fields %}{{ field }}{% endfor %}<button class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white" type="submit">ذخیره نسخه جدید</button></form></section>{% endif %}
+   {% if can_prepare_proposal and observation.status == "accepted" %}<section class="erp-surface mt-5 max-w-3xl rounded-xl p-5"><h2 class="font-semibold">تهیه پیشنهاد (بدون اثر دامنه‌ای)</h2><form class="mt-4 space-y-4" method="post" action="{% url 'daily_reports:field_proposal_create' observation.id %}">{% csrf_token %}{% for field in proposal_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white" type="submit">ایجاد پیشنهاد</button></form></section>{% endif %}
+ </div>
+--- phase2/templates/contracts/contractual_record_detail.html
++++ phase3/templates/contracts/contractual_record_detail.html
+@@ -1,11 +1,14 @@
+-{% extends "base.html" %}{% load erp_format %}
++{% extends "base.html" %}{% load static document_evidence %}{% load erp_format %}
+ {% block title %}{{ record.record_number }} | کنترل قراردادی{% endblock %}
+-{% block content %}<div dir="rtl">
++{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{% endblock %}
++{% block content %}{% document_evidence "contractual" record as evidence_panel %}<div dir="rtl">
+ <nav class="text-xs text-slate-400"><a class="hover:text-blue-700" href="{% url 'contracts:contractual_list' %}">کنترل قراردادی</a><span class="px-2">/</span><span dir="ltr">{{ record.record_number }}</span></nav>
+ <div class="mt-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p class="text-xs font-semibold text-blue-600">{{ record.get_kind_display }} · نسخه {{ record.version|erp_number }}</p><h1 class="mt-1 text-2xl font-bold text-slate-950">{{ record.title }}</h1><p class="mt-1 text-sm text-slate-500"><span dir="ltr">{{ record.contract.contract_number }}</span> · {{ record.project.name }}</p></div>{% include "components/status_badge.html" with status=record.status label=record.get_status_display only %}</div>
++{% include "components/evidence_nav.html" %}
+ <div class="mt-6 grid gap-4 lg:grid-cols-3"><section class="erp-surface rounded-xl p-5 lg:col-span-2"><h2 class="font-semibold text-slate-900">شرح و فرض‌ها</h2><p class="mt-4 whitespace-pre-line text-sm leading-7 text-slate-700">{{ record.description }}</p><dl class="mt-5 grid gap-4 text-sm sm:grid-cols-2"><div><dt class="text-slate-500">مبلغ درخواستی</dt><dd class="mt-1 font-semibold" dir="ltr">{{ record.requested_amount|default:"—"|erp_number }}</dd></div><div><dt class="text-slate-500">روز تمدید درخواستی</dt><dd class="mt-1 font-semibold">{{ record.requested_eot_days|default:"—"|erp_number }}</dd></div><div><dt class="text-slate-500">فرض اثر هزینه</dt><dd class="mt-1">{{ record.cost_impact_assumptions|default:"ثبت نشده" }}</dd></div><div><dt class="text-slate-500">فرض اثر برنامه</dt><dd class="mt-1">{{ record.schedule_impact_assumptions|default:"ثبت نشده" }}</dd></div></dl></section><aside class="erp-surface rounded-xl p-5"><h2 class="font-semibold text-slate-900">مرز اثر</h2><p class="mt-3 text-sm leading-6 text-amber-800">تأیید این رکورد هیچ تغییر خودکاری در مبلغ قرارداد، الحاقیه، بودجه، خط مبنای برنامه، صورت‌وضعیت، زیر‌دفتر، حسابداری، خزانه یا وجه نقد ایجاد نمی‌کند.</p></aside></div>
+ {% if record.status == "approved" %}<section class="erp-surface mt-5 rounded-xl p-5"><h2 class="font-semibold text-slate-900">نتیجه صریح تأییدشده</h2><dl class="mt-4 grid gap-4 text-sm sm:grid-cols-4"><div><dt class="text-slate-500">استحقاق</dt><dd class="mt-1 font-semibold">{% if record.entitlement_approved %}تأیید شد{% else %}تأیید نشد{% endif %}</dd></div><div><dt class="text-slate-500">مبلغ</dt><dd class="mt-1 font-semibold" dir="ltr">{{ record.approved_amount|default:"—"|erp_number }}</dd></div><div><dt class="text-slate-500">روز تمدید</dt><dd class="mt-1 font-semibold">{{ record.approved_eot_days|default:"—"|erp_number }}</dd></div><div><dt class="text-slate-500">مسئولیت تأخیر</dt><dd class="mt-1 font-semibold">{{ record.approved_delay_responsibility|default:"ثبت نشده" }}</dd></div></dl><p class="mt-4 text-sm text-slate-600">{{ record.approval_reason }}</p></section>{% endif %}
+-<section class="erp-surface mt-5 rounded-xl p-5"><h2 class="font-semibold text-slate-900">شواهد و تبار نسخه</h2><ul class="mt-4 space-y-2 text-sm">{% for evidence in record.evidence_links.all %}<li class="rounded-lg bg-slate-50 px-3 py-2">{{ evidence.label }}</li>{% empty %}<li class="text-slate-500">پیوند شواهدی ثبت نشده است.</li>{% endfor %}</ul>{% if record.supersedes %}<p class="mt-4 text-sm">این نسخه جایگزین <a class="text-blue-700 hover:underline" href="{% url 'contracts:contractual_detail' record.supersedes.id %}">نسخه {{ record.supersedes.version|erp_number }}</a> است.</p>{% endif %}</section>
++{% include "components/document_evidence.html" %}
++<section class="erp-surface mt-5 rounded-xl p-5"><h2 class="font-semibold text-slate-900">تبار نسخه و مراجع عملیاتی</h2><ul class="mt-4 space-y-2 text-sm">{% for evidence in record.evidence_links.all %}{% if not evidence.document_version_id %}<li class="rounded-lg bg-slate-50 px-3 py-2">{{ evidence.label }}</li>{% endif %}{% endfor %}</ul>{% if record.supersedes %}<p class="mt-4 text-sm">این نسخه جایگزین <a class="text-blue-700 hover:underline" href="{% url 'contracts:contractual_detail' record.supersedes.id %}">نسخه {{ record.supersedes.version|erp_number }}</a> است.</p>{% endif %}</section>
+ {% if record.status == "draft" and can_submit %}<form class="erp-surface mt-5 rounded-xl p-5" method="post" action="{% url 'contracts:contractual_submit' record.id %}">{% csrf_token %}<button class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white" type="submit">ارسال برای تأیید</button></form>{% endif %}
+ {% if record.status == "submitted" and can_approve %}<form class="erp-surface mt-5 space-y-4 rounded-xl p-5" method="post" action="{% url 'contracts:contractual_decide' record.id %}">{% csrf_token %}<h2 class="font-semibold">تصمیم گردش‌کار</h2>{% for field in decision_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white" type="submit">ثبت تصمیم</button></form>{% endif %}
+ {% if can_prepare and record.status == "returned" or can_prepare and record.status == "approved" %}<form class="erp-surface mt-5 space-y-4 rounded-xl p-5" method="post" action="{% url 'contracts:contractual_revision' record.id %}">{% csrf_token %}<input type="hidden" name="idempotency_key" value="revision-{{ record.id }}-{{ record.updated_at|date:'U' }}"><h2 class="font-semibold">نسخه اصلاحی یا ابطال پیوندخورده</h2>{% for field in revision_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="rounded-lg bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white" type="submit">ایجاد نسخه جدید</button></form>{% endif %}
+--- phase2/apps/billing/templates/billing/commercial_record_detail.html
++++ phase3/apps/billing/templates/billing/commercial_record_detail.html
+@@ -1,19 +1,25 @@
+-{% extends "base.html" %}
++{% extends "base.html" %}{% load static document_evidence %}
+ {% block title %}{{ title }} | بنیرا{% endblock %}
+-{% block content %}
++{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{{ revision_form.media.css }}{% endblock %}
++{% block extra_scripts %}{{ revision_form.media.js }}{% endblock %}
++{% block content %}{% document_evidence kind record as evidence_panel %}{% evidence_management_allowed kind record as can_manage_evidence %}
+ {% include "components/page_header.html" with page_breadcrumb_label="کنترل ضمانت و انطباق" page_breadcrumb_url="/billing/commercial-controls/" page_eyebrow=record.project.name page_title=title page_description=record.contract.contract_number only %}
++{% include "components/evidence_nav.html" %}
+ <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+   <section class="erp-surface rounded-xl p-4"><p class="text-xs text-slate-500">وضعیت</p><p class="mt-2">{% include "components/status_badge.html" with status=record.status label=record.get_status_display only %}</p></section>
+   {% if kind == "guarantee" %}<section class="erp-surface rounded-xl p-4"><p class="text-xs text-slate-500">نوع و سمت</p><p class="mt-2 font-semibold">{{ record.get_guarantee_type_display }}</p><p class="text-xs text-slate-500">{{ record.get_exposure_side_display }}</p></section><section class="erp-surface rounded-xl p-4"><p class="text-xs text-slate-500">مبلغ اسمی</p><p class="mt-2 text-xl font-bold" dir="ltr">{{ record.amount }} {{ record.currency_code }}</p></section><section class="erp-surface rounded-xl p-4"><p class="text-xs text-slate-500">مرجع / نسخه</p><p class="mt-2 font-semibold" dir="ltr">{{ record.instrument_reference }} / {{ record.version }}</p></section>{% endif %}
+   {% if kind == "compliance" %}<section class="erp-surface rounded-xl p-4"><p class="text-xs text-slate-500">نوع شاهد</p><p class="mt-2 font-semibold">{{ record.get_evidence_kind_display }}</p></section><section class="erp-surface rounded-xl p-4"><p class="text-xs text-slate-500">مرجع / نسخه</p><p class="mt-2 font-semibold" dir="ltr">{{ record.reference }} / {{ record.version }}</p></section><section class="erp-surface rounded-xl p-4"><p class="text-xs text-slate-500">مرجع صادرکننده</p><p class="mt-2 font-semibold">{{ record.issuing_authority }}</p></section>{% endif %}
+   {% if kind == "release" %}<section class="erp-surface rounded-xl p-4"><p class="text-xs text-slate-500">مبلغ آزادسازی</p><p class="mt-2 text-xl font-bold" dir="ltr">{{ record.amount }} {{ record.currency_code }}</p></section><section class="erp-surface rounded-xl p-4"><p class="text-xs text-slate-500">مانده پیش از آزادسازی</p><p class="mt-2 font-semibold" dir="ltr">{{ record.available_amount_snapshot }}</p></section><section class="erp-surface rounded-xl p-4"><p class="text-xs text-slate-500">شماره / ویرایش</p><p class="mt-2 font-semibold" dir="ltr">{{ record.release_number }}-{{ record.revision_number }}</p></section>{% endif %}
+ </div>
+-<section class="erp-surface mt-6 rounded-xl p-5"><h2 class="font-semibold">شواهد و تاریخ‌های مؤثر</h2><dl class="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4"><div><dt class="text-slate-500">قرارداد / طرف</dt><dd class="mt-1">{{ record.contract.contract_number }} — {{ record.party_identity_snapshot.display_name }}</dd></div>{% if kind == "guarantee" %}<div><dt class="text-slate-500">صادرکننده</dt><dd class="mt-1">{{ record.issuer_name }}</dd></div><div><dt class="text-slate-500">صدور / اثر / انقضا</dt><dd class="mt-1" dir="ltr">{{ record.issued_on }} / {{ record.effective_from }} / {{ record.expires_on|default:"—" }}</dd></div><div><dt class="text-slate-500">نسخه سند شاهد</dt><dd class="mt-1" dir="ltr">{{ record.evidence_document_version_id }}</dd></div>{% elif kind == "compliance" %}<div><dt class="text-slate-500">اثر / انقضا</dt><dd class="mt-1" dir="ltr">{{ record.effective_from }} / {{ record.expires_on|default:"—" }}</dd></div><div><dt class="text-slate-500">نسخه سند شاهد</dt><dd class="mt-1" dir="ltr">{{ record.document_version_id }}</dd></div>{% else %}<div><dt class="text-slate-500">نسخه شرایط</dt><dd class="mt-1" dir="ltr">{{ record.contract_term_version.version }}</dd></div><div><dt class="text-slate-500">کسور/آزادسازی قبلی</dt><dd class="mt-1" dir="ltr">{{ record.retained_total_snapshot }} / {{ record.prior_release_total_snapshot }}</dd></div><div><dt class="text-slate-500">مفاصاحساب پین‌شده</dt><dd class="mt-1" dir="ltr">{{ record.clearance_evidence_id|default:"—" }}</dd></div>{% endif %}</dl></section>
+-{% if record.predecessor_id or record.corrects_id %}<section class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm"><h2 class="font-semibold">زنجیره اصلاح</h2>{% if record.predecessor_id %}<p class="mt-2">نسخه پیشین: <span dir="ltr">{{ record.predecessor_id }}</span> — {{ record.get_revision_action_display }}</p>{% endif %}{% if record.corrects_id %}<p class="mt-2">آزادسازی مرجع: <span dir="ltr">{{ record.corrects_id }}</span> — {{ record.get_correction_kind_display }}</p>{% endif %}<p class="mt-1 text-slate-600">{{ record.revision_reason|default:record.correction_reason }}</p></section>{% endif %}
++<section class="erp-surface mt-6 rounded-xl p-5"><h2 class="font-semibold">شواهد و تاریخ‌های مؤثر</h2><dl class="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4"><div><dt class="text-slate-500">قرارداد / طرف</dt><dd class="mt-1">{{ record.contract.contract_number }} — {{ record.party_identity_snapshot.display_name }}</dd></div>{% if kind == "guarantee" %}<div><dt class="text-slate-500">صادرکننده</dt><dd class="mt-1">{{ record.issuer_name }}</dd></div><div><dt class="text-slate-500">صدور / اثر / انقضا</dt><dd class="mt-1" dir="ltr">{{ record.issued_on }} / {{ record.effective_from }} / {{ record.expires_on|default:"—" }}</dd></div>{% elif kind == "compliance" %}<div><dt class="text-slate-500">اثر / انقضا</dt><dd class="mt-1" dir="ltr">{{ record.effective_from }} / {{ record.expires_on|default:"—" }}</dd></div>{% else %}<div><dt class="text-slate-500">نسخه شرایط</dt><dd class="mt-1" dir="ltr">{{ record.contract_term_version.version }}</dd></div><div><dt class="text-slate-500">کسور/آزادسازی قبلی</dt><dd class="mt-1" dir="ltr">{{ record.retained_total_snapshot }} / {{ record.prior_release_total_snapshot }}</dd></div><div><dt class="text-slate-500">مفاصاحساب پین‌شده</dt><dd class="mt-1" dir="ltr">{% if record.clearance_evidence_id %}مرجع ثبت‌شده؛ پیوند مجاز در بخش شواهد{% else %}—{% endif %}</dd></div>{% endif %}</dl></section>
++{% include "components/document_evidence.html" %}
++{% if evidence_panel.context_links %}<ul class="erp-surface mt-4 rounded-xl p-4 text-sm">{% for label, title, url in evidence_panel.context_links %}<li><span>{{ label }}: </span><a class="text-blue-700 hover:underline" href="{{ url }}">{{ title }}</a></li>{% endfor %}</ul>{% endif %}
++{% if record.predecessor_id or record.corrects_id %}<section class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm"><h2 class="font-semibold">زنجیره اصلاح</h2>{% if record.predecessor_id %}<p class="mt-2">نسخه پیشین: سابقه نسخه پیشین محفوظ است — {{ record.get_revision_action_display }}</p>{% endif %}{% if record.corrects_id %}<p class="mt-2">آزادسازی مرجع: سابقه آزادسازی مرجع محفوظ است — {{ record.get_correction_kind_display }}</p>{% endif %}<p class="mt-1 text-slate-600">{{ record.revision_reason|default:record.correction_reason }}</p></section>{% endif %}
+ <div class="mt-6 flex flex-wrap gap-3">
+   {% if record.status == "draft" %}<form method="post" action="{% if kind == 'guarantee' %}{% url 'billing:guarantee_submit' record.pk %}{% elif kind == 'compliance' %}{% url 'billing:compliance_evidence_submit' record.pk %}{% else %}{% url 'billing:retention_release_submit' record.pk %}{% endif %}">{% csrf_token %}<button class="erp-button-primary" type="submit">ارسال برای تأیید</button></form>{% endif %}
+   {% if record.status == "submitted" %}<form class="flex flex-wrap gap-2" method="post" action="{% if kind == 'guarantee' %}{% url 'billing:guarantee_approve' record.pk %}{% elif kind == 'compliance' %}{% url 'billing:compliance_evidence_approve' record.pk %}{% else %}{% url 'billing:retention_release_approve' record.pk %}{% endif %}">{% csrf_token %}<input class="erp-input" name="reason" required placeholder="دلیل تأیید"><button class="erp-button-primary" type="submit">تأیید</button></form><form class="flex flex-wrap gap-2" method="post" action="{% if kind == 'guarantee' %}{% url 'billing:guarantee_return' record.pk %}{% elif kind == 'compliance' %}{% url 'billing:compliance_evidence_return' record.pk %}{% else %}{% url 'billing:retention_release_return' record.pk %}{% endif %}">{% csrf_token %}<input class="erp-input" name="reason" required placeholder="دلیل بازگردانی"><button class="erp-button-secondary" type="submit">بازگردانی</button></form>{% endif %}
+   {% if "work_items.view" in business_permission_codes %}<a class="erp-button-secondary" href="{% url 'workflows:workbench' %}">کارتابل تأییدها</a>{% endif %}
+ </div>
+-{% if kind == "guarantee" and record.status == "active" or kind == "guarantee" and record.status == "expired" or kind == "compliance" and record.status == "approved" or kind == "compliance" and record.status == "expired" or kind == "release" and record.status == "approved" %}<section class="erp-surface mt-6 rounded-xl border-r-4 border-amber-400 p-5"><h2 class="font-semibold">نسخه پیوندخورده</h2><p class="mt-2 text-sm text-slate-600">نسخه نهایی بازنویسی نمی‌شود. اصلاح، تمدید، آزادسازی یا ابطال پس از گردش تأیید، سابقه را به‌صورت پیوندخورده تکمیل می‌کند.</p><form method="post" action="{% if kind == 'guarantee' %}{% url 'billing:guarantee_revise' record.pk %}{% elif kind == 'compliance' %}{% url 'billing:compliance_evidence_revise' record.pk %}{% else %}{% url 'billing:retention_release_correct' record.pk %}{% endif %}" class="mt-4 grid gap-4 md:grid-cols-2">{% csrf_token %}{% for field in revision_form %}<div><label class="mb-1 block text-sm font-medium" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}<p class="mt-1 text-xs text-red-700">{{ field.errors|join:", " }}</p>{% endif %}</div>{% endfor %}<button class="erp-button-secondary md:col-span-2" type="submit">ایجاد نسخه جدید</button></form></section>{% endif %}
++{% if can_manage_evidence %}{% if kind == "guarantee" and record.status == "active" or kind == "guarantee" and record.status == "expired" or kind == "compliance" and record.status == "approved" or kind == "compliance" and record.status == "expired" or kind == "release" and record.status == "approved" %}<section class="erp-surface mt-6 rounded-xl border-r-4 border-amber-400 p-5"><h2 class="font-semibold">نسخه پیوندخورده</h2><p class="mt-2 text-sm text-slate-600">نسخه نهایی بازنویسی نمی‌شود. اصلاح، تمدید، آزادسازی یا ابطال پس از گردش تأیید، سابقه را به‌صورت پیوندخورده تکمیل می‌کند.</p><form method="post" action="{% if kind == 'guarantee' %}{% url 'billing:guarantee_revise' record.pk %}{% elif kind == 'compliance' %}{% url 'billing:compliance_evidence_revise' record.pk %}{% else %}{% url 'billing:retention_release_correct' record.pk %}{% endif %}" class="mt-4 grid gap-4 md:grid-cols-2">{% csrf_token %}{% include "components/form_errors.html" with form=revision_form only %}{% for field in revision_form %}<div>{% include "components/form_field.html" with field=field only %}</div>{% endfor %}<button class="erp-button-secondary md:col-span-2" type="submit">ایجاد نسخه جدید</button></form></section>{% endif %}
++{% endif %}
+ {% endblock %}
+--- phase2/apps/billing/templates/billing/commercial_form.html
++++ phase3/apps/billing/templates/billing/commercial_form.html
+@@ -1,6 +1,8 @@
+ {% extends "base.html" %}
+ {% load ui_actions %}
+ {% block title %}{{ title }} | بنیرا{% endblock %}
++{% block extra_head %}{{ form.media.css }}{% endblock %}
++{% block extra_scripts %}{{ form.media.js }}{% endblock %}
+ {% block content %}
+ {% include "components/page_header.html" with page_breadcrumb_label="کنترل ضمانت و انطباق" page_breadcrumb_url="/billing/commercial-controls/" page_eyebrow="کنترل تجاری و شواهد" page_title=title page_description="فقط واقعیت قراردادی یا شاهد بازبینی‌شده ثبت می‌شود؛ نبود اختیار صریح، عملیات را متوقف می‌کند." only %}
+ <section class="erp-surface mt-6 rounded-xl p-5">
+--- phase2/apps/daily_reports/field_services.py
++++ phase3/apps/daily_reports/field_services.py
+@@ -405,7 +405,7 @@
+     existing = FieldObservationEvidenceLink.objects.filter(organization=organization, created_by=actor, operation_key=operation_key).first()
+     payload_hash = _sha({"observation": str(observation.pk), "document_version": str(version.pk), "sha256": version.sha256})
+     if existing:
+-        if existing.observation_id != observation.pk or existing.payload_hash != payload_hash:
++        if existing.field_observation_id != observation.pk or existing.payload_hash != payload_hash:
+             raise ValidationError("کلید تکرار با داده متفاوت استفاده شده است.")
+         return existing
+     return FieldObservationEvidenceLink.objects.create(
+--- /dev/null
++++ phase3/apps/documents/evidence.py
+@@ -0,0 +1,487 @@
++"""Presentation adapters for persisted, domain-owned exact-version witnesses.
++
++These adapters grant no domain authority. Domain services still own registration
++and lifecycle; ordinary DMS services own metadata access and secure delivery.
++"""
++
++from __future__ import annotations
++
++from dataclasses import dataclass
++from itertools import islice
++from typing import TYPE_CHECKING
++from uuid import UUID
++
++from django.core.exceptions import PermissionDenied
++from django.db.models import Q
++from django.urls import reverse
++
++from apps.documents.models import DocumentVersion
++from apps.documents.services import (
++    get_document_version_for_download,
++    get_organization_document,
++    get_organization_documents,
++)
++from apps.organizations.authorization import (
++    has_business_permission,
++    require_business_permission,
++)
++from apps.organizations.models import BusinessPermissionCode as P
++from core.forms import normalize_jalali_digits
++from core.product_surface import route_exposed
++
++if TYPE_CHECKING:
++    from django.db.models import Model, QuerySet
++
++    from apps.accounts.models import User
++    from apps.organizations.models import Organization
++
++DENIED = "شاهد یا سابقه مرتبط در دسترس نیست یا اجازه انجام این عملیات را ندارید."
++PAGE_SIZE = 20
++# Explicit UI routes only; this is not a new relationship registry.
++SOURCE_ROUTES = {
++    "safety": ("safety:detail", "حادثه ایمنی"),
++    "quality": ("quality:detail", "مسئله کیفیت"),
++    "material": ("materials:material_detail", "مصالح"),
++    "field_observation": ("daily_reports:field_observation_detail", "مشاهده میدانی"),
++    "contractual": ("contracts:contractual_detail", "رکورد قراردادی"),
++    "guarantee": ("billing:guarantee_detail", "ضمانت‌نامه"),
++    "compliance": ("billing:compliance_evidence_detail", "شاهد انطباق قرارداد"),
++    "release": ("billing:retention_release_detail", "آزادسازی کسور تضمین"),
++}
++REGISTRATION_PERMISSIONS = {
++    "safety": P.SAFETY_INCIDENTS_RECORD_SUBMIT,
++    "quality": P.QUALITY_ISSUES_RECORD_SUBMIT,
++    "field_observation": P.FIELD_OBSERVATIONS_CAPTURE,
++    "contractual": P.CONTRACTUAL_RECORDS_PREPARE,
++    "material": P.MATERIAL_DOCUMENTS_LINK,
++}
++COMMERCIAL_PERMISSIONS = {
++    "guarantee": P.GUARANTEES_MANAGE,
++    "compliance": P.COMPLIANCE_EVIDENCE_MANAGE,
++    "release": P.RETENTION_RELEASES_CREATE,
++}
++
++
++@dataclass(frozen=True)
++class EvidenceSource:
++    kind: str
++    target: Model
++    label: str
++    title: str
++    url: str
++
++
++@dataclass(frozen=True)
++class PinnedEvidenceRow:
++    version_id: UUID
++    title: str
++    number: str
++    type_label: str
++    version: int
++    current_version: int
++    status: str
++    available: bool
++    view_url: str
++    download_url: str
++
++
++@dataclass(frozen=True)
++class EvidencePanel:
++    source: EvidenceSource
++    rows: tuple[PinnedEvidenceRow, ...]
++    register_url: str = ""
++    register_label: str = ""
++    context_links: tuple[tuple[str, str, str], ...] = ()
++
++
++def _record(
++    *, user: User, organization: Organization, kind: str, identifier: UUID
++) -> Model:
++    if kind == "safety":
++        from apps.safety.services import get_organization_safety_incident
++
++        return get_organization_safety_incident(
++            user=user, organization=organization, incident_id=str(identifier)
++        )
++    if kind == "quality":
++        from apps.quality.services import get_organization_quality_issue
++
++        return get_organization_quality_issue(
++            user=user, organization=organization, issue_id=str(identifier)
++        )
++    if kind == "material":
++        from apps.materials.services import get_organization_materials
++
++        records = get_organization_materials(user=user, organization=organization)
++    elif kind == "field_observation":
++        from apps.daily_reports.field_services import get_field_observation
++
++        return get_field_observation(
++            actor=user, organization=organization, observation_id=str(identifier)
++        )
++    elif kind == "contractual":
++        from apps.contracts.contractual_services import get_contractual_records
++
++        records = get_contractual_records(actor=user, organization=organization)
++    else:
++        from apps.billing.commercial_services import (
++            get_compliance_evidence,
++            get_guarantees,
++            get_retention_releases,
++        )
++
++        records = {
++            "guarantee": get_guarantees,
++            "compliance": get_compliance_evidence,
++            "release": get_retention_releases,
++        }[kind](actor=user, organization=organization)
++    target = records.filter(pk=identifier).first()
++    if target is None:
++        raise PermissionDenied(DENIED)
++    return target
++
++
++def resolve_evidence_source(
++    *, user: User, organization: Organization, kind: str, identifier: UUID | str
++) -> EvidenceSource:
++    if kind not in SOURCE_ROUTES or not route_exposed(SOURCE_ROUTES[kind][0]):
++        raise PermissionDenied(DENIED)
++    require_business_permission(
++        user=user,
++        organization=organization,
++        permission=P.DOCUMENTS_VIEW,
++        allow_any_scope=True,
++        message=DENIED,
++    )
++    try:
++        identifier = UUID(str(identifier))
++    except (ValueError, TypeError, AttributeError) as exc:
++        raise PermissionDenied(DENIED) from exc
++    target = _record(
++        user=user, organization=organization, kind=kind, identifier=identifier
++    )
++    title = (
++        getattr(target, "incident_number", "")
++        or getattr(target, "issue_number", "")
++        or getattr(target, "title", "")
++        or getattr(target, "name", "")
++        or getattr(target, "instrument_reference", "")
++        or getattr(target, "reference", "")
++        or getattr(target, "release_number", "")
++    )
++    return EvidenceSource(
++        kind,
++        target,
++        SOURCE_ROUTES[kind][1],
++        str(title),
++        reverse(SOURCE_ROUTES[kind][0], args=[target.pk]) + "#document-evidence",
++    )
++
++
++def can_register(
++    *, user: User, organization: Organization, source: EvidenceSource
++) -> bool:
++    permission = REGISTRATION_PERMISSIONS.get(source.kind)
++    if permission is None:
++        return False
++    target = source.target
++    if source.kind == "material":
++        return all(
++            has_business_permission(
++                user=user, organization=organization, permission=code
++            )
++            for code in (P.MATERIAL_DOCUMENTS_LINK, P.DOCUMENTS_UPLOAD)
++        )
++    state = (
++        target.review_status if source.kind in {"safety", "quality"} else target.status
++    )
++    return state == "draft" and has_business_permission(
++        user=user,
++        organization=organization,
++        permission=permission,
++        project=target.project,
++        site=getattr(target, "site", None),
++    )
++
++
++def references(source: EvidenceSource) -> list[tuple[UUID, str]]:
++    """Return persisted exact identities; callers must authorize each witness."""
++    target = source.target
++    organization = target.organization
++    if source.kind in {"safety", "quality"}:
++        result = []
++        for revision in target.review_revisions.filter(
++            organization=organization
++        ).order_by("sequence"):
++            label = f"بازبینی {revision.sequence} · {revision.get_state_display()}"
++            result.extend(
++                (version_id, label)
++                for version_id in revision.evidence.filter(
++                    organization=organization
++                ).values_list("document_version_id", flat=True)
++            )
++        return result
++    if source.kind == "material":
++        return [
++            (identifier, "نسخه ثبت‌شده مصالح")
++            for identifier in target.document_links.filter(
++                organization=organization
++            ).values_list("document_version_id", flat=True)
++        ]
++    if source.kind == "field_observation":
++        return [
++            (identifier, target.get_status_display())
++            for identifier in target.evidence_links.filter(
++                organization=organization
++            ).values_list("document_version_id", flat=True)
++        ]
++    if source.kind == "contractual":
++        # Non-document sources retain their own presentation and authority.
++        return [
++            (identifier, f"{label} · {target.get_status_display()}")
++            for identifier, label in target.evidence_links.filter(
++                organization=organization, document_version__isnull=False
++            ).values_list("document_version_id", "label")
++        ]
++    identifier = (
++        target.document_version_id
++        if source.kind == "compliance"
++        else target.evidence_document_version_id
++    )
++    return [(identifier, target.get_status_display())] if identifier else []
++
++
++def pinned_row(
++    *,
++    user: User,
++    organization: Organization,
++    source: EvidenceSource,
++    version_id: UUID,
++    status: str,
++) -> PinnedEvidenceRow:
++    version = (
++        DocumentVersion.objects.select_related("document")
++        .filter(pk=version_id, organization=organization)
++        .first()
++    )
++    if version is None:
++        raise PermissionDenied(DENIED)
++    document = get_organization_document(
++        user=user, organization=organization, document_id=str(version.document_id)
++    )
++    download_url = ""
++    if route_exposed("documents:version-download"):
++        try:
++            get_document_version_for_download(
++                document=document, version_id=str(version.pk), actor=user
++            )
++        except PermissionDenied:
++            pass
++        else:
++            download_url = reverse(
++                "documents:version-download", args=[document.pk, version.pk]
++            )
++    return PinnedEvidenceRow(
++        version.pk,
++        document.title,
++        document.document_number,
++        document.get_document_type_display(),
++        version.version_number,
++        document.current_version.version_number,
++        status,
++        version.is_available,
++        reverse(
++            "documents:evidence-detail",
++            args=[source.kind, source.target.pk, version.pk],
++        ),
++        download_url,
++    )
++
++
++def evidence_panel(
++    *, user: User, organization: Organization, kind: str, identifier: UUID | str
++) -> EvidencePanel | None:
++    try:
++        source = resolve_evidence_source(
++            user=user, organization=organization, kind=kind, identifier=identifier
++        )
++    except PermissionDenied:
++        return None
++    rows = []
++    for version_id, status in references(source):
++        try:
++            rows.append(
++                pinned_row(
++                    user=user,
++                    organization=organization,
++                    source=source,
++                    version_id=version_id,
++                    status=status,
++                )
++            )
++        except PermissionDenied:
++            continue
++    context_links = []
++    if kind in COMMERCIAL_PERMISSIONS:
++        for name, related_kind, label in (
++            ("predecessor", kind, "نسخه پیشین"),
++            ("corrects", kind, "آزادسازی مرجع"),
++            ("clearance_evidence", "compliance", "مفاصاحساب ثبت‌شده"),
++        ):
++            related_id = getattr(source.target, name + "_id", None)
++            if related_id is None:
++                continue
++            try:
++                related = resolve_evidence_source(
++                    user=user,
++                    organization=organization,
++                    kind=related_kind,
++                    identifier=related_id,
++                )
++            except PermissionDenied:
++                continue
++            version = getattr(related.target, "version", None) or getattr(
++                related.target, "revision_number", ""
++            )
++            context_links.append(
++                (label, f"{related.title} · نسخه {version}", related.url)
++            )
++    permitted = can_register(user=user, organization=organization, source=source)
++    return EvidencePanel(
++        source,
++        tuple(rows),
++        reverse("documents:evidence-register", args=[kind, source.target.pk])
++        if permitted
++        else "",
++        "ارسال رکورد همراه شواهد"
++        if kind in {"safety", "quality"}
++        else "انتخاب نسخه شاهد",
++        tuple(context_links),
++    )
++
++
++def picker_source(
++    *,
++    user: User,
++    organization: Organization,
++    kind: str,
++    identifier: UUID | str | None = None,
++) -> EvidenceSource | None:
++    if identifier is not None:
++        source = resolve_evidence_source(
++            user=user, organization=organization, kind=kind, identifier=identifier
++        )
++        if kind in COMMERCIAL_PERMISSIONS:
++            require_business_permission(
++                user=user,
++                organization=organization,
++                permission=COMMERCIAL_PERMISSIONS[kind],
++                project=source.target.project,
++                message=DENIED,
++            )
++            # Existing commercial revision services own the final state/action checks.
++            return source
++        if not can_register(user=user, organization=organization, source=source):
++            raise PermissionDenied(DENIED)
++        return source
++    if kind not in COMMERCIAL_PERMISSIONS or not route_exposed(SOURCE_ROUTES[kind][0]):
++        raise PermissionDenied(DENIED)
++    for permission in (P.DOCUMENTS_VIEW, COMMERCIAL_PERMISSIONS[kind]):
++        require_business_permission(
++            user=user,
++            organization=organization,
++            permission=permission,
++            allow_any_scope=True,
++            message=DENIED,
++        )
++    return None
++
++
++def eligible_versions(
++    *,
++    user: User,
++    organization: Organization,
++    kind: str,
++    source: EvidenceSource | None,
++    query: str = "",
++) -> QuerySet[DocumentVersion]:
++    ids = []
++    documents = get_organization_documents(user=user, organization=organization)
++    query = query.strip()
++    if query:
++        normalized = normalize_jalali_digits(query).replace("ي", "ی").replace("ك", "ک")
++        documents = documents.filter(
++            Q(title__icontains=query)
++            | Q(title__icontains=normalized)
++            | Q(document_number__icontains=normalized)
++            | Q(reference__icontains=query)
++        )
++    for identifier in (
++        documents.prefetch_related(None)
++        .values_list("pk", flat=True)
++        .iterator(chunk_size=200)
++    ):
++        try:
++            document = get_organization_document(
++                user=user, organization=organization, document_id=str(identifier)
++            )
++            if kind == "material":
++                from apps.documents.services import _validate_document_context_access
++
++                _validate_document_context_access(
++                    document=document, actor=user, permission=P.DOCUMENTS_UPLOAD
++                )
++        except PermissionDenied:
++            continue
++        ids.append(identifier)
++    versions = (
++        DocumentVersion.objects.filter(organization=organization, document_id__in=ids)
++        .select_related("document", "document__current_version")
++        .prefetch_related("processing_assessments")
++    )
++    eligible = []
++    for version in versions:
++        if kind == "material" and (
++            source is None
++            or version.pk != version.document.current_version_id
++            or source.target.document_links.filter(
++                organization=organization, document_version=version
++            ).exists()
++        ):
++            continue
++        if kind in {"safety", "quality"}:
++            if source is None:
++                continue
++            if kind == "safety":
++                from apps.safety.record_review import _valid_evidence_scope
++            else:
++                from apps.quality.record_review import _valid_evidence_scope
++            if not _valid_evidence_scope(version, source.target):
++                continue
++        elif (
++            kind in {*COMMERCIAL_PERMISSIONS, "field_observation"}
++            and not version.is_available
++        ):
++            continue
++        eligible.append(version.pk)
++    return versions.filter(pk__in=eligible).order_by(
++        "document__title", "document_id", "version_number"
++    )
++
++
++def version_label(version: DocumentVersion) -> str:
++    state = "آماده دریافت" if version.is_available else "قرنطینه یا ارزیابی‌نشده"
++    return f"{version.document.title} · {version.document.document_number} · {version.document.get_document_type_display()} · نسخه شاهد {version.version_number} · {state}"
++
++
++def choice_page(
++    versions: QuerySet[DocumentVersion], *, page: int = 1
++) -> tuple[list[DocumentVersion], bool]:
++    rows = list(
++        islice(
++            versions.iterator(chunk_size=200),
++            (page - 1) * PAGE_SIZE,
++            page * PAGE_SIZE + 1,
++        )
++    )
++    return rows[:PAGE_SIZE], len(rows) > PAGE_SIZE
+--- /dev/null
++++ phase3/apps/documents/evidence_forms.py
+@@ -0,0 +1,155 @@
++"""Shared version selection within existing source-owned operations."""
++
++from __future__ import annotations
++
++from uuid import uuid4
++
++from django import forms
++from django.core import signing
++from django.core.exceptions import PermissionDenied
++from django.urls import reverse
++
++from apps.documents.evidence import (
++    EvidenceSource,
++    choice_page,
++    eligible_versions,
++    picker_source,
++    version_label,
++)
++from apps.documents.models import DocumentVersion
++from core.business_choices import InheritedParentInput, SearchChoiceSelect
++
++
++def configure_version_picker(form, name, *, user, organization, kind, identifier=None):
++    """Keep native queryset validation and the existing searchable widget."""
++    field = form.fields[name]
++    versions = DocumentVersion.objects.none()
++    if user is not None:
++        try:
++            source = picker_source(
++                user=user, organization=organization, kind=kind, identifier=identifier
++            )
++            versions = eligible_versions(
++                user=user, organization=organization, kind=kind, source=source
++            )
++        except PermissionDenied:
++            pass
++    field.queryset = versions
++    field.label_from_instance = version_label
++    field.error_messages.update(
++        invalid_choice="نسخه انتخاب‌شده در دسترس نیست یا برای این عملیات مجاز نیست."
++    )
++    rows, _ = choice_page(versions)
++    selected = (
++        form.data.getlist(name)
++        if form.is_bound and hasattr(form.data, "getlist")
++        else []
++    )
++    if form.is_bound and not selected and form.data.get(name):
++        selected = [form.data[name]]
++    for value in selected:
++        try:
++            chosen = versions.filter(pk=value).first()
++        except (ValueError, forms.ValidationError):
++            continue
++        if chosen is not None and all(chosen.pk != row.pk for row in rows):
++            rows.insert(0, chosen)
++    route = (
++        "documents:evidence-choices"
++        if identifier
++        else "documents:commercial-evidence-choices"
++    )
++    args = [kind, identifier] if identifier else [kind]
++    field.widget = SearchChoiceSelect(
++        attrs={
++            "data-options-url": reverse(route, args=args),
++            "data-business-choice": name,
++            "data-business-names-primary": "true",
++            "data-placeholder": "جست‌وجوی عنوان یا شماره سند و انتخاب نسخه شاهد…",
++            "dir": "rtl",
++        },
++        choices=[("", "انتخاب نسخه شاهد")]
++        + [(str(row.pk), version_label(row)) for row in rows],
++    )
++    if isinstance(field, forms.ModelMultipleChoiceField):
++        field.widget.allow_multiple_selected = True
++    field.help_text = "عنوان سند و شماره نسخه انتخاب‌شده در همین کادر نمایش داده می‌شود؛ نسخه جاری به‌طور خودکار جایگزین شاهد نمی‌شود."
++
++
++class EvidenceRegistrationForm(forms.Form):
++    versions = forms.ModelMultipleChoiceField(
++        label="نسخه‌های شاهد بررسی",
++        queryset=DocumentVersion.objects.none(),
++        required=False,
++    )
++    version = forms.ModelChoiceField(
++        label="نسخه شاهد", queryset=DocumentVersion.objects.none()
++    )
++    label = forms.CharField(label="عنوان شاهد", max_length=255)
++    reason = forms.CharField(
++        label="دلیل ارسال رکورد", widget=forms.Textarea(attrs={"rows": 3})
++    )
++    operation_key = forms.UUIDField(widget=forms.HiddenInput, initial=uuid4)
++    context_token = forms.CharField(widget=forms.HiddenInput)
++
++    def __init__(self, *args, source: EvidenceSource, user, organization, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.intent = {
++            "kind": source.kind,
++            "source": str(source.target.pk),
++            "user": str(user.pk),
++            "organization": str(organization.pk),
++        }
++        self.fields["context_token"].widget = InheritedParentInput(
++            signing.dumps(self.intent, salt="documents.evidence-registration.v1")
++        )
++        if source.kind in {"safety", "quality"}:
++            for name in ("version", "label", "operation_key"):
++                self.fields.pop(name)
++            name = "versions"
++        else:
++            self.fields.pop("versions")
++            self.fields.pop("reason")
++            if source.kind in {"contractual", "material"}:
++                self.fields.pop("operation_key")
++            if source.kind != "contractual":
++                self.fields.pop("label")
++            name = "version"
++        configure_version_picker(
++            self,
++            name,
++            user=user,
++            organization=organization,
++            kind=source.kind,
++            identifier=source.target.pk,
++        )
++        if source.kind == "material":
++            self.fields[
++                "version"
++            ].help_text = "فقط نسخه جاری سند قابل ثبت است. شماره نسخه انتخاب‌شده پیش از ثبت بررسی می‌شود؛ تغییر هم‌زمان نسخه، نیازمند انتخاب دوباره است."
++
++    def clean(self):
++        cleaned = super().clean()
++        try:
++            signed = signing.loads(
++                cleaned.get("context_token", ""),
++                salt="documents.evidence-registration.v1",
++                max_age=3600,
++            )
++        except signing.BadSignature as exc:
++            raise forms.ValidationError(
++                "مهلت فرم پایان یافته یا زمینه معتبر نیست؛ دوباره تلاش کنید."
++            ) from exc
++        if signed != self.intent or any(
++            self.data.get(name)
++            for name in (
++                "next",
++                "return_url",
++                "organization",
++                "organization_id",
++                "target_id",
++                "target_type",
++            )
++        ):
++            raise forms.ValidationError("زمینه ارسالی با این فرم هم‌خوان نیست.")
++        return cleaned
+--- /dev/null
++++ phase3/apps/documents/evidence_registration.py
+@@ -0,0 +1,112 @@
++"""Transactional UI orchestration; source services retain evidence authority."""
++
++from __future__ import annotations
++
++from collections.abc import Mapping
++from typing import TYPE_CHECKING, Any
++from uuid import UUID
++
++from django.core.exceptions import PermissionDenied
++from django.db import transaction
++
++from apps.documents.evidence import (
++    DENIED,
++    EvidenceSource,
++    eligible_versions,
++    picker_source,
++)
++from apps.documents.models import Document
++
++if TYPE_CHECKING:
++    from apps.accounts.models import User
++    from apps.organizations.models import Organization
++
++
++@transaction.atomic
++def register_evidence(
++    *,
++    user: User,
++    organization: Organization,
++    kind: str,
++    source_id: UUID | str,
++    values: Mapping[str, Any],
++) -> EvidenceSource:
++    source = picker_source(
++        user=user, organization=organization, kind=kind, identifier=source_id
++    )
++    if kind not in {
++        "safety",
++        "quality",
++        "contractual",
++        "field_observation",
++        "material",
++    }:
++        raise PermissionDenied(DENIED)
++    # The existing material service pins the current version. Serialize with
++    # version addition so the user's selected exact identity cannot drift.
++    if kind == "material" and not (
++        Document.objects.select_for_update()
++        .filter(organization=organization, pk=values["version"].document_id)
++        .exists()
++    ):
++        raise PermissionDenied(DENIED)
++    ids = (
++        [str(version.pk) for version in values.get("versions", [])]
++        if kind in {"safety", "quality"}
++        else [str(values["version"].pk)]
++    )
++    # Revalidate DMS and every linked context inside the registration transaction.
++    allowed = eligible_versions(
++        user=user, organization=organization, kind=kind, source=source
++    )
++    versions = list(allowed.filter(pk__in=ids))
++    if len(versions) != len(set(ids)):
++        raise PermissionDenied(DENIED)
++    if kind in {"safety", "quality"}:
++        if kind == "safety":
++            from apps.safety.record_review import submit_safety_record
++
++            submit_safety_record(
++                organization=organization,
++                actor=user,
++                incident_id=str(source.target.pk),
++                reason=values["reason"],
++                document_version_ids=ids,
++            )
++        else:
++            from apps.quality.record_review import submit_quality_record
++
++            submit_quality_record(
++                organization=organization,
++                actor=user,
++                issue_id=str(source.target.pk),
++                reason=values["reason"],
++                document_version_ids=ids,
++            )
++    elif kind == "contractual":
++        from apps.contracts.contractual_services import add_contractual_evidence
++
++        add_contractual_evidence(
++            organization=organization,
++            actor=user,
++            record=source.target,
++            label=values["label"],
++            document_version=versions[0],
++        )
++    elif kind == "material":
++        from apps.documents.services import add_document_link
++
++        add_document_link(
++            document=versions[0].document, actor=user, target=source.target
++        )
++    else:
++        from apps.daily_reports.field_services import attach_field_evidence
++
++        attach_field_evidence(
++            organization=organization,
++            actor=user,
++            observation_id=str(source.target.pk),
++            document_version_id=str(versions[0].pk),
++            operation_key=values["operation_key"],
++        )
++    return source
+--- /dev/null
++++ phase3/apps/documents/evidence_views.py
+@@ -0,0 +1,176 @@
++"""HTTP adapters for existing version-aware domain evidence services."""
++
++from urllib.parse import urlencode
++
++from django.contrib import messages
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import IntegrityError
++from django.http import HttpRequest, HttpResponse, JsonResponse
++from django.shortcuts import redirect, render
++from django.views.decorators.cache import never_cache
++from django.views.decorators.http import require_GET, require_http_methods
++
++from apps.documents.evidence import (
++    DENIED,
++    can_register,
++    choice_page,
++    eligible_versions,
++    picker_source,
++    pinned_row,
++    references,
++    resolve_evidence_source,
++    version_label,
++)
++from apps.documents.evidence_forms import EvidenceRegistrationForm
++from apps.documents.evidence_registration import register_evidence as _register
++from apps.organizations.decorators import (
++    active_organization_required,
++    organization_permission_required,
++)
++from apps.organizations.models import BusinessPermissionCode as P
++
++
++def _safe_request(request):
++    if any(
++        request.GET.get(name)
++        for name in (
++            "next",
++            "return_url",
++            "return_to",
++            "organization",
++            "organization_id",
++            "target_id",
++            "target_type",
++        )
++    ):
++        raise PermissionDenied(DENIED)
++
++
++@never_cache
++@active_organization_required
++@organization_permission_required(P.DOCUMENTS_VIEW)
++@require_GET
++def evidence_detail(
++    request: HttpRequest, kind: str, source_id: str, version_id: str
++) -> HttpResponse:
++    _safe_request(request)
++    source = resolve_evidence_source(
++        user=request.user,
++        organization=request.organization,
++        kind=kind,
++        identifier=source_id,
++    )
++    status = next(
++        (
++            status
++            for identifier, status in references(source)
++            if str(identifier) == str(version_id)
++        ),
++        None,
++    )
++    if status is None:
++        raise PermissionDenied(DENIED)
++    row = pinned_row(
++        user=request.user,
++        organization=request.organization,
++        source=source,
++        version_id=version_id,
++        status=status,
++    )
++    return render(
++        request, "documents/evidence_detail.html", {"source": source, "row": row}
++    )
++
++
++@never_cache
++@active_organization_required
++@organization_permission_required(P.DOCUMENTS_VIEW)
++@require_GET
++def evidence_choices(
++    request: HttpRequest, kind: str, source_id: str | None = None
++) -> JsonResponse:
++    _safe_request(request)
++    source = picker_source(
++        user=request.user,
++        organization=request.organization,
++        kind=kind,
++        identifier=source_id,
++    )
++    query = request.GET.get("q", "").strip()[:200]
++    try:
++        page = max(1, min(int(request.GET.get("page", 1)), 100000))
++    except (TypeError, ValueError):
++        page = 1
++    versions = eligible_versions(
++        user=request.user,
++        organization=request.organization,
++        kind=kind,
++        source=source,
++        query=query,
++    )
++    rows, more = choice_page(versions, page=page)
++    response = JsonResponse(
++        {
++            "results": [
++                {"value": str(row.pk), "label": version_label(row)} for row in rows
++            ],
++            "next": request.path + "?" + urlencode({"q": query, "page": page + 1})
++            if more
++            else None,
++        }
++    )
++    response["Cache-Control"] = "private, no-store"
++    return response
++
++
++@never_cache
++@active_organization_required
++@organization_permission_required(P.DOCUMENTS_VIEW)
++@require_http_methods(["GET", "POST"])
++def evidence_register(request: HttpRequest, kind: str, source_id: str) -> HttpResponse:
++    _safe_request(request)
++    source = resolve_evidence_source(
++        user=request.user,
++        organization=request.organization,
++        kind=kind,
++        identifier=source_id,
++    )
++    if not can_register(
++        user=request.user, organization=request.organization, source=source
++    ):
++        raise PermissionDenied(DENIED)
++    form = EvidenceRegistrationForm(
++        request.POST if request.method == "POST" else None,
++        source=source,
++        user=request.user,
++        organization=request.organization,
++    )
++    if request.method == "POST" and form.is_valid():
++        try:
++            source = _register(
++                user=request.user,
++                organization=request.organization,
++                kind=kind,
++                source_id=source_id,
++                values=form.cleaned_data,
++            )
++        except PermissionDenied as exc:
++            raise PermissionDenied(DENIED) from exc
++        except (ValidationError, IntegrityError, ValueError):
++            form.add_error(
++                None, "ثبت انجام نشد؛ اطلاعات، وضعیت سابقه و نسخه شاهد را بررسی کنید."
++            )
++        else:
++            messages.success(
++                request,
++                "رکورد برای بررسی ارسال شد و شواهد انتخاب‌شده ثبت شد."
++                if kind in {"safety", "quality"}
++                else "نسخه شاهد به سابقه پیوند خورد.",
++            )
++            return redirect(source.url)
++    return render(
++        request,
++        "documents/evidence_register.html",
++        {"form": form, "source": source},
++        status=400 if request.method == "POST" else 200,
++    )
+--- /dev/null
++++ phase3/apps/documents/templatetags/document_evidence.py
+@@ -0,0 +1,40 @@
++from django import template
++from django.core.exceptions import PermissionDenied
++
++from apps.documents.evidence import (
++    COMMERCIAL_PERMISSIONS,
++    evidence_panel,
++    picker_source,
++)
++
++register = template.Library()
++
++
++@register.simple_tag(takes_context=True)
++def document_evidence(context, kind, target):
++    if target is None:
++        return None
++    request = context["request"]
++    return evidence_panel(
++        user=request.user,
++        organization=request.organization,
++        kind=kind,
++        identifier=target.pk,
++    )
++
++
++@register.simple_tag(takes_context=True)
++def evidence_management_allowed(context, kind, target):
++    if kind not in COMMERCIAL_PERMISSIONS:
++        return False
++    request = context["request"]
++    try:
++        picker_source(
++            user=request.user,
++            organization=request.organization,
++            kind=kind,
++            identifier=target.pk,
++        )
++    except PermissionDenied:
++        return False
++    return True
+--- /dev/null
++++ phase3/apps/documents/test_evidence_integration.py
+@@ -0,0 +1,958 @@
++"""Exact-version presentation and source-owned registration security regressions."""
++
++from datetime import date, timedelta
++from decimal import Decimal
++from html.parser import HTMLParser
++from unittest.mock import patch
++from uuid import uuid4
++
++from django.core.exceptions import ValidationError
++from django.test import Client, TestCase, override_settings
++from django.urls import reverse
++from django.utils import timezone
++
++from apps.billing import test_commercial_controls as commercial_fixture
++from apps.billing.commercial_services import (
++    create_compliance_evidence,
++    create_guarantee,
++    create_retention_release,
++)
++from apps.contracts.contractual_services import (
++    create_contractual_record,
++    submit_contractual_record,
++)
++from apps.contracts.services import (
++    add_contract_item,
++    approve_contract_term_version,
++    create_contract,
++    create_contract_term_version,
++    transition_contract_status,
++)
++from apps.daily_reports.field_services import (
++    create_field_observation,
++    submit_field_observation,
++)
++from apps.documents import test_related_documents as phase1
++from apps.documents import tests as dms_fixture
++from apps.documents.evidence import evidence_panel
++from apps.documents.models import Document
++from apps.documents.services import add_document_link, add_document_version
++from apps.materials.models import Material, UnitOfMeasure
++from apps.organizations.models import BusinessPermission
++from apps.parties.services import create_business_party
++from apps.projects.models import Project, ProjectSite
++from apps.quality.services import create_quality_issue
++from apps.safety.services import create_safety_incident
++
++
++class Page(HTMLParser):
++    def __init__(self, html):
++        super().__init__()
++        self.hidden = {}
++        self.visible = []
++        self.form = False
++        self.feed(html)
++
++    def handle_starttag(self, tag, attrs):
++        attrs = dict(attrs)
++        if tag == "form":
++            self.form = attrs.get("aria-label") == "انتخاب نسخه شاهد"
++        if self.form and tag == "input" and attrs.get("type") == "hidden":
++            self.hidden[attrs["name"]] = attrs.get("value", "")
++
++    def handle_endtag(self, tag):
++        if tag == "form":
++            self.form = False
++
++    def handle_data(self, data):
++        self.visible.append(data)
++
++
++@override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
++class EvidenceIntegrationTests(TestCase):
++    setUp = dms_fixture.DocumentServiceTests.setUp
++    _pdf_upload = staticmethod(dms_fixture.DocumentServiceTests._pdf_upload)
++    _create_document = dms_fixture.DocumentServiceTests._create_document
++    reader = phase1.RelatedDocumentsTests.reader
++    clean_version = phase1.RelatedDocumentsTests.clean_version
++
++    def login(self, user=None, client=None):
++        client = client or self.client
++        client.force_login(user or self.owner)
++        session = client.session
++        session["active_organization_id"] = str(self.organization.pk)
++        session.save()
++        return client
++
++    def safety(self):
++        return create_safety_incident(
++            organization=self.organization,
++            actor=self.owner,
++            project=self.project,
++            incident_number="PH3-S",
++            occurred_at=timezone.now(),
++            incident_type="near_miss",
++            severity="high",
++            description="رویداد ایمنی آزمایشی",
++        )
++
++    def quality(self):
++        return create_quality_issue(
++            organization=self.organization,
++            actor=self.owner,
++            project=self.project,
++            issue_number="PH3-Q",
++            identified_at=timezone.now(),
++            issue_type="nonconformance",
++            severity="major",
++            description="مسئله کیفیت آزمایشی",
++        )
++
++    def observation(self):
++        site = ProjectSite.objects.create(
++            organization=self.organization,
++            project=self.project,
++            code="PH3-SITE",
++            name="کارگاه آزمون",
++        )
++        return create_field_observation(
++            organization=self.organization,
++            actor=self.owner,
++            project=self.project,
++            site=site,
++            kind="general",
++            title="مشاهده آزمایشی",
++            operation_key=uuid4(),
++        )
++
++    def material(self):
++        unit = UnitOfMeasure.objects.create(
++            organization=self.organization,
++            code="PH3-UNIT",
++            name="عدد",
++            symbol="pcs",
++            category="count",
++        )
++        return Material.objects.create(
++            organization=self.organization,
++            code="PH3-MAT",
++            name="مصالح شاهد",
++            unit_of_measure=unit,
++        )
++
++    def contract(self, *, with_item=False):
++        party = create_business_party(
++            organization=self.organization,
++            actor=self.owner,
++            party_kind="company",
++            display_name="طرف آزمون",
++        )
++        contract = create_contract(
++            organization=self.organization,
++            actor=self.owner,
++            project=self.project,
++            party=party,
++            contract_number="PH3-C",
++            title="قرارداد شاهد",
++            counterparty_name=party.display_name,
++            direction="payable",
++            contract_type="subcontract",
++            contract_value=Decimal(1000),
++        )
++        if with_item:
++            self.item = add_contract_item(
++                organization=self.organization,
++                actor=self.owner,
++                contract=contract,
++                description="کار قابل اندازه‌گیری",
++                quantity=Decimal(10),
++                unit_price=Decimal(100),
++            )
++        transition_contract_status(
++            organization=self.organization,
++            actor=self.owner,
++            contract=contract,
++            status="active",
++        )
++        contract.refresh_from_db()
++        return contract
++
++    def contractual(self):
++        return create_contractual_record(
++            organization=self.organization,
++            actor=self.owner,
++            contract=self.contract(),
++            kind="claim",
++            record_number="PH3-CR",
++            title="رکورد قراردادی شاهد",
++            description="شاهد بدون اثر خودکار",
++            idempotency_key="ph3-contractual",
++        )
++
++    def url(self, action, kind, target, version=None):
++        return reverse(
++            "documents:evidence-" + action,
++            args=[kind, target.pk, *([version.pk] if version else [])],
++        )
++
++    def form(self, kind, target):
++        response = self.client.get(self.url("register", kind, target))
++        self.assertEqual(response.status_code, 200)
++        return response, Page(response.content.decode()).hidden
++
++    def register(self, kind, target, version, **extra):
++        _, hidden = self.form(kind, target)
++        key = "versions" if kind in {"safety", "quality"} else "version"
++        return self.client.post(
++            self.url("register", kind, target),
++            {
++                **hidden,
++                key: [str(version.pk)] if key == "versions" else str(version.pk),
++                "reason": "ارسال برای بررسی",
++                "label": "شاهد قراردادی",
++                **extra,
++            },
++        )
++
++    def panel(self, kind, target, user=None):
++        return evidence_panel(
++            user=user or self.owner,
++            organization=self.organization,
++            kind=kind,
++            identifier=target.pk,
++        )
++
++    def test_safety_and_quality_submit_revision_evidence_and_keep_v1_after_v2(self):
++        self.login()
++        document = self._create_document()
++        first = document.current_version
++        self.clean_version(first)
++        targets = (("safety", self.safety()), ("quality", self.quality()))
++        for kind, target in targets:
++            with self.subTest(kind=kind):
++                result = self.register(kind, target, first)
++                self.assertRedirects(
++                    result,
++                    self.panel(kind, target).source.url,
++                    fetch_redirect_response=False,
++                )
++                revision = target.review_revisions.get()
++                self.assertEqual(revision.evidence.get().document_version_id, first.pk)
++                target.refresh_from_db()
++                self.assertEqual(target.status, "reported")
++                self.assertEqual(target.review_status, "submitted")
++                with self.assertRaises(ValidationError):
++                    revision.delete()
++                with self.assertRaises(ValidationError):
++                    revision.evidence.get().delete()
++                self.assertEqual(
++                    self.client.get(self.url("register", kind, target)).status_code, 403
++                )
++        second = add_document_version(
++            document=document, actor=self.owner, upload=self._pdf_upload(suffix=b"v2")
++        )
++        self.assertFalse(second.is_available)
++        for kind, target in targets:
++            row = self.panel(kind, target).rows[0]
++            self.assertEqual((row.version, row.current_version), (1, 2))
++            self.assertIn(str(first.pk), row.download_url)
++            detail = self.client.get(row.view_url)
++            self.assertContains(detail, "نسخه شاهد")
++            self.assertContains(detail, "نسخه جاری سند")
++            self.assertNotIn(
++                str(first.pk), " ".join(Page(detail.content.decode()).visible)
++            )
++            download = self.client.get(row.download_url)
++            self.assertEqual(download.status_code, 200)
++            self.assertTrue(b"".join(download.streaming_content).startswith(b"%PDF"))
++
++    def test_observation_draft_picker_preserves_pin_and_idempotency(self):
++        self.login()
++        observation = self.observation()
++        document = self._create_document()
++        version = document.current_version
++        self.clean_version(version)
++        _, hidden = self.form("field_observation", observation)
++        data = {**hidden, "version": str(version.pk)}
++        endpoint = self.url("register", "field_observation", observation)
++        self.assertEqual(self.client.post(endpoint, data).status_code, 302)
++        self.assertEqual(self.client.post(endpoint, data).status_code, 302)
++        self.assertEqual(observation.evidence_links.count(), 1)
++        submit_field_observation(
++            organization=self.organization,
++            actor=self.owner,
++            observation_id=observation.pk,
++            operation_key=uuid4(),
++        )
++        add_document_version(
++            document=document, actor=self.owner, upload=self._pdf_upload(suffix=b"new")
++        )
++        panel = self.panel("field_observation", observation)
++        self.assertEqual(panel.rows[0].version, 1)
++        self.assertFalse(panel.register_url)
++        self.assertEqual(self.client.post(endpoint, data).status_code, 403)
++        response = self.client.get(panel.source.url)
++        self.assertContains(response, "شواهد و مستندات")
++        self.assertNotContains(response, "شناسه نسخه DMS")
++        self.assertNotContains(response, version.sha256)
++
++    def test_contractual_witness_is_draft_only_and_survives_submission(self):
++        self.login()
++        target = self.contractual()
++        document = self._create_document()
++        result = self.register("contractual", target, document.current_version)
++        self.assertEqual(result.status_code, 302)
++        evidence = target.evidence_links.get()
++        self.assertEqual(evidence.document_version_id, document.current_version_id)
++        self.reader(list(BusinessPermission.objects.values_list("code", flat=True)))
++        submit_contractual_record(
++            organization=self.organization, actor=self.owner, record=target
++        )
++        with self.assertRaises(ValidationError):
++            evidence.delete()
++        self.assertFalse(self.panel("contractual", target).register_url)
++        self.assertEqual(
++            self.client.get(self.url("register", "contractual", target)).status_code,
++            403,
++        )
++
++    def test_material_existing_exact_version_navigation_keeps_pin_after_v2(self):
++        self.login()
++        material = self.material()
++        document = self._create_document()
++        version = document.current_version
++        self.clean_version(version)
++        add_document_link(document=document, actor=self.owner, target=material)
++        add_document_version(
++            document=document, actor=self.owner, upload=self._pdf_upload(suffix=b"v2")
++        )
++        panel = self.panel("material", material)
++        self.assertEqual(panel.rows[0].version_id, version.pk)
++        self.assertTrue(panel.register_url)
++        response = self.client.get(panel.source.url)
++        self.assertContains(response, 'href="#document-evidence"', count=1)
++        self.assertContains(response, 'id="document-evidence"', count=1)
++        self.assertContains(response, document.title)
++        self.assertEqual(
++            self.client.get(self.url("register", "material", material)).status_code, 200
++        )
++
++    def test_validation_cancel_and_forged_intent_preserve_context_without_writes(self):
++        self.login()
++        target = self.safety()
++        response, hidden = self.form("safety", target)
++        source = response.context["source"]
++        self.assertEqual(self.client.get(source.url).status_code, 200)
++        result = self.client.post(
++            self.url("register", "safety", target), {**hidden, "reason": ""}
++        )
++        self.assertEqual(result.status_code, 400)
++        self.assertContains(result, source.title, status_code=400)
++        self.assertContains(result, source.url, status_code=400)
++        result = self.client.post(
++            self.url("register", "safety", target),
++            {**hidden, "reason": "سبب", "context_token": "forged"},
++        )
++        self.assertEqual(result.status_code, 400)
++        self.assertFalse(target.review_revisions.exists())
++
++    def test_picker_filters_foreign_denied_project_and_all_context_documents(self):
++        self.login()
++        target = self.safety()
++        allowed = self._create_document()
++        other_project = Project.objects.create(
++            organization=self.organization, code="DENIED-P", name="پروژه محدود"
++        )
++        hidden = self._create_document(
++            reference="HIDDEN", title="DO NOT EXPOSE", target=other_project
++        )
++        foreign = self._create_document(
++            organization=self.other_organization,
++            actor=self.other_user,
++            target=Project.objects.create(
++                organization=self.other_organization, code="FOREIGN", name="Foreign"
++            ),
++            reference="FOREIGN",
++        )
++        reader = self.reader(
++            [
++                "safety_incidents.view",
++                "safety_incidents.record_submit",
++                "documents.view",
++                "projects.view",
++            ],
++            project=self.project,
++        )
++        self.login(reader)
++        endpoint = self.url("choices", "safety", target)
++        result = self.client.get(endpoint)
++        self.assertEqual(result.status_code, 200)
++        text = result.content.decode()
++        self.assertIn(allowed.title, text)
++        self.assertNotIn(hidden.title, text)
++        self.assertNotIn(str(foreign.current_version_id), text)
++        self.assertEqual(
++            self.client.get(endpoint, {"q": allowed.document_number}).json()["results"][
++                0
++            ]["value"],
++            str(allowed.current_version_id),
++        )
++        add_document_link(document=allowed, actor=self.owner, target=other_project)
++        self.assertEqual(self.client.get(endpoint).json()["results"], [])
++        _, intent = self.form("safety", target)
++        response = self.client.post(
++            self.url("register", "safety", target),
++            {**intent, "reason": "ثبت", "versions": [str(hidden.current_version_id)]},
++        )
++        self.assertEqual(response.status_code, 400)
++        self.assertNotContains(response, hidden.title, status_code=400)
++
++    def test_unauthorized_personas_cannot_read_titles_or_register(self):
++        target = self.quality()
++        document = self._create_document()
++        self.login()
++        self.register("quality", target, document.current_version)
++        reader = self.reader(["quality_issues.view"], project=self.project)
++        self.login(reader)
++        self.assertIsNone(self.panel("quality", target, reader))
++        self.assertEqual(
++            self.client.get(
++                self.url("detail", "quality", target, document.current_version)
++            ).status_code,
++            403,
++        )
++        response = self.client.get(reverse("quality:detail", args=[target.pk]))
++        self.assertNotContains(response, document.title)
++        self.assertNotContains(response, 'id="document-evidence"')
++
++    def test_cross_tenant_sources_unsafe_returns_and_unpersisted_versions_denied(self):
++        self.login()
++        target = self.safety()
++        document = self._create_document()
++        self.assertEqual(
++            self.client.get(
++                self.url("detail", "safety", target, document.current_version)
++            ).status_code,
++            403,
++        )
++        for action in ("choices", "register"):
++            self.assertEqual(
++                self.client.get(
++                    self.url(action, "safety", target),
++                    {"next": "https://example.invalid"},
++                ).status_code,
++                403,
++            )
++        self.login(self.other_user)
++        session = self.client.session
++        session["active_organization_id"] = str(self.other_organization.pk)
++        session.save()
++        for action in ("choices", "register"):
++            self.assertEqual(
++                self.client.get(self.url(action, "safety", target)).status_code, 403
++            )
++
++    def test_archive_expiry_and_sealed_witnesses_expose_no_metadata(self):
++        self.login()
++        target = self.contractual()
++        for index, (field, value) in enumerate(
++            (
++                ("archived_at", timezone.now()),
++                ("access_expires_at", timezone.now() - timedelta(days=1)),
++                ("retention_classification", "sealed_supplier_quote_evidence"),
++            )
++        ):
++            document = self._create_document(reference=f"BLOCK-{index}")
++            self.assertEqual(
++                self.register(
++                    "contractual", target, document.current_version
++                ).status_code,
++                302,
++            )
++            Document.objects.filter(pk=document.pk).update(**{field: value})
++            self.assertEqual(
++                self.client.get(
++                    self.url("detail", "contractual", target, document.current_version)
++                ).status_code,
++                403,
++            )
++        self.assertEqual(self.panel("contractual", target).rows, ())
++
++    def test_quarantine_is_visible_to_review_but_never_delivered_or_field_selectable(
++        self,
++    ):
++        self.login()
++        document = self._create_document()
++        target = self.safety()
++        self.assertEqual(
++            self.register("safety", target, document.current_version).status_code, 302
++        )
++        row = self.panel("safety", target).rows[0]
++        self.assertFalse(row.available)
++        self.assertFalse(row.download_url)
++        self.assertEqual(
++            self.client.get(
++                reverse(
++                    "documents:version-download",
++                    args=[document.pk, document.current_version_id],
++                )
++            ).status_code,
++            403,
++        )
++        observation = self.observation()
++        self.assertEqual(
++            self.client.get(
++                self.url("choices", "field_observation", observation)
++            ).json()["results"],
++            [],
++        )
++
++    def test_picker_has_no_authority_without_submission_permission(self):
++        target = self.safety()
++        reader = self.reader(
++            ["safety_incidents.view", "documents.view", "projects.view"],
++            project=self.project,
++        )
++        self.login(reader)
++        self.assertFalse(self.panel("safety", target, reader).register_url)
++        for action in ("choices", "register"):
++            self.assertEqual(
++                self.client.get(self.url(action, "safety", target)).status_code, 403
++            )
++
++    def test_csrf_and_transactional_authority_recheck(self):
++        target = self.safety()
++        client = self.login(client=Client(enforce_csrf_checks=True))
++        self.assertEqual(
++            client.post(self.url("register", "safety", target), {}).status_code, 403
++        )
++        self.login()
++        _, hidden = self.form("safety", target)
++        from apps.documents.evidence_views import _register
++
++        def revoked(**kwargs):
++            self.organization.memberships.filter(user=self.owner).update(
++                status="inactive"
++            )
++            return _register(**kwargs)
++
++        with patch("apps.documents.evidence_views._register", side_effect=revoked):
++            response = self.client.post(
++                self.url("register", "safety", target), {**hidden, "reason": "ارسال"}
++            )
++        self.assertEqual(response.status_code, 403)
++        self.assertFalse(target.review_revisions.exists())
++
++    def commercial(self):
++        self.contract = self.contract(with_item=True)
++        self.manager = self.reader(
++            list(BusinessPermission.objects.values_list("code", flat=True))
++        )
++        self.term = create_contract_term_version(
++            organization=self.organization,
++            actor=self.owner,
++            contract=self.contract,
++            effective_from=date(2026, 1, 1),
++            retention_rate=Decimal(10),
++            retention_cap=Decimal(100),
++            retention_release_requirement="evidence_only",
++            retention_release_cap=Decimal(100),
++            reason="شرایط آزمایشی",
++        )
++        approve_contract_term_version(
++            organization=self.organization,
++            actor=self.manager,
++            term_version=self.term,
++            reason="تأیید مستقل",
++        )
++        commercial_fixture.CommercialControlFixture.approve_retained_certificate(self)
++        self.evidence = self._create_document().current_version
++        self.clean_version(self.evidence)
++        guarantee = create_guarantee(
++            organization=self.organization,
++            actor=self.owner,
++            contract=self.contract,
++            guarantee_type="performance",
++            exposure_side="received",
++            instrument_reference="PH3-G",
++            issuer_name="بانک آزمایشی",
++            amount=Decimal(100),
++            issued_on=date(2026, 1, 1),
++            effective_from=date(2026, 1, 1),
++            expiry_kind="dated",
++            expires_on=date(2028, 1, 1),
++            evidence_document_version=self.evidence,
++            reason="ثبت شاهد",
++        )
++        compliance = create_compliance_evidence(
++            organization=self.organization,
++            actor=self.owner,
++            contract=self.contract,
++            evidence_kind="clearance",
++            reference="PH3-CE",
++            issuing_authority="مرجع آزمایشی",
++            effective_from=date(2026, 1, 1),
++            expiry_kind="dated",
++            expires_on=date(2028, 1, 1),
++            document_version=self.evidence,
++            reason="ثبت شاهد",
++        )
++        release = create_retention_release(
++            organization=self.organization,
++            actor=self.owner,
++            contract=self.contract,
++            release_date=date(2026, 10, 1),
++            amount=Decimal(10),
++            evidence_document_version=self.evidence,
++        )
++        return [
++            ("guarantee", guarantee),
++            ("compliance", compliance),
++            ("release", release),
++        ]
++
++    def test_all_three_commercial_witnesses_use_exact_version_and_no_uuid_labels(self):
++        self.login()
++        targets = self.commercial()
++        add_document_version(
++            document=self.evidence.document,
++            actor=self.owner,
++            upload=self._pdf_upload(suffix=b"v2"),
++        )
++        for kind, target in targets:
++            with self.subTest(kind=kind):
++                panel = self.panel(kind, target)
++                self.assertEqual(panel.rows[0].version_id, self.evidence.pk)
++                self.assertFalse(panel.register_url)
++                response = self.client.get(panel.source.url)
++                self.assertEqual(response.status_code, 200)
++                visible = " ".join(Page(response.content.decode()).visible)
++                self.assertNotIn(str(self.evidence.pk), visible)
++                self.assertContains(response, "نسخه جاری سند")
++                self.assertContains(response, 'href="#document-evidence"', count=1)
++                self.assertEqual(
++                    self.client.get(panel.rows[0].view_url).status_code, 200
++                )
++
++    def test_commercial_create_and_revision_pickers_are_scoped_searchable_exact_versions(
++        self,
++    ):
++        self.login()
++        targets = self.commercial()
++        routes = {
++            "guarantee": "billing:guarantee_create",
++            "compliance": "billing:compliance_evidence_create",
++            "release": "billing:retention_release_create",
++        }
++        for kind, target in targets:
++            with self.subTest(kind=kind):
++                response = self.client.get(reverse(routes[kind]))
++                self.assertContains(response, "data-options-url")
++                self.assertContains(response, "نسخه شاهد 1")
++                endpoint = reverse("documents:commercial-evidence-choices", args=[kind])
++                response = self.client.get(
++                    endpoint, {"q": self.evidence.document.document_number}
++                )
++                self.assertEqual(response.status_code, 200)
++                self.assertEqual(
++                    response.json()["results"][0]["value"], str(self.evidence.pk)
++                )
++                response = self.client.get(self.url("choices", kind, target))
++                self.assertEqual(
++                    response.json()["results"][0]["value"], str(self.evidence.pk)
++                )
++        from apps.billing.forms import GuaranteeRevisionForm
++
++        form = GuaranteeRevisionForm(organization=self.organization)
++        self.assertFalse(form.fields["evidence_document_version"].queryset.exists())
++
++    def test_commercial_create_posts_preserve_selected_exact_version(self):
++        self.login()
++        self.commercial()
++        base = {
++            "contract": str(self.contract.pk),
++            "reason": "ثبت شاهد دقیق",
++            "evidence_document_version": str(self.evidence.pk),
++        }
++        cases = [
++            (
++                "billing:guarantee_create",
++                {
++                    **base,
++                    "guarantee_type": "performance",
++                    "exposure_side": "received",
++                    "instrument_reference": "PH3-HTTP-G",
++                    "issuer_name": "بانک نمونه",
++                    "amount": "100",
++                    "issued_on": "2026-01-01",
++                    "effective_from": "2026-01-01",
++                    "expiry_kind": "dated",
++                    "expires_on": "2028-01-01",
++                },
++                "guarantee",
++            ),
++            (
++                "billing:compliance_evidence_create",
++                {
++                    **base,
++                    "document_version": str(self.evidence.pk),
++                    "evidence_kind": "clearance",
++                    "reference": "PH3-HTTP-C",
++                    "issuing_authority": "مرجع نمونه",
++                    "effective_from": "2026-01-01",
++                    "expiry_kind": "dated",
++                    "expires_on": "2028-01-01",
++                },
++                "compliance",
++            ),
++            (
++                "billing:retention_release_create",
++                {**base, "release_date": "2026-10-01", "amount": "10"},
++                "release",
++            ),
++        ]
++        from apps.billing.models import (
++            ContractComplianceEvidence,
++            ContractGuarantee,
++            RetentionRelease,
++        )
++
++        models = {
++            "guarantee": ContractGuarantee,
++            "compliance": ContractComplianceEvidence,
++            "release": RetentionRelease,
++        }
++        for route, values, kind in cases:
++            with self.subTest(kind=kind):
++                response = self.client.post(reverse(route), values)
++                self.assertEqual(
++                    response.status_code, 302, getattr(response, "context", None)
++                )
++                target = models[kind].objects.order_by("-created_at").first()
++                self.assertEqual(
++                    self.panel(kind, target).rows[0].version_id, self.evidence.pk
++                )
++
++    def test_commercial_revision_posts_keep_original_witness_and_finalized_history(
++        self,
++    ):
++        self.login()
++        targets = self.commercial()
++        from apps.billing.commercial_services import (
++            decide_compliance_evidence,
++            decide_guarantee,
++            decide_retention_release,
++            submit_compliance_evidence,
++            submit_guarantee,
++            submit_retention_release,
++        )
++
++        operations = {
++            "guarantee": (
++                submit_guarantee,
++                decide_guarantee,
++                "guarantee",
++                "billing:guarantee_revise",
++            ),
++            "compliance": (
++                submit_compliance_evidence,
++                decide_compliance_evidence,
++                "evidence",
++                "billing:compliance_evidence_revise",
++            ),
++            "release": (
++                submit_retention_release,
++                decide_retention_release,
++                "release",
++                "billing:retention_release_correct",
++            ),
++        }
++        second = add_document_version(
++            document=self.evidence.document,
++            actor=self.owner,
++            upload=self._pdf_upload(suffix=b"v2"),
++        )
++        self.clean_version(second)
++        for kind, target in targets:
++            with self.subTest(kind=kind):
++                submit, decide, argument, route = operations[kind]
++                submit(
++                    organization=self.organization,
++                    actor=self.owner,
++                    **{argument: target},
++                )
++                decide(
++                    organization=self.organization,
++                    actor=self.manager,
++                    approved=True,
++                    reason="تأیید مستقل",
++                    **{argument: target},
++                )
++                target.refresh_from_db()
++                values = {
++                    "reason": "اصلاح با شاهد جدید",
++                    "evidence_document_version": str(second.pk),
++                    "document_version": str(second.pk),
++                    "revision_action": "correction",
++                    "correction_kind": "replacement",
++                    "amount": "10",
++                    "reference": "PH3-REVISED-C",
++                    "issuing_authority": "مرجع جدید",
++                    "effective_from": "2026-01-01",
++                    "expiry_kind": "dated",
++                    "expires_on": "2028-01-01",
++                }
++                response = self.client.post(reverse(route, args=[target.pk]), values)
++                self.assertEqual(response.status_code, 302)
++                revised = (
++                    type(target)
++                    .objects.filter(
++                        **{"corrects" if kind == "release" else "predecessor": target}
++                    )
++                    .get()
++                )
++                self.assertEqual(
++                    self.panel(kind, revised).rows[0].version_id, second.pk
++                )
++                self.assertEqual(
++                    self.panel(kind, target).rows[0].version_id, self.evidence.pk
++                )
++
++    def test_site_scope_picker_is_available_only_for_own_observation(self):
++        self.login()
++        observation = self.observation()
++        document = self._create_document(target=observation.site)
++        self.clean_version(document.current_version)
++        other_project = Project.objects.create(
++            organization=self.organization, code="SITE-DENIED", name="پروژه دیگر"
++        )
++        other_site = ProjectSite.objects.create(
++            organization=self.organization,
++            project=other_project,
++            code="SITE-DENIED",
++            name="کارگاه دیگر",
++        )
++        other = create_field_observation(
++            organization=self.organization,
++            actor=self.owner,
++            project=other_project,
++            site=other_site,
++            kind="general",
++            title="مشاهده محدود",
++            operation_key=uuid4(),
++        )
++        reader = self.reader(
++            [
++                "field_observations.view",
++                "field_observations.capture",
++                "documents.view",
++                "projects.view",
++                "project_sites.view",
++            ],
++            site=observation.site,
++        )
++        self.login(reader)
++        self.assertEqual(
++            self.client.get(
++                self.url("choices", "field_observation", observation)
++            ).json()["results"][0]["value"],
++            str(document.current_version_id),
++        )
++        for action in ("choices", "register"):
++            self.assertEqual(
++                self.client.get(
++                    self.url(action, "field_observation", other)
++                ).status_code,
++                403,
++            )
++
++    def test_download_permission_is_rechecked_separately_from_evidence_view(self):
++        self.login()
++        target = self.safety()
++        document = self._create_document()
++        self.clean_version(document.current_version)
++        self.assertEqual(
++            self.register("safety", target, document.current_version).status_code, 302
++        )
++        reader = self.reader(
++            ["safety_incidents.view", "documents.view", "projects.view"],
++            project=self.project,
++        )
++        self.login(reader)
++        row = self.panel("safety", target, reader).rows[0]
++        self.assertTrue(row.available)
++        self.assertFalse(row.download_url)
++        self.assertEqual(self.client.get(row.view_url).status_code, 200)
++        self.assertEqual(
++            self.client.get(
++                reverse(
++                    "documents:version-download",
++                    args=[document.pk, document.current_version_id],
++                )
++            ).status_code,
++            403,
++        )
++
++    def test_review_registration_rolls_back_on_domain_audit_failure(self):
++        self.login()
++        target = self.safety()
++        document = self._create_document()
++        with patch(
++            "apps.safety.record_review.record_audit_event",
++            side_effect=ValidationError("INTERNAL-AUDIT-ERROR"),
++        ):
++            response = self.register("safety", target, document.current_version)
++        self.assertEqual(response.status_code, 400)
++        self.assertNotContains(response, "INTERNAL-AUDIT-ERROR", status_code=400)
++        self.assertFalse(target.review_revisions.exists())
++        target.refresh_from_db()
++        self.assertEqual(target.review_status, "draft")
++
++    def test_material_registration_rejects_current_version_drift_and_keeps_exact_pin(
++        self,
++    ):
++        self.login()
++        target = self.material()
++        document = self._create_document()
++        first = document.current_version
++        _, intent = self.form("material", target)
++        second = add_document_version(
++            document=document, actor=self.owner, upload=self._pdf_upload(suffix=b"v2")
++        )
++        response = self.client.post(
++            self.url("register", "material", target),
++            {**intent, "version": str(first.pk)},
++        )
++        self.assertEqual(response.status_code, 400)
++        self.assertFalse(target.document_links.exists())
++        self.assertEqual(self.register("material", target, second).status_code, 302)
++        self.assertEqual(target.document_links.get().document_version_id, second.pk)
++        self.assertEqual(
++            self.client.get(self.url("choices", "material", target)).json()["results"],
++            [],
++        )
++        self.assertFalse(self.panel("material", target).rows[0].download_url)
++
++    def test_material_registration_rechecks_version_after_form_validation(self):
++        self.login()
++        target = self.material()
++        document = self._create_document()
++        first = document.current_version
++        _, intent = self.form("material", target)
++        from apps.documents.evidence_registration import register_evidence
++
++        def advanced(**kwargs):
++            add_document_version(
++                document=document,
++                actor=self.owner,
++                upload=self._pdf_upload(suffix=b"v2"),
++            )
++            return register_evidence(**kwargs)
++
++        with patch("apps.documents.evidence_views._register", side_effect=advanced):
++            response = self.client.post(
++                self.url("register", "material", target),
++                {**intent, "version": str(first.pk)},
++            )
++        self.assertEqual(response.status_code, 403)
++        self.assertFalse(target.document_links.exists())
+--- /dev/null
++++ phase3/templates/components/document_evidence.html
+@@ -0,0 +1,7 @@
++{% if evidence_panel != None %}
++<section id="document-evidence" class="erp-surface erp-related-documents" aria-labelledby="document-evidence-heading" tabindex="-1">
++  <div class="erp-panel-header erp-related-documents-header"><h2 id="document-evidence-heading">{% include "components/form_icon.html" with icon="document" only %}شواهد و مستندات</h2><p>نسخه‌های شاهد قابل مشاهده این {{ evidence_panel.source.label }}</p></div>
++  {% if evidence_panel.register_url %}<div class="erp-related-documents-context-actions"><a class="erp-btn erp-btn--secondary" href="{{ evidence_panel.register_url }}">{% include "components/form_icon.html" with icon="document" only %}{{ evidence_panel.register_label }}</a></div>{% endif %}
++  {% for row in evidence_panel.rows %}{% include "components/pinned_evidence_row.html" with row=row only %}{% empty %}<p class="erp-related-documents-empty" role="status">شاهد قابل مشاهده‌ای در دسترس نیست.</p>{% endfor %}
++</section>
++{% endif %}
+--- /dev/null
++++ phase3/templates/components/evidence_nav.html
+@@ -0,0 +1 @@
++{% if evidence_panel != None %}<nav class="erp-related-documents-shortcut" aria-label="مستندات سابقه"><a class="erp-related-documents-nav" href="#document-evidence">{% include "components/form_icon.html" with icon="document" only %}شواهد و مستندات</a></nav>{% endif %}
+--- /dev/null
++++ phase3/templates/components/pinned_evidence_row.html
+@@ -0,0 +1,6 @@
++{% load erp_format %}
++<div class="space-y-2 border-t border-slate-100 p-4 text-sm">
++  <div class="erp-related-documents-name">{% include "components/form_icon.html" with icon="document" only %}{% if detail_mode %}<strong>{{ row.title }}</strong>{% else %}<a href="{{ row.view_url }}">{{ row.title }}</a>{% endif %}</div>
++  <div class="erp-related-documents-meta"><bdi>{{ row.number }}</bdi><span>{{ row.type_label }}</span><span>نسخه شاهد {{ row.version|erp_number }}</span>{% if row.version != row.current_version %}<span>نسخه جاری سند {{ row.current_version|erp_number }}</span>{% endif %}<span>{{ row.status }}</span><span>{% if row.available %}نسخه شاهد آماده دریافت{% else %}نسخه شاهد قرنطینه یا ارزیابی‌نشده{% endif %}</span></div>
++  <div class="erp-related-documents-actions flex-wrap">{% if not detail_mode %}<a href="{{ row.view_url }}">مشاهده شاهد</a>{% endif %}{% if row.download_url %}<a href="{{ row.download_url }}">دریافت نسخه شاهد {{ row.version|erp_number }}</a>{% endif %}</div>
++</div>
+--- /dev/null
++++ phase3/templates/documents/evidence_detail.html
+@@ -0,0 +1,10 @@
++{% extends "base.html" %}{% load static %}
++{% block title %}{{ row.title }} | نسخه شاهد{% endblock %}
++{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{% endblock %}
++{% block content %}
++{% include "components/breadcrumbs.html" with page_breadcrumb_label=source.label page_breadcrumb_url=source.url page_title="نسخه شاهد" only %}
++<h1 class="mt-5 text-2xl font-bold">نسخه شاهد: {{ row.title }}</h1>
++<a class="erp-document-return" href="{{ source.url }}">{% include "components/form_icon.html" with icon="document" only %}بازگشت به {{ source.label }}: {{ source.title }}</a>
++<section class="erp-surface erp-related-documents" aria-label="نسخه دقیق شاهد">{% include "components/pinned_evidence_row.html" with row=row detail_mode=True only %}</section>
++<p class="text-sm text-slate-500">این شاهد به نسخه ثبت‌شده ارجاع دارد؛ ایجاد نسخه جدید سند، شاهد تاریخی را تغییر نمی‌دهد.</p>
++{% endblock %}
+--- /dev/null
++++ phase3/templates/documents/evidence_register.html
+@@ -0,0 +1,13 @@
++{% extends "base.html" %}{% load static %}
++{% block title %}انتخاب نسخه شاهد | بنیرا{% endblock %}
++{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{{ form.media.css }}{% endblock %}
++{% block extra_scripts %}{{ form.media.js }}{% endblock %}
++{% block content %}<div class="mx-auto max-w-4xl">
++{% include "components/breadcrumbs.html" with page_breadcrumb_label=source.label page_breadcrumb_url=source.url page_title="انتخاب نسخه شاهد" only %}
++<h1 class="mt-5 text-2xl font-bold">{% if source.kind == "safety" or source.kind == "quality" %}ارسال رکورد همراه شواهد{% else %}انتخاب نسخه شاهد{% endif %}</h1>
++<section class="erp-surface erp-document-association-context" aria-label="سابقه مرتبط"><h2>{{ source.label }}</h2><p><strong>{{ source.title }}</strong>{% if source.target.project %} · {{ source.target.project.name }}{% endif %}{% if source.target.site %} · {{ source.target.site.name }}{% endif %}</p>{% if source.kind == "safety" or source.kind == "quality" %}<p class="erp-document-association-note">نسخه‌های انتخاب‌شده با بازبینی جدید رکورد ثبت و برای بررسی ارسال می‌شوند. تاریخچه بازبینی‌های پیشین تغییر نمی‌کند.</p>{% elif source.kind == "material" %}<p class="erp-document-association-note">نسخه جاری انتخاب‌شده ثبت می‌شود. شواهد نسخه‌های پیشین تغییر نمی‌کند.</p>{% else %}<p class="erp-document-association-note">نسخه انتخاب‌شده به همین پیش‌نویس پیوند می‌خورد.</p>{% endif %}</section>
++<form class="erp-surface mt-5 space-y-5 rounded-xl p-5" method="post" aria-label="انتخاب نسخه شاهد">{% csrf_token %}
++{% include "components/form_errors.html" with form=form only %}
++{% for field in form %}{% if field.is_hidden %}{{ field }}{% else %}{% include "components/form_field.html" with field=field only %}{% endif %}{% endfor %}
++<div class="erp-document-association-footer"><a class="erp-btn erp-btn--secondary" href="{{ source.url }}">انصراف</a><button class="erp-btn erp-btn--primary" type="submit">{% if source.kind == "safety" or source.kind == "quality" %}ارسال رکورد همراه شواهد{% else %}ثبت نسخه شاهد{% endif %}</button></div>
++</form></div>{% endblock %}
+--- /dev/null
++++ phase3/docs/validation/related-documents-phase3.md
+@@ -0,0 +1,237 @@
++# Related Documents — Phase 3
++
++**Status:** Implementation complete; 21 focused tests PASS. Broader run:
++101 PASS and 25 baseline fixture errors out of 126 attempted tests. Actual Chrome
++verification/screenshots BLOCKED by disabled local browser access in Work settings.
++Phase 3 Product Owner review remains pending.
++
++The Phase 3 request confirms Product Owner visual acceptance of Phases 1/2.
++Their accepted implementation is preserved. Their dated validation reports were
++not rewritten, and this report does not grant Phase 3 Human visual acceptance.
++
++## Domain verification and implementation matrix
++
++Relationships and lifecycle were inspected in current models, services and actual
++Detail templates before editing each domain. The source graph supplied orientation;
++current implementation, rather than the older graph, supplied authority.
++
++| Domain / Detail | Actual persisted witness | Display and navigation | Selection / registration implemented | Authority retained |
++|---|---|---|---|---|
++| Safety Incident | `review_revisions → revision.evidence → document_version` | Section after incident facts, before operational actions; each row identifies its review revision/state | Searchable exact-version multiselect in draft record-review submission | `submit_safety_record`; record-submit permission, existing same-project/site validation; immutable revision evidence. No generic incident DocumentLink |
++| Quality Issue | `review_revisions → revision.evidence → document_version` | Section after quality facts, before operational actions; review revision/state preserved | Searchable exact-version multiselect in draft record-review submission | `submit_quality_record`; record-submit permission, existing same-project/site validation; immutable revision evidence. No hidden Compliance target |
++| Material | `document_links → MaterialDocumentLink.document_version` | Below existing material form; contextual evidence navigation | Register the explicitly selected **current** version through existing DMS association; stale selections rejected | Existing `add_document_link`, DMS view/upload, Materials view and `material_documents.link`; existing exact historical pins remain unchanged |
++| Field Observation | `evidence_links → FieldObservationEvidenceLink.document_version`, with stored hash | Replaces UUID/hash-only DMS evidence list in the existing supporting-record area | Searchable exact clean-version selection while draft/capture-authorized | `attach_field_evidence`; existing draft, capture, scope, clean processing and operation-key rules |
++| Contractual Record | `evidence_links → ContractualRecordEvidence.document_version` | Upgrades existing evidence area; retains separate lineage/non-document references | Label plus searchable exact-version selection on draft only | `add_contractual_evidence`; prepare authority, source validation and append-only evidence. No generic Contract/Project association |
++| Contract Guarantee | `evidence_document_version` | Section near commercial evidence/effective dates; replaces UUID witness field | Existing create/revise form now uses authorized searchable version choices | Existing guarantee create/revision/approval services and finalized history |
++| Contract Compliance Evidence | `document_version` | Same commercial section and version-aware row | Existing create/revise form now uses authorized searchable version choices | Existing commercial compliance services; distinct from the MVP-hidden Compliance app |
++| Retention Release | `evidence_document_version`; separate governed clearance FK | Displays release witness; authorized business labels/links replace clearance and lineage UUIDs | Existing create/correction form now uses authorized searchable version choices | Existing release/correction/clearance services, calculations, approval and financial boundaries |
++
++All eight Detail variants have one contextual «شواهد و مستندات» navigation entry
++and one compact evidence section when its source/DMS read boundary allows it.
++Rows use the existing document icon, ERP surfaces/buttons and Persian RTL styles.
++They show authorized title, document number, Persian type, exact «نسخه شاهد»,
++owner/review status and processing availability. «نسخه جاری سند» appears separately
++when different. The row layout wraps inside narrow supporting-record columns.
++
++Evidence view is a read-only, source-bound DMS projection using the same pinned
++row and canonical delivery service. Its return link resolves to the owning record's
++`#document-evidence` section. The route verifies that the exact version is actually
++persisted for that source; a merely accessible unrelated version cannot be viewed
++through a forged source context. It contains no generic mutation controls.
++
++Empty and restricted evidence share a neutral visible-empty state. Hidden witnesses
++produce no title, number, ID, file metadata, row or count. No total evidence count
++is rendered. Authorized quarantined witnesses show their state and have no download
++action. Archived, expired, sealed or otherwise denied documents contribute no row.
++
++## Selection, permissions and security
++
++- Existing `SearchChoiceSelect`, its existing Tom Select assets, shared form/error
++  components and canonical DMS selectors are reused. No library, model, migration,
++  permission definition, relationship type or parallel DMS was introduced.
++- Picker labels contain document title/number/type and the exact version, including
++  availability. The selected label remains visible in the control before submission.
++  Search uses titles/numbers/references and normalized Persian/Arabic digits.
++  Remote pagination exposes pages of 20 authorized versions without hidden totals.
++- Canonical DMS list results are only candidates. Detail-equivalent all-linked-context
++  authorization runs before exposing labels. Expiry, archive, sealed evidence,
++  tenant/scope isolation and typed/legacy parity remain enforced. Download authority
++  is checked separately through `get_document_version_for_download`; no storage URL
++  or bypass delivery path is returned.
++- Domain registration permissions remain distinct from DMS upload permission.
++  Safety/Quality review submission, contractual preparation and observation capture
++  use their existing source-owned authority. Material association additionally
++  requires the existing DMS upload and material-link permissions. No role implies
++  another permission and no document view permission implies download.
++- Registration targets come from an allowlisted, tenant/permission-scoped source
++  resolver. A signed one-hour form intent binds actor, organization, kind and source.
++  CSRF remains required. Unsafe return URLs and forged context are rejected; safe
++  return URLs are generated from source routes. Errors retain the source/cancel link,
++  and authorized selections survive ordinary validation rerenders.
++- Source and DMS eligibility are rechecked inside the registration transaction,
++  followed by the authoritative source service. Material registration locks the
++  Document before checking that the selected version is still current; concurrent
++  version advancement is rejected rather than silently pinning the newer version.
++- Safety/Quality evidence remains revision-owned. Submitting evidence changes record
++  review status through its existing submission command, without approving the
++  review or changing the separate operational incident/issue status. Finalized or
++  submitted records receive no generic evidence mutation action.
++- Observation and commercial selection retain their existing clean-version
++  requirement. Safety/Quality, contractual and Material services can register an
++  otherwise authorized quarantined witness under their existing rules; this does
++  not make its bytes deliverable. No new clean-processing requirement or clearance
++  ACL was invented. Confidentiality classification and existing specialized privacy
++  rules remain unchanged.
++- Business-context fields never create additional Project/Contract links. Witness
++  registration reuses the canonical Document and DocumentVersion identity/history.
++  No new upload, unlink, reassignment, deletion or binary deduplication is added.
++- Commercial revision forms previously had organization-only version choices.
++  They now receive the actual actor/source and use canonical authorized choices;
++  missing actor context fails closed. Clearance record labels/choices and visible
++  lineage links use their existing commercial read authority. The version selector
++  does not expose UUID/model-name option labels.
++
++## Necessary compatibility correction
++
++The observation retry test exposed an existing `AttributeError` in
++`attach_field_evidence`: its replay check read `existing.observation_id`, but the
++typed model field is `field_observation_id`. The single attribute reference was
++corrected. An identical operation-key replay now returns the existing link;
++different payloads retain the existing rejection. Hashing, permissions, lifecycle,
++schema and immutable evidence behavior were not changed. The original bytes and
++one-line diff are retained in the evidence baseline.
++
++## Changed files and reuse
++
++| Files | Change |
++|---|---|
++| `apps/documents/evidence.py` | Bounded source resolvers, authorized pinned rows, domain-specific picker eligibility |
++| `apps/documents/evidence_forms.py` | Shared exact-version widget configuration and context-bound registration form |
++| `apps/documents/evidence_registration.py` | Typed transactional orchestration around existing source services |
++| `apps/documents/evidence_views.py`, `apps/documents/urls.py` | Scoped evidence view, choices and registration routes |
++| `apps/documents/templatetags/document_evidence.py` | Shared presentation tags and commercial management visibility |
++| `templates/components/{document_evidence,evidence_nav,pinned_evidence_row}.html` | Specialized shared section/navigation and pinned row |
++| `templates/documents/{evidence_detail,evidence_register}.html` | Read-only witness view and existing-version registration form |
++| `templates/{safety,quality}/detail.html` | Review-evidence placement/navigation |
++| `templates/materials/material_form.html` | Material evidence placement/navigation |
++| `templates/daily_reports/field_observation_detail.html` | Evidence picker entry, pinned labels, Persian transition labels; removes hash-only business display |
++| `templates/contracts/contractual_record_detail.html` | Document-backed evidence section alongside retained lineage/non-document references |
++| `apps/billing/forms.py`, `apps/billing/views.py` | Actor/source-aware commercial version choices and existing form callers |
++| `apps/billing/templates/billing/{commercial_form,commercial_record_detail}.html` | Widget assets, pinned witness section and business-friendly authorized references |
++| `apps/daily_reports/field_services.py` | Single replay field-name correction described above |
++| `apps/documents/test_evidence_integration.py` | 21 focused tests with eight-domain and three-commercial-type subtests |
++| `docs/validation/related-documents-phase3.md` | This report |
++
++Existing Phase 1/2 projection, association/forms/views, shared related-document
++templates/CSS/JavaScript and five business Detail templates were not changed.
++Their routes remain intact. Canonical DMS services, models, link registry, storage,
++review services, commercial calculations and approval workflows were not changed.
++
++## Verification results
++
++Final broad run: **126 attempted, 101 PASS, 25 ERROR**, 415.183 seconds.
++This is **not a full regression PASS**.
++
++| Coverage | Result |
++|---|---|
++| New Phase 3 integration/security tests | **21/21 PASS** |
++| Phase 2 contextual-association regressions | **21/21 PASS** |
++| Phase 1 related-document regressions | **14/14 PASS** |
++| Existing DMS services / target-scope regressions | **18/18 PASS** |
++| Existing Safety / Quality record-review regressions | **10/10 PASS** |
++| Existing Product Surface policy/HTTP regressions | **17/17 PASS** |
++| Existing Field Operations regression class | **6 setup errors — BASELINE TEST DEBT** |
++| Existing Contractual Record regression class | **11 setup errors — BASELINE TEST DEBT** |
++| Existing Commercial Control regression class | **8 setup errors — BASELINE TEST DEBT** |
++
++All 25 errors occur in unchanged fixture `setUp` at `create_project`, before reaching
++changed code or test bodies. Those fixtures create legacy memberships without the
++current effective role/scope grants. The fixture modules, Project service and
++authorization/model files were verified unchanged from HEAD. Attribution and every
++affected test identity are recorded in `baseline-test-debt.json`. These tests were
++not modified, bypassed or counted as PASS. Their domain bodies remain unverified
++by those legacy classes; new isolated, explicitly granted fixtures exercise the
++Phase 3 operations and real commercial create/revision requests instead.
++
++Focused coverage includes review-owned registration, draft/finalized denials,
++idempotent observation replay, exact v1 evidence after quarantined v2, authorized
++v1 byte delivery, Material version drift before/after form validation, commercial
++create/revision identity preservation, immutable history, cross-tenant/project/site
++and all-context denials, view/download separation, CSRF, signed-context forgery,
++safe cancellation/return, validation, audit rollback, quarantine, archive, expiry,
++sealed exclusion and absence of technical witness labels.
++
++Tests use the retained isolated PostgreSQL database
++`test_bonira_related_documents_phase1_20261104`; schema setup reported **no migrations
++to apply**. No application-database migration was executed. New Phase 3 fixtures
++use temporary protected-file storage. Django checks, affected template compilation,
++Ruff and whitespace validation are recorded in `checks.txt`.
++
++Evidence directory: `output/related-documents-phase3/`:
++
++- `regression-tests.txt`: complete final broad result, including the setup errors.
++- `baseline-test-debt.json`: attribution, unchanged-file checks and counts.
++- `checks.txt`: final static/system/template checks.
++- `baseline.json`, `baseline/`, `implementation.diff`, `touch-set.json`: starting
++  repository state, exact source snapshots, scoped changes and final hashes.
++- `browser-verification.json`: browser blocker and viewport matrix.
++- `focused-tests*.txt`: development runs, including corrected new-fixture/streaming
++  harness errors and the observed retry defect; these do not replace the final run.
++
++## Chrome and visual verification
++
++Actual Chrome access was attempted through the browser tool. Local browser use is
++disabled in Work settings. No native/CLI bypass or substitute visual PASS is claimed.
++
++| Detail page and applicable selection/revision forms | 1440 px | 1024 px | 390 px |
++|---|---|---|---|
++| Safety Incident | BLOCKED | BLOCKED | BLOCKED |
++| Quality Issue | BLOCKED | BLOCKED | BLOCKED |
++| Material | BLOCKED | BLOCKED | BLOCKED |
++| Field Observation | BLOCKED | BLOCKED | BLOCKED |
++| Contractual Record | BLOCKED | BLOCKED | BLOCKED |
++| Contract Guarantee | BLOCKED | BLOCKED | BLOCKED |
++| Contract Compliance Evidence | BLOCKED | BLOCKED | BLOCKED |
++| Retention Release | BLOCKED | BLOCKED | BLOCKED |
++
++**Screenshots:** none captured. Source snapshots are not screenshots. Actual layout,
++focus/keyboard behavior, selector search/scroll/multiselect, status presentation,
++navigation and browser registration/download usability are not visually verified.
++
++After enabling Chrome, use isolated records to capture all eight Detail variants
++and their applicable forms at all three widths. Check long labels, empty/restricted
++states, clean/quarantined old/current versions, selected-version confirmation,
++validation/cancel/return, read-only personas and finalized records. Product Owner
++must review the new UI; automated tests do not grant visual acceptance.
++
++## Remaining findings and bounded deferrals
++
++1. **Arbitrary historical Material registration:** the existing application service
++   pins the current version. Phase 3 safely exposes that operation only. Selecting
++   an arbitrary older version for a new Material association needs a separately
++   reviewed domain-service contract. Existing older witnesses remain readable.
++2. **Review decisions/corrections:** Safety/Quality submission uses existing record
++   review authority. No new review-approval/correction UI or mapping to operational
++   review/closure was introduced. Legacy-unassessed/returned states are not coerced
++   into draft. Further workflow UX needs separate bounded scope.
++3. **Project/Contract matching policy:** Safety/Quality retain their explicit
++   project/site evidence rules. Material is an organization master. Other owners
++   retain their existing evidence rules and may accept a document from another
++   context when every context is authorized. No blanket same-contract/project
++   policy or inferred association was invented. A stricter policy requires a
++   Product Owner/domain decision.
++4. **Performance:** exact DMS authorization is retained per candidate. Large
++   document/history sets can require many queries before constructing authorized
++   picker pages. No persistent permission cache or weakened authorization shortcut
++   was added. Remote search/pagination uses the existing JavaScript enhancement;
++   the native fallback contains its initial authorized options and retained choices.
++5. **Verification debt:** repair the 25 legacy fixtures separately, complete actual
++   Chrome verification, and obtain Phase 3 Product Owner visual review. These
++   limitations are not accepted residual risk or production authorization.
++
++Starting branch `main`, HEAD/upstream
++`06bcee2ffd31302091388b3738eca38f840500a6`; working tree was clean. Work remains
++uncommitted. No commit, push, dependency installation, new migration, production
++operation, unsupported relation or hidden HR/financial/RFQ workflow activation.
++
++**Stopped for Product Owner review. Phase 3 Human visual acceptance is not issued.**

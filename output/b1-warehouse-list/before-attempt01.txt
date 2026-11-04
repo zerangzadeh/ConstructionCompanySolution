@@ -1,0 +1,64 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ WarehouseReferenceBrowserTests.test_warehouse_reference_journeys _______
+
+self = <test_warehouse_reference_list.WarehouseReferenceBrowserTests testMethod=test_warehouse_reference_journeys>
+
+    def test_warehouse_reference_journeys(self):
+>       self.make_fixture()
+
+tests\test_warehouse_reference_list.py:211: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_warehouse_reference_list.py:73: in make_fixture
+    self.organization.memberships.create(user=self.denied, status="active")
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:856: in create
+    return super(RelatedManager, self.db_manager(db)).create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\organizations\models.py:2392: in save
+    self.role_definition = OrganizationRole.objects.get(code=self.role)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <QuerySet []>, args = (), kwargs = {'code': ''}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist
+=========================== short test summary info ===========================
+FAILED tests/test_warehouse_reference_list.py::WarehouseReferenceBrowserTests::test_warehouse_reference_journeys
+1 failed in 75.80s (0:01:15)

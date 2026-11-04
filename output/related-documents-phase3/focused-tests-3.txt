@@ -1,0 +1,124 @@
+Found 19 test(s).
+Using existing test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+test_all_three_commercial_witnesses_use_exact_version_and_no_uuid_labels (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_all_three_commercial_witnesses_use_exact_version_and_no_uuid_labels) ... {"timestamp":"2026-11-04T18:01:32.407454+00:00","event":"http.response","request_id":"f2c04c3c-6774-4ed5-9743-a48892ccd982","method":"GET","route":"billing:guarantee_detail","status_code":200,"duration_ms":3619}
+{"timestamp":"2026-11-04T18:01:33.657967+00:00","event":"http.response","request_id":"b8bbd40e-d048-4724-a225-88338ed03ce6","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1227}
+{"timestamp":"2026-11-04T18:01:37.564975+00:00","event":"http.response","request_id":"42a40bd9-ed5f-484b-83e7-2d7c33ced5c6","method":"GET","route":"billing:compliance_evidence_detail","status_code":200,"duration_ms":3121}
+{"timestamp":"2026-11-04T18:01:38.748064+00:00","event":"http.response","request_id":"41579fef-327e-4b86-b6ca-09ee084dd8c1","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1157}
+{"timestamp":"2026-11-04T18:01:43.066597+00:00","event":"http.response","request_id":"f70cddee-95a3-4f03-931e-060e3d8f1180","method":"GET","route":"billing:retention_release_detail","status_code":200,"duration_ms":3554}
+{"timestamp":"2026-11-04T18:01:44.281210+00:00","event":"http.response","request_id":"1fa186c8-ba83-43dc-94c3-ef63b3821103","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1186}
+ok
+test_archive_expiry_and_sealed_witnesses_expose_no_metadata (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_archive_expiry_and_sealed_witnesses_expose_no_metadata) ... {"timestamp":"2026-11-04T18:01:47.728103+00:00","event":"http.response","request_id":"ba5e1295-84f8-420d-844b-d4993728044a","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2524}
+{"timestamp":"2026-11-04T18:01:51.870647+00:00","event":"http.response","request_id":"0058f0db-96bc-427d-b14d-4342d9d63b93","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4115}
+{"timestamp":"2026-11-04T18:01:52.622214+00:00","event":"http.response","request_id":"59c51e60-d2d8-4b6b-806c-cba0e8e79f98","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":747}
+{"timestamp":"2026-11-04T18:01:55.267357+00:00","event":"http.response","request_id":"16002a9a-15c4-4bd4-8236-f32e6db40d44","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2403}
+{"timestamp":"2026-11-04T18:01:59.068309+00:00","event":"http.response","request_id":"1c7cfe10-2ced-4fb2-9f82-7bef7cc81e10","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":3772}
+{"timestamp":"2026-11-04T18:01:59.891585+00:00","event":"http.response","request_id":"0b2f2efa-b02e-41e8-b5f5-caaeb0b044de","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":820}
+{"timestamp":"2026-11-04T18:02:02.744579+00:00","event":"http.response","request_id":"0a330903-1d88-4c35-a888-ef023e2cdc2b","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2602}
+{"timestamp":"2026-11-04T18:02:06.448889+00:00","event":"http.response","request_id":"83d7b103-5fcb-413d-941a-4fc55014419c","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":3685}
+{"timestamp":"2026-11-04T18:02:07.151811+00:00","event":"http.response","request_id":"faffb8a8-15af-4244-8742-af35fcbc45c1","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":697}
+ok
+test_commercial_create_and_revision_pickers_are_scoped_searchable_exact_versions (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_commercial_create_and_revision_pickers_are_scoped_searchable_exact_versions) ... {"timestamp":"2026-11-04T18:02:13.984993+00:00","event":"http.response","request_id":"9f2e3ab5-0465-49f0-a530-2a113e3bb250","method":"GET","route":"billing:guarantee_create","status_code":200,"duration_ms":1967}
+{"timestamp":"2026-11-04T18:02:15.600853+00:00","event":"http.response","request_id":"b6d2ded6-65ec-4030-a082-6642fad4f232","method":"GET","route":"documents:commercial-evidence-choices","status_code":200,"duration_ms":1613}
+{"timestamp":"2026-11-04T18:02:17.562749+00:00","event":"http.response","request_id":"f7f38841-b5d3-4870-a9d2-71efabb2d7de","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":1965}
+{"timestamp":"2026-11-04T18:02:19.648396+00:00","event":"http.response","request_id":"ef47cdd4-854f-4f9a-a1e2-ce8bcc0ade32","method":"GET","route":"billing:compliance_evidence_create","status_code":200,"duration_ms":2080}
+{"timestamp":"2026-11-04T18:02:21.300041+00:00","event":"http.response","request_id":"f1ebeaef-3eb8-4845-b019-f33852b11048","method":"GET","route":"documents:commercial-evidence-choices","status_code":200,"duration_ms":1649}
+{"timestamp":"2026-11-04T18:02:22.926693+00:00","event":"http.response","request_id":"6b70039c-9fda-4f29-9385-e48d0a4fa701","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":1622}
+{"timestamp":"2026-11-04T18:02:25.046326+00:00","event":"http.response","request_id":"c19cd1ff-218e-4b32-9fa3-374540d0dff3","method":"GET","route":"billing:retention_release_create","status_code":200,"duration_ms":2117}
+{"timestamp":"2026-11-04T18:02:26.592771+00:00","event":"http.response","request_id":"de486017-741a-4623-a5d6-3432f2bd881a","method":"GET","route":"documents:commercial-evidence-choices","status_code":200,"duration_ms":1542}
+{"timestamp":"2026-11-04T18:02:28.232639+00:00","event":"http.response","request_id":"9e8fe38d-5fe2-447e-91b5-c5e2ee146de9","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":1639}
+ok
+test_commercial_create_posts_preserve_selected_exact_version (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_commercial_create_posts_preserve_selected_exact_version) ... {"timestamp":"2026-11-04T18:02:34.520673+00:00","event":"http.response","request_id":"c9c40b9e-8db0-43b1-bf1b-fa476b391e0a","method":"POST","route":"billing:guarantee_create","status_code":302,"duration_ms":2118}
+{"timestamp":"2026-11-04T18:02:37.005998+00:00","event":"http.response","request_id":"267bf2ec-ff5e-4d04-9aad-a464ec70f6fa","method":"POST","route":"billing:compliance_evidence_create","status_code":302,"duration_ms":1752}
+{"timestamp":"2026-11-04T18:02:39.488138+00:00","event":"http.response","request_id":"304a0303-a436-442a-a025-b560b43f2646","method":"POST","route":"billing:retention_release_create","status_code":302,"duration_ms":1731}
+ok
+test_commercial_revision_posts_keep_original_witness_and_finalized_history (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_commercial_revision_posts_keep_original_witness_and_finalized_history) ... {"timestamp":"2026-11-04T18:02:49.586053+00:00","event":"http.response","request_id":"45128d56-4d9a-4989-9e9d-c45aed7fb8b0","method":"POST","route":"billing:guarantee_revise","status_code":302,"duration_ms":2104}
+{"timestamp":"2026-11-04T18:02:55.990701+00:00","event":"http.response","request_id":"9aafc06b-f281-4d23-a5bd-62d2379768c7","method":"POST","route":"billing:compliance_evidence_revise","status_code":302,"duration_ms":1894}
+{"timestamp":"2026-11-04T18:03:02.916116+00:00","event":"http.response","request_id":"42a7e4a0-1c25-4242-9952-904d22e3a1bc","method":"POST","route":"billing:retention_release_correct","status_code":302,"duration_ms":2953}
+ok
+test_contractual_witness_is_draft_only_and_survives_submission (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_contractual_witness_is_draft_only_and_survives_submission) ... {"timestamp":"2026-11-04T18:03:08.376752+00:00","event":"http.response","request_id":"2655dbc4-7649-4043-ba05-7f0db07ad2a0","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2356}
+{"timestamp":"2026-11-04T18:03:12.772647+00:00","event":"http.response","request_id":"651d21fe-7322-4edd-a306-94182bbe7401","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4370}
+{"timestamp":"2026-11-04T18:03:15.485383+00:00","event":"http.response","request_id":"30a317d6-a590-4930-8865-7680f8d5c79e","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":586}
+ok
+test_cross_tenant_sources_unsafe_returns_and_unpersisted_versions_denied (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_cross_tenant_sources_unsafe_returns_and_unpersisted_versions_denied) ... {"timestamp":"2026-11-04T18:03:17.924175+00:00","event":"http.response","request_id":"f19fb0f0-803a-4077-89f0-c1f728c4efef","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":681}
+{"timestamp":"2026-11-04T18:03:18.423643+00:00","event":"http.response","request_id":"4c7d3684-8e7d-4993-abec-7ce579cdfd6e","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":496}
+{"timestamp":"2026-11-04T18:03:18.926586+00:00","event":"http.response","request_id":"df348196-5f2b-449f-bf89-460424812452","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":503}
+{"timestamp":"2026-11-04T18:03:19.563462+00:00","event":"http.response","request_id":"1a0fcea4-a443-4fb4-9760-b4e70ceadfd6","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":619}
+{"timestamp":"2026-11-04T18:03:20.256264+00:00","event":"http.response","request_id":"3695b2e5-f002-477c-afdc-e7e07f078b5c","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":676}
+ok
+test_csrf_and_transactional_authority_recheck (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_csrf_and_transactional_authority_recheck) ... {"timestamp":"2026-11-04T18:03:21.732812+00:00","event":"http.response","request_id":"2ccc7fac-c9b7-4a5c-a4d3-6da0753b88a6","method":"POST","route":"documents:evidence-register","status_code":403,"duration_ms":24}
+{"timestamp":"2026-11-04T18:03:23.636569+00:00","event":"http.response","request_id":"18e7ac5c-249a-424d-8685-972ffe0c99f4","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1880}
+{"timestamp":"2026-11-04T18:03:25.135253+00:00","event":"http.response","request_id":"67bdd096-54c8-4f69-84a1-cc2dc5ad11e6","method":"POST","route":"documents:evidence-register","status_code":403,"duration_ms":1474}
+ok
+test_download_permission_is_rechecked_separately_from_evidence_view (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_download_permission_is_rechecked_separately_from_evidence_view) ... {"timestamp":"2026-11-04T18:03:29.228704+00:00","event":"http.response","request_id":"d0bf84f1-d089-4dba-b771-2459a5670efd","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2391}
+{"timestamp":"2026-11-04T18:03:33.505604+00:00","event":"http.response","request_id":"963e474d-c22a-4632-8f33-d7388142e210","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4258}
+{"timestamp":"2026-11-04T18:03:34.536097+00:00","event":"http.response","request_id":"7222ecfa-1c9a-47e2-b210-a0e1f7f0e7ff","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":550}
+{"timestamp":"2026-11-04T18:03:34.755889+00:00","event":"http.response","request_id":"bea358fc-e895-4caa-b333-7f15fdb3531b","method":"GET","route":"documents:version-download","status_code":403,"duration_ms":217}
+ok
+test_material_existing_exact_version_has_navigation_without_new_mutation (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_material_existing_exact_version_has_navigation_without_new_mutation) ... {"timestamp":"2026-11-04T18:03:38.097461+00:00","event":"http.response","request_id":"9908cca1-4ff6-44b7-b422-c79be83eb12b","method":"GET","route":"materials:material_detail","status_code":200,"duration_ms":1325}
+{"timestamp":"2026-11-04T18:03:38.680457+00:00","event":"http.response","request_id":"162211ac-0865-4329-9559-ed10ede0c369","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":585}
+ok
+test_observation_draft_picker_preserves_pin_and_idempotency (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_observation_draft_picker_preserves_pin_and_idempotency) ... {"timestamp":"2026-11-04T18:03:41.589185+00:00","event":"http.response","request_id":"45d37331-f263-476b-adf7-4879a7a26cef","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2265}
+{"timestamp":"2026-11-04T18:03:45.439608+00:00","event":"http.response","request_id":"c9b6284f-f0e9-4baf-a63f-f798d843695b","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":3821}
+{"timestamp":"2026-11-04T18:03:49.307058+00:00","event":"http.response","request_id":"01c7616a-ca54-4852-81be-728ec879d8f9","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":3860}
+{"timestamp":"2026-11-04T18:03:51.291907+00:00","event":"http.response","request_id":"054161ee-79cf-449d-91de-d586b3f55e6a","method":"POST","route":"documents:evidence-register","status_code":403,"duration_ms":578}
+{"timestamp":"2026-11-04T18:03:53.303273+00:00","event":"http.response","request_id":"4b8a6549-c289-473c-a5cc-77f25200092e","method":"GET","route":"daily_reports:field_observation_detail","status_code":200,"duration_ms":2009}
+ok
+test_picker_filters_foreign_denied_project_and_all_context_documents (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_picker_filters_foreign_denied_project_and_all_context_documents) ... {"timestamp":"2026-11-04T18:03:56.454942+00:00","event":"http.response","request_id":"28200bd3-d1a6-4f75-bb7f-39043d829cf6","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":902}
+{"timestamp":"2026-11-04T18:03:57.327252+00:00","event":"http.response","request_id":"fd140a06-920a-4f9e-ab42-69293f6b332c","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":861}
+{"timestamp":"2026-11-04T18:03:58.191048+00:00","event":"http.response","request_id":"849b5138-2cf9-4709-adaa-9265f0fca568","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":523}
+{"timestamp":"2026-11-04T18:03:59.196784+00:00","event":"http.response","request_id":"4fe167f2-03e6-4f10-a206-5cefdca7042d","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1006}
+{"timestamp":"2026-11-04T18:04:00.163404+00:00","event":"http.response","request_id":"3c6b8cd8-689f-4487-ab76-06369096c913","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":947}
+ok
+test_picker_has_no_authority_without_submission_permission (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_picker_has_no_authority_without_submission_permission) ... {"timestamp":"2026-11-04T18:04:02.387566+00:00","event":"http.response","request_id":"0b8c248f-4548-40f6-853d-9e31c5285584","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":440}
+{"timestamp":"2026-11-04T18:04:02.766348+00:00","event":"http.response","request_id":"c71d2f52-aebb-4b86-bf59-5e7e84181bc1","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":378}
+ok
+test_quarantine_is_visible_to_review_but_never_delivered_or_field_selectable (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_quarantine_is_visible_to_review_but_never_delivered_or_field_selectable) ... {"timestamp":"2026-11-04T18:04:06.786915+00:00","event":"http.response","request_id":"7fa7a731-c971-4cf3-aa27-ce48ca568432","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2376}
+{"timestamp":"2026-11-04T18:04:10.772984+00:00","event":"http.response","request_id":"3645a3e1-6b17-4c8d-b184-83f0be493aa1","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":3974}
+{"timestamp":"2026-11-04T18:04:12.587722+00:00","event":"http.response","request_id":"02a29eb2-318a-4762-a3b4-29d15f35c62b","method":"GET","route":"documents:version-download","status_code":403,"duration_ms":1032}
+{"timestamp":"2026-11-04T18:04:14.304381+00:00","event":"http.response","request_id":"0c534b9b-8b16-465d-af5e-e83815a05c24","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":1611}
+ok
+test_review_registration_rolls_back_on_domain_audit_failure (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_review_registration_rolls_back_on_domain_audit_failure) ... {"timestamp":"2026-11-04T18:04:18.539794+00:00","event":"http.response","request_id":"7f599c2e-4a8c-43ed-b302-bfa7d31f97b2","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2755}
+{"timestamp":"2026-11-04T18:04:22.942555+00:00","event":"http.response","request_id":"9e96c4ce-3cd2-4d26-bf54-26a606e960e7","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":4384}
+ok
+test_safety_and_quality_submit_revision_evidence_and_keep_v1_after_v2 (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_safety_and_quality_submit_revision_evidence_and_keep_v1_after_v2) ... {"timestamp":"2026-11-04T18:04:28.080117+00:00","event":"http.response","request_id":"47748b73-5a54-4e70-9591-2af07dff9cc7","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2394}
+{"timestamp":"2026-11-04T18:04:32.397550+00:00","event":"http.response","request_id":"f9f3f5a3-0dbc-4708-8a8e-46d42a31cad4","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4285}
+{"timestamp":"2026-11-04T18:04:33.844821+00:00","event":"http.response","request_id":"8a9e9672-9a57-4424-a5f2-0e9f3fa084bd","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":689}
+{"timestamp":"2026-11-04T18:04:36.447842+00:00","event":"http.response","request_id":"a7ab87d2-f23e-4715-887a-dbbb452fea8a","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2600}
+{"timestamp":"2026-11-04T18:04:41.357427+00:00","event":"http.response","request_id":"52342b08-ca89-42d8-8161-85a34dcd4f4a","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4881}
+{"timestamp":"2026-11-04T18:04:42.857687+00:00","event":"http.response","request_id":"addcaf48-bacd-4a00-9f89-a814f59fcfb8","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":735}
+{"timestamp":"2026-11-04T18:04:45.058784+00:00","event":"http.response","request_id":"561edc6b-7637-4013-801d-95148cf0d0ff","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1233}
+{"timestamp":"2026-11-04T18:04:46.332187+00:00","event":"http.response","request_id":"5bc32025-2846-43f7-863b-6506b6353c77","method":"GET","route":"documents:version-download","status_code":200,"duration_ms":1252}
+{"timestamp":"2026-11-04T18:04:48.034095+00:00","event":"http.response","request_id":"165c7abb-b43f-4148-a215-2b1e45385dc2","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1047}
+{"timestamp":"2026-11-04T18:04:48.925985+00:00","event":"http.response","request_id":"615d8f61-1cf0-4cf4-ab30-3abf8df8887b","method":"GET","route":"documents:version-download","status_code":200,"duration_ms":872}
+ok
+test_site_scope_picker_is_available_only_for_own_observation (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_site_scope_picker_is_available_only_for_own_observation) ... {"timestamp":"2026-11-04T18:04:50.259726+00:00","event":"http.response","request_id":"5427c143-3c01-47ce-84ff-f32b7a8af172","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":723}
+{"timestamp":"2026-11-04T18:04:50.570869+00:00","event":"http.response","request_id":"5149232d-b948-4ef6-8258-5f22aff9cb45","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":309}
+{"timestamp":"2026-11-04T18:04:50.810489+00:00","event":"http.response","request_id":"8f695e52-2e9f-46cb-a329-aa5c63775e99","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":238}
+ok
+test_unauthorized_personas_cannot_read_titles_or_register (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_unauthorized_personas_cannot_read_titles_or_register) ... {"timestamp":"2026-11-04T18:04:55.384281+00:00","event":"http.response","request_id":"1193200b-1e89-4f7c-b930-1e8ab5a65220","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2796}
+{"timestamp":"2026-11-04T18:04:59.707843+00:00","event":"http.response","request_id":"d22e7748-acf7-4c7d-8bd7-1e34b2689ffc","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4307}
+{"timestamp":"2026-11-04T18:04:59.990317+00:00","event":"http.response","request_id":"6e8a2555-be1a-47e3-8b77-463ef24b1828","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":213}
+{"timestamp":"2026-11-04T18:05:00.406401+00:00","event":"http.response","request_id":"8ba18f29-35fb-4669-8047-4ceff0144dbd","method":"GET","route":"quality:detail","status_code":200,"duration_ms":419}
+ok
+test_validation_cancel_and_forged_intent_preserve_context_without_writes (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_validation_cancel_and_forged_intent_preserve_context_without_writes) ... {"timestamp":"2026-11-04T18:05:03.841772+00:00","event":"http.response","request_id":"fa181dd7-1a55-40a1-beb9-6e5ce283a7a3","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2022}
+{"timestamp":"2026-11-04T18:05:04.736226+00:00","event":"http.response","request_id":"660e181b-f6db-4f57-954c-a36f93725fe5","method":"GET","route":"safety:detail","status_code":200,"duration_ms":871}
+{"timestamp":"2026-11-04T18:05:07.170413+00:00","event":"http.response","request_id":"15ec1933-b69c-4ce2-9eb0-ace25bbee656","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":2431}
+{"timestamp":"2026-11-04T18:05:09.252556+00:00","event":"http.response","request_id":"c39abc09-64cb-40f4-a9d2-8e0f726090c2","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":2077}
+ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 228.267s
+
+OK
+Preserving test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+

@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% load static %}
+{% block title %}انتخاب نسخه شاهد | بنیرا{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{{ form.media.css }}{% endblock %}
+{% block extra_scripts %}{{ form.media.js }}{% endblock %}
+{% block content %}<div class="mx-auto max-w-4xl">
+{% include "components/breadcrumbs.html" with page_breadcrumb_label=source.label page_breadcrumb_url=source.url page_title="انتخاب نسخه شاهد" only %}
+<h1 class="mt-5 text-2xl font-bold">{% if source.kind == "safety" or source.kind == "quality" %}ارسال رکورد همراه شواهد{% else %}انتخاب نسخه شاهد{% endif %}</h1>
+<section class="erp-surface erp-document-association-context" aria-label="سابقه مرتبط"><h2>{{ source.label }}</h2><p><strong>{{ source.title }}</strong>{% if source.target.project %} · {{ source.target.project.name }}{% endif %}{% if source.target.site %} · {{ source.target.site.name }}{% endif %}</p>{% if source.kind == "safety" or source.kind == "quality" %}<p class="erp-document-association-note">نسخه‌های انتخاب‌شده با بازبینی جدید رکورد ثبت و برای بررسی ارسال می‌شوند. تاریخچه بازبینی‌های پیشین تغییر نمی‌کند.</p>{% elif source.kind == "material" %}<p class="erp-document-association-note">نسخه جاری انتخاب‌شده ثبت می‌شود. شواهد نسخه‌های پیشین تغییر نمی‌کند.</p>{% else %}<p class="erp-document-association-note">نسخه انتخاب‌شده به همین پیش‌نویس پیوند می‌خورد.</p>{% endif %}</section>
+<form class="erp-surface mt-5 space-y-5 rounded-xl p-5" method="post" aria-label="انتخاب نسخه شاهد">{% csrf_token %}
+{% include "components/form_errors.html" with form=form only %}
+{% for field in form %}{% if field.is_hidden %}{{ field }}{% else %}{% include "components/form_field.html" with field=field only %}{% endif %}{% endfor %}
+<div class="erp-document-association-footer"><a class="erp-btn erp-btn--secondary" href="{{ source.url }}">انصراف</a><button class="erp-btn erp-btn--primary" type="submit">{% if source.kind == "safety" or source.kind == "quality" %}ارسال رکورد همراه شواهد{% else %}ثبت نسخه شاهد{% endif %}</button></div>
+</form></div>{% endblock %}

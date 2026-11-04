@@ -11,6 +11,24 @@ from core.list_filters import build_filter_bar
 register = template.Library()
 
 PROFILES = {
+    "warehouses": {
+        "search": "warehouse",
+        "placeholder": "جست‌وجوی کد یا نام انبار",
+        "text_labels": {
+            "warehouse": "کد یا نام انبار",
+            "location": "محل انبار",
+        },
+        "search_direction": "auto",
+        "result_label": "انبار",
+        "default_sort": "warehouse",
+        "quick": ("project", "location"),
+        "sorts": (
+            ("warehouse", "کد و نام انبار"),
+            ("project", "پروژه"),
+            ("location", "محل"),
+            ("status", "وضعیت"),
+        ),
+    },
     "expenses": {
         "search": "description",
         "placeholder": "جست‌وجوی شرح، فروشنده یا رسید…",
@@ -91,11 +109,15 @@ def reference_list_state(context, profile):
     """Adapt only the filter definitions and authorized page supplied by a view."""
     config = PROFILES[profile]
     request = context["request"]
-    form = forms.Form(request.GET)
+    form = context.get("list_filter_form")
+    if form is None:
+        form = forms.Form(request.GET)
     for column in context["filters"]:
         if column is None:
             continue
         name = column["name"]
+        if name in form.fields:
+            continue
         attrs = {"class": "erp-input w-full"}
         if column["kind"] == "date_range":
             for suffix, label in (("from", "از"), ("to", "تا")):
@@ -128,21 +150,23 @@ def reference_list_state(context, profile):
                 error_messages={"invalid_choice": "گزینه معتبر را انتخاب کنید."},
             )
         else:
-            attrs["placeholder"] = column["label"]
+            label = config.get("text_labels", {}).get(name, column["label"])
+            attrs["placeholder"] = label
             field = forms.CharField(
-                label=column["label"],
+                label=label,
                 required=False,
                 widget=forms.TextInput(attrs=attrs),
             )
         form.fields[name] = field
     search = config["search"]
-    form.fields[search].widget = forms.TextInput(
-        attrs={
-            "type": "search",
-            "class": "erp-input w-full",
-            "placeholder": config["placeholder"],
-        }
-    )
+    search_attrs = {
+        "type": "search",
+        "class": "erp-input w-full",
+        "placeholder": config["placeholder"],
+    }
+    if direction := config.get("search_direction"):
+        search_attrs["dir"] = direction
+    form.fields[search].widget = forms.TextInput(attrs=search_attrs)
     form.is_valid()
     quick = config.get("quick", tuple(name for name in form.fields if name != search))
     bar = build_filter_bar(

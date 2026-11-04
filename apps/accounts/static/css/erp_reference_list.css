@@ -185,6 +185,16 @@
 :is(.erp-contracts-list, .erp-reference-pattern) .erp-list-quick > .erp-list-filter-actions { flex: 0 0 auto; min-width: 0; max-width: none; }
 :is(.erp-contracts-list, .erp-reference-pattern) .erp-list-filter-actions { padding-top: 0; flex-wrap: nowrap; gap: 8px; }
 :is(.erp-contracts-list, .erp-reference-pattern) .erp-list-filter-actions .erp-btn { min-height: 40px; font-size: 12px; padding-inline: 12px; }
+/* Fit a small quick-filter group to its controls so the primary search grows. */
+@media (min-width: 768px) {
+    :is(.erp-contracts-list, .erp-reference-pattern) [data-fit-quick-filters] .erp-list-quick > div:has(select[data-business-choice]:not([name="project"])) { flex-basis: 190px; min-width: 176px; }
+}
+@media (min-width: 1280px) {
+    :is(.erp-contracts-list, .erp-reference-pattern) [data-fit-quick-filters] .erp-list-options { flex: 0 0 auto; }
+    :is(.erp-contracts-list, .erp-reference-pattern) [data-fit-quick-filters] .erp-list-quick { flex-wrap: nowrap; }
+}
+/* Mixed-direction search text can change direction without moving the icon. */
+[data-fit-quick-filters] #list-filter-bar .erp-list-search__input:dir(rtl) input[dir="auto"]:dir(ltr) { padding-inline: 12px 38px; text-align: right; }
 :is(.erp-contracts-list, .erp-reference-pattern) [data-more-toggle] { color: var(--bonira-deep-navy); background: var(--bonira-soft); }
 :is(.erp-contracts-list, .erp-reference-pattern) .erp-list-filter-summary { border: 0; padding: 0; margin: 14px 0; min-height: 38px; }
 :is(.erp-contracts-list, .erp-reference-pattern) .erp-list-chips { gap: 10px; }

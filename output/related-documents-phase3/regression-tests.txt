@@ -1,0 +1,787 @@
+Found 126 test(s).
+Using existing test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+test_all_three_commercial_witnesses_use_exact_version_and_no_uuid_labels (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_all_three_commercial_witnesses_use_exact_version_and_no_uuid_labels) ... {"timestamp":"2026-11-04T18:06:59.778225+00:00","event":"http.response","request_id":"c4c8387b-1055-4e14-8857-79831f110938","method":"GET","route":"billing:guarantee_detail","status_code":200,"duration_ms":3093}
+{"timestamp":"2026-11-04T18:07:01.376225+00:00","event":"http.response","request_id":"ee3b9335-9eef-46f5-a51e-80d673ac0451","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1574}
+{"timestamp":"2026-11-04T18:07:05.999101+00:00","event":"http.response","request_id":"d53d3ba5-23ef-4af5-b889-03040e6efd19","method":"GET","route":"billing:compliance_evidence_detail","status_code":200,"duration_ms":3909}
+{"timestamp":"2026-11-04T18:07:07.283245+00:00","event":"http.response","request_id":"1d485d55-b711-4972-bb27-27d37a12b0a0","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1268}
+{"timestamp":"2026-11-04T18:07:11.881153+00:00","event":"http.response","request_id":"eec28916-44e7-4052-b729-cd2b0bb294d9","method":"GET","route":"billing:retention_release_detail","status_code":200,"duration_ms":3736}
+{"timestamp":"2026-11-04T18:07:13.163087+00:00","event":"http.response","request_id":"aa433c76-6e29-4033-ab5a-0b0315b60221","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":1252}
+ok
+test_archive_expiry_and_sealed_witnesses_expose_no_metadata (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_archive_expiry_and_sealed_witnesses_expose_no_metadata) ... {"timestamp":"2026-11-04T18:07:16.823197+00:00","event":"http.response","request_id":"7d13e929-b101-486a-a9c0-765ae7f63d9c","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2645}
+{"timestamp":"2026-11-04T18:07:21.532219+00:00","event":"http.response","request_id":"426fe56b-1e25-4d28-98a6-a8564a1f3cdd","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":4681}
+{"timestamp":"2026-11-04T18:07:22.936275+00:00","event":"http.response","request_id":"3cce1ab0-a098-4ad2-b6b2-2d412e2e7f44","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":1400}
+{"timestamp":"2026-11-04T18:07:25.654262+00:00","event":"http.response","request_id":"90676aa0-bbeb-4257-bf3e-69e8608e173f","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2503}
+{"timestamp":"2026-11-04T18:07:29.368396+00:00","event":"http.response","request_id":"aee666b3-ac15-4a87-b5ad-777e9b0c391b","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":3694}
+{"timestamp":"2026-11-04T18:07:30.093429+00:00","event":"http.response","request_id":"63f2029f-7d8f-44bf-8e7d-89fa7467608e","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":721}
+{"timestamp":"2026-11-04T18:07:32.968908+00:00","event":"http.response","request_id":"b2918b7a-e7e4-4256-87a8-85cc4e13331f","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2632}
+{"timestamp":"2026-11-04T18:07:35.550959+00:00","event":"http.response","request_id":"bf774440-8172-4ed7-a5a1-333914329d1e","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":2568}
+{"timestamp":"2026-11-04T18:07:35.953065+00:00","event":"http.response","request_id":"6a7c9fd4-357d-4279-9eee-bdbfb80d5d79","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":397}
+ok
+test_commercial_create_and_revision_pickers_are_scoped_searchable_exact_versions (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_commercial_create_and_revision_pickers_are_scoped_searchable_exact_versions) ... {"timestamp":"2026-11-04T18:07:40.241556+00:00","event":"http.response","request_id":"ed041c5d-896d-415f-842d-2e0217e721f6","method":"GET","route":"billing:guarantee_create","status_code":200,"duration_ms":1081}
+{"timestamp":"2026-11-04T18:07:41.192640+00:00","event":"http.response","request_id":"6c7fe9eb-a36b-43e2-9e4b-eccb275de2c8","method":"GET","route":"documents:commercial-evidence-choices","status_code":200,"duration_ms":947}
+{"timestamp":"2026-11-04T18:07:42.085446+00:00","event":"http.response","request_id":"980fc337-e381-420f-971b-9468adc71593","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":897}
+{"timestamp":"2026-11-04T18:07:43.029131+00:00","event":"http.response","request_id":"9e87ab10-9679-4181-9238-a11bc75d3b53","method":"GET","route":"billing:compliance_evidence_create","status_code":200,"duration_ms":939}
+{"timestamp":"2026-11-04T18:07:43.752035+00:00","event":"http.response","request_id":"1616d764-ce7b-4c3a-aa0c-4affeb961fb9","method":"GET","route":"documents:commercial-evidence-choices","status_code":200,"duration_ms":724}
+{"timestamp":"2026-11-04T18:07:44.447264+00:00","event":"http.response","request_id":"e50fdf49-4385-435c-ad1c-68278f9233ed","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":690}
+{"timestamp":"2026-11-04T18:07:45.534735+00:00","event":"http.response","request_id":"d43a2b28-1dbb-4ad3-a889-1d3e8eb4d5c1","method":"GET","route":"billing:retention_release_create","status_code":200,"duration_ms":1086}
+{"timestamp":"2026-11-04T18:07:46.512825+00:00","event":"http.response","request_id":"3938c849-24f6-4935-97f0-d18ea617c796","method":"GET","route":"documents:commercial-evidence-choices","status_code":200,"duration_ms":977}
+{"timestamp":"2026-11-04T18:07:47.323625+00:00","event":"http.response","request_id":"f917d3a1-e683-4ff3-af2f-8da70efd314e","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":808}
+ok
+test_commercial_create_posts_preserve_selected_exact_version (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_commercial_create_posts_preserve_selected_exact_version) ... {"timestamp":"2026-11-04T18:07:50.488398+00:00","event":"http.response","request_id":"b23daee2-c98c-4436-b7b1-879495ea21a8","method":"POST","route":"billing:guarantee_create","status_code":302,"duration_ms":1036}
+{"timestamp":"2026-11-04T18:07:51.864789+00:00","event":"http.response","request_id":"54373b0f-2d95-432a-a5a4-31e0891c7837","method":"POST","route":"billing:compliance_evidence_create","status_code":302,"duration_ms":1009}
+{"timestamp":"2026-11-04T18:07:53.308846+00:00","event":"http.response","request_id":"fa96a7d5-f1f8-4033-ab28-418f50d88646","method":"POST","route":"billing:retention_release_create","status_code":302,"duration_ms":991}
+ok
+test_commercial_revision_posts_keep_original_witness_and_finalized_history (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_commercial_revision_posts_keep_original_witness_and_finalized_history) ... {"timestamp":"2026-11-04T18:07:58.469191+00:00","event":"http.response","request_id":"fde38666-c7e7-4148-ba8d-0471754c6745","method":"POST","route":"billing:guarantee_revise","status_code":302,"duration_ms":1171}
+{"timestamp":"2026-11-04T18:08:01.376541+00:00","event":"http.response","request_id":"b72a475f-5967-4c3f-a217-8e1bfd1a0d59","method":"POST","route":"billing:compliance_evidence_revise","status_code":302,"duration_ms":848}
+{"timestamp":"2026-11-04T18:08:04.001018+00:00","event":"http.response","request_id":"f55cc487-8300-416d-8270-0dc76c55857a","method":"POST","route":"billing:retention_release_correct","status_code":302,"duration_ms":921}
+ok
+test_contractual_witness_is_draft_only_and_survives_submission (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_contractual_witness_is_draft_only_and_survives_submission) ... {"timestamp":"2026-11-04T18:08:06.514415+00:00","event":"http.response","request_id":"3bd60825-9f82-4c54-bdaf-0aedc29fda84","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1188}
+{"timestamp":"2026-11-04T18:08:08.457446+00:00","event":"http.response","request_id":"56b2115d-3beb-4ba0-b815-a2070d06f665","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":1934}
+{"timestamp":"2026-11-04T18:08:09.583803+00:00","event":"http.response","request_id":"4f0a75ed-507c-47d7-8a23-40fc42ebbd8d","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":242}
+ok
+test_cross_tenant_sources_unsafe_returns_and_unpersisted_versions_denied (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_cross_tenant_sources_unsafe_returns_and_unpersisted_versions_denied) ... {"timestamp":"2026-11-04T18:08:10.802790+00:00","event":"http.response","request_id":"2bc43864-7d89-43fa-9323-24eca25f8b71","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":296}
+{"timestamp":"2026-11-04T18:08:11.004952+00:00","event":"http.response","request_id":"853871f3-80f7-438e-afb8-80f751d46aa1","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":200}
+{"timestamp":"2026-11-04T18:08:11.191844+00:00","event":"http.response","request_id":"73f10032-3416-471e-9ccc-7478a38a44ae","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":192}
+{"timestamp":"2026-11-04T18:08:11.501415+00:00","event":"http.response","request_id":"cd8298df-b946-46a3-8eff-de3df433c9ba","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":291}
+{"timestamp":"2026-11-04T18:08:11.784372+00:00","event":"http.response","request_id":"b8ad6843-59cf-42c5-a154-490026c57d0f","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":284}
+ok
+test_csrf_and_transactional_authority_recheck (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_csrf_and_transactional_authority_recheck) ... {"timestamp":"2026-11-04T18:08:12.568305+00:00","event":"http.response","request_id":"aed1ed59-202d-4548-acc1-95d4bb9bad47","method":"POST","route":"documents:evidence-register","status_code":403,"duration_ms":16}
+{"timestamp":"2026-11-04T18:08:14.746243+00:00","event":"http.response","request_id":"41613a73-7a75-43c0-85e2-a79ca9ecaf90","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":2158}
+{"timestamp":"2026-11-04T18:08:15.513446+00:00","event":"http.response","request_id":"b5b59052-3516-4cab-a4f9-91a68d798591","method":"POST","route":"documents:evidence-register","status_code":403,"duration_ms":755}
+ok
+test_download_permission_is_rechecked_separately_from_evidence_view (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_download_permission_is_rechecked_separately_from_evidence_view) ... {"timestamp":"2026-11-04T18:08:17.509793+00:00","event":"http.response","request_id":"be92619d-ee14-418b-89e0-c0323c8c1885","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1247}
+{"timestamp":"2026-11-04T18:08:20.017360+00:00","event":"http.response","request_id":"90cfce17-15f9-4bd2-87b7-8e3c6c3dfa83","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":2501}
+{"timestamp":"2026-11-04T18:08:20.766726+00:00","event":"http.response","request_id":"17cd7b38-00b4-4bde-b943-fad4a6bc8ec9","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":354}
+{"timestamp":"2026-11-04T18:08:20.836631+00:00","event":"http.response","request_id":"afc36f1e-154c-4853-8c24-7afa38e6bebd","method":"GET","route":"documents:version-download","status_code":403,"duration_ms":70}
+ok
+test_material_existing_exact_version_navigation_keeps_pin_after_v2 (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_material_existing_exact_version_navigation_keeps_pin_after_v2) ... {"timestamp":"2026-11-04T18:08:22.583462+00:00","event":"http.response","request_id":"c16340bc-4b9c-4ec3-b8be-d543b7600cf8","method":"GET","route":"materials:material_detail","status_code":200,"duration_ms":611}
+{"timestamp":"2026-11-04T18:08:23.865987+00:00","event":"http.response","request_id":"04961068-f618-4acc-b2f4-35ce63825b4c","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1276}
+ok
+test_material_registration_rechecks_version_after_form_validation (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_material_registration_rechecks_version_after_form_validation) ... {"timestamp":"2026-11-04T18:08:25.225583+00:00","event":"http.response","request_id":"f6f10d11-52c1-4bf5-907b-351cacbca78c","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1113}
+{"timestamp":"2026-11-04T18:08:27.183423+00:00","event":"http.response","request_id":"48377ab7-8eb6-4dbb-a1a7-e99a4ceccd82","method":"POST","route":"documents:evidence-register","status_code":403,"duration_ms":1955}
+ok
+test_material_registration_rejects_current_version_drift_and_keeps_exact_pin (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_material_registration_rejects_current_version_drift_and_keeps_exact_pin) ... {"timestamp":"2026-11-04T18:08:28.801101+00:00","event":"http.response","request_id":"ac5fb516-0df0-4df3-81b1-38cc852e9bac","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1423}
+{"timestamp":"2026-11-04T18:08:30.750207+00:00","event":"http.response","request_id":"4678d8a3-e861-4b26-820a-b3d3fbaea939","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":1785}
+{"timestamp":"2026-11-04T18:08:31.998971+00:00","event":"http.response","request_id":"c2ba3157-af8a-44b5-87d6-30da2828a56a","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1238}
+{"timestamp":"2026-11-04T18:08:34.405292+00:00","event":"http.response","request_id":"9c17a0b7-8ce6-4a99-bbbb-f4c0ee875b51","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":2400}
+{"timestamp":"2026-11-04T18:08:35.628017+00:00","event":"http.response","request_id":"1fd02537-e2cc-4e2e-b248-a29a80ff0610","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":1217}
+ok
+test_observation_draft_picker_preserves_pin_and_idempotency (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_observation_draft_picker_preserves_pin_and_idempotency) ... {"timestamp":"2026-11-04T18:08:37.441755+00:00","event":"http.response","request_id":"9ceaf14e-0fbd-49ec-94d3-af9d38cbfc14","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1154}
+{"timestamp":"2026-11-04T18:08:39.185782+00:00","event":"http.response","request_id":"cebfd227-b819-491f-a504-222b27a8f6ef","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":1738}
+{"timestamp":"2026-11-04T18:08:41.446549+00:00","event":"http.response","request_id":"44895999-84e0-4963-812e-8e1e9ec1d5bc","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":2259}
+{"timestamp":"2026-11-04T18:08:42.351143+00:00","event":"http.response","request_id":"2e02e322-2316-430e-96e5-1ed18a7af237","method":"POST","route":"documents:evidence-register","status_code":403,"duration_ms":222}
+{"timestamp":"2026-11-04T18:08:43.115906+00:00","event":"http.response","request_id":"a1dc805a-9253-4f10-bcd4-6e888fbc0760","method":"GET","route":"daily_reports:field_observation_detail","status_code":200,"duration_ms":757}
+ok
+test_picker_filters_foreign_denied_project_and_all_context_documents (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_picker_filters_foreign_denied_project_and_all_context_documents) ... {"timestamp":"2026-11-04T18:08:44.956076+00:00","event":"http.response","request_id":"73301d97-076e-4ddb-8a87-0a63920ab3b0","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":609}
+{"timestamp":"2026-11-04T18:08:45.475304+00:00","event":"http.response","request_id":"64d7e2c8-ef3b-470d-a2d0-1c76117ee049","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":521}
+{"timestamp":"2026-11-04T18:08:45.960956+00:00","event":"http.response","request_id":"8e063bf1-e7df-4f7d-9407-15903acb1cf8","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":307}
+{"timestamp":"2026-11-04T18:08:46.479595+00:00","event":"http.response","request_id":"bb972b44-2199-41f9-86a2-cf6a60b640c2","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":519}
+{"timestamp":"2026-11-04T18:08:47.162143+00:00","event":"http.response","request_id":"f6b1dc87-e632-421f-b723-4a12c58ad45b","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":677}
+ok
+test_picker_has_no_authority_without_submission_permission (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_picker_has_no_authority_without_submission_permission) ... {"timestamp":"2026-11-04T18:08:48.364478+00:00","event":"http.response","request_id":"253dc5de-a84d-493c-a8e8-ba4b10ed0c1a","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":286}
+{"timestamp":"2026-11-04T18:08:48.635917+00:00","event":"http.response","request_id":"9ff09d57-1bde-4063-a5f7-023504d88389","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":274}
+ok
+test_quarantine_is_visible_to_review_but_never_delivered_or_field_selectable (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_quarantine_is_visible_to_review_but_never_delivered_or_field_selectable) ... {"timestamp":"2026-11-04T18:08:51.283111+00:00","event":"http.response","request_id":"dec85aaa-9976-4155-9ec6-20c21d19826c","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1620}
+{"timestamp":"2026-11-04T18:08:53.710600+00:00","event":"http.response","request_id":"4174da94-0905-437a-b0e3-d38583eb2173","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":2416}
+{"timestamp":"2026-11-04T18:08:54.665061+00:00","event":"http.response","request_id":"e4ad4563-c722-4035-9537-433348959a57","method":"GET","route":"documents:version-download","status_code":403,"duration_ms":584}
+{"timestamp":"2026-11-04T18:08:55.887348+00:00","event":"http.response","request_id":"80da9c3c-a17f-41a2-a59e-36a93d3677ba","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":1159}
+ok
+test_review_registration_rolls_back_on_domain_audit_failure (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_review_registration_rolls_back_on_domain_audit_failure) ... {"timestamp":"2026-11-04T18:08:58.277115+00:00","event":"http.response","request_id":"cf7f7350-9445-4c83-b77d-ebc5659fd3d8","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1415}
+{"timestamp":"2026-11-04T18:09:00.462972+00:00","event":"http.response","request_id":"d959d0bb-7a34-495b-907f-ee3d22890438","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":2180}
+ok
+test_safety_and_quality_submit_revision_evidence_and_keep_v1_after_v2 (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_safety_and_quality_submit_revision_evidence_and_keep_v1_after_v2) ... {"timestamp":"2026-11-04T18:09:03.547711+00:00","event":"http.response","request_id":"de081866-6702-40fd-94f1-e2ec563541d6","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1464}
+{"timestamp":"2026-11-04T18:09:05.581099+00:00","event":"http.response","request_id":"0c156056-5a8a-40cb-b601-294a61ccd212","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":2022}
+{"timestamp":"2026-11-04T18:09:06.284791+00:00","event":"http.response","request_id":"41f25f59-0ec7-433a-9eea-1ac106a08a18","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":305}
+{"timestamp":"2026-11-04T18:09:07.781685+00:00","event":"http.response","request_id":"fdd6d399-7cef-4ed3-bc3a-385ef0c1a92f","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1489}
+{"timestamp":"2026-11-04T18:09:10.049072+00:00","event":"http.response","request_id":"1d08cee9-806f-4ae4-9198-bc21212617d5","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":2261}
+{"timestamp":"2026-11-04T18:09:10.984057+00:00","event":"http.response","request_id":"4315f004-4edc-4c48-b56b-be2246c45635","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":301}
+{"timestamp":"2026-11-04T18:09:12.006282+00:00","event":"http.response","request_id":"36964e40-14a3-4804-96fa-1db9daf57bb4","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":509}
+{"timestamp":"2026-11-04T18:09:12.658679+00:00","event":"http.response","request_id":"fd0f7b24-a65e-44fd-9ef6-e7b128be4544","method":"GET","route":"documents:version-download","status_code":200,"duration_ms":642}
+{"timestamp":"2026-11-04T18:09:13.899367+00:00","event":"http.response","request_id":"4fa22aaa-0301-471a-9647-4c042a0b81be","method":"GET","route":"documents:evidence-detail","status_code":200,"duration_ms":783}
+{"timestamp":"2026-11-04T18:09:14.541321+00:00","event":"http.response","request_id":"816a61b5-166f-4a90-afd4-981f853da5f9","method":"GET","route":"documents:version-download","status_code":200,"duration_ms":626}
+ok
+test_site_scope_picker_is_available_only_for_own_observation (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_site_scope_picker_is_available_only_for_own_observation) ... {"timestamp":"2026-11-04T18:09:15.221725+00:00","event":"http.response","request_id":"f6063956-9fdf-400f-bddc-a0d140bb2989","method":"GET","route":"documents:evidence-choices","status_code":200,"duration_ms":338}
+{"timestamp":"2026-11-04T18:09:15.349552+00:00","event":"http.response","request_id":"08d79c71-c76d-4889-9448-b11407773202","method":"GET","route":"documents:evidence-choices","status_code":403,"duration_ms":127}
+{"timestamp":"2026-11-04T18:09:15.528310+00:00","event":"http.response","request_id":"1d566080-ebe4-4b00-becc-c6dc330b3052","method":"GET","route":"documents:evidence-register","status_code":403,"duration_ms":177}
+ok
+test_unauthorized_personas_cannot_read_titles_or_register (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_unauthorized_personas_cannot_read_titles_or_register) ... {"timestamp":"2026-11-04T18:09:17.421508+00:00","event":"http.response","request_id":"44d50a06-0d2c-45aa-92a1-ab9bc12efe92","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1012}
+{"timestamp":"2026-11-04T18:09:19.202853+00:00","event":"http.response","request_id":"80fa23a8-0fc4-419d-a5b5-2c08fea72917","method":"POST","route":"documents:evidence-register","status_code":302,"duration_ms":1769}
+{"timestamp":"2026-11-04T18:09:19.314111+00:00","event":"http.response","request_id":"47204499-a436-41ae-81bc-610b5a6ed640","method":"GET","route":"documents:evidence-detail","status_code":403,"duration_ms":82}
+{"timestamp":"2026-11-04T18:09:19.503976+00:00","event":"http.response","request_id":"cdf25b03-2ab4-4332-bc11-a22ba0100a1b","method":"GET","route":"quality:detail","status_code":200,"duration_ms":188}
+ok
+test_validation_cancel_and_forged_intent_preserve_context_without_writes (apps.documents.test_evidence_integration.EvidenceIntegrationTests.test_validation_cancel_and_forged_intent_preserve_context_without_writes) ... {"timestamp":"2026-11-04T18:09:21.202560+00:00","event":"http.response","request_id":"c5317b4e-04f8-445d-931f-2cb2f2613150","method":"GET","route":"documents:evidence-register","status_code":200,"duration_ms":1028}
+{"timestamp":"2026-11-04T18:09:21.580728+00:00","event":"http.response","request_id":"be9aaeb6-cc08-4630-98f9-d9889c7c36ff","method":"GET","route":"safety:detail","status_code":200,"duration_ms":371}
+{"timestamp":"2026-11-04T18:09:22.717861+00:00","event":"http.response","request_id":"108f4fca-3084-4cb6-b24e-7db160fbb90f","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":1134}
+{"timestamp":"2026-11-04T18:09:23.632175+00:00","event":"http.response","request_id":"7d8e654a-1f46-4c76-91b9-97b5cc633d6c","method":"POST","route":"documents:evidence-register","status_code":400,"duration_ms":912}
+ok
+test_all_context_document_permissions_and_metadata_are_filtered (apps.documents.test_contextual_association.ContextualAssociationTests.test_all_context_document_permissions_and_metadata_are_filtered) ... {"timestamp":"2026-11-04T18:09:24.821921+00:00","event":"http.response","request_id":"97b40d05-ce3a-43a2-acce-cb0f4fcd3f7d","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":236}
+{"timestamp":"2026-11-04T18:09:25.225436+00:00","event":"http.response","request_id":"c33173e4-a45e-408f-8eb7-73495b751dc2","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":401}
+{"timestamp":"2026-11-04T18:09:25.703329+00:00","event":"http.response","request_id":"d0caf2de-6f2c-40eb-9140-bd8a05be39ef","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":481}
+ok
+test_archived_expired_and_sealed_documents_never_enter_picker (apps.documents.test_contextual_association.ContextualAssociationTests.test_archived_expired_and_sealed_documents_never_enter_picker) ... {"timestamp":"2026-11-04T18:09:26.747993+00:00","event":"http.response","request_id":"a4cc5c86-57f4-4f81-8b58-88e3044605c4","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":575}
+ok
+test_authority_is_rechecked_inside_upload_transaction (apps.documents.test_contextual_association.ContextualAssociationTests.test_authority_is_rechecked_inside_upload_transaction) ... {"timestamp":"2026-11-04T18:09:27.528078+00:00","event":"http.response","request_id":"c353afe3-9eed-4c4f-96fb-f4e4c9974388","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":679}
+{"timestamp":"2026-11-04T18:09:27.952575+00:00","event":"http.response","request_id":"8c49f72b-4a83-4e8c-aa6c-f18a467eca51","method":"POST","route":"documents:contextual-upload","status_code":403,"duration_ms":417}
+ok
+test_candidate_pages_search_and_selected_value_retention (apps.documents.test_contextual_association.ContextualAssociationTests.test_candidate_pages_search_and_selected_value_retention) ... {"timestamp":"2026-11-04T18:09:38.119144+00:00","event":"http.response","request_id":"1cc49fc3-a3ab-4422-901e-fb9f3f4cb464","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":7290}
+{"timestamp":"2026-11-04T18:09:45.080828+00:00","event":"http.response","request_id":"6b31fdc1-924d-41e5-b15d-522277f2c3a6","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":6965}
+{"timestamp":"2026-11-04T18:09:46.071433+00:00","event":"http.response","request_id":"7129f42c-4089-40be-8c8c-9846a701d4a3","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":989}
+{"timestamp":"2026-11-04T18:09:54.278886+00:00","event":"http.response","request_id":"96884636-f015-463e-9012-390ca8fdc56f","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":8203}
+{"timestamp":"2026-11-04T18:10:02.730477+00:00","event":"http.response","request_id":"1bdd041a-7b6f-4ff5-8785-451977fb07ec","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":8447}
+ok
+test_contextual_upload_for_all_five_sources (apps.documents.test_contextual_association.ContextualAssociationTests.test_contextual_upload_for_all_five_sources) ... {"timestamp":"2026-11-04T18:10:03.649840+00:00","event":"http.response","request_id":"58b5b988-9e9f-4ad5-9782-d49e1c2d932a","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":680}
+{"timestamp":"2026-11-04T18:10:05.408687+00:00","event":"http.response","request_id":"365a4880-2247-455f-8cfe-81c752679c1c","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1744}
+{"timestamp":"2026-11-04T18:10:06.030870+00:00","event":"http.response","request_id":"84748eff-ebb6-4949-8f5a-b4abb9a51b78","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":618}
+{"timestamp":"2026-11-04T18:10:07.053588+00:00","event":"http.response","request_id":"17977b3a-13fd-48a2-96f1-0a55ecdc5278","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":1016}
+{"timestamp":"2026-11-04T18:10:09.184743+00:00","event":"http.response","request_id":"adb39676-e703-4902-ad7d-82564c6b063b","method":"GET","route":"projects:detail","status_code":200,"duration_ms":2109}
+{"timestamp":"2026-11-04T18:10:09.680079+00:00","event":"http.response","request_id":"35843894-93cd-41bf-8dca-1cf3fa448f47","method":"GET","route":"documents:download","status_code":403,"duration_ms":490}
+{"timestamp":"2026-11-04T18:10:10.428921+00:00","event":"http.response","request_id":"7dcbb668-0ee0-4d5e-b609-a828c8824b33","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":748}
+{"timestamp":"2026-11-04T18:10:11.883385+00:00","event":"http.response","request_id":"db5ff526-3455-4040-aa5c-f5b894ee9e08","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1435}
+{"timestamp":"2026-11-04T18:10:12.501240+00:00","event":"http.response","request_id":"8337cd5b-ba1f-4d2f-9901-cc631d2ea89a","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":614}
+{"timestamp":"2026-11-04T18:10:13.485158+00:00","event":"http.response","request_id":"224863c2-42a4-4754-a987-daec216b7a93","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":973}
+{"timestamp":"2026-11-04T18:10:15.639579+00:00","event":"http.response","request_id":"71846233-434c-40cf-95c5-493aefd7719a","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":2144}
+{"timestamp":"2026-11-04T18:10:16.063436+00:00","event":"http.response","request_id":"f5c396c6-a59d-40de-9d85-e0c916002109","method":"GET","route":"documents:download","status_code":403,"duration_ms":420}
+{"timestamp":"2026-11-04T18:10:16.935595+00:00","event":"http.response","request_id":"7bce4aa2-ee13-4de5-a5bb-9faebdb516c0","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":870}
+{"timestamp":"2026-11-04T18:10:18.068435+00:00","event":"http.response","request_id":"1cffafe1-e264-4acb-bf15-3ad9d541327a","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":1117}
+{"timestamp":"2026-11-04T18:10:18.842852+00:00","event":"http.response","request_id":"1091219f-3214-4b63-a38d-66956e760e37","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":769}
+{"timestamp":"2026-11-04T18:10:19.915492+00:00","event":"http.response","request_id":"135f2997-b2ce-4a0b-af2b-edb573cc4066","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":1063}
+{"timestamp":"2026-11-04T18:10:21.425848+00:00","event":"http.response","request_id":"61512d97-c7c5-4b78-a048-594a34277155","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":1490}
+{"timestamp":"2026-11-04T18:10:21.923326+00:00","event":"http.response","request_id":"8e59cf1f-aaa9-4b8e-97b9-d207133d8082","method":"GET","route":"documents:download","status_code":403,"duration_ms":497}
+{"timestamp":"2026-11-04T18:10:22.794523+00:00","event":"http.response","request_id":"15ae812b-4040-49f5-ad37-91b4b74bcc92","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":868}
+{"timestamp":"2026-11-04T18:10:23.765800+00:00","event":"http.response","request_id":"90dc4ea3-5311-42c6-92b3-1432a03c1124","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":955}
+{"timestamp":"2026-11-04T18:10:24.537011+00:00","event":"http.response","request_id":"fff792f3-2820-4566-bedc-45730c58ac62","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":764}
+{"timestamp":"2026-11-04T18:10:25.463888+00:00","event":"http.response","request_id":"43e567d6-b9ae-4d2a-958a-bee95b7cacb4","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":921}
+{"timestamp":"2026-11-04T18:10:26.702035+00:00","event":"http.response","request_id":"78c9790f-7765-4eae-a0af-b2fd65cad6ec","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":1229}
+{"timestamp":"2026-11-04T18:10:27.368976+00:00","event":"http.response","request_id":"b8eeb894-74a7-498d-a173-0500f424ef36","method":"GET","route":"documents:download","status_code":403,"duration_ms":660}
+{"timestamp":"2026-11-04T18:10:28.076716+00:00","event":"http.response","request_id":"b97aea3b-1c0b-4c16-a65c-31abeca70ed0","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":708}
+{"timestamp":"2026-11-04T18:10:29.298929+00:00","event":"http.response","request_id":"e899de40-0bc7-4cce-bac9-274c1a80f90d","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":1206}
+{"timestamp":"2026-11-04T18:10:29.956778+00:00","event":"http.response","request_id":"b805baef-d9cb-4f38-8446-ff80de4edd15","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":654}
+{"timestamp":"2026-11-04T18:10:30.812726+00:00","event":"http.response","request_id":"aec80504-8877-4513-a70f-7785570dfca0","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":850}
+{"timestamp":"2026-11-04T18:10:32.091763+00:00","event":"http.response","request_id":"a24f35bd-450d-4214-a0e2-49c2c2ecaf64","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":1265}
+{"timestamp":"2026-11-04T18:10:32.637266+00:00","event":"http.response","request_id":"cc23cb4a-fe75-4243-8a6c-072649c186d9","method":"GET","route":"documents:download","status_code":403,"duration_ms":543}
+ok
+test_csrf_is_required_for_both_actions (apps.documents.test_contextual_association.ContextualAssociationTests.test_csrf_is_required_for_both_actions) ... {"timestamp":"2026-11-04T18:10:32.770514+00:00","event":"http.response","request_id":"21a8eee9-ae2a-4744-b60f-8db157775a31","method":"POST","route":"documents:contextual-upload","status_code":403,"duration_ms":10}
+{"timestamp":"2026-11-04T18:10:32.778983+00:00","event":"http.response","request_id":"33ef08a9-8260-4a57-b264-df3f48f216cd","method":"POST","route":"documents:contextual-link","status_code":403,"duration_ms":9}
+{"timestamp":"2026-11-04T18:10:33.473632+00:00","event":"http.response","request_id":"184256a7-2a0c-4b77-9387-82d57e7ebd56","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":692}
+{"timestamp":"2026-11-04T18:10:34.273458+00:00","event":"http.response","request_id":"1af5ddc0-d8be-4c52-9d5b-96704b3e3f81","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":790}
+ok
+test_document_view_and_upload_permissions_are_separate_from_download (apps.documents.test_contextual_association.ContextualAssociationTests.test_document_view_and_upload_permissions_are_separate_from_download) ... {"timestamp":"2026-11-04T18:10:34.648698+00:00","event":"http.response","request_id":"c82a2182-7525-451b-980a-6593e63b137b","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":280}
+{"timestamp":"2026-11-04T18:10:35.019566+00:00","event":"http.response","request_id":"0d56fa60-a2f1-4738-9548-e58a07a42b43","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":365}
+{"timestamp":"2026-11-04T18:10:35.121502+00:00","event":"http.response","request_id":"e2f1b5e2-e5ae-4179-bfb7-d44ee91a600a","method":"GET","route":"documents:download","status_code":403,"duration_ms":82}
+ok
+test_duplicate_associations_and_retry_do_not_add_rows (apps.documents.test_contextual_association.ContextualAssociationTests.test_duplicate_associations_and_retry_do_not_add_rows) ... {"timestamp":"2026-11-04T18:10:37.638762+00:00","event":"http.response","request_id":"542b15b1-b854-4b1d-8837-3c9e09c56356","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":2000}
+{"timestamp":"2026-11-04T18:10:40.501645+00:00","event":"http.response","request_id":"b593792a-64ca-4a60-89ba-7a978ae6f1b7","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2855}
+{"timestamp":"2026-11-04T18:10:42.365690+00:00","event":"http.response","request_id":"c29fc955-f7a4-4645-9905-170ff5a833ba","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1860}
+ok
+test_existing_document_for_all_five_sources_preserves_identity_versions (apps.documents.test_contextual_association.ContextualAssociationTests.test_existing_document_for_all_five_sources_preserves_identity_versions) ... {"timestamp":"2026-11-04T18:10:45.146135+00:00","event":"http.response","request_id":"2f4de1e1-ded0-4131-8320-1db6df79dc73","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1884}
+{"timestamp":"2026-11-04T18:10:47.113979+00:00","event":"http.response","request_id":"bbeb2ef4-cccf-4900-9989-b88a2c3c1182","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1951}
+{"timestamp":"2026-11-04T18:10:49.037801+00:00","event":"http.response","request_id":"df69084d-20ee-482e-8766-37dc424820d2","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1920}
+{"timestamp":"2026-11-04T18:10:51.773312+00:00","event":"http.response","request_id":"9f924841-2d5b-4b93-bcbd-6ab71e47643f","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2719}
+{"timestamp":"2026-11-04T18:10:53.817271+00:00","event":"http.response","request_id":"92e27400-b835-4b28-bccb-e67343c11a2f","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":2036}
+{"timestamp":"2026-11-04T18:10:55.114128+00:00","event":"http.response","request_id":"b4047d65-4fad-499a-a752-8dadcb17a1d2","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1292}
+{"timestamp":"2026-11-04T18:10:56.848143+00:00","event":"http.response","request_id":"5505505b-0cbf-4840-a4af-a167903af8f8","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1735}
+{"timestamp":"2026-11-04T18:10:59.814676+00:00","event":"http.response","request_id":"33654fc3-ea22-4e36-892a-3657a0c9be72","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":2952}
+{"timestamp":"2026-11-04T18:11:02.417371+00:00","event":"http.response","request_id":"1aedaa1f-8ffa-4f8b-9503-8a07791eed23","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":2595}
+{"timestamp":"2026-11-04T18:11:03.727619+00:00","event":"http.response","request_id":"30d65063-4b12-46c7-8305-34dafc8f37c1","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":1296}
+{"timestamp":"2026-11-04T18:11:05.717805+00:00","event":"http.response","request_id":"4a805a82-a753-4216-9a8b-a04f79b53d4e","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1990}
+{"timestamp":"2026-11-04T18:11:08.828142+00:00","event":"http.response","request_id":"8fa3acc8-2ace-42d6-8654-b13d58763ba8","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":3098}
+{"timestamp":"2026-11-04T18:11:10.978053+00:00","event":"http.response","request_id":"2be2f02f-ab2d-4645-a318-7575de77636c","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":2140}
+{"timestamp":"2026-11-04T18:11:12.292424+00:00","event":"http.response","request_id":"9348e745-669b-4e22-a1e7-ef5eb6f320d7","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":1304}
+{"timestamp":"2026-11-04T18:11:14.567286+00:00","event":"http.response","request_id":"eee530ed-9bbe-4c18-9c03-e68eff5b55f1","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":2271}
+{"timestamp":"2026-11-04T18:11:17.889901+00:00","event":"http.response","request_id":"b3eb3d3b-bc9c-404a-a3c8-6915a0c1d525","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":3315}
+{"timestamp":"2026-11-04T18:11:19.686944+00:00","event":"http.response","request_id":"72a978ff-664d-4e31-ba76-c222afb908b1","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1789}
+{"timestamp":"2026-11-04T18:11:20.858940+00:00","event":"http.response","request_id":"496c6adb-df20-4513-ba10-2dcfbee72756","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":1161}
+{"timestamp":"2026-11-04T18:11:23.343358+00:00","event":"http.response","request_id":"b02173f3-c080-47e7-a5d8-282b2cad21df","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":2483}
+{"timestamp":"2026-11-04T18:11:26.536316+00:00","event":"http.response","request_id":"c33202ff-4086-4338-8e20-e0b1153b44aa","method":"POST","route":"documents:contextual-link","status_code":302,"duration_ms":3183}
+ok
+test_expired_context_keeps_source_and_refreshes_form_intent (apps.documents.test_contextual_association.ContextualAssociationTests.test_expired_context_keeps_source_and_refreshes_form_intent) ... {"timestamp":"2026-11-04T16:11:26.643331+00:00","event":"http.response","request_id":"73308a12-cc6c-4e44-8b88-de195576273b","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":712}
+{"timestamp":"2026-11-04T18:11:28.088873+00:00","event":"http.response","request_id":"483b109c-87f9-4f55-b35d-4b65d0b4005b","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":721}
+{"timestamp":"2026-11-04T18:11:28.839792+00:00","event":"http.response","request_id":"af5692ef-9fa6-4ebb-a81b-b5f3d01ef5c7","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":738}
+ok
+test_file_and_required_field_errors_keep_source_and_cancel (apps.documents.test_contextual_association.ContextualAssociationTests.test_file_and_required_field_errors_keep_source_and_cancel) ... {"timestamp":"2026-11-04T18:11:29.720730+00:00","event":"http.response","request_id":"ad8e0a2d-7479-4e18-a3e1-6e3a08afd3f2","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":776}
+{"timestamp":"2026-11-04T18:11:30.415923+00:00","event":"http.response","request_id":"775a2400-c964-4cf7-95a8-9e84c57842fb","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":683}
+{"timestamp":"2026-11-04T18:11:31.054192+00:00","event":"http.response","request_id":"89e71dab-d276-4dc6-a596-16c2083d6fe7","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":629}
+ok
+test_foreign_targets_and_unsafe_navigation_are_denied (apps.documents.test_contextual_association.ContextualAssociationTests.test_foreign_targets_and_unsafe_navigation_are_denied) ... {"timestamp":"2026-11-04T18:11:31.458371+00:00","event":"http.response","request_id":"36b68f3f-1fe3-47ce-9139-ad6dc22d3b0a","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":334}
+{"timestamp":"2026-11-04T18:11:31.701957+00:00","event":"http.response","request_id":"d6846b11-1dd4-4b68-800f-c933520da93f","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":241}
+{"timestamp":"2026-11-04T18:11:31.958767+00:00","event":"http.response","request_id":"e89c1159-472a-413d-8e2e-5f0c7b63de92","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":255}
+{"timestamp":"2026-11-04T18:11:32.322632+00:00","event":"http.response","request_id":"1519b48a-a5a0-485b-a344-7d066718e282","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":364}
+{"timestamp":"2026-11-04T18:11:32.919425+00:00","event":"http.response","request_id":"e02918c7-9e17-4cdf-931a-5caa5acbd331","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":597}
+{"timestamp":"2026-11-04T18:11:33.193562+00:00","event":"http.response","request_id":"d9f60e9e-9165-472e-90e1-705349c9ca53","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":274}
+{"timestamp":"2026-11-04T18:11:33.503017+00:00","event":"http.response","request_id":"0f3cce62-c034-4f76-9e61-cb519be9391f","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":306}
+{"timestamp":"2026-11-04T18:11:33.750641+00:00","event":"http.response","request_id":"8891a296-9427-4c2e-a66c-214040747f86","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":245}
+{"timestamp":"2026-11-04T18:11:34.098545+00:00","event":"http.response","request_id":"c89af872-4c89-4fa8-a24a-45eee630d62c","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":347}
+{"timestamp":"2026-11-04T18:11:34.440223+00:00","event":"http.response","request_id":"c05b20c3-6a60-4bfd-9d83-0715303f16cb","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":341}
+{"timestamp":"2026-11-04T18:11:34.742639+00:00","event":"http.response","request_id":"f6c5e060-c252-4f40-917b-f03ad3f70821","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":301}
+{"timestamp":"2026-11-04T18:11:35.025064+00:00","event":"http.response","request_id":"824daa6a-2a4f-4367-9335-0e666ae298c4","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":286}
+ok
+test_forged_target_token_and_additional_relationships_are_rejected (apps.documents.test_contextual_association.ContextualAssociationTests.test_forged_target_token_and_additional_relationships_are_rejected) ... {"timestamp":"2026-11-04T18:11:35.815444+00:00","event":"http.response","request_id":"c6cc3580-9bc4-4e73-9e6b-a699035fcfa0","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":686}
+{"timestamp":"2026-11-04T18:11:36.472127+00:00","event":"http.response","request_id":"e5fd98c7-952d-4c62-aeba-7f313642bbe4","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":647}
+{"timestamp":"2026-11-04T18:11:37.109241+00:00","event":"http.response","request_id":"21b6c0ac-9cd0-4b5e-ab10-ba983fbfab13","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":636}
+{"timestamp":"2026-11-04T18:11:37.745146+00:00","event":"http.response","request_id":"a6994475-45ee-4f76-8773-8b69ba6cb087","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":633}
+{"timestamp":"2026-11-04T18:11:38.443624+00:00","event":"http.response","request_id":"5a7c43b7-ac57-4abb-879c-8c7eaf91f4e3","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":695}
+{"timestamp":"2026-11-04T18:11:39.150017+00:00","event":"http.response","request_id":"1a4dedf1-753f-4570-9b2f-9d9130552185","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":701}
+{"timestamp":"2026-11-04T18:11:39.876628+00:00","event":"http.response","request_id":"4dc1ca0a-0e7a-40e4-b3c5-d125ad5e4f56","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":729}
+{"timestamp":"2026-11-04T18:11:40.658325+00:00","event":"http.response","request_id":"73845703-ecdb-4d91-a408-6148e620160e","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":777}
+ok
+test_link_rollback_preserves_typed_legacy_atomicity (apps.documents.test_contextual_association.ContextualAssociationTests.test_link_rollback_preserves_typed_legacy_atomicity) ... {"timestamp":"2026-11-04T18:11:42.855361+00:00","event":"http.response","request_id":"ac7ef629-2332-465d-b5af-c53322ca9639","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1932}
+{"timestamp":"2026-11-04T18:11:45.749083+00:00","event":"http.response","request_id":"d3f5803e-e839-4461-b47e-e62a117d3d6e","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":2888}
+ok
+test_picker_search_excludes_duplicates_and_foreign_documents (apps.documents.test_contextual_association.ContextualAssociationTests.test_picker_search_excludes_duplicates_and_foreign_documents) ... {"timestamp":"2026-11-04T18:11:47.439566+00:00","event":"http.response","request_id":"76063d23-427e-49f1-9021-72803572d57d","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":1158}
+{"timestamp":"2026-11-04T18:11:48.501678+00:00","event":"http.response","request_id":"9d687684-30cb-4133-a0bd-487652922229","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":1061}
+{"timestamp":"2026-11-04T18:11:50.374426+00:00","event":"http.response","request_id":"d6a671bb-c145-49f1-b03a-e2ccff349d0c","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1876}
+{"timestamp":"2026-11-04T18:11:52.201505+00:00","event":"http.response","request_id":"fd442d71-5dab-44a2-b250-60d7707512a5","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1815}
+ok
+test_project_and_site_scope_are_rechecked (apps.documents.test_contextual_association.ContextualAssociationTests.test_project_and_site_scope_are_rechecked) ... {"timestamp":"2026-11-04T18:11:52.538975+00:00","event":"http.response","request_id":"5b52bbfd-6f59-450c-9f67-629b12f580a2","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":177}
+{"timestamp":"2026-11-04T18:11:52.721174+00:00","event":"http.response","request_id":"02a49076-134e-4d08-b0af-541408e6fdc1","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":181}
+{"timestamp":"2026-11-04T18:11:52.888475+00:00","event":"http.response","request_id":"8100e8c6-bc67-4efc-8dec-9ca5d6ea66cd","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":166}
+ok
+test_site_scoped_daily_report_upload_and_denied_other_site (apps.documents.test_contextual_association.ContextualAssociationTests.test_site_scoped_daily_report_upload_and_denied_other_site) ... {"timestamp":"2026-11-04T18:11:53.380279+00:00","event":"http.response","request_id":"c0efaf97-04fa-40b5-a0bc-6a011fa6b7e4","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":316}
+{"timestamp":"2026-11-04T18:11:53.882264+00:00","event":"http.response","request_id":"0b38b14f-cb72-4e95-8228-95f6161e3daa","method":"POST","route":"documents:contextual-upload","status_code":302,"duration_ms":495}
+{"timestamp":"2026-11-04T18:11:54.144020+00:00","event":"http.response","request_id":"c4913ced-6b09-4d30-9b89-73a2ab82a682","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":226}
+{"timestamp":"2026-11-04T18:11:54.381863+00:00","event":"http.response","request_id":"c526fa3e-84db-48a7-be42-7a24baaf93dc","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":236}
+{"timestamp":"2026-11-04T18:11:54.581583+00:00","event":"http.response","request_id":"67355cd8-d82e-49e9-9a29-1b4b586617e2","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":201}
+ok
+test_stale_compatibility_mapping_cannot_be_selected (apps.documents.test_contextual_association.ContextualAssociationTests.test_stale_compatibility_mapping_cannot_be_selected) ... {"timestamp":"2026-11-04T18:11:55.945900+00:00","event":"http.response","request_id":"4af78c16-c9c7-4bc5-940c-39feb63b1c0a","method":"GET","route":"documents:contextual-choices","status_code":200,"duration_ms":1064}
+{"timestamp":"2026-11-04T18:11:57.749986+00:00","event":"http.response","request_id":"f455feb6-94d3-46b9-aa81-989fbd8e5d5f","method":"GET","route":"documents:contextual-link","status_code":200,"duration_ms":1802}
+{"timestamp":"2026-11-04T18:11:59.681376+00:00","event":"http.response","request_id":"e880fcf2-bb6b-47dc-a0c6-ed94fe656348","method":"POST","route":"documents:contextual-link","status_code":400,"duration_ms":1929}
+ok
+test_upload_only_persona_cannot_read_picker_or_contextual_forms (apps.documents.test_contextual_association.ContextualAssociationTests.test_upload_only_persona_cannot_read_picker_or_contextual_forms) ... {"timestamp":"2026-11-04T18:11:59.857666+00:00","event":"http.response","request_id":"8eea79be-7a73-45b9-9cd3-45e08d2cfec2","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":81}
+{"timestamp":"2026-11-04T18:11:59.937139+00:00","event":"http.response","request_id":"ef31365c-92eb-44c1-a85d-2df8bf9630b5","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":79}
+{"timestamp":"2026-11-04T18:12:00.036999+00:00","event":"http.response","request_id":"95e59710-506b-43c3-9812-727d7ccf9c45","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":98}
+ok
+test_upload_rollback_removes_only_the_new_binary (apps.documents.test_contextual_association.ContextualAssociationTests.test_upload_rollback_removes_only_the_new_binary) ... {"timestamp":"2026-11-04T18:12:00.884203+00:00","event":"http.response","request_id":"ddef34c8-c50a-484c-ad93-70ecc40f359d","method":"GET","route":"documents:contextual-upload","status_code":200,"duration_ms":758}
+{"timestamp":"2026-11-04T18:12:02.012629+00:00","event":"http.response","request_id":"29bea45b-27c0-40ea-a05e-914034d7cd71","method":"POST","route":"documents:contextual-upload","status_code":400,"duration_ms":1115}
+ok
+test_viewer_has_no_contextual_mutation_actions_or_endpoints (apps.documents.test_contextual_association.ContextualAssociationTests.test_viewer_has_no_contextual_mutation_actions_or_endpoints) ... {"timestamp":"2026-11-04T18:12:02.526058+00:00","event":"http.response","request_id":"5d77a404-eede-4b78-a7e4-6720b2a9a0bd","method":"GET","route":"documents:contextual-upload","status_code":403,"duration_ms":110}
+{"timestamp":"2026-11-04T18:12:02.622482+00:00","event":"http.response","request_id":"4d11a0cc-f709-4435-9c9c-e6c3572aa905","method":"GET","route":"documents:contextual-link","status_code":403,"duration_ms":92}
+{"timestamp":"2026-11-04T18:12:02.725527+00:00","event":"http.response","request_id":"63d942c2-9a5c-4eab-a82b-002369921d3f","method":"GET","route":"documents:contextual-choices","status_code":403,"duration_ms":102}
+ok
+test_all_linked_contexts_must_be_authorized (apps.documents.test_related_documents.RelatedDocumentsTests.test_all_linked_contexts_must_be_authorized) ... ok
+test_archived_expired_sealed_and_deleted_source_documents_are_absent (apps.documents.test_related_documents.RelatedDocumentsTests.test_archived_expired_sealed_and_deleted_source_documents_are_absent) ... ok
+test_business_templates_have_one_navigation_and_one_read_only_section (apps.documents.test_related_documents.RelatedDocumentsTests.test_business_templates_have_one_navigation_and_one_read_only_section) ... {"timestamp":"2026-11-04T18:12:08.378279+00:00","event":"http.response","request_id":"db7fb8cb-9174-460d-9340-b041cb73995b","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1986}
+{"timestamp":"2026-11-04T18:12:09.684551+00:00","event":"http.response","request_id":"b388037d-cab9-4378-8ea6-ec4769143f79","method":"GET","route":"contracts:detail","status_code":200,"duration_ms":1302}
+{"timestamp":"2026-11-04T18:12:10.756197+00:00","event":"http.response","request_id":"36d6d747-1b8f-4cdb-ab3a-851f1a6e61e5","method":"GET","route":"estimates:detail","status_code":200,"duration_ms":1058}
+{"timestamp":"2026-11-04T18:12:11.649966+00:00","event":"http.response","request_id":"6250aaad-144f-44bf-8f1c-55b8697e7e81","method":"GET","route":"expenses:detail","status_code":200,"duration_ms":885}
+{"timestamp":"2026-11-04T18:12:12.607397+00:00","event":"http.response","request_id":"2c232299-470d-4421-ae53-a69b59457792","method":"GET","route":"daily_reports:detail","status_code":200,"duration_ms":951}
+ok
+test_daily_report_site_scope_does_not_expand_to_another_site (apps.documents.test_related_documents.RelatedDocumentsTests.test_daily_report_site_scope_does_not_expand_to_another_site) ... ok
+test_denied_dms_permission_hides_panel_and_count (apps.documents.test_related_documents.RelatedDocumentsTests.test_denied_dms_permission_hides_panel_and_count) ... ok
+test_document_detail_shows_real_source_return_without_new_mutation_flows (apps.documents.test_related_documents.RelatedDocumentsTests.test_document_detail_shows_real_source_return_without_new_mutation_flows) ... {"timestamp":"2026-11-04T18:12:14.649782+00:00","event":"http.response","request_id":"d75bcc37-2530-4564-b122-506c85250f19","method":"GET","route":"documents:detail","status_code":200,"duration_ms":868}
+ok
+test_download_requires_its_own_permission_and_exact_clean_version (apps.documents.test_related_documents.RelatedDocumentsTests.test_download_requires_its_own_permission_and_exact_clean_version) ... ok
+test_estimate_return_does_not_require_unauthorized_project_context (apps.documents.test_related_documents.RelatedDocumentsTests.test_estimate_return_does_not_require_unauthorized_project_context) ... ok
+test_five_sources_deduplicate_mirrors_and_generate_safe_roundtrips (apps.documents.test_related_documents.RelatedDocumentsTests.test_five_sources_deduplicate_mirrors_and_generate_safe_roundtrips) ... ok
+test_forged_return_context_never_produces_a_url (apps.documents.test_related_documents.RelatedDocumentsTests.test_forged_return_context_never_produces_a_url) ... ok
+test_missing_compatibility_parity_hides_document (apps.documents.test_related_documents.RelatedDocumentsTests.test_missing_compatibility_parity_hides_document) ... ok
+test_missing_source_permission_and_foreign_target_fail_closed (apps.documents.test_related_documents.RelatedDocumentsTests.test_missing_source_permission_and_foreign_target_fail_closed) ... ok
+test_only_direct_entity_links_are_projected (apps.documents.test_related_documents.RelatedDocumentsTests.test_only_direct_entity_links_are_projected) ... ok
+test_read_projection_does_not_record_a_download_or_change_links (apps.documents.test_related_documents.RelatedDocumentsTests.test_read_projection_does_not_record_a_download_or_change_links) ... ok
+test_add_link_supports_an_existing_financial_entity_and_audits (apps.documents.tests.DocumentServiceTests.test_add_link_supports_an_existing_financial_entity_and_audits) ... ok
+test_archive_preserves_versions_and_links_and_removes_active_listing (apps.documents.tests.DocumentServiceTests.test_archive_preserves_versions_and_links_and_removes_active_listing) ... ok
+test_create_document_records_first_version_link_metadata_and_audit (apps.documents.tests.DocumentServiceTests.test_create_document_records_first_version_link_metadata_and_audit) ... ok
+test_document_access_requires_linked_context_permission (apps.documents.tests.DocumentServiceTests.test_document_access_requires_linked_context_permission) ... ok
+test_document_link_requires_exactly_one_same_tenant_target (apps.documents.tests.DocumentServiceTests.test_document_link_requires_exactly_one_same_tenant_target) ... ok
+test_download_audit_is_version_specific_and_rechecks_access (apps.documents.tests.DocumentServiceTests.test_download_audit_is_version_specific_and_rechecks_access) ... ok
+test_endpoints_reject_cross_tenant_document_uuid (apps.documents.tests.DocumentServiceTests.test_endpoints_reject_cross_tenant_document_uuid) ... {"timestamp":"2026-11-04T18:12:39.257945+00:00","event":"http.response","request_id":"cef9bfb5-2d60-4664-b643-f97b0d110711","method":"GET","route":"documents:detail","status_code":403,"duration_ms":370}
+{"timestamp":"2026-11-04T18:12:39.549243+00:00","event":"http.response","request_id":"3c7e246e-768d-48f4-b136-5d49e6416d24","method":"GET","route":"documents:download","status_code":403,"duration_ms":286}
+{"timestamp":"2026-11-04T18:12:40.074383+00:00","event":"http.response","request_id":"d730bce2-3d5e-4251-802f-19f396a41dd5","method":"POST","route":"documents:archive","status_code":403,"duration_ms":525}
+ok
+test_new_version_is_numbered_immutable_and_becomes_current (apps.documents.tests.DocumentServiceTests.test_new_version_is_numbered_immutable_and_becomes_current) ... ok
+test_partner_evidence_document_keeps_tenant_and_domain_permission (apps.documents.tests.DocumentServiceTests.test_partner_evidence_document_keeps_tenant_and_domain_permission) ... ok
+test_partner_evidence_document_resolves_registered_link_model (apps.documents.tests.DocumentServiceTests.test_partner_evidence_document_resolves_registered_link_model) ... ok
+test_upload_validation_rejects_mismatched_type_and_signature (apps.documents.tests.DocumentServiceTests.test_upload_validation_rejects_mismatched_type_and_signature) ... ok
+test_views_create_add_version_and_secure_download (apps.documents.tests.DocumentServiceTests.test_views_create_add_version_and_secure_download) ... {"timestamp":"2026-11-04T18:12:48.365493+00:00","event":"http.response","request_id":"dee3389f-4e36-4c64-9612-d4e5d5e4d1b2","method":"POST","route":"documents:upload","status_code":302,"duration_ms":538}
+{"timestamp":"2026-11-04T18:12:49.514740+00:00","event":"http.response","request_id":"a5492ad9-997a-411c-ab29-5e7505d5ae55","method":"GET","route":"documents:detail","status_code":200,"duration_ms":1142}
+{"timestamp":"2026-11-04T18:12:49.883030+00:00","event":"http.response","request_id":"fbb6b4d4-d473-43fb-8917-5a99413e0bc7","method":"POST","route":"documents:version-add","status_code":302,"duration_ms":366}
+{"timestamp":"2026-11-04T18:12:51.200583+00:00","event":"http.response","request_id":"24d10883-3f3f-4081-b45e-c00ac8516dad","method":"GET","route":"documents:detail","status_code":200,"duration_ms":1316}
+{"timestamp":"2026-11-04T18:12:51.824624+00:00","event":"http.response","request_id":"4b398ce0-e583-43df-bc76-cad13f5f65f4","method":"GET","route":"documents:download","status_code":403,"duration_ms":619}
+{"timestamp":"2026-11-04T18:12:52.305403+00:00","event":"http.response","request_id":"6290254c-0b39-4266-8938-dda52f2fdbe3","method":"GET","route":"documents:download","status_code":200,"duration_ms":453}
+ok
+test_inactive_membership_fails_closed (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_inactive_membership_fails_closed) ... ok
+test_linked_contract_choices_intersect_source_project (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_linked_contract_choices_intersect_source_project) ... ok
+test_missing_permission_cannot_reveal_choices (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_missing_permission_cannot_reveal_choices) ... ok
+test_organization_grant_remains_tenant_filtered (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_organization_grant_remains_tenant_filtered) ... ok
+test_project_reader_has_exact_allowed_choices_and_valid_target (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_project_reader_has_exact_allowed_choices_and_valid_target) ... ok
+test_ungranted_and_foreign_targets_cannot_be_selected (apps.documents.test_cep079_form_scope.DocumentTargetScopeTests.test_ungranted_and_foreign_targets_cannot_be_selected) ... ok
+test_domain_closure_requires_record_approval (apps.safety.test_cep027_review.SafetyRecordReviewTests.test_domain_closure_requires_record_approval) ... ok
+test_evidence_pins_exact_dms_version (apps.safety.test_cep027_review.SafetyRecordReviewTests.test_evidence_pins_exact_dms_version) ... ok
+test_permissions_tenant_and_policy_absence_fail_closed (apps.safety.test_cep027_review.SafetyRecordReviewTests.test_permissions_tenant_and_policy_absence_fail_closed) ... ok
+test_return_correction_resubmit_approval_and_history (apps.safety.test_cep027_review.SafetyRecordReviewTests.test_return_correction_resubmit_approval_and_history) ... ok
+test_submitted_source_cannot_be_silently_edited (apps.safety.test_cep027_review.SafetyRecordReviewTests.test_submitted_source_cannot_be_silently_edited) ... ok
+test_domain_closure_requires_record_approval (apps.quality.test_cep027_review.QualityRecordReviewTests.test_domain_closure_requires_record_approval) ... ok
+test_evidence_pins_exact_dms_version (apps.quality.test_cep027_review.QualityRecordReviewTests.test_evidence_pins_exact_dms_version) ... ok
+test_permissions_tenant_and_invalid_evidence_fail_closed (apps.quality.test_cep027_review.QualityRecordReviewTests.test_permissions_tenant_and_invalid_evidence_fail_closed) ... ok
+test_return_correction_resubmit_approval_and_history (apps.quality.test_cep027_review.QualityRecordReviewTests.test_return_correction_resubmit_approval_and_history) ... ok
+test_submitted_source_cannot_be_silently_edited (apps.quality.test_cep027_review.QualityRecordReviewTests.test_submitted_source_cannot_be_silently_edited) ... ok
+test_capture_permission_project_site_scope_and_minimized_location (apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_capture_permission_project_site_scope_and_minimized_location) ... ERROR
+test_create_is_idempotent_and_cross_tenant_is_denied (apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_create_is_idempotent_and_cross_tenant_is_denied) ... ERROR
+test_dms_version_hash_is_pinned_and_submission_blocks_new_attachment (apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_dms_version_hash_is_pinned_and_submission_blocks_new_attachment) ... ERROR
+test_draft_revision_and_immutable_review_lineage (apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_draft_revision_and_immutable_review_lineage) ... ERROR
+test_responsive_rtl_workbench_is_accessible_to_authorized_user (apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_responsive_rtl_workbench_is_accessible_to_authorized_user) ... ERROR
+test_reviewed_proposal_does_not_create_downstream_fact (apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_reviewed_proposal_does_not_create_downstream_fact) ... ERROR
+test_approved_correction_and_cancellation_preserve_final_history (apps.contracts.test_contractual_records.ContractualRecordTests.test_approved_correction_and_cancellation_preserve_final_history) ... ERROR
+test_audit_failure_rolls_back_approval (apps.contracts.test_contractual_records.ContractualRecordTests.test_audit_failure_rolls_back_approval) ... ERROR
+test_commercial_review_fails_closed_for_cross_tenant_contract (apps.contracts.test_contractual_records.ContractualRecordTests.test_commercial_review_fails_closed_for_cross_tenant_contract) ... ERROR
+test_commercial_review_includes_permitted_billing_references_and_permissions (apps.contracts.test_contractual_records.ContractualRecordTests.test_commercial_review_includes_permitted_billing_references_and_permissions) ... ERROR
+test_governed_approval_records_explicit_facts_and_no_source_effects (apps.contracts.test_contractual_records.ContractualRecordTests.test_governed_approval_records_explicit_facts_and_no_source_effects) ... ERROR
+test_project_control_evidence_is_linked_without_mutating_source (apps.contracts.test_contractual_records.ContractualRecordTests.test_project_control_evidence_is_linked_without_mutating_source) ... ERROR
+test_read_only_commercial_review_orders_evidence_and_marks_advisory_gap (apps.contracts.test_contractual_records.ContractualRecordTests.test_read_only_commercial_review_orders_evidence_and_marks_advisory_gap) ... ERROR
+test_rtl_operational_views_are_tenant_scoped (apps.contracts.test_contractual_records.ContractualRecordTests.test_rtl_operational_views_are_tenant_scoped) ... ERROR
+test_submitted_withdrawal_closes_workflow_atomically (apps.contracts.test_contractual_records.ContractualRecordTests.test_submitted_withdrawal_closes_workflow_atomically) ... ERROR
+test_withdrawal_idempotency_tenant_and_permission_isolation (apps.contracts.test_contractual_records.ContractualRecordTests.test_withdrawal_idempotency_tenant_and_permission_isolation) ... ERROR
+test_workflow_sod_and_returned_revision_lineage (apps.contracts.test_contractual_records.ContractualRecordTests.test_workflow_sod_and_returned_revision_lineage) ... ERROR
+test_audit_records_lifecycle_without_financial_side_effect (apps.billing.test_commercial_controls.CommercialControlTests.test_audit_records_lifecycle_without_financial_side_effect) ... ERROR
+test_clearance_requirement_is_explicit_and_effective_dated (apps.billing.test_commercial_controls.CommercialControlTests.test_clearance_requirement_is_explicit_and_effective_dated) ... ERROR
+test_expiry_and_compliance_renewal_preserve_history (apps.billing.test_commercial_controls.CommercialControlTests.test_expiry_and_compliance_renewal_preserve_history) ... ERROR
+test_guarantee_workflow_exposure_release_and_immutable_history (apps.billing.test_commercial_controls.CommercialControlTests.test_guarantee_workflow_exposure_release_and_immutable_history) ... ERROR
+test_missing_contract_authority_unsafe_evidence_and_tenant_scope_fail_closed (apps.billing.test_commercial_controls.CommercialControlTests.test_missing_contract_authority_unsafe_evidence_and_tenant_scope_fail_closed) ... ERROR
+test_retention_release_calculation_correction_and_fail_closed_cap (apps.billing.test_commercial_controls.CommercialControlTests.test_retention_release_calculation_correction_and_fail_closed_cap) ... ERROR
+test_rtl_operational_dashboard_is_tenant_scoped (apps.billing.test_commercial_controls.CommercialControlTests.test_rtl_operational_dashboard_is_tenant_scoped) ... ERROR
+test_workflow_domain_and_audit_failure_roll_back_atomically (apps.billing.test_commercial_controls.CommercialControlTests.test_workflow_domain_and_audit_failure_roll_back_atomically) ... ERROR
+test_financial_shortcuts_preserve_expenses_and_remove_cash_workspace (core.test_product_surface.ProductSurfaceHttpTests.test_financial_shortcuts_preserve_expenses_and_remove_cash_workspace) ... ok
+test_hidden_http_get_post_and_htmx_fail_without_calling_domain_view (core.test_product_surface.ProductSurfaceHttpTests.test_hidden_http_get_post_and_htmx_fail_without_calling_domain_view) ... {"timestamp":"2026-11-04T18:13:30.786844+00:00","event":"http.response","request_id":"3b741b8c-2b02-4dd2-90b6-ed60e38e9e48","method":"GET","route":"treasury:workbench","status_code":403,"duration_ms":199}
+{"timestamp":"2026-11-04T18:13:31.048707+00:00","event":"http.response","request_id":"88f2d6fb-86d3-44e2-a1a9-d554ddb1a48c","method":"GET","route":"accounting:dashboard","status_code":403,"duration_ms":254}
+{"timestamp":"2026-11-04T18:13:31.274421+00:00","event":"http.response","request_id":"5bd05f8a-74c3-447b-8824-ac47899ae57b","method":"GET","route":"subledgers:workbench","status_code":403,"duration_ms":224}
+{"timestamp":"2026-11-04T18:13:31.531773+00:00","event":"http.response","request_id":"7bcd8742-f34b-4dd2-a5ec-5102250633f2","method":"GET","route":"financials:dashboard","status_code":403,"duration_ms":256}
+{"timestamp":"2026-11-04T18:13:31.787988+00:00","event":"http.response","request_id":"0b0bc4a3-fa7b-4443-a4dc-102dc9993294","method":"GET","route":"fixed_assets:workbench","status_code":403,"duration_ms":255}
+{"timestamp":"2026-11-04T18:13:32.188110+00:00","event":"http.response","request_id":"f7c925c0-afcf-4aa6-9b86-a9bf581fb6ef","method":"GET","route":"payroll:workbench","status_code":403,"duration_ms":387}
+{"timestamp":"2026-11-04T18:13:32.373234+00:00","event":"http.response","request_id":"f9eece4d-47ba-4535-9ae8-0c74fd414229","method":"GET","route":"workforce:foundation","status_code":403,"duration_ms":182}
+{"timestamp":"2026-11-04T18:13:32.558202+00:00","event":"http.response","request_id":"8618081b-b467-40df-bc37-6709d6fa4b43","method":"GET","route":"workforce:ess_dashboard","status_code":403,"duration_ms":189}
+{"timestamp":"2026-11-04T18:13:32.843924+00:00","event":"http.response","request_id":"06966666-680a-4e9c-93a9-c6bf914cbaf0","method":"GET","route":"workforce:employment_manage","status_code":403,"duration_ms":279}
+{"timestamp":"2026-11-04T18:13:33.120047+00:00","event":"http.response","request_id":"c982b521-7868-44bc-a4a4-3bcecd8cf59e","method":"GET","route":"reporting:reconciliation_workbench","status_code":403,"duration_ms":271}
+{"timestamp":"2026-11-04T18:13:33.364659+00:00","event":"http.response","request_id":"6b70eab6-f3da-4614-990d-1bd4fa9beaea","method":"GET","route":"reporting:project_closeout_workbench","status_code":403,"duration_ms":246}
+{"timestamp":"2026-11-04T18:13:33.584997+00:00","event":"http.response","request_id":"751abc6b-0ac0-4b68-92a1-0f6cbfcdcc7f","method":"GET","route":"organizations:reference_personas","status_code":403,"duration_ms":214}
+{"timestamp":"2026-11-04T18:13:33.872283+00:00","event":"http.response","request_id":"fca2c370-1c02-403b-ac50-04ed06e0b18a","method":"GET","route":"organizations:platform_role_catalog","status_code":403,"duration_ms":289}
+{"timestamp":"2026-11-04T18:13:34.170457+00:00","event":"http.response","request_id":"12c3aea9-0ac2-4521-a0d0-dc2719d4d3d7","method":"GET","route":"expenses:platform_group_list","status_code":403,"duration_ms":291}
+{"timestamp":"2026-11-04T18:13:34.411789+00:00","event":"http.response","request_id":"d11b00bc-5323-4b43-a78b-b52716d09e3c","method":"GET","route":"treasury:workbench","status_code":403,"duration_ms":246}
+{"timestamp":"2026-11-04T18:13:34.619608+00:00","event":"http.response","request_id":"77b982bb-0766-44be-a541-91ba84d33677","method":"POST","route":"treasury:workbench","status_code":403,"duration_ms":199}
+ok
+test_hidden_workflow_proxy_cannot_invoke_runtime (core.test_product_surface.ProductSurfaceHttpTests.test_hidden_workflow_proxy_cannot_invoke_runtime) ... {"timestamp":"2026-11-04T18:13:34.672813+00:00","event":"http.response","request_id":"17025d94-7a48-45ae-9619-54a31898307d","method":"POST","route":"workflows:work_item_action","status_code":302,"duration_ms":35}
+ok
+test_home_desktop_mobile_and_admin_navigation_share_five_groups (core.test_product_surface.ProductSurfaceHttpTests.test_home_desktop_mobile_and_admin_navigation_share_five_groups) ... {"timestamp":"2026-11-04T18:13:35.910520+00:00","event":"http.response","request_id":"a9919e7d-c112-449a-8121-ac0ed1544512","method":"GET","route":"home","status_code":200,"duration_ms":1222}
+ok
+test_home_keeps_own_requests_without_backoffice_permissions (core.test_product_surface.ProductSurfaceHttpTests.test_home_keeps_own_requests_without_backoffice_permissions) ... {"timestamp":"2026-11-04T18:13:36.254821+00:00","event":"http.response","request_id":"e6b86bd6-c52a-40b1-9349-e8c7fc11e8b6","method":"GET","route":"home","status_code":200,"duration_ms":203}
+{"timestamp":"2026-11-04T18:13:36.447304+00:00","event":"http.response","request_id":"a7408d7a-84d4-461c-b301-39cae57372fa","method":"GET","route":"workflows:my_requests","status_code":200,"duration_ms":183}
+ok
+test_internal_profile_reaches_original_authorized_hidden_view (core.test_product_surface.ProductSurfaceHttpTests.test_internal_profile_reaches_original_authorized_hidden_view) ... {"timestamp":"2026-11-04T18:13:37.012945+00:00","event":"http.response","request_id":"c252fbaa-3472-4f6e-ab6a-354a3f8f1eab","method":"GET","route":"treasury:workbench","status_code":200,"duration_ms":550}
+{"timestamp":"2026-11-04T18:13:37.278428+00:00","event":"http.response","request_id":"bd9763d2-8145-448c-b2d3-75d4168ec815","method":"GET","route":"treasury:workbench","status_code":403,"duration_ms":266}
+ok
+test_own_timekeeping_status_preserves_identity_and_source_ownership (core.test_product_surface.ProductSurfaceHttpTests.test_own_timekeeping_status_preserves_identity_and_source_ownership) ... {"timestamp":"2026-11-04T18:13:37.829195+00:00","event":"http.response","request_id":"be21b269-4cb0-4576-b421-fb9552d0838d","method":"GET","route":"workforce:ess_request_status","status_code":200,"duration_ms":461}
+{"timestamp":"2026-11-04T18:13:38.200692+00:00","event":"http.response","request_id":"6f638f8a-5cf6-4f3a-8f5e-29ba545d046e","method":"GET","route":"workflows:my_requests","status_code":200,"duration_ms":369}
+{"timestamp":"2026-11-04T18:13:38.336994+00:00","event":"http.response","request_id":"e30ca7c3-97aa-45d4-aedf-94ac1000b9cc","method":"GET","route":"workforce:ess_request_status","status_code":403,"duration_ms":137}
+{"timestamp":"2026-11-04T18:13:38.683825+00:00","event":"http.response","request_id":"2b9bfe24-f2d6-48e2-bfe2-3f3137f3be9f","method":"GET","route":"workforce:ess_request_status","status_code":403,"duration_ms":345}
+{"timestamp":"2026-11-04T18:13:38.956707+00:00","event":"http.response","request_id":"5726ea54-deac-42ed-acfd-b3f0a33019b7","method":"GET","route":"workforce:ess_request_status","status_code":403,"duration_ms":276}
+{"timestamp":"2026-11-04T18:13:38.995315+00:00","event":"http.response","request_id":"13d5ae5f-b948-4162-9c2b-d0bb3db80a4f","method":"GET","route":"workforce:ess_request_status","status_code":403,"duration_ms":31}
+ok
+test_permission_and_exposure_are_intersections (core.test_product_surface.ProductSurfaceHttpTests.test_permission_and_exposure_are_intersections) ... {"timestamp":"2026-11-04T18:13:39.154210+00:00","event":"http.response","request_id":"cb2872fc-0d35-4ed3-9edb-ae719cd8226f","method":"GET","route":"home","status_code":200,"duration_ms":127}
+{"timestamp":"2026-11-04T18:13:39.272498+00:00","event":"http.response","request_id":"20cb0899-25fb-42fe-b005-8bdfdfe99f9f","method":"GET","route":"projects:list","status_code":403,"duration_ms":121}
+{"timestamp":"2026-11-04T18:13:39.476496+00:00","event":"http.response","request_id":"689f45e3-9560-440e-a747-8aa53984910a","method":"GET","route":"expenses:list","status_code":200,"duration_ms":197}
+{"timestamp":"2026-11-04T18:13:39.587520+00:00","event":"http.response","request_id":"44c3419d-b02d-4399-9f49-2d1011b54149","method":"GET","route":"treasury:workbench","status_code":403,"duration_ms":109}
+ok
+test_reporting_filters_retained_cash_projection_after_authorization (core.test_product_surface.ProductSurfaceHttpTests.test_reporting_filters_retained_cash_projection_after_authorization) ... {"timestamp":"2026-11-04T18:13:39.613423+00:00","event":"http.response","request_id":"a54ea2ef-e279-4747-a1d0-49d0a69b81d2","method":"GET","route":"reporting:dashboard","status_code":200,"duration_ms":10}
+ok
+test_revoked_membership_and_superuser_do_not_bypass_product_boundary (core.test_product_surface.ProductSurfaceHttpTests.test_revoked_membership_and_superuser_do_not_bypass_product_boundary) ... {"timestamp":"2026-11-04T18:13:39.954463+00:00","event":"http.response","request_id":"ebb26d6a-ca4f-49d6-89ba-7aee1b4ec9fd","method":"GET","route":"treasury:workbench","status_code":403,"duration_ms":313}
+{"timestamp":"2026-11-04T18:13:39.966932+00:00","event":"http.response","request_id":"246ec436-3156-4726-9681-17bed218d46f","method":"GET","route":"expenses:list","status_code":302,"duration_ms":10}
+ok
+test_tenant_switch_object_reads_and_writes_fail_closed (core.test_product_surface.ProductSurfaceHttpTests.test_tenant_switch_object_reads_and_writes_fail_closed) ... {"timestamp":"2026-11-04T18:13:40.322784+00:00","event":"http.response","request_id":"53d860e4-b354-463f-81e9-cd34803a2f65","method":"GET","route":"projects:detail","status_code":403,"duration_ms":338}
+{"timestamp":"2026-11-04T18:13:40.677986+00:00","event":"http.response","request_id":"dc6efbaa-eb17-4ab2-8ca7-54b1cb60856d","method":"GET","route":"workforce:employee_detail","status_code":404,"duration_ms":354}
+{"timestamp":"2026-11-04T18:13:40.776427+00:00","event":"http.response","request_id":"fafab72b-83ab-4c39-a703-6347aec66d28","method":"POST","route":"workforce:employee_status_change","status_code":404,"duration_ms":97}
+{"timestamp":"2026-11-04T18:13:40.798374+00:00","event":"http.response","request_id":"85721115-3560-47bb-bb17-d040e2017469","method":"GET","route":"projects:list","status_code":403,"duration_ms":13}
+ok
+test_visible_operations_and_workforce_detail_keep_existing_guards (core.test_product_surface.ProductSurfaceHttpTests.test_visible_operations_and_workforce_detail_keep_existing_guards) ... {"timestamp":"2026-11-04T18:13:41.232059+00:00","event":"http.response","request_id":"7305b594-6a13-442b-9e93-822f12eb79cc","method":"GET","route":"projects:list","status_code":200,"duration_ms":415}
+{"timestamp":"2026-11-04T18:13:41.574560+00:00","event":"http.response","request_id":"0c989361-2520-4fa8-a103-de61761c8976","method":"GET","route":"expenses:list","status_code":200,"duration_ms":344}
+{"timestamp":"2026-11-04T18:13:42.163217+00:00","event":"http.response","request_id":"e3920f0f-1b0a-49ed-97fd-d7bbe937425e","method":"GET","route":"workforce:employee_list","status_code":200,"duration_ms":583}
+{"timestamp":"2026-11-04T18:13:42.817234+00:00","event":"http.response","request_id":"0c2991ad-ad4a-4694-aac7-0b800820c1f9","method":"GET","route":"timekeeping:workbench","status_code":200,"duration_ms":655}
+{"timestamp":"2026-11-04T18:13:43.253176+00:00","event":"http.response","request_id":"45c3837a-4cea-44fd-b796-c28e5a725d17","method":"GET","route":"reporting:dashboard","status_code":200,"duration_ms":433}
+{"timestamp":"2026-11-04T18:13:43.605252+00:00","event":"http.response","request_id":"daf0f310-570d-46b2-be73-0487b153e939","method":"GET","route":"organizations:settings","status_code":200,"duration_ms":350}
+{"timestamp":"2026-11-04T18:13:44.160481+00:00","event":"http.response","request_id":"1dc27f8a-1290-4e8d-a69f-98faf7e823d2","method":"GET","route":"workforce:employee_detail","status_code":200,"duration_ms":553}
+ok
+test_capabilities_are_unique_and_unknown_fails_closed (core.test_product_surface.SurfacePolicyTests.test_capabilities_are_unique_and_unknown_fails_closed) ... ok
+test_dynamic_shared_links_use_central_resolver_and_keep_plain_labels (core.test_product_surface.SurfacePolicyTests.test_dynamic_shared_links_use_central_resolver_and_keep_plain_labels) ... ok
+test_internal_profile_is_explicit_and_grants_no_unknown_capability (core.test_product_surface.SurfacePolicyTests.test_internal_profile_is_explicit_and_grants_no_unknown_capability) ... ok
+test_mixed_capabilities_share_namespaces_without_sharing_exposure (core.test_product_surface.SurfacePolicyTests.test_mixed_capabilities_share_namespaces_without_sharing_exposure) ... ok
+test_navigation_permissions_empty_groups_and_operational_reports (core.test_product_surface.SurfacePolicyTests.test_navigation_permissions_empty_groups_and_operational_reports) ... ok
+
+======================================================================
+ERROR: test_capture_permission_project_site_scope_and_minimized_location (apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_capture_permission_project_site_scope_and_minimized_location)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\daily_reports\test_p9_s01_s05.py", line 71, in setUp
+    self.project = create_project(organization=self.organization, actor=self.creator, code="P9-P", name="P9 project")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_create_is_idempotent_and_cross_tenant_is_denied (apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_create_is_idempotent_and_cross_tenant_is_denied)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\daily_reports\test_p9_s01_s05.py", line 71, in setUp
+    self.project = create_project(organization=self.organization, actor=self.creator, code="P9-P", name="P9 project")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_dms_version_hash_is_pinned_and_submission_blocks_new_attachment (apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_dms_version_hash_is_pinned_and_submission_blocks_new_attachment)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\daily_reports\test_p9_s01_s05.py", line 71, in setUp
+    self.project = create_project(organization=self.organization, actor=self.creator, code="P9-P", name="P9 project")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_draft_revision_and_immutable_review_lineage (apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_draft_revision_and_immutable_review_lineage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\daily_reports\test_p9_s01_s05.py", line 71, in setUp
+    self.project = create_project(organization=self.organization, actor=self.creator, code="P9-P", name="P9 project")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_responsive_rtl_workbench_is_accessible_to_authorized_user (apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_responsive_rtl_workbench_is_accessible_to_authorized_user)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\daily_reports\test_p9_s01_s05.py", line 71, in setUp
+    self.project = create_project(organization=self.organization, actor=self.creator, code="P9-P", name="P9 project")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_reviewed_proposal_does_not_create_downstream_fact (apps.daily_reports.test_p9_s01_s05.FieldOperationsP9S01S05Tests.test_reviewed_proposal_does_not_create_downstream_fact)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\daily_reports\test_p9_s01_s05.py", line 71, in setUp
+    self.project = create_project(organization=self.organization, actor=self.creator, code="P9-P", name="P9 project")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_approved_correction_and_cancellation_preserve_final_history (apps.contracts.test_contractual_records.ContractualRecordTests.test_approved_correction_and_cancellation_preserve_final_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\test_contractual_records.py", line 67, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_audit_failure_rolls_back_approval (apps.contracts.test_contractual_records.ContractualRecordTests.test_audit_failure_rolls_back_approval)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\test_contractual_records.py", line 67, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_commercial_review_fails_closed_for_cross_tenant_contract (apps.contracts.test_contractual_records.ContractualRecordTests.test_commercial_review_fails_closed_for_cross_tenant_contract)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\test_contractual_records.py", line 67, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_commercial_review_includes_permitted_billing_references_and_permissions (apps.contracts.test_contractual_records.ContractualRecordTests.test_commercial_review_includes_permitted_billing_references_and_permissions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\test_contractual_records.py", line 67, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_governed_approval_records_explicit_facts_and_no_source_effects (apps.contracts.test_contractual_records.ContractualRecordTests.test_governed_approval_records_explicit_facts_and_no_source_effects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\test_contractual_records.py", line 67, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_project_control_evidence_is_linked_without_mutating_source (apps.contracts.test_contractual_records.ContractualRecordTests.test_project_control_evidence_is_linked_without_mutating_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\test_contractual_records.py", line 67, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_read_only_commercial_review_orders_evidence_and_marks_advisory_gap (apps.contracts.test_contractual_records.ContractualRecordTests.test_read_only_commercial_review_orders_evidence_and_marks_advisory_gap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\test_contractual_records.py", line 67, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_rtl_operational_views_are_tenant_scoped (apps.contracts.test_contractual_records.ContractualRecordTests.test_rtl_operational_views_are_tenant_scoped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\test_contractual_records.py", line 67, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_submitted_withdrawal_closes_workflow_atomically (apps.contracts.test_contractual_records.ContractualRecordTests.test_submitted_withdrawal_closes_workflow_atomically)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\test_contractual_records.py", line 67, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_withdrawal_idempotency_tenant_and_permission_isolation (apps.contracts.test_contractual_records.ContractualRecordTests.test_withdrawal_idempotency_tenant_and_permission_isolation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\test_contractual_records.py", line 67, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_workflow_sod_and_returned_revision_lineage (apps.contracts.test_contractual_records.ContractualRecordTests.test_workflow_sod_and_returned_revision_lineage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\test_contractual_records.py", line 67, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_audit_records_lifecycle_without_financial_side_effect (apps.billing.test_commercial_controls.CommercialControlTests.test_audit_records_lifecycle_without_financial_side_effect)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_clearance_requirement_is_explicit_and_effective_dated (apps.billing.test_commercial_controls.CommercialControlTests.test_clearance_requirement_is_explicit_and_effective_dated)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_expiry_and_compliance_renewal_preserve_history (apps.billing.test_commercial_controls.CommercialControlTests.test_expiry_and_compliance_renewal_preserve_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_guarantee_workflow_exposure_release_and_immutable_history (apps.billing.test_commercial_controls.CommercialControlTests.test_guarantee_workflow_exposure_release_and_immutable_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_missing_contract_authority_unsafe_evidence_and_tenant_scope_fail_closed (apps.billing.test_commercial_controls.CommercialControlTests.test_missing_contract_authority_unsafe_evidence_and_tenant_scope_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_retention_release_calculation_correction_and_fail_closed_cap (apps.billing.test_commercial_controls.CommercialControlTests.test_retention_release_calculation_correction_and_fail_closed_cap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_rtl_operational_dashboard_is_tenant_scoped (apps.billing.test_commercial_controls.CommercialControlTests.test_rtl_operational_dashboard_is_tenant_scoped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_workflow_domain_and_audit_failure_roll_back_atomically (apps.billing.test_commercial_controls.CommercialControlTests.test_workflow_domain_and_audit_failure_roll_back_atomically)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+----------------------------------------------------------------------
+Ran 126 tests in 415.183s
+
+FAILED (errors=25)
+Preserving test database for alias 'default' ('test_bonira_related_documents_phase1_20261104')...
+
