@@ -1,0 +1,8 @@
+<div class="grid grid-cols-2 gap-3" data-duration-input>
+  {% for part in widget.subwidgets %}
+    <div>
+      <label for="{{ part.attrs.id }}" class="mb-1 block text-xs text-slate-600">{% if forloop.first %}ساعت{% else %}دقیقه{% endif %}</label>
+      {% include part.template_name with widget=part %}
+    </div>
+  {% endfor %}
+</div>

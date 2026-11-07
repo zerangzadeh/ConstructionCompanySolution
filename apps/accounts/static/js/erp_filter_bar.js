@@ -2,9 +2,48 @@
 (() => {
     'use strict';
     let rowMenusBound = false;
+    window.addEventListener('pageshow', () => {
+        // Opt-in lists restore server-rendered GET values after browser history
+        // restores a form's later, unsaved edits over the previous result page.
+        document.querySelectorAll('form[data-restore-filter-state]').forEach(form => {
+            form.reset();
+            form.querySelectorAll('select').forEach(select => {
+                if (select.tomselect) {
+                    select.tomselect.setValue([...select.selectedOptions].map(option => option.value), true);
+                }
+            });
+        });
+    });
     const mount = () => {
         document.querySelectorAll('[data-filter-options]').forEach(panel => {
             if (panel.dataset.responsiveBound) return;
+            const quick = panel.querySelector('.erp-list-quick');
+            let summary = panel.querySelector('.erp-list-options__summary');
+            const enhancedDisclosure = panel.closest('[data-field-list], .erp-workspace--timekeeping');
+            if (enhancedDisclosure) {
+                // Preserve the live controls while avoiding native details
+                // content remaining hidden around enhanced selects in Chrome.
+                const replacement = document.createElement('div');
+                for (const attribute of panel.attributes) {
+                    if (attribute.name !== 'open') replacement.setAttribute(attribute.name, attribute.value);
+                }
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = summary.className;
+                button.append(...summary.childNodes);
+                summary.replaceWith(button);
+                summary = button;
+                replacement.append(...panel.childNodes);
+                panel.replaceWith(replacement);
+                panel = replacement;
+                quick.id ||= panel.closest('form').id + '-quick';
+                summary.setAttribute('aria-controls', quick.id);
+                summary.addEventListener('click', () => {
+                    panel.open = !panel.open;
+                    quick.hidden = !panel.open;
+                    summary.setAttribute('aria-expanded', String(panel.open));
+                });
+            }
             panel.dataset.responsiveBound = 'true';
             const desktop = window.matchMedia(panel.hasAttribute('data-filter-options-expanded') ? '(min-width: 0px)' : '(min-width: 1280px)');
             const bar = panel.closest('[data-filter-bar]');
@@ -20,6 +59,10 @@
             };
             const sync = () => {
                 panel.open = desktop.matches;
+                if (enhancedDisclosure) {
+                    quick.hidden = !panel.open;
+                    summary.setAttribute('aria-expanded', String(panel.open));
+                }
                 // One clear link: beside Apply on desktop, with visible chips
                 // when the mobile quick-filter disclosure is collapsed.
                 if (clear && !bar.hasAttribute('data-reference-layout')) (desktop.matches ? actions : chips)?.append(clear);

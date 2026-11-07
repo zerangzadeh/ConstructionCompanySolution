@@ -1,0 +1,258 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 40 items
+
+core/test_home_workspace.py::HomeWorkspaceTests::test_active_organization_switch_replaces_all_home_data PASSED [  2%]
+core/test_home_workspace.py::HomeWorkspaceTests::test_all_home_destinations_remain_authorized PASSED [  5%]
+core/test_home_workspace.py::HomeWorkspaceTests::test_counts_chart_and_workbench_use_real_visible_sources PASSED [  7%]
+core/test_home_workspace.py::HomeWorkspaceTests::test_empty_organization_has_truthful_zero_counts_and_no_donut PASSED [ 10%]
+core/test_home_workspace.py::HomeWorkspaceTests::test_product_surface_hides_project_facts_and_chart PASSED [ 12%]
+core/test_home_workspace.py::HomeWorkspaceTests::test_project_scope_applies_to_counts_chart_recent_records_and_links PASSED [ 15%]
+core/test_home_workspace.py::HomeWorkspaceTests::test_recent_records_use_actual_timestamps_and_readable_destinations PASSED [ 17%]
+core/test_home_workspace.py::HomeWorkspaceTests::test_source_denial_cannot_be_overridden_by_navigation PASSED [ 20%]
+apps/projects/test_command_center.py::CommandCenterTests::test_dashboard_sources_commercial_links_and_no_inferred_progress PASSED [ 22%]
+apps/projects/test_command_center.py::CommandCenterTests::test_list_search_chips_dates_and_scope PASSED [ 25%]
+apps/projects/test_command_center.py::CommandCenterTests::test_restricted_metrics_never_load_or_leak_and_context_is_isolated PASSED [ 27%]
+apps/projects/test_command_center.py::CommandCenterTests::test_sibling_and_foreign_records_do_not_enter_charts_or_recent PASSED [ 30%]
+apps/projects/test_command_center.py::CommandCenterTests::test_status_summary_uses_all_authorized_projects_before_filter_and_pagination PASSED [ 32%]
+apps/projects/test_command_center.py::CommandCenterTests::test_surface_hidden_sources_and_links_are_omitted PASSED [ 35%]
+apps/projects/test_command_center.py::CommandCenterCostTests::test_commitment_evidence_does_not_fabricate_a_zero_actual_cost PASSED [ 37%]
+apps/projects/test_command_center.py::CommandCenterCostTests::test_exact_projection_and_currency_guard_without_legacy_budget_substitution PASSED [ 40%]
+core/test_product_surface.py::ProductSurfaceHttpTests::test_financial_shortcuts_preserve_expenses_and_remove_cash_workspace PASSED [ 42%]
+core/test_product_surface.py::ProductSurfaceHttpTests::test_hidden_http_get_post_and_htmx_fail_without_calling_domain_view 
+core/test_product_surface.py::ProductSurfaceHttpTests::test_hidden_http_get_post_and_htmx_fail_without_calling_domain_view PASSED [ 45%]
+core/test_product_surface.py::ProductSurfaceHttpTests::test_hidden_workflow_proxy_cannot_invoke_runtime PASSED [ 47%]
+core/test_product_surface.py::ProductSurfaceHttpTests::test_home_desktop_mobile_and_admin_navigation_share_five_groups PASSED [ 50%]
+core/test_product_surface.py::ProductSurfaceHttpTests::test_home_keeps_own_requests_without_backoffice_permissions PASSED [ 52%]
+core/test_product_surface.py::ProductSurfaceHttpTests::test_internal_profile_reaches_original_authorized_hidden_view PASSED [ 55%]
+core/test_product_surface.py::ProductSurfaceHttpTests::test_own_timekeeping_status_preserves_identity_and_source_ownership PASSED [ 57%]
+core/test_product_surface.py::ProductSurfaceHttpTests::test_permission_and_exposure_are_intersections PASSED [ 60%]
+core/test_product_surface.py::ProductSurfaceHttpTests::test_reporting_filters_retained_cash_projection_after_authorization PASSED [ 62%]
+core/test_product_surface.py::ProductSurfaceHttpTests::test_revoked_membership_and_superuser_do_not_bypass_product_boundary PASSED [ 65%]
+core/test_product_surface.py::ProductSurfaceHttpTests::test_tenant_switch_object_reads_and_writes_fail_closed PASSED [ 67%]
+core/test_product_surface.py::ProductSurfaceHttpTests::test_visible_operations_and_workforce_detail_keep_existing_guards PASSED [ 70%]
+tests/test_dashboard_reporting.py::DashboardReportingBrowserTests::test_pilot_home_real_kpis_charts_navigation_and_restricted_scope FAILED [ 72%]
+tests/test_dashboard_reporting.py::DashboardReportingBrowserTests::test_reporting_populated_incomplete_empty_and_permissions PASSED [ 75%]
+tests/test_dashboard_reporting.py::DashboardReportingBrowserTests::test_specialized_empty_pages_and_denied_reports PASSED [ 77%]
+tests/test_dashboard_reporting.py::ProjectReportSourceBrowserTests::test_nonempty_comparison_exceptions_and_full_project_export FAILED [ 80%]
+tests/test_dashboard_reporting.py::CommercialDashboardSourceBrowserTests::test_commercial_source_amounts_dates_and_navigation FAILED [ 82%]
+tests/test_dashboard_reporting.py::StatutoryReportSourceBrowserTests::test_statutory_source_records_and_existing_export FAILED [ 85%]
+tests/test_dashboard_reporting.py::InventoryReportSourceBrowserTests::test_valuation_exact_source_units_and_history FAILED [ 87%]
+core/test_product_surface.py::SurfacePolicyTests::test_capabilities_are_unique_and_unknown_fails_closed PASSED [ 90%]
+core/test_product_surface.py::SurfacePolicyTests::test_dynamic_shared_links_use_central_resolver_and_keep_plain_labels PASSED [ 92%]
+core/test_product_surface.py::SurfacePolicyTests::test_internal_profile_is_explicit_and_grants_no_unknown_capability PASSED [ 95%]
+core/test_product_surface.py::SurfacePolicyTests::test_mixed_capabilities_share_namespaces_without_sharing_exposure PASSED [ 97%]
+core/test_product_surface.py::SurfacePolicyTests::test_navigation_permissions_empty_groups_and_operational_reports PASSED [100%]
+
+================================== FAILURES ===================================
+_ DashboardReportingBrowserTests.test_pilot_home_real_kpis_charts_navigation_and_restricted_scope _
+tests\test_dashboard_reporting.py:161: in test_pilot_home_real_kpis_charts_navigation_and_restricted_scope
+    self.browser(
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:305
+E             throw new Error(scenario.name+': '+step.description);
+E                   ^
+E   
+E   Error: restricted-project-1440: only authorized budget and contract counts remain
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:305:17
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-05T20:58:34.485024+00:00","event":"http.response","request_id":"23086cb8-75cb-4926-9f02-d9b0802730c1","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1729}
+
+{"timestamp":"2026-11-05T20:58:35.661372+00:00","event":"http.response","request_id":"7f2d6ad9-f05c-4216-b175-2f6a637b10f8","method":"GET","route":null,"status_code":404,"duration_ms":385}
+
+{"timestamp":"2026-11-05T20:58:37.588917+00:00","event":"http.response","request_id":"c5bb86f2-ddb2-476c-b110-d6b71a553efc","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1606}
+
+{"timestamp":"2026-11-05T20:58:40.073260+00:00","event":"http.response","request_id":"23318f44-4b88-4c50-94a2-88bc9d79b321","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1528}
+
+{"timestamp":"2026-11-05T20:58:41.654221+00:00","event":"http.response","request_id":"f25927de-561c-4b26-95d7-88a8cb5e178a","method":"GET","route":"home","status_code":200,"duration_ms":867}
+
+{"timestamp":"2026-11-05T20:58:43.503665+00:00","event":"http.response","request_id":"f6e01f1e-9a3a-4067-82fc-2326790e7c8d","method":"GET","route":"home","status_code":200,"duration_ms":977}
+
+{"timestamp":"2026-11-05T20:58:44.794511+00:00","event":"http.response","request_id":"17957ec4-154b-4776-bc47-15d070c31bbd","method":"GET","route":"home","status_code":200,"duration_ms":672}
+
+{"timestamp":"2026-11-05T20:58:48.049578+00:00","event":"http.response","request_id":"775d9f02-4d57-467d-a697-525ad9fec193","method":"GET","route":"projects:detail","status_code":200,"duration_ms":2148}
+
+{"timestamp":"2026-11-05T20:58:50.413555+00:00","event":"http.response","request_id":"ba0d3cf6-4be9-4474-8294-081be2196025","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1762}
+
+{"timestamp":"2026-11-05T20:58:52.463324+00:00","event":"http.response","request_id":"bdf8084e-3470-4d3c-bd20-af4004751634","method":"GET","route":"projects:detail","status_code":200,"duration_ms":1419}
+
+{"timestamp":"2026-11-05T20:58:53.013673+00:00","event":"http.response","request_id":"7ad045a3-bcff-4295-98be-e31ee81f9bde","method":"GET","route":"contracts:list","status_code":200,"duration_ms":417}
+
+{"timestamp":"2026-11-05T20:58:55.979077+00:00","event":"http.response","request_id":"0c0f82fa-63e1-4d9d-86aa-32f40b863fbb","method":"GET","route":"projects:detail","status_code":200,"duration_ms":628}
+
+{"timestamp":"2026-11-05T20:58:56.718102+00:00","event":"http.response","request_id":"d1617c90-8e6b-40d9-86f2-6d592eef2d6e","method":"GET","route":null,"status_code":404,"duration_ms":272}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+_ ProjectReportSourceBrowserTests.test_nonempty_comparison_exceptions_and_full_project_export _
+tests\test_dashboard_reporting.py:353: in test_nonempty_comparison_exceptions_and_full_project_export
+    self.browser(
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385
+E       for(const text of scenario.mustText || []) if(!visibleText.includes(text)) throw new Error(scenario.name+': missing business text '+text);
+E                                                                                        ^
+E   
+E   Error: comparison-populated-1440: missing business text IRR
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385:86
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-05T21:00:29.584525+00:00","event":"http.response","request_id":"b30cc080-d752-4caa-bbde-02dcd85f4bfe","method":"GET","route":"projects:controls_comparison","status_code":200,"duration_ms":412}
+
+{"timestamp":"2026-11-05T21:00:29.881074+00:00","event":"http.response","request_id":"fdd36d7b-278d-4961-9f0b-509b39f19f97","method":"GET","route":"projects:controls_export","status_code":200,"duration_ms":294}
+
+{"timestamp":"2026-11-05T21:00:31.648948+00:00","event":"http.response","request_id":"a45a4667-f640-45a6-8521-273213fdea8a","method":"GET","route":"projects:controls_comparison","status_code":200,"duration_ms":658}
+
+{"timestamp":"2026-11-05T21:00:33.122247+00:00","event":"http.response","request_id":"dc77db4f-03a6-465f-a1de-607cc711dd81","method":"GET","route":null,"status_code":404,"duration_ms":541}
+
+[06/Nov/2026 00:30:33,123] - Broken pipe from ('127.0.0.1', 61782)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 61782)
+_ CommercialDashboardSourceBrowserTests.test_commercial_source_amounts_dates_and_navigation _
+tests\test_dashboard_reporting.py:404: in test_commercial_source_amounts_dates_and_navigation
+    self.browser(
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385
+E       for(const text of scenario.mustText || []) if(!visibleText.includes(text)) throw new Error(scenario.name+': missing business text '+text);
+E                                                                                        ^
+E   
+E   Error: commercial-populated-1440: missing business text IRR
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385:86
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-05T21:00:46.986247+00:00","event":"http.response","request_id":"0987c107-1692-477b-a036-644a033e0526","method":"GET","route":"billing:commercial_control_dashboard","status_code":200,"duration_ms":433}
+
+{"timestamp":"2026-11-05T21:00:48.490400+00:00","event":"http.response","request_id":"806e1a0b-7c5e-4f2d-9893-d6fcd0e704f6","method":"GET","route":"billing:commercial_control_dashboard","status_code":200,"duration_ms":688}
+
+{"timestamp":"2026-11-05T21:00:49.299541+00:00","event":"http.response","request_id":"41296fb1-0552-444d-97cd-e5ea1123badc","method":"GET","route":null,"status_code":404,"duration_ms":392}
+
+[06/Nov/2026 00:30:49,300] - Broken pipe from ('127.0.0.1', 62274)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 62274)
+_ StatutoryReportSourceBrowserTests.test_statutory_source_records_and_existing_export _
+tests\test_dashboard_reporting.py:456: in test_statutory_source_records_and_existing_export
+    self.browser(
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385
+E       for(const text of scenario.mustText || []) if(!visibleText.includes(text)) throw new Error(scenario.name+': missing business text '+text);
+E                                                                                        ^
+E   
+E   Error: statutory-populated-1440: missing business text IRR
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385:86
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-05T21:01:05.460317+00:00","event":"http.response","request_id":"67962528-9fca-4b36-bf1c-7050f0523381","method":"GET","route":"billing:statutory_operations_dashboard","status_code":200,"duration_ms":341}
+
+{"timestamp":"2026-11-05T21:01:11.616263+00:00","event":"http.response","request_id":"74479e25-1906-46d3-ae81-149f93439007","method":"GET","route":"billing:statutory_operations_dashboard","status_code":200,"duration_ms":692}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ InventoryReportSourceBrowserTests.test_valuation_exact_source_units_and_history _
+tests\test_dashboard_reporting.py:573: in test_valuation_exact_source_units_and_history
+    self.browser(
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385
+E       for(const text of scenario.mustText || []) if(!visibleText.includes(text)) throw new Error(scenario.name+': missing business text '+text);
+E                                                                                        ^
+E   
+E   Error: valuation-populated-1440: missing business text IRR
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385:86
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-05T21:01:28.793977+00:00","event":"http.response","request_id":"ca4d95fc-ba24-4fb0-835e-596e41149953","method":"GET","route":"inventory:valuation_workbench","status_code":200,"duration_ms":418}
+
+{"timestamp":"2026-11-05T21:01:29.982032+00:00","event":"http.response","request_id":"7f0a0a28-8f09-419d-bbdb-cd52834d395d","method":"GET","route":"inventory:valuation_workbench","status_code":200,"duration_ms":480}
+
+{"timestamp":"2026-11-05T21:01:30.611316+00:00","event":"http.response","request_id":"13e41ffa-11c9-461f-922e-15219ac7777f","method":"GET","route":null,"status_code":404,"duration_ms":345}
+
+[06/Nov/2026 00:31:30,612] - Broken pipe from ('127.0.0.1', 54533)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 54533)
+=========================== short test summary info ===========================
+FAILED tests/test_dashboard_reporting.py::DashboardReportingBrowserTests::test_pilot_home_real_kpis_charts_navigation_and_restricted_scope - AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:305
+          throw new Error(scenario.name+': '+step.description);
+                ^
+
+Error: restricted-project-1440: only authorized budget and contract counts remain
+    at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:305:17
+
+Node.js v24.20.0
+FAILED tests/test_dashboard_reporting.py::ProjectReportSourceBrowserTests::test_nonempty_comparison_exceptions_and_full_project_export - AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385
+    for(const text of scenario.mustText || []) if(!visibleText.includes(text)) throw new Error(scenario.name+': missing business text '+text);
+                                                                                     ^
+
+Error: comparison-populated-1440: missing business text IRR
+    at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385:86
+
+Node.js v24.20.0
+FAILED tests/test_dashboard_reporting.py::CommercialDashboardSourceBrowserTests::test_commercial_source_amounts_dates_and_navigation - AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385
+    for(const text of scenario.mustText || []) if(!visibleText.includes(text)) throw new Error(scenario.name+': missing business text '+text);
+                                                                                     ^
+
+Error: commercial-populated-1440: missing business text IRR
+    at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385:86
+
+Node.js v24.20.0
+FAILED tests/test_dashboard_reporting.py::StatutoryReportSourceBrowserTests::test_statutory_source_records_and_existing_export - AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385
+    for(const text of scenario.mustText || []) if(!visibleText.includes(text)) throw new Error(scenario.name+': missing business text '+text);
+                                                                                     ^
+
+Error: statutory-populated-1440: missing business text IRR
+    at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385:86
+
+Node.js v24.20.0
+FAILED tests/test_dashboard_reporting.py::InventoryReportSourceBrowserTests::test_valuation_exact_source_units_and_history - AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385
+    for(const text of scenario.mustText || []) if(!visibleText.includes(text)) throw new Error(scenario.name+': missing business text '+text);
+                                                                                     ^
+
+Error: valuation-populated-1440: missing business text IRR
+    at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:385:86
+
+Node.js v24.20.0
+======== 5 failed, 35 passed, 14 subtests passed in 257.85s (0:04:17) =========

@@ -1,0 +1,11 @@
+{% extends "components/sectioned_form_page.html" %}
+{% block title %}{{ title }} | بنیرا{% endblock %}
+{% block sectioned_content %}
+    {% url back_url as cancel_url %}
+    {% include "components/page_header.html" with page_title=title page_breadcrumb_label="سرویس و تعمیرات" page_breadcrumb_url=cancel_url page_description="ثبت مشخصات نگهداری تجهیز، محل خدمت و شرح کار" page_icon="document" only %}
+    <form class="erp-create-form erp-sectioned-form" method="post" aria-labelledby="erp-page-title">
+        {% csrf_token %}
+        {% include "components/sectioned_form_fields.html" with form=form profile="equipment_maintenance" only %}
+        {% include "components/form_footer.html" with submit_label="ثبت سابقه" cancel_url=cancel_url submit_icon="check-circle" only %}
+    </form>
+{% endblock %}

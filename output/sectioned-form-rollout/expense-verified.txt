@@ -1,0 +1,90 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________ SectionedFormRolloutTests.test_expense_pilot _________________
+tests\test_sectioned_form_rollout.py:201: in test_expense_pilot
+    Expense.objects.filter(
+tests\test_sectioned_form_rollout.py:167: in verify_pages
+    self.browser(self.owner, journeys)
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:299
+E             throw new Error(scenario.name+': '+step.description);
+E                   ^
+E   
+E   Error: expense-save: valid submission follows the existing success destination
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:299:17
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-04T22:08:32.701965+00:00","event":"http.response","request_id":"4ccc1b26-328e-4f0c-b9bd-c1663ad1f9ca","method":"GET","route":"expenses:create","status_code":200,"duration_ms":500}
+
+{"timestamp":"2026-11-04T22:08:32.968111+00:00","event":"http.response","request_id":"ff8b6cf2-034a-4034-88c0-cdc028da74f8","method":"GET","route":"expenses:draft_create","status_code":200,"duration_ms":245}
+
+{"timestamp":"2026-11-04T22:08:34.434949+00:00","event":"http.response","request_id":"43c41b69-bded-4ccf-813e-b797925f883f","method":"GET","route":"expenses:create","status_code":200,"duration_ms":498}
+
+{"timestamp":"2026-11-04T22:08:35.556947+00:00","event":"http.response","request_id":"9cc54bb5-4934-4218-b07a-cfcf5d788786","method":"GET","route":null,"status_code":404,"duration_ms":412}
+
+{"timestamp":"2026-11-04T22:08:36.589588+00:00","event":"http.response","request_id":"55f62043-b3c8-46d4-933b-84edce33ec8a","method":"GET","route":"expenses:create","status_code":200,"duration_ms":491}
+
+{"timestamp":"2026-11-04T22:08:38.208852+00:00","event":"http.response","request_id":"5be58bfa-1445-4115-9a60-52de4a1fcd46","method":"GET","route":"expenses:create","status_code":200,"duration_ms":631}
+
+{"timestamp":"2026-11-04T22:08:39.511417+00:00","event":"http.response","request_id":"37a1ae76-ad11-4138-a2af-ccc3ce080b7f","method":"GET","route":"expenses:create","status_code":200,"duration_ms":489}
+
+{"timestamp":"2026-11-04T22:08:40.189649+00:00","event":"http.response","request_id":"b100079d-0b2f-41d3-828e-9c1a5afb4f03","method":"GET","route":"expenses:draft_create","status_code":200,"duration_ms":490}
+
+{"timestamp":"2026-11-04T22:08:41.625439+00:00","event":"http.response","request_id":"a939df09-2339-4ecd-b965-446aa703fa61","method":"GET","route":"expenses:draft_create","status_code":200,"duration_ms":502}
+
+{"timestamp":"2026-11-04T22:08:43.134119+00:00","event":"http.response","request_id":"8f2227c6-d4d4-41f4-a10e-ab845d3df1b8","method":"GET","route":"expenses:draft_create","status_code":200,"duration_ms":643}
+
+{"timestamp":"2026-11-04T22:08:44.811512+00:00","event":"http.response","request_id":"dfb5a4d7-2735-4ff7-882f-958f341c16ce","method":"GET","route":"expenses:draft_create","status_code":200,"duration_ms":756}
+
+[05/Nov/2026 01:39:13,509] - Broken pipe from ('127.0.0.1', 59712)
+
+[05/Nov/2026 01:39:41,553] - Broken pipe from ('127.0.0.1', 50373)
+
+{"timestamp":"2026-11-04T22:09:42.824031+00:00","event":"http.response","request_id":"27855bfb-5170-46ff-b788-c3bf58b8a893","method":"POST","route":"expenses:create","status_code":200,"duration_ms":473}
+
+{"timestamp":"2026-11-04T22:09:43.168576+00:00","event":"http.response","request_id":"1a002e3e-942f-4c1d-b96f-24e63287bc2d","method":"POST","route":"expenses:draft_create","status_code":200,"duration_ms":343}
+
+{"timestamp":"2026-11-04T22:09:45.095131+00:00","event":"http.response","request_id":"2e1490fe-ce0d-4995-95e2-9b1d87206f6f","method":"GET","route":"expenses:create","status_code":200,"duration_ms":500}
+
+{"timestamp":"2026-11-04T22:09:46.245733+00:00","event":"http.response","request_id":"3d0ac38a-0ee8-4555-9ebe-5a6248f32e14","method":"GET","route":"organizations:form_context_options","status_code":200,"duration_ms":471}
+
+{"timestamp":"2026-11-04T22:09:46.259081+00:00","event":"http.response","request_id":"b75a87a7-4625-4936-9d25-8537e1d44718","method":"GET","route":null,"status_code":404,"duration_ms":620}
+
+{"timestamp":"2026-11-04T22:09:46.608987+00:00","event":"http.response","request_id":"96e0c8c9-81cd-4f66-b708-9a4661baba6f","method":"POST","route":"expenses:create","status_code":200,"duration_ms":768}
+
+{"timestamp":"2026-11-04T22:09:47.951086+00:00","event":"http.response","request_id":"910a48d2-b4e6-4830-84e0-242bc20afdc8","method":"GET","route":"expenses:create","status_code":200,"duration_ms":525}
+
+{"timestamp":"2026-11-04T22:09:48.325681+00:00","event":"http.response","request_id":"4e2c5477-d899-4699-a335-0e9373d8d2cf","method":"GET","route":"organizations:form_context_options","status_code":200,"duration_ms":210}
+
+{"timestamp":"2026-11-04T22:09:48.689787+00:00","event":"http.response","request_id":"def85c00-c082-4326-a006-9b687615df2b","method":"POST","route":"expenses:create","status_code":200,"duration_ms":547}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 59712)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 50373)
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+=========================== short test summary info ===========================
+FAILED tests/test_sectioned_form_rollout.py::SectionedFormRolloutTests::test_expense_pilot
+1 failed in 139.26s (0:02:19)

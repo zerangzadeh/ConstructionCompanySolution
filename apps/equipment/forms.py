@@ -27,8 +27,30 @@ from apps.organizations.models import OrganizationMembership
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project, ProjectSite
 from apps.workforce.models import Employee, EmployeeQualification
+from core.business_choices import SearchChoiceSelect, business_label
 from core.forms import JalaliDateMixin, attach_parent_choice_ui
+from core.jalali import format_jalali
 from core.ui_forms import initialize_occurrence_key
+
+
+class EquipmentCategoryInput(forms.TextInput):
+    """Native editable selector for the existing tenant-owned text category."""
+
+    template_name = "equipment/widgets/category_selector.html"
+
+    class Media(SearchChoiceSelect.Media):
+        pass
+
+    def __init__(self, *, categories=(), attrs=None):
+        self.categories = tuple(categories)
+        super().__init__(attrs=attrs)
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        widget = context["widget"]
+        widget["categories"] = self.categories
+        widget["attrs"]["list"] = f"{widget['attrs'].get('id', name)}-choices"
+        return context
 
 
 class _StyledForm(JalaliDateMixin, forms.Form):
@@ -64,6 +86,33 @@ class EquipmentForm(_StyledForm):
     notes = forms.CharField(
         label="یادداشت‌ها", required=False, widget=forms.Textarea(attrs={"rows": 3})
     )
+
+    def __init__(self, *args, organization=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        categories = (
+            Equipment.objects.filter(
+                organization=organization, archived_at__isnull=True
+            )
+            .exclude(category="")
+            .order_by("category")
+            .values_list("category", flat=True)
+            .distinct()
+            if organization is not None
+            else ()
+        )
+        field = self.fields["category"]
+        field.widget = EquipmentCategoryInput(
+            categories=categories,
+            attrs={
+                **field.widget.attrs,
+                "placeholder": "انتخاب یا ورود دسته تجهیز…",
+                "data-placeholder": "انتخاب یا ورود دسته تجهیز…",
+                "data-editable-text-choice": "true",
+                "data-local-choices": "true",
+                "dir": "rtl",
+            },
+        )
+        field.help_text = "از دسته‌های موجود انتخاب کنید یا دسته جدید را وارد کنید."
 
 
 class EquipmentAssignmentForm(_StyledForm):
@@ -336,9 +385,15 @@ class MeterReadingForm(_StyledForm):
         initialize_occurrence_key(self, "source_key")
         self.fields["meter"].queryset = EquipmentMeter.objects.filter(
             organization=organization, is_active=True
+        ).select_related("equipment")
+        self.fields["meter"].label_from_instance = lambda meter: (
+            f"{business_label(meter.equipment)} · {meter.name}"
         )
         self.fields["correction_of"].queryset = MeterReading.objects.filter(
             organization=organization
+        ).select_related("meter")
+        self.fields["correction_of"].label_from_instance = lambda reading: (
+            f"{reading.meter.name} · {reading.value} · {format_jalali(reading.observed_at, include_time=True)}"
         )
 
 

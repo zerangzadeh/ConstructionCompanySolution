@@ -13,6 +13,13 @@ from apps.organizations.services import (
     create_organization_with_owner,
 )
 
+PLATFORM_ROUTES = (
+    "organizations:create",
+    "organizations:platform_role_catalog",
+    "organizations:protected_operation_catalog",
+    "organizations:platform_policy_catalog",
+)
+
 
 class Cep014AdministrationTemplateTests(SimpleTestCase):
     def test_platform_entry_is_separate_desktop_only_and_technical_boundary_is_explicit(
@@ -54,15 +61,15 @@ class Cep014AdministrationRouteTests(TestCase):
             name="CEP 014 Tenant",
             slug="cep014-tenant",
         )
-        root = User.objects.create_superuser(
+        self.root = User.objects.create_superuser(
             username="cep014-root", password="test-password", email="root@example.test"
         )
         self.platform_admin = User.objects.create_user(
             username="cep014-platform-admin", password="test-password"
         )
         assign_platform_admin(
-            actor=root,
-            approver=root,
+            actor=self.root,
+            approver=self.root,
             target=self.platform_admin,
             reason="CEP-014 platform boundary test",
         )
@@ -107,12 +114,33 @@ class Cep014AdministrationRouteTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertNotIn(str(self.organization.pk), response.content.decode())
 
-    def test_mvp_platform_role_does_not_expose_technical_administration(self) -> None:
+    @override_settings(PRODUCT_SURFACE_PROFILE="MVP")
+    def test_mvp_platform_admin_can_open_platform_tools_without_a_tenant(self) -> None:
         self.client.force_login(self.platform_admin)
-        self.assertEqual(
-            self.client.get(reverse("organizations:platform_role_catalog")).status_code,
-            403,
-        )
-        self.assertNotContains(
-            self.client.get(reverse("home")), 'href="/organizations/platform/roles/"'
-        )
+        home = self.client.get(reverse("home"))
+        for route in PLATFORM_ROUTES:
+            with self.subTest(route=route):
+                url = reverse(route)
+                self.assertContains(home, f'href="{url}"')
+                self.assertEqual(self.client.get(url).status_code, 200)
+        selector = self.client.get(reverse("organizations:select"))
+        self.assertContains(selector, f'href="{reverse("organizations:create")}"')
+        for route in ("admin:index", "organizations:reference_personas"):
+            with self.subTest(route=route):
+                url = reverse(route)
+                self.assertNotContains(home, f'href="{url}"')
+                self.assertEqual(self.client.get(url).status_code, 403)
+        self.assertNotIn(ACTIVE_ORGANIZATION_SESSION_KEY, self.client.session)
+
+    @override_settings(PRODUCT_SURFACE_PROFILE="MVP")
+    def test_mvp_platform_tools_require_the_platform_role(self) -> None:
+        for user in (self.tenant_owner, self.root):
+            self.client.force_login(user)
+            self.assertNotContains(
+                self.client.get(reverse("home")), 'data-nav-id="NAV-042"'
+            )
+            for route in PLATFORM_ROUTES:
+                with self.subTest(user=user.username, route=route):
+                    url = reverse(route)
+                    self.assertEqual(self.client.get(url).status_code, 403)
+                    self.assertEqual(self.client.post(url).status_code, 403)

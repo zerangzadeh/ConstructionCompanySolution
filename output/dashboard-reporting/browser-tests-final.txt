@@ -1,0 +1,18 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 7 items
+
+tests/test_dashboard_reporting.py::DashboardReportingBrowserTests::test_pilot_home_real_kpis_charts_navigation_and_restricted_scope PASSED [ 14%]
+tests/test_dashboard_reporting.py::DashboardReportingBrowserTests::test_reporting_populated_incomplete_empty_and_permissions PASSED [ 28%]
+tests/test_dashboard_reporting.py::DashboardReportingBrowserTests::test_specialized_empty_pages_and_denied_reports PASSED [ 42%]
+tests/test_dashboard_reporting.py::ProjectReportSourceBrowserTests::test_nonempty_comparison_exceptions_and_full_project_export PASSED [ 57%]
+tests/test_dashboard_reporting.py::CommercialDashboardSourceBrowserTests::test_commercial_source_amounts_dates_and_navigation PASSED [ 71%]
+tests/test_dashboard_reporting.py::StatutoryReportSourceBrowserTests::test_statutory_source_records_and_existing_export PASSED [ 85%]
+tests/test_dashboard_reporting.py::InventoryReportSourceBrowserTests::test_valuation_exact_source_units_and_history PASSED [100%]
+
+======================== 7 passed in 266.78s (0:04:26) ========================

@@ -1,0 +1,22 @@
+{% extends "components/operational_workspace.html" %}{% load erp_format operational_workspaces %}
+{% block title %}کارتابل متمرکز | بنیرا{% endblock %}
+{% block workspace_class %}erp-workspace--inbox erp-reference-list{% endblock %}
+{% block table_filter_controls %}{% endblock %}
+{% block list_pagination %}{% endblock %}
+{% block workspace_content %}
+{% include "components/page_header.html" with page_eyebrow="گردش‌کار" page_title="کارتابل متمرکز" page_description="کارهای تخصیص‌یافته و قابل دریافت را بررسی و پیگیری کنید." only %}
+<div id="workbench-feedback" aria-live="polite"></div>
+<nav class="erp-workspace-summary" aria-label="نماهای سمت" aria-describedby="workbench-count-scope">
+    <a href="{{ all_positions_url }}"{% if not selected_filters.position and not selected_filters.routing %} aria-current="page"{% endif %}><span>همه کارها</span><strong>{{ counts.all_items|erp_number }}</strong></a>
+    <a href="{{ role_permission_url }}"{% if selected_filters.routing == 'role_permission' %} aria-current="page"{% endif %}><span>نقش و مجوز</span><strong>{{ counts.role_permission_items|erp_number }}</strong></a>
+    {% for position in position_links %}<a href="{{ position.url }}"{% if selected_filters.position == position.id|stringformat:'s' %} aria-current="page"{% endif %}><span>{{ position.label }}</span><strong>{{ position.count|erp_number }}</strong></a>{% endfor %}
+</nav>
+<p id="workbench-count-scope" class="mb-3 text-xs text-slate-500">تعداد کارهای مجاز پیش از فیلتر؛ یک کار ممکن است از چند سمت دریافت شده باشد.</p>
+<div class="erp-list-workspace">
+    {% workflow_filter_bar as inbox_bar %}
+    {% include "components/filter_bar.html" with bar=inbox_bar reference_layout=True restore_url_state=True inline_filters=True only %}
+    <div class="erp-list-toolbar"><h2>فهرست کارها</h2>{% include "components/list_result_summary.html" with bar=inbox_bar reference_layout=True only %}</div>
+    {% include "workflows/_work_item_table.html" %}
+    {% include "components/list_pagination.html" with page_obj=page_obj pagination_query=pagination_query result_label="کار" reference_layout=True only %}
+</div>
+{% endblock %}

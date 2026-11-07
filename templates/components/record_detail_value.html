@@ -1,0 +1,2 @@
+{% load erp_format %}
+{% if value == None or value == "" %}—{% elif kind == "date" %}<bdi>{{ value|jalali_date }}</bdi>{% elif kind == "datetime" %}<bdi>{{ value|jalali_datetime }}</bdi>{% elif kind == "number" or kind == "amount" %}<bdi>{{ value|erp_number }}</bdi>{% elif kind == "identifier" %}<bdi dir="ltr">{{ value }}</bdi>{% elif kind == "status" %}{% include "components/status_badge.html" with status=value label=label only %}{% else %}{{ value }}{% endif %}{% if suffix %} <span class="erp-record-muted">{{ suffix }}</span>{% endif %}

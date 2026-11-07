@@ -1353,11 +1353,14 @@ def member_detail(request: HttpRequest, membership_id: str) -> HttpResponse:
         "components/read_only_record_detail.html",
         {
             "detail_title": member.user.get_full_name() or member.user.username,
+            "detail_eyebrow": "جزئیات عضویت",
+            "detail_breadcrumb_label": "اعضای شرکت",
+            "detail_status_code": member.status,
             "back_url": reverse("organizations:members"),
             "detail_rows": [
                 ("نام کاربری", member.user.username, "text"),
                 ("نقش‌های فعال", "، ".join(role_names), "text"),
-                ("وضعیت", member.get_status_display(), "text"),
+                ("وضعیت", member.get_status_display(), "status"),
             ],
         },
     )

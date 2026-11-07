@@ -1,0 +1,54 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+________ WarehouseCompactFormBrowserTests.test_working_context_header _________
+tests\test_warehouse_compact_form_browser.py:88: in test_working_context_header
+    self.browser(
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:294
+E             throw new Error(scenario.name+': '+step.description);
+E                   ^
+E   
+E   Error: open-1024: shared disclosure reveals the company and fits the viewport
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:294:17
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-04T20:48:16.363755+00:00","event":"http.response","request_id":"aec14009-9126-4c65-a2fd-df1d83268e90","method":"GET","route":"inventory:warehouse_list","status_code":200,"duration_ms":509}
+
+{"timestamp":"2026-11-04T20:48:17.180791+00:00","event":"http.response","request_id":"961280b9-2940-45ff-99dd-0c5c4e20108f","method":"GET","route":null,"status_code":404,"duration_ms":220}
+
+{"timestamp":"2026-11-04T20:48:17.803524+00:00","event":"http.response","request_id":"3ae1285f-2201-4b9d-b8e2-8ebf7093a346","method":"GET","route":"inventory:warehouse_list","status_code":200,"duration_ms":398}
+
+{"timestamp":"2026-11-04T20:48:18.630714+00:00","event":"http.response","request_id":"7e5b62b3-cad3-4a09-bc98-27376095d85a","method":"GET","route":"inventory:warehouse_list","status_code":200,"duration_ms":300}
+
+{"timestamp":"2026-11-04T20:48:19.380049+00:00","event":"http.response","request_id":"2682baf1-2454-4dcb-9552-a8c63e0273c6","method":"GET","route":"inventory:warehouse_create","status_code":200,"duration_ms":254}
+
+{"timestamp":"2026-11-04T20:48:20.105696+00:00","event":"http.response","request_id":"fd5db6d4-1ef1-475b-baa7-2c624a0a2d9d","method":"GET","route":"inventory:warehouse_create","status_code":200,"duration_ms":264}
+
+{"timestamp":"2026-11-04T20:48:20.825710+00:00","event":"http.response","request_id":"672a777b-50bb-4e1a-bfcc-8f4134b29bf7","method":"GET","route":"inventory:warehouse_create","status_code":200,"duration_ms":301}
+
+{"timestamp":"2026-11-04T20:48:21.819064+00:00","event":"http.response","request_id":"ba0a1afb-27f0-4739-b96f-62dadc1b2641","method":"GET","route":"inventory:warehouse_create","status_code":200,"duration_ms":483}
+
+{"timestamp":"2026-11-04T20:48:22.990127+00:00","event":"http.response","request_id":"ee25deb0-54db-478a-a9ee-48d7dca0e8bd","method":"GET","route":"inventory:warehouse_create","status_code":200,"duration_ms":418}
+
+[05/Nov/2026 00:18:36,684] - Broken pipe from ('127.0.0.1', 59502)
+
+[05/Nov/2026 00:18:36,690] - Broken pipe from ('127.0.0.1', 54048)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 59502)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 54048)
+=========================== short test summary info ===========================
+FAILED tests/test_warehouse_compact_form_browser.py::WarehouseCompactFormBrowserTests::test_working_context_header
+1 failed in 63.60s (0:01:03)

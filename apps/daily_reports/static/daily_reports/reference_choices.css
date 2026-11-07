@@ -1,0 +1,26 @@
+/* Keep the shared searchable multi-select visibly recognizable as a dropdown. */
+.daily-report-reference-choice .ts-wrapper.multi .ts-control {
+    position: relative;
+    padding-inline-end: 2rem;
+    cursor: pointer;
+}
+.daily-report-reference-choice .ts-wrapper.multi .ts-control::after {
+    content: "";
+    position: absolute;
+    inset-inline-end: .875rem;
+    top: 1rem;
+    width: .4rem;
+    height: .4rem;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+    pointer-events: none;
+    color: var(--erp-text-muted);
+}
+.daily-report-reference-choice .ts-wrapper.dropdown-active .ts-control::after {
+    transform: rotate(225deg);
+}
+.erp-create-form .daily-report-reference-choice select.ts-hidden-accessible {
+    min-height: 0;
+    padding: 0;
+}

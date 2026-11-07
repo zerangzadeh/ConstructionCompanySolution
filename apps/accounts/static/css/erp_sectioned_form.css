@@ -1,0 +1,16 @@
+/* Shared Sectioned Forms, using the existing form controls and canonical tokens. */
+.erp-sectioned-form { gap: .75rem; }
+.erp-sectioned-form .erp-form-section { padding: 0; border-radius: .75rem; }
+.erp-sectioned-form .erp-form-section__header { margin: 0; padding: .5rem 1.5rem; border-block-end: 1px solid var(--color-border-subtle); border-radius: .75rem .75rem 0 0; background: var(--color-primary-hover-overlay); }
+.erp-sectioned-form .erp-form-section__header .erp-form-icon-tile { width: 1.5rem; height: 1.5rem; background: transparent; }
+.erp-sectioned-form .erp-form-section__header svg { width: 1.25rem; height: 1.25rem; }
+.erp-sectioned-form .erp-form-section__header h2 { font-size: .875rem; }
+.erp-sectioned-form .erp-form-grid { padding: 1rem 1.5rem; gap: 1rem 1.5rem; }
+.erp-sectioned-form textarea[rows="10"] { block-size: 5rem; }
+.erp-sectioned-form .erp-form-footer { position: static; border: 0; background: transparent; box-shadow: none; padding: .25rem 0; }
+.erp-sectioned-form .erp-form-footer .erp-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+@media (max-width: 639px) {
+    .erp-sectioned-form .erp-form-section__header { padding-inline: .875rem; }
+    .erp-sectioned-form .erp-form-grid { padding: .875rem; }
+    .erp-sectioned-form .erp-form-footer { flex-direction: column; align-items: stretch; }
+}

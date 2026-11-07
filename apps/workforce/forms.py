@@ -115,8 +115,14 @@ class PositionForm(_StyledForm):
 
 
 class WorkTeamForm(_StyledForm):
-    code = forms.CharField(label="کد گروه کاری", max_length=50)
-    name = forms.CharField(label="نام گروه کاری", max_length=255)
+    code = forms.CharField(
+        label="کد گروه کاری", max_length=50,
+        widget=forms.TextInput(attrs={"autocomplete": "off"}),
+    )
+    name = forms.CharField(
+        label="نام گروه کاری", max_length=255,
+        widget=forms.TextInput(attrs={"autocomplete": "off"}),
+    )
     department = forms.ModelChoiceField(
         label="واحد سازمانی", queryset=Department.objects.none(), required=False,
         empty_label="انتخاب واحد سازمانی",
@@ -464,6 +470,7 @@ class EmployeeAssignmentForm(_StyledForm):
     )
     role_title = forms.CharField(
         label="مسئولیت در این پروژه/کارگاه", max_length=255, required=False,
+        widget=forms.TextInput(attrs={"autocomplete": "off"}),
         help_text="اختیاری؛ مسئولیت این تخصیص، مستقل از سمت یا حرفه نیروی کار است.",
     )
     start_date = forms.DateField(

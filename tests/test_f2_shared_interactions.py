@@ -33,7 +33,7 @@ class SharedInteractionBrowserTests(ReceiptJourneyFixture, StaticLiveServerTestC
         self.login(self.owner)
         scenarios = []
         request_ids = []
-        for width in (1440, 390):
+        for width in (1440, 1024, 390):
             record = create_purchase_request(
                 organization=self.organization,
                 project=self.project,
@@ -80,7 +80,7 @@ class SharedInteractionBrowserTests(ReceiptJourneyFixture, StaticLiveServerTestC
                         "action": action,
                     }
                 )
-        evidence = ROOT / "output/f2/browser"
+        evidence = ROOT / os.environ.get("F2_EVIDENCE_DIRECTORY", "output/f2/browser")
         evidence.mkdir(parents=True, exist_ok=True)
         env = os.environ.copy()
         env["F2_SESSION"] = self.client.cookies["sessionid"].value
@@ -104,12 +104,12 @@ class SharedInteractionBrowserTests(ReceiptJourneyFixture, StaticLiveServerTestC
             encoding="utf-8",
         )
         self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-5000:])
-        self.assertEqual(json.loads(result.stdout)["pages"], 6)
+        self.assertEqual(json.loads(result.stdout)["pages"], 9)
         self.assertEqual(
             list(
                 PurchaseRequest.objects.filter(pk__in=request_ids).values_list(
                     "status", flat=True
                 )
             ),
-            ["submitted", "submitted"],
+            ["submitted", "submitted", "submitted"],
         )

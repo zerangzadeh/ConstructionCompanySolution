@@ -1,6 +1,11 @@
 .erp-business-choice { min-width: 0; }
+:is([data-field-list], .erp-workspace--timekeeping) .erp-list-quick[hidden] { display: none; }
+:is([data-field-list], .erp-workspace--timekeeping) .erp-list-options__summary { width: 100%; text-align: start; }
+.erp-business-choice .erp-choice-status:not(.sr-only) { display: block; margin-block-start: .25rem; color: var(--erp-text-muted); font-size: .8125rem; }
 .erp-business-choice .ts-wrapper { width: 100%; min-width: 0; font: inherit; }
 .erp-business-choice .ts-wrapper.multi .ts-control { min-height: 44px; font: inherit; text-align: start; border-color: var(--erp-border-strong); border-radius: var(--erp-radius-control); }
+.erp-business-choice .ts-wrapper.multi .ts-control > .item { background: var(--erp-surface-subtle); color: var(--erp-text); border: 1px solid var(--erp-border-strong); box-shadow: none; }
+.erp-business-choice .ts-wrapper.multi .ts-control > .item.active { background: var(--erp-surface); border-color: var(--erp-primary); outline: 1px solid var(--erp-primary); }
 .erp-business-choice .ts-wrapper.single .ts-control { min-height: 44px; padding: .6rem .75rem; padding-inline-end: 2rem; border: 1px solid var(--erp-border-strong); border-radius: var(--erp-radius-control); background: var(--erp-surface); background-image: none; box-shadow: none; flex-wrap: nowrap; color: var(--erp-text); font: inherit; font-size: .875rem; text-align: start; }
 .erp-business-choice .ts-wrapper.single .ts-control::after { content: '⌄'; position: absolute; inset-inline-end: .75rem; top: .5rem; color: var(--erp-text-muted); border: 0; margin: 0; width: auto; height: auto; }
 .erp-business-choice .ts-control > input { font: inherit; min-width: 0; flex: 1 1 1px; }

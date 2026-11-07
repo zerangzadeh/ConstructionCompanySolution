@@ -32,6 +32,7 @@ from .field_forms import (
 )
 from .field_presentation import list_presentation, presentation_error
 from .field_selectors import (
+    FieldContext,
     context_employees,
     current_assignments,
     employee_person,
@@ -187,6 +188,7 @@ def detail(request, employee_id):
             ),
             "timekeeping_url": _url("timekeeping:workbench", worker_context),
             "attendance_url": _url("timekeeping:attendance_create", worker_context),
+            "leave_mission_url": _url("timekeeping:leave_mission_create", worker_context),
             "timesheet_url": _url("timekeeping:timesheet_create", worker_context),
             "overtime_url": _url("timekeeping:overtime_create", worker_context),
             "back_url": _url("workforce:field_list", context),
@@ -199,6 +201,11 @@ def detail(request, employee_id):
 
 def _employee_form(request, employee=None):
     context = _context(request)
+    can_view = has_business_permission(
+        user=request.user, organization=request.organization,
+        permission=P.EMPLOYEES_VIEW, project=context.project, site=context.site,
+        allow_site_parent=True, allow_any_scope=True,
+    )
     person = employee_person(employee) if employee else None
     initial = {}
     if employee:
@@ -264,6 +271,7 @@ def _employee_form(request, employee=None):
             messages.success(request, "اطلاعات نیروی کار ثبت شد.")
             return redirect(
                 _url("workforce:field_detail", context, employee_id=saved.pk)
+                if can_view else reverse("home")
             )
     return render(
         request,
@@ -272,7 +280,8 @@ def _employee_form(request, employee=None):
             "form": form,
             "field_context": context,
             "title": "ویرایش نیروی کار" if employee else "افزودن نیروی کار",
-            "back_url": _url("workforce:field_list", context),
+            "no_work_teams": not form.fields["work_team"].queryset.exists(),
+            "back_url": _url("workforce:field_list", context) if can_view else reverse("home"),
         },
     )
 
@@ -311,7 +320,7 @@ def assign(request, employee_id):
         and form.is_valid()
     ):
         try:
-            assign_field_employee(
+            assignment = assign_field_employee(
                 organization=request.organization,
                 actor=request.user,
                 employee=employee,
@@ -321,9 +330,8 @@ def assign(request, employee_id):
             form.add_error(None, presentation_error(exc))
         else:
             messages.success(request, "تخصیص نیروی کار ثبت شد.")
-            return redirect(
-                _url("workforce:field_detail", context, employee_id=employee.pk)
-            )
+            assigned_context = FieldContext(project=assignment.project, site=assignment.site)
+            return redirect(_url("workforce:field_detail", assigned_context, employee_id=employee.pk))
     return render(
         request,
         "workforce/field_form.html",
@@ -376,11 +384,13 @@ def choices(request, kind):
         ),
         "calendar": (P.ATTENDANCE_CAPTURE,),
         "shift": (P.ATTENDANCE_CAPTURE,),
+        "calendar_setup": (P.TIME_CALENDARS_MANAGE,),
+        "shift_setup": (P.TIME_CALENDARS_MANAGE,),
         "activity": (P.TIMESHEETS_PREPARE,),
     }
     if kind == "employee" and request.GET.get("purpose") == "assignment_filter":
         permissions[kind] = (P.PROJECT_ASSIGNMENTS_VIEW,)
-    organization_master = kind in {"department", "team_lead"}
+    organization_master = kind in {"department", "team_lead", "calendar_setup", "shift_setup"}
     if not any(
         has_business_permission(
             user=request.user,
@@ -432,11 +442,11 @@ def choices(request, kind):
             )
         else:
             records = _employees(request, context)
-    elif kind in ("calendar", "shift"):
+    elif kind in ("calendar", "shift", "calendar_setup", "shift_setup"):
         from apps.timekeeping.models import ShiftDefinition, WorkCalendar
 
         records = (
-            WorkCalendar if kind == "calendar" else ShiftDefinition
+            WorkCalendar if kind in ("calendar", "calendar_setup") else ShiftDefinition
         ).objects.filter(organization=request.organization, is_active=True)
         if kind == "shift":
             try:

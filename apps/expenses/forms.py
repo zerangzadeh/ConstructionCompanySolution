@@ -188,6 +188,15 @@ class ExpenseAllocationForm(forms.ModelForm):
             "amount",
             "allocation_basis_reference",
         ]
+        labels: ClassVar[dict[str, str]] = {
+            "project": "پروژه",
+            "wbs_node": "گره ساختار شکست کار",
+            "activity": "فعالیت",
+            "cbs_node": "گره ساختار شکست هزینه",
+            "cost_center": "مرکز هزینه",
+            "amount": "مبلغ",
+            "allocation_basis_reference": "مرجع مبنای تخصیص",
+        }
 
     def __init__(
         self, *args, organization=None, membership=None, expense=None, **kwargs

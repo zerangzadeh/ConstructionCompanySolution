@@ -124,7 +124,7 @@ def custody_workbench(request: HttpRequest) -> HttpResponse:
 def valuation_workbench(request: HttpRequest) -> HttpResponse:
     events = list(
         InventoryValuationEvent.objects.filter(organization=request.organization)
-        .select_related("stock_transaction")
+        .select_related("stock_transaction__unit_of_measure")
         .order_by("-finalized_at")[:100]
     )
     try:
@@ -143,7 +143,7 @@ def valuation_workbench(request: HttpRequest) -> HttpResponse:
         {
             "pools": InventoryValuationPool.objects.filter(
                 organization=request.organization
-            ).select_related("material")[:50],
+            ).select_related("material__unit_of_measure")[:50],
             "events": events,
             "visible_transaction_ids": visible_transaction_ids,
             "envelopes": DownstreamCostSourceEnvelope.objects.filter(

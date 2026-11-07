@@ -66,6 +66,21 @@ def record_actions(request, record, kind: str) -> dict:
             and record.requested_by_id == request.user.pk
             and allowed(f"{prefix}.request")
         ):
+            if kind == "leave" and record.kind == "leave":
+                from apps.workforce.leave_models import (
+                    LeaveBalanceEntry,
+                    LeaveEntryKind,
+                )
+
+                if not LeaveBalanceEntry.objects.filter(
+                    organization=request.organization,
+                    request=record,
+                    kind=LeaveEntryKind.RESERVATION,
+                ).exists():
+                    return {
+                        "label": "پیش‌نویس مرخصی",
+                        "blocked": "برای ارسال، تخصیص مرخصی باید از مسیر مصوب شرکت ثبت شود.",
+                    }
             result = {
                 "url": reverse(f"timekeeping:{prefix}_submit", args=[record.pk]),
                 "label": "ارسال درخواست",

@@ -118,11 +118,13 @@ class BusinessBreadcrumbTests(JourneyFixture, TestCase):
                 {"label": self.contract.title, "url": ""},
             ],
         )
-        self.assert_trail(
+        self.assertContains(page, 'class="cd-back"')
+        standard_detail = self.assert_trail(
             reverse("contracts:detail", args=[self.contract.pk]),
             [project, reverse("contracts:list")],
             [detail],
         )
+        self.assertNotContains(standard_detail, 'class="cd-back"')
         self.assertEqual(self.client.get(detail).status_code, 200)
 
     def test_claim_baseline_progress_details_lists_and_create_have_real_parents(self):
@@ -137,7 +139,16 @@ class BusinessBreadcrumbTests(JourneyFixture, TestCase):
         ):
             self.assert_trail(
                 reverse(route, args=[identifier]),
-                [project, contract, reverse(collection)],
+                [
+                    project,
+                    contract,
+                    reverse(collection)
+                    + {
+                        "billing:baseline_list": f"?contract={self.contract.pk}&versions=1",
+                        "billing:progress_list": f"?contract={self.contract.pk}&line_key={record.baseline_item.line_key}",
+                        "billing:claim_list": "",
+                    }[collection],
+                ],
             )
         for route in (
             "billing:baseline_list",
@@ -145,10 +156,10 @@ class BusinessBreadcrumbTests(JourneyFixture, TestCase):
             "billing:claim_list",
         ):
             self.assert_trail(
-                reverse(route) + f"?contract={self.contract.pk}",
-                [reverse("contracts:list")]
-                if route == "billing:claim_list"
-                else [project, contract],
+                reverse(route)
+                + f"?contract={self.contract.pk}"
+                + ("&versions=1" if route == "billing:baseline_list" else ""),
+                [project, contract],
             )
         self.assert_trail(
             reverse("billing:claim_create") + f"?contract={self.contract.pk}",
@@ -192,13 +203,16 @@ class BusinessBreadcrumbTests(JourneyFixture, TestCase):
             detail + f"?estimate={unrelated.pk}&estimate={private.pk}",
             [reverse("contracts:list")],
         )
-        for route in (
-            "billing:baseline_list",
-            "billing:progress_list",
-            "billing:claim_list",
-        ):
+        forged_contract = "?contract=00000000-0000-0000-0000-000000000001"
+        self.assertEqual(
+            self.client.get(
+                reverse("billing:baseline_list") + forged_contract
+            ).status_code,
+            404,
+        )
+        for route in ("billing:progress_list", "billing:claim_list"):
             self.assert_trail(
-                reverse(route) + "?contract=00000000-0000-0000-0000-000000000001",
+                reverse(route) + forged_contract,
                 absent=[detail],
             )
 

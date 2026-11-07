@@ -24,16 +24,36 @@ class _StyledForm(JalaliDateMixin, forms.Form):
 
 
 class WarehouseForm(_StyledForm):
-    code = forms.CharField(label="کد انبار", max_length=50)
-    name = forms.CharField(label="نام انبار", max_length=255)
+    code = forms.CharField(
+        label="کد انبار",
+        max_length=50,
+        widget=forms.TextInput(attrs={"placeholder": "مانند WH-05", "dir": "auto"}),
+    )
+    name = forms.CharField(
+        label="نام انبار",
+        max_length=255,
+        widget=forms.TextInput(attrs={"placeholder": "مانند انبار کارگاه مرکزی"}),
+    )
     project = forms.ModelChoiceField(
         label="پروژه",
         queryset=Project.objects.none(),
         required=False,
         empty_label="انبار مرکزی سازمان",
+        widget=SearchChoiceSelect(
+            attrs={
+                "data-business-choice": "project",
+                "data-local-choices": "true",
+                "data-placeholder": "جست‌وجو یا انتخاب پروژه",
+                "dir": "rtl",
+            }
+        ),
     )
     location = forms.CharField(
-        label="محل انبار", required=False, widget=forms.Textarea(attrs={"rows": 3})
+        label="محل انبار",
+        required=False,
+        widget=forms.Textarea(
+            attrs={"rows": 3, "placeholder": "مانند سالن جنوبی کارگاه"}
+        ),
     )
 
     def __init__(

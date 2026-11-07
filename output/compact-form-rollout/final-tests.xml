@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="111.494" timestamp="2026-11-05T01:21:36.146763+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_compact_form_rollout.CompactFormRolloutTests" name="test_calendar_forms" time="44.157"><failure message="django.core.exceptions.ValidationError: {'created_by': ['این فیلد نمی تواند پوچ باشد.'], 'timezone': ['تقویم باید از منطقه زمانی تنظیمات شرکت استفاده کند.']}">tests\test_compact_form_rollout.py:35: in test_calendar_forms
+    calendar = WorkCalendar.objects.create(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\timekeeping\models.py:255: in save
+    self.full_clean(validate_constraints=False)
+.venv\Lib\site-packages\django\db\models\base.py:1679: in full_clean
+    raise ValidationError(errors)
+E   django.core.exceptions.ValidationError: {'created_by': ['این فیلد نمی تواند پوچ باشد.'], 'timezone': ['تقویم باید از منطقه زمانی تنظیمات شرکت استفاده کند.']}</failure></testcase><testcase classname="tests.test_compact_form_rollout.CompactFormRolloutTests" name="test_migrated_forms" time="66.701"><failure message="AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:294&#10;          throw new Error(scenario.name+': '+step.description);&#10;                ^&#10;&#10;Error: unit-errors-390: the field error is associated and code is retained&#10;    at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:294:17&#10;&#10;Node.js v24.20.0">tests\test_compact_form_rollout.py:335: in test_migrated_forms
+    ),
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:294
+E             throw new Error(scenario.name+': '+step.description);
+E                   ^
+E   
+E   Error: unit-errors-390: the field error is associated and code is retained
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:294:17
+E   
+E   Node.js v24.20.0</failure></testcase></testsuite></testsuites>

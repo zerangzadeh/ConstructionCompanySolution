@@ -1,0 +1,73 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ SectionedFormRolloutTests.test_safety_quality_daily_report __________
+tests\test_sectioned_form_rollout.py:232: in test_safety_quality_daily_report
+    self.verify_pages(records)
+tests\test_sectioned_form_rollout.py:109: in verify_pages
+    self.assertEqual(retained, str(value))
+E   AssertionError: '2026-10-15 12:00' != '1405/07/23 12:00'
+E   - 2026-10-15 12:00
+E   + 1405/07/23 12:00
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-04T22:29:11.351107+00:00","event":"http.response","request_id":"4e7aaa46-3047-47f0-b781-6089fe301037","method":"GET","route":"safety:create","status_code":200,"duration_ms":1148}
+
+{"timestamp":"2026-11-04T22:29:12.013145+00:00","event":"http.response","request_id":"5bfc0659-2bcb-4f58-ae66-96f360c053a0","method":"GET","route":"quality:create","status_code":200,"duration_ms":606}
+
+{"timestamp":"2026-11-04T22:29:12.640400+00:00","event":"http.response","request_id":"0b928257-80ca-4128-9840-d0af93dd8070","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":588}
+
+{"timestamp":"2026-11-04T22:29:15.571325+00:00","event":"http.response","request_id":"ac1f12c5-d2d1-4b94-bd39-674a5f5f0afb","method":"GET","route":"safety:create","status_code":200,"duration_ms":981}
+
+{"timestamp":"2026-11-04T22:29:18.844207+00:00","event":"http.response","request_id":"96a9f22a-6b60-42f9-9b7b-16c31299128f","method":"GET","route":null,"status_code":404,"duration_ms":1122}
+
+{"timestamp":"2026-11-04T22:29:21.319710+00:00","event":"http.response","request_id":"35bedd77-8769-4af9-9b96-3c1398517bb8","method":"GET","route":"safety:create","status_code":200,"duration_ms":1205}
+
+{"timestamp":"2026-11-04T22:29:24.432612+00:00","event":"http.response","request_id":"c01cc710-78b0-4706-8538-ed63575a12c6","method":"GET","route":"safety:create","status_code":200,"duration_ms":1144}
+
+{"timestamp":"2026-11-04T22:29:26.660617+00:00","event":"http.response","request_id":"984cb63b-b494-416f-851c-4d0b282dbd3f","method":"GET","route":"safety:create","status_code":200,"duration_ms":1150}
+
+{"timestamp":"2026-11-04T22:29:27.888842+00:00","event":"http.response","request_id":"4b5416b9-b7fe-47fc-92c2-b0a05f268557","method":"GET","route":"quality:create","status_code":200,"duration_ms":1038}
+
+{"timestamp":"2026-11-04T22:29:30.607584+00:00","event":"http.response","request_id":"b476061d-78b5-4d75-96fc-259fb2bb9182","method":"GET","route":"quality:create","status_code":200,"duration_ms":1111}
+
+{"timestamp":"2026-11-04T22:29:33.954908+00:00","event":"http.response","request_id":"233860a8-513b-4b42-84c3-d0bc945b8148","method":"GET","route":"quality:create","status_code":200,"duration_ms":1315}
+
+{"timestamp":"2026-11-04T22:29:36.715396+00:00","event":"http.response","request_id":"3309b7ec-07c3-4c6e-8005-9acf855c74c3","method":"GET","route":"quality:create","status_code":200,"duration_ms":1086}
+
+{"timestamp":"2026-11-04T22:29:37.903152+00:00","event":"http.response","request_id":"f2fd1c86-1c32-4e56-ac13-0b27c89aaeb3","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":1005}
+
+{"timestamp":"2026-11-04T22:29:40.868094+00:00","event":"http.response","request_id":"5035db74-15d7-4ccd-9b65-1171cb1cdad1","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":958}
+
+{"timestamp":"2026-11-04T22:29:44.378633+00:00","event":"http.response","request_id":"d42da80a-3da8-4771-806c-c564689edacb","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":982}
+
+{"timestamp":"2026-11-04T22:29:46.464435+00:00","event":"http.response","request_id":"0888101d-8b05-4bc6-9c8a-3620826c00ec","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":939}
+
+[05/Nov/2026 01:59:47,070] - Broken pipe from ('127.0.0.1', 61842)
+
+[05/Nov/2026 01:59:47,103] - Broken pipe from ('127.0.0.1', 55857)
+
+{"timestamp":"2026-11-04T22:29:48.142459+00:00","event":"http.response","request_id":"5d79be89-3d8d-4a15-8502-e4d488dae91f","method":"POST","route":"safety:create","status_code":200,"duration_ms":626}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 61842)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 55857)
+INFO     bonira.request:telemetry.py:78 http.response
+=========================== short test summary info ===========================
+FAILED tests/test_sectioned_form_rollout.py::SectionedFormRolloutTests::test_safety_quality_daily_report
+1 failed in 143.63s (0:02:23)

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="7" time="47.391" timestamp="2026-11-05T15:09:51.264457+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_append_only_constraints_and_native_refresh" time="23.475" /><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_atomic_creation_reuses_documents_and_preserves_sources" time="4.252" /><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_closed_approved_source_can_be_referenced_by_multiple_reports" time="0.680"><failure message="apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.">tests\test_daily_report_references.py:224: in test_closed_approved_source_can_be_referenced_by_multiple_reports
+    review_safety_incident(
+apps\safety\services.py:550: in review_safety_incident
+    return perform_safety_transition(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:762: in perform_safety_transition
+    _backfill_one(incident=incident, actor=starter)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:650: in _backfill_one
+    instance = start_safety_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:497: in start_safety_workflow
+    ensure_safety_compatibility_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:370: in ensure_safety_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.</failure></testcase><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_explicit_permission_and_read_projection" time="1.703" /><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_lookup_permission_scope_pagination_and_form_retention" time="3.066" /><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_tenant_site_phase_and_forged_identifiers_fail_atomically" time="0.313"><failure message="django.core.exceptions.ValidationError: {'created_by': ['کاربر ثبت\u200cشده باید عضوی از همین سازمان باشد.']}">tests\test_daily_report_references.py:276: in test_tenant_site_phase_and_forged_identifiers_fail_atomically
+    foreign = self.safety(
+tests\test_daily_report_references.py:104: in safety
+    return SafetyIncident.objects.create(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\safety\models.py:456: in save
+    self.full_clean(validate_constraints=False)
+.venv\Lib\site-packages\django\db\models\base.py:1679: in full_clean
+    raise ValidationError(errors)
+E   django.core.exceptions.ValidationError: {'created_by': ['کاربر ثبت\u200cشده باید عضوی از همین سازمان باشد.']}</failure></testcase><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_upload_validation_and_failure_roll_back_all_associations" time="12.766" /></testsuite></testsuites>

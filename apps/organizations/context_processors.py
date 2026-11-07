@@ -4,7 +4,6 @@ from django.http import HttpRequest
 from apps.accounts.header_identity import membership_header_identity
 from apps.organizations.authorization import (
     get_active_membership,
-    is_platform_admin,
     membership_has_scope,
     membership_permission_codes,
     permission_supports_object_scope,
@@ -18,7 +17,11 @@ from apps.workflows.personal_workspaces import (
     my_requests_available,
 )
 from apps.workforce.ess_services import has_ess_subject
-from core.product_surface import navigation_groups, route_exposed
+from core.product_surface import (
+    navigation_groups,
+    platform_administration_exposed,
+    route_exposed,
+)
 
 SITE_CONTEXT_NAMESPACES = frozenset(
     {
@@ -126,11 +129,7 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
         "party_governance_available": BusinessPermissionCode.PARTIES_VIEW
         in permission_codes
         and bool(permission_codes & GOVERNANCE_PERMISSIONS),
-        "platform_navigation_access": bool(
-            request.user.is_authenticated
-            and is_platform_admin(request.user)
-            and route_exposed("organizations:platform_role_catalog")
-        ),
+        "platform_navigation_access": platform_administration_exposed(request.user),
         "reference_persona_catalogue_enabled": reference_catalogue_enabled(),
         "can_view_contracts": BusinessPermissionCode.CONTRACTS_VIEW in permission_codes,
         "can_manage_contracts": BusinessPermissionCode.CONTRACTS_CREATE

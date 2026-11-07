@@ -1,15 +1,17 @@
-{% extends "base.html" %}
+{% extends "components/record_detail_page.html" %}
 {% load erp_format field_journey %}
 {% block title %}{{ detail_title }} | بنیرا{% endblock %}
-{% block content %}
-{% include "components/page_header.html" with page_title=detail_title page_breadcrumb_label="بازگشت به فهرست" page_breadcrumb_url=back_url only %}
+{% block detail_heading %}
+{% include "components/page_header.html" with page_title=detail_title page_eyebrow=detail_eyebrow page_breadcrumb_label=detail_breadcrumb_label|default:"بازگشت به فهرست" page_breadcrumb_url=back_url page_icon="document" only %}
+{% endblock %}
+{% block detail_content %}
 {% if field_project %}{% field_journey field_project field_site %}{% endif %}
-<section class="erp-surface mt-5 min-w-0 rounded-xl p-5" aria-label="مشخصات رکورد">
-  <dl class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+<section class="erp-record-section" aria-labelledby="record-information-title">{% include "components/form_section_header.html" with heading_id="record-information-title" heading="مشخصات رکورد" icon="document" only %}<div class="erp-record-section__body">
+  <dl class="erp-record-fields">
     {% for label, value, kind in detail_rows %}
-    <div class="min-w-0"><dt class="text-xs text-slate-500">{{ label }}</dt><dd class="mt-1 break-words font-semibold">{% if value == None or value == "" %}—{% elif kind == "date" %}{{ value|jalali_date }}{% elif kind == "datetime" %}{{ value|jalali_datetime }}{% elif kind == "number" %}<bdi>{{ value|erp_number }}</bdi>{% else %}{{ value }}{% endif %}</dd></div>
+    <div class="min-w-0"><dt class="text-xs text-slate-500">{{ label }}</dt><dd class="mt-1 break-words font-semibold">{% if kind == "status" %}{% include "components/status_badge.html" with status=detail_status_code label=value only %}{% else %}{% include "components/record_detail_value.html" with value=value kind=kind only %}{% endif %}</dd></div>
     {% endfor %}
   </dl>
   {% for label, payload in detail_sections %}<details class="mt-5 rounded-lg border border-slate-200 p-3"><summary class="cursor-pointer font-semibold">{{ label }}</summary><pre class="mt-3 overflow-x-auto whitespace-pre-wrap break-words text-sm">{{ payload|pprint }}</pre></details>{% endfor %}
-</section>
+</div></section>
 {% endblock %}

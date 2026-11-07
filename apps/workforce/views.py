@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
@@ -10,6 +12,7 @@ from django.http import (
 )
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.documents.models import DocumentConfidentiality
@@ -1283,6 +1286,14 @@ def work_team_list(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.WORK_TEAMS_CREATE)
 def work_team_create(request: HttpRequest) -> HttpResponse:
     form = WorkTeamForm(request.POST or None, organization=request.organization)
+    back_route = (
+        "workforce:work_team_list"
+        if has_business_permission(
+            user=request.user, organization=request.organization,
+            permission=BusinessPermissionCode.WORK_TEAMS_VIEW,
+        )
+        else "home"
+    )
     if (
         request.method == "POST"
         and request.POST.get("_refresh_choices") != "1"
@@ -1300,15 +1311,15 @@ def work_team_create(request: HttpRequest) -> HttpResponse:
             form.add_error(None, presentation_error(exc))
         else:
             messages.success(request, "گروه کاری ایجاد شد.")
-            return redirect("workforce:work_team_list")
+            return redirect(back_route)
     return render(
         request,
-        "workforce/form.html",
+        "workforce/work_team_create.html",
         {
             "form": form,
             "title": "ثبت گروه کاری",
             "work_team_form": True,
-            "back_url": "workforce:work_team_list",
+            "back_url": back_route,
         },
     )
 
@@ -1386,10 +1397,26 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
             "form": form,
+            "assignment_create_url": _assignment_journey_url(
+                "workforce:assignment_create",
+                values if not form.errors else {
+                    name: request.GET.get(name) for name in ("sort", "direction")
+                },
+            ),
             "has_active_filters": has_active_table_filters(request),
             **list_presentation(request, form, page, kind="assignments"),
         },
     )
+
+
+def _assignment_journey_url(route, values):
+    filter_names = (
+        "project", "site", "employee", "q", "status", "role", "start_date_from",
+        "start_date_to", "sort", "direction", "page_filters",
+    )
+    query = urlencode({name: values[name] for name in filter_names if values.get(name)})
+    url = reverse(route)
+    return f"{url}?{query}" if query else url
 
 
 @active_organization_required
@@ -1397,6 +1424,11 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
 def assignment_create(request: HttpRequest) -> HttpResponse:
     from .field_selectors import resolve_field_context
     context = resolve_field_context(organization=request.organization, user=request.user, values=request.GET, include_employee=True)
+    can_view = has_business_permission(
+        user=request.user, organization=request.organization,
+        permission=BusinessPermissionCode.PROJECT_ASSIGNMENTS_VIEW,
+    )
+    back_url = _assignment_journey_url("workforce:assignment_list", request.GET) if can_view else reverse("home")
     form = EmployeeAssignmentForm(
         request.POST or None,
         initial={"project": context.project, "site": context.site, "employee": context.employee},
@@ -1422,8 +1454,11 @@ def assignment_create(request: HttpRequest) -> HttpResponse:
             form.add_error(None, presentation_error(exc))
         else:
             messages.success(request, "کارمند به پروژه تخصیص یافت.")
-            return redirect("workforce:assignment_list")
-    return render(request, "workforce/assignment_form.html", {"form": form, "field_context": context})
+            return redirect(back_url)
+    return render(
+        request, "workforce/assignment_form.html",
+        {"form": form, "field_context": context, "assignment_list_url": back_url},
+    )
 
 
 @active_organization_required

@@ -578,25 +578,46 @@ def update_organization_settings(
         message="اجازه به‌روزرسانی تنظیمات این شرکت را ندارید.",
     )
 
+    return _save_organization_settings(
+        organization=locked_organization,
+        actor=updated_by,
+        settings_data={
+            key: value
+            for key, value in {
+                "timezone": timezone_name,
+                "currency": currency,
+                "fiscal_year_start_month": fiscal_year_start_month,
+                "fiscal_year_start_day": fiscal_year_start_day,
+                "language": language,
+                "project_code_prefix": project_code_prefix,
+                "contract_code_prefix": contract_code_prefix,
+                "site_code_prefix": site_code_prefix,
+                "document_code_prefix": document_code_prefix,
+            }.items()
+            if value is not None
+        },
+        profile_data=profile_data,
+        logo=logo,
+    )
+
+
+def _save_organization_settings(
+    *,
+    organization: Organization,
+    actor: User,
+    settings_data: Mapping[str, Any],
+    profile_data: Mapping[str, str] | None = None,
+    logo: object = _LOGO_UNSET,
+    platform_reason: str = "",
+) -> OrganizationSettings:
+    """Persist configuration after the caller locks and authorizes the company."""
     settings_record = OrganizationSettings.objects.select_for_update().get(
-        organization=locked_organization
+        organization=organization
     )
     before = _organization_settings_snapshot(settings_record)
-    settings_record.timezone = timezone_name
-    settings_record.currency = currency
-    settings_record.fiscal_year_start_month = fiscal_year_start_month
-    if fiscal_year_start_day is not None:
-        settings_record.fiscal_year_start_day = fiscal_year_start_day
-    if language is not None:
-        settings_record.language = language
-    if project_code_prefix is not None:
-        settings_record.project_code_prefix = project_code_prefix
-    if contract_code_prefix is not None:
-        settings_record.contract_code_prefix = contract_code_prefix
-    if site_code_prefix is not None:
-        settings_record.site_code_prefix = site_code_prefix
-    if document_code_prefix is not None:
-        settings_record.document_code_prefix = document_code_prefix
+    for field_name in before:
+        if field_name in settings_data:
+            setattr(settings_record, field_name, settings_data[field_name])
     if logo is not _LOGO_UNSET:
         settings_record.logo = logo
     settings_record.full_clean()
@@ -616,13 +637,16 @@ def update_organization_settings(
         settings_update_fields.append("logo")
     settings_record.save(update_fields=settings_update_fields)
 
+    changed_profile_fields = []
     if profile_data is not None:
         for field_name in ORGANIZATION_PROFILE_FIELDS:
             if field_name in profile_data:
-                setattr(locked_organization, field_name, profile_data[field_name])
-    locked_organization.updated_by = updated_by
-    locked_organization.full_clean()
-    locked_organization.save(
+                if getattr(organization, field_name) != profile_data[field_name]:
+                    changed_profile_fields.append(field_name)
+                setattr(organization, field_name, profile_data[field_name])
+    organization.updated_by = actor
+    organization.full_clean()
+    organization.save(
         update_fields=[
             *ORGANIZATION_PROFILE_FIELDS,
             "updated_by",
@@ -634,8 +658,9 @@ def update_organization_settings(
         action=AuditAction.ORGANIZATION_SETTINGS_UPDATED,
         entity_type="organization_settings",
         entity_id=settings_record.pk,
-        organization=locked_organization,
-        actor=updated_by,
+        organization=organization,
+        actor=actor,
+        allow_platform_actor=bool(platform_reason),
         metadata={
             "before": before,
             "after": after,
@@ -643,6 +668,12 @@ def update_organization_settings(
                 key for key, value in after.items() if before.get(key) != value
             ),
             "authority": "organizations.OrganizationSettings",
+            "profile_changed_fields": changed_profile_fields,
+            **(
+                {"reason": platform_reason, "control_plane": True}
+                if platform_reason
+                else {}
+            ),
         },
     )
     return settings_record

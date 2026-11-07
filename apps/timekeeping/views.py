@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from urllib.parse import parse_qsl, urlencode
+
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404, HttpRequest, HttpResponse
@@ -9,6 +11,7 @@ from django.views.decorators.http import require_GET, require_POST
 
 from apps.organizations.authorization import (
     get_active_membership,
+    has_business_permission,
     require_business_permission,
     scope_queryset,
 )
@@ -75,23 +78,94 @@ def _entry_form_kwargs(request):
 
 
 def _workbench_url(request):
-    context = _field_context(request)
-    url = reverse("timekeeping:workbench")
-    return f"{url}?{context.query}" if context.query else url
+    return _journey_url(request, "timekeeping:workbench")
+
+
+def _journey_url(request, route, *args, context=None):
+    query = _journey_query(
+        request, context if context is not None else _field_context(request)
+    )
+    url = reverse(route, args=args)
+    return f"{url}?{query}" if query else url
+
+
+def _journey_query(request, context):
+    query = dict(parse_qsl(context.query))
+    for name in ("date_from", "date_to", "view", "month"):
+        if request.GET.get(name):
+            query[name] = request.GET[name][:32]
+    return urlencode(query)
+
+
+def _saved_record_url(request, record, kind, permission):
+    from apps.workforce.field_selectors import FieldContext
+
+    if has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.ATTENDANCE_VIEW,
+        allow_any_scope=True,
+    ):
+        if has_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission=permission,
+            project=record.project,
+            site=record.site,
+        ):
+            context = FieldContext(
+                project=record.project, site=record.site, employee=record.employee
+            )
+            return _journey_url(
+                request, "timekeeping:record_detail", kind, record.pk, context=context
+            )
+        return _workbench_url(request)
+    return reverse("home")
+
+
+def _add_form_error(form, exc):
+    if isinstance(exc, ValidationError) and hasattr(exc, "error_dict"):
+        for name, errors in exc.error_dict.items():
+            form.add_error(
+                name if name in form.fields else None,
+                _error_message(ValidationError(errors)),
+            )
+    else:
+        form.add_error(None, _error_message(exc))
 
 
 def _form_page(
-    request: HttpRequest, *, form, title: str, description: str
+    request: HttpRequest, *, form, title: str, description: str, submit_label=""
 ) -> HttpResponse:
+    context = _field_context(request)
+    reference_name = "shift" if isinstance(form, ShiftBreakForm) else "calendar"
+    reference_field = form.fields.get(reference_name)
+    missing_reference = (
+        reference_name
+        if reference_field and not reference_field.queryset.exists()
+        else None
+    )
     return render(
         request,
-        "timekeeping/form.html",
+        "timekeeping/compact_form.html"
+        if request.resolver_match.url_name
+        in {"calendar_create", "shift_create", "holiday_create", "shift_break_create"}
+        else "timekeeping/form.html",
         {
             "form": form,
             "title": title,
             "description": description,
-            "field_context": _field_context(request),
-            "back_url": _workbench_url(request),
+            "submit_label": submit_label,
+            "missing_reference": missing_reference,
+            "field_context": context,
+            "back_url": _workbench_url(request)
+            if has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.ATTENDANCE_VIEW,
+                allow_any_scope=True,
+            )
+            else reverse("home"),
         },
     )
 
@@ -151,7 +225,11 @@ def workbench(request: HttpRequest) -> HttpResponse:
             )
         ),
         result_label="سابقه",
+        context={
+            key: request.GET[key] for key in ("view", "month") if request.GET.get(key)
+        },
     )
+    data["history_query"] = _journey_query(request, context)
     data["calendars"] = WorkCalendar.objects.filter(
         organization=request.organization
     ).prefetch_related("shifts")[:20]
@@ -165,7 +243,11 @@ def workbench(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.TIME_CALENDARS_MANAGE)
 def calendar_create(request: HttpRequest) -> HttpResponse:
     form = CalendarForm(request.POST or None, organization=request.organization)
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and form.is_valid()
+    ):
         try:
             services.create_work_calendar(
                 organization=request.organization,
@@ -189,7 +271,11 @@ def calendar_create(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.TIME_CALENDARS_MANAGE)
 def shift_create(request: HttpRequest) -> HttpResponse:
     form = ShiftForm(request.POST or None, organization=request.organization)
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and form.is_valid()
+    ):
         try:
             services.create_shift(
                 organization=request.organization,
@@ -217,7 +303,11 @@ def shift_create(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.TIME_CALENDARS_MANAGE)
 def holiday_create(request: HttpRequest) -> HttpResponse:
     form = HolidayForm(request.POST or None, organization=request.organization)
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and form.is_valid()
+    ):
         try:
             services.add_calendar_holiday(
                 organization=request.organization,
@@ -241,7 +331,11 @@ def holiday_create(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.TIME_CALENDARS_MANAGE)
 def shift_break_create(request: HttpRequest) -> HttpResponse:
     form = ShiftBreakForm(request.POST or None, organization=request.organization)
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and request.POST.get("_refresh_choices") != "1"
+        and form.is_valid()
+    ):
         try:
             services.add_shift_break(
                 organization=request.organization,
@@ -276,21 +370,28 @@ def attendance_create(request: HttpRequest) -> HttpResponse:
         and form.is_valid()
     ):
         try:
-            services.capture_attendance(
+            record = services.capture_attendance(
                 organization=request.organization,
                 actor=request.user,
                 **form.cleaned_data,
             )
         except (ValidationError, PermissionDenied) as exc:
-            form.add_error(None, _error_message(exc))
+            _add_form_error(form, exc)
         else:
             messages.success(request, "حضور برای بررسی ثبت شد.")
-            return redirect(_workbench_url(request))
+            return redirect(
+                _saved_record_url(
+                    request,
+                    record,
+                    "attendance",
+                    BusinessPermissionCode.ATTENDANCE_VIEW,
+                )
+            )
     return _form_page(
         request,
         form=form,
         title="ثبت دستی حضور",
-        description="ثبت دستی کنترل‌شده است و حضور قطعی فقط توسط بررسی‌کننده مستقل ایجاد می‌شود.",
+        description="زمان ورود و خروج واقعی نیروی کار را ثبت کنید. سابقه برای بررسی مستقل ذخیره می‌شود.",
     )
 
 
@@ -414,21 +515,26 @@ def leave_mission_create(request: HttpRequest) -> HttpResponse:
         and form.is_valid()
     ):
         try:
-            services.create_leave_mission_request(
+            record = services.create_leave_mission_request(
                 organization=request.organization,
                 actor=request.user,
                 **form.cleaned_data,
             )
         except (ValidationError, PermissionDenied) as exc:
-            form.add_error(None, _error_message(exc))
+            _add_form_error(form, exc)
         else:
             messages.success(request, "پیش‌نویس درخواست ثبت شد.")
-            return redirect(_workbench_url(request))
+            return redirect(
+                _saved_record_url(
+                    request, record, "leave", BusinessPermissionCode.LEAVE_MISSION_VIEW
+                )
+            )
     return _form_page(
         request,
         form=form,
         title="درخواست مرخصی یا مأموریت",
-        description="تأیید درخواست به سیاست مصوب نیاز دارد؛ مانده یا استحقاق مرخصی به‌صورت خودکار محاسبه نمی‌شود.",
+        description="نوع درخواست، بازه زمانی و دلیل را وارد کنید و پیش‌نویس را ذخیره کنید.",
+        submit_label="ذخیره پیش‌نویس درخواست",
     )
 
 
@@ -485,21 +591,26 @@ def overtime_create(request: HttpRequest) -> HttpResponse:
         and form.is_valid()
     ):
         try:
-            services.create_overtime_request(
+            record = services.create_overtime_request(
                 organization=request.organization,
                 actor=request.user,
                 **form.cleaned_data,
             )
         except (ValidationError, PermissionDenied) as exc:
-            form.add_error(None, _error_message(exc))
+            _add_form_error(form, exc)
         else:
             messages.success(request, "پیش‌نویس اضافه‌کاری ثبت شد.")
-            return redirect(_workbench_url(request))
+            return redirect(
+                _saved_record_url(
+                    request, record, "overtime", BusinessPermissionCode.OVERTIME_VIEW
+                )
+            )
     return _form_page(
         request,
         form=form,
         title="درخواست اضافه‌کاری",
-        description="هیچ ضریب، سقف، گردکردن یا اثر حقوقی/مالی بدون سیاست مصوب محاسبه نمی‌شود.",
+        description="بازه زمانی و دلیل اضافه‌کاری را برای بررسی ثبت کنید.",
+        submit_label="ذخیره پیش‌نویس درخواست",
     )
 
 
@@ -562,21 +673,25 @@ def timesheet_create(request: HttpRequest) -> HttpResponse:
                 **form.cleaned_data,
             )
         except (ValidationError, PermissionDenied) as exc:
-            form.add_error(None, _error_message(exc))
+            _add_form_error(form, exc)
         else:
+            messages.success(request, "پیش‌نویس کارکرد ثبت شد.")
+            if not has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.TIMESHEETS_VIEW,
+                allow_any_scope=True,
+            ):
+                return redirect("home")
             return redirect(
-                reverse("timekeeping:timesheet_detail", args=[sheet.pk])
-                + (
-                    f"?{_field_context(request).query}"
-                    if _field_context(request).query
-                    else ""
-                )
+                _journey_url(request, "timekeeping:timesheet_detail", sheet.pk)
             )
     return _form_page(
         request,
         form=form,
         title="کارکرد جدید",
-        description="کارکرد محل مصرف زمان را ثبت می‌کند و حضور را تغییر نمی‌دهد.",
+        description="بازه گزارش و مدت کار را ثبت کنید. در مرحله بعد مدت را به پروژه یا فعالیت تخصیص دهید. کارکرد، حضور را تغییر نمی‌دهد.",
+        submit_label="ذخیره و افزودن تخصیص",
     )
 
 
@@ -606,11 +721,14 @@ def timesheet_detail(request: HttpRequest, timesheet_id) -> HttpResponse:
             state="draft",
             entries__isnull=True,
         )
+    form_kwargs = _entry_form_kwargs(request)
+    if sheet.period_start == sheet.period_end:
+        form_kwargs["initial"]["work_date"] = sheet.period_start
     form = TimesheetEntryForm(
         request.POST or None,
         organization=request.organization,
         user=request.user,
-        **_entry_form_kwargs(request),
+        **form_kwargs,
     )
     if (
         request.method == "POST"
@@ -625,19 +743,12 @@ def timesheet_detail(request: HttpRequest, timesheet_id) -> HttpResponse:
                 **form.cleaned_data,
             )
         except (ValidationError, PermissionDenied) as exc:
-            form.add_error(None, _error_message(exc))
+            _add_form_error(form, exc)
         else:
             messages.success(request, "ردیف تخصیص زمان ثبت شد.")
             return redirect(
-                reverse("timekeeping:timesheet_detail", args=[sheet.pk])
-                + (
-                    f"?{_field_context(request).query}"
-                    if _field_context(request).query
-                    else ""
-                )
+                _journey_url(request, "timekeeping:timesheet_detail", sheet.pk)
             )
-    from apps.organizations.authorization import has_business_permission
-
     entries = list(sheet.entries.select_related("project", "site", "activity"))
 
     def can_act(permission):
@@ -668,6 +779,7 @@ def timesheet_detail(request: HttpRequest, timesheet_id) -> HttpResponse:
             "entries": entries,
             "form": form,
             "field_context": _field_context(request),
+            "history_query": _journey_query(request, _field_context(request)),
             "back_url": _workbench_url(request),
             "can_prepare": can_prepare,
             "can_submit": can_prepare
@@ -849,5 +961,6 @@ def record_detail(request: HttpRequest, kind: str, record_id: str) -> HttpRespon
             else record.get_state_display(),
             "actions": record_actions(request, record, kind),
             "field_context": _field_context(request),
+            "history_query": _journey_query(request, _field_context(request)),
         },
     )

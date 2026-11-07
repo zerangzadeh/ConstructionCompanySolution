@@ -3,7 +3,8 @@
 {% block field_heading %}
 {% if "work_teams.create" in business_permission_codes %}{% url "workforce:work_team_create" as create_url %}{% endif %}
 {% field_breadcrumbs "گروه‌های کاری" workforce_parent=True as breadcrumbs %}
-{% include "workforce/_field_header.html" with page_breadcrumbs=breadcrumbs page_title="گروه‌های کاری" page_description="سامان‌دهی نیروها در تیم‌های اجرایی در سطح شرکت" page_action_url=create_url page_action_label="گروه جدید" page_filters=True %}
+{% include "components/page_header.html" with page_breadcrumbs=breadcrumbs page_title="گروه‌های کاری" page_description="سامان‌دهی نیروها در تیم‌های اجرایی در سطح شرکت" page_action_url=create_url page_action_label="گروه جدید" only %}
+{% field_navigation current_as_label=True %}
 {% endblock %}
 {% block field_sort %}{% table_sort_header "team" "نام گروه" %}{% table_sort_header "department" "واحد شرکتی" %}{% table_sort_header "lead" "سرپرست" %}{% endblock %}
 {% block field_results %}

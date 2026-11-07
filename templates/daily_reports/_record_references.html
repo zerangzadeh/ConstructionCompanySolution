@@ -1,0 +1,9 @@
+{% if record_references.safety or record_references.quality %}
+<section class="erp-surface mt-5 overflow-hidden rounded-xl" aria-labelledby="report-record-references">
+    <div class="erp-panel-header"><h2 id="report-record-references" class="font-semibold">رکوردهای ایمنی و کیفیت مرتبط</h2></div>
+    <div class="grid gap-4 p-5 sm:grid-cols-2">
+        {% if record_references.safety %}<div><h3 class="mb-2 text-sm font-semibold">ایمنی</h3><ul class="space-y-2 text-sm">{% for incident in record_references.safety %}<li><a class="font-semibold text-blue-700 underline" href="{% url 'safety:detail' incident.pk %}"><bdi>{{ incident.incident_number }}</bdi></a> · {{ incident.description|truncatechars:90 }} · {{ incident.get_status_display }}</li>{% endfor %}</ul></div>{% endif %}
+        {% if record_references.quality %}<div><h3 class="mb-2 text-sm font-semibold">کیفیت</h3><ul class="space-y-2 text-sm">{% for issue in record_references.quality %}<li><a class="font-semibold text-blue-700 underline" href="{% url 'quality:detail' issue.pk %}"><bdi>{{ issue.issue_number }}</bdi></a> · {{ issue.description|truncatechars:90 }} · {{ issue.get_status_display }}</li>{% endfor %}</ul></div>{% endif %}
+    </div>
+</section>
+{% endif %}

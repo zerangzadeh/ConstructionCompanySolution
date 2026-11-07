@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="70.777" timestamp="2026-11-05T01:40:35.520689+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_sectioned_form_rollout.SectionedFormRolloutTests" name="test_expense_pilot" time="70.160"><failure message="apps.expenses.models.PlatformExpenseGroup.DoesNotExist: PlatformExpenseGroup matching query does not exist.">tests\test_sectioned_form_rollout.py:175: in test_expense_pilot
+    group = PlatformExpenseGroup.objects.get(code="materials")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.expenses.models.PlatformExpenseGroup.DoesNotExist: PlatformExpenseGroup matching query does not exist.</failure></testcase></testsuite></testsuites>

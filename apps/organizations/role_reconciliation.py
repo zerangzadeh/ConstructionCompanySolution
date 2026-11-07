@@ -223,10 +223,13 @@ ROLE_PERMISSION_ADDITIONS: dict[str, set[str]] = {
     "support_access_approver": {"support.access_platform_approve"},
 }
 
-# Catalogue-only placeholder: no service/view enforces this operation. A role
-# matrix correction must not invent a new Support reconciliation capability.
+# Explicit reasons for omitting registered capabilities from tenant role defaults.
 UNASSIGNED_PERMISSION_REASONS = {
     "support.audit_reconcile": "Reserved catalogue code; no implemented enforcement path.",
+    "platform_companies.view": "Requires independently assigned Platform Admin authority.",
+    "platform_companies.configure": "Requires independently assigned Platform Admin authority.",
+    "platform_companies.change_status": "Requires independently assigned Platform Admin authority.",
+    "platform_companies.audit_view": "Requires independently assigned Platform Admin authority.",
 }
 
 SPECIALIST_ROLE_DESCRIPTIONS = {

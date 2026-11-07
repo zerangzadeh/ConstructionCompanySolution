@@ -1,19 +1,19 @@
 {% extends "base.html" %}{% load static erp_format product_surface related_documents %}
 {% block title %}{{ project.name }} | مرکز کنترل پروژه{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}?v=20261103-projects"><link rel="stylesheet" href="{% static 'projects/workspace.css' %}?v=20261103"><link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% endblock %}
+{% block extra_head %}{% include "components/dashboard_reporting_assets.html" %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% endblock %}
 {% block working_context %}{% endblock %}
 {% block content %}
 {% related_documents project as related_documents %}
-<div class="erp-command-center erp-reference-list">
+<div class="erp-command-center erp-reference-list erp-dashboard" data-page-family="dashboard">
     {% url 'projects:list' as list_url %}{% breadcrumb_trail project.name 'پروژه‌ها' list_url as breadcrumbs %}
     {% include "components/breadcrumbs.html" with page_breadcrumbs=breadcrumbs only %}
     <header class="erp-project-heading">
         <div class="erp-project-heading__copy"><span class="erp-project-heading__icon">{% include "components/form_icon.html" with icon="layers" only %}</span><div class="erp-project-heading__identity"><h1>{{ project.name }}</h1>{% include "components/status_badge.html" with status=project.status label=project.get_status_display only %}</div><div class="erp-project-meta"><span>مرکز کنترل پروژه</span><bdi dir="ltr">{{ project.code }}</bdi><span>{{ request.organization.name }}</span><span>شروع: <bdi dir="ltr">{{ project.start_date|jalali_date|default:"—" }}</bdi></span><span>پایان: <bdi dir="ltr">{{ project.end_date|jalali_date|default:"—" }}</bdi></span></div></div>
-        <a class="erp-btn erp-btn--secondary" href="{{ list_url }}">همه پروژه‌ها ←</a>
     </header>
     <nav class="erp-project-tabs" aria-label="بخش‌های پروژه"><a class="is-current" href="#overview" aria-current="location">داشبورد</a><a href="#information">اطلاعات اصلی</a>{% if dashboard.can_controls %}<a href="#progress">برنامه و پیشرفت</a>{% endif %}{% for item in commercial_summary %}<a href="{{ item.list_url }}">{{ item.label }}</a>{% endfor %}{% for link in dashboard.quick_links %}{% if link.label == "کارگاه‌ها" %}<a href="{{ link.url }}">کارگاه‌ها</a>{% endif %}{% endfor %}{% if cost_projection %}<a href="#costs">هزینه‌ها</a>{% endif %}<a href="#recent">آخرین ثبت‌ها</a>{% include "components/related_documents_nav.html" %}{% for link in dashboard.quick_links %}{% if link.label == 'اسناد و گالری' %}<a href="{{ link.url }}">گالری تصاویر</a>{% endif %}{% endfor %}</nav>
-    <section id="overview" class="erp-project-kpis" aria-label="شاخص‌های پروژه">
-        {% for kpi in dashboard.kpis %}<article data-kpi-tone="{{ kpi.tone }}"><div class="erp-project-kpi-label">{% include "components/form_icon.html" with icon=kpi.icon only %}<p>{{ kpi.label }}</p></div><div class="erp-project-kpi-value"><bdi dir="ltr">{{ kpi.value|erp_number|default_if_none:"—" }}</bdi><span>{{ kpi.unit }}</span></div><small>{{ kpi.note }}</small>{% if kpi.url %}<a href="{{ kpi.url }}" aria-label="مشاهده {{ kpi.label }}">مشاهده ←</a>{% endif %}</article>{% endfor %}
+    <p class="erp-insight-context">شاخص‌ها و سوابق این صفحه فقط برای همین پروژه و در محدوده دسترسی شما هستند؛ تفسیر هر شاخص در توضیح آن آمده است.</p>
+    <section id="overview" class="erp-project-kpis erp-dashboard-kpis" aria-label="شاخص‌های پروژه">
+        {% for kpi in dashboard.kpis %}{% include "components/dashboard_metric.html" with metric=kpi only %}{% endfor %}
     </section>
     <div class="erp-project-analytics">
         {% if cost_projection %}<section id="costs" class="erp-project-panel">

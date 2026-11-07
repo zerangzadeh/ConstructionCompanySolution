@@ -14,7 +14,9 @@ import django
 django.setup()
 
 import pytest
+from django.apps import apps
 from django.core.management import call_command
+from django.core.management.color import no_style
 from django.db import connections
 
 TEST_DATABASE = "test_bonira_b1_warehouse_20261104"
@@ -57,6 +59,17 @@ class RetainMigrationSeed:
             inhibit_post_migrate=True,
         )
         connections["default"].creation.deserialize_db_from_string(seed)
+        from apps.organizations.catalog_bootstrap import (
+            synchronize_authorization_catalog,
+        )
+
+        synchronize_authorization_catalog(using="default")
+        # Explicit IDs in the retained seed do not advance PostgreSQL sequences.
+        # New additive migrations/post_migrate may allocate content types next.
+        connection = connections["default"]
+        with connection.cursor() as cursor:
+            for sql in connection.ops.sequence_reset_sql(no_style(), apps.get_models()):
+                cursor.execute(sql)
 
 
 raise SystemExit(

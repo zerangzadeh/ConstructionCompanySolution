@@ -19,6 +19,7 @@ const chrome = spawn('C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe
   `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, 'about:blank',
 ], { stdio: 'ignore', windowsHide: true });
 let socket;
+let closeBrowser;
 try {
   let page;
   for (let i = 0; i < 80; i++) {
@@ -74,7 +75,12 @@ try {
     pending.set(next, { done, fail });
     socket.send(JSON.stringify({ id: next, method, params }));
   });
-  const evaluate = async expression => (await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true })).result.value;
+  closeBrowser = () => send('Browser.close');
+  const evaluate = async expression => {
+    const result = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
+    if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description || result.exceptionDetails.text);
+    return result.result.value;
+  };
   await send('Network.enable');
   await send('Page.enable');
   await send('Runtime.enable');
@@ -116,8 +122,8 @@ try {
       await new Promise(done => setTimeout(done, 100));
       state = await evaluate(`(() => ({
         ready:document.readyState, path:location.pathname,
-        lang:document.documentElement.lang, dir:document.documentElement.dir,
-        width:document.documentElement.clientWidth, scroll:document.documentElement.scrollWidth,
+        lang:document.documentElement?.lang, dir:document.documentElement?.dir,
+        width:document.documentElement?.clientWidth, scroll:document.documentElement?.scrollWidth,
         links:[...document.querySelectorAll('a[href]')].map(a=>a.getAttribute('href')),
         groups:[...document.querySelectorAll('aside [data-surface-group]')].map(g=>g.dataset.surfaceGroup),
         mobileGroups:[...document.querySelectorAll('.erp-mobile-nav [data-surface-group]')].map(g=>g.dataset.surfaceGroup),
@@ -127,6 +133,11 @@ try {
       if (state?.ready === 'complete' && state.path === scenario.path.split('?')[0] && documentStatus) break;
     }
     for (const step of scenario.steps || []) {
+      if (step.pressTab) {
+        await send('Input.dispatchKeyEvent', {type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+        await send('Input.dispatchKeyEvent', {type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+        continue;
+      }
       if (step.upload) {
         const { root } = await send('DOM.getDocument');
         const { nodeId } = await send('DOM.querySelector', {nodeId:root.nodeId, selector:step.upload.selector});
@@ -177,19 +188,28 @@ try {
       }
       if(step.searchChoice) {
         const {name,query,value}=step.searchChoice;
-        const selector = 'select[name="'+name+'"]';
+        const selector = step.searchChoice.selector || 'select[name="'+name+'"]';
         await click(selector+' + .ts-wrapper .ts-control');
         await send('Input.dispatchKeyEvent', {type:'keyDown',key:'a',code:'KeyA',modifiers:2,windowsVirtualKeyCode:65});
         await send('Input.dispatchKeyEvent', {type:'keyUp',key:'a',code:'KeyA',modifiers:2,windowsVirtualKeyCode:65});
         await send('Input.insertText', {text:query});
         for(let i=0;i<100;i++) {
           await new Promise(done=>setTimeout(done,100));
-          const found=await evaluate(`(() => {const t=document.querySelector(${JSON.stringify(selector)}).tomselect;return t?.isOpen && t.loading===0 && t.control_input.value===${JSON.stringify(query)} && !!t.dropdown.querySelector('[data-value="'+${JSON.stringify(value)}+'"]');})()`);
+          const found=await evaluate(`(() => {const t=document.querySelector(${JSON.stringify(selector)}).tomselect;return t?.isOpen && t.loading===0 && t.control_input.value===${JSON.stringify(query)} && !!t.dropdown.querySelector(${JSON.stringify(step.searchChoice.createNew ? '.create[data-selectable]' : '[data-value="'+value+'"]')});})()`);
           // Native fallback matches can appear before the debounced fetch updates
           // the popup. Wait beyond its throttle before measuring a click target.
           if(found && i>=5) break;
           if(i===99) {
             const diagnostic=await evaluate(`(() => {const s=document.querySelector(${JSON.stringify(selector)}),t=s.tomselect;return {name:s.name,value:s.value,search:t.control_input.value,disabled:t.isDisabled,open:t.isOpen,loading:t.loading,active:document.activeElement?.outerHTML,fields:[...s.form.querySelectorAll('select')].map(f=>({name:f.name,value:f.value,disabled:f.disabled,search:f.tomselect?.control_input.value})),scrollY,control:t.control.getBoundingClientRect().toJSON(),dropdown:t.dropdown.getBoundingClientRect().toJSON(),options:[...t.dropdown.querySelectorAll('[data-value]')].map(o=>({value:o.dataset.value,text:o.textContent,rect:o.getBoundingClientRect().toJSON()}))};})()`);
+            diagnostic.ancestors = await evaluate(`(() => {
+              const control = document.querySelector(${JSON.stringify(selector)}).tomselect.control;
+              const ancestors = [];
+              for (let element = control; element && ancestors.length < 8; element = element.parentElement) {
+                const style = getComputedStyle(element);
+                ancestors.push({tag:element.tagName,classes:element.className,connected:element.isConnected,hidden:element.hidden,display:style.display,visibility:style.visibility,contentVisibility:style.contentVisibility,rect:element.getBoundingClientRect().toJSON()});
+              }
+              return ancestors;
+            })()`);
             await writeFile(join(outputDirectory,actor+'-search-diagnostic.json'),JSON.stringify(diagnostic,null,2));
             const shot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
             await writeFile(join(outputDirectory,actor+'-search-diagnostic.png'),Buffer.from(shot.data,'base64'));
@@ -205,7 +225,7 @@ try {
         if(step.keyboard) {
           await send('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowDown',code:'ArrowDown',windowsVirtualKeyCode:40});
           await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
-        } else await click(selector+' + .ts-wrapper .ts-dropdown [data-value="'+value+'"]');
+        } else await click(selector+' + .ts-wrapper .ts-dropdown '+(step.searchChoice.createNew ? '.create[data-selectable]' : '[data-value="'+value+'"]'));
         if(step.filterChange) {
           for(let i=0;i<100;i++) {
             await new Promise(done=>setTimeout(done,100));
@@ -329,7 +349,7 @@ try {
       }
       for(let i=0;i<200;i++) {
         await new Promise(done=>setTimeout(done,100));
-        const settled=await evaluate(`({ready:document.readyState,path:location.pathname,text:document.body.innerText})`);
+        const settled=await evaluate(`({ready:document.readyState,path:location.pathname,text:document.body?.innerText || ''})`);
         if(documentStatus && settled?.ready==='complete' && (!step.afterPath || settled.path===step.afterPath) && (!step.afterPrefix || settled.path.startsWith(step.afterPrefix)) && (!step.mustText || settled.text.includes(step.mustText))) break;
         if(i===199) throw new Error(scenario.name+': interaction did not settle '+JSON.stringify(settled));
       }
@@ -416,6 +436,15 @@ try {
       }
       const shot = await send('Page.captureScreenshot', scenario.mobile ? {format:'png',captureBeyondViewport:true,clip:{x:0,y:0,width:size.width,height:size.height,scale:1}} : {format:'png',captureBeyondViewport:false});
       await writeFile(join(outputDirectory, `${actor}-${scenario.name}.png`), Buffer.from(shot.data, 'base64'));
+      if (scenario.fullPageScreenshot) {
+        // A clipped capture can shift the RTL shell when the entire page already fits.
+        const viewport = layout.cssLayoutViewport;
+        const fitsViewport = size.width <= viewport.clientWidth && size.height <= viewport.clientHeight;
+        const full = await send('Page.captureScreenshot', fitsViewport
+          ? {format:'png',captureBeyondViewport:false}
+          : {format:'png',captureBeyondViewport:true,clip:{x:0,y:0,width:size.width,height:size.height,scale:1}});
+        await writeFile(join(outputDirectory, `${actor}-${scenario.name}-full.png`), Buffer.from(full.data, 'base64'));
+      }
       if (scenario.bottomScreenshot) {
         await evaluate('window.scrollTo(0,document.documentElement.scrollHeight)');
         await new Promise(done=>setTimeout(done,120));
@@ -424,14 +453,24 @@ try {
         await evaluate('window.scrollTo(0,0)');
       }
     }
+    if (scenario.measure) state.measurement = await evaluate(scenario.measure);
     if (unexpectedExternal.length) throw new Error(scenario.name+': unexpected external frontend dependency '+JSON.stringify(unexpectedExternal));
     results.push({ name: scenario.name, status: documentStatus, ...state, ...(process.env.BONIRA_BROWSER_LOCAL_ONLY === '1' ? {unexpectedExternal} : {}), ...(navigationTrace ? {navigationTrace} : {}) });
   }
   await writeFile(join(outputDirectory, `${actor}-results.json`), JSON.stringify(results, null, 2));
   process.stdout.write(JSON.stringify(results));
 } finally {
+  // Close Chrome through CDP before terminating its parent process. On Windows,
+  // killing the parent first can leave Crashpad holding the temporary profile.
+  if (closeBrowser && chrome.exitCode === null) {
+    await new Promise(resolveClose => {
+      const timeout = setTimeout(resolveClose, 10000);
+      chrome.once('exit', () => { clearTimeout(timeout); resolveClose(); });
+      closeBrowser().catch(() => {});
+    });
+  }
   socket?.close();
-  chrome.kill();
+  if (chrome.exitCode === null) chrome.kill();
   // Guard the exact helper-created directory before recursive cleanup.
   if (resolve(profile).startsWith(resolve(tmpdir()) + '\\bonira-mvp02-')) {
     await rm(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });

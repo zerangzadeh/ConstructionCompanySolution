@@ -1,0 +1,135 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ SectionedFormRolloutTests.test_safety_quality_daily_report __________
+tests\test_sectioned_form_rollout.py:240: in test_safety_quality_daily_report
+    self.verify_pages(records)
+tests\test_sectioned_form_rollout.py:179: in verify_pages
+    self.browser(self.owner, journeys)
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:389
+E       if (documentStatus !== scenario.status) throw new Error(`${scenario.name}: expected ${scenario.status}, got ${documentStatus}`);
+E                                                     ^
+E   
+E   Error: safety-save: expected 200, got 500
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:389:51
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-04T22:32:59.813750+00:00","event":"http.response","request_id":"260afe9b-f676-4ee0-8477-a8f747831c8e","method":"GET","route":"safety:create","status_code":200,"duration_ms":460}
+
+{"timestamp":"2026-11-04T22:33:00.086619+00:00","event":"http.response","request_id":"9d25b64b-90d1-4fd9-ac6f-2738cd768614","method":"GET","route":"quality:create","status_code":200,"duration_ms":253}
+
+{"timestamp":"2026-11-04T22:33:00.340216+00:00","event":"http.response","request_id":"cd1a1513-918c-4656-9d9a-dc7db7d5fc2d","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":234}
+
+{"timestamp":"2026-11-04T22:33:01.731755+00:00","event":"http.response","request_id":"ac3f056d-4d2a-475b-9b6f-fe7a5f86bfbd","method":"GET","route":"safety:create","status_code":200,"duration_ms":530}
+
+{"timestamp":"2026-11-04T22:33:02.918868+00:00","event":"http.response","request_id":"f33f5cab-f303-4adc-b17f-36a921fb1b7b","method":"GET","route":null,"status_code":404,"duration_ms":381}
+
+{"timestamp":"2026-11-04T22:33:03.853035+00:00","event":"http.response","request_id":"ff41a245-332e-4db9-8a31-bbdf264dec2b","method":"GET","route":"safety:create","status_code":200,"duration_ms":470}
+
+{"timestamp":"2026-11-04T22:33:05.344569+00:00","event":"http.response","request_id":"55c4c071-6237-48a2-9728-dae8335c983d","method":"GET","route":"safety:create","status_code":200,"duration_ms":526}
+
+{"timestamp":"2026-11-04T22:33:06.610761+00:00","event":"http.response","request_id":"36604e38-41db-4e8d-bdcd-6b4292814e34","method":"GET","route":"safety:create","status_code":200,"duration_ms":507}
+
+{"timestamp":"2026-11-04T22:33:07.320169+00:00","event":"http.response","request_id":"7940f614-8f1b-4f37-a5f4-56e873f773dd","method":"GET","route":"quality:create","status_code":200,"duration_ms":533}
+
+{"timestamp":"2026-11-04T22:33:08.679211+00:00","event":"http.response","request_id":"81302554-83ac-4e15-85c6-5ca101564798","method":"GET","route":"quality:create","status_code":200,"duration_ms":464}
+
+{"timestamp":"2026-11-04T22:33:10.031063+00:00","event":"http.response","request_id":"5e84b3a0-9f1a-4ccf-a492-f487739f735e","method":"GET","route":"quality:create","status_code":200,"duration_ms":472}
+
+{"timestamp":"2026-11-04T22:33:11.259624+00:00","event":"http.response","request_id":"62a512bb-fb40-47ca-ad63-95dd834482b9","method":"GET","route":"quality:create","status_code":200,"duration_ms":459}
+
+{"timestamp":"2026-11-04T22:33:12.023497+00:00","event":"http.response","request_id":"5aac9d08-e11f-4033-a5d4-19d01e87e952","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":610}
+
+{"timestamp":"2026-11-04T22:33:13.374083+00:00","event":"http.response","request_id":"a95280cc-d4a2-4b85-8612-8c09310b2e70","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":459}
+
+{"timestamp":"2026-11-04T22:33:14.717644+00:00","event":"http.response","request_id":"abbaad44-734f-4ee8-b60b-c57fd78d5285","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":436}
+
+{"timestamp":"2026-11-04T22:33:15.905851+00:00","event":"http.response","request_id":"bcfe22c4-a137-4fdc-8612-8bc09b1ef577","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":430}
+
+{"timestamp":"2026-11-04T22:33:16.804588+00:00","event":"http.response","request_id":"3dda3fc7-55b6-455d-a6a0-1b84243e3064","method":"POST","route":"safety:create","status_code":200,"duration_ms":344}
+
+{"timestamp":"2026-11-04T22:33:17.106712+00:00","event":"http.response","request_id":"d9e945ae-77c6-4897-a4d8-cb178dc9d129","method":"POST","route":"quality:create","status_code":200,"duration_ms":300}
+
+{"timestamp":"2026-11-04T22:33:17.382394+00:00","event":"http.response","request_id":"b78afbee-a749-4bd1-a47c-8305d84d8d36","method":"POST","route":"daily_reports:create","status_code":200,"duration_ms":274}
+
+{"timestamp":"2026-11-04T22:33:18.939727+00:00","event":"http.response","request_id":"2c319271-cef8-405e-88ba-733d07cd5a66","method":"GET","route":"safety:create","status_code":200,"duration_ms":541}
+
+{"timestamp":"2026-11-04T22:33:19.676292+00:00","event":"http.response","request_id":"d5e715ec-edaf-4bb4-80a6-1373bbceadc3","method":"GET","route":null,"status_code":404,"duration_ms":436}
+
+{"timestamp":"2026-11-04T22:33:19.909501+00:00","event":"http.response","request_id":"68695239-2369-450e-88c0-37158271c511","method":"POST","route":"safety:create","status_code":200,"duration_ms":593}
+
+{"timestamp":"2026-11-04T22:33:20.963394+00:00","event":"http.response","request_id":"e1d80397-be74-412e-a6c6-e15e0af163eb","method":"GET","route":"safety:create","status_code":200,"duration_ms":507}
+
+{"timestamp":"2026-11-04T22:33:21.506269+00:00","event":"http.response","request_id":"4f8c1873-6812-4870-b17b-572a8884e7ef","method":"POST","route":"safety:create","status_code":500,"duration_ms":401}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+ERROR    django.request:log.py:253 Internal Server Error: /safety/create/
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 52, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\decorators.py", line 77, in wrapped
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\safety\views.py", line 132, in incident_create
+    incident = create_safety_incident(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\safety\services.py", line 536, in create_safety_incident
+    start_safety_workflow(
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\safety\workflow.py", line 497, in start_safety_workflow
+    ensure_safety_compatibility_workflow(organization=organization, actor=actor)
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\safety\workflow.py", line 370, in ensure_safety_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 635, in get
+    raise self.model.DoesNotExist(
+apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+ERROR    bonira.request:telemetry.py:78 http.response
+=========================== short test summary info ===========================
+FAILED tests/test_sectioned_form_rollout.py::SectionedFormRolloutTests::test_safety_quality_daily_report
+1 failed in 84.80s (0:01:24)

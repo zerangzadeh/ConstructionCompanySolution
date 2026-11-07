@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="7" skipped="0" tests="8" time="18.877" timestamp="2026-11-05T14:47:11.197636+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_equipment_operations_workspace.EquipmentOperationsWorkspaceTests" name="test_empty_workspace_preserves_all_actions_and_truthful_summary" time="14.331"><failure message="django.core.exceptions.ValidationError: {'category': ['این فیلد نمی تواند خالی باشد.'], '__all__': ['وارد کردن کد، نام و دسته تجهیز الزامی است.']}">tests\test_equipment_operations_workspace.py:19: in setUp
+    self.equipment = Equipment.objects.create(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\equipment\models.py:169: in save
+    self.full_clean(validate_constraints=False)
+.venv\Lib\site-packages\django\db\models\base.py:1679: in full_clean
+    raise ValidationError(errors)
+E   django.core.exceptions.ValidationError: {'category': ['این فیلد نمی تواند خالی باشد.'], '__all__': ['وارد کردن کد، نام و دسته تجهیز الزامی است.']}</failure></testcase><testcase classname="tests.test_equipment_operations_workspace.EquipmentOperationsWorkspaceTests" name="test_existing_work_order_limit_is_reported_without_fleet_totals" time="0.085"><failure message="django.core.exceptions.ValidationError: {'category': ['این فیلد نمی تواند خالی باشد.'], '__all__': ['وارد کردن کد، نام و دسته تجهیز الزامی است.']}">tests\test_equipment_operations_workspace.py:19: in setUp
+    self.equipment = Equipment.objects.create(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\equipment\models.py:169: in save
+    self.full_clean(validate_constraints=False)
+.venv\Lib\site-packages\django\db\models\base.py:1679: in full_clean
+    raise ValidationError(errors)
+E   django.core.exceptions.ValidationError: {'category': ['این فیلد نمی تواند خالی باشد.'], '__all__': ['وارد کردن کد، نام و دسته تجهیز الزامی است.']}</failure></testcase><testcase classname="tests.test_equipment_operations_workspace.EquipmentOperationsWorkspaceTests" name="test_foreign_tenant_order_is_not_in_summary_or_follow_up" time="0.130"><failure message="django.core.exceptions.ValidationError: {'category': ['این فیلد نمی تواند خالی باشد.'], '__all__': ['وارد کردن کد، نام و دسته تجهیز الزامی است.']}">tests\test_equipment_operations_workspace.py:19: in setUp
+    self.equipment = Equipment.objects.create(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\equipment\models.py:169: in save
+    self.full_clean(validate_constraints=False)
+.venv\Lib\site-packages\django\db\models\base.py:1679: in full_clean
+    raise ValidationError(errors)
+E   django.core.exceptions.ValidationError: {'category': ['این فیلد نمی تواند خالی باشد.'], '__all__': ['وارد کردن کد، نام و دسته تجهیز الزامی است.']}</failure></testcase><testcase classname="tests.test_equipment_operations_workspace.EquipmentOperationsWorkspaceTests" name="test_read_only_role_and_denied_role_keep_existing_authority" time="0.104"><failure message="django.core.exceptions.ValidationError: {'category': ['این فیلد نمی تواند خالی باشد.'], '__all__': ['وارد کردن کد، نام و دسته تجهیز الزامی است.']}">tests\test_equipment_operations_workspace.py:19: in setUp
+    self.equipment = Equipment.objects.create(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\equipment\models.py:169: in save
+    self.full_clean(validate_constraints=False)
+.venv\Lib\site-packages\django\db\models\base.py:1679: in full_clean
+    raise ValidationError(errors)
+E   django.core.exceptions.ValidationError: {'category': ['این فیلد نمی تواند خالی باشد.'], '__all__': ['وارد کردن کد، نام و دسته تجهیز الزامی است.']}</failure></testcase><testcase classname="tests.test_equipment_operations_workspace.EquipmentOperationsWorkspaceTests" name="test_real_work_orders_keep_dates_statuses_evidence_and_finalized_actions" time="0.103"><failure message="django.core.exceptions.ValidationError: {'category': ['این فیلد نمی تواند خالی باشد.'], '__all__': ['وارد کردن کد، نام و دسته تجهیز الزامی است.']}">tests\test_equipment_operations_workspace.py:19: in setUp
+    self.equipment = Equipment.objects.create(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\equipment\models.py:169: in save
+    self.full_clean(validate_constraints=False)
+.venv\Lib\site-packages\django\db\models\base.py:1679: in full_clean
+    raise ValidationError(errors)
+E   django.core.exceptions.ValidationError: {'category': ['این فیلد نمی تواند خالی باشد.'], '__all__': ['وارد کردن کد، نام و دسته تجهیز الزامی است.']}</failure></testcase><testcase classname="apps.equipment.test_p8_s18_s23.P8EquipmentOperationsTests" name="test_rtl_operations_workbench_and_mutation_routes_are_navigable" time="0.236"><failure message="django.core.exceptions.PermissionDenied: اجازه عملیات تجهیز را ندارید.">apps\equipment\test_p8_s18_s23.py:583: in test_rtl_operations_workbench_and_mutation_routes_are_navigable
+    order = self._work_order("P8-UI-WO")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\equipment\test_p8_s18_s23.py:63: in _work_order
+    return create_work_order(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\equipment\p8_services.py:349: in create_work_order
+    _require(
+apps\equipment\p8_services.py:39: in _require
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه عملیات تجهیز را ندارید.</failure></testcase><testcase classname="apps.equipment.test_p8_s18_s23.P8EquipmentOperationsTests" name="test_operations_enforce_permission_tenant_project_and_site_scope" time="0.048"><failure message="django.core.exceptions.PermissionDenied: اجازه عملیات تجهیز را ندارید.">apps\equipment\test_p8_s18_s23.py:534: in test_operations_enforce_permission_tenant_project_and_site_scope
+    usage = record_usage(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\equipment\p8_services.py:143: in record_usage
+    _require(
+apps\equipment\p8_services.py:39: in _require
+    require_business_permission(
+apps\organizations\authorization.py:441: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه عملیات تجهیز را ندارید.</failure></testcase><testcase classname="tests.test_mvp07_xlsx.P1ExportTests" name="test_equipment_operational_sources_and_filters" time="1.930" /></testsuite></testsuites>

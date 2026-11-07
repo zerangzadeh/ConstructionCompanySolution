@@ -1,0 +1,15 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________ SectionedFormRolloutTests.test_expense_pilot _________________
+tests\test_sectioned_form_rollout.py:175: in test_expense_pilot
+    group = PlatformExpenseGroup.objects.get(code="materials")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.expenses.models.PlatformExpenseGroup.DoesNotExist: PlatformExpenseGroup matching query does not exist.
+=========================== short test summary info ===========================
+FAILED tests/test_sectioned_form_rollout.py::SectionedFormRolloutTests::test_expense_pilot
+1 failed in 70.82s (0:01:10)

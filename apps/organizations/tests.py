@@ -1095,6 +1095,7 @@ class OrganizationSettingsServiceTests(TestCase):
         self.assertEqual(self.organization.settings.document_code_prefix, "DOC")
 
 
+@override_settings(PRODUCT_SURFACE_PROFILE="MVP")
 class OrganizationCreationViewTests(TestCase):
     def setUp(self) -> None:
         self.user = User.objects.create_user(
@@ -1126,6 +1127,7 @@ class OrganizationCreationViewTests(TestCase):
             password="test-password",
         )
 
+    @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_create_view_requires_authentication(self) -> None:
         response = self.client.get(reverse("organizations:create"))
 
@@ -1134,6 +1136,7 @@ class OrganizationCreationViewTests(TestCase):
             f"{reverse('accounts:login')}?next={reverse('organizations:create')}",
         )
 
+    @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_create_view_rejects_authenticated_organization_user(self) -> None:
         self.client.force_login(self.user)
 

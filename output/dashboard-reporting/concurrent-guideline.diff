@@ -1,0 +1,16 @@
+--- 
++++ 
+@@ -1210,7 +1210,7 @@
+ | Capability | Preferred default | Use when needed | Keep the simpler approach when |
+ | --- | --- | --- | --- |
+ | Advanced selects | Tom Select | Large option sets, searchable/multi-select, autocomplete or remote/AJAX lookup for project, site, party, employee, material, contract and similar masters | A short native dropdown is sufficient. Select2 is not the default; do not introduce jQuery solely for a select widget when a strong dependency-free alternative exists. |
+-| Confirmations and focused dialogs | SweetAlert2 | Important delete, void/cancel, irreversible or submit/approve/reject confirmations, or short success/error interactions that justify a modal under section 47 | Ordinary Django messages, inline validation, simple toast/status feedback or routine reversible actions suffice. Do not turn every message or workflow action into a modal. |
++| Toasts, confirmations and interactive alerts | SweetAlert2 (mandatory) | All MVP-visible transient feedback and existing consequential confirmations use the shared Stage 6 integration (section 55). | Validation, empty/loading states, status badges, persistent contextual guidance and 403/404/500 pages stay inline. Routine actions do not gain confirmations. |
+ | Advanced data grids | Tabulator | A business table genuinely needs large-dataset handling, advanced filters/sort, grouping, frozen columns, remote pagination or interactive row operations, such as complex inventory/cardex, procurement or reporting views | A normal Django/Tailwind table with server-side sorting/filtering/pagination meets the need. Do not convert simple CRUD lists into grids. |
+ | Charts | Chart.js | A chart improves a business decision: project progress, expense trends, procurement status, workforce/equipment utilization, safety/quality trends or inventory movements | KPI cards, tables or text communicate the result adequately. Never invent data or placeholder metrics to justify a chart. |
+ | Jalali date/time input | JalaliDatePicker (`@majidh1/jalalidatepicker`), or a currently verified compatible equivalent when repository constraints justify it | Persian/Jalali input requires more than browser-native Gregorian controls | An existing verified shared solution already meets the requirement. Preserve section 32's `erp_jalali` / `JalaliDateMixin` contract; this preference neither orders replacement nor certifies the current helper as an equivalent library. |
+@@ -2138,3 +2138,4 @@
+ and empty states, filtering where supported, permitted actions, access restrictions,
+ RTL and navigation, plus focused regressions. Technical completion and screenshots
+ do not constitute Product Owner acceptance.
++

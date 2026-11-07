@@ -493,6 +493,7 @@ def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
                 estimate=context_estimate,
             ),
             "related_estimates": related_estimates,
+            "has_estimate_breadcrumb": context_estimate is not None,
             "is_receivable": is_receivable,
             "related_claims": related_claims,
             "related_baselines": related_baselines,

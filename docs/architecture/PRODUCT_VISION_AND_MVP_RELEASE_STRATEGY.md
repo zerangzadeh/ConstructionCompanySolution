@@ -48,6 +48,15 @@ non-MVP Commercial capabilities, Compliance, Partner Qualification, Support,
 Knowledge, technical/platform administration surfaces, and technical
 reconciliation/reporting surfaces remain outside the MVP user surface.
 
+The MVP profile includes an internal workspace for active Platform Admins.
+It provides company creation, the role and permission catalogue, protected
+operations, and platform policies without requiring an active organization.
+The workspace also provides a company directory and per-company audit activity
+showing event time, action and actor. Platform Admins may update company identity
+and existing configuration, suspend an active company, or reactivate a suspended
+company. Mutations require a reason, current company version, transactional
+authorization checks and append-only audit evidence.
+
 **UI-Hidden** means excluded from MVP customer exposure. It does not mean removed,
 deprecated, abandoned or backend-disabled, nor does backend-active imply that all
 future behavior or statutory/production activation is implemented or authorized.

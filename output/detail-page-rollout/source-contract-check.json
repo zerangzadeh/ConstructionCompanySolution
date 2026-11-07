@@ -1,0 +1,150 @@
+[
+  {
+    "file": "templates/expenses/detail.html",
+    "action_routes_preserved": true,
+    "before": [
+      "{% url 'expenses:allocate' expense.pk %}",
+      "{% url 'expenses:approve' expense.pk %}",
+      "{% url 'expenses:return' expense.pk %}",
+      "{% url 'expenses:submit' expense.pk %}",
+      "{% url 'expenses:void' expense.pk %}"
+    ],
+    "after": [
+      "{% url 'expenses:allocate' expense.pk %}",
+      "{% url 'expenses:approve' expense.pk %}",
+      "{% url 'expenses:return' expense.pk %}",
+      "{% url 'expenses:submit' expense.pk %}",
+      "{% url 'expenses:void' expense.pk %}"
+    ]
+  },
+  {
+    "file": "templates/safety/detail.html",
+    "action_routes_preserved": true,
+    "before": [
+      "{% url 'safety:assign' incident.id %}",
+      "{% url 'safety:close' incident.id %}",
+      "{% url 'safety:corrective_action' incident.id %}",
+      "{% url 'safety:resolve' incident.id %}",
+      "{% url 'safety:review' incident.id %}"
+    ],
+    "after": [
+      "{% url 'safety:assign' incident.id %}",
+      "{% url 'safety:close' incident.id %}",
+      "{% url 'safety:corrective_action' incident.id %}",
+      "{% url 'safety:resolve' incident.id %}",
+      "{% url 'safety:review' incident.id %}"
+    ]
+  },
+  {
+    "file": "templates/quality/detail.html",
+    "action_routes_preserved": true,
+    "before": [
+      "{% url 'quality:assign' issue.id %}",
+      "{% url 'quality:close' issue.id %}",
+      "{% url 'quality:corrective_action' issue.id %}",
+      "{% url 'quality:review' issue.id %}",
+      "{% url 'quality:submit_for_verification' issue.id %}",
+      "{% url 'quality:verify' issue.id %}"
+    ],
+    "after": [
+      "{% url 'quality:assign' issue.id %}",
+      "{% url 'quality:close' issue.id %}",
+      "{% url 'quality:corrective_action' issue.id %}",
+      "{% url 'quality:review' issue.id %}",
+      "{% url 'quality:submit_for_verification' issue.id %}",
+      "{% url 'quality:verify' issue.id %}"
+    ]
+  },
+  {
+    "file": "templates/equipment/detail.html",
+    "action_routes_preserved": true,
+    "before": [
+      "{% url 'equipment:archive' equipment.id %}",
+      "{% url 'equipment:status_change' equipment.id %}"
+    ],
+    "after": [
+      "{% url 'equipment:archive' equipment.id %}",
+      "{% url 'equipment:status_change' equipment.id %}"
+    ]
+  },
+  {
+    "file": "templates/parties/detail.html",
+    "action_routes_preserved": true,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "templates/projects/phase_detail.html",
+    "action_routes_preserved": true,
+    "before": [
+      "{% url 'projects:phase_transition' phase.site.project.id phase.site.id phase.id %}"
+    ],
+    "after": [
+      "{% url 'projects:phase_transition' phase.site.project.id phase.site.id phase.id %}"
+    ]
+  },
+  {
+    "file": "templates/inventory/warehouse_detail.html",
+    "action_routes_preserved": true,
+    "before": [
+      "{% url 'inventory:warehouse_archive' warehouse.id %}"
+    ],
+    "after": [
+      "{% url 'inventory:warehouse_archive' warehouse.id %}"
+    ]
+  },
+  {
+    "file": "templates/daily_reports/detail.html",
+    "action_routes_preserved": true,
+    "before": [
+      "{% url 'daily_reports:activity_add' report.id %}",
+      "{% url 'daily_reports:approve' report.id %}",
+      "{% url 'daily_reports:delay_add' report.id %}",
+      "{% url 'daily_reports:equipment_add' report.id %}",
+      "{% url 'daily_reports:labor_add' report.id %}",
+      "{% url 'daily_reports:material_add' report.id %}",
+      "{% url 'daily_reports:submit' report.id %}"
+    ],
+    "after": [
+      "{% url 'daily_reports:activity_add' report.id %}",
+      "{% url 'daily_reports:approve' report.id %}",
+      "{% url 'daily_reports:delay_add' report.id %}",
+      "{% url 'daily_reports:equipment_add' report.id %}",
+      "{% url 'daily_reports:labor_add' report.id %}",
+      "{% url 'daily_reports:material_add' report.id %}",
+      "{% url 'daily_reports:submit' report.id %}"
+    ]
+  },
+  {
+    "file": "templates/documents/detail.html",
+    "action_routes_preserved": true,
+    "before": [
+      "{% url 'documents:archive' document.id %}",
+      "{% url 'documents:link-add' document.id %}",
+      "{% url 'documents:version-add' document.id %}"
+    ],
+    "after": [
+      "{% url 'documents:archive' document.id %}",
+      "{% url 'documents:link-add' document.id %}",
+      "{% url 'documents:version-add' document.id %}"
+    ]
+  },
+  {
+    "file": "templates/materials/category_form.html",
+    "action_routes_preserved": true,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "templates/materials/material_form.html",
+    "action_routes_preserved": true,
+    "before": [],
+    "after": []
+  },
+  {
+    "file": "templates/expenses/category_form.html",
+    "action_routes_preserved": true,
+    "before": [],
+    "after": []
+  }
+]

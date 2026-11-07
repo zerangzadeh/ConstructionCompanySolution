@@ -5,8 +5,8 @@
   window.BoniraFieldChoices = true;
   TomSelect.define('virtual_scroll', window.virtual_scroll);
   const controls = root => [
-    ...(root.matches?.('select[data-business-choice]') ? [root] : []),
-    ...root.querySelectorAll('select[data-business-choice]'),
+    ...(root.matches?.('select[data-business-choice], input[data-editable-text-choice="true"]') ? [root] : []),
+    ...root.querySelectorAll('select[data-business-choice], input[data-editable-text-choice="true"]'),
   ];
   const parent = (select, name) => [...(select.form?.elements || [])].find(el => el.name === name);
   const endpoint = (select, query) => {
@@ -29,9 +29,15 @@
       if (select.tomselect) continue;
       const container = select.closest('[data-field-search]');
       const status = container.querySelector('[data-choice-status]');
+      const local = select.dataset.localChoices === 'true';
+      const editableText = local && select.matches('input[data-editable-text-choice="true"]');
       const initiallyDisabled = select.disabled;
       let generation = 0, pending;
-      const message = text => { status.textContent = text; };
+      const message = (text, visible = false) => {
+        status.textContent = text;
+        status.classList.toggle('sr-only', !visible);
+      };
+      const emptyMessage = query => !query && select.dataset.emptyChoices || 'گزینه‌ای یافت نشد.';
       const nativeClasses = [...select.classList];
       const displayChoice = (data, escape) => {
         if (select.dataset.businessNamesPrimary !== 'true') return '<div>' + escape(data.label) + '</div>';
@@ -40,13 +46,19 @@
           (details.length ? '<span class="business-choice-code" dir="auto">' + escape(details.join(' · ')) + '</span>' : '') + '</div>';
       };
       const widget = new TomSelect(select, {
-        plugins: ['virtual_scroll'], valueField: 'value', labelField: 'label', searchField: ['label'],
-        create: false, maxItems: select.multiple ? null : 1, maxOptions: null, loadThrottle: 250,
-        preload: 'focus', placeholder: select.dataset.placeholder,
+        plugins: local ? [] : ['virtual_scroll'], valueField: 'value', labelField: 'label', searchField: ['label'],
+        create: editableText ? value => ({value:value.trim(), label:value.trim()}) : false,
+        createFilter: editableText ? value => !!value.trim() && (select.maxLength < 0 || value.trim().length <= select.maxLength) : null,
+        ...(editableText ? {
+          options:[...new Set([...select.list.options].map(option=>option.value).concat(select.value || []))].filter(Boolean).map(value=>({value,label:value})),
+          items:select.value ? [select.value] : [],
+        } : {}),
+        maxItems: select.multiple ? null : 1, maxOptions: null, loadThrottle: 250,
+        allowEmptyOption: local, preload: local ? false : 'focus', placeholder: select.dataset.placeholder,
         // Exclude non-matching HTML fallback options retained by virtual_scroll.
         score: query => {const terms = normalize(query).split(/\s+/).filter(Boolean); return item => terms.every(term => normalize(item.label).includes(term)) ? 1 : 0;},
         firstUrl: query => endpoint(select, query),
-        load: function(query, callback) {
+        load: local ? null : function(query, callback) {
           pending?.abort();
           const controller = new AbortController();
           pending = controller;
@@ -59,7 +71,9 @@
               if (version !== generation || controller.signal.aborted) {callback(); return;}
               this.setNextUrl(query, data.next ? new URL(data.next, location.origin).href : false);
               callback(data.results);
-              message(data.results.length ? 'گزینه‌ها آماده انتخاب هستند.' : 'گزینه‌ای یافت نشد.');
+              const empty = data.results.length === 0;
+              message(empty ? emptyMessage(query) : 'گزینه‌ها آماده انتخاب هستند.',
+                empty && !query && !!select.dataset.emptyChoices);
             }).catch(error => {
               if (error.name !== 'AbortError' && version === generation) {
                 this.boniraFailed = true;
@@ -78,12 +92,13 @@
             });
         },
         render: {
+          option_create: (data, escape) => '<div class="create">انتخاب دسته جدید: ' + escape(data.input) + '</div>',
           option: displayChoice,
           item: displayChoice,
-          no_results: function() {
+          no_results: function(data, escape) {
             return this.boniraFailed
               ? '<div class="no-results">دریافت گزینه‌ها انجام نشد. <button type="button" data-choice-retry>تلاش دوباره</button></div>'
-              : '<div class="no-results">گزینه‌ای یافت نشد.</div>';
+              : '<div class="no-results">' + escape(emptyMessage(data?.input)) + '</div>';
           },
           loading: () => '<div class="spinner">در حال جست‌وجو…</div>',
           loading_more: () => '<div class="loading-more-results">در حال دریافت گزینه‌ها…</div>',

@@ -1,0 +1,16 @@
+{% load form_layouts %}
+{% include "components/form_errors.html" with form=form only %}
+{% for field in form.hidden_fields %}{{ field }}{% if field.errors %}<p class="erp-field-error" role="alert">{{ field.label }}: {{ field.errors|join:", " }}</p>{% endif %}{% endfor %}
+{% sectioned_form_sections form profile as sections %}
+{% for section in sections %}
+    <section class="erp-form-section" aria-labelledby="{{ section.id }}">
+        {% include "components/form_section_header.html" with heading_id=section.id heading=section.title icon=section.icon only %}
+        <div class="erp-form-grid erp-form-grid--two">
+            {% for field in section.fields %}
+                {% if field.field.widget.attrs.rows or field.field.widget.allow_multiple_selected or field.name == "description" %}<div class="erp-form-grid__full">{% endif %}
+                {% include "components/form_field.html" with field=field only %}
+                {% if field.field.widget.attrs.rows or field.field.widget.allow_multiple_selected or field.name == "description" %}</div>{% endif %}
+            {% endfor %}
+        </div>
+    </section>
+{% endfor %}

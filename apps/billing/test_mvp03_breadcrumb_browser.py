@@ -111,13 +111,23 @@ class BreadcrumbBrowserTests(JourneyFixture, StaticLiveServerTestCase):
             add(
                 "baseline-detail-" + suffix,
                 reverse("billing:baseline_detail", args=[claim.baseline.pk]),
-                [project, contract, reverse("billing:baseline_list")],
+                [
+                    project,
+                    contract,
+                    reverse("billing:baseline_list")
+                    + f"?contract={self.contract.pk}&versions=1",
+                ],
                 mobile,
             )
             add(
                 "progress-detail-" + suffix,
                 reverse("billing:progress_detail", args=[record.pk]),
-                [project, contract, reverse("billing:progress_list")],
+                [
+                    project,
+                    contract,
+                    reverse("billing:progress_list")
+                    + f"?contract={self.contract.pk}&line_key={record.baseline_item.line_key}",
+                ],
                 mobile,
             )
         for name, route in (
@@ -127,7 +137,9 @@ class BreadcrumbBrowserTests(JourneyFixture, StaticLiveServerTestCase):
         ):
             add(
                 name + "-scoped-list",
-                reverse(route) + f"?contract={self.contract.pk}",
+                reverse(route)
+                + f"?contract={self.contract.pk}"
+                + ("&versions=1" if name == "baseline" else ""),
                 [project, contract],
             )
             add(name + "-general-list", reverse(route), [reverse("home")])

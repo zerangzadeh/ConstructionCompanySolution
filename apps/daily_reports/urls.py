@@ -18,6 +18,7 @@ urlpatterns = [
     path("field/<uuid:observation_id>/proposals/<uuid:proposal_id>/review/<str:accepted>/", field_views.field_proposal_review, name="field_proposal_review"),
     path("", views.daily_report_list, name="list"),
     path("create/", views.daily_report_create, name="create"),
+    path("create/choices/<str:kind>/", views.daily_report_reference_choices, name="reference_choices"),
     path("<uuid:report_id>/labor/", views.daily_report_labor_add, name="labor_add"),
     path(
         "<uuid:report_id>/equipment/",

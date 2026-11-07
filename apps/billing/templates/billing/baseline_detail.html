@@ -14,10 +14,7 @@
 <aside class="erp-list-scope mt-4" aria-label="زمینه مبنا">
   <p class="font-semibold text-sm">{{ baseline.contract.title }}</p>
   <p class="mt-1 text-xs text-slate-500">{{ baseline.project.name }} · <bdi dir="ltr">{{ baseline.contract.contract_number }}</bdi></p>
-  <div class="mt-3 flex flex-wrap gap-2">
-    <a class="erp-btn erp-btn--secondary" href="{% url 'billing:baseline_list' %}?contract={{ baseline.contract_id }}&amp;versions=1">همه نسخه‌های این قرارداد</a>
-    {% if create_url and create_url|surface_url_exposed %}<a class="erp-btn erp-btn--secondary" href="{{ create_url }}">صورت‌وضعیت جدید از این مبنا</a>{% endif %}
-  </div>
+  {% if create_url and create_url|surface_url_exposed %}<div class="mt-3"><a class="erp-btn erp-btn--secondary" href="{{ create_url }}">صورت‌وضعیت جدید از این مبنا</a></div>{% endif %}
 </aside>
 <div class="billing-summary">
   <section class="billing-summary__item"><p class="text-xs text-slate-500">تاریخ اثر</p><p class="mt-2 text-sm font-semibold"><bdi dir="ltr">{{ baseline.effective_date|jalali_date }}</bdi></p></section>

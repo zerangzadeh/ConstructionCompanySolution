@@ -793,7 +793,6 @@ class ContractHubBrowserTests(HubFixture, StaticLiveServerTestCase):
                         ],
                         "mustText": [
                             "صورت‌وضعیت‌ها",
-                            "بازگشت به قرارداد",
                             self.contract.title,
                         ],
                         "mustLinks": [

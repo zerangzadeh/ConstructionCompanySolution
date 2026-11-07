@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="16" skipped="0" tests="60" time="88.143" timestamp="2026-11-05T15:53:07.576310+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_append_only_constraints_and_native_refresh" time="20.292" /><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_atomic_creation_reuses_documents_and_preserves_sources" time="2.958" /><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_closed_approved_source_can_be_referenced_by_multiple_reports" time="4.102" /><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_explicit_permission_and_read_projection" time="1.336" /><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_lookup_permission_scope_pagination_and_form_retention" time="2.097" /><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_revocation_and_suspended_tenant_fail_closed" time="0.311" /><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_tenant_site_phase_and_forged_identifiers_fail_atomically" time="1.863" /><testcase classname="tests.test_daily_report_references.DailyReportReferenceTests" name="test_upload_validation_and_failure_roll_back_all_associations" time="2.501" /><testcase classname="apps.daily_reports.tests.DailyReportServiceTests" name="test_create_report_is_tenant_scoped_and_audited" time="0.782"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.daily_reports.tests.DailyReportServiceTests" name="test_draft_report_accepts_operational_entries_and_locks_on_submit" time="0.678"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.daily_reports.tests.DailyReportServiceTests" name="test_list_and_create_views_are_tenant_scoped" time="0.830"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.daily_reports.tests.DailyReportServiceTests" name="test_report_list_and_detail_exclude_other_tenant" time="0.713"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.daily_reports.tests.DailyReportServiceTests" name="test_report_optionally_scopes_to_an_active_worksite_phase" time="0.713"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.daily_reports.tests.DailyReportServiceTests" name="test_report_rejects_cross_tenant_project" time="0.714"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.daily_reports.tests.DailyReportServiceTests" name="test_report_rejects_phase_from_another_worksite" time="0.911"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.daily_reports.tests.DailyReportServiceTests" name="test_report_rejects_site_from_another_project" time="1.498"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.daily_reports.tests.DailyReportServiceTests" name="test_structured_entries_are_locked_after_submission_and_reject_cross_project_activity" time="1.417"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.daily_reports.tests.DailyReportServiceTests" name="test_structured_entries_validate_master_scope_and_preserve_material_snapshots" time="1.776"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.daily_reports.tests.DailyReportServiceTests" name="test_submitted_report_can_be_approved_once" time="1.572"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.daily_reports.tests.DailyReportServiceTests" name="test_viewer_cannot_create_report" time="1.668"><failure message="django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.">apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.</failure></testcase><testcase classname="apps.organizations.test_permission_registry.PermissionRegistryDatabaseTests" name="test_database_catalog_matches_registry" time="0.126" /><testcase classname="tests.test_daily_report_references.DailyReportReferenceBrowserTests" name="test_real_chrome_reference_create_validation_and_navigation" time="20.823"><failure message="AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:299&#10;          throw new Error(scenario.name+': '+step.description);&#10;                ^&#10;&#10;Error: daily-selection-validation-1440: shared multiple selector is initialized&#10;    at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:299:17&#10;&#10;Node.js v24.20.0">tests\test_daily_report_references.py:577: in test_real_chrome_reference_create_validation_and_navigation
+    self.browser(
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:299
+E             throw new Error(scenario.name+': '+step.description);
+E                   ^
+E   
+E   Error: daily-selection-validation-1440: shared multiple selector is initialized
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:299:17
+E   
+E   Node.js v24.20.0</failure></testcase><testcase classname="apps.organizations.test_permission_registry.PermissionRegistryArchitectureTests" name="test_every_managed_business_model_is_registered_exactly_once" time="0.004"><failure message="AssertionError: Lists differ: ['payroll.FinancialHandoffLine', 'payroll.[74 chars]lip'] != []&#10;&#10;First list contains 4 additional elements.&#10;First extra element 0:&#10;'payroll.FinancialHandoffLine'&#10;&#10;+ []&#10;- ['payroll.FinancialHandoffLine',&#10;-  'payroll.FinancialHandoffProposal',&#10;-  'payroll.FinancialHandoffReview',&#10;-  'payroll.Payslip']">apps\organizations\test_permission_registry.py:95: in test_every_managed_business_model_is_registered_exactly_once
+    self.assertEqual(duplicates, [])
+E   AssertionError: Lists differ: ['payroll.FinancialHandoffLine', 'payroll.[74 chars]lip'] != []
+E   
+E   First list contains 4 additional elements.
+E   First extra element 0:
+E   'payroll.FinancialHandoffLine'
+E   
+E   + []
+E   - ['payroll.FinancialHandoffLine',
+E   -  'payroll.FinancialHandoffProposal',
+E   -  'payroll.FinancialHandoffReview',
+E   -  'payroll.Payslip']</failure></testcase><testcase classname="apps.organizations.test_permission_registry.PermissionRegistryArchitectureTests" name="test_every_permission_code_is_registered_exactly_once" time="0.003" /><testcase classname="apps.organizations.test_permission_registry.PermissionRegistryArchitectureTests" name="test_every_registered_permission_is_referenced_by_its_enforcement_module" time="5.166"><failure message="AssertionError: {'support': ['SUPPORT_AUDIT_RECONCILE'], '[1806 chars]EN']} != {}&#10;Diff is 2564 characters long. Set self.maxDiff to None to see it.">apps\organizations\test_permission_registry.py:112: in test_every_registered_permission_is_referenced_by_its_enforcement_module
+    self.assertEqual(missing, {})
+E   AssertionError: {'support': ['SUPPORT_AUDIT_RECONCILE'], '[1806 chars]EN']} != {}
+E   Diff is 2564 characters long. Set self.maxDiff to None to see it.</failure></testcase><testcase classname="apps.organizations.test_permission_registry.PermissionRegistryArchitectureTests" name="test_global_catalog_models_are_explicitly_excluded" time="0.002" /><testcase classname="apps.organizations.test_permission_registry.PermissionRegistryArchitectureTests" name="test_resource_keys_are_unique_and_match_permission_namespaces" time="0.003"><failure message="AssertionError: Lists differ: ['billing_variation_eligibility.retry', 'b[2223 chars]age'] != []&#10;&#10;First list contains 77 additional elements.&#10;First extra element 0:&#10;'billing_variation_eligibility.retry'&#10;&#10;Diff is 2506 characters long. Set self.maxDiff to None to see it.">apps\organizations\test_permission_registry.py:78: in test_resource_keys_are_unique_and_match_permission_namespaces
+    self.assertEqual(namespace_mismatches, [])
+E   AssertionError: Lists differ: ['billing_variation_eligibility.retry', 'b[2223 chars]age'] != []
+E   
+E   First list contains 77 additional elements.
+E   First extra element 0:
+E   'billing_variation_eligibility.retry'
+E   
+E   Diff is 2506 characters long. Set self.maxDiff to None to see it.</failure></testcase><testcase classname="apps.organizations.test_permission_registry.PermissionRegistryArchitectureTests" name="test_role_defaults_only_use_registered_permissions" time="10.656" /></testsuite></testsuites>

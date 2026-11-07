@@ -1,0 +1,68 @@
+I001 [*] Import block is un-sorted or un-formatted
+  --> apps\inventory\p8_views.py:1:1
+   |
+ 1 | / from datetime import timedelta
+ 2 | | from decimal import Decimal, InvalidOperation
+ 3 | |
+ 4 | | from django.contrib import messages
+ 5 | | from django.core.exceptions import PermissionDenied, ValidationError
+ 6 | | from django.http import Http404, HttpRequest, HttpResponse
+ 7 | | from django.shortcuts import redirect, render
+ 8 | | from django.utils import timezone
+ 9 | | from django.views.decorators.http import require_GET, require_POST
+10 | |
+11 | | from apps.inventory.models import (
+12 | |     DownstreamCostSourceEnvelope,
+13 | |     InventoryLot,
+14 | |     InventorySerial,
+15 | |     InventoryValuationEvent,
+16 | |     InventoryValuationPool,
+17 | |     TraceQualityStatus,
+18 | |     TransferExceptionCode,
+19 | | )
+20 | | from apps.inventory.p8_forms import (
+21 | |     InventoryCountCreateForm,
+22 | |     InventoryTransferCreateForm,
+23 | |     ReservationCreateForm,
+24 | | )
+25 | | from apps.inventory.p8_services import (
+26 | |     TraceAllocationSpec,
+27 | |     TransferLineSpec,
+28 | |     accept_inventory_transfer,
+29 | |     activate_reservation,
+30 | |     approve_inventory_count,
+31 | |     create_inventory_count,
+32 | |     create_inventory_transfer,
+33 | |     create_reservation,
+34 | |     dispatch_inventory_transfer,
+35 | |     freeze_inventory_count,
+36 | |     get_inventory_counts,
+37 | |     get_inventory_transfers,
+38 | |     get_reservations,
+39 | |     inventory_reconciliation,
+40 | |     mark_transfer_in_transit,
+41 | |     post_inventory_count,
+42 | |     record_counted_quantity,
+43 | |     release_reservation,
+44 | |     submit_inventory_count,
+45 | |     valuation_reconciliation,
+46 | | )
+47 | | from apps.organizations.authorization import has_business_permission
+48 | | from apps.inventory.services import get_organization_stock_transactions
+49 | | from apps.organizations.decorators import (
+50 | |     active_organization_required,
+51 | |     organization_permission_required,
+52 | | )
+53 | | from apps.organizations.models import BusinessPermissionCode
+   | |____________________________________________________________^
+help: Organize imports
+   |
+46 | )
+47 + from apps.inventory.services import get_organization_stock_transactions
+48 | from apps.organizations.authorization import has_business_permission
+   - from apps.inventory.services import get_organization_stock_transactions
+49 | from apps.organizations.decorators import (
+   |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.

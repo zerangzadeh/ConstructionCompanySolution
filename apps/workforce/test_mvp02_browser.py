@@ -29,6 +29,219 @@ from core.product_surface import url_exposed
 
 @override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
 class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
+    # The custom cascade flush retains retired tables but removes migration seeds.
+    # Restore Django's serialized seed before each independent browser fixture.
+    serialized_rollback = True
+
+    def test_workforce_timekeeping_journeys(self):
+        from datetime import time
+
+        from apps.timekeeping.models import LeaveMissionRequest
+        from apps.timekeeping.services import create_shift
+        from apps.workforce.models import EmployeeProjectAssignment, WorkTeam
+        from core.forms import parse_jalali_date
+
+        owner = User.objects.create_user(username="journey-owner")
+        organization = create_organization_with_owner(
+            owner=owner, name="شرکت آزمون مسیر کارکرد", slug="journey-company"
+        )
+        project, site, team, employee, _report = make_field_fixture(owner, organization)
+        evidence = "output/workforce-timekeeping-journey/after"
+        work_date = "1405/08/10"
+        recorded_date = parse_jalali_date(work_date)
+        attendance = reverse("timekeeping:attendance_create")
+        history = reverse("timekeeping:workbench")
+        context = FieldContext(project=project, site=site, employee=employee)
+        self._probe(owner, [{
+            "name": "calendar-unconfigured",
+            "path": f"{attendance}?{context.query}",
+            "width": 390, "mobile": True, "status": 200,
+            "mustText": ["تقویم کاری فعالی برای این شرکت وجود ندارد."],
+            "steps": [{
+                "inspect": "!!document.querySelector('main a[href*=\"/calendars/new/\"]')",
+                "description": "authorized setup route offered when no calendar exists",
+            }],
+            "screenshot": True,
+        }], evidence_directory=evidence)
+        calendar = create_work_calendar(
+            organization=organization, actor=owner, code="J-CAL", name="تقویم اجرای آزمون",
+            effective_from=date(2026, 1, 1), working_weekdays=[1, 2, 3, 4, 5, 6, 7],
+        )
+        alternate = create_work_calendar(
+            organization=organization, actor=owner, code="J-EMPTY", name="تقویم بدون شیفت",
+            effective_from=date(2026, 1, 1), working_weekdays=[1, 2, 3, 4, 5, 6, 7],
+        )
+        shift = create_shift(
+            organization=organization, actor=owner, calendar=calendar, code="J-SHIFT",
+            name="شیفت اجرای آزمون", starts_at=time(8), ends_at=time(16),
+            crosses_midnight=False, effective_from=date(2026, 1, 1),
+        )
+
+        def choice(name, query, record, **extra):
+            return {"searchChoice": {"name": name, "query": query, "value": str(record.pk)}, **extra}
+
+        for width in (1440, 1024, 390):
+            with self.subTest(width=width):
+                def scenario(name, path, *steps, width=width, **expectations):
+                    return {
+                        "name": f"{name}-{width}", "path": path, "width": width,
+                        "mobile": width == 390, "status": 200, "steps": steps,
+                        "screenshot": True, "viewportScreenshot": True, "noJsErrors": True,
+                        **expectations,
+                    }
+
+                worker_number = f"J-WORKER-{width}"
+                worker_create = reverse("workforce:field_create")
+                team_create = reverse("workforce:work_team_create")
+                team_list = reverse("workforce:work_team_list")
+                self._probe(owner, [
+                    scenario(
+                        "worker-and-assignment", worker_create,
+                        {"submit": True, "afterPath": worker_create, "mustText": "لطفاً موارد زیر را بررسی کنید"},
+                        {"inspect": "document.activeElement.name === 'employee_number'", "description": "first required field focused"},
+                        choice("work_team", team.code, team),
+                        {"fill": {
+                            "employee_number": worker_number, "first_name": "نیروی",
+                            "last_name": f"آزمون {width}", "start_date": work_date,
+                        }, "submit": True, "afterPrefix": "/workforce/field/", "mustText": "اطلاعات نیروی کار ثبت شد."},
+                        {"clickSelector": "main section a[href*='/assign/']", "afterPrefix": "/workforce/field/", "mustText": "تخصیص جدید"},
+                        {"inspect": "!document.querySelector('main form [name=employee]')", "description": "known worker inherited"},
+                        choice("project", project.code, project),
+                        choice("site", site.code, site),
+                        {"fill": {"role_title": "مسئول اجرای آزمون", "start_date": work_date},
+                         "submit": True, "afterPrefix": "/workforce/field/", "mustText": "تخصیص نیروی کار ثبت شد."},
+                        {"inspect": "location.search.includes('project=') && location.search.includes('site=')",
+                         "description": "assignment destination retains the new work context"},
+                    ),
+                    scenario(
+                        "work-team", team_create,
+                        {"fill": {"code": f"J-TEAM-{width}", "name": f"گروه آزمون {width}"},
+                         "submit": True, "afterPath": team_list, "mustText": f"گروه آزمون {width}"},
+                        {"inspect": "document.querySelector('main [data-workforce-navigation] [aria-current=page]').tagName === 'SPAN'",
+                         "description": "current Work Teams tab cannot reload the list"},
+                    ),
+                ], evidence_directory=f"{evidence}/{width}/workforce")
+                worker = Employee.objects.get(organization=organization, employee_number=worker_number)
+                self.assertIsNone(worker.user_id)
+                self.assertEqual(worker.work_team, team)
+                assignment = EmployeeProjectAssignment.objects.get(organization=organization, employee=worker)
+                self.assertEqual((assignment.project, assignment.site, assignment.start_date), (project, site, recorded_date))
+                self.assertTrue(WorkTeam.objects.filter(organization=organization, code=f"J-TEAM-{width}").exists())
+
+                query = FieldContext(project=project, site=site, employee=worker).query
+                leave = reverse("timekeeping:leave_mission_create")
+                overtime = reverse("timekeeping:overtime_create")
+                timesheet = reverse("timekeeping:timesheet_create")
+                kind = "mission" if width == 1024 else "leave"
+                self._probe(owner, [
+                    scenario(
+                        "attendance", f"{attendance}?{query}",
+                        {"inspect": "document.querySelector('[name=shift]').tomselect.isDisabled", "description": "shift awaits calendar"},
+                        choice("calendar", alternate.code, alternate),
+                        {"openChoice": "shift"},
+                        {"inspect": """(() => {
+                            const status = document.querySelector('[name=shift]').closest('[data-field-search]').querySelector('[data-choice-status]');
+                            return !status.classList.contains('sr-only') && status.textContent.includes('شیفت فعالی');
+                        })()""", "waitMs": 550,
+                         "description": "empty dependent list explains its cause"},
+                        choice("calendar", calendar.code, calendar),
+                        choice("shift", shift.code, shift),
+                        {"fill": {"work_date": work_date, "check_in_at": f"{work_date} 08:00",
+                                  "check_out_at": f"{work_date} 10:35"},
+                         "inspect": "document.querySelector('[name=work_date]').value.length === 10",
+                         "description": "Jalali work date remains visible before submission"},
+                        {"toggleSelector": "#id_work_date + .erp-jalali-trigger"},
+                        {"toggleSelector": ".erp-jalali-popover:not([hidden]) [data-day='10']"},
+                        {"toggleSelector": "#id_check_in_at + .erp-jalali-trigger"},
+                        {"inspect": "document.querySelector('.erp-jalali-popover:not([hidden]) [data-jalali-clock]').value === '08:00'",
+                         "description": "datetime picker exposes the existing clock value"},
+                        {"toggleSelector": ".erp-jalali-popover:not([hidden]) .erp-jalali-time-done"},
+                        {"submit": True, "afterPrefix": "/timekeeping/records/attendance/", "mustText": "حضور برای بررسی ثبت شد."},
+                    ),
+                    scenario(
+                        "leave-mission", f"{leave}?{query}",
+                        {"fill": {"kind": kind, "category_code": "JOURNEY-CATEGORY",
+                                  "starts_at": f"{work_date} 11:00", "ends_at": f"{work_date} 12:00",
+                                  "reason": "درخواست آزمایشی"},
+                         "submit": True, "afterPrefix": "/timekeeping/records/leave/", "mustText": "پیش‌نویس درخواست ثبت شد."},
+                    ),
+                    scenario(
+                        "overtime", f"{overtime}?{query}",
+                        {"fill": {"starts_at": f"{work_date} 16:00", "ends_at": f"{work_date} 17:00",
+                                  "reason": "تکمیل عملیات آزمایشی"},
+                         "submit": True, "afterPrefix": "/timekeeping/records/overtime/", "mustText": "پیش‌نویس اضافه‌کاری ثبت شد."},
+                    ),
+                    scenario(
+                        "work-log-form", f"{timesheet}?{query}",
+                        {"inspect": "document.querySelectorAll('[data-duration-input] input[type=number]').length === 2",
+                         "description": "total duration exposes hours and minutes"},
+                    ),
+                    scenario(
+                        "work-log", f"{timesheet}?{query}",
+                        {"fill": {"period_start": work_date, "period_end": work_date,
+                                  "declared_minutes_hours": "0", "declared_minutes_minutes": "0"},
+                         "submit": True, "afterPath": timesheet, "mustText": "مدت را بیشتر از صفر"},
+                        {"inspect": "document.activeElement.name === 'declared_minutes_hours'",
+                         "description": "invalid duration focused with dates retained"},
+                        {"fill": {"declared_minutes_hours": "2", "declared_minutes_minutes": "35"},
+                         "submit": True, "afterPrefix": "/timekeeping/timesheets/", "mustText": "جزئیات کارکرد"},
+                        {"inspect": "!!document.querySelector('[name=work_date]').value && !!document.querySelector('[name=site]').value",
+                         "description": "single-day date and work site carried to allocation"},
+                        {"fill": {"minutes_hours": "2", "minutes_minutes": "35"},
+                         "submit": True, "formSelector": "main form[data-timesheet-entry]",
+                         "afterPrefix": "/timekeeping/timesheets/", "mustText": "ردیف تخصیص زمان ثبت شد."},
+                        mustText=["۲ ساعت و ۳۵ دقیقه"],
+                    ),
+                    scenario(
+                        "attendance-month", f"{history}?{query}&date_from={work_date}&date_to={work_date}",
+                        *([
+                            {"toggleSelector": "[data-filter-options] > .erp-list-options__summary"},
+                            {"inspect": """(() => {
+                                const button = document.querySelector('[data-filter-options] > button');
+                                const control = document.querySelector('main [name=project]').tomselect.control;
+                                return button.getAttribute('aria-expanded') === 'true' && control.getBoundingClientRect().width > 0;
+                            })()""", "description": "Timekeeping filters expand around live selectors"},
+                        ] if width < 1280 else []),
+                        {"clickSelector": "main nav a[href*='view=calendar']", "mustText": "عدد داخل پرانتز"},
+                        {"inspect": "!!document.querySelector('[data-attendance-calendar] a[href*=\"date_from=\"][aria-label]')",
+                         "description": "saved attendance appears on the matching day"},
+                        {"history": "back"},
+                        {"inspect": "!document.querySelector('[data-attendance-calendar]') && location.search.includes('date_from=')",
+                         "description": "Back restores list and date filter"},
+                        {"history": "forward"},
+                        {"inspect": "!!document.querySelector('[data-attendance-calendar]') && location.search.includes('date_from=')",
+                         "description": "Forward restores monthly view and date filter"},
+                        {"inspect": "document.querySelector('[data-attendance-calendar]').scrollIntoView({block:'center'}); true",
+                         "description": "calendar available in the current viewport"},
+                        preserveScrollScreenshot=True,
+                    ),
+                    scenario(
+                        "attendance-month-empty", f"{history}?{query}&view=calendar&month=1405-07",
+                        mustText=["برای این ماه با فیلترهای فعلی سابقه حضوری یافت نشد."],
+                    ),
+                ], evidence_directory=f"{evidence}/{width}/timekeeping")
+                attendance_record = AttendanceRecord.objects.get(organization=organization, employee=worker)
+                self.assertEqual((attendance_record.work_date, attendance_record.calendar, attendance_record.shift), (recorded_date, calendar, shift))
+                draft = LeaveMissionRequest.objects.get(organization=organization, employee=worker)
+                self.assertEqual((draft.kind, draft.state, draft.policy_reference), (kind, "draft", ""))
+                self.assertEqual(OvertimeRequest.objects.get(organization=organization, employee=worker).state, "draft")
+                sheet = Timesheet.objects.get(organization=organization, employee=worker)
+                entry = sheet.entries.get()
+                self.assertEqual((sheet.declared_minutes, entry.minutes, entry.project, entry.site), (155, 155, project, site))
+                self.assertEqual(AttendanceRecord.objects.filter(organization=organization, employee=worker).count(), 1)
+
+        foreign = User.objects.create_user(username="journey-other-owner")
+        create_organization_with_owner(owner=foreign, name="شرکت مستقل آزمون", slug="journey-other-company")
+        self._probe(foreign, [
+            {"name": "foreign-worker-context", "path": f"{attendance}?{context.query}", "status": 404},
+            *[
+                {"name": "foreign-attendance", "path": reverse("timekeeping:record_detail", args=["attendance", pk]), "status": 404}
+                for pk in AttendanceRecord.objects.filter(organization=organization).values_list("pk", flat=True)[:1]
+            ],
+        ], evidence_directory=f"{evidence}/authorization")
+        response = self.client.get(reverse("workforce:field_choices", args=["calendar"]), {"q": calendar.code})
+        self.assertEqual(response.json()["results"], [])
+
     def test_assignment_planned_end_visual_followup(self):
         from apps.projects.models import Project, ProjectSite
         from apps.workforce.models import EmployeeProjectAssignment
@@ -320,7 +533,7 @@ class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
             ],
             env=env,
             capture_output=True,
-            text=True,
+            encoding="utf-8",
             timeout=420,
             check=False,
         )
@@ -450,7 +663,7 @@ class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
                                 "check_out_at": "1405/07/28 16:00",
                             },
                             "submit": True,
-                            "afterPath": "/timekeeping/",
+                            "afterPrefix": "/timekeeping/records/attendance/",
                             "mustText": "حضور برای بررسی ثبت شد.",
                         }
                     ],
@@ -471,7 +684,7 @@ class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
                                 "reason": "تکمیل آرماتوربندی آزمایشی",
                             },
                             "submit": True,
-                            "afterPath": "/timekeeping/",
+                            "afterPrefix": "/timekeeping/records/overtime/",
                             "mustText": "پیش‌نویس اضافه‌کاری ثبت شد.",
                         }
                     ],
@@ -488,21 +701,21 @@ class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
                             "fill": {
                                 "period_start": "1405/07/28",
                                 "period_end": "1405/07/28",
-                                "declared_minutes": "480",
+                                "declared_minutes_hours": "8",
                             },
                             "submit": True,
                             "afterPrefix": "/timekeeping/timesheets/",
                             "mustText": "جزئیات کارکرد",
                         },
                         {
-                            "fill": {"work_date": "1405/07/28", "minutes": "480"},
+                            "fill": {"work_date": "1405/07/28", "minutes_hours": "8"},
                             "submit": True,
                             "formSelector": "main form[data-timesheet-entry]",
                             "afterPrefix": "/timekeeping/timesheets/",
                             "mustText": "ردیف تخصیص زمان ثبت شد.",
                         },
                     ],
-                    "mustText": [project.name, site.name, "480"],
+                    "mustText": [project.name, site.name, "۸ ساعت"],
                     "screenshot": True,
                 },
                 {
@@ -1019,10 +1232,19 @@ class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
           const target='"""
             + assignments
             + """';
-          const primary=[...document.querySelectorAll('aside a[href],.erp-mobile-nav a[href]')];
+          const primary=[...document.querySelectorAll('aside .erp-nav-link,.erp-mobile-nav .erp-nav-link')];
           const internal=document.querySelectorAll('main [data-workforce-navigation]');
-          const h=document.querySelector('main [data-workforce-header] header[aria-labelledby=erp-page-title]');
-          return !primary.some(a=>new URL(a.href).pathname===target) && primary.some(a=>a.textContent.trim()==='نیروهای کار' && a.classList.contains('is-active')) && internal.length===1 && internal[0].querySelectorAll('a').length===3 && internal[0].querySelectorAll('[aria-current=page]').length===1 && h?.nextElementSibling===internal[0] && [...internal[0].querySelectorAll('a')].every(a=>Math.abs(a.getBoundingClientRect().top-internal[0].firstElementChild.getBoundingClientRect().top)<1) && JSON.stringify([...internal[0].querySelectorAll('a')].map(a=>a.textContent.trim()))===JSON.stringify(['نیروها','تخصیص به پروژه و کارگاه','گروه‌های کاری']) && [...document.querySelectorAll('main a.erp-page-header__action')].every(a=>h.contains(a));
+          const h=document.querySelector('main header[aria-labelledby=erp-page-title]');
+          const items=[...(internal[0]?.children || [])];
+          return !primary.some(a=>a.href && new URL(a.href).pathname===target)
+            && primary.some(a=>a.textContent.trim()==='نیروهای کار' && a.classList.contains('is-active'))
+            && internal.length===1 && items.length===3
+            && internal[0].querySelectorAll('[aria-current]').length===1
+            && h?.nextElementSibling===internal[0]
+            && items.every(a=>a.tagName!=='A' || new URL(a.href).pathname!==location.pathname)
+            && (innerWidth<640 || items.every(a=>Math.abs(a.getBoundingClientRect().top-items[0].getBoundingClientRect().top)<1))
+            && JSON.stringify(items.map(a=>a.textContent.trim()))===JSON.stringify(['نیروها','تخصیص به پروژه و کارگاه','گروه‌های کاری'])
+            && [...document.querySelectorAll('main a.erp-page-header__action')].every(a=>h.contains(a));
         })()"""
         )
         action = """(() => {
@@ -1083,6 +1305,7 @@ class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
                     "mobile": mobile,
                     "steps": [
                         {"clickHref": assignments, "afterPath": assignments},
+                        {"toggleSelector": "#list-more-filters > summary" if mobile else "[data-more-toggle]"},
                         {
                             "inspect": navigation,
                             "description": "assignment duplicated in primary navigation",
@@ -1197,14 +1420,24 @@ class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
                         "status": 200,
                         "mobile": mobile,
                         "steps": [
+                            *([
+                                {"toggleSelector": "[data-filter-options] > .erp-list-options__summary"},
+                                {"inspect": """(() => {
+                                    const panel = document.querySelector('[data-filter-options]');
+                                    const control = panel.querySelector('[name=project]').tomselect.control;
+                                    return panel.open && control.getBoundingClientRect().width > 0;
+                                })()""",
+                                 "description": "mobile filter disclosure opens", "waitMs": 250},
+                            ] if mobile else []),
                             {
                                 "searchChoice": {
                                     "name": "project",
                                     "query": "ساختمان",
                                     "value": str(second.pk),
                                 },
-                                "filterChange": True,
+                                "expectCleared": ["site"],
                             },
+                            {"submit": True, "formSelector": "#list-filter-bar", "afterPath": path},
                             {
                                 "inspect": "(() => {const site=document.querySelector('main select[name=site]');return !site.value && [...site.options].filter(o=>o.value).every(o=>o.value==="
                                 + repr(str(second_site.pk))
@@ -1216,7 +1449,7 @@ class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
                     }
                 )
         self._probe(
-            owner, scenarios, evidence_directory="output/mvp-02/uiux/navigation/browser"
+            owner, scenarios, evidence_directory="output/workforce-timekeeping-journey/navigation"
         )
 
     def test_global_context_and_work_team_filter_followup(self):

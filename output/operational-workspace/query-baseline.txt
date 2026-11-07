@@ -1,0 +1,85 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_ WorkbenchTests.test_high_open_item_volume_keeps_page_and_query_count_bounded _
+
+self = <apps.workflows.test_workbench.WorkbenchTests testMethod=test_high_open_item_volume_keeps_page_and_query_count_bounded>
+
+    def test_high_open_item_volume_keeps_page_and_query_count_bounded(self) -> None:
+        base = self._item(self._submitted_request("WB-W6-VOLUME"))
+        member = base.candidates.get().membership
+        items = WorkItem.objects.bulk_create(
+            [
+                WorkItem(
+                    organization=self.organization,
+                    instance=base.instance,
+                    step_instance=base.step_instance,
+                    action_key=f"w6-volume-{index}",
+                    idempotency_key=f"w6-volume-{index}",
+                    required_permission=base.required_permission,
+                    priority=index % 100,
+                )
+                for index in range(2000)
+            ],
+            batch_size=500,
+        )
+        WorkItemCandidate.objects.bulk_create(
+            [
+                WorkItemCandidate(
+                    organization=self.organization,
+                    work_item=item,
+                    membership=member,
+                    routing_basis=[{"resolver": "organization_owner"}],
+                    is_active=True,
+                )
+                for item in items
+            ],
+            batch_size=500,
+        )
+    
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(reverse("workflows:workbench"))
+    
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["counts"].all_items, 2001)
+        self.assertEqual(len(response.context["work_items"]), 25)
+        self.assertTrue(response.context["page_obj"].has_next())
+>       self.assertLessEqual(len(queries), 45)
+E       AssertionError: 86 not less than or equal to 45
+
+apps\workflows\test_workbench.py:323: AssertionError
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-05T16:03:01.274290+00:00","event":"http.response","request_id":"4573ec5c-f977-47a0-ae33-429111ca8c1d","method":"GET","route":"workflows:workbench","status_code":200,"duration_ms":2987}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+______ WorkbenchTests.test_pagination_responsive_context_and_query_bound ______
+
+self = <apps.workflows.test_workbench.WorkbenchTests testMethod=test_pagination_responsive_context_and_query_bound>
+
+    def test_pagination_responsive_context_and_query_bound(self) -> None:
+        for index in range(26):
+            self._submitted_request(f"WB-PAGE-{index:02d}")
+    
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(reverse("workflows:workbench"))
+    
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["work_items"]), 25)
+        self.assertTrue(response.context["page_obj"].has_next())
+        self.assertTrue(response.context["is_rtl"])
+        self.assertTrue(response.context["responsive_table"])
+        self.assertContains(response, 'dir="rtl"')
+        self.assertContains(response, 'class="erp-table-wrap"')
+>       self.assertLessEqual(len(queries), 45)
+E       AssertionError: 86 not less than or equal to 45
+
+apps\workflows\test_workbench.py:282: AssertionError
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-05T16:03:11.733765+00:00","event":"http.response","request_id":"73f5284b-7e4a-4821-a576-6f9bc3738727","method":"GET","route":"workflows:workbench","status_code":200,"duration_ms":283}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+=========================== short test summary info ===========================
+FAILED apps/workflows/test_workbench.py::WorkbenchTests::test_high_open_item_volume_keeps_page_and_query_count_bounded
+FAILED apps/workflows/test_workbench.py::WorkbenchTests::test_pagination_responsive_context_and_query_bound
+2 failed in 44.97s

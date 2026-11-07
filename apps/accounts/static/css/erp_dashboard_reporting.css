@@ -1,0 +1,74 @@
+/* Opt-in Dashboard and Reporting composition. Existing data and patterns own behavior. */
+.erp-dashboard, .erp-report { min-width:0; color:var(--bonira-ink); }
+:is(.erp-dashboard,.erp-report) :is(h1,h2,h3,p,dl,figure) { margin-block-start:0; }
+:is(.erp-dashboard,.erp-report) :is(a,button,summary,[tabindex]):focus-visible { outline:2px solid var(--bonira-royal-blue); outline-offset:3px; }
+:is(.erp-dashboard,.erp-report) > .erp-page-header { margin-bottom:18px; }
+.erp-insight-context { display:flex; flex-wrap:wrap; align-items:center; gap:6px 18px; margin-block:12px 18px; padding:10px 14px; border:1px solid var(--bonira-light-gray); border-radius:8px; background:var(--bonira-soft); color:var(--bonira-slate); font-size:12px; line-height:1.9; }
+.erp-insight-context strong { color:var(--bonira-deep-navy); font-weight:600; }
+.erp-insight-nav, .erp-insight-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-block:12px 18px; }
+.erp-insight-nav a { display:inline-flex; align-items:center; min-height:36px; padding:8px 12px; border:1px solid var(--bonira-light-gray); border-radius:7px; background:var(--bonira-white); color:var(--bonira-royal-blue); font-size:12px; }
+.erp-insight-actions form { margin:0; }
+.erp-insight-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:start; }
+.erp-insight-grid > :only-child { grid-column:1/-1; }
+.erp-insight-section { min-width:0; margin-block:18px; border:1px solid var(--bonira-light-gray); border-radius:12px; background:var(--bonira-white); overflow:hidden; }
+.erp-insight-heading { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding:14px 16px; border-bottom:1px solid var(--bonira-light-gray); }
+.erp-insight-heading h2, .erp-insight-heading h3 { margin:0; color:var(--bonira-deep-navy); font-size:15px; font-weight:600; }
+.erp-insight-heading p, .erp-insight-heading > span { margin:0; color:var(--bonira-muted); font-size:12px; }
+.erp-insight-body { padding:16px; }
+.erp-insight-note { padding:10px 14px; border-inline-start:3px solid var(--bonira-border); border-radius:6px; background:var(--bonira-soft); color:var(--bonira-slate); font-size:12px; line-height:1.9; }
+.erp-insight-note--warning { border-color:var(--bonira-warning); background:var(--color-warning-soft); }
+.erp-insight-empty { padding:28px 16px; color:var(--bonira-muted); text-align:center; font-size:13px; line-height:1.9; }
+.erp-dashboard-kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); gap:12px; margin-block:16px; }
+.erp-dashboard-metric { position:relative; min-width:0; padding:14px 16px; border:1px solid var(--bonira-light-gray); border-radius:10px; background:var(--bonira-white); }
+.erp-dashboard-kpis > .erp-dashboard-metric:only-child { grid-column:1/-1; }
+.erp-dashboard-metric__label { display:flex; flex-direction:row-reverse; align-items:center; justify-content:space-between; gap:10px; }
+.erp-dashboard-metric__label p { margin:0; font-size:12px; font-weight:500; color:var(--bonira-slate); }
+.erp-dashboard-metric__label svg { width:24px; height:24px; flex-shrink:0; color:var(--bonira-royal-blue); }
+.erp-dashboard-metric__value { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px; margin-block:10px 4px; font-size:24px; font-weight:600; }
+.erp-dashboard-metric__value bdi { font-size:24px; font-weight:600; overflow-wrap:anywhere; }
+.erp-dashboard-metric__value span, .erp-dashboard-metric small { color:var(--bonira-muted); font-size:11px; line-height:1.9; }
+.erp-dashboard-metric > a { display:inline-flex; align-items:center; min-height:36px; padding-block:6px; font-size:12px; color:var(--bonira-royal-blue); }
+.erp-dashboard .erp-project-kpis { padding:0; border:0; background:transparent; }
+.erp-dashboard .erp-project-kpis .erp-dashboard-metric { background:var(--bonira-white); padding:14px 16px; }
+.erp-dashboard .erp-project-kpis .erp-dashboard-metric > a { position:static; inset:auto; font-size:12px; overflow:visible; }
+.erp-dashboard .erp-project-kpis .erp-dashboard-metric:hover { outline:none; }
+.erp-report-table { max-width:100%; overflow-x:auto; }
+.erp-report-table table { width:100%; min-width:640px; border-collapse:collapse; text-align:start; font-size:13px; }
+.erp-report-table :is(th,td) { padding:12px 14px; vertical-align:top; border-bottom:1px solid var(--bonira-light-gray); }
+.erp-report-table th { background:var(--bonira-soft); color:var(--bonira-slate); font-size:12px; font-weight:600; white-space:nowrap; }
+.erp-report-table td { line-height:1.9; }
+.erp-report-table tbody tr:last-child td { border-bottom:0; }
+.erp-report-table tbody tr:hover { background:var(--bonira-soft); }
+.erp-report-table a { color:var(--bonira-royal-blue); }
+.erp-report-table a:hover { text-decoration:underline; }
+.erp-report-table [dir="ltr"] { text-align:end; white-space:nowrap; }
+.erp-insight-values { margin:0; font-size:13px; }
+.erp-insight-values > div { display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px 14px; padding-block:8px; border-bottom:1px solid var(--bonira-light-gray); }
+.erp-insight-values > div:last-child { border:0; }
+.erp-insight-values dt { color:var(--bonira-muted); }
+.erp-insight-values dd { margin:0; overflow-wrap:anywhere; }
+.erp-insight-card { min-width:0; padding:16px; border:1px solid var(--bonira-light-gray); border-radius:10px; background:var(--bonira-white); }
+.erp-insight-card h3 { color:var(--bonira-deep-navy); font-size:15px; font-weight:600; }
+.erp-insight-card > p, .erp-insight-card details { font-size:12px; color:var(--bonira-slate); line-height:1.9; }
+.erp-insight-card summary { min-height:32px; cursor:pointer; }
+.erp-insight-card .erp-insight-note { margin-block:10px; }
+.erp-insight-card-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-block:14px; }
+.erp-dashboard .erp-insight-card-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.erp-dashboard .home-kpis .home-metric { border-radius:10px; box-shadow:none; }
+.erp-dashboard .home-metric__value { font-size:24px; }
+.erp-dashboard .home-metric__heading .home-icon { background:var(--bonira-soft); color:var(--bonira-royal-blue); }
+@media (max-width:1199px) {
+  .erp-insight-grid { grid-template-columns:1fr; }
+  .erp-dashboard .erp-insight-card-grid { grid-template-columns:1fr; }
+}
+@media (max-width:639px) {
+  .erp-insight-context { padding:10px 12px; gap:6px 12px; }
+  .erp-dashboard-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .erp-dashboard .erp-project-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .erp-dashboard .erp-project-kpis .erp-dashboard-metric, .erp-dashboard-metric { padding:12px; }
+  .erp-dashboard-metric__value bdi { font-size:21px; }
+  .erp-insight-card-grid { grid-template-columns:1fr; }
+  .erp-insight-heading, .erp-insight-body { padding:12px; }
+  .erp-insight-actions > a { max-width:100%; white-space:normal; }
+  .erp-insight-nav a, .erp-dashboard-metric > a, .erp-insight-card summary { min-height:44px; }
+}

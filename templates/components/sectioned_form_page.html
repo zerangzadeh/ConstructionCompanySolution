@@ -1,0 +1,4 @@
+{% extends "components/compact_form_page.html" %}
+{% load static %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/erp_sectioned_form.css' %}?v=20261105-1">{% endblock %}
+{% block content %}<div class="erp-compact-page erp-sectioned-page">{% block sectioned_content %}{% endblock %}</div>{% endblock %}

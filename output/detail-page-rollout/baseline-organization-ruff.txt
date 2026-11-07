@@ -1,0 +1,138 @@
+I001 [*] Import block is un-sorted or un-formatted
+   --> apps\organizations\views.py:1:1
+    |
+  1 | / import json
+  2 | | from datetime import date
+  3 | |
+  4 | | from django.contrib import messages
+  5 | | from django.contrib.auth.decorators import login_required
+  6 | | from django.core.exceptions import PermissionDenied, ValidationError
+  7 | | from django.http import (
+  8 | |     FileResponse,
+  9 | |     Http404,
+ 10 | |     HttpRequest,
+ 11 | |     HttpResponse,
+ 12 | |     HttpResponseForbidden,
+ 13 | |     JsonResponse,
+ 14 | | )
+ 15 | | from django.shortcuts import get_object_or_404, redirect, render
+ 16 | | from django.utils import timezone
+ 17 | | from django.utils.http import url_has_allowed_host_and_scheme
+ 18 | | from django.urls import reverse
+ 19 | | from django.views.decorators.http import require_GET, require_http_methods, require_POST
+ 20 | |
+ 21 | | from apps.accounts.models import User
+ 22 | | from apps.contracts.models import Contract
+ 23 | | from apps.organizations.access_services import (
+ 24 | |     archive_organization_role,
+ 25 | |     assign_membership_role,
+ 26 | |     create_organization_role,
+ 27 | |     create_protected_operation_version,
+ 28 | |     grant_membership_scope,
+ 29 | |     retire_protected_operation,
+ 30 | |     revoke_membership_role,
+ 31 | |     revoke_membership_scope,
+ 32 | |     update_organization_role,
+ 33 | | )
+ 34 | | from apps.organizations.authorization import (
+ 35 | |     get_active_membership,
+ 36 | |     has_business_permission,
+ 37 | |     is_platform_admin,
+ 38 | |     membership_has_permission,
+ 39 | |     membership_has_role,
+ 40 | |     membership_has_scope,
+ 41 | |     membership_is_tenant_owner,
+ 42 | | )
+ 43 | | from apps.organizations.configuration_profiles import (
+ 44 | |     MATRIX_VERSION,
+ 45 | |     PROFILE_NAMES,
+ 46 | |     apply_profile_suggestion,
+ 47 | |     preview_configuration_profile,
+ 48 | | )
+ 49 | | from apps.organizations.context import set_effective_context
+ 50 | | from apps.organizations.decorators import (
+ 51 | |     active_organization_required,
+ 52 | |     organization_permission_required,
+ 53 | |     require_organization_permission,
+ 54 | | )
+ 55 | | from apps.organizations.form_scoping import (
+ 56 | |     normalized_uuid,
+ 57 | |     scope_project_related_choices,
+ 58 | |     scoped_projects_for_form,
+ 59 | | )
+ 60 | | from apps.organizations.forms import (
+ 61 | |     ExistingAccountConnectionForm,
+ 62 | |     MembershipRoleAssignmentForm,
+ 63 | |     MembershipScopeGrantForm,
+ 64 | |     OrganizationAccountCreateForm,
+ 65 | |     OrganizationForm,
+ 66 | |     OrganizationMemberPasswordResetForm,
+ 67 | |     OrganizationMembershipForm,
+ 68 | |     OrganizationProfileForm,
+ 69 | |     OrganizationRoleCatalogForm,
+ 70 | |     OrganizationSettingsForm,
+ 71 | |     ProtectedOperationCatalogForm,
+ 72 | | )
+ 73 | | from apps.organizations.models import (
+ 74 | |     AccountConnectionRequestStatus,
+ 75 | |     BusinessPermissionCode,
+ 76 | |     InsuranceClassification,
+ 77 | |     MembershipRole,
+ 78 | |     MembershipRoleAssignment,
+ 79 | |     MembershipScopeGrant,
+ 80 | |     Organization,
+ 81 | |     OrganizationAccountConnectionRequest,
+ 82 | |     OrganizationMembership,
+ 83 | |     OrganizationRole,
+ 84 | |     PlatformPolicy,
+ 85 | |     PlatformPolicyVersion,
+ 86 | |     PolicySource,
+ 87 | |     ProtectedOperation,
+ 88 | | )
+ 89 | | from apps.organizations.policy_services import (
+ 90 | |     apply_tenant_policy_selection,
+ 91 | |     create_insurance_classification,
+ 92 | |     create_platform_policy,
+ 93 | |     create_platform_policy_version,
+ 94 | |     link_policy_version_source,
+ 95 | |     list_tenant_policy_selections,
+ 96 | |     publish_platform_policy_version,
+ 97 | |     record_optional_policy_review,
+ 98 | |     record_policy_source,
+ 99 | |     retire_platform_policy_version,
+100 | |     select_tenant_policy_version,
+101 | |     set_insurance_classification_active,
+102 | |     update_platform_policy_version,
+103 | | )
+104 | | from apps.organizations.policy_specs import (
+105 | |     PLATFORM_POLICY_SPECS,
+106 | |     policy_version_is_configuration_ready,
+107 | | )
+108 | | from apps.organizations.services import (
+109 | |     create_organization_account,
+110 | |     create_organization_by_system_admin,
+111 | |     get_organization_members,
+112 | |     get_organization_settings,
+113 | |     get_valid_memberships,
+114 | |     request_existing_account_connection,
+115 | |     reset_organization_member_password,
+116 | |     resolve_active_organization,
+117 | |     set_active_organization,
+118 | |     update_organization_membership,
+119 | |     update_organization_settings,
+120 | | )
+121 | | from apps.projects.models import ProjectPhase
+122 | | from core.list_filters import apply_table_sorting
+    | |_________________________________________________^
+help: Organize imports
+   |
+15 | from django.shortcuts import get_object_or_404, redirect, render
+16 + from django.urls import reverse
+17 | from django.utils import timezone
+18 | from django.utils.http import url_has_allowed_host_and_scheme
+   - from django.urls import reverse
+19 | from django.views.decorators.http import require_GET, require_http_methods, require_POST
+   |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.

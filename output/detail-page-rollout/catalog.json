@@ -1,0 +1,596 @@
+[
+  {
+    "route": "organizations:member_detail",
+    "path": "/organizations/members/<uuid:membership_id>/",
+    "view": "apps.organizations.views.member_detail",
+    "templates": [
+      "components/read_only_record_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Shared conventions applied; specialized body retained",
+    "reason": "Privileged membership authority remains read-only; shared header/info shell only.",
+    "browser_verified": true
+  },
+  {
+    "route": "parties:governance_detail",
+    "path": "/parties/governance/<uuid:party_id>/",
+    "view": "apps.parties.governance_views.detail",
+    "templates": [],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Governed supplier/customer legal, tax and identity workflows; separate from operational master.",
+    "browser_verified": false
+  },
+  {
+    "route": "parties:detail",
+    "path": "/parties/<uuid:party_id>/",
+    "view": "apps.parties.views.party_detail",
+    "templates": [
+      "parties/detail.html"
+    ],
+    "defaults": {},
+    "classification": "Standard Record Detail",
+    "outcome": "Migrated",
+    "reason": "Operational party identity, specifications, roles and contacts; governance remains separate.",
+    "browser_verified": true
+  },
+  {
+    "route": "materials:material_detail",
+    "path": "/materials/<uuid:material_id>/",
+    "view": "apps.materials.views.material_detail",
+    "templates": [
+      "materials/material_form.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Shared conventions applied; specialized body retained",
+    "reason": "Combined detail/edit endpoint: Compact editor preserved; existing-record header/summary only.",
+    "browser_verified": true
+  },
+  {
+    "route": "materials:category_detail",
+    "path": "/materials/categories/<uuid:category_id>/",
+    "view": "apps.materials.views.category_detail",
+    "templates": [
+      "materials/category_form.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Shared conventions applied; specialized body retained",
+    "reason": "Combined detail/edit endpoint: Compact editor preserved; existing-record header/summary only.",
+    "browser_verified": true
+  },
+  {
+    "route": "projects:site_detail",
+    "path": "/projects/<uuid:project_id>/sites/<uuid:site_id>/",
+    "view": "apps.projects.views.project_site_detail",
+    "templates": [
+      "components/read_only_record_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Standard Record Detail",
+    "outcome": "Migrated",
+    "reason": "Existing authorized read-only site rows; shared detail presentation.",
+    "browser_verified": true
+  },
+  {
+    "route": "projects:phase_detail",
+    "path": "/projects/<uuid:project_id>/sites/<uuid:site_id>/phases/<uuid:phase_id>/",
+    "view": "apps.projects.views.project_phase_detail",
+    "templates": [
+      "projects/phase_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Standard Record Detail",
+    "outcome": "Migrated",
+    "reason": "Phase identity and existing status transitions.",
+    "browser_verified": true
+  },
+  {
+    "route": "projects:detail",
+    "path": "/projects/<uuid:project_id>/",
+    "view": "apps.projects.views.project_detail",
+    "templates": [
+      "projects/detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Approved Projects Exception in UI guidelines section 30 requires separate instruction for final design.",
+    "browser_verified": false
+  },
+  {
+    "route": "contracts:contractual_detail",
+    "path": "/contracts/contractual-records/<uuid:record_id>/",
+    "view": "apps.contracts.views.contractual_record_detail",
+    "templates": [
+      "contracts/contractual_record_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized contractual entitlement/change-order instruction workspace.",
+    "browser_verified": false
+  },
+  {
+    "route": "contracts:detail",
+    "path": "/contracts/<uuid:contract_id>/",
+    "view": "apps.contracts.views.contract_detail",
+    "templates": [
+      "contracts/detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized contract items, workflow and financial/source relationships.",
+    "browser_verified": false
+  },
+  {
+    "route": "billing:taxpayer_invoice_detail",
+    "path": "/billing/taxpayer-invoices/<uuid:invoice_id>/",
+    "view": "apps.billing.views.taxpayer_invoice_detail",
+    "templates": [
+      "billing/statutory_record_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized billing/compliance/claim/measurement lifecycle, calculations and protected financial lineage.",
+    "browser_verified": false
+  },
+  {
+    "route": "billing:contractor_compliance_detail",
+    "path": "/billing/contractor-compliance/<uuid:assessment_id>/",
+    "view": "apps.billing.views.contractor_compliance_detail",
+    "templates": [
+      "billing/statutory_record_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized billing/compliance/claim/measurement lifecycle, calculations and protected financial lineage.",
+    "browser_verified": false
+  },
+  {
+    "route": "billing:guarantee_detail",
+    "path": "/billing/guarantees/<uuid:guarantee_id>/",
+    "view": "apps.billing.views.guarantee_detail",
+    "templates": [
+      "billing/commercial_record_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized billing/compliance/claim/measurement lifecycle, calculations and protected financial lineage.",
+    "browser_verified": false
+  },
+  {
+    "route": "billing:compliance_evidence_detail",
+    "path": "/billing/compliance-evidence/<uuid:evidence_id>/",
+    "view": "apps.billing.views.compliance_evidence_detail",
+    "templates": [
+      "billing/commercial_record_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized billing/compliance/claim/measurement lifecycle, calculations and protected financial lineage.",
+    "browser_verified": false
+  },
+  {
+    "route": "billing:retention_release_detail",
+    "path": "/billing/retention-releases/<uuid:release_id>/",
+    "view": "apps.billing.views.retention_release_detail",
+    "templates": [
+      "billing/commercial_record_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized billing/compliance/claim/measurement lifecycle, calculations and protected financial lineage.",
+    "browser_verified": false
+  },
+  {
+    "route": "billing:baseline_detail",
+    "path": "/billing/baselines/<uuid:baseline_id>/",
+    "view": "apps.billing.views.baseline_detail",
+    "templates": [
+      "billing/baseline_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized billing/compliance/claim/measurement lifecycle, calculations and protected financial lineage.",
+    "browser_verified": false
+  },
+  {
+    "route": "billing:progress_detail",
+    "path": "/billing/progress/<uuid:record_id>/",
+    "view": "apps.billing.views.progress_detail",
+    "templates": [
+      "billing/progress_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized billing/compliance/claim/measurement lifecycle, calculations and protected financial lineage.",
+    "browser_verified": false
+  },
+  {
+    "route": "billing:claim_detail",
+    "path": "/billing/claims/<uuid:claim_id>/",
+    "view": "apps.billing.views.claim_detail",
+    "templates": [],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized billing/compliance/claim/measurement lifecycle, calculations and protected financial lineage.",
+    "browser_verified": false
+  },
+  {
+    "route": "billing:payable_certificate_detail",
+    "path": "/billing/payable-certificates/<uuid:certificate_id>/",
+    "view": "apps.billing.views.payable_certificate_detail",
+    "templates": [
+      "billing/payable_certificate_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized billing/compliance/claim/measurement lifecycle, calculations and protected financial lineage.",
+    "browser_verified": false
+  },
+  {
+    "route": "billing:payable_measurement_detail",
+    "path": "/billing/payable-measurements/<uuid:measurement_id>/",
+    "view": "apps.billing.views.payable_measurement_detail",
+    "templates": [
+      "billing/payable_measurement_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized billing/compliance/claim/measurement lifecycle, calculations and protected financial lineage.",
+    "browser_verified": false
+  },
+  {
+    "route": "estimates:detail",
+    "path": "/estimates/<uuid:estimate_id>/",
+    "view": "apps.estimates.views.estimate_detail",
+    "templates": [
+      "estimates/detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Estimate item/revision/quantity-calculation workspace, not a simple record.",
+    "browser_verified": false
+  },
+  {
+    "route": "expenses:category_detail",
+    "path": "/expenses/categories/<uuid:category_id>/",
+    "view": "apps.expenses.views.expense_category_detail",
+    "templates": [
+      "expenses/category_form.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Shared conventions applied; specialized body retained",
+    "reason": "Combined detail/edit endpoint: Compact editor preserved; existing-record header/summary only.",
+    "browser_verified": true
+  },
+  {
+    "route": "expenses:detail",
+    "path": "/expenses/<uuid:expense_id>/",
+    "view": "apps.expenses.views.expense_detail",
+    "templates": [
+      "expenses/detail.html"
+    ],
+    "defaults": {},
+    "classification": "Standard Record Detail",
+    "outcome": "Migrated",
+    "reason": "Expense pilot; actual lifecycle, allocations, assessments, documents and timestamp history.",
+    "browser_verified": true
+  },
+  {
+    "route": "documents:evidence-detail",
+    "path": "/documents/evidence/<slug:kind>/<uuid:source_id>/<uuid:version_id>/",
+    "view": "apps.documents.evidence_views.evidence_detail",
+    "templates": [
+      "documents/evidence_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized protected evidence/version route; not ordinary DMS master detail.",
+    "browser_verified": false
+  },
+  {
+    "route": "documents:employee-detail",
+    "path": "/documents/mine/<uuid:document_id>/",
+    "view": "apps.documents.views.employee_document_detail",
+    "templates": [
+      "documents/employee_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Protected workforce document route with separate identity/access boundary.",
+    "browser_verified": false
+  },
+  {
+    "route": "documents:detail",
+    "path": "/documents/<uuid:document_id>/",
+    "view": "apps.documents.views.document_detail",
+    "templates": [
+      "documents/detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Shared conventions applied; specialized body retained",
+    "reason": "Version, download quarantine, source linkage, retention and archive workflows preserved; shared shell only.",
+    "browser_verified": true
+  },
+  {
+    "route": "daily_reports:field_observation_detail",
+    "path": "/daily-reports/field/<uuid:observation_id>/",
+    "view": "apps.daily_reports.field_views.field_observation_detail",
+    "templates": [
+      "daily_reports/field_observation_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized field observation workspace and lifecycle.",
+    "browser_verified": false
+  },
+  {
+    "route": "daily_reports:detail",
+    "path": "/daily-reports/<uuid:report_id>/",
+    "view": "apps.daily_reports.views.daily_report_detail",
+    "templates": [
+      "daily_reports/detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Shared conventions applied; specialized body retained",
+    "reason": "Operational entry grids, HSE references, DMS and submit/approve forms preserved; shared shell only.",
+    "browser_verified": true
+  },
+  {
+    "route": "workforce:field_detail",
+    "path": "/workforce/field/<uuid:employee_id>/",
+    "view": "apps.workforce.field_views.detail",
+    "templates": [
+      "workforce/field_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Field-worker identity/assignment/history workspace with dedicated field journey.",
+    "browser_verified": false
+  },
+  {
+    "route": "workforce:employee_detail",
+    "path": "/workforce/employees/<uuid:employee_id>/",
+    "view": "apps.workforce.views.employee_detail",
+    "templates": [
+      "workforce/employee_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "MVP compatibility route delegates to field-worker identity surface; no second design.",
+    "browser_verified": false
+  },
+  {
+    "route": "timekeeping:record_detail",
+    "path": "/timekeeping/records/<str:kind>/<uuid:record_id>/",
+    "view": "apps.timekeeping.views.record_detail",
+    "templates": [
+      "timekeeping/record_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Dynamic operational attendance/overtime/timesheet record kinds and approval actions.",
+    "browser_verified": false
+  },
+  {
+    "route": "timekeeping:timesheet_detail",
+    "path": "/timekeeping/timesheets/<uuid:timesheet_id>/",
+    "view": "apps.timekeeping.views.timesheet_detail",
+    "templates": [
+      "timekeeping/timesheet_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Timesheet lines, approval and work-context workspace.",
+    "browser_verified": false
+  },
+  {
+    "route": "procurement:rfq_detail",
+    "path": "/procurement/rfqs/<uuid:rfq_id>/",
+    "view": "apps.procurement.rfq_workspace.rfq_detail",
+    "templates": [
+      "procurement/rfq_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized procurement lines, handoffs, source records and lifecycle.",
+    "browser_verified": false
+  },
+  {
+    "route": "procurement:request_detail",
+    "path": "/procurement/requests/<uuid:request_id>/",
+    "view": "apps.procurement.views.purchase_request_detail",
+    "templates": [
+      "procurement/request_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized procurement lines, handoffs, source records and lifecycle.",
+    "browser_verified": false
+  },
+  {
+    "route": "procurement:order_detail",
+    "path": "/procurement/orders/<uuid:order_id>/",
+    "view": "apps.procurement.order_workspace.order_detail",
+    "templates": [
+      "procurement/order_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized procurement lines, handoffs, source records and lifecycle.",
+    "browser_verified": false
+  },
+  {
+    "route": "procurement:receipt_detail",
+    "path": "/procurement/receipts/<uuid:receipt_id>/",
+    "view": "apps.procurement.receipt_workspace.receipt_detail",
+    "templates": [
+      "procurement/receipt_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized procurement lines, handoffs, source records and lifecycle.",
+    "browser_verified": false
+  },
+  {
+    "route": "inventory:count_detail",
+    "path": "/inventory/custody/counts/<uuid:count_id>/",
+    "view": "apps.inventory.p8_views.count_detail",
+    "templates": [
+      "inventory/count_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized inventory quantity/value transactions, lines, counts or transfers; authoritative stock workflow.",
+    "browser_verified": false
+  },
+  {
+    "route": "inventory:transfer_detail",
+    "path": "/inventory/custody/transfers/<uuid:transfer_id>/",
+    "view": "apps.inventory.p8_views.transfer_detail",
+    "templates": [
+      "inventory/transfer_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized inventory quantity/value transactions, lines, counts or transfers; authoritative stock workflow.",
+    "browser_verified": false
+  },
+  {
+    "route": "inventory:warehouse_detail",
+    "path": "/inventory/<uuid:warehouse_id>/",
+    "view": "apps.inventory.views.warehouse_detail",
+    "templates": [
+      "inventory/warehouse_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Shared conventions applied; specialized body retained",
+    "reason": "Stock/balance and transaction workspace preserved; shared header/summary only.",
+    "browser_verified": true
+  },
+  {
+    "route": "inventory:transaction_detail",
+    "path": "/inventory/transactions/<uuid:transaction_id>/",
+    "view": "apps.inventory.journey_views.transaction_detail",
+    "templates": [
+      "inventory/transaction_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Specialized inventory quantity/value transactions, lines, counts or transfers; authoritative stock workflow.",
+    "browser_verified": false
+  },
+  {
+    "route": "equipment:work_order_detail",
+    "path": "/equipment/operations/work-orders/<uuid:work_order_id>/",
+    "view": "apps.equipment.views.work_order_detail",
+    "templates": [
+      "components/read_only_record_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Standard Record Detail",
+    "outcome": "Migrated",
+    "reason": "Existing authorized read-only work-order rows and structured evidence.",
+    "browser_verified": true
+  },
+  {
+    "route": "equipment:maintenance_detail",
+    "path": "/equipment/maintenance/<uuid:record_id>/",
+    "view": "apps.equipment.views.maintenance_detail",
+    "templates": [
+      "components/read_only_record_detail.html"
+    ],
+    "defaults": {},
+    "classification": "Standard Record Detail",
+    "outcome": "Migrated",
+    "reason": "Existing authorized read-only maintenance rows and source lineage.",
+    "browser_verified": true
+  },
+  {
+    "route": "equipment:detail",
+    "path": "/equipment/<uuid:equipment_id>/",
+    "view": "apps.equipment.views.equipment_detail",
+    "templates": [
+      "equipment/detail.html"
+    ],
+    "defaults": {},
+    "classification": "Standard Record Detail",
+    "outcome": "Migrated",
+    "reason": "Equipment master identity; retained assignment/maintenance/financial links and state/archive forms.",
+    "browser_verified": true
+  },
+  {
+    "route": "safety:detail",
+    "path": "/safety/<uuid:incident_id>/",
+    "view": "apps.safety.views.incident_detail",
+    "templates": [
+      "safety/detail.html"
+    ],
+    "defaults": {},
+    "classification": "Standard Record Detail",
+    "outcome": "Migrated",
+    "reason": "Incident information, existing action forms, evidence and review revisions.",
+    "browser_verified": true
+  },
+  {
+    "route": "quality:detail",
+    "path": "/quality/<uuid:issue_id>/",
+    "view": "apps.quality.views.issue_detail",
+    "templates": [
+      "quality/detail.html"
+    ],
+    "defaults": {},
+    "classification": "Standard Record Detail",
+    "outcome": "Migrated",
+    "reason": "Issue information, existing verification/action forms, evidence and review revisions.",
+    "browser_verified": true
+  },
+  {
+    "route": "workflows:version_detail",
+    "path": "/workflows/administration/versions/<uuid:version_id>/",
+    "view": "apps.workflows.administration_views.version_detail",
+    "templates": [
+      "detail.html"
+    ],
+    "defaults": {},
+    "classification": "Specialized Operational Detail",
+    "outcome": "Excluded from generic migration; existing structure retained",
+    "reason": "Workflow definition/version administration and immutable configuration evidence.",
+    "browser_verified": false
+  }
+]

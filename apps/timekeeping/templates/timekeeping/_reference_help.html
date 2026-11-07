@@ -1,0 +1,15 @@
+{% load field_journey %}
+{% if missing_reference %}
+  <p class="erp-surface mt-4 rounded-xl p-3 text-sm" role="status">
+    {% if missing_reference == "calendar" %}تقویم کاری فعالی برای این شرکت وجود ندارد.{% else %}شیفت فعالی برای این شرکت وجود ندارد.{% endif %}
+    {% if "time_calendars.manage" in business_permission_codes %}
+      {% if missing_reference == "calendar" %}{% field_context_url "timekeeping:calendar_create" as setup_url %}{% else %}{% field_context_url "timekeeping:shift_create" as setup_url %}{% endif %}
+      <a href="{{ setup_url }}" class="font-semibold text-blue-700 underline">{% if missing_reference == "calendar" %}ایجاد تقویم کاری{% else %}ایجاد شیفت{% endif %}</a>
+    {% else %}
+      برای تنظیم آن با مسئول تقویم و شیفت شرکت تماس بگیرید.
+    {% endif %}
+  </p>
+{% elif request.resolver_match.url_name == "attendance_create" and "time_calendars.manage" in business_permission_codes %}
+  {% field_context_url "timekeeping:shift_create" as shift_setup_url %}
+  <p class="mt-3 text-sm text-slate-600">اگر شیفت موردنیاز در تقویم کاری تعریف نشده، از <a href="{{ shift_setup_url }}" class="font-semibold text-blue-700 underline">ایجاد شیفت</a> استفاده کنید.</p>
+{% endif %}

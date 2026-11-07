@@ -1,0 +1,15 @@
+{% extends "components/compact_form_page.html" %}
+{% load field_journey %}
+{% block title %}{{ title }} | بنیرا{% endblock %}
+{% block extra_head %}{% prepare_native_choices form %}{{ block.super }}{% endblock %}
+{% block compact_content %}
+    {% field_breadcrumbs title team_parent=True as breadcrumbs %}
+    {% workforce_mvp as workforce_is_mvp %}
+    {% if workforce_is_mvp %}
+        {% include "workforce/_field_header.html" with page_breadcrumbs=breadcrumbs page_title=title page_description="گروه کاری در سطح شرکت تعریف می‌شود و به پروژه یا کارگاه خاصی محدود نیست." page_filters=True %}
+    {% else %}
+        {% include "components/page_header.html" with page_breadcrumbs=breadcrumbs page_title=title page_description="گروه کاری در سطح شرکت تعریف می‌شود و به پروژه یا کارگاه خاصی محدود نیست." only %}
+    {% endif %}
+    {% url back_url as cancel_url %}
+    {% include "components/compact_form_card.html" with form=form csrf_token=csrf_token cancel_url=cancel_url submit_label="ثبت" native_choices=True work_team_form=True focus_first_error=True request=request only %}
+{% endblock %}

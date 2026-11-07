@@ -1,7 +1,7 @@
 /* Shared local dialogs use BONIRA tokens and the document's Persian RTL direction. */
 .erp-interaction-popup {
   direction: rtl;
-  font-family: inherit;
+  font-family: "Vazirmatn", Tahoma, sans-serif;
   color: var(--erp-text, #0f172a);
   background: var(--erp-surface, #fff);
   border-radius: var(--erp-radius-control, .75rem);
@@ -12,3 +12,33 @@
 .erp-interaction-popup .swal2-html-container { font-size: .875rem; line-height: 1.9; }
 .erp-interaction-popup .swal2-actions { gap: .75rem; flex-wrap: wrap; }
 .erp-interaction-popup .swal2-close { font-family: inherit; }
+.erp-interaction-popup .swal2-title,
+.erp-interaction-popup .swal2-html-container { text-align: start; }
+.erp-interaction-popup .swal2-title { color: var(--bonira-deep-navy, #0e2746); }
+.erp-interaction-popup .swal2-close { min-width: 44px; min-height: 44px; color: #475569; }
+.erp-interaction-popup .erp-btn { min-height: 44px; margin: 0; font-family: inherit; }
+.erp-interaction-popup .erp-btn--primary { background: var(--bonira-royal-blue, #1563d6); }
+.erp-interaction-popup .erp-feedback-danger { background: #b91c1c; color: white; }
+.erp-interaction-popup .erp-feedback-danger:hover { background: #991b1b; }
+.erp-interaction-popup :focus-visible { outline: 3px solid #1563d6; outline-offset: 3px; }
+.erp-interaction-popup.swal2-toast { width: min(26rem, calc(100vw - 2rem)); padding: .75rem; border: 1px solid #cbd5e1; }
+.erp-interaction-popup.swal2-toast .swal2-title { font-size: .8125rem; line-height: 1.9; margin: .35rem .65rem; }
+.erp-interaction-popup.swal2-toast[data-feedback-level="success"] { background: #f0fdf4; border-color: #86efac; }
+.erp-interaction-popup.swal2-toast[data-feedback-level="error"] { background: #fef2f2; border-color: #fca5a5; }
+.erp-interaction-popup.swal2-toast[data-feedback-level="warning"] { background: #fffbeb; border-color: #fcd34d; }
+.erp-interaction-popup.swal2-toast[data-feedback-level="info"] { background: #eff6ff; border-color: #93c5fd; }
+.erp-interaction-popup .swal2-timer-progress-bar { background: #64748b; }
+.erp-feedback-fallback { padding: 1rem; border: 1px solid #fca5a5; border-radius: .5rem; background: #fef2f2; color: #991b1b; }
+[data-feedback-messages][hidden], [data-feedback-level][hidden] { display: none !important; }
+form[aria-busy="true"] [aria-disabled="true"] { cursor: progress; opacity: .65; }
+.erp-system-state { max-width: 38rem; margin: 2rem auto; text-align: center; }
+.erp-system-state__icon { display: grid; place-items: center; width: 4rem; height: 4rem; margin: 0 auto 1rem; border: 1px solid #cbd5e1; border-radius: .75rem; background: #eff6ff; color: #1563d6; }
+.erp-system-state__icon svg { width: 2rem; height: 2rem; }
+@media (max-width: 639px) {
+  .erp-interaction-popup .swal2-actions { width: calc(100% - 2rem); }
+  .erp-interaction-popup .swal2-actions .erp-btn { flex: 1; }
+  .swal2-container.swal2-top-start { padding: .75rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .swal2-container *, .swal2-container *::before, .swal2-container *::after { animation: none !important; transition: none !important; }
+}

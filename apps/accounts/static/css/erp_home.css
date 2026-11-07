@@ -102,3 +102,10 @@
 @media(max-width:639px) { .home-hero { padding:20px; min-height:170px; } .home-hero h1 { font-size:23px; } .home-hero__art { position:absolute; inset-inline-end:-60px; bottom:0; width:65%; opacity:.13; } .home-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; } .home-metric { padding:12px; } .home-metric__heading { gap:7px; } .home-metric h2 { font-size:10px; } .home-metric .home-icon { width:30px; height:32px; } .home-metric__value { padding-inline-start:0; font-size:25px; } .home-metric small { font-size:9px; } .home-workspace-grid,.home-workspace-grid:not(:has(.home-quick)),.home-workspace-grid:not(:has(.home-focus > *)) { grid-template-columns:minmax(0,1fr); } .home-focus { grid-column:auto; grid-template-columns:minmax(0,1fr); grid-row:1; } .home-quick__link { min-height:64px; } .home-panel { padding:15px; } .home-domains__grid { grid-template-columns:minmax(0,1fr); } .home-panel__heading > span { display:none; } .home-recent time { max-width:75px; } }
 
 @media(max-width:639px) { .home-metric:last-child:nth-child(odd) { grid-column:1 / -1; display:grid; grid-template-columns:1fr auto; align-items:center; gap:5px 12px; } .home-metric:last-child:nth-child(odd) .home-metric__value { grid-column:2; grid-row:1 / 3; margin:0; } .home-metric:last-child:nth-child(odd) small { grid-column:1; } }
+@media (min-width: 768px) and (max-width: 1279px) {
+    .erp-list-context--fit-tablet .erp-list-context__panel {
+        position: fixed;
+        inset-block-start: 88px;
+        inset-inline: auto 12px;
+    }
+}

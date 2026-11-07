@@ -95,8 +95,12 @@ class CEP016ContextTests(TestCase):
 
         response = self.client.get(reverse("home"))
         self.assertContains(response, '<html lang="fa" dir="rtl">')
-        self.assertContains(response, "دامنه کاری مؤثر")
-        self.assertContains(response, self.project.name)
+        self.assertContains(
+            response,
+            f'<span class="erp-list-context__value">'
+            f"{self.project.name} / {self.site.name}</span>",
+            html=True,
+        )
         self.assertNotContains(response, self.sibling.name)
         self.assertNotContains(response, self.other_project.name)
 

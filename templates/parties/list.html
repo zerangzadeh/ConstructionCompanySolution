@@ -1,34 +1,29 @@
-{% extends "base.html" %}{% load table_filters %}
-
-{% block title %}طرف‌های تجاری | سامانه مدیریت ساخت{% endblock %}
-
-{% block content %}
-{% include "parties/_surface_navigation.html" %}
-{% table_filters filters "party-filters" %}
-    {% if party_governance_available %}{% url "parties:governance" as governance_url %}{% endif %}
-    {% include "components/page_header.html" with page_eyebrow="نمای عملیاتی" page_title="طرف‌های تجاری" page_description=request.organization.name page_action_url=governance_url page_action_label="مدیریت و سوابق" only %}
-
-    <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست طرف‌های تجاری">
-        {% if parties %}
-            <div class="erp-panel-header"><div><h2 class="text-sm font-semibold text-slate-900">اشخاص و شرکت‌ها</h2><p class="mt-0.5 text-[11px] text-slate-500">کارفرمایان، پیمانکاران، تأمین‌کنندگان و سایر طرف‌های تجاری</p></div><span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{{ parties|length }} رکورد</span></div>
-            <div class="erp-table-wrap">
-                <table class="w-full min-w-[760px] text-right">
-                    <thead><tr><th class="border-b border-slate-200 px-4 py-3">نام نمایشی</th><th class="border-b border-slate-200 px-4 py-3">نوع</th><th class="border-b border-slate-200 px-4 py-3">نقش‌ها</th><th class="border-b border-slate-200 px-4 py-3">شناسه مالیاتی</th><th class="w-20 border-b border-slate-200 px-4 py-3 text-center">عملیات</th></tr></thead>
-                    <tbody class="divide-y divide-slate-100">
-                        {% for party in parties %}
-                            <tr>
-                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'parties:detail' party.pk %}">{{ party.display_name }}</a>{% if party.legal_name and party.legal_name != party.display_name %}<p class="mt-0.5 text-[11px] text-slate-500">{{ party.legal_name }}</p>{% endif %}</td>
-                                <td class="px-4 py-3.5 text-slate-600">{{ party.get_party_kind_display }}</td>
-                                <td class="px-4 py-3.5"><div class="flex flex-wrap gap-1">{% for role in party.operational_roles %}<span class="erp-badge erp-badge--info">{{ role.get_role_display }}</span>{% empty %}<span class="text-xs text-slate-400">بدون نقش</span>{% endfor %}</div></td>
-                                <td class="whitespace-nowrap px-4 py-3.5 text-slate-600" dir="ltr">{{ party.tax_identifier|default:"—" }}</td>
-                                <td class="px-4 py-3.5 text-center">{% url 'parties:detail' party.pk as record_detail_url %}{% include "components/record_detail_link.html" with detail_url=record_detail_url record_label=party.display_name only %}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            {% include "components/empty_state.html" with empty_title="طرف تجاری مجازی برای نمایش موجود نیست" empty_description="جستجو و فیلترهای انتخاب‌شده را بررسی کنید." only %}
-        {% endif %}
-    </section>
+{% extends "components/operational_list.html" %}{% load table_filters static %}
+{% block extra_head %}{{ block.super }}<script src="{% static 'workforce/field_list.js' %}" defer></script>{% endblock %}
+{% block list_root_attributes %}data-field-list{% endblock %}
+{% block title %}طرف‌های تجاری | بنیرا{% endblock %}
+{% block list_heading %}
+{% if party_governance_available %}{% url "parties:governance" as governance_url %}{% endif %}
+{% include "components/page_header.html" with page_title="طرف‌های تجاری" page_description="مدیریت فهرست اشخاص و شرکت‌های همکار" page_action_url=governance_url page_action_label="مدیریت و سوابق" page_icon="document" only %}
+{% endblock %}
+{% block list_navigation %}<nav class="erp-list-navigation" aria-label="سطوح طرف تجاری">
+{% if party_governance_available %}<a href="{% url 'parties:governance' %}">مدیریت و سوابق طرف‌های تجاری</a>{% endif %}
+{% if "partner.view" in business_permission_codes %}<a href="{% url 'partner_qualification:workbench' %}">صلاحیت و عملکرد همکاران</a>{% endif %}
+</nav>{% endblock %}
+{% block list_table %}
+{% if parties %}<table class="erp-responsive-list" aria-label="طرف‌های تجاری"><thead><tr>
+<th scope="col"{% if list_ui.sort.key == 'name' %} aria-sort="{{ list_ui.sort.descending|yesno:'descending,ascending' }}"{% endif %}>{% table_sort_header 'name' 'نام نمایشی' %}</th>
+<th scope="col"{% if list_ui.sort.key == 'kind' %} aria-sort="{{ list_ui.sort.descending|yesno:'descending,ascending' }}"{% endif %}>{% table_sort_header 'kind' 'نوع' %}</th>
+<th scope="col">نقش‌ها</th>
+<th scope="col"{% if list_ui.sort.key == 'tax_id' %} aria-sort="{{ list_ui.sort.descending|yesno:'descending,ascending' }}"{% endif %}>{% table_sort_header 'tax_id' 'شناسه مالیاتی' %}</th>
+<th scope="col">عملیات</th>
+</tr></thead><tbody>{% for party in parties %}{% url 'parties:detail' party.pk as detail_url %}<tr>
+<td class="erp-list-title" data-label="نام نمایشی"><a href="{{ detail_url }}">{{ party.display_name }}</a>{% if party.legal_name and party.legal_name != party.display_name %}<span class="erp-list-subtitle">{{ party.legal_name }}</span>{% endif %}</td>
+<td data-label="نوع">{{ party.get_party_kind_display }}</td>
+<td data-label="نقش‌ها"><div class="flex flex-wrap gap-1">{% for role in party.operational_roles %}<span class="erp-badge erp-badge--info">{{ role.get_role_display }}</span>{% empty %}<span class="text-xs text-slate-400">بدون نقش</span>{% endfor %}</div></td>
+<td data-label="شناسه مالیاتی"><bdi dir="ltr">{{ party.tax_identifier|default:"—" }}</bdi></td>
+<td class="erp-list-row-action">{% include "components/list_detail_action.html" with detail_url=detail_url label=party.display_name floating_menu=True only %}</td>
+</tr>{% endfor %}</tbody></table>
+{% elif has_active_filters %}{% include "components/filtered_empty_state.html" with clear_filters_url=list_ui.bar.clear_url %}
+{% else %}{% include "components/empty_state.html" with empty_title="طرف تجاری مجازی برای نمایش موجود نیست" empty_description="اشخاص و شرکت‌های مجاز در این فهرست نمایش داده می‌شوند." only %}{% endif %}
 {% endblock %}

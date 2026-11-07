@@ -1,0 +1,58 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________ SectionedFormRolloutTests.test_expense_pilot _________________
+tests\test_sectioned_form_rollout.py:196: in test_expense_pilot
+    self.verify_pages(records)
+tests\test_sectioned_form_rollout.py:100: in verify_pages
+    self.assertEqual(invalid.context["form"][key].value(), str(value))
+E   AssertionError: '2026-10-15' != '1405/07/23'
+E   - 2026-10-15
+E   + 1405/07/23
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-04T22:06:28.111413+00:00","event":"http.response","request_id":"4fd024b5-bb9c-42b7-a2c8-2dbaf4a09e81","method":"GET","route":"expenses:create","status_code":200,"duration_ms":492}
+
+{"timestamp":"2026-11-04T22:06:28.406444+00:00","event":"http.response","request_id":"bcd3705c-07a2-4b81-946e-fb1fcc43cf18","method":"GET","route":"expenses:draft_create","status_code":200,"duration_ms":276}
+
+{"timestamp":"2026-11-04T22:06:29.952483+00:00","event":"http.response","request_id":"9ca84731-908a-4d43-8091-c3968066e5e1","method":"GET","route":"expenses:create","status_code":200,"duration_ms":519}
+
+{"timestamp":"2026-11-04T22:06:31.187393+00:00","event":"http.response","request_id":"f7aa80db-d66e-495c-b8d7-39ddcf027876","method":"GET","route":null,"status_code":404,"duration_ms":391}
+
+{"timestamp":"2026-11-04T22:06:32.293918+00:00","event":"http.response","request_id":"1028f423-c5bc-4ecc-a229-e3fec83a5329","method":"GET","route":"expenses:create","status_code":200,"duration_ms":496}
+
+{"timestamp":"2026-11-04T22:06:33.629513+00:00","event":"http.response","request_id":"2c84772c-47a6-473b-b4e5-2cabc48a50cc","method":"GET","route":"expenses:create","status_code":200,"duration_ms":484}
+
+{"timestamp":"2026-11-04T22:06:34.799274+00:00","event":"http.response","request_id":"cfd134a6-22e4-4b8f-bb58-cbbba209c949","method":"GET","route":"expenses:create","status_code":200,"duration_ms":430}
+
+{"timestamp":"2026-11-04T22:06:35.378138+00:00","event":"http.response","request_id":"e4c1b699-bc3c-4af1-925b-dc73a091e5b7","method":"GET","route":"expenses:draft_create","status_code":200,"duration_ms":434}
+
+{"timestamp":"2026-11-04T22:06:36.779628+00:00","event":"http.response","request_id":"e1c552bc-22ec-4ed5-890c-543d5fc1d973","method":"GET","route":"expenses:draft_create","status_code":200,"duration_ms":494}
+
+{"timestamp":"2026-11-04T22:06:38.033975+00:00","event":"http.response","request_id":"b70a14a0-bfc6-4365-9460-a03a61cf2474","method":"GET","route":"expenses:draft_create","status_code":200,"duration_ms":426}
+
+{"timestamp":"2026-11-04T22:06:39.199029+00:00","event":"http.response","request_id":"3d35dfde-00ba-4eea-a719-64cdeecaf9b3","method":"GET","route":"expenses:draft_create","status_code":200,"duration_ms":449}
+
+[05/Nov/2026 01:36:39,541] - Broken pipe from ('127.0.0.1', 53670)
+
+[05/Nov/2026 01:36:39,542] - Broken pipe from ('127.0.0.1', 57470)
+
+{"timestamp":"2026-11-04T22:06:40.065304+00:00","event":"http.response","request_id":"7200e8b2-e24a-4220-822a-116d8c4b2ddb","method":"POST","route":"expenses:create","status_code":200,"duration_ms":322}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 53670)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 57470)
+INFO     bonira.request:telemetry.py:78 http.response
+=========================== short test summary info ===========================
+FAILED tests/test_sectioned_form_rollout.py::SectionedFormRolloutTests::test_expense_pilot
+1 failed in 73.08s (0:01:13)

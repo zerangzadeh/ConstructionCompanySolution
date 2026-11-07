@@ -6,11 +6,11 @@
 {% block list_pagination %}{% endblock %}
 {% block content %}
 {% reference_list_state list_profile as list_ui %}
-<div class="erp-reference-list erp-contracts-list erp-operational-list">
+<div class="erp-reference-list erp-contracts-list erp-operational-list" {% block list_root_attributes %}{% endblock %}>
     <div class="erp-list-heading">{% block list_heading %}{% endblock %}</div>
     <div class="erp-list-workspace">
         {% block list_navigation %}{% endblock %}
-        {% include "components/filter_bar.html" with bar=list_ui.bar reference_layout=True only %}
+        {% include "components/filter_bar.html" with bar=list_ui.bar reference_layout=True restore_url_state=list_ui.restore_url_state only %}
         {% include "components/reference_list_toolbar.html" %}
         {% block list_outputs %}{% endblock %}
         <section class="erp-contracts-table overflow-x-auto" aria-label="{{ list_ui.bar.result_label }}" tabindex="0">

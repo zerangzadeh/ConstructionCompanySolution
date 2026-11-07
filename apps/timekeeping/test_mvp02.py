@@ -1,8 +1,9 @@
 from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
+from django.core.exceptions import ValidationError
 from django.db import connection
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
@@ -18,7 +19,7 @@ from apps.organizations.services import create_organization_with_owner
 from apps.projects.models import ProjectSite
 from apps.workforce.test_mvp02 import make_field_fixture
 
-from .forms import AttendanceForm, TimesheetForm
+from .forms import AttendanceForm, DurationField, TimesheetForm
 from .models import AttendanceRecord, OvertimeRequest, Timesheet
 from .services import (
     add_timesheet_entry,
@@ -27,6 +28,41 @@ from .services import (
     create_timesheet,
     create_work_calendar,
 )
+
+
+class DurationFieldTests(SimpleTestCase):
+    def test_split_duration_and_storage_bounds(self):
+        field = DurationField()
+        self.assertEqual(field.clean(["2", "35"]), 155)
+        self.assertEqual(field.clean(["2", ""]), 120)
+        self.assertEqual(field.clean(["", "35"]), 35)
+        self.assertEqual(field.clean(divmod(field.max_minutes, 60)), field.max_minutes)
+        for value in (
+            ["0", "0"],
+            ["-1", "35"],
+            ["1", "-5"],
+            ["0", "60"],
+            ["abc", "0"],
+            divmod(field.max_minutes + 1, 60),
+        ):
+            with self.subTest(value=value), self.assertRaises(ValidationError):
+                field.clean(value)
+
+    def test_legacy_minute_payload_uses_same_validation(self):
+        field = DurationField()
+        for legacy in ("۱۵۵", "155.0", 155):
+            values = field.widget.value_from_datadict({"duration": legacy}, {}, "duration")
+            self.assertEqual(field.clean(values), 155)
+        values = field.widget.value_from_datadict({"duration": None}, {}, "duration")
+        with self.assertRaises(ValidationError):
+            field.clean(values)
+        values = field.widget.value_from_datadict(
+            {"duration": "155", "duration_hours": "0", "duration_minutes": "0"},
+            {},
+            "duration",
+        )
+        with self.assertRaises(ValidationError):
+            field.clean(values)
 
 
 class FieldTimekeepingTests(TestCase):
@@ -48,6 +84,65 @@ class FieldTimekeepingTests(TestCase):
         )
         self.client.force_login(self.owner)
         self.url = reverse("timekeeping:workbench")
+
+    def test_saved_request_returns_to_its_actual_worker_project_and_site(self):
+        from urllib.parse import parse_qs, urlsplit
+
+        response = self.client.post(
+            reverse("timekeeping:overtime_create"),
+            {
+                "employee": str(self.employee.pk),
+                "project": str(self.project.pk),
+                "site": str(self.site.pk),
+                "starts_at": "1405/08/10 16:00",
+                "ends_at": "1405/08/10 17:00",
+                "reason": "تکمیل عملیات",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        record = OvertimeRequest.objects.get(organization=self.organization)
+        destination = urlsplit(response.url)
+        self.assertEqual(
+            destination.path,
+            reverse("timekeeping:record_detail", args=["overtime", record.pk]),
+        )
+        self.assertEqual(
+            parse_qs(destination.query),
+            {
+                "employee": [str(self.employee.pk)],
+                "project": [str(self.project.pk)],
+                "site": [str(self.site.pk)],
+            },
+        )
+        self.assertEqual(self.client.get(response.url).status_code, 200)
+
+    def test_prepare_only_role_does_not_redirect_to_a_forbidden_timesheet_detail(self):
+        preparer = User.objects.create_user(username="work-log-preparer")
+        role = OrganizationRole.objects.create(
+            organization=self.organization, code="work_log_preparer", name="ثبت کارکرد"
+        )
+        role.permissions.add(BusinessPermission.objects.get(code="timesheets.prepare"))
+        membership = OrganizationMembership.objects.create(
+            organization=self.organization, user=preparer, role_definition=role, status="active"
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization, membership=membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+        )
+        self.client.force_login(preparer)
+        response = self.client.post(
+            reverse("timekeeping:timesheet_create"),
+            {
+                "employee": str(self.employee.pk),
+                "period_start": "1405/08/10",
+                "period_end": "1405/08/10",
+                "declared_minutes_hours": "2",
+                "declared_minutes_minutes": "35",
+            },
+        )
+        self.assertRedirects(response, reverse("home"))
+        record = Timesheet.objects.get(organization=self.organization)
+        self.assertEqual((record.prepared_by, record.declared_minutes), (preparer, 155))
 
     def _attendance(self, day):
         tz = ZoneInfo(self.organization.settings.timezone)

@@ -1,0 +1,13 @@
+{% extends "components/compact_form_page.html" %}
+{% load field_journey ui_actions %}
+{% block title %}{{ title }} | بنیرا{% endblock %}
+{% block extra_head %}{% prepare_native_choices form %}{{ block.super }}{% endblock %}
+{% block compact_content %}
+    {% if "attendance.view" in business_permission_codes %}{% firstof back_url as breadcrumb_parent_url %}{% endif %}
+    {% include "components/page_header.html" with page_breadcrumb_label="حضور و کارکرد" page_breadcrumb_url=breadcrumb_parent_url page_title=title page_description=description page_icon="calendar" only %}
+    {% include "workforce/_field_context.html" %}
+    {% include "timekeeping/_reference_help.html" %}
+    {% with submit_label=title|form_action_label %}
+        {% include "components/compact_form_card.html" with form=form csrf_token=csrf_token cancel_url=back_url submit_label=submit_label server_validation=True native_choices=True focus_first_error=True request=request only %}
+    {% endwith %}
+{% endblock %}

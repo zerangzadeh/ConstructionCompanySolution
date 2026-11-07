@@ -125,7 +125,7 @@ class BillingJourneyContentBrowserTests(
                         "description": "Claims collection has no sibling-workspace tabs",
                     },
                 ],
-                "mustText": ["صورت‌وضعیت‌ها", "بازگشت به قرارداد"],
+                "mustText": ["صورت‌وضعیت‌ها", self.contract.title],
             }
         )
         self.browser(self.owner, scenarios)
@@ -164,6 +164,7 @@ class JourneyContentTests(JourneyFixture, TestCase):
         )
         self.assertIn(f"contract={self.contract.pk}", response.context["history_url"])
         self.assertIn("line_key=ITEM-01", response.context["history_url"])
+        self.assertNotContains(response, "بازگشت به سوابق کارکرد این قلم")
         self.assertEqual(
             response.context["page_breadcrumbs"][-2]["url"],
             response.context["history_url"],

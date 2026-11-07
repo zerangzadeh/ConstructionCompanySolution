@@ -1,4 +1,4 @@
-<section class="border-b border-slate-200 bg-slate-50/95" aria-label="انتخاب پروژه و کارگاه">
+<section class="border-b border-slate-200 bg-slate-50/95" aria-label="{{ context_submit_label|default:'انتخاب پروژه و کارگاه' }}">
     <form class="mx-auto flex max-w-[1600px] flex-wrap items-end gap-2 px-4 py-2 sm:px-6 lg:px-8" method="post" action="{% url 'organizations:update_context' %}">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
@@ -22,7 +22,7 @@
                 </select>
             </label>
         {% endif %}
-        <button class="erp-btn erp-btn--secondary erp-btn--compact min-h-9" type="submit">انتخاب پروژه و کارگاه</button>
+        <button class="erp-btn erp-btn--secondary erp-btn--compact min-h-9" type="submit">{{ context_submit_label|default:"انتخاب پروژه و کارگاه" }}</button>
         {% if context_requires_project and not active_project %}
             <p class="w-full text-[11px] text-amber-700" role="status">پروژه‌ای انتخاب نشده است؛ برای ثبت اطلاعات، پروژه را از این بخش یا در فرم انتخاب کنید.</p>
         {% endif %}

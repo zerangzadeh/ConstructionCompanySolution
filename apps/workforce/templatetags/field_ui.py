@@ -54,6 +54,7 @@ def field_form_sections(form):
                 "period_start",
                 "period_end",
                 "minutes",
+                "declared_minutes",
                 "calendar",
                 "shift",
                 "effective_from",

@@ -2,7 +2,7 @@
 {{ bar.form.media }}
 <script src="{% static 'js/erp_filter_bar.js' %}?v=20261103-compact-options-1" defer></script>
 <section class="erp-list-filters" aria-label="جست‌وجو و فیلتر" data-filter-bar{% if reference_layout %} data-reference-layout{% endif %}{% if fit_quick_filters %} data-fit-quick-filters{% endif %} data-table-filter-controls="list-filter-bar">
-    <form id="list-filter-bar" method="get" data-table-filter-form data-filter-submit="explicit" aria-label="فیلتر فهرست">
+    <form id="list-filter-bar" method="get" data-table-filter-form data-filter-submit="explicit"{% if restore_url_state %} data-restore-filter-state{% endif %} aria-label="فیلتر فهرست">
         {% for name, value in bar.hidden.items %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
         <div class="erp-list-filters__top">
             <div class="erp-list-search">

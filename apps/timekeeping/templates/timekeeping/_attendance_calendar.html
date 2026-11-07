@@ -1,0 +1,26 @@
+{% load erp_format %}
+<div data-attendance-calendar class="mt-4">
+  <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+    <a class="erp-btn erp-btn--secondary" href="{{ calendar.previous_url }}">ماه قبل</a>
+    <h3 class="font-bold">{{ calendar.month_name }} {{ calendar.year|stringformat:"d" }}</h3>
+    <a class="erp-btn erp-btn--secondary" href="{{ calendar.next_url }}">ماه بعد</a>
+  </div>
+  <div class="erp-attendance-calendar-grid text-center text-xs" aria-label="روزهای ماه">
+    <span><abbr title="شنبه">ش</abbr></span><span><abbr title="یکشنبه">ی</abbr></span><span><abbr title="دوشنبه">د</abbr></span><span><abbr title="سه‌شنبه">س</abbr></span><span><abbr title="چهارشنبه">چ</abbr></span><span><abbr title="پنجشنبه">پ</abbr></span><span><abbr title="جمعه">ج</abbr></span>
+    {% for day in calendar.days %}
+      {% if not day %}<span aria-hidden="true"></span>
+      {% elif day.count %}
+        <a class="erp-attendance-calendar-day flex flex-col items-center justify-center rounded-lg bg-blue-50 px-1 font-semibold text-blue-800 hover:bg-blue-100" href="{{ day.url }}" aria-label="{{ day.label }}، {{ day.count|erp_number }} سابقه حضور"{% if day.today %} aria-current="date"{% endif %}>
+          <span>{{ day.number|erp_number }}</span><span class="text-xs">({{ day.count|erp_number }})</span>
+        </a>
+      {% else %}
+        <span class="erp-attendance-calendar-day flex items-center justify-center rounded-lg bg-slate-50 text-slate-500"{% if day.today %} aria-current="date"{% endif %}>{{ day.number|erp_number }}</span>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% if calendar.count %}
+    <p class="mt-3 text-sm text-slate-600">عدد داخل پرانتز تعداد سوابق حضور است. برای مشاهده سوابق، روز موردنظر را انتخاب کنید.</p>
+  {% else %}
+    <p class="mt-3 text-sm text-slate-600" role="status">برای این ماه با فیلترهای فعلی سابقه حضوری یافت نشد.</p>
+  {% endif %}
+</div>

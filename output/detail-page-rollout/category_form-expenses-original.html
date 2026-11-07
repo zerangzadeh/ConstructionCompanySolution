@@ -1,0 +1,7 @@
+{% extends "components/compact_form_page.html" %}
+{% block title %}{% if category %}ویرایش دسته هزینه{% else %}دسته هزینه جدید{% endif %} | بنیرا{% endblock %}
+{% block compact_content %}
+{% url "expenses:category_list" as cancel_url %}
+{% if category %}{% with heading="ویرایش دسته هزینه" %}{% include "components/page_header.html" with page_title=heading page_breadcrumb_label="دسته‌های هزینه" page_breadcrumb_url=cancel_url page_icon="document" page_description="هر دسته هزینه به یک گروه اصلی هزینهٔ پلتفرم متصل است." only %}{% endwith %}{% else %}{% with heading="دسته هزینه جدید" %}{% include "components/page_header.html" with page_title=heading page_breadcrumb_label="دسته‌های هزینه" page_breadcrumb_url=cancel_url page_icon="document" page_description="هر دسته هزینه به یک گروه اصلی هزینهٔ پلتفرم متصل است." only %}{% endwith %}{% endif %}
+{% if not category or "expense_categories.change" in business_permission_codes %}{% include "components/compact_form_card.html" with form=form csrf_token=csrf_token cancel_url=cancel_url submit_label="ذخیره دسته هزینه" only %}{% else %}{% include "components/compact_form_card.html" with form=form csrf_token=csrf_token cancel_url=cancel_url submit_label="ذخیره دسته هزینه" cancel_only=True only %}{% endif %}
+{% endblock %}

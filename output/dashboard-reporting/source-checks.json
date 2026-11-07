@@ -1,0 +1,67 @@
+{
+  "templates/home.html": {
+    "forms_unchanged": true,
+    "utf8": true,
+    "sha256": "32c8b85ff53b4fdfc1fb9400b797aed09e9704c93397670df5f31e299c74e466"
+  },
+  "templates/projects/detail.html": {
+    "forms_unchanged": true,
+    "utf8": true,
+    "sha256": "93acc6a312d5a95b068313463bd07530a91780304b9d4905922198d38f6fd895"
+  },
+  "templates/projects/control_comparison.html": {
+    "forms_unchanged": true,
+    "utf8": true,
+    "sha256": "c8401db5995f9c49ca77c936c4a16d08a381a11a038b79892da9721130be841d"
+  },
+  "templates/projects/control_exceptions.html": {
+    "forms_unchanged": true,
+    "utf8": true,
+    "sha256": "0796e1008ef54422581aefbd0b9f2d9ae205a9f93d6f057bde6488be62bef0ff"
+  },
+  "templates/reporting/dashboard.html": {
+    "forms_unchanged": true,
+    "utf8": true,
+    "sha256": "acaaaecd906401d8813a83fdee30c01d3cce2ab8d4dcd5adf9814345ea45f58f"
+  },
+  "apps/reporting/templates/reporting/_read_model_card.html": {
+    "forms_unchanged": true,
+    "utf8": true,
+    "sha256": "7ddcc432e72553b1eb3f8183b14de62c0ad008c210ba6d07a0bc4f685ee8d5b8"
+  },
+  "templates/inventory/valuation_workbench.html": {
+    "forms_unchanged": true,
+    "utf8": true,
+    "sha256": "bca130cc4b636a902b14a8c427e485f2c2a0eeeafaf57709578f880818c06e34"
+  },
+  "apps/billing/templates/billing/commercial_control_dashboard.html": {
+    "forms_unchanged": true,
+    "utf8": true,
+    "sha256": "ed4a69bcab41201fb7f8bbe889e3e5cb644ef79f77c2af2147de6976f9a4d497"
+  },
+  "apps/billing/templates/billing/statutory_operations_dashboard.html": {
+    "forms_unchanged": true,
+    "utf8": true,
+    "sha256": "f67f27f050b17282a93073abc4037ef0bbcefa653386164559efa2a0cd05a823"
+  },
+  "prior_ui_guidelines_preserved_except_independent_stage6_row": true,
+  "view_diff": "diff --git a/apps/inventory/p8_views.py b/apps/inventory/p8_views.py\nindex ddcb5553..0ad8f711 100644\n--- a/apps/inventory/p8_views.py\n+++ b/apps/inventory/p8_views.py\n@@ -124,7 +124,7 @@ def custody_workbench(request: HttpRequest) -> HttpResponse:\n def valuation_workbench(request: HttpRequest) -> HttpResponse:\n     events = list(\n         InventoryValuationEvent.objects.filter(organization=request.organization)\n-        .select_related(\"stock_transaction\")\n+        .select_related(\"stock_transaction__unit_of_measure\")\n         .order_by(\"-finalized_at\")[:100]\n     )\n     try:\n@@ -143,7 +143,7 @@ def valuation_workbench(request: HttpRequest) -> HttpResponse:\n         {\n             \"pools\": InventoryValuationPool.objects.filter(\n                 organization=request.organization\n-            ).select_related(\"material\")[:50],\n+            ).select_related(\"material__unit_of_measure\")[:50],\n             \"events\": events,\n             \"visible_transaction_ids\": visible_transaction_ids,\n             \"envelopes\": DownstreamCostSourceEnvelope.objects.filter(\n",
+  "files": [
+    "templates/home.html",
+    "templates/projects/detail.html",
+    "templates/projects/control_comparison.html",
+    "templates/projects/control_exceptions.html",
+    "templates/reporting/dashboard.html",
+    "apps/reporting/templates/reporting/_read_model_card.html",
+    "templates/inventory/valuation_workbench.html",
+    "apps/billing/templates/billing/commercial_control_dashboard.html",
+    "apps/billing/templates/billing/statutory_operations_dashboard.html",
+    "apps/inventory/p8_views.py",
+    "docs/ui-guidelines.md",
+    "apps/accounts/static/css/erp_dashboard_reporting.css",
+    "templates/components/dashboard_reporting_assets.html",
+    "templates/components/dashboard_metric.html",
+    "tests/test_dashboard_reporting.py",
+    "scripts/verification/dashboard_reporting_validate.py"
+  ]
+}

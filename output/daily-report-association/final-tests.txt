@@ -1,0 +1,216 @@
+........FFFFFFFFFFFF.FF.F.F.             [100%]
+================================== FAILURES ===================================
+___ DailyReportServiceTests.test_create_report_is_tenant_scoped_and_audited ___
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ DailyReportServiceTests.test_draft_report_accepts_operational_entries_and_locks_on_submit _
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+____ DailyReportServiceTests.test_list_and_create_views_are_tenant_scoped _____
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+__ DailyReportServiceTests.test_report_list_and_detail_exclude_other_tenant ___
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ DailyReportServiceTests.test_report_optionally_scopes_to_an_active_worksite_phase _
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+______ DailyReportServiceTests.test_report_rejects_cross_tenant_project _______
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+___ DailyReportServiceTests.test_report_rejects_phase_from_another_worksite ___
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+____ DailyReportServiceTests.test_report_rejects_site_from_another_project ____
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ DailyReportServiceTests.test_structured_entries_are_locked_after_submission_and_reject_cross_project_activity _
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ DailyReportServiceTests.test_structured_entries_validate_master_scope_and_preserve_material_snapshots _
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_____ DailyReportServiceTests.test_submitted_report_can_be_approved_once ______
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+__________ DailyReportServiceTests.test_viewer_cannot_create_report ___________
+apps\daily_reports\tests.py:72: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+E   django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ DailyReportReferenceBrowserTests.test_real_chrome_reference_create_validation_and_navigation _
+tests\test_daily_report_references.py:577: in test_real_chrome_reference_create_validation_and_navigation
+    self.browser(
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:299
+E             throw new Error(scenario.name+': '+step.description);
+E                   ^
+E   
+E   Error: daily-selection-validation-1440: shared multiple selector is initialized
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:299:17
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-05T12:24:03.618567+00:00","event":"http.response","request_id":"9121af94-e628-48dc-ae06-9a7a7dfec59f","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":1320}
+
+{"timestamp":"2026-11-05T12:24:05.026891+00:00","event":"http.response","request_id":"937f34e3-b5dd-42c9-9024-e7c156f5c5ac","method":"GET","route":null,"status_code":404,"duration_ms":523}
+
+{"timestamp":"2026-11-05T12:24:06.691701+00:00","event":"http.response","request_id":"de868d43-0a4a-4d60-a06d-2e8e3ed50ae5","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":1270}
+
+{"timestamp":"2026-11-05T12:24:08.358832+00:00","event":"http.response","request_id":"4448e67b-bf7d-4f39-b0a3-ffe06ec66655","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":912}
+
+[05/Nov/2026 15:54:09,020] - Broken pipe from ('127.0.0.1', 64438)
+
+[05/Nov/2026 15:54:09,020] - Broken pipe from ('127.0.0.1', 58965)
+
+{"timestamp":"2026-11-05T12:24:11.151081+00:00","event":"http.response","request_id":"3c7559b3-4003-4ff6-9a72-1e96cf54b6a9","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":1224}
+
+[05/Nov/2026 15:54:11,918] - Broken pipe from ('127.0.0.1', 60298)
+
+[05/Nov/2026 15:54:11,918] - Broken pipe from ('127.0.0.1', 54642)
+
+{"timestamp":"2026-11-05T12:24:11.920851+00:00","event":"http.response","request_id":"0c6599f3-1b88-43f4-a9a3-7c87d757409f","method":"GET","route":null,"status_code":404,"duration_ms":390}
+
+[05/Nov/2026 15:54:11,921] - Broken pipe from ('127.0.0.1', 57523)
+
+[05/Nov/2026 15:54:11,922] - Broken pipe from ('127.0.0.1', 62857)
+
+[05/Nov/2026 15:54:11,929] - Broken pipe from ('127.0.0.1', 62073)
+
+[05/Nov/2026 15:54:11,934] - Broken pipe from ('127.0.0.1', 54872)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 64438)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 58965)
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 60298)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 54642)
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 57523)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 62857)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 62073)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 54872)
+_ PermissionRegistryArchitectureTests.test_every_managed_business_model_is_registered_exactly_once _
+apps\organizations\test_permission_registry.py:95: in test_every_managed_business_model_is_registered_exactly_once
+    self.assertEqual(duplicates, [])
+E   AssertionError: Lists differ: ['payroll.FinancialHandoffLine', 'payroll.[74 chars]lip'] != []
+E   
+E   First list contains 4 additional elements.
+E   First extra element 0:
+E   'payroll.FinancialHandoffLine'
+E   
+E   + []
+E   - ['payroll.FinancialHandoffLine',
+E   -  'payroll.FinancialHandoffProposal',
+E   -  'payroll.FinancialHandoffReview',
+E   -  'payroll.Payslip']
+_ PermissionRegistryArchitectureTests.test_every_registered_permission_is_referenced_by_its_enforcement_module _
+apps\organizations\test_permission_registry.py:112: in test_every_registered_permission_is_referenced_by_its_enforcement_module
+    self.assertEqual(missing, {})
+E   AssertionError: {'support': ['SUPPORT_AUDIT_RECONCILE'], '[1806 chars]EN']} != {}
+E   Diff is 2564 characters long. Set self.maxDiff to None to see it.
+_ PermissionRegistryArchitectureTests.test_resource_keys_are_unique_and_match_permission_namespaces _
+apps\organizations\test_permission_registry.py:78: in test_resource_keys_are_unique_and_match_permission_namespaces
+    self.assertEqual(namespace_mismatches, [])
+E   AssertionError: Lists differ: ['billing_variation_eligibility.retry', 'b[2223 chars]age'] != []
+E   
+E   First list contains 77 additional elements.
+E   First extra element 0:
+E   'billing_variation_eligibility.retry'
+E   
+E   Diff is 2506 characters long. Set self.maxDiff to None to see it.
+=========================== short test summary info ===========================
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_create_report_is_tenant_scoped_and_audited
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_draft_report_accepts_operational_entries_and_locks_on_submit
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_list_and_create_views_are_tenant_scoped
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_report_list_and_detail_exclude_other_tenant
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_report_optionally_scopes_to_an_active_worksite_phase
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_report_rejects_cross_tenant_project
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_report_rejects_phase_from_another_worksite
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_report_rejects_site_from_another_project
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_structured_entries_are_locked_after_submission_and_reject_cross_project_activity
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_structured_entries_validate_master_scope_and_preserve_material_snapshots
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_submitted_report_can_be_approved_once
+FAILED apps/daily_reports/tests.py::DailyReportServiceTests::test_viewer_cannot_create_report
+FAILED tests/test_daily_report_references.py::DailyReportReferenceBrowserTests::test_real_chrome_reference_create_validation_and_navigation
+FAILED apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_every_managed_business_model_is_registered_exactly_once
+FAILED apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_every_registered_permission_is_referenced_by_its_enforcement_module
+FAILED apps/organizations/test_permission_registry.py::PermissionRegistryArchitectureTests::test_resource_keys_are_unique_and_match_permission_namespaces
+16 failed, 12 passed, 32 subtests passed in 88.18s (0:01:28)

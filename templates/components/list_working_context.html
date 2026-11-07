@@ -1,7 +1,7 @@
-<details class="erp-list-context{% if header_layout %} erp-list-context--header{% endif %}">
+<details class="erp-list-context{% if header_layout %} erp-list-context--header{% endif %}{% if fit_tablet_panel %} erp-list-context--fit-tablet{% endif %}">
     <summary>{% if header_layout %}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>{% endif %}<span>زمینه کاری سراسری</span><span class="erp-list-context__value">{% if active_project %}{{ active_project.name }}{% if active_site %} / {{ active_site.name }}{% endif %}{% else %}همه پروژه‌های در دسترس{% endif %}</span><span class="erp-list-context__change">تغییر</span></summary>
     <div class="erp-list-context__panel">
-    <p class="erp-list-context__note">این انتخاب مستقل از فیلترهای این فهرست است.</p>
-    {% include "components/context_selector.html" with request=request csrf_token=csrf_token active_project=active_project active_site=active_site context_projects=context_projects context_sites=context_sites context_requires_project=context_requires_project site_context_relevant=site_context_relevant only %}
+    <p class="erp-list-context__note">{{ context_note|default:"این انتخاب مستقل از فیلترهای این فهرست است." }}</p>
+    {% include "components/context_selector.html" with request=request csrf_token=csrf_token active_project=active_project active_site=active_site context_projects=context_projects context_sites=context_sites context_requires_project=context_requires_project site_context_relevant=site_context_relevant context_submit_label=context_submit_label only %}
     </div>
 </details>

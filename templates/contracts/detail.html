@@ -1,6 +1,6 @@
 {% extends "base.html" %}{% load static erp_format product_surface related_documents %}
 {% block title %}{{ contract.contract_number }} | جزئیات قرارداد{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}"><link rel="stylesheet" href="{% static 'contracts/detail.css' %}?v=20261102-quantities-2"><link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}"><link rel="stylesheet" href="{% static 'contracts/detail.css' %}?v=20261106-navigation"><link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% endblock %}
 {% block working_context %}{% endblock %}
 {% block content %}
 {% related_documents contract as related_documents %}
@@ -8,7 +8,7 @@
     {% include "components/breadcrumbs.html" with page_breadcrumbs=page_breadcrumbs only %}
     <header class="cd-heading">
         <div class="cd-identity">{% include "contracts/detail_icon.html" with icon="document" only %}<div><div class="cd-title"><h1>{{ contract.title }}</h1>{% include "components/status_badge.html" with status=contract.status label=contract.get_status_display only %}</div><div class="cd-subtitle"><bdi dir="ltr">{{ contract.contract_number }}</bdi><span>{{ contract.get_direction_display|default:"جهت قرارداد ثبت نشده" }}</span></div></div></div>
-        <div class="cd-actions">{% if workspace.can_edit %}<a class="erp-btn erp-btn--primary" href="#draft-edit" data-draft-edit>ویرایش قرارداد</a>{% endif %}{% if claim_create_url and not workspace.is_draft %}<a class="erp-btn erp-btn--primary" href="{{ claim_create_url }}"><span aria-hidden="true">＋</span> صورت‌وضعیت جدید</a>{% endif %}{% if can_review_commercial and "contracts:commercial_review"|surface_exposed %}<a class="erp-btn erp-btn--secondary" href="{% url 'contracts:commercial_review' contract.pk %}">مرور تجاری و استثناها</a>{% endif %}<a class="cd-back" href="{% url 'contracts:list' %}">قراردادها ←</a></div>
+        <div class="cd-actions">{% if workspace.can_edit %}<a class="erp-btn erp-btn--primary" href="#draft-edit" data-draft-edit>ویرایش قرارداد</a>{% endif %}{% if claim_create_url and not workspace.is_draft %}<a class="erp-btn erp-btn--primary" href="{{ claim_create_url }}"><span aria-hidden="true">＋</span> صورت‌وضعیت جدید</a>{% endif %}{% if can_review_commercial and "contracts:commercial_review"|surface_exposed %}<a class="erp-btn erp-btn--secondary" href="{% url 'contracts:commercial_review' contract.pk %}">مرور تجاری و استثناها</a>{% endif %}{% if has_estimate_breadcrumb %}<a class="cd-back" href="{% url 'contracts:list' %}">قراردادها ←</a>{% endif %}</div>
     </header>
     {% if workspace.is_draft %}<p class="cd-state-note">پیش‌نویس قرارداد · فضای آماده‌سازی اطلاعات، ردیف‌ها و شرایط</p>{% else %}<p class="cd-state-note">{{ workspace.finalized_note }}</p>{% endif %}
     <section class="cd-context cd-panel" aria-label="اطلاعات کلیدی قرارداد">
@@ -51,4 +51,4 @@
 {{ dashboard.chart_rows|json_script:"contract-financial-data" }}
 </div>
 {% endblock %}
-{% block extra_scripts %}<script src="{% static 'projects/vendor/chartjs-4.6.1/chart.umd.min.js' %}" defer></script><script src="{% static 'contracts/detail.js' %}?v=20261102-quantities-2" defer></script>{% endblock %}
+{% block extra_scripts %}<script src="{% static 'projects/vendor/chartjs-4.6.1/chart.umd.min.js' %}" defer></script><script src="{% static 'contracts/detail.js' %}?v=20261106-navigation" defer></script>{% endblock %}

@@ -290,6 +290,7 @@ class AuditAction(models.TextChoices):
         "واگذاری گردش‌کار لغو شد",
     )
     ORGANIZATION_CREATED = "organization.created", "سازمان ایجاد شد"
+    ORGANIZATION_STATUS_CHANGED = "organization.status_changed", "وضعیت شرکت تغییر کرد"
     ORGANIZATION_SETTINGS_UPDATED = (
         "organization_settings.updated",
         "تنظیمات سازمان به‌روزرسانی شد",
@@ -858,6 +859,7 @@ class AuditAction(models.TextChoices):
         "شاهد بازیابی سند تأیید شد",
     )
     DAILY_REPORT_CREATED = "daily_report.created", "گزارش روزانه ایجاد شد"
+    DAILY_REPORT_RECORD_REFERENCED = "daily_report.record_referenced", "رکورد به گزارش روزانه ارجاع شد"
     DAILY_REPORT_SUBMITTED = "daily_report.submitted", "گزارش روزانه ارسال شد"
     DAILY_REPORT_APPROVED = "daily_report.approved", "گزارش روزانه تأیید شد"
     DAILY_REPORT_LABOR_ADDED = (

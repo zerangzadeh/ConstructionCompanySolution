@@ -27,6 +27,28 @@ class _StyledForm(JalaliDateMixin):
             field.widget.attrs["class"] = field_class
 
 
+class SafetyContextSelect(forms.Select):
+    """Describe existing relationships on choices already authorized by the form."""
+
+    def create_option(self, name, value, label, selected, index, **kwargs):
+        option = super().create_option(name, value, label, selected, index, **kwargs)
+        if value and hasattr(value, "instance"):
+            record = value.instance
+            context = {
+                "project": record.site.project_id
+                if isinstance(record, ProjectPhase)
+                else record.project_id,
+                "site": record.pk
+                if isinstance(record, ProjectSite)
+                else getattr(record, "site_id", None),
+                "phase": getattr(record, "phase_id", None),
+            }
+            option["attrs"].update(
+                {f"data-{key}": str(value or "") for key, value in context.items()}
+            )
+        return option
+
+
 class SafetyIncidentForm(_StyledForm, forms.ModelForm):
     class Meta:
         model = SafetyIncident
@@ -62,6 +84,19 @@ class SafetyIncidentForm(_StyledForm, forms.ModelForm):
         for optional in ("site", "phase", "activity", "daily_report"):
             self.fields[optional].required = False
         self._style_fields()
+        hints = {
+            "site": "ابتدا پروژه را انتخاب کنید.",
+            "phase": "ابتدا کارگاه را انتخاب کنید.",
+            "activity": "فعالیت‌های سازگار با پروژه، کارگاه و فاز انتخاب‌شده نمایش داده می‌شوند.",
+            "daily_report": "گزارش‌های روزانه همان پروژه، کارگاه و فاز نمایش داده می‌شوند.",
+        }
+        for name, hint in hints.items():
+            field = self.fields[name]
+            field.help_text = hint
+            field.widget = SafetyContextSelect(
+                attrs={**field.widget.attrs, "data-safety-context": name},
+                choices=field.choices,
+            )
         if not isinstance(membership, OrganizationMembership) or (
             membership.organization_id != organization.pk
         ):
@@ -80,7 +115,7 @@ class SafetyIncidentForm(_StyledForm, forms.ModelForm):
             membership=membership,
             project_lookup="site__project_id",
             site_lookup="site_id",
-        )
+        ).select_related("site")
         self.fields["activity"].queryset = scope_queryset(
             Activity.objects.filter(
                 organization=organization, archived_at__isnull=True, is_active=True

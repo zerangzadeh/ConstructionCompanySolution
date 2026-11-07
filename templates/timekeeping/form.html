@@ -2,11 +2,17 @@
 {% block title %}{{ title }} | بنیرا{% endblock %}
 {% block extra_head %}{% include "workforce/_form_assets.html" %}{% endblock %}
 {% block content %}<div class="erp-create-page">
-{% if "attendance.view" in business_permission_codes %}{% field_context_url "timekeeping:workbench" as breadcrumb_parent_url %}{% endif %}
+{% if "attendance.view" in business_permission_codes %}{% firstof back_url as breadcrumb_parent_url %}{% endif %}
 {% include "components/page_header.html" with page_breadcrumb_label="حضور و کارکرد" page_breadcrumb_url=breadcrumb_parent_url page_title=title page_description=description only %}
 {% include "workforce/_field_context.html" %}
-<form method="post" class="erp-create-form mt-5" novalidate aria-label="{{ title }}">{% csrf_token %}
+{% include "timekeeping/_reference_help.html" %}
+<form method="post" class="erp-create-form erp-sectioned-form mt-5" novalidate autocomplete="off" data-focus-first-error aria-label="{{ title }}">{% csrf_token %}
 {% include "workforce/_form_sections.html" %}
-{% with submit_label=title|form_action_label %}{% include "components/form_footer.html" with submit_label=submit_label cancel_url=back_url only %}{% endwith %}
+{% if form.leave_categories %}
+  <datalist id="timekeeping-leave-categories">{% for category in form.leave_categories %}<option value="{{ category }}"></option>{% endfor %}</datalist>
+{% endif %}
+{% with default_label=title|form_action_label %}
+  {% include "components/form_footer.html" with submit_label=submit_label|default:default_label cancel_url=back_url only %}
+{% endwith %}
 </form></div>{% endblock %}
-{% block extra_scripts %}{{ form.media.js }}{% endblock %}
+{% block extra_scripts %}{% load static %}{{ form.media.js }}{% if form.leave_categories %}<script src="{% static 'timekeeping/leave_category.js' %}" defer></script>{% endif %}{% endblock %}

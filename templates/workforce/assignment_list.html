@@ -1,7 +1,7 @@
 {% extends "workforce/field_list_base.html" %}{% load field_journey table_filters %}
 {% block title %}تخصیص نیرو به پروژه و کارگاه | بنیرا{% endblock %}
 {% block field_heading %}
-{% if "project_assignments.create" in business_permission_codes %}{% field_context_url "workforce:assignment_create" as create_url %}{% endif %}
+{% if "project_assignments.create" in business_permission_codes %}{% firstof assignment_create_url as create_url %}{% endif %}
 {% field_breadcrumbs "تخصیص نیرو به پروژه و کارگاه" workforce_parent=True as breadcrumbs %}
 {% include "workforce/_field_header.html" with page_breadcrumbs=breadcrumbs page_title="تخصیص نیرو به پروژه و کارگاه" page_description="محل فعالیت، مسئولیت و بازه تخصیص هر نیرو" page_action_url=create_url page_action_label="تخصیص جدید" page_filters=True %}
 {% endblock %}

@@ -1,0 +1,89 @@
+..F                                                                      [100%]
+================================== FAILURES ===================================
+_________ SectionedFormRolloutTests.test_safety_quality_daily_report __________
+tests\test_sectioned_form_rollout.py:232: in test_safety_quality_daily_report
+    self.verify_pages(records)
+tests\test_sectioned_form_rollout.py:93: in verify_pages
+    self.browser(self.owner, scenarios)
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:299
+E             throw new Error(scenario.name+': '+step.description);
+E                   ^
+E   
+E   Error: daily-report-keyboard: Tab advances to the next relationship field
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:299:17
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-04T22:25:37.755216+00:00","event":"http.response","request_id":"225f5687-3ed4-4e59-962e-ce7e7cb3b700","method":"GET","route":"safety:create","status_code":200,"duration_ms":958}
+
+{"timestamp":"2026-11-04T22:25:38.541248+00:00","event":"http.response","request_id":"f346b389-14ef-4c7d-af05-1063e7d34796","method":"GET","route":"quality:create","status_code":200,"duration_ms":705}
+
+{"timestamp":"2026-11-04T22:25:39.226629+00:00","event":"http.response","request_id":"784a6f98-3a8a-466b-a807-8ee75d1c8962","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":613}
+
+{"timestamp":"2026-11-04T22:25:42.089033+00:00","event":"http.response","request_id":"53229b39-352f-42d7-bba5-a327183bcd44","method":"GET","route":"safety:create","status_code":200,"duration_ms":967}
+
+{"timestamp":"2026-11-04T22:25:45.357877+00:00","event":"http.response","request_id":"ad8596df-e26c-4189-a889-e4099009f93c","method":"GET","route":null,"status_code":404,"duration_ms":1130}
+
+{"timestamp":"2026-11-04T22:25:47.892699+00:00","event":"http.response","request_id":"c5a149fc-86bd-401a-972a-c1726d01bec5","method":"GET","route":"safety:create","status_code":200,"duration_ms":1186}
+
+{"timestamp":"2026-11-04T22:25:51.983351+00:00","event":"http.response","request_id":"c70387d4-b23b-4272-b3ba-682fce88f940","method":"GET","route":"safety:create","status_code":200,"duration_ms":1908}
+
+{"timestamp":"2026-11-04T22:25:55.203669+00:00","event":"http.response","request_id":"7355cec5-8b58-4862-a345-b058e3d6701f","method":"GET","route":"safety:create","status_code":200,"duration_ms":1220}
+
+{"timestamp":"2026-11-04T22:25:56.484217+00:00","event":"http.response","request_id":"fbb2c7ed-3c6c-4ac2-b937-b86c295078d0","method":"GET","route":"quality:create","status_code":200,"duration_ms":1024}
+
+{"timestamp":"2026-11-04T22:25:59.341296+00:00","event":"http.response","request_id":"3030ae55-1cd3-4d0a-9b2e-cecc86623526","method":"GET","route":"quality:create","status_code":200,"duration_ms":1025}
+
+{"timestamp":"2026-11-04T22:26:02.019166+00:00","event":"http.response","request_id":"6ca39c75-b53d-46fe-bdfa-b2e5a230beb1","method":"GET","route":"quality:create","status_code":200,"duration_ms":1110}
+
+{"timestamp":"2026-11-04T22:26:04.109085+00:00","event":"http.response","request_id":"04703e33-ef01-4ec6-9e02-288e03fa593e","method":"GET","route":"quality:create","status_code":200,"duration_ms":1033}
+
+{"timestamp":"2026-11-04T22:26:05.552071+00:00","event":"http.response","request_id":"2031d374-8d1c-41f9-a045-4d009503e385","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":1167}
+
+{"timestamp":"2026-11-04T22:26:07.949522+00:00","event":"http.response","request_id":"5fe124dd-182f-422c-8136-a36479e70bb7","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":991}
+
+{"timestamp":"2026-11-04T22:26:11.068412+00:00","event":"http.response","request_id":"cf37cc41-f258-4935-860f-46482d582997","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":951}
+
+{"timestamp":"2026-11-04T22:26:13.180499+00:00","event":"http.response","request_id":"c034ddda-88ed-4670-bafc-a85f98658d92","method":"GET","route":"daily_reports:create","status_code":200,"duration_ms":1065}
+
+[05/Nov/2026 01:56:14,469] - Broken pipe from ('127.0.0.1', 54824)
+
+[05/Nov/2026 01:56:14,471] - Broken pipe from ('127.0.0.1', 49845)
+
+[05/Nov/2026 01:56:14,471] - Broken pipe from ('127.0.0.1', 55812)
+
+[05/Nov/2026 01:56:14,475] - Broken pipe from ('127.0.0.1', 59465)
+
+[05/Nov/2026 01:56:14,475] - Broken pipe from ('127.0.0.1', 64308)
+
+[05/Nov/2026 01:56:14,477] - Broken pipe from ('127.0.0.1', 55256)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 54824)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 49845)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 55812)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 59465)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 64308)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 55256)
+=========================== short test summary info ===========================
+FAILED tests/test_sectioned_form_rollout.py::SectionedFormRolloutTests::test_safety_quality_daily_report
+1 failed, 2 passed in 150.68s (0:02:30)

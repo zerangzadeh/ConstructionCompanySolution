@@ -3,7 +3,11 @@ import json
 from django import forms
 from django.core.exceptions import ValidationError
 
-from apps.organizations.authorization import get_active_membership, scope_queryset
+from apps.organizations.authorization import (
+    get_active_membership,
+    has_business_permission,
+    scope_queryset,
+)
 from apps.projects.models import Activity, Project, ProjectSite
 from apps.workforce.field_forms import (
     business_label,
@@ -17,9 +21,73 @@ from apps.workforce.field_selectors import (
     scoped_employees,
 )
 from apps.workforce.models import Employee
-from core.forms import JalaliDateMixin
+from core.forms import JalaliDateMixin, normalize_jalali_digits
 
 from .models import ShiftDefinition, WorkCalendar
+
+
+class DurationWidget(forms.MultiWidget):
+    template_name = "timekeeping/duration_widget.html"
+
+    def __init__(self):
+        super().__init__(
+            {
+                "hours": forms.NumberInput(attrs={"min": 0, "inputmode": "numeric"}),
+                "minutes": forms.NumberInput(
+                    attrs={"min": 0, "max": 59, "inputmode": "numeric"}
+                ),
+            }
+        )
+
+    def decompress(self, value):
+        return divmod(value, 60) if isinstance(value, int) else (None, None)
+
+    def id_for_label(self, id_):
+        return f"{id_}_0" if id_ else ""
+
+    def use_required_attribute(self, initial):
+        # Either part can supply the duration. The combined field is required.
+        return False
+
+    def value_from_datadict(self, data, files, name):
+        values = super().value_from_datadict(data, files, name)
+        if values != [None, None] or name not in data:
+            return [
+                normalize_jalali_digits(value) if value else value for value in values
+            ]
+        # Preserve the existing minute payload for callers without the split widget.
+        try:
+            minutes = forms.IntegerField().to_python(
+                normalize_jalali_digits(str(data[name] or ""))
+            )
+            return self.decompress(minutes)
+        except ValidationError:
+            return [data[name], None]
+
+
+class DurationField(forms.MultiValueField):
+    widget = DurationWidget
+    # PostgreSQL PositiveIntegerField storage limit.
+    max_minutes = 2_147_483_647
+
+    def __init__(self, **kwargs):
+        super().__init__(
+            fields=(
+                forms.IntegerField(min_value=0, max_value=self.max_minutes // 60),
+                forms.IntegerField(min_value=0, max_value=59),
+            ),
+            require_all_fields=False,
+            **kwargs,
+        )
+        for field in self.fields:
+            field.required = False
+
+    def compress(self, values):
+        hours, minutes = values or (0, 0)
+        total = (hours or 0) * 60 + (minutes or 0)
+        if not 0 < total <= self.max_minutes:
+            raise ValidationError("مدت را بیشتر از صفر و در محدوده مجاز وارد کنید.")
+        return total
 
 
 class StyledForm(JalaliDateMixin, forms.Form):
@@ -35,6 +103,8 @@ class StyledForm(JalaliDateMixin, forms.Form):
                 "class",
                 "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm",
             )
+            if isinstance(field, forms.DateTimeField):
+                field.widget.attrs["data-jalali-time-control"] = "true"
 
 
 class WorkingWeekdaysField(forms.TypedMultipleChoiceField):
@@ -79,7 +149,7 @@ class CalendarForm(StyledForm):
 
 class ShiftForm(StyledForm):
     calendar = forms.ModelChoiceField(
-        label="تقویم", queryset=WorkCalendar.objects.none()
+        label="تقویم کاری", queryset=WorkCalendar.objects.none()
     )
     code = forms.CharField(label="کد")
     name = forms.CharField(label="نام")
@@ -99,11 +169,12 @@ class ShiftForm(StyledForm):
         self.fields["calendar"].queryset = WorkCalendar.objects.filter(
             organization=organization, is_active=True
         )
+        searchable_choices(self, "calendar", "calendar_setup")
 
 
 class HolidayForm(StyledForm):
     calendar = forms.ModelChoiceField(
-        label="تقویم", queryset=WorkCalendar.objects.none()
+        label="تقویم کاری", queryset=WorkCalendar.objects.none()
     )
     holiday_date = forms.DateField(
         label="تاریخ", widget=forms.DateInput(attrs={"type": "date"})
@@ -118,6 +189,7 @@ class HolidayForm(StyledForm):
         self.fields["calendar"].queryset = WorkCalendar.objects.filter(
             organization=organization, is_active=True
         )
+        searchable_choices(self, "calendar", "calendar_setup")
 
 
 class ShiftBreakForm(StyledForm):
@@ -139,10 +211,13 @@ class ShiftBreakForm(StyledForm):
         self.fields["shift"].queryset = ShiftDefinition.objects.filter(
             organization=organization, is_active=True
         )
+        searchable_choices(self, "shift", "shift_setup")
 
 
 class ScopedForm(StyledForm):
-    employee = forms.ModelChoiceField(label="نیروی کار", queryset=Employee.objects.none())
+    employee = forms.ModelChoiceField(
+        label="نیروی کار", queryset=Employee.objects.none()
+    )
     project = forms.ModelChoiceField(
         label="پروژه", queryset=Project.objects.none(), required=False
     )
@@ -151,7 +226,7 @@ class ScopedForm(StyledForm):
     )
 
     def __init__(self, *args, organization=None, user=None, **kwargs):
-        super().__init__(*args, organization=organization, **kwargs)
+        super().__init__(*args, organization=organization, user=user, **kwargs)
         self.fields["employee"].queryset = (
             scoped_employees(organization=organization, user=user)
             if user is not None
@@ -194,16 +269,23 @@ class ScopedForm(StyledForm):
 
 class AttendanceForm(ScopedForm):
     calendar = forms.ModelChoiceField(
-        label="تقویم", queryset=WorkCalendar.objects.none()
+        label="تقویم کاری",
+        queryset=WorkCalendar.objects.none(),
+        help_text="تقویم کاری شرکت را برای این سابقه حضور انتخاب کنید.",
     )
     shift = forms.ModelChoiceField(
-        label="شیفت", queryset=ShiftDefinition.objects.none(), required=False
+        label="شیفت",
+        queryset=ShiftDefinition.objects.none(),
+        required=False,
+        help_text="ابتدا تقویم کاری را انتخاب کنید. ثبت حضور بدون شیفت هم ممکن است.",
     )
     work_date = forms.DateField(
         label="تاریخ کار", widget=forms.DateInput(attrs={"type": "date"})
     )
     check_in_at = forms.DateTimeField(
-        label="ورود", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
+        label="زمان ورود",
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+        help_text="روز و ساعت را از انتخابگر وارد کنید، یا زمان را به شکل ۰۸:۳۰ بنویسید.",
     )
     check_out_at = forms.DateTimeField(
         label="خروج",
@@ -230,13 +312,21 @@ class AttendanceForm(ScopedForm):
         except (ValueError, ValidationError):
             self.fields["shift"].queryset = self.fields["shift"].queryset.none()
         self.fields["shift"].widget.attrs["data-depends-on"] = "calendar"
+        self.fields["shift"].widget.attrs["data-empty-choices"] = (
+            "برای تقویم کاری انتخاب‌شده شیفت فعالی وجود ندارد."
+        )
+        self.fields["calendar"].widget.attrs["data-empty-choices"] = (
+            "تقویم کاری فعالی برای این شرکت وجود ندارد."
+        )
         for name in ("calendar", "shift"):
             searchable_choices(self, name, name)
 
 
 class TimeRequestForm(ScopedForm):
     starts_at = forms.DateTimeField(
-        label="شروع", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
+        label="شروع",
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+        help_text="روز و ساعت را از انتخابگر وارد کنید، یا زمان را به شکل ۰۸:۳۰ بنویسید.",
     )
     ends_at = forms.DateTimeField(
         label="پایان", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
@@ -245,15 +335,56 @@ class TimeRequestForm(ScopedForm):
     policy_reference = forms.CharField(
         label="مرجع سیاست مصوب",
         required=False,
-        help_text="برای تأیید الزامی است؛ سامانه مقدار قانونی یا حقوقی استنباط نمی‌کند.",
+        max_length=255,
+        widget=forms.TextInput(attrs={"autocomplete": "off"}),
+        help_text="برای ذخیره پیش‌نویس اختیاری است و در زمان تأیید لازم است.",
     )
+
+    def clean(self):
+        cleaned = super().clean()
+        start, end = cleaned.get("starts_at"), cleaned.get("ends_at")
+        if start and end and end <= start:
+            self.add_error("ends_at", "پایان باید پس از شروع باشد.")
+        return cleaned
 
 
 class LeaveMissionForm(TimeRequestForm):
     kind = forms.ChoiceField(
         label="نوع", choices=(("leave", "مرخصی"), ("mission", "مأموریت"))
     )
-    category_code = forms.CharField(label="کد دسته")
+    category_code = forms.CharField(
+        label="دسته درخواست",
+        max_length=50,
+        widget=forms.TextInput(attrs={"autocomplete": "off"}),
+        help_text="کد دسته درخواست را مطابق دسته‌بندی مصوب شرکت وارد کنید.",
+    )
+
+    def __init__(self, *args, organization=None, **kwargs):
+        super().__init__(*args, organization=organization, **kwargs)
+        from apps.workforce.leave_models import LeavePolicyVersion
+
+        self.leave_categories = []
+        if not self.user or not any(
+            has_business_permission(
+                user=self.user, organization=organization, permission=permission
+            )
+            for permission in (
+                "leave_policies.manage",
+                "leave_balances.view",
+                "leave_balances.manage",
+            )
+        ):
+            return
+        self.leave_categories = list(
+            LeavePolicyVersion.objects.filter(organization=organization)
+            .order_by("category_code")
+            .values_list("category_code", flat=True)
+            .distinct()
+        )
+        if self.leave_categories:
+            self.fields["category_code"].widget.attrs.update(
+                {"data-leave-category": "", "list": "timekeeping-leave-categories"}
+            )
 
 
 class OvertimeForm(TimeRequestForm):
@@ -261,14 +392,19 @@ class OvertimeForm(TimeRequestForm):
 
 
 class TimesheetForm(StyledForm):
-    employee = forms.ModelChoiceField(label="نیروی کار", queryset=Employee.objects.none())
+    employee = forms.ModelChoiceField(
+        label="نیروی کار", queryset=Employee.objects.none()
+    )
     period_start = forms.DateField(
         label="شروع دوره", widget=forms.DateInput(attrs={"type": "date"})
     )
     period_end = forms.DateField(
         label="پایان دوره", widget=forms.DateInput(attrs={"type": "date"})
     )
-    declared_minutes = forms.IntegerField(label="کل دقیقه اعلام‌شده", min_value=1)
+    declared_minutes = DurationField(
+        label="مدت کل کارکرد",
+        help_text="زمانی را وارد کنید که واقعاً در این دوره کار کرده‌اید.",
+    )
 
     def __init__(self, *args, organization=None, user=None, **kwargs):
         super().__init__(*args, organization=organization, **kwargs)
@@ -288,6 +424,15 @@ class TimesheetForm(StyledForm):
         )
         searchable_choices(self, "employee", "employee", query=context.query)
 
+    def clean(self):
+        cleaned = super().clean()
+        start, end = cleaned.get("period_start"), cleaned.get("period_end")
+        if start and end and end < start:
+            self.add_error(
+                "period_end", "پایان دوره باید هم‌زمان با آغاز یا پس از آن باشد."
+            )
+        return cleaned
+
 
 class TimesheetEntryForm(StyledForm):
     work_date = forms.DateField(
@@ -300,8 +445,8 @@ class TimesheetEntryForm(StyledForm):
     activity = forms.ModelChoiceField(
         label="فعالیت", queryset=Activity.objects.none(), required=False
     )
-    minutes = forms.IntegerField(label="دقیقه", min_value=1)
-    note = forms.CharField(label="شرح", required=False)
+    minutes = DurationField(label="مدت تخصیص")
+    note = forms.CharField(label="شرح", required=False, max_length=500)
 
     def __init__(self, *args, organization=None, user=None, **kwargs):
         super().__init__(*args, organization=organization, **kwargs)
@@ -356,6 +501,8 @@ class TimesheetEntryForm(StyledForm):
         project = cleaned.get("project")
         site = cleaned.get("site")
         activity = cleaned.get("activity")
+        if site and site.project_id != getattr(project, "pk", None):
+            self.add_error("site", "کارگاه باید متعلق به پروژه انتخاب‌شده باشد.")
         if activity and activity.project_id != getattr(project, "pk", None):
             self.add_error("activity", "فعالیت باید متعلق به پروژه انتخاب‌شده باشد.")
         if activity and activity.site_id != getattr(site, "pk", None):

@@ -7,7 +7,7 @@
 <div class="erp-reference-list erp-contracts-list erp-baselines-list{% if selected_contract %} erp-baselines-scoped{% endif %}">
   <div class="erp-list-heading">{% include "components/page_header.html" with page_breadcrumbs=page_breadcrumbs page_title="مبنای متره و صورت‌وضعیت" page_description="نسخه‌های مقادیر، نرخ‌ها و ردیف‌های قرارداد که مبنای محاسبه پیشرفت و صورت‌وضعیت هستند." page_icon="document" only %}</div>
   {% include "billing/journey_nav.html" with journey_contract=selected_contract.pk %}
-  {% if selected_contract %}<aside class="baseline-context" aria-label="زمینه قرارداد"><div><span class="erp-list-muted">قرارداد</span><strong><bdi dir="ltr">{{ selected_contract.contract_number }}</bdi></strong><p>{{ selected_contract.title }}</p></div><div><span class="erp-list-muted">پروژه</span><strong>{{ selected_contract.project.name }}</strong></div><div><span class="erp-list-side">قرارداد دریافتنی</span><a href="{% url 'contracts:detail' selected_contract.pk %}">بازگشت به قرارداد ←</a></div></aside>{% endif %}
+  {% if selected_contract %}<aside class="baseline-context" aria-label="زمینه قرارداد"><div><span class="erp-list-muted">قرارداد</span><strong><bdi dir="ltr">{{ selected_contract.contract_number }}</bdi></strong><p>{{ selected_contract.title }}</p></div><div><span class="erp-list-muted">پروژه</span><strong>{{ selected_contract.project.name }}</strong></div><div><span class="erp-list-side">قرارداد دریافتنی</span></div></aside>{% endif %}
   <div class="erp-list-workspace">
     {% if filter_bar %}{% include "components/filter_bar.html" with bar=filter_bar reference_layout=True only %}{% endif %}
     {% if page_obj.paginator.count %}<div class="erp-list-toolbar">

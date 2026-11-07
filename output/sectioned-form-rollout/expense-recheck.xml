@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="73.037" timestamp="2026-11-05T01:35:55.031016+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_sectioned_form_rollout.SectionedFormRolloutTests" name="test_expense_pilot" time="72.465"><failure message="AssertionError: '2026-10-15' != '1405/07/23'&#10;- 2026-10-15&#10;+ 1405/07/23">tests\test_sectioned_form_rollout.py:196: in test_expense_pilot
+    self.verify_pages(records)
+tests\test_sectioned_form_rollout.py:100: in verify_pages
+    self.assertEqual(invalid.context["form"][key].value(), str(value))
+E   AssertionError: '2026-10-15' != '1405/07/23'
+E   - 2026-10-15
+E   + 1405/07/23</failure></testcase></testsuite></testsuites>

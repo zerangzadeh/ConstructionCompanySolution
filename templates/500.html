@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}خطا در دریافت اطلاعات | بنیرا{% endblock %}
+{% block content %}
+{% include "components/system_state.html" with state="error" title="دریافت اطلاعات ممکن نشد" description="لطفاً کمی بعد دوباره تلاش کنید. اگر مشکل ادامه داشت، با پشتیبانی سامانه تماس بگیرید." only %}
+{% endblock %}

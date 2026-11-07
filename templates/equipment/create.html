@@ -1,0 +1,7 @@
+{% extends "components/compact_form_page.html" %}
+{% block title %}{{ title }} | بنیرا{% endblock %}
+{% block compact_content %}
+    {% url back_url as cancel_url %}
+    {% include "components/page_header.html" with page_title=title page_breadcrumb_label="تجهیزات" page_breadcrumb_url=cancel_url page_description=request.organization.name page_icon="document" only %}
+    {% include "components/compact_form_card.html" with form=form csrf_token=csrf_token cancel_url=cancel_url submit_label="ثبت" only %}
+{% endblock %}

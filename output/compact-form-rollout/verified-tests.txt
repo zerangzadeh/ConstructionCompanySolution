@@ -1,0 +1,314 @@
+.F                                                      [100%]
+================================== FAILURES ===================================
+_________________ CompactFormRolloutTests.test_migrated_forms _________________
+tests\test_compact_form_rollout.py:441: in test_migrated_forms
+    self.browser(self.owner, journeys)
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:307
+E             if (i===199) throw new Error('Browser history did not restore the requested URL');
+E                                ^
+E   
+E   Error: Browser history did not restore the requested URL
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:307:30
+E   
+E   Node.js v24.20.0
+---------------------------- Captured stdout call -----------------------------
+uuuuuuuuuuuuu
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-04T21:56:18.292930+00:00","event":"http.response","request_id":"c4ead5c0-2a4b-4e3d-b2b4-9a47e4daefc4","method":"GET","route":"materials:unit_create","status_code":200,"duration_ms":530}
+
+{"timestamp":"2026-11-04T21:56:19.131242+00:00","event":"http.response","request_id":"878adfb8-481b-479d-a50e-870131afb95a","method":"GET","route":null,"status_code":404,"duration_ms":465}
+
+{"timestamp":"2026-11-04T21:56:19.564208+00:00","event":"http.response","request_id":"77e9f760-d43e-49ad-9f97-fc7a56bd1c3c","method":"GET","route":"materials:unit_create","status_code":200,"duration_ms":467}
+
+{"timestamp":"2026-11-04T21:56:20.640560+00:00","event":"http.response","request_id":"91ca3b1b-2f65-42f4-bd00-6a2566c9c55c","method":"GET","route":"materials:category_create","status_code":200,"duration_ms":565}
+
+{"timestamp":"2026-11-04T21:56:21.645226+00:00","event":"http.response","request_id":"becdc4f2-7d60-4143-8f0d-25468530e811","method":"GET","route":"materials:category_create","status_code":200,"duration_ms":457}
+
+{"timestamp":"2026-11-04T21:56:22.543390+00:00","event":"http.response","request_id":"9c5199ee-9cfc-40e7-a50a-63643fd79aee","method":"GET","route":"materials:material_create","status_code":200,"duration_ms":433}
+
+{"timestamp":"2026-11-04T21:56:23.665830+00:00","event":"http.response","request_id":"b7381867-96ec-4554-a3de-24009decb599","method":"GET","route":"materials:material_create","status_code":200,"duration_ms":484}
+
+{"timestamp":"2026-11-04T21:56:24.563937+00:00","event":"http.response","request_id":"28b56d23-f5a1-4951-9804-324196eadf71","method":"GET","route":"expenses:category_create","status_code":200,"duration_ms":429}
+
+{"timestamp":"2026-11-04T21:56:25.540165+00:00","event":"http.response","request_id":"1ccafaf3-b541-4eec-8713-33825229d90e","method":"GET","route":"expenses:category_create","status_code":200,"duration_ms":449}
+
+{"timestamp":"2026-11-04T21:56:26.344489+00:00","event":"http.response","request_id":"99499dac-810a-4d9e-90e0-771a86644ccb","method":"GET","route":"parties:create","status_code":200,"duration_ms":359}
+
+{"timestamp":"2026-11-04T21:56:27.200488+00:00","event":"http.response","request_id":"81ae8a76-b92f-4312-9316-7901facc1e9e","method":"GET","route":"parties:create","status_code":200,"duration_ms":359}
+
+{"timestamp":"2026-11-04T21:56:28.082304+00:00","event":"http.response","request_id":"a1a2906f-08a2-44ef-a7cb-32c35c4c56e7","method":"GET","route":"projects:create","status_code":200,"duration_ms":389}
+
+{"timestamp":"2026-11-04T21:56:29.069483+00:00","event":"http.response","request_id":"28787695-ac7a-45ff-b53e-851a61f94926","method":"GET","route":"projects:create","status_code":200,"duration_ms":449}
+
+{"timestamp":"2026-11-04T21:56:30.107044+00:00","event":"http.response","request_id":"93461463-e4ae-4f9a-880a-924a601b3459","method":"GET","route":"projects:site_create","status_code":200,"duration_ms":532}
+
+{"timestamp":"2026-11-04T21:56:30.985328+00:00","event":"http.response","request_id":"089ca74a-67bb-4f6c-951e-0e2bc06b59df","method":"GET","route":"projects:site_create","status_code":200,"duration_ms":393}
+
+{"timestamp":"2026-11-04T21:56:31.898336+00:00","event":"http.response","request_id":"d0efb8bb-4dbd-48cc-b444-83be1e9a259d","method":"GET","route":"projects:phase_create","status_code":200,"duration_ms":480}
+
+{"timestamp":"2026-11-04T21:56:32.866657+00:00","event":"http.response","request_id":"5cb56353-dbe8-4322-92ac-a34cf094e074","method":"GET","route":"projects:phase_create","status_code":200,"duration_ms":437}
+
+{"timestamp":"2026-11-04T21:56:33.779715+00:00","event":"http.response","request_id":"6121cc75-302d-466c-b111-30745a778ef8","method":"GET","route":"equipment:create","status_code":200,"duration_ms":448}
+
+{"timestamp":"2026-11-04T21:56:34.738636+00:00","event":"http.response","request_id":"0674dc3a-35e4-486f-9795-9488c86b9c5b","method":"GET","route":"equipment:create","status_code":200,"duration_ms":441}
+
+{"timestamp":"2026-11-04T21:56:35.759166+00:00","event":"http.response","request_id":"94298ae5-05fc-4ac1-8255-b0f8397f00aa","method":"GET","route":"workforce:work_team_create","status_code":200,"duration_ms":586}
+
+{"timestamp":"2026-11-04T21:56:36.896591+00:00","event":"http.response","request_id":"7ab9cef4-78e8-4165-a593-9dfc9f00d343","method":"GET","route":"workforce:work_team_create","status_code":200,"duration_ms":582}
+
+{"timestamp":"2026-11-04T21:56:37.847714+00:00","event":"http.response","request_id":"edd07c43-4a96-4999-a657-1e92a35c6bec","method":"GET","route":"materials:category_detail","status_code":200,"duration_ms":490}
+
+{"timestamp":"2026-11-04T21:56:38.952641+00:00","event":"http.response","request_id":"660cadcb-5ef2-4cd2-850f-b4cb41a8c112","method":"GET","route":"materials:category_detail","status_code":200,"duration_ms":508}
+
+{"timestamp":"2026-11-04T21:56:40.089132+00:00","event":"http.response","request_id":"6c41e795-0f4a-4c02-bd9b-adedea44bc56","method":"GET","route":"materials:material_detail","status_code":200,"duration_ms":652}
+
+{"timestamp":"2026-11-04T21:56:41.282196+00:00","event":"http.response","request_id":"d5cbe7a1-9e39-485f-b877-6f7fb4a8d378","method":"GET","route":"materials:material_detail","status_code":200,"duration_ms":679}
+
+{"timestamp":"2026-11-04T21:56:42.189051+00:00","event":"http.response","request_id":"aaad2660-da7b-4748-a5cc-0191cbdd6fdf","method":"GET","route":"expenses:category_detail","status_code":200,"duration_ms":453}
+
+{"timestamp":"2026-11-04T21:56:43.168256+00:00","event":"http.response","request_id":"428ef1ae-f222-4f75-b8bc-1182cd67b88b","method":"GET","route":"expenses:category_detail","status_code":200,"duration_ms":491}
+
+{"timestamp":"2026-11-04T21:56:44.029612+00:00","event":"http.response","request_id":"3e38dd90-c963-4b81-b6bf-f3ac1ca88bcc","method":"GET","route":"materials:unit_create","status_code":200,"duration_ms":409}
+
+{"timestamp":"2026-11-04T21:56:44.606728+00:00","event":"http.response","request_id":"a778f72a-7a75-4a2e-b014-e09743cb37e6","method":"POST","route":"materials:unit_create","status_code":200,"duration_ms":395}
+
+{"timestamp":"2026-11-04T21:56:45.391156+00:00","event":"http.response","request_id":"671dbaa0-6b79-48b9-8749-c41fb6c57740","method":"GET","route":"materials:unit_create","status_code":200,"duration_ms":387}
+
+{"timestamp":"2026-11-04T21:56:46.057688+00:00","event":"http.response","request_id":"ff9ed73a-3d48-43e4-9635-ce1353892bdb","method":"GET","route":"materials:unit_list","status_code":200,"duration_ms":478}
+
+{"timestamp":"2026-11-04T21:56:47.160980+00:00","event":"http.response","request_id":"6caa5862-503b-4440-86d9-fb723ccf2d6f","method":"POST","route":"materials:unit_create","status_code":200,"duration_ms":283}
+
+{"timestamp":"2026-11-04T21:56:47.272015+00:00","event":"http.response","request_id":"dd70bbb4-23a0-4300-9a50-a3c31f304b41","method":"POST","route":"materials:unit_create","status_code":302,"duration_ms":109}
+
+{"timestamp":"2026-11-04T21:56:47.504609+00:00","event":"http.response","request_id":"ef7aa6be-5964-4eb0-bf84-8c0ccff03edb","method":"GET","route":"materials:unit_list","status_code":200,"duration_ms":233}
+
+{"timestamp":"2026-11-04T21:56:47.741163+00:00","event":"http.response","request_id":"7827d926-ddda-4b1a-b577-4166d32e4bcd","method":"POST","route":"materials:category_create","status_code":200,"duration_ms":232}
+
+{"timestamp":"2026-11-04T21:56:47.816277+00:00","event":"http.response","request_id":"83262543-bfea-4acc-9638-681b79f5c48e","method":"POST","route":"materials:category_create","status_code":302,"duration_ms":78}
+
+{"timestamp":"2026-11-04T21:56:48.113489+00:00","event":"http.response","request_id":"e7600f5a-d949-4c87-a649-d071a1e3a252","method":"GET","route":"materials:category_list","status_code":200,"duration_ms":293}
+
+{"timestamp":"2026-11-04T21:56:48.319231+00:00","event":"http.response","request_id":"67c4ee4f-c2e5-4af0-9ed3-6036543b18e3","method":"POST","route":"materials:material_create","status_code":200,"duration_ms":204}
+
+{"timestamp":"2026-11-04T21:56:48.407877+00:00","event":"http.response","request_id":"7ae89e29-884b-4171-a2e3-bd36080d8167","method":"POST","route":"materials:material_create","status_code":302,"duration_ms":87}
+
+{"timestamp":"2026-11-04T21:56:48.704051+00:00","event":"http.response","request_id":"7b15b4ed-0158-42a9-b11b-8015d64444a5","method":"GET","route":"materials:material_list","status_code":200,"duration_ms":296}
+
+{"timestamp":"2026-11-04T21:56:48.930249+00:00","event":"http.response","request_id":"77514f50-c595-4be2-8627-50a3e9024d46","method":"POST","route":"expenses:category_create","status_code":200,"duration_ms":224}
+
+{"timestamp":"2026-11-04T21:56:49.038792+00:00","event":"http.response","request_id":"e39cb699-ec88-4047-9b6c-fd3a53855b2b","method":"POST","route":"expenses:category_create","status_code":302,"duration_ms":105}
+
+{"timestamp":"2026-11-04T21:56:49.315959+00:00","event":"http.response","request_id":"d05aeaa8-8ff1-4d19-ab8f-6345bbdb77f5","method":"GET","route":"expenses:category_list","status_code":200,"duration_ms":281}
+
+{"timestamp":"2026-11-04T21:56:49.577271+00:00","event":"http.response","request_id":"9dfa0b05-a83d-4c87-9e3d-9e7ed4033d8e","method":"POST","route":"parties:create","status_code":400,"duration_ms":256}
+
+{"timestamp":"2026-11-04T21:56:49.737362+00:00","event":"http.response","request_id":"73f51ff5-57f3-4c15-a357-7735e59a990a","method":"POST","route":"parties:create","status_code":302,"duration_ms":159}
+
+{"timestamp":"2026-11-04T21:56:50.265721+00:00","event":"http.response","request_id":"150c2dc5-ae29-48e1-9470-3b835ff189d2","method":"GET","route":"parties:list","status_code":200,"duration_ms":526}
+
+{"timestamp":"2026-11-04T21:56:50.549345+00:00","event":"http.response","request_id":"2a327641-d9ac-480e-9ba7-2be60ae18397","method":"POST","route":"projects:create","status_code":200,"duration_ms":280}
+
+{"timestamp":"2026-11-04T21:56:50.637938+00:00","event":"http.response","request_id":"cd8b97c3-bd9c-44cf-8775-a271a15bd3ee","method":"POST","route":"projects:create","status_code":302,"duration_ms":87}
+
+{"timestamp":"2026-11-04T21:56:51.038806+00:00","event":"http.response","request_id":"5ef8f886-355e-4185-b930-4dc31b92a599","method":"GET","route":"projects:list","status_code":200,"duration_ms":399}
+
+{"timestamp":"2026-11-04T21:56:51.305043+00:00","event":"http.response","request_id":"de596d41-2a07-4c77-acbd-92e6a5ddcebb","method":"POST","route":"projects:site_create","status_code":200,"duration_ms":268}
+
+{"timestamp":"2026-11-04T21:56:51.421748+00:00","event":"http.response","request_id":"b23569a2-eae1-4d54-af4c-cefe02e2644a","method":"POST","route":"projects:site_create","status_code":302,"duration_ms":116}
+
+{"timestamp":"2026-11-04T21:56:51.734917+00:00","event":"http.response","request_id":"d50c2c7e-debf-4984-9013-e88b9a574678","method":"GET","route":"projects:site_list","status_code":200,"duration_ms":313}
+
+{"timestamp":"2026-11-04T21:56:52.040247+00:00","event":"http.response","request_id":"2a7c0962-1481-4e93-8e8d-714cef31aa88","method":"POST","route":"projects:phase_create","status_code":200,"duration_ms":301}
+
+{"timestamp":"2026-11-04T21:56:52.188761+00:00","event":"http.response","request_id":"84250dff-fa42-400f-92c9-8a3089a070ce","method":"POST","route":"projects:phase_create","status_code":302,"duration_ms":146}
+
+{"timestamp":"2026-11-04T21:56:52.682650+00:00","event":"http.response","request_id":"29855868-b032-438b-b0e6-ca70b78be924","method":"GET","route":"projects:phase_list","status_code":200,"duration_ms":493}
+
+{"timestamp":"2026-11-04T21:56:52.922679+00:00","event":"http.response","request_id":"0a263b86-0db6-4c88-a19d-8b8ecf2fc96f","method":"POST","route":"equipment:create","status_code":200,"duration_ms":238}
+
+{"timestamp":"2026-11-04T21:56:53.022123+00:00","event":"http.response","request_id":"83da2a3f-2c7b-4739-8468-229ab7e38267","method":"POST","route":"equipment:create","status_code":302,"duration_ms":98}
+
+{"timestamp":"2026-11-04T21:56:53.282967+00:00","event":"http.response","request_id":"d3a0195b-531e-4cc4-b725-40a985275c7f","method":"GET","route":"equipment:list","status_code":200,"duration_ms":262}
+
+{"timestamp":"2026-11-04T21:56:53.633519+00:00","event":"http.response","request_id":"cb964cf0-bdad-48f9-be91-dd4cb3bbec22","method":"POST","route":"workforce:work_team_create","status_code":200,"duration_ms":348}
+
+{"timestamp":"2026-11-04T21:56:53.712694+00:00","event":"http.response","request_id":"447824a7-948a-40e3-a02e-da066c804527","method":"POST","route":"workforce:work_team_create","status_code":302,"duration_ms":75}
+
+{"timestamp":"2026-11-04T21:56:54.154579+00:00","event":"http.response","request_id":"894f0441-6323-42df-b25a-4c8b14825d34","method":"GET","route":"workforce:work_team_list","status_code":200,"duration_ms":441}
+
+{"timestamp":"2026-11-04T21:56:54.416937+00:00","event":"http.response","request_id":"93b6a4b7-9b15-4396-a792-28f16eef29cb","method":"POST","route":"materials:category_detail","status_code":200,"duration_ms":262}
+
+{"timestamp":"2026-11-04T21:56:54.492982+00:00","event":"http.response","request_id":"614df0ac-a260-494c-a87b-2e6e83c1fa85","method":"POST","route":"materials:category_detail","status_code":302,"duration_ms":74}
+
+{"timestamp":"2026-11-04T21:56:54.822293+00:00","event":"http.response","request_id":"464eb5df-d939-4d51-a0df-cc024670fdaa","method":"GET","route":"materials:category_list","status_code":200,"duration_ms":332}
+
+{"timestamp":"2026-11-04T21:56:55.244582+00:00","event":"http.response","request_id":"a7f11c1b-47da-4686-b01f-9119ba536218","method":"POST","route":"materials:material_detail","status_code":200,"duration_ms":416}
+
+{"timestamp":"2026-11-04T21:56:55.358419+00:00","event":"http.response","request_id":"6d7ff291-fb1a-4139-be29-5159e4f357da","method":"POST","route":"materials:material_detail","status_code":302,"duration_ms":112}
+
+{"timestamp":"2026-11-04T21:56:55.626133+00:00","event":"http.response","request_id":"b7db0332-6e05-4536-951a-a061a416d02c","method":"GET","route":"materials:material_list","status_code":200,"duration_ms":266}
+
+{"timestamp":"2026-11-04T21:56:55.895590+00:00","event":"http.response","request_id":"286e5519-af0d-4cef-af11-5dd144011c5e","method":"POST","route":"expenses:category_detail","status_code":200,"duration_ms":269}
+
+{"timestamp":"2026-11-04T21:56:55.992584+00:00","event":"http.response","request_id":"438af8b2-3c6c-487a-85a2-33ed65cc5b98","method":"POST","route":"expenses:category_detail","status_code":302,"duration_ms":100}
+
+{"timestamp":"2026-11-04T21:56:56.309692+00:00","event":"http.response","request_id":"7adb1a67-4613-4ae6-80fe-e8df96c1ec60","method":"GET","route":"expenses:category_list","status_code":200,"duration_ms":315}
+
+{"timestamp":"2026-11-04T21:56:57.721749+00:00","event":"http.response","request_id":"2b642812-0fb5-48b7-b090-ee6947896a86","method":"GET","route":"materials:unit_create","status_code":200,"duration_ms":497}
+
+{"timestamp":"2026-11-04T21:56:58.398330+00:00","event":"http.response","request_id":"2f141f68-197e-4530-82c1-4f14683723cc","method":"GET","route":null,"status_code":404,"duration_ms":439}
+
+{"timestamp":"2026-11-04T21:56:58.534724+00:00","event":"http.response","request_id":"efa64863-c260-4a24-9b4d-bbed9e2da233","method":"POST","route":"materials:unit_create","status_code":200,"duration_ms":508}
+
+{"timestamp":"2026-11-04T21:56:59.119255+00:00","event":"http.response","request_id":"60a2c151-8087-4f58-8125-b2379040a507","method":"GET","route":"materials:unit_list","status_code":200,"duration_ms":426}
+
+{"timestamp":"2026-11-04T21:56:59.506418+00:00","event":"http.response","request_id":"a9921500-4233-4e12-8aae-15551fd615de","method":"POST","route":"materials:unit_create","status_code":302,"duration_ms":198}
+
+{"timestamp":"2026-11-04T21:57:00.147574+00:00","event":"http.response","request_id":"97a868ee-e10a-4556-9065-14ef210e1767","method":"GET","route":"materials:unit_list","status_code":200,"duration_ms":636}
+
+{"timestamp":"2026-11-04T21:57:00.885707+00:00","event":"http.response","request_id":"7bac6dd1-27c8-47c8-881b-eafccb56d18c","method":"GET","route":"materials:category_create","status_code":200,"duration_ms":412}
+
+{"timestamp":"2026-11-04T21:57:01.394651+00:00","event":"http.response","request_id":"fd9113d1-f1f4-418e-9962-701abd438b60","method":"POST","route":"materials:category_create","status_code":200,"duration_ms":373}
+
+{"timestamp":"2026-11-04T21:57:01.973701+00:00","event":"http.response","request_id":"f79af4b5-5042-47e6-97b8-0e0fb34da1ce","method":"GET","route":"materials:category_list","status_code":200,"duration_ms":453}
+
+{"timestamp":"2026-11-04T21:57:02.359243+00:00","event":"http.response","request_id":"d74d3bc7-d3c7-4801-ba6c-8b6d58b7f262","method":"POST","route":"materials:category_create","status_code":302,"duration_ms":190}
+
+{"timestamp":"2026-11-04T21:57:02.749529+00:00","event":"http.response","request_id":"4cb77887-9a6c-4055-8305-a30e23ecb20c","method":"GET","route":"materials:category_list","status_code":200,"duration_ms":389}
+
+{"timestamp":"2026-11-04T21:57:03.481342+00:00","event":"http.response","request_id":"cf0e235f-889a-4a7c-84e5-8bc87b5bb943","method":"GET","route":"materials:material_create","status_code":200,"duration_ms":446}
+
+{"timestamp":"2026-11-04T21:57:03.942950+00:00","event":"http.response","request_id":"a66084c5-2855-422c-bc2d-f10d1f6e50da","method":"POST","route":"materials:material_create","status_code":200,"duration_ms":330}
+
+{"timestamp":"2026-11-04T21:57:04.669473+00:00","event":"http.response","request_id":"b58830e4-4898-4f33-8ef1-35f6d8946c77","method":"GET","route":"materials:material_list","status_code":200,"duration_ms":577}
+
+{"timestamp":"2026-11-04T21:57:05.068766+00:00","event":"http.response","request_id":"e2c6e661-7c71-4354-a723-3e7523075720","method":"POST","route":"materials:material_create","status_code":302,"duration_ms":208}
+
+{"timestamp":"2026-11-04T21:57:05.634803+00:00","event":"http.response","request_id":"e0dc43d0-cbba-454b-8a78-c7b341bcf139","method":"GET","route":"materials:material_detail","status_code":200,"duration_ms":558}
+
+{"timestamp":"2026-11-04T21:57:06.347852+00:00","event":"http.response","request_id":"de6578d2-f583-4ed5-91a2-79e8000c628b","method":"GET","route":"expenses:category_create","status_code":200,"duration_ms":402}
+
+{"timestamp":"2026-11-04T21:57:06.781024+00:00","event":"http.response","request_id":"d4cb4e7c-dc16-4ff5-9390-fed3278b82ac","method":"POST","route":"expenses:category_create","status_code":200,"duration_ms":297}
+
+{"timestamp":"2026-11-04T21:57:07.467520+00:00","event":"http.response","request_id":"069b549b-cb84-4174-a57d-b8dd1e810b3b","method":"GET","route":"expenses:category_list","status_code":200,"duration_ms":440}
+
+{"timestamp":"2026-11-04T21:57:08.073010+00:00","event":"http.response","request_id":"d3557de4-ccde-45fe-b971-0817b1ec2cc9","method":"POST","route":"expenses:category_create","status_code":302,"duration_ms":254}
+
+{"timestamp":"2026-11-04T21:57:08.523950+00:00","event":"http.response","request_id":"84147fcb-8ff0-4000-b49c-0516826c7ff3","method":"GET","route":"expenses:category_list","status_code":200,"duration_ms":448}
+
+{"timestamp":"2026-11-04T21:57:09.148759+00:00","event":"http.response","request_id":"a3cae501-ceb1-4011-a7d3-3bbb6b0fd1a7","method":"GET","route":"parties:create","status_code":200,"duration_ms":339}
+
+{"timestamp":"2026-11-04T21:57:09.681907+00:00","event":"http.response","request_id":"881f27d3-87ac-487b-8e3d-7ad2c01fa02e","method":"POST","route":"parties:create","status_code":400,"duration_ms":391}
+
+{"timestamp":"2026-11-04T21:57:10.266789+00:00","event":"http.response","request_id":"0ee4bc5d-8eb2-4f2b-84a4-38961c2a45d3","method":"GET","route":"parties:list","status_code":200,"duration_ms":447}
+
+[05/Nov/2026 01:27:32,225] - Broken pipe from ('127.0.0.1', 62442)
+
+[05/Nov/2026 01:27:32,239] - Broken pipe from ('127.0.0.1', 51557)
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Bad Request: /parties/create/
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Bad Request: /parties/create/
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 62442)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 51557)
+=========================== short test summary info ===========================
+FAILED tests/test_compact_form_rollout.py::CompactFormRolloutTests::test_migrated_forms
+1 failed, 1 passed, 17 subtests passed in 216.97s (0:03:36)

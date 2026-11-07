@@ -571,9 +571,9 @@ class MVP02SelectorTests(TestCase):
                 self.assertNotIn("workforce:assignment_list", routes)
                 self.assertIn("workforce:field_list", routes)
                 markup = WorkforceNavigationMarkup(response.content.decode())
-                self.assertEqual(len(markup.internal_links), 3)
+                self.assertEqual(len(markup.internal_links), 2)
                 self.assertEqual(
-                    {href.split("?")[0] for href in markup.internal_links}, set(paths)
+                    {href.split("?")[0] for href in markup.internal_links}, set(paths) - {path}
                 )
                 self.assertNotIn(
                     reverse("workforce:assignment_list"), markup.primary_links
@@ -590,7 +590,7 @@ class MVP02SelectorTests(TestCase):
                     if path == paths[1]:
                         labels.append("تخصیص نیرو به پروژه و کارگاه")
                         self.assertInHTML(
-                            '<a class="transition hover:text-blue-700" href="'
+                            '<a class="min-w-0 break-words transition hover:text-blue-700" href="'
                             + paths[0]
                             + '">نیروهای کار</a>',
                             breadcrumb,
@@ -599,7 +599,7 @@ class MVP02SelectorTests(TestCase):
                     self.assertEqual(positions, sorted(positions))
                     self.assertIn('href="/#home-operations"', breadcrumb)
                     self.assertInHTML(
-                        '<span class="text-slate-600" aria-current="page">'
+                        '<span class="min-w-0 break-words text-slate-600" aria-current="page">'
                         + labels[-1]
                         + "</span>",
                         breadcrumb,
@@ -645,16 +645,18 @@ class MVP02SelectorTests(TestCase):
 
     def assert_persistent_workforce_tabs(self, response):
         html = response.content.decode()
-        self.assertEqual(html.count("data-workforce-header"), 1)
+        work_team_list = response.wsgi_request.resolver_match.url_name == "work_team_list"
+        self.assertEqual(html.count("data-workforce-header"), 0 if work_team_list else 1)
         self.assertEqual(html.count("data-workforce-navigation"), 1)
-        self.assertRegex(html, r"(?s)</header>\s*<nav[^>]*data-workforce-navigation")
+        if not work_team_list:
+            self.assertRegex(html, r"(?s)</header>\s*<nav[^>]*data-workforce-navigation")
         tabs = html.split("data-workforce-navigation>", 1)[1].split("</nav>", 1)[0]
         labels = ["نیروها", "تخصیص به پروژه و کارگاه", "گروه‌های کاری"]
         self.assertEqual(
             [tabs.index(label) for label in labels],
             sorted(tabs.index(label) for label in labels),
         )
-        self.assertEqual(tabs.count('aria-current="page"'), 1)
+        self.assertEqual(tabs.count("aria-current="), 1)
         header = html.split('aria-labelledby="erp-page-title">', 1)[1].split(
             "</header>", 1
         )[0]
@@ -707,7 +709,7 @@ class MVP02SelectorTests(TestCase):
             .split("</nav>", 1)[0]
         )
         self.assertInHTML(
-            '<a class="transition hover:text-blue-700" href="'
+            '<a class="min-w-0 break-words transition hover:text-blue-700" href="'
             + reverse("workforce:field_list")
             + "?"
             + urlsplit(url).query.replace("&", "&amp;")
@@ -779,7 +781,8 @@ class MVP02SelectorTests(TestCase):
         response = self.client.get(reverse("workforce:field_list"))
         self.assertEqual(response.status_code, 200)
         links = WorkforceNavigationMarkup(response.content.decode()).internal_links
-        self.assertEqual(links, [reverse("workforce:field_list")])
+        self.assertEqual(links, [])
+        self.assertContains(response, 'aria-current="page">نیروها</span>')
         self.assertEqual(
             self.client.get(reverse("workforce:assignment_list")).status_code, 403
         )
@@ -802,7 +805,7 @@ class MVP02SelectorTests(TestCase):
             .split('aria-label="مسیر صفحه">', 1)[1]
             .split("</nav>", 1)[0]
         )
-        self.assertInHTML("<span>نیروهای کار</span>", breadcrumb)
+        self.assertInHTML('<span class="min-w-0 break-words">نیروهای کار</span>', breadcrumb)
         self.assertNotIn('href="' + reverse("workforce:field_list") + '"', breadcrumb)
         self.assertNotIn('href="/#home-operations"', breadcrumb)
 

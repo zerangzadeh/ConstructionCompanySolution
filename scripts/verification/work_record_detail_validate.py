@@ -98,7 +98,7 @@ class WorkDetailVisualChecks(JourneyFixture, StaticLiveServerTestCase):
                 "status": 200,
                 "steps": [
                     {
-                        "clickSelector": ".measurement-detail-heading > a",
+                        "clickSelector": '.measurement-detail-heading nav a[href*="line_key="]',
                         "afterPath": reverse("billing:progress_list"),
                     },
                     {

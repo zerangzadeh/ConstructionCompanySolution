@@ -1,0 +1,675 @@
+[
+  {
+    "route": "organizations:account_create",
+    "path": "/organizations/members/accounts/create/",
+    "view": "apps.organizations.views.organization_account_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Identity and membership administration or the global context POST endpoint."
+  },
+  {
+    "route": "organizations:member_update",
+    "path": "/organizations/members/<uuid:membership_id>/edit/",
+    "view": "apps.organizations.views.update_member",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Identity and membership administration or the global context POST endpoint."
+  },
+  {
+    "route": "organizations:update_context",
+    "path": "/organizations/context/",
+    "view": "apps.organizations.views.update_context",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Identity and membership administration or the global context POST endpoint."
+  },
+  {
+    "route": "parties:create",
+    "path": "/parties/create/",
+    "view": "apps.parties.views.party_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "parties:role_create",
+    "path": "/parties/<uuid:party_id>/roles/",
+    "view": "apps.parties.views.party_role_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Role/contact commands inside the existing party governance record."
+  },
+  {
+    "route": "parties:contact_create",
+    "path": "/parties/<uuid:party_id>/contacts/",
+    "view": "apps.parties.views.party_contact_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Role/contact commands inside the existing party governance record."
+  },
+  {
+    "route": "materials:material_create",
+    "path": "/materials/create/",
+    "view": "apps.materials.views.material_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "materials:category_create",
+    "path": "/materials/categories/create/",
+    "view": "apps.materials.views.category_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "materials:unit_create",
+    "path": "/materials/units/create/",
+    "view": "apps.materials.views.unit_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "projects:create",
+    "path": "/projects/create/",
+    "view": "apps.projects.views.project_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "projects:photo_add",
+    "path": "/projects/<uuid:project_id>/gallery/add/",
+    "view": "apps.projects.views.project_photo_add",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Gallery uploads and WBS/activity controls within the project workbench."
+  },
+  {
+    "route": "projects:wbs_create",
+    "path": "/projects/<uuid:project_id>/controls/wbs/",
+    "view": "apps.projects.views.wbs_node_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Gallery uploads and WBS/activity controls within the project workbench."
+  },
+  {
+    "route": "projects:activity_create",
+    "path": "/projects/<uuid:project_id>/controls/activities/",
+    "view": "apps.projects.views.activity_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Gallery uploads and WBS/activity controls within the project workbench."
+  },
+  {
+    "route": "projects:site_create",
+    "path": "/projects/<uuid:project_id>/sites/create/",
+    "view": "apps.projects.views.project_site_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "projects:phase_create",
+    "path": "/projects/<uuid:project_id>/sites/<uuid:site_id>/phases/create/",
+    "view": "apps.projects.views.project_phase_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "contracts:create",
+    "path": "/contracts/create/",
+    "view": "apps.contracts.views.contract_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Separate Contract Create reference or contractual revision/source-document workspace."
+  },
+  {
+    "route": "contracts:contractual_create",
+    "path": "/contracts/contractual-records/create/",
+    "view": "apps.contracts.views.contractual_record_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Separate Contract Create reference or contractual revision/source-document workspace."
+  },
+  {
+    "route": "billing:claim_create",
+    "path": "/billing/claims/new/",
+    "view": "apps.billing.journey_views.claim_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial certificate, measurement, guarantee, compliance or claim workspace with source and lifecycle contracts."
+  },
+  {
+    "route": "billing:taxpayer_invoice_create",
+    "path": "/billing/taxpayer-invoices/new/",
+    "view": "apps.billing.views.taxpayer_invoice_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial certificate, measurement, guarantee, compliance or claim workspace with source and lifecycle contracts."
+  },
+  {
+    "route": "billing:contractor_compliance_create",
+    "path": "/billing/contractor-compliance/new/",
+    "view": "apps.billing.views.contractor_compliance_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial certificate, measurement, guarantee, compliance or claim workspace with source and lifecycle contracts."
+  },
+  {
+    "route": "billing:guarantee_create",
+    "path": "/billing/guarantees/new/",
+    "view": "apps.billing.views.guarantee_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial certificate, measurement, guarantee, compliance or claim workspace with source and lifecycle contracts."
+  },
+  {
+    "route": "billing:compliance_evidence_create",
+    "path": "/billing/compliance-evidence/new/",
+    "view": "apps.billing.views.compliance_evidence_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial certificate, measurement, guarantee, compliance or claim workspace with source and lifecycle contracts."
+  },
+  {
+    "route": "billing:retention_release_create",
+    "path": "/billing/retention-releases/new/",
+    "view": "apps.billing.views.retention_release_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial certificate, measurement, guarantee, compliance or claim workspace with source and lifecycle contracts."
+  },
+  {
+    "route": "billing:payable_certificate_create",
+    "path": "/billing/payable-certificates/new/",
+    "view": "apps.billing.views.payable_certificate_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial certificate, measurement, guarantee, compliance or claim workspace with source and lifecycle contracts."
+  },
+  {
+    "route": "billing:payable_measurement_create",
+    "path": "/billing/payable-measurements/new/",
+    "view": "apps.billing.views.payable_measurement_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial certificate, measurement, guarantee, compliance or claim workspace with source and lifecycle contracts."
+  },
+  {
+    "route": "estimates:create",
+    "path": "/estimates/create/",
+    "view": "apps.estimates.views.estimate_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Separate estimate reference with inherited parents and estimate-specific layout."
+  },
+  {
+    "route": "expenses:create",
+    "path": "/expenses/create/",
+    "view": "apps.expenses.views.expense_create",
+    "disposition": "Sectioned Form migrated",
+    "reason": "Standalone Create form with multiple logical field groups."
+  },
+  {
+    "route": "expenses:draft_create",
+    "path": "/expenses/draft/create/",
+    "view": "apps.expenses.views.expense_draft_create",
+    "disposition": "Sectioned Form migrated",
+    "reason": "Standalone Create form with multiple logical field groups."
+  },
+  {
+    "route": "expenses:category_create",
+    "path": "/expenses/categories/create/",
+    "view": "apps.expenses.views.expense_category_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "documents:evidence-register",
+    "path": "/documents/evidence/<slug:kind>/<uuid:source_id>/register/",
+    "view": "apps.documents.evidence_views.evidence_register",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "DMS upload, version, evidence-registration or typed-link workflow."
+  },
+  {
+    "route": "documents:version-add",
+    "path": "/documents/<uuid:document_id>/versions/add/",
+    "view": "apps.documents.views.document_version_add",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "DMS upload, version, evidence-registration or typed-link workflow."
+  },
+  {
+    "route": "documents:link-add",
+    "path": "/documents/<uuid:document_id>/links/add/",
+    "view": "apps.documents.views.document_link_add",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "DMS upload, version, evidence-registration or typed-link workflow."
+  },
+  {
+    "route": "daily_reports:field_observation_create",
+    "path": "/daily-reports/field/create/",
+    "view": "apps.daily_reports.field_views.field_observation_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Field capture/evidence/proposal workflow or inline detail-entry commands."
+  },
+  {
+    "route": "daily_reports:field_observation_evidence_add",
+    "path": "/daily-reports/field/<uuid:observation_id>/evidence/",
+    "view": "apps.daily_reports.field_views.field_observation_evidence_add",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Field capture/evidence/proposal workflow or inline detail-entry commands."
+  },
+  {
+    "route": "daily_reports:field_proposal_create",
+    "path": "/daily-reports/field/<uuid:observation_id>/proposals/create/",
+    "view": "apps.daily_reports.field_views.field_proposal_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Field capture/evidence/proposal workflow or inline detail-entry commands."
+  },
+  {
+    "route": "daily_reports:create",
+    "path": "/daily-reports/create/",
+    "view": "apps.daily_reports.views.daily_report_create",
+    "disposition": "Sectioned Form migrated",
+    "reason": "Standalone Create form with multiple logical field groups."
+  },
+  {
+    "route": "daily_reports:labor_add",
+    "path": "/daily-reports/<uuid:report_id>/labor/",
+    "view": "apps.daily_reports.views.daily_report_labor_add",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Field capture/evidence/proposal workflow or inline detail-entry commands."
+  },
+  {
+    "route": "daily_reports:equipment_add",
+    "path": "/daily-reports/<uuid:report_id>/equipment/",
+    "view": "apps.daily_reports.views.daily_report_equipment_add",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Field capture/evidence/proposal workflow or inline detail-entry commands."
+  },
+  {
+    "route": "daily_reports:material_add",
+    "path": "/daily-reports/<uuid:report_id>/materials/",
+    "view": "apps.daily_reports.views.daily_report_material_add",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Field capture/evidence/proposal workflow or inline detail-entry commands."
+  },
+  {
+    "route": "daily_reports:activity_add",
+    "path": "/daily-reports/<uuid:report_id>/activities/",
+    "view": "apps.daily_reports.views.daily_activity_add",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Field capture/evidence/proposal workflow or inline detail-entry commands."
+  },
+  {
+    "route": "daily_reports:delay_add",
+    "path": "/daily-reports/<uuid:report_id>/delays/",
+    "view": "apps.daily_reports.views.delay_event_add",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Field capture/evidence/proposal workflow or inline detail-entry commands."
+  },
+  {
+    "route": "workforce:field_create",
+    "path": "/workforce/field/new/",
+    "view": "apps.workforce.field_views.create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Conditional workforce identity registration, profile image or contextual assignment flow with its existing sections."
+  },
+  {
+    "route": "workforce:field_edit",
+    "path": "/workforce/field/<uuid:employee_id>/edit/",
+    "view": "apps.workforce.field_views.edit",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Conditional workforce identity registration, profile image or contextual assignment flow with its existing sections."
+  },
+  {
+    "route": "workforce:employee_create",
+    "path": "/workforce/employees/create/",
+    "view": "apps.workforce.views.employee_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Conditional workforce identity registration, profile image or contextual assignment flow with its existing sections."
+  },
+  {
+    "route": "workforce:employee_profile_image_update",
+    "path": "/workforce/employees/<uuid:employee_id>/profile-image/update/",
+    "view": "apps.workforce.views.employee_profile_image_update",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Conditional workforce identity registration, profile image or contextual assignment flow with its existing sections."
+  },
+  {
+    "route": "workforce:work_team_create",
+    "path": "/workforce/teams/create/",
+    "view": "apps.workforce.views.work_team_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "workforce:assignment_create",
+    "path": "/workforce/assignments/create/",
+    "view": "apps.workforce.views.assignment_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Conditional workforce identity registration, profile image or contextual assignment flow with its existing sections."
+  },
+  {
+    "route": "timekeeping:calendar_create",
+    "path": "/timekeeping/calendars/new/",
+    "view": "apps.timekeeping.views.calendar_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "timekeeping:holiday_create",
+    "path": "/timekeeping/holidays/new/",
+    "view": "apps.timekeeping.views.holiday_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "timekeeping:shift_create",
+    "path": "/timekeeping/shifts/new/",
+    "view": "apps.timekeeping.views.shift_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "timekeeping:shift_break_create",
+    "path": "/timekeeping/shift-breaks/new/",
+    "view": "apps.timekeeping.views.shift_break_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "timekeeping:attendance_create",
+    "path": "/timekeeping/attendance/new/",
+    "view": "apps.timekeeping.views.attendance_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Attendance, correction, leave/mission, overtime or timesheet operational workflow."
+  },
+  {
+    "route": "timekeeping:attendance_correction_create",
+    "path": "/timekeeping/attendance/<uuid:record_id>/corrections/new/",
+    "view": "apps.timekeeping.views.attendance_correction_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Attendance, correction, leave/mission, overtime or timesheet operational workflow."
+  },
+  {
+    "route": "timekeeping:leave_mission_create",
+    "path": "/timekeeping/leave-mission/new/",
+    "view": "apps.timekeeping.views.leave_mission_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Attendance, correction, leave/mission, overtime or timesheet operational workflow."
+  },
+  {
+    "route": "timekeeping:overtime_create",
+    "path": "/timekeeping/overtime/new/",
+    "view": "apps.timekeeping.views.overtime_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Attendance, correction, leave/mission, overtime or timesheet operational workflow."
+  },
+  {
+    "route": "timekeeping:timesheet_create",
+    "path": "/timekeeping/timesheets/new/",
+    "view": "apps.timekeeping.views.timesheet_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Attendance, correction, leave/mission, overtime or timesheet operational workflow."
+  },
+  {
+    "route": "procurement:rfq_addendum",
+    "path": "/procurement/rfqs/<uuid:rfq_id>/addendum/",
+    "view": "apps.procurement.commercial_scope_views.rfq_addendum",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Versioned procurement, line-item or commercial-source workspace."
+  },
+  {
+    "route": "procurement:rfq_create",
+    "path": "/procurement/rfqs/create/",
+    "view": "apps.procurement.rfq_workspace.rfq_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Versioned procurement, line-item or commercial-source workspace."
+  },
+  {
+    "route": "procurement:rfq_line_add",
+    "path": "/procurement/rfqs/<uuid:rfq_id>/lines/",
+    "view": "apps.procurement.rfq_workspace.rfq_line_add",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Versioned procurement, line-item or commercial-source workspace."
+  },
+  {
+    "route": "procurement:request_create",
+    "path": "/procurement/requests/create/",
+    "view": "apps.procurement.views.purchase_request_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Versioned procurement, line-item or commercial-source workspace."
+  },
+  {
+    "route": "procurement:request_item_add",
+    "path": "/procurement/requests/<uuid:request_id>/items/",
+    "view": "apps.procurement.views.purchase_request_item_add",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Versioned procurement, line-item or commercial-source workspace."
+  },
+  {
+    "route": "procurement:order_create",
+    "path": "/procurement/orders/create/",
+    "view": "apps.procurement.views.purchase_order_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Versioned procurement, line-item or commercial-source workspace."
+  },
+  {
+    "route": "procurement:order_item_add",
+    "path": "/procurement/orders/<uuid:order_id>/items/",
+    "view": "apps.procurement.order_workspace.order_item_add",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Versioned procurement, line-item or commercial-source workspace."
+  },
+  {
+    "route": "procurement:receipt_create",
+    "path": "/procurement/receipts/create/",
+    "view": "apps.procurement.receipt_workspace.receipt_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Versioned procurement, line-item or commercial-source workspace."
+  },
+  {
+    "route": "procurement:receipt_item_add",
+    "path": "/procurement/receipts/<uuid:receipt_id>/items/",
+    "view": "apps.procurement.receipt_workspace.receipt_item_add",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Versioned procurement, line-item or commercial-source workspace."
+  },
+  {
+    "route": "inventory:reservation_create",
+    "path": "/inventory/custody/reservations/new/",
+    "view": "apps.inventory.p8_views.reservation_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Stock movement, custody, count or transfer workflow with quantity authority."
+  },
+  {
+    "route": "inventory:count_create",
+    "path": "/inventory/custody/counts/new/",
+    "view": "apps.inventory.p8_views.count_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Stock movement, custody, count or transfer workflow with quantity authority."
+  },
+  {
+    "route": "inventory:transfer_create",
+    "path": "/inventory/custody/transfers/new/",
+    "view": "apps.inventory.p8_views.transfer_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Stock movement, custody, count or transfer workflow with quantity authority."
+  },
+  {
+    "route": "inventory:warehouse_create",
+    "path": "/inventory/create/",
+    "view": "apps.inventory.views.warehouse_create",
+    "disposition": "Compact reference retained",
+    "reason": "Existing Product Owner-approved implementation."
+  },
+  {
+    "route": "inventory:transaction_create",
+    "path": "/inventory/transactions/create/",
+    "view": "apps.inventory.journey_views.transaction_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Stock movement, custody, count or transfer workflow with quantity authority."
+  },
+  {
+    "route": "equipment:create",
+    "path": "/equipment/create/",
+    "view": "apps.equipment.views.equipment_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "equipment:assignment_create",
+    "path": "/equipment/assignments/create/",
+    "view": "apps.equipment.views.assignment_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "equipment:maintenance_create",
+    "path": "/equipment/maintenance/create/",
+    "view": "apps.equipment.views.maintenance_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial proposal/handoff/reversal, multi-source maintenance record, or linked work-order evidence/spare command."
+  },
+  {
+    "route": "equipment:cost_policy_create",
+    "path": "/equipment/cost/policies/create/",
+    "view": "apps.equipment.views.cost_policy_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial proposal/handoff/reversal, multi-source maintenance record, or linked work-order evidence/spare command."
+  },
+  {
+    "route": "equipment:cost_rate_create",
+    "path": "/equipment/cost/rates/create/",
+    "view": "apps.equipment.views.cost_rate_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial proposal/handoff/reversal, multi-source maintenance record, or linked work-order evidence/spare command."
+  },
+  {
+    "route": "equipment:cost_allocation_create",
+    "path": "/equipment/cost/allocations/create/",
+    "view": "apps.equipment.views.cost_allocation_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial proposal/handoff/reversal, multi-source maintenance record, or linked work-order evidence/spare command."
+  },
+  {
+    "route": "equipment:cost_handoff_create",
+    "path": "/equipment/cost/handoffs/create/",
+    "view": "apps.equipment.views.cost_handoff_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial proposal/handoff/reversal, multi-source maintenance record, or linked work-order evidence/spare command."
+  },
+  {
+    "route": "equipment:meter_reading_create",
+    "path": "/equipment/operations/meters/create/",
+    "view": "apps.equipment.views.meter_reading_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "equipment:usage_create",
+    "path": "/equipment/operations/usage/create/",
+    "view": "apps.equipment.views.usage_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "equipment:fuel_create",
+    "path": "/equipment/operations/fuel/create/",
+    "view": "apps.equipment.views.fuel_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "equipment:maintenance_plan_create",
+    "path": "/equipment/operations/plans/create/",
+    "view": "apps.equipment.views.maintenance_plan_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "equipment:work_order_create",
+    "path": "/equipment/operations/work-orders/create/",
+    "view": "apps.equipment.views.work_order_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "equipment:spare_link_create",
+    "path": "/equipment/operations/work-orders/<uuid:work_order_id>/spares/create/",
+    "view": "apps.equipment.views.spare_link_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial proposal/handoff/reversal, multi-source maintenance record, or linked work-order evidence/spare command."
+  },
+  {
+    "route": "equipment:operator_qualification_create",
+    "path": "/equipment/operations/qualifications/create/",
+    "view": "apps.equipment.views.operator_qualification_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "equipment:downtime_create",
+    "path": "/equipment/operations/downtime/create/",
+    "view": "apps.equipment.views.downtime_create",
+    "disposition": "Compact Form migrated",
+    "reason": "Standalone form with one logical record and ordinary POST actions."
+  },
+  {
+    "route": "equipment:work_order_evidence_create",
+    "path": "/equipment/operations/work-orders/<uuid:work_order_id>/evidence/",
+    "view": "apps.equipment.views.work_order_evidence_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Financial proposal/handoff/reversal, multi-source maintenance record, or linked work-order evidence/spare command."
+  },
+  {
+    "route": "safety:create",
+    "path": "/safety/create/",
+    "view": "apps.safety.views.incident_create",
+    "disposition": "Sectioned Form migrated",
+    "reason": "Standalone Create form with multiple logical field groups."
+  },
+  {
+    "route": "quality:create",
+    "path": "/quality/create/",
+    "view": "apps.quality.views.issue_create",
+    "disposition": "Sectioned Form migrated",
+    "reason": "Standalone Create form with multiple logical field groups."
+  },
+  {
+    "route": "workflows:definition_create",
+    "path": "/workflows/administration/new/",
+    "view": "apps.workflows.administration_views.definition_create",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Workflow definition/configuration and version editing."
+  },
+  {
+    "route": "workflows:version_edit",
+    "path": "/workflows/administration/versions/<uuid:version_id>/edit/",
+    "view": "apps.workflows.administration_views.version_edit",
+    "disposition": "Specialized or inline flow retained",
+    "reason": "Workflow definition/configuration and version editing."
+  },
+  {
+    "route": "materials:category_detail",
+    "path": "/materials/categories/<uuid:category_id>/",
+    "disposition": "Compact Form migrated",
+    "reason": "Existing detail route also hosts the permission-aware edit form."
+  },
+  {
+    "route": "materials:material_detail",
+    "path": "/materials/<uuid:material_id>/",
+    "disposition": "Compact Form migrated",
+    "reason": "Existing detail route also hosts the permission-aware edit form."
+  },
+  {
+    "route": "expenses:category_detail",
+    "path": "/expenses/categories/<uuid:category_id>/",
+    "disposition": "Compact Form migrated",
+    "reason": "Existing detail route also hosts the permission-aware edit form."
+  },
+  {
+    "route": "expenses:recurrences",
+    "disposition": "Specialized workspace retained",
+    "reason": "Recurring expense schedule and proposal workspace."
+  },
+  {
+    "route": "accounts:settings",
+    "disposition": "Specialized workspace retained",
+    "reason": "Profile, password and image settings with separate forms."
+  },
+  {
+    "route": "organizations:settings",
+    "disposition": "Specialized workspace retained",
+    "reason": "Tenant profile/settings workspace."
+  },
+  {
+    "route": "documents:upload",
+    "disposition": "Specialized workspace retained",
+    "reason": "Multipart document upload workflow."
+  },
+  {
+    "route": "documents:contextual-upload",
+    "disposition": "Specialized workspace retained",
+    "reason": "Typed parent document upload workflow."
+  }
+]

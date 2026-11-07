@@ -1,0 +1,7 @@
+{% load erp_format %}
+<article class="erp-dashboard-metric" data-kpi-tone="{{ metric.tone }}">
+  <div class="erp-dashboard-metric__label">{% if metric.icon %}{% include "components/form_icon.html" with icon=metric.icon only %}{% endif %}<p>{{ metric.label }}</p></div>
+  <div class="erp-dashboard-metric__value"><bdi dir="ltr">{{ metric.value|erp_number|default_if_none:"—" }}</bdi><span>{{ metric.unit }}</span></div>
+  {% if metric.note %}<small>{{ metric.note }}</small>{% endif %}
+  {% if metric.url %}<a href="{{ metric.url }}" aria-label="مشاهده {{ metric.label }}">مشاهده ←</a>{% endif %}
+</article>

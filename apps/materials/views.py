@@ -151,7 +151,30 @@ def category_list(request: HttpRequest) -> HttpResponse:
     categories = get_organization_material_categories(
         user=request.user, organization=request.organization
     ).select_related("parent")
-    return render(request, "materials/category_list.html", {"categories": categories})
+    scoped_has_records = categories.exists()
+    categories = apply_table_filters(
+        categories, request, text_fields={"q": ("code", "name")}
+    )
+    page = paginate_table(
+        categories,
+        request,
+        sort_fields={"code": "code", "name": "name", "parent": "parent__name"},
+        default_ordering=("name", "pk"),
+    )
+    return render(
+        request,
+        "materials/category_list.html",
+        {
+            "categories": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
+            "filters": build_table_filters(
+                request, [{"name": "q", "kind": "text", "label": "کد یا نام دسته‌بندی"}]
+            ),
+            "list_profile": "material_categories",
+            "scoped_has_records": scoped_has_records,
+        },
+    )
 
 
 @active_organization_required
@@ -239,6 +262,7 @@ def material_list(request: HttpRequest) -> HttpResponse:
         organization=request.organization,
         search="",
     )
+    scoped_has_records = materials.exists()
     materials = apply_table_filters(
         materials,
         request,
@@ -265,11 +289,14 @@ def material_list(request: HttpRequest) -> HttpResponse:
         "materials/material_list.html",
         {
             "materials": page.object_list,
+            "list_profile": "materials",
+            "scoped_has_records": scoped_has_records,
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [
+                    {"name": "q", "kind": "text", "label": "کد یا نام مصالح"},
                     {"name": "code", "kind": "text", "label": "کد"},
                     {"name": "name", "kind": "text", "label": "نام مصالح"},
                     None,

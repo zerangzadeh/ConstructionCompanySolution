@@ -238,6 +238,10 @@ class PolicyReviewDisposition(models.TextChoices):
 
 
 class BusinessPermissionCode(models.TextChoices):
+    PLATFORM_COMPANIES_VIEW = "platform_companies.view", "مشاهده شرکت‌های پلتفرم"
+    PLATFORM_COMPANIES_CONFIGURE = "platform_companies.configure", "تنظیم شرکت‌های پلتفرم"
+    PLATFORM_COMPANIES_CHANGE_STATUS = "platform_companies.change_status", "تغییر وضعیت شرکت‌های پلتفرم"
+    PLATFORM_COMPANIES_AUDIT_VIEW = "platform_companies.audit_view", "مشاهده فعالیت شرکت‌های پلتفرم"
     ACCOUNTING_YEAR_END_VIEW = "accounting.year_end_view", "مشاهده بستن سال مالی"
     ACCOUNTING_YEAR_END_CONFIGURE = "accounting.year_end_configure", "تنظیم حساب‌های بستن سال"
     ACCOUNTING_YEAR_END_PREPARE = "accounting.year_end_prepare", "تهیه بستن سال مالی"
@@ -910,6 +914,7 @@ class BusinessPermissionCode(models.TextChoices):
 
     DAILY_REPORTS_VIEW = "daily_reports.view", "مشاهده گزارش‌های روزانه"
     DAILY_REPORTS_CREATE = "daily_reports.create", "ثبت گزارش روزانه"
+    DAILY_REPORTS_LINK_RECORDS = "daily_reports.link_records", "ارجاع رکورد ایمنی و کیفیت در گزارش روزانه"
     DAILY_REPORTS_ADD_LABOR = (
         "daily_reports.add_labor",
         "افزودن نیروی کار به گزارش روزانه",

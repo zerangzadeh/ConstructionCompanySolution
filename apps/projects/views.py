@@ -732,7 +732,16 @@ def project_controls_comparison(request: HttpRequest, project_id: str) -> HttpRe
     return render(
         request,
         "projects/control_comparison.html",
-        {"project": project, "comparison": comparison},
+        {
+            "project": project,
+            "comparison": comparison,
+            "can_view_controls": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.PROJECT_CONTROLS_VIEW,
+                project=project,
+            ),
+        },
     )
 
 
@@ -765,6 +774,12 @@ def project_controls_exceptions(request: HttpRequest, project_id: str) -> HttpRe
             "project": project,
             "snapshot": snapshot,
             "visible_expense_ids": visible_expense_ids,
+            "can_view_controls": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.PROJECT_CONTROLS_VIEW,
+                project=project,
+            ),
         },
     )
 
@@ -967,14 +982,17 @@ def project_site_detail(
         "components/read_only_record_detail.html",
         {
             "detail_title": site.name,
+            "detail_eyebrow": "جزئیات کارگاه",
+            "detail_breadcrumb_label": "کارگاه‌ها",
+            "detail_status_code": "active" if site.is_active else "inactive",
             "field_project": site.project,
             "field_site": site,
             "back_url": reverse("projects:site_list", args=[site.project_id]),
             "detail_rows": [
-                ("کد کارگاه", site.code, "text"),
+                ("کد کارگاه", site.code, "identifier"),
                 ("پروژه", site.project.name, "text"),
                 ("نشانی", site.address, "text"),
-                ("وضعیت", "فعال" if site.is_active else "غیرفعال", "text"),
+                ("وضعیت", "فعال" if site.is_active else "غیرفعال", "status"),
             ],
         },
     )

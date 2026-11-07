@@ -10,6 +10,15 @@ from .forms import _StyledForm
 from .identity_integrity import normalize_national_id
 from .models import Employee, WorkTeam
 
+EMPTY_CHOICE_MESSAGES = {
+    "employee": "نیروی کاری در محدوده انتخاب‌شده در دسترس نیست.",
+    "project": "پروژه‌ای در دسترس نیست.",
+    "site": "کارگاهی برای پروژه انتخاب‌شده در دسترس نیست.",
+    "team": "گروه کاری فعالی در شرکت وجود ندارد.",
+    "department": "واحد سازمانی فعالی در شرکت وجود ندارد.",
+    "team_lead": "نیروی فعالی برای سرپرستی گروه در دسترس نیست.",
+}
+
 
 def page_filter_values(request):
     """Default read-only page filters from resolved global context, never persist it."""
@@ -123,6 +132,10 @@ def searchable_choices(
                 else {}
             ),
             "data-placeholder": f"جست‌وجو یا انتخاب {field.label}…",
+            **(
+                {"data-empty-choices": EMPTY_CHOICE_MESSAGES[kind]}
+                if kind in EMPTY_CHOICE_MESSAGES else {}
+            ),
             "dir": "rtl",
         }
     )
@@ -196,6 +209,7 @@ class FieldAssignmentForm(_StyledForm):
         label="مسئولیت در این پروژه/کارگاه",
         max_length=255,
         required=False,
+        widget=forms.TextInput(attrs={"autocomplete": "off"}),
         help_text="اختیاری؛ مسئولیت این تخصیص، مستقل از سمت یا حرفه نیروی کار است.",
     )
     start_date = forms.DateField(label="تاریخ شروع")

@@ -136,7 +136,7 @@ def field_breadcrumbs(
         crumbs.append(
             {
                 "label": "تخصیص نیرو به پروژه و کارگاه",
-                "url": field_context_url(context, route) if available else None,
+                "url": (context.get("assignment_list_url") or field_context_url(context, route)) if available else None,
             }
         )
     if team_parent:
@@ -156,7 +156,7 @@ def field_breadcrumbs(
 
 
 @register.inclusion_tag("workforce/_field_navigation.html", takes_context=True)
-def field_navigation(context):
+def field_navigation(context, current_as_label=False):
     """One permission-aware internal navigation for the Workforce experience."""
     request = context["request"]
     current = request.resolver_match.url_name
@@ -199,5 +199,12 @@ def field_navigation(context):
             url = reverse(route)
             if query and route != "workforce:work_team_list":
                 url += f"?{query}"
-            links.append({"url": url, "label": label, "active": current in names})
-    return {"links": links}
+            if route == "workforce:assignment_list" and context.get("assignment_list_url"):
+                url = context["assignment_list_url"]
+            links.append({
+                "url": url,
+                "label": label,
+                "active": current in names,
+                "current": request.path == reverse(route),
+            })
+    return {"links": links, "current_as_label": current_as_label}

@@ -15,7 +15,7 @@
 .erp-form-icon-tile--page { width: 3.5rem; height: 3.5rem; border-radius: 1rem; }
 .erp-form-icon-tile--page svg { width: 2rem; height: 2rem; }
 .erp-create-form { display: flex; flex-direction: column; gap: .625rem; min-width: 0; }
-.erp-form-section, .erp-form-footer { min-width: 0; border: 1px solid var(--color-border-subtle); border-radius: .875rem; background: var(--color-bg-surface); box-shadow: 0 2px 4px rgb(14 39 70 / 6%); }
+.erp-form-section, .erp-form-footer, .erp-compact-form { min-width: 0; border: 1px solid var(--color-border-subtle); border-radius: .875rem; background: var(--color-bg-surface); box-shadow: 0 2px 4px rgb(14 39 70 / 6%); }
 .erp-form-section { padding: .5rem 1.5rem .625rem; }
 .erp-form-section__header { display: flex; align-items: center; gap: .75rem; margin-bottom: .375rem; }
 .erp-form-section__header .erp-form-icon-tile { width: 2.25rem; height: 2.25rem; }
@@ -80,4 +80,31 @@ main .erp-create-form input[aria-invalid=true]:not([type=hidden]):not([type=chec
     main .erp-create-form .ts-control > input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=submit]) { min-height: 0; }
     .erp-form-footer { gap: .5rem; padding: .625rem; bottom: .375rem; }
     .erp-form-footer .erp-btn { flex: 1; min-height: 2.75rem; padding-inline: .625rem; }
+}
+
+@media (min-width: 768px) and (max-width: 1279px) {
+    .erp-list-context--fit-tablet .erp-list-context__panel { position: fixed; inset-block-start: 88px; inset-inline: auto 12px; }
+}
+
+/* Compact forms keep the section and its actions in a single surface. */
+.erp-compact-page { max-inline-size: 64rem; min-width: 0; }
+.erp-compact-page .erp-page-header { margin-block-end: 1rem; }
+.erp-compact-page .erp-page-header__copy { position: relative; padding-inline-start: 2.75rem; }
+.erp-compact-page .erp-page-header__icon { position: absolute; inset-inline-start: 0; inset-block-start: .125rem; color: var(--color-text-primary); }
+.erp-compact-page .erp-page-header__icon svg { width: 2rem; height: 2rem; }
+.erp-compact-form { --compact-inset: 1.5rem; --compact-radius: .75rem; gap: 0; border-radius: var(--compact-radius); }
+.erp-compact-form :is(.erp-form-section, .erp-form-footer) { border: 0; box-shadow: none; }
+.erp-compact-form .erp-form-section { padding: 0; }
+.erp-compact-form .erp-form-section__header { margin: 0; padding: .625rem var(--compact-inset); border-block-end: 1px solid var(--color-border-subtle); background: var(--color-bg-subtle); border-radius: var(--compact-radius) var(--compact-radius) 0 0; }
+.erp-compact-form .erp-form-section__header .erp-form-icon-tile { width: 1.5rem; height: 1.5rem; background: transparent; }
+.erp-compact-form .erp-form-section__header svg { width: 1.25rem; height: 1.25rem; }
+.erp-compact-form .erp-form-grid { gap: 1rem 1.5rem; }
+.erp-compact-form__body { display: grid; gap: 1rem; padding: 1rem var(--compact-inset); }
+.erp-compact-form textarea[rows="10"] { block-size: 5rem; }
+main .erp-compact-form input:is([type="checkbox"], [type="radio"]) { width: 1rem; min-height: 1rem; height: 1rem; padding: 0; }
+.erp-compact-form .erp-form-footer { position: static; padding: .75rem var(--compact-inset); border-block-start: 1px solid var(--color-border-subtle); border-radius: 0 0 var(--compact-radius) var(--compact-radius); background: var(--color-bg-subtle); }
+.erp-compact-form .erp-form-footer .erp-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+@media (max-width: 639px) {
+    .erp-compact-form { --compact-inset: .875rem; }
+    .erp-compact-form .erp-form-footer { flex-direction: column; align-items: stretch; }
 }

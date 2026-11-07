@@ -1,18 +1,23 @@
-{% extends "base.html" %}
-
-{% block title %}مقایسه بودجه و هزینه | سامانه مدیریت ساخت{% endblock %}
-
+{% extends "base.html" %}{% load erp_format product_surface %}
+{% block title %}مقایسه بودجه و هزینه | بنیرا{% endblock %}
+{% block extra_head %}{% include "components/dashboard_reporting_assets.html" %}{% endblock %}
 {% block content %}
-    {% url "projects:controls" project.pk as controls_url %}
-    {% include "components/page_header.html" with page_breadcrumb_label=project.name page_breadcrumb_url=controls_url page_eyebrow=project.code page_title="مقایسه بودجه پذیرفته‌شده و هزینه" page_description="شواهد محدود، فقط‌خواندنی و کدگذاری‌شده" only %}
-    <section class="erp-surface mt-6 rounded-xl p-5">
-        <p class="rounded-lg bg-amber-50 p-3 text-sm leading-6 text-amber-900">این نمایش فقط مقایسه شواهد است. سیاست هشدار، توقف، رزرو، پیش‌بینی، ثبت مالی و تغییر بودجه فعال نیست.</p>
-        {% if comparison %}
-            <div class="mt-4 flex flex-wrap gap-4 text-sm text-slate-600"><span>شناسه بودجه حاکم: <span dir="ltr">{{ comparison.budget_id }}</span></span><span>ارز: <span dir="ltr">{{ comparison.currency }}</span></span></div>
-            <div class="mt-5 overflow-x-auto"><table class="w-full min-w-[760px] text-right text-sm"><thead class="border-b border-slate-200 text-xs text-slate-500"><tr><th class="p-3">CBS</th><th class="p-3">WBS</th><th class="p-3">مرکز هزینه</th><th class="p-3">بودجه پذیرفته‌شده</th><th class="p-3">هزینه تأیید/ثبت‌شده</th><th class="p-3">مانده مشاهده‌ای</th></tr></thead><tbody>{% for line in comparison.lines %}<tr class="border-b border-slate-100"><td class="p-3"><span dir="ltr">{{ line.cbs_code }}</span> · {{ line.cbs_name }}</td><td class="p-3"><span dir="ltr">{{ line.wbs_code }}</span> · {{ line.wbs_title }}</td><td class="p-3" dir="ltr">{{ line.cost_center_code }}</td><td class="p-3 tabular-nums" dir="ltr">{{ line.accepted_budget_amount|erp_number }}</td><td class="p-3 tabular-nums" dir="ltr">{{ line.approved_or_recorded_expense_amount|erp_number }}</td><td class="p-3 tabular-nums" dir="ltr">{{ line.remaining_amount|erp_number }}</td></tr>{% empty %}<tr><td class="p-4 text-slate-500" colspan="6">برای بودجه حاکم، تخصیص قابل مقایسه‌ای ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div>
-            {% if comparison.unallocated_expense_count %}<p class="mt-4 rounded-lg bg-slate-50 p-3 text-sm text-slate-600"><span class="font-semibold" dir="ltr">{{ comparison.unallocated_expense_count }}</span> هزینه به مبلغ <span class="font-semibold tabular-nums" dir="ltr">{{ comparison.unallocated_expense_amount|erp_number }}</span> به‌دلیل نداشتن کدگذاری از مقایسه حذف شده است؛ این حذف به‌معنای صفر بودن یا تصمیم کنترلی نیست.</p>{% endif %}
-        {% else %}
-            <p class="mt-4 text-slate-600">بودجه پذیرفته‌شده حاکم برای این پروژه وجود ندارد؛ مقایسه ارائه نمی‌شود.</p>
-        {% endif %}
-    </section>
+<div class="erp-report erp-reference-list erp-reference-pattern" data-page-family="report">
+  {% url "projects:list" as project_list_url %}{% url "projects:detail" project.pk as project_url %}
+  {% if can_view_controls %}{% url "projects:controls" project.pk as controls_url %}{% endif %}
+  {% breadcrumb_trail "مقایسه بودجه پذیرفته‌شده و هزینه" "پروژه‌ها" project_list_url project.name project_url "ساختار شکست و فعالیت‌ها" controls_url as breadcrumbs %}
+  {% include "components/page_header.html" with page_breadcrumbs=breadcrumbs page_eyebrow=project.code page_title="مقایسه بودجه پذیرفته‌شده و هزینه" page_description="مقایسه شواهد هزینه با بودجه حاکم در محدوده همین پروژه" page_icon="document" only %}
+  <div class="erp-insight-context"><strong>{{ project.name }}</strong><span>{{ request.organization.name }}</span>{% if comparison %}<span>ارز گزارش: <bdi dir="ltr">{{ comparison.currency }}</bdi></span>{% endif %}</div>
+  {% if "project_controls.exceptions_view" in business_permission_codes or "project_controls.export" in business_permission_codes %}<nav class="erp-insight-nav" aria-label="گزارش‌های کنترل پروژه">{% if "project_controls.exceptions_view" in business_permission_codes %}<a href="{% url 'projects:controls_exceptions' project.pk %}">انحرافات بودجه‌ای</a>{% endif %}{% if "project_controls.export" in business_permission_codes %}<a href="{% url 'projects:controls_export' project.pk %}">دریافت گزارش کامل کنترل پروژه (CSV)</a>{% endif %}</nav>{% endif %}
+  <p class="erp-insight-note erp-insight-note--warning">این نمایش فقط مقایسه شواهد است. سیاست هشدار، توقف، رزرو، پیش‌بینی، ثبت مالی و تغییر بودجه فعال نیست.</p>
+  <section class="erp-insight-section" aria-labelledby="comparison-title">
+    <div class="erp-insight-heading"><h2 id="comparison-title">نتیجه مقایسه</h2>{% if comparison %}<span>{{ comparison.lines|length|erp_number }} ردیف قابل مقایسه · بودجه پذیرفته‌شده حاکم</span>{% endif %}</div>
+    {% if comparison %}
+    <div class="erp-report-table" role="region" aria-label="مقایسه بودجه و هزینه" tabindex="0"><table><thead><tr><th scope="col">طبقه هزینه</th><th scope="col">ساختار شکست</th><th scope="col">مرکز هزینه</th><th scope="col">بودجه پذیرفته‌شده</th><th scope="col">هزینه تأیید/ثبت‌شده</th><th scope="col">مانده مشاهده‌ای</th></tr></thead><tbody>
+    {% for line in comparison.lines %}<tr><td><bdi dir="ltr">{{ line.cbs_code }}</bdi> · {{ line.cbs_name }}</td><td><bdi dir="ltr">{{ line.wbs_code }}</bdi> · {{ line.wbs_title }}</td><td dir="ltr">{{ line.cost_center_code }}</td><td dir="ltr">{{ line.accepted_budget_amount|erp_number }}</td><td dir="ltr">{{ line.approved_or_recorded_expense_amount|erp_number }}</td><td dir="ltr">{{ line.remaining_amount|erp_number }}</td></tr>{% empty %}<tr><td colspan="6" class="erp-insight-empty">برای بودجه حاکم، تخصیص قابل مقایسه‌ای ثبت نشده است.</td></tr>{% endfor %}
+    </tbody></table></div>
+    {% else %}<p class="erp-insight-empty">بودجه پذیرفته‌شده حاکم برای این پروژه وجود ندارد؛ مقایسه ارائه نمی‌شود.</p>{% endif %}
+  </section>
+  {% if comparison.unallocated_expense_count %}<p class="erp-insight-note"><bdi dir="ltr">{{ comparison.unallocated_expense_count|erp_number }}</bdi> هزینه به مبلغ <bdi dir="ltr">{{ comparison.unallocated_expense_amount|erp_number }}</bdi> {{ comparison.currency }} به‌دلیل نداشتن کدگذاری از مقایسه حذف شده است؛ این حذف به‌معنای صفر بودن یا تصمیم کنترلی نیست.</p>{% endif %}
+</div>
 {% endblock %}

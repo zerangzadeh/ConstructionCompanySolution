@@ -1,0 +1,24 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_ WorkbenchTests.test_high_open_item_volume_keeps_page_and_query_count_bounded _
+apps\workflows\test_workbench.py:323: in test_high_open_item_volume_keeps_page_and_query_count_bounded
+    self.assertLessEqual(len(queries), 45)
+E   AssertionError: 86 not less than or equal to 45
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-05T21:06:50.891073+00:00","event":"http.response","request_id":"46db683c-9302-4dea-8978-6e18301aeaac","method":"GET","route":"workflows:workbench","status_code":200,"duration_ms":5482}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+______ WorkbenchTests.test_pagination_responsive_context_and_query_bound ______
+apps\workflows\test_workbench.py:282: in test_pagination_responsive_context_and_query_bound
+    self.assertLessEqual(len(queries), 45)
+E   AssertionError: 86 not less than or equal to 45
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-05T21:07:08.462405+00:00","event":"http.response","request_id":"4776604d-c129-431c-8f3c-8498e16af469","method":"GET","route":"workflows:workbench","status_code":200,"duration_ms":718}
+
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+=========================== short test summary info ===========================
+FAILED apps/workflows/test_workbench.py::WorkbenchTests::test_high_open_item_volume_keeps_page_and_query_count_bounded
+FAILED apps/workflows/test_workbench.py::WorkbenchTests::test_pagination_responsive_context_and_query_bound
+2 failed in 36.35s

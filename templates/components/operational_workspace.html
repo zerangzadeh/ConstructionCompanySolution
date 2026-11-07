@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/erp_operational_workspace.css' %}?v=20261105-reference-alignment-2">
+{% block workspace_head %}{% endblock %}
+{% endblock %}
+{% block content %}
+<div class="erp-workspace {% block workspace_class %}{% endblock %}">
+    {% block workspace_content %}{% endblock %}
+</div>
+{% endblock %}

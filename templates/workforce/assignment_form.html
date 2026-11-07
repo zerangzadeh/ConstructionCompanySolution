@@ -4,9 +4,8 @@
 {% block content %}<div class="erp-create-page">
 {% field_breadcrumbs "تخصیص جدید" assignment_parent=True as breadcrumbs %}
 {% include "workforce/_field_header.html" with page_breadcrumbs=breadcrumbs page_title="تخصیص جدید" page_description="نیرو، محل فعالیت، مسئولیت و بازه تخصیص را مشخص کنید." %}
-<form class="erp-create-form mt-5" method="post" novalidate aria-label="تخصیص جدید">{% csrf_token %}
+<form class="erp-create-form erp-sectioned-form mt-5" method="post" novalidate autocomplete="off" data-focus-first-error aria-label="تخصیص جدید">{% csrf_token %}
 {% include "workforce/_form_sections.html" %}
-{% field_context_url "workforce:assignment_list" as cancel_url %}
-{% include "components/form_footer.html" with submit_label="ثبت تخصیص" cancel_url=cancel_url only %}
+{% include "components/form_footer.html" with submit_label="ثبت تخصیص" cancel_url=assignment_list_url only %}
 </form></div>{% endblock %}
 {% block extra_scripts %}{{ form.media.js }}{% endblock %}

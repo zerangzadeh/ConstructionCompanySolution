@@ -163,6 +163,11 @@ def issue_detail(request: HttpRequest, issue_id: str) -> HttpResponse:
         "quality/detail.html",
         {
             "issue": issue,
+            "record_history": issue.review_revisions.filter(
+                organization=request.organization
+            )
+            .select_related("actor")
+            .order_by("sequence"),
             "assignment_form": QualityIssueAssignmentForm(
                 organization=request.organization
             ),

@@ -64,6 +64,7 @@ def party_list(request: HttpRequest) -> HttpResponse:
         "parties/list.html",
         {
             "parties": page.object_list,
+            "list_profile": "parties",
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(

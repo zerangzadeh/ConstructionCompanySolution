@@ -1,0 +1,11 @@
+{% extends "components/compact_form_page.html" %}
+{% load static document_evidence %}
+{% block title %}{% if material %}ویرایش مصالح{% else %}افزودن مصالح{% endif %} | بنیرا{% endblock %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">{% endblock %}
+{% block compact_content %}
+{% url "materials:material_list" as cancel_url %}
+{% if material %}{% with heading="ویرایش مصالح" %}{% include "components/page_header.html" with page_title=heading page_breadcrumb_label="مصالح" page_breadcrumb_url=cancel_url page_icon="document" only %}{% endwith %}{% else %}{% with heading="افزودن مصالح" %}{% include "components/page_header.html" with page_title=heading page_breadcrumb_label="مصالح" page_breadcrumb_url=cancel_url page_icon="document" only %}{% endwith %}{% endif %}
+{% document_evidence "material" material as evidence_panel %}{% include "components/evidence_nav.html" %}
+{% if not material or "materials.change" in business_permission_codes %}{% include "components/compact_form_card.html" with form=form csrf_token=csrf_token cancel_url=cancel_url submit_label="ذخیره مصالح" only %}{% else %}{% include "components/compact_form_card.html" with form=form csrf_token=csrf_token cancel_url=cancel_url submit_label="ذخیره مصالح" cancel_only=True only %}{% endif %}
+{% include "components/document_evidence.html" %}
+{% endblock %}

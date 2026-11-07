@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="84.730" timestamp="2026-11-05T02:02:25.371719+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_sectioned_form_rollout.SectionedFormRolloutTests" name="test_safety_quality_daily_report" time="84.215"><failure message="AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:389&#10;    if (documentStatus !== scenario.status) throw new Error(`${scenario.name}: expected ${scenario.status}, got ${documentStatus}`);&#10;                                                  ^&#10;&#10;Error: safety-save: expected 200, got 500&#10;    at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:389:51&#10;&#10;Node.js v24.20.0">tests\test_sectioned_form_rollout.py:240: in test_safety_quality_daily_report
+    self.verify_pages(records)
+tests\test_sectioned_form_rollout.py:179: in verify_pages
+    self.browser(self.owner, journeys)
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:389
+E       if (documentStatus !== scenario.status) throw new Error(`${scenario.name}: expected ${scenario.status}, got ${documentStatus}`);
+E                                                     ^
+E   
+E   Error: safety-save: expected 200, got 500
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:389:51
+E   
+E   Node.js v24.20.0</failure></testcase></testsuite></testsuites>

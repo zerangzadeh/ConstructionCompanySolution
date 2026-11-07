@@ -1,0 +1,14 @@
+.erp-attendance-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: .25rem;
+}
+
+.erp-attendance-calendar-day {
+    min-block-size: 3rem;
+}
+
+.erp-attendance-calendar-day[aria-current="date"] {
+    outline: 1px solid var(--color-primary);
+    outline-offset: -1px;
+}

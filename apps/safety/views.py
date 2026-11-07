@@ -155,6 +155,11 @@ def incident_detail(request: HttpRequest, incident_id: str) -> HttpResponse:
         "safety/detail.html",
         {
             "incident": incident,
+            "record_history": incident.review_revisions.filter(
+                organization=request.organization
+            )
+            .select_related("actor")
+            .order_by("sequence"),
             "assignment_form": SafetyIncidentAssignmentForm(
                 organization=request.organization
             ),

@@ -16,7 +16,21 @@ class PermissionResource:
 
 P = BusinessPermissionCode
 
+PLATFORM_COMPANY_PERMISSIONS = frozenset({
+    P.PLATFORM_COMPANIES_VIEW,
+    P.PLATFORM_COMPANIES_CONFIGURE,
+    P.PLATFORM_COMPANIES_CHANGE_STATUS,
+    P.PLATFORM_COMPANIES_AUDIT_VIEW,
+})
+
 PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
+    PermissionResource(
+        "platform_companies", "مدیریت شرکت‌های پلتفرم",
+        (),
+        (P.PLATFORM_COMPANIES_VIEW, P.PLATFORM_COMPANIES_CONFIGURE,
+         P.PLATFORM_COMPANIES_CHANGE_STATUS, P.PLATFORM_COMPANIES_AUDIT_VIEW),
+        ("apps.organizations.platform_companies", "apps.organizations.platform_views"),
+    ),
     PermissionResource(
         "support", "Tenant support and attention",
         ("support.Notification", "support.SupportCase", "support.SupportCaseEvent",
@@ -730,12 +744,14 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             "daily_reports.DailyReportLaborEntry",
             "daily_reports.DailyReportEquipmentEntry",
             "daily_reports.DailyReportMaterialEntry",
+            "daily_reports.DailyReportRecordReference",
             "daily_reports.DailyActivity",
             "daily_reports.DelayEvent",
         ),
         (
             P.DAILY_REPORTS_VIEW,
             P.DAILY_REPORTS_CREATE,
+            P.DAILY_REPORTS_LINK_RECORDS,
             P.DAILY_REPORTS_ADD_LABOR,
             P.DAILY_REPORTS_ADD_EQUIPMENT,
             P.DAILY_REPORTS_ADD_MATERIAL,
@@ -744,7 +760,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             P.DAILY_REPORTS_SUBMIT,
             P.DAILY_REPORTS_APPROVE,
         ),
-        ("apps.daily_reports.services",),
+        ("apps.daily_reports.services", "apps.daily_reports.references"),
     ),
     PermissionResource(
         "field_observations",

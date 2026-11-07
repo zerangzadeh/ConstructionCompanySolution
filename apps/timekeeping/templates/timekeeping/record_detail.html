@@ -9,5 +9,4 @@
 {% include "timekeeping/_record_actions.html" %}
 {% if not actions %}<p class="mt-4 text-sm text-slate-500">این سابقه برای نقش و وضعیت فعلی قابل اقدام نیست. پیگیری سوابق از فهرست حضور و کارکرد در دسترس است.</p>{% endif %}
 {% if record_kind == "correction" %}<a class="erp-btn erp-btn--secondary mt-4" href="{% url 'timekeeping:record_detail' 'attendance' source.pk %}">مشاهده حضور مبنا</a>{% endif %}
-<a class="erp-btn erp-btn--secondary mt-4" href="{{ back_url }}">بازگشت به حضور و کارکرد</a>
 {% endblock %}

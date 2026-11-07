@@ -1,0 +1,19 @@
+<form class="erp-create-form erp-compact-form" method="post" aria-labelledby="erp-page-title"{% if work_team_form %} data-work-team-form{% endif %}{% if server_validation %} novalidate{% endif %}{% if focus_first_error %} data-focus-first-error autocomplete="off"{% endif %}>
+    {% csrf_token %}
+    <section class="erp-form-section" aria-labelledby="compact-form-heading">
+        {% include "components/form_section_header.html" with heading_id="compact-form-heading" heading="اطلاعات اصلی" icon="document" only %}
+        <div class="erp-compact-form__body">
+            {% include "components/form_errors.html" with form=form only %}
+            {% for field in form.hidden_fields %}{{ field }}{% if field.errors %}<p class="erp-field-error" role="alert">{{ field.label }}: {{ field.errors|join:", " }}</p>{% endif %}{% endfor %}
+            <div class="erp-form-grid erp-form-grid--two">
+                {% for field in form.visible_fields %}
+                    {% if field.field.widget.attrs.rows or field.field.widget.allow_multiple_selected %}<div class="erp-form-grid__full">{% endif %}
+                    {% include "components/form_field.html" with field=field only %}
+                    {% if field.field.widget.attrs.rows or field.field.widget.allow_multiple_selected %}</div>{% endif %}
+                {% endfor %}
+            </div>
+            {% if native_choices %}{% include "workforce/_native_choices.html" with choice_form=form %}{% endif %}
+        </div>
+    </section>
+    {% include "components/form_footer.html" with submit_label=submit_label cancel_url=cancel_url submit_icon="check-circle" cancel_only=cancel_only only %}
+</form>

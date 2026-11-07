@@ -2,15 +2,14 @@
 {% load static erp_format %}
 {% block title %}{{ purchase_request.request_number }} | درخواست خرید{% endblock %}
 {% block extra_head %}
-{% include "components/interaction_styles.html" %}{{ item_form.media.css }}
+{{ item_form.media.css }}
 <link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}">
 <link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}">
 <link rel="stylesheet" href="{% static 'css/erp_purchase_request_detail.css' %}">
 {% endblock %}
-{% block extra_scripts %}{{ item_form.media.js }}{% include "components/interaction_scripts.html" %}{% endblock %}
+{% block extra_scripts %}{{ item_form.media.js }}{% endblock %}
 {% block content %}
 <div class="pr-detail" data-pr-state="{{ purchase_request.status }}">
-<div data-success-toast hidden></div>
 <nav class="pr-detail__breadcrumb" aria-label="مسیر صفحه"><a href="{{ list_url }}">درخواست‌های خرید</a><span aria-hidden="true">‹</span><span aria-current="page">درخواست خرید <bdi dir="ltr">{{ purchase_request.request_number }}</bdi></span></nav>
 <header class="pr-detail__header">
     <div class="min-w-0">

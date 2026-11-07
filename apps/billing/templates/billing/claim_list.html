@@ -8,12 +8,7 @@
 {% block content %}
 <div class="erp-reference-list erp-contracts-list erp-claims-list">
   <div class="erp-list-heading">
-    <nav class="claim-breadcrumbs" aria-label="مسیر صفحه">
-      {% for crumb in page_breadcrumbs %}{% if forloop.first or forloop.last or crumb.label == "قراردادها" %}
-        {% if not forloop.first %}<span aria-hidden="true">‹</span>{% endif %}
-        {% if forloop.last %}<span aria-current="page">{{ crumb.label }}</span>{% elif crumb.url and crumb.url|surface_url_exposed %}<a href="{{ crumb.url }}">{{ crumb.label }}</a>{% else %}<span>{{ crumb.label }}</span>{% endif %}
-      {% endif %}{% endfor %}
-    </nav>
+    {% include "components/breadcrumbs.html" with page_breadcrumbs=page_breadcrumbs only %}
     <header class="claim-page-header" aria-labelledby="erp-page-title">
       <div><h1 id="erp-page-title">صورت‌وضعیت‌ها</h1><p>پیگیری دوره، مبلغ و وضعیت تأیید صورت‌وضعیت قراردادها</p></div>
       <div class="claim-page-actions">
@@ -29,7 +24,7 @@
     <div><span>پروژه</span><strong>{% if selected_contract %}{{ selected_contract.project.name }}{% else %}{{ selected_project.name }}{% endif %}</strong></div>
     {% if selected_contract %}<div class="claim-context-contract"><span>قرارداد</span><strong>{{ selected_contract.title }}</strong><bdi dir="ltr">{{ selected_contract.contract_number }}</bdi></div>{% endif %}
     <div class="claim-context-links">
-      {% if selected_contract %}<a href="{% url 'contracts:detail' selected_contract.pk %}">بازگشت به قرارداد ←</a>{% elif selected_project %}<a href="{% url 'projects:detail' selected_project.pk %}#commercial-summary">بازگشت به پروژه ←</a>{% endif %}
+      {% if not selected_contract and selected_project %}<a href="{% url 'projects:detail' selected_project.pk %}#commercial-summary">بازگشت به پروژه ←</a>{% endif %}
       {% if has_context %}<a href="{{ request.path }}">مشاهده همه سوابق مجاز</a>{% endif %}
     </div>
   </aside>

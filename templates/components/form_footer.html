@@ -1,4 +1,4 @@
 <footer class="erp-form-footer" aria-label="اقدام‌های فرم">
-    <button class="erp-btn erp-btn--primary" type="submit">{% include "components/form_icon.html" with icon="document" only %}{{ submit_label }}</button>
-    <a class="erp-btn erp-btn--secondary" href="{{ cancel_url }}">{% include "components/form_icon.html" with icon="close" only %}انصراف</a>
+    {% if not cancel_only %}<button class="erp-btn erp-btn--primary" type="submit">{% include "components/form_icon.html" with icon=submit_icon|default:"document" only %}{{ submit_label }}</button>{% endif %}
+    {% if cancel_url %}<a class="erp-btn erp-btn--secondary" href="{{ cancel_url }}">{% include "components/form_icon.html" with icon="close" only %}انصراف</a>{% endif %}
 </footer>

@@ -1,0 +1,52 @@
+..F..F.                                                                  [100%]
+================================== FAILURES ===================================
+_ DailyReportReferenceTests.test_closed_approved_source_can_be_referenced_by_multiple_reports _
+tests\test_daily_report_references.py:224: in test_closed_approved_source_can_be_referenced_by_multiple_reports
+    review_safety_incident(
+apps\safety\services.py:550: in review_safety_incident
+    return perform_safety_transition(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:762: in perform_safety_transition
+    _backfill_one(incident=incident, actor=starter)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:650: in _backfill_one
+    instance = start_safety_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:497: in start_safety_workflow
+    ensure_safety_compatibility_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:370: in ensure_safety_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+_ DailyReportReferenceTests.test_tenant_site_phase_and_forged_identifiers_fail_atomically _
+tests\test_daily_report_references.py:276: in test_tenant_site_phase_and_forged_identifiers_fail_atomically
+    foreign = self.safety(
+tests\test_daily_report_references.py:104: in safety
+    return SafetyIncident.objects.create(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\safety\models.py:456: in save
+    self.full_clean(validate_constraints=False)
+.venv\Lib\site-packages\django\db\models\base.py:1679: in full_clean
+    raise ValidationError(errors)
+E   django.core.exceptions.ValidationError: {'created_by': ['\u06a9\u0627\u0631\u0628\u0631 \u062b\u0628\u062a\\u200c\u0634\u062f\u0647 \u0628\u0627\u06cc\u062f \u0639\u0636\u0648\u06cc \u0627\u0632 \u0647\u0645\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0628\u0627\u0634\u062f.']}
+=========================== short test summary info ===========================
+FAILED tests/test_daily_report_references.py::DailyReportReferenceTests::test_closed_approved_source_can_be_referenced_by_multiple_reports
+FAILED tests/test_daily_report_references.py::DailyReportReferenceTests::test_tenant_site_phase_and_forged_identifiers_fail_atomically
+2 failed, 5 passed in 47.44s

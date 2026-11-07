@@ -1,12 +1,10 @@
 /* Work-record layout; colors and controls remain owned by BONIRA's shared system. */
 .measurement-detail { color: var(--bonira-ink); min-width: 0; }
 .measurement-detail .erp-surface { border-radius: 12px; }
-.measurement-detail-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 24px; align-items: center; margin-bottom: 18px; }
-.measurement-detail-heading > nav { grid-column: 1 / -1; }
+.measurement-detail-heading { margin-bottom: 18px; }
 .measurement-detail-heading .erp-page-header__copy { position: relative; padding-inline-start: 43px; }
 .measurement-detail-heading .erp-page-header__icon { position: absolute; inset-inline-start: 0; top: 5px; }
 .measurement-detail-heading h1 { font-size: 24px; }
-.measurement-detail-heading > a { white-space: normal; text-align: center; }
 .measurement-detail-heading header p { font-size: 12px; line-height: 1.9; }
 .measurement-identity { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 20px; }
 .measurement-label { font-size: 11px; color: var(--bonira-muted); }
@@ -46,14 +44,11 @@
 .measurement-actions .erp-btn { justify-self: start; }
 .measurement-detail :is(summary, a, button, textarea):focus-visible { outline: 2px solid var(--bonira-royal-blue); outline-offset: 3px; }
 @media (max-width: 1023px) {
-  .measurement-detail-heading { grid-template-columns: minmax(0, 1fr); }
-  .measurement-detail-heading > a { justify-self: start; }
   .measurement-identity h2 { font-size: 15px; }
   .measurement-values article { padding: 14px; }
 }
 @media (max-width: 639px) {
   .measurement-detail-heading h1 { font-size: 21px; }
-  .measurement-detail-heading > a { min-height: 44px; }
   .measurement-identity { flex-wrap: wrap; padding: 14px; gap: 12px; }
   .measurement-identity-state { align-items: start; }
   .measurement-values, .measurement-panels, .measurement-source dl, .measurement-decision-forms { grid-template-columns: minmax(0, 1fr); }

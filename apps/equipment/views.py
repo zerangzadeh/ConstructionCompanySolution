@@ -117,6 +117,17 @@ def equipment_list(request: HttpRequest) -> HttpResponse:
     equipment = get_organization_equipment(
         user=request.user, organization=request.organization
     )
+    scoped_has_records = equipment.exists()
+    category_choices = list(
+        equipment.exclude(category="")
+        .order_by("category")
+        .values_list("category", flat=True)
+        .distinct()
+    )
+    selected_category = request.GET.get("category", "").strip()
+    if selected_category and selected_category not in category_choices:
+        # Legacy partial-text URLs retain their existing filtering semantics.
+        category_choices.append(selected_category)
     equipment = apply_table_filters(
         equipment,
         request,
@@ -152,17 +163,26 @@ def equipment_list(request: HttpRequest) -> HttpResponse:
         "equipment/list.html",
         {
             "equipment": page.object_list,
+            "list_profile": "equipment",
+            "scoped_has_records": scoped_has_records,
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [
                     {"name": "equipment", "kind": "text", "label": "کد و نام"},
-                    {"name": "category", "kind": "text", "label": "دسته"},
+                    {
+                        "name": "category",
+                        "kind": "select",
+                        "label": "دسته تجهیز",
+                        "choices": [(value, value) for value in category_choices],
+                        "empty_label": "همه دسته‌های تجهیز",
+                    },
                     {
                         "name": "ownership",
                         "kind": "select",
-                        "label": "مالکیت",
+                        "label": "نوع مالکیت",
+                        "empty_label": "نوع مالکیت",
                         "choices": EquipmentOwnershipType.choices,
                     },
                     {
@@ -476,7 +496,7 @@ def operator_qualification_create(request: HttpRequest) -> HttpResponse:
             return redirect("equipment:operations_workbench")
     return render(
         request,
-        "equipment/form.html",
+        "equipment/create.html",
         {
             "form": form,
             "title": "صلاحیت اپراتور تجهیز",
@@ -502,7 +522,7 @@ def downtime_create(request: HttpRequest) -> HttpResponse:
             return redirect("equipment:operations_workbench")
     return render(
         request,
-        "equipment/form.html",
+        "equipment/create.html",
         {
             "form": form,
             "title": "ثبت توقف تجهیز",
@@ -567,7 +587,16 @@ def _operation_form(
             return redirect(back_url)
     return render(
         request,
-        "equipment/form.html",
+        "equipment/create.html"
+        if request.resolver_match.url_name
+        in {
+            "meter_reading_create",
+            "usage_create",
+            "fuel_create",
+            "maintenance_plan_create",
+            "work_order_create",
+        }
+        else "equipment/form.html",
         {"form": form, "title": title, "back_url": back_url},
     )
 
@@ -677,7 +706,7 @@ def spare_link_create(request: HttpRequest, work_order_id: str) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.EQUIPMENT_CREATE)
 def equipment_create(request: HttpRequest) -> HttpResponse:
-    form = EquipmentForm(request.POST or None)
+    form = EquipmentForm(request.POST or None, organization=request.organization)
     if request.method == "POST" and form.is_valid():
         try:
             equipment = create_equipment(
@@ -691,7 +720,7 @@ def equipment_create(request: HttpRequest) -> HttpResponse:
             return redirect("equipment:detail", equipment_id=equipment.pk)
     return render(
         request,
-        "equipment/form.html",
+        "equipment/create.html",
         {"form": form, "title": "تجهیز جدید", "back_url": "equipment:list"},
     )
 
@@ -857,7 +886,7 @@ def assignment_create(request: HttpRequest) -> HttpResponse:
             return redirect("equipment:detail", equipment_id=assignment.equipment_id)
     return render(
         request,
-        "equipment/form.html",
+        "equipment/create.html",
         {"form": form, "title": "تخصیص تجهیز", "back_url": "equipment:assignment_list"},
     )
 
@@ -992,7 +1021,7 @@ def maintenance_create(request: HttpRequest) -> HttpResponse:
             return redirect("equipment:detail", equipment_id=record.equipment_id)
     return render(
         request,
-        "equipment/form.html",
+        "equipment/maintenance_create.html",
         {
             "form": form,
             "title": "سابقه سرویس یا تعمیر",
@@ -1065,6 +1094,9 @@ def maintenance_detail(request: HttpRequest, record_id: str) -> HttpResponse:
         "components/read_only_record_detail.html",
         {
             "detail_title": record.record_number,
+            "detail_eyebrow": "جزئیات سابقه نگهداری",
+            "detail_breadcrumb_label": "سوابق نگهداری",
+            "detail_status_code": record.status,
             "back_url": reverse("equipment:maintenance_list"),
             "detail_rows": [
                 ("عنوان", record.summary, "text"),
@@ -1072,7 +1104,7 @@ def maintenance_detail(request: HttpRequest, record_id: str) -> HttpResponse:
                 ("پروژه", record.project, "text"),
                 ("کارگاه", record.site, "text"),
                 ("نوع", record.get_maintenance_type_display(), "text"),
-                ("وضعیت", record.get_status_display(), "text"),
+                ("وضعیت", record.get_status_display(), "status"),
                 ("تاریخ برنامه", record.scheduled_date, "date"),
                 ("شروع", record.started_date, "date"),
                 ("پایان", record.completed_date, "date"),
@@ -1100,11 +1132,14 @@ def work_order_detail(request: HttpRequest, work_order_id: str) -> HttpResponse:
         "components/read_only_record_detail.html",
         {
             "detail_title": record.number,
+            "detail_eyebrow": "جزئیات دستورکار تجهیز",
+            "detail_breadcrumb_label": "عملیات تجهیزات",
+            "detail_status_code": record.status,
             "back_url": reverse("equipment:operations_workbench"),
             "detail_rows": [
                 ("عنوان", record.summary, "text"),
                 ("تجهیز", record.equipment.name, "text"),
-                ("وضعیت", record.get_status_display(), "text"),
+                ("وضعیت", record.get_status_display(), "status"),
                 ("تاریخ برنامه", record.scheduled_for, "date"),
                 ("زمان تکمیل", record.completed_at, "datetime"),
                 ("شرح تکمیل", record.completion_notes, "text"),

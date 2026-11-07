@@ -1,0 +1,7 @@
+{% extends "components/compact_form_page.html" %}
+{% block title %}{% if category %}ویرایش دسته‌بندی{% else %}افزودن دسته‌بندی{% endif %} | بنیرا{% endblock %}
+{% block compact_content %}
+{% url "materials:category_list" as cancel_url %}
+{% if category %}{% with heading="ویرایش دسته‌بندی" %}{% include "components/page_header.html" with page_title=heading page_breadcrumb_label="دسته‌بندی مصالح" page_breadcrumb_url=cancel_url page_icon="document" only %}{% endwith %}{% else %}{% with heading="افزودن دسته‌بندی" %}{% include "components/page_header.html" with page_title=heading page_breadcrumb_label="دسته‌بندی مصالح" page_breadcrumb_url=cancel_url page_icon="document" only %}{% endwith %}{% endif %}
+{% if not category or "material_categories.change" in business_permission_codes %}{% include "components/compact_form_card.html" with form=form csrf_token=csrf_token cancel_url=cancel_url submit_label="ذخیره دسته‌بندی" only %}{% else %}{% include "components/compact_form_card.html" with form=form csrf_token=csrf_token cancel_url=cancel_url submit_label="ذخیره دسته‌بندی" cancel_only=True only %}{% endif %}
+{% endblock %}

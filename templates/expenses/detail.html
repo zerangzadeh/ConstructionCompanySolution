@@ -1,29 +1,49 @@
-{% extends "base.html" %}{% load static erp_format related_documents %}
-{% block title %}جزئیات هزینه | سامانه مدیریت ساخت{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% endblock %}
-{% block content %}
-{% related_documents expense as related_documents %}
-<div class="mx-auto max-w-5xl">
-  <a class="text-sm font-semibold text-blue-700" href="{% url 'expenses:list' %}">بازگشت به هزینه‌ها</a>
-  <section class="erp-surface mt-4 rounded-xl p-6">
-    <div class="flex flex-wrap items-start justify-between gap-4">
-      <div><p class="text-xs text-slate-500">{{ expense.source_reference }}</p><h1 class="mt-1 text-2xl font-bold">{{ expense.description }}</h1><p class="mt-2 text-sm text-slate-600">{{ expense.project.name }} · {{ expense.get_classification_display }}</p></div>
-      <div class="text-left"><p class="text-xl font-bold" dir="ltr">{{ expense.amount|erp_number }} {{ request.organization.currency }}</p><span class="mt-2 inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold">{{ expense.get_status_display }}</span></div>
-    </div>
-    <div class="mt-5 flex flex-wrap items-center gap-2 border-t pt-5">
-      {% include "components/related_documents_nav.html" %}
-      {% if expense.status == "draft" or expense.status == "returned" %}{% if "expenses.submit" in business_permission_codes %}<form method="post" action="{% url 'expenses:submit' expense.pk %}">{% csrf_token %}<button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">ارسال برای تأیید</button></form>{% endif %}{% endif %}
-      {% if expense.status == "submitted" %}{% if "expenses.approve" in business_permission_codes %}<form method="post" action="{% url 'expenses:approve' expense.pk %}">{% csrf_token %}<button class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white">تأیید مستقل</button></form>{% endif %}{% endif %}
-      {% if expense.status != "void" and "expenses.void" in business_permission_codes %}<form class="flex gap-2" method="post" action="{% url 'expenses:void' expense.pk %}">{% csrf_token %}<input name="reason" required placeholder="دلیل ابطال"><button class="rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-700">ابطال</button></form>{% endif %}
-    </div>
-    {% if expense.status == "submitted" and "expenses.return" in business_permission_codes %}<form class="mt-4 flex gap-2" method="post" action="{% url 'expenses:return' expense.pk %}">{% csrf_token %}<input class="flex-1" name="reason" required placeholder="دلیل بازگشت برای اصلاح"><button class="rounded-lg border px-4 py-2 text-sm font-semibold">بازگردانی</button></form>{% endif %}
-  </section>
-  {% include "components/related_documents.html" with source_label="هزینه" %}
-  <section class="erp-surface mt-6 rounded-xl p-6">
-    <h2 class="text-lg font-bold">تخصیص و کدگذاری</h2>
-    <div class="mt-4 space-y-2">{% for allocation in expense.allocations.all %}<div class="rounded-lg bg-slate-50 p-3 text-sm"><span dir="ltr">{{ allocation.amount|erp_number }}</span> · {{ allocation.project.name }} · WBS {{ allocation.wbs_node.code }} · CBS {{ allocation.cbs_node.code }}{% if allocation.cost_center %} · {{ allocation.cost_center.code }}{% endif %}</div>{% empty %}<p class="text-sm text-slate-500">هنوز تخصیصی ثبت نشده است.</p>{% endfor %}</div>
-    {% if expense.status == "draft" or expense.status == "returned" %}{% if "expenses.allocate" in business_permission_codes %}<form class="mt-5 grid gap-4 sm:grid-cols-2" method="post" action="{% url 'expenses:allocate' expense.pk %}">{% csrf_token %}{% for field in allocation_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<div class="sm:col-span-2"><button class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white">افزودن تخصیص</button></div></form>{% endif %}{% endif %}
-  </section>
-  {% if expense.budget_assessments.all %}<section class="erp-surface mt-6 rounded-xl p-6"><h2 class="text-lg font-bold">ارزیابی بودجه پذیرفته‌شده</h2><p class="mt-1 text-xs text-amber-700">حالت فقط اطلاعاتی است؛ سیاست هشدار یا توقف P4-G10 هنوز تصویب نشده است.</p>{% for assessment in expense.budget_assessments.all %}<div class="mt-3 rounded-lg bg-slate-50 p-3 text-sm">بودجه: {{ assessment.accepted_budget_amount|erp_number }} · پیشین: {{ assessment.prior_approved_expense_amount|erp_number }} · مانده پس از پیشنهاد: {{ assessment.remaining_after_proposal|erp_number }}</div>{% endfor %}</section>{% endif %}
-</div>
+{% extends "components/record_detail_page.html" %}{% load static erp_format related_documents %}
+{% block title %}جزئیات هزینه | بنیرا{% endblock %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% endblock %}
+{% block content %}{% related_documents expense as related_documents %}{{ block.super }}{% endblock %}
+{% block detail_heading %}{% url 'expenses:list' as list_url %}{% include "components/page_header.html" with page_title="جزئیات هزینه" page_description=expense.description page_breadcrumb_label="هزینه‌ها" page_breadcrumb_url=list_url page_icon="document" only %}{% endblock %}
+{% block detail_actions %}
+{% if expense.status == "draft" or expense.status == "returned" %}{% if "expenses.submit" in business_permission_codes %}<form method="post" action="{% url 'expenses:submit' expense.pk %}">{% csrf_token %}<button class="erp-btn erp-btn--primary" type="submit">ارسال برای تأیید</button></form>{% endif %}{% endif %}
+{% if expense.status == "submitted" and "expenses.approve" in business_permission_codes and expense.created_by_id != request.user.pk and expense.submitted_by_id != request.user.pk %}<form method="post" action="{% url 'expenses:approve' expense.pk %}">{% csrf_token %}<button class="erp-btn erp-btn--primary" type="submit">تأیید مستقل</button></form>{% endif %}
+{% endblock %}
+{% block detail_summary %}<dl class="erp-record-summary" aria-label="خلاصه هزینه">
+{% include "components/record_summary_item.html" with heading="مرجع هزینه" value=expense.source_reference|default:expense.receipt_reference only %}
+{% include "components/record_summary_item.html" with heading="تاریخ هزینه" value=expense.incurred_on kind="date" only %}
+{% include "components/record_summary_item.html" with heading="مبلغ" value=expense.amount kind="amount" suffix=request.organization.currency only %}
+{% include "components/record_summary_item.html" with heading="وضعیت" value=expense.status kind="status" label=expense.get_status_display only %}
+</dl>{% endblock %}
+{% block detail_navigation %}<nav class="erp-record-nav" aria-label="بخش‌های هزینه"><a href="#expense-information">اطلاعات اصلی</a><a href="#expense-allocations">تخصیص و کدگذاری</a>{% if related_documents != None %}<a href="#related-documents">اسناد مرتبط ({{ related_documents.count|erp_number }})</a>{% endif %}<a href="#expense-history">سوابق ثبت و تغییر وضعیت</a>{% if expense.status != "void" and expense.status != "approved" and "expenses.void" in business_permission_codes or expense.status == "submitted" and "expenses.return" in business_permission_codes %}<a href="#expense-actions">اقدامات رکورد</a>{% endif %}</nav>{% endblock %}
+{% block detail_content %}
+<section class="erp-record-section" id="expense-information" aria-labelledby="expense-information-title">
+{% include "components/form_section_header.html" with heading_id="expense-information-title" heading="اطلاعات عمومی" icon="document" only %}
+<div class="erp-record-section__body"><dl class="erp-record-fields">
+<div class="erp-record-wide"><dt>شرح هزینه</dt><dd>{{ expense.description }}</dd></div>
+<div><dt>پروژه</dt><dd>{% if "projects.view" in business_permission_codes %}<a class="text-blue-700 underline" href="{% url 'projects:detail' expense.project_id %}">{{ expense.project.name }}</a>{% else %}{{ expense.project.name }}{% endif %}</dd></div>
+<div><dt>نوع هزینه</dt><dd>{{ expense.get_classification_display }}</dd></div>
+<div><dt>گروه هزینه</dt><dd>{{ expense.primary_group.name|default:expense.get_category_display }}</dd></div>
+<div><dt>دسته هزینه</dt><dd>{{ expense.expense_category.name|default:"—" }}</dd></div>
+{% if expense.phase %}<div><dt>فاز</dt><dd>{{ expense.phase.name }}</dd></div>{% endif %}
+<div><dt>فروشنده / طرف تجاری</dt><dd>{{ expense.party.display_name|default:expense.vendor_name|default:"—" }}</dd></div>
+<div><dt>مرجع رسید</dt><dd><bdi>{{ expense.receipt_reference|default:"—" }}</bdi></dd></div>
+{% if expense.notes %}<div class="erp-record-wide"><dt>یادداشت‌ها</dt><dd class="whitespace-pre-line">{{ expense.notes }}</dd></div>{% endif %}
+</dl></div></section>
+<section class="erp-record-section" id="expense-allocations" aria-labelledby="expense-allocations-title">
+{% include "components/form_section_header.html" with heading_id="expense-allocations-title" heading="تخصیص و کدگذاری" icon="layers" only %}
+<div class="erp-record-section__body"><div class="space-y-2">{% for allocation in expense.allocations.all %}<dl class="erp-record-fields"><div><dt>مبلغ تخصیص</dt><dd><bdi>{{ allocation.amount|erp_number }}</bdi></dd></div><div><dt>پروژه</dt><dd>{{ allocation.project.name }}</dd></div><div><dt>ساختار شکست کار</dt><dd><bdi>{{ allocation.wbs_node.code }}</bdi></dd></div><div><dt>ساختار شکست هزینه</dt><dd><bdi>{{ allocation.cbs_node.code }}</bdi></dd></div>{% if allocation.cost_center %}<div><dt>مرکز هزینه</dt><dd>{{ allocation.cost_center.code }}</dd></div>{% endif %}</dl>{% empty %}<p class="text-sm text-slate-500" role="status">هنوز تخصیصی ثبت نشده است.</p>{% endfor %}</div>
+{% if expense.status == "draft" or expense.status == "returned" %}{% if "expenses.allocate" in business_permission_codes %}<form class="mt-5 grid gap-4 sm:grid-cols-2" method="post" action="{% url 'expenses:allocate' expense.pk %}" aria-label="افزودن تخصیص">{% csrf_token %}{% include "components/form_errors.html" with form=allocation_form only %}{% for field in allocation_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<div class="sm:col-span-2"><button class="erp-btn erp-btn--primary" type="submit">افزودن تخصیص</button></div></form>{% endif %}{% endif %}</div></section>
+{% include "components/related_documents.html" with source_label="هزینه" %}
+{% if expense.budget_assessments.all %}<section class="erp-record-section" aria-labelledby="expense-budget-title">{% include "components/form_section_header.html" with heading_id="expense-budget-title" heading="ارزیابی بودجه پذیرفته‌شده" icon="document" only %}<div class="erp-record-section__body"><p class="text-xs text-amber-700">این ارزیابی اطلاعاتی است و سیاست هشدار یا توقف تأیید به آن اضافه نشده است.</p>{% for assessment in expense.budget_assessments.all %}<p class="mt-3 text-sm">بودجه: {{ assessment.accepted_budget_amount|erp_number }} · پیشین: {{ assessment.prior_approved_expense_amount|erp_number }} · مانده پس از پیشنهاد: {{ assessment.remaining_after_proposal|erp_number }}</p>{% endfor %}</div></section>{% endif %}
+<section class="erp-record-section" id="expense-history" aria-labelledby="expense-history-title">{% include "components/form_section_header.html" with heading_id="expense-history-title" heading="سوابق ثبت و تغییر وضعیت" icon="calendar" only %}<div class="erp-record-section__body"><ol class="erp-record-history">
+<li>ثبت: <bdi>{{ expense.created_at|jalali_datetime }}</bdi> · {% if expense.created_by %}{{ expense.created_by.get_full_name|default:expense.created_by.username|default:"—" }}{% else %}—{% endif %}</li>
+{% if expense.submitted_at %}<li>ارسال: <bdi>{{ expense.submitted_at|jalali_datetime }}</bdi> · {% if expense.submitted_by %}{{ expense.submitted_by.get_full_name|default:expense.submitted_by.username|default:"—" }}{% else %}—{% endif %}</li>{% endif %}
+{% if expense.returned_at or expense.return_reason %}<li>بازگردانی: <bdi>{{ expense.returned_at|jalali_datetime|default:"—" }}</bdi> · {{ expense.return_reason }}</li>{% endif %}
+{% if expense.approved_at %}<li>تأیید: <bdi>{{ expense.approved_at|jalali_datetime }}</bdi> · {% if expense.approved_by %}{{ expense.approved_by.get_full_name|default:expense.approved_by.username|default:"—" }}{% else %}—{% endif %}</li>{% endif %}
+{% if expense.voided_at or expense.void_reason %}<li>ابطال: <bdi>{{ expense.voided_at|jalali_datetime|default:"—" }}</bdi> · {{ expense.void_reason }}</li>{% endif %}
+</ol></div></section>
+{% if expense.status != "void" and expense.status != "approved" and "expenses.void" in business_permission_codes or expense.status == "submitted" and "expenses.return" in business_permission_codes %}
+<section class="erp-record-section" id="expense-actions" aria-labelledby="expense-actions-title">{% include "components/form_section_header.html" with heading_id="expense-actions-title" heading="اقدامات رکورد" icon="document" only %}<div class="erp-record-section__body space-y-4">
+{% if expense.status == "submitted" and "expenses.return" in business_permission_codes %}<form class="erp-record-inline-form" method="post" action="{% url 'expenses:return' expense.pk %}">{% csrf_token %}<label for="expense-return-reason">دلیل بازگشت برای اصلاح<input id="expense-return-reason" class="erp-input" name="reason" required></label><button class="erp-btn erp-btn--secondary" type="submit">بازگردانی</button></form>{% endif %}
+{% if expense.status != "void" and expense.status != "approved" and "expenses.void" in business_permission_codes %}<form class="erp-record-inline-form" method="post" action="{% url 'expenses:void' expense.pk %}">{% csrf_token %}<label for="expense-void-reason">دلیل ابطال<input id="expense-void-reason" class="erp-input" name="reason" required></label><button class="erp-btn erp-btn--secondary" type="submit">ابطال</button></form>{% endif %}
+</div></section>{% endif %}
 {% endblock %}

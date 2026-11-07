@@ -12,6 +12,17 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import Resolver404, resolve
 
+_PLATFORM_ADMIN_ROUTES = (
+    "organizations:platform_company_list",
+    "organizations:platform_company_detail",
+    "organizations:platform_company_edit",
+    "organizations:platform_company_status",
+    "organizations:create",
+    "organizations:platform_role_catalog",
+    "organizations:protected_operation_catalog",
+    "organizations:platform_policy_catalog",
+)
+
 
 @dataclass(frozen=True)
 class Capability:
@@ -78,13 +89,10 @@ CAPABILITIES = (
         "technical_administration",
         False,
         ("admin",),
-        tuple(
+        _PLATFORM_ADMIN_ROUTES
+        + tuple(
             f"organizations:{name}"
             for name in (
-                "create",
-                "platform_role_catalog",
-                "protected_operation_catalog",
-                "platform_policy_catalog",
                 "reference_personas",
                 "tenant_policy_configuration",
                 "configuration_profiles",
@@ -162,8 +170,21 @@ def route_capability(view_name: str, route_kwargs: dict | None = None) -> str:
     )
 
 
-def route_exposed(view_name: str, route_kwargs: dict | None = None) -> bool:
-    return capability_exposed(route_capability(view_name, route_kwargs))
+def platform_administration_exposed(user) -> bool:
+    """Expose the internal platform workspace to active platform administrators."""
+    from apps.organizations.authorization import is_platform_admin
+
+    return is_platform_admin(user)
+
+
+def route_exposed(
+    view_name: str, route_kwargs: dict | None = None, *, user=None
+) -> bool:
+    return capability_exposed(route_capability(view_name, route_kwargs)) or (
+        view_name in _PLATFORM_ADMIN_ROUTES
+        and user is not None
+        and platform_administration_exposed(user)
+    )
 
 
 def url_exposed(url: str) -> bool:
@@ -260,11 +281,53 @@ NAVIGATION_GROUPS = (
             ),
             NavigationLink("حضور و کارکرد", "timekeeping:workbench", "attendance.view"),
             NavigationLink(
-                "تجهیزات عملیاتی",
+                "عملیات تجهیزات",
                 "equipment:operations_workbench",
                 "equipment_operations.view",
             ),
-            NavigationLink("فهرست تجهیزات", "equipment:list", "equipment.view"),
+            NavigationLink(
+                "تجهیزات",
+                "equipment:list",
+                "equipment.view",
+                active_routes=tuple(
+                    f"equipment:{name}"
+                    for name in (
+                        "create",
+                        "detail",
+                        "status_change",
+                        "archive",
+                        "assignment_list",
+                        "assignment_create",
+                        "assignment_status_change",
+                        "maintenance_list",
+                        "maintenance_create",
+                        "maintenance_detail",
+                        "maintenance_status_change",
+                        "operations_workbench",
+                        "meter_reading_create",
+                        "usage_create",
+                        "fuel_create",
+                        "operator_qualification_create",
+                        "downtime_create",
+                        "maintenance_plan_create",
+                        "work_order_create",
+                        "work_order_detail",
+                        "work_order_transition",
+                        "work_order_evidence_create",
+                        "spare_link_create",
+                        "cost_workbench",
+                        "cost_policy_create",
+                        "cost_policy_transition",
+                        "cost_rate_create",
+                        "cost_allocation_create",
+                        "cost_allocation_finalize",
+                        "cost_allocation_reverse",
+                        "cost_handoff_create",
+                        "cost_handoff_review",
+                        "cost_handoff_reconcile",
+                    )
+                ),
+            ),
             NavigationLink("هزینه‌ها و تنخواه", "expenses:list", "expenses.view"),
             NavigationLink("ایمنی", "safety:list", "safety_incidents.view"),
             NavigationLink("کیفیت", "quality:list", "quality_issues.view"),
@@ -362,8 +425,8 @@ def navigation_groups(
                 )
                 and route_exposed(link.route)
                 and not (
-                    link.route == "equipment:list"
-                    and "equipment_operations.view" in codes
+                    link.route == "equipment:operations_workbench"
+                    and "equipment.view" in codes
                 )
             )
         )

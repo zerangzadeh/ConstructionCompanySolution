@@ -136,6 +136,7 @@
             const fieldLabel = Array.from(input.labels || []).map((label) => label.textContent.trim()).join(" ") || input.getAttribute("aria-label") || "";
             trigger.setAttribute("aria-label", fieldLabel ? `باز کردن تقویم شمسی: ${fieldLabel}` : "باز کردن تقویم شمسی");
             trigger.innerHTML = "<span aria-hidden=\"true\">▦</span>";
+            trigger.addEventListener("click", () => openPicker(input));
             wrap.appendChild(trigger);
         }
         let popover = wrap.querySelector(":scope > .erp-jalali-popover");
@@ -145,7 +146,6 @@
             popover.hidden = true;
             wrap.appendChild(popover);
         }
-        trigger.addEventListener("click", () => openPicker(input));
         return popover;
     }
 
@@ -159,6 +159,27 @@
         const firstGregorian = jalaliToGregorian(year, month, 1);
         const firstWeekday = (new Date(firstGregorian[0], firstGregorian[1] - 1, firstGregorian[2]).getDay() + 1) % 7;
         popover.innerHTML = `<div class="erp-jalali-header"><button class="erp-jalali-nav" type="button" data-month="next" aria-label="ماه بعد">‹</button><strong class="erp-jalali-title">${monthNames[month - 1]} ${toPersianDigits(year)}</strong><button class="erp-jalali-nav" type="button" data-month="previous" aria-label="ماه قبل">›</button></div><div class="erp-jalali-week">${weekNames.map((day) => `<span>${day}</span>`).join("")}</div><div class="erp-jalali-days"></div>`;
+        const input = activeInput;
+        const timeControl = input.dataset.jalaliTimeControl === "true";
+        const existingTime = normalizeDigits(input.value).match(/\s(\d{2}:\d{2})/)?.[1];
+        if (timeControl) {
+            popover.insertAdjacentHTML("beforeend", '<div class="erp-jalali-time"><label>ساعت <input type="time" dir="ltr" data-jalali-clock></label><button type="button" class="erp-jalali-time-done">انجام</button></div>');
+        }
+        const clock = popover.querySelector("[data-jalali-clock]");
+        if (clock) {
+            clock.value = existingTime || "";
+            clock.addEventListener("change", () => {
+                const day = parseJalali(input.value);
+                if (!day || !clock.value) return;
+                input.value = `${formatJalali(day)} ${toPersianDigits(clock.value)}`;
+                input.setCustomValidity("");
+                input.dispatchEvent(new Event("change", {bubbles: true}));
+            });
+            popover.querySelector(".erp-jalali-time-done").addEventListener("click", () => {
+                popover.hidden = true;
+                input.parentElement.querySelector(".erp-jalali-trigger")?.focus();
+            });
+        }
         const days = popover.querySelector(".erp-jalali-days");
         for (let index = 0; index < firstWeekday; index += 1) days.insertAdjacentHTML("beforeend", '<span class="erp-jalali-day-spacer"></span>');
         for (let day = 1; day <= daysInJalaliMonth(year, month); day += 1) {
@@ -177,11 +198,13 @@
             const button = event.target.closest("[data-day]");
             if (!button) return;
             const datePart = formatJalali([year, month, Number(button.dataset.day)]);
-            const timePart = activeInput.dataset.jalaliMode === "datetime" ? ` ${toPersianDigits(normalizeDigits(activeInput.value).split(/\s+/)[1] || "00:00")}` : "";
-            activeInput.value = datePart + timePart;
-            activeInput.setCustomValidity("");
-            popover.hidden = true;
-            activeInput.dispatchEvent(new Event("change", {bubbles: true}));
+            const chosenTime = clock?.value || existingTime || (clock ? "" : "00:00");
+            const timePart = input.dataset.jalaliMode === "datetime" && chosenTime ? ` ${toPersianDigits(chosenTime)}` : "";
+            input.value = datePart + timePart;
+            input.setCustomValidity("");
+            if (clock) clock.focus();
+            else popover.hidden = true;
+            input.dispatchEvent(new Event("change", {bubbles: true}));
         });
     }
 
@@ -210,10 +233,10 @@
         const popover = ensurePopover(input);
         const rect = input.getBoundingClientRect();
         const popoverWidth = Math.min(304, window.innerWidth - 32);
-        popover.style.top = `${Math.min(rect.bottom + 6, window.innerHeight - 340)}px`;
         popover.style.left = `${Math.max(16, Math.min(rect.right - popoverWidth, window.innerWidth - popoverWidth - 16))}px`;
         popover.hidden = false;
         renderPicker();
+        popover.style.top = `${Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - popover.offsetHeight - 8))}px`;
     }
 
     function enhanceInput(input) {
@@ -235,7 +258,7 @@
         input.type = "text";
         input.classList.add("erp-jalali-input");
         input.placeholder = input.dataset.jalaliMode === "datetime" ? "۱۴۰۵/۰۶/۲۳ ۱۴:۳۰" : "۱۴۰۵/۰۶/۲۳";
-        input.setAttribute("inputmode", "numeric");
+        input.setAttribute("inputmode", input.dataset.jalaliTimeControl === "true" ? "text" : "numeric");
         input.setAttribute("autocomplete", "off");
         input.setAttribute("maxlength", input.dataset.jalaliMode === "datetime" ? "16" : "10");
         input.addEventListener("input", () => {
@@ -252,6 +275,7 @@
 
     function prepareForm(form) {
         let valid = true;
+        const canonical = [];
         form.querySelectorAll("[data-jalali-enhanced]").forEach((input) => {
             if (!input.value.trim()) return;
             const parsed = parseJalali(input.value);
@@ -270,11 +294,13 @@
                     valid = false;
                     return;
                 }
-                input.value = `${datePart}T${pad(timeMatch[1])}:${timeMatch[2]}`;
-            } else input.value = datePart;
+                canonical.push([input, `${datePart}T${pad(timeMatch[1])}:${timeMatch[2]}`]);
+            } else canonical.push([input, datePart]);
         });
         if (!valid) {
             form.querySelector("[data-jalali-enhanced]:invalid")?.reportValidity();
+        } else {
+            canonical.forEach(([input, value]) => { input.value = value; });
         }
         return valid;
     }

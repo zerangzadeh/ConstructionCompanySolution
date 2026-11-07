@@ -1,0 +1,138 @@
+"""Opt-in grouping of bound form fields for shared presentation."""
+
+from django import template
+
+register = template.Library()
+
+SECTIONED_PROFILES = {
+    "equipment_maintenance": (
+        (
+            "record",
+            "مشخصات سرویس یا تعمیر",
+            "document",
+            (
+                "equipment",
+                "record_number",
+                "maintenance_type",
+                "summary",
+                "scheduled_date",
+            ),
+        ),
+        ("context", "محل و ارائه‌دهنده خدمت", "layers", ("project", "site", "provider")),
+        ("details", "شرح کار و هزینه", "coins", ("description", "cost", "notes")),
+    ),
+    "safety": (
+        (
+            "scope",
+            "پروژه و محل وقوع",
+            "layers",
+            ("project", "site", "phase", "activity", "daily_report"),
+        ),
+        (
+            "incident",
+            "اطلاعات حادثه",
+            "hard-hat",
+            ("incident_number", "occurred_at", "incident_type", "severity"),
+        ),
+        ("details", "شرح و اقدام فوری", "notes", ("description", "immediate_action")),
+    ),
+    "quality": (
+        (
+            "scope",
+            "پروژه و محل مسئله",
+            "layers",
+            ("project", "site", "phase", "activity", "daily_report"),
+        ),
+        (
+            "issue",
+            "اطلاعات مسئله کیفیت",
+            "document",
+            ("issue_number", "identified_at", "issue_type", "severity"),
+        ),
+        (
+            "details",
+            "شرح و مرجع مشخصات",
+            "notes",
+            ("description", "specification_reference"),
+        ),
+    ),
+    "daily_report": (
+        ("scope", "محدوده پروژه", "layers", ("project", "site", "phase")),
+        (
+            "conditions",
+            "شرایط گزارش",
+            "calendar",
+            ("reporting_date", "weather_conditions", "labor_count"),
+        ),
+        (
+            "progress",
+            "کار و پیشرفت",
+            "document",
+            ("work_performed", "progress_summary"),
+        ),
+        (
+            "observations",
+            "کنترل‌ها و مشاهدات",
+            "notes",
+            ("issues_and_delays", "safety_notes", "quality_notes"),
+        ),
+        (
+            "references",
+            "رکوردها و اسناد مرتبط",
+            "document",
+            ("linked_safety_incidents", "linked_quality_issues", "linked_documents"),
+        ),
+    ),
+    "expense": (
+        (
+            "general",
+            "اطلاعات عمومی",
+            "document",
+            (
+                "project",
+                "phase",
+                "incurred_on",
+                "classification",
+                "source_reference",
+                "receipt_reference",
+            ),
+        ),
+        (
+            "financial",
+            "اطلاعات مالی",
+            "coins",
+            (
+                "amount",
+                "category",
+                "expense_category",
+                "vendor_name",
+                "party",
+                "description",
+            ),
+        ),
+        ("notes", "توضیحات", "notes", ("notes",)),
+    ),
+}
+
+
+@register.simple_tag
+def sectioned_form_sections(form, profile):
+    """Return every visible field once, preserving the existing widgets and binding."""
+    remaining = {field.name: field for field in form.visible_fields()}
+    sections = []
+    for key, title, icon, names in SECTIONED_PROFILES[profile]:
+        fields = [remaining.pop(name) for name in names if name in remaining]
+        if fields:
+            sections.append(
+                {"id": f"form-{key}", "title": title, "icon": icon, "fields": fields}
+            )
+    if remaining:
+        sections.append(
+            {
+                "id": "form-details",
+                "title": "جزئیات",
+                "icon": "document",
+                "fields": list(remaining.values()),
+            }
+        )
+    return sections

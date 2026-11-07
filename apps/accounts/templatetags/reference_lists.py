@@ -11,6 +11,60 @@ from core.list_filters import build_filter_bar
 register = template.Library()
 
 PROFILES = {
+    "materials": {
+        "restore_url_state": True,
+        "search": "q",
+        "placeholder": "جست‌وجوی کد یا نام مصالح…",
+        "result_label": "مصالح",
+        "default_sort": "name",
+        "quick": ("category",),
+        "sorts": (
+            ("code", "کد"),
+            ("name", "نام مصالح"),
+            ("unit", "واحد"),
+            ("category", "دسته‌بندی"),
+        ),
+    },
+    "material_categories": {
+        "restore_url_state": True,
+        "search": "q",
+        "placeholder": "جست‌وجوی کد یا نام دسته‌بندی…",
+        "result_label": "دسته‌بندی",
+        "default_sort": "name",
+        "quick": (),
+        "sorts": (
+            ("code", "کد"),
+            ("name", "نام دسته‌بندی"),
+            ("parent", "دسته‌بندی والد"),
+        ),
+    },
+    "equipment": {
+        "restore_url_state": True,
+        "search": "equipment",
+        "placeholder": "جست‌وجوی کد یا نام تجهیز…",
+        "result_label": "تجهیز",
+        "default_sort": "equipment",
+        "quick": ("category", "ownership", "status"),
+        "sorts": (
+            ("equipment", "کد و نام"),
+            ("category", "دسته"),
+            ("ownership", "مالکیت"),
+            ("status", "وضعیت"),
+        ),
+    },
+    "parties": {
+        "restore_url_state": True,
+        "search": "name",
+        "placeholder": "جست‌وجوی نام شخص یا شرکت…",
+        "result_label": "طرف تجاری",
+        "default_sort": "name",
+        "quick": ("kind", "tax_id"),
+        "sorts": (
+            ("name", "نام نمایشی"),
+            ("kind", "نوع"),
+            ("tax_id", "شناسه مالیاتی"),
+        ),
+    },
     "warehouses": {
         "search": "warehouse",
         "placeholder": "جست‌وجوی کد یا نام انبار",
@@ -134,12 +188,14 @@ def reference_list_state(context, profile):
                 choices=[
                     (
                         "",
-                        {
+                        column.get("empty_label")
+                        or {
                             "status": "همه وضعیت‌ها",
                             "severity": "همه شدت‌ها",
                             "category": "همه گروه‌ها",
                             "incident_type": "همه انواع",
                             "issue_type": "همه انواع",
+                            "ownership": "همه انواع مالکیت",
                         }.get(name, "همه گزینه‌ها")
                         if "quick" in config
                         else "همه وضعیت‌ها",
@@ -190,6 +246,7 @@ def reference_list_state(context, profile):
     if not explicit_sort:
         key = config["default_sort"]
     return {
+        "restore_url_state": config.get("restore_url_state", False),
         "bar": bar,
         "sorts": [{"key": name, "label": label} for name, label in config["sorts"]],
         "sort": {

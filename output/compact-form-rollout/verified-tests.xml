@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="19" time="216.881" timestamp="2026-11-05T01:24:25.379374+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_compact_form_rollout.CompactFormRolloutTests" name="test_calendar_forms" time="105.471" /><testcase classname="tests.test_compact_form_rollout.CompactFormRolloutTests" name="test_migrated_forms" time="110.862"><failure message="AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:307&#10;          if (i===199) throw new Error('Browser history did not restore the requested URL');&#10;                             ^&#10;&#10;Error: Browser history did not restore the requested URL&#10;    at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:307:30&#10;&#10;Node.js v24.20.0">tests\test_compact_form_rollout.py:441: in test_migrated_forms
+    self.browser(self.owner, journeys)
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:307
+E             if (i===199) throw new Error('Browser history did not restore the requested URL');
+E                                ^
+E   
+E   Error: Browser history did not restore the requested URL
+E       at file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:307:30
+E   
+E   Node.js v24.20.0</failure></testcase></testsuite></testsuites>

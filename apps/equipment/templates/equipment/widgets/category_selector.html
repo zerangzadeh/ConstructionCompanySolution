@@ -1,0 +1,5 @@
+<div class="erp-business-choice" data-field-search>
+{% include "django/forms/widgets/input.html" %}
+<datalist id="{{ widget.attrs.list }}">{% for category in widget.categories %}<option value="{{ category }}"></option>{% endfor %}</datalist>
+<span class="sr-only" data-choice-status aria-live="polite"></span>
+</div>

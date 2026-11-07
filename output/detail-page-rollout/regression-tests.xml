@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="15" time="162.246" timestamp="2026-11-05T18:57:59.541831+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_compact_form_rollout.CompactFormRolloutTests" name="test_migrated_forms" time="93.619"><failure message="AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:79&#10;    if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description || result.exceptionDetails.text);&#10;                                       ^&#10;&#10;Error: TypeError: Cannot read properties of null (reading 'innerText')&#10;    at &lt;anonymous&gt;:1:71&#10;    at evaluate (file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:79:40)&#10;    at async file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:341:23&#10;&#10;Node.js v24.20.0">tests\test_compact_form_rollout.py:643: in test_migrated_forms
+    self.browser(
+apps\billing\test_mvp03_browser.py:230: in browser
+    self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[-3000:])
+E   AssertionError: 1 != 0 : file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:79
+E       if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description || result.exceptionDetails.text);
+E                                          ^
+E   
+E   Error: TypeError: Cannot read properties of null (reading 'innerText')
+E       at &lt;anonymous&gt;:1:71
+E       at evaluate (file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:79:40)
+E       at async file:///E:/Construction_Company_Solution/scripts/verification/mvp02_browser.mjs:341:23
+E   
+E   Node.js v24.20.0</failure></testcase><testcase classname="tests.test_record_detail_adopters.RecordDetailAdoptionTests" name="test_hse_closed_history_and_real_actions" time="68.059" /></testsuite></testsuites>

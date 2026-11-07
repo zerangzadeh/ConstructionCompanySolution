@@ -1,49 +1,29 @@
-{% extends "base.html" %}{% load product_surface %}
-{% load erp_format %}
-{% block title %}داشبورد مدیریت{% endblock %}
+{% extends "base.html" %}{% load erp_format product_surface %}
+{% block title %}گزارش‌های عملیاتی | بنیرا{% endblock %}
+{% block extra_head %}{% include "components/dashboard_reporting_assets.html" %}{% endblock %}
 {% block content %}
-<div class="mx-auto max-w-7xl space-y-6 px-4 py-6" dir="rtl">
-  <header class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-    <p class="text-xs font-semibold text-blue-700">گزارش‌ها و اطلاعات مدیریتی</p>
-    <h1 class="mt-2 text-2xl font-bold text-slate-900">داشبورد مدیریت</h1>
-    <p class="mt-2 text-sm text-slate-600">وضعیت عملکرد و موارد نیازمند توجه را ببینید؛ برای بررسی علت هر نتیجه وارد جزئیات شوید.</p>
-    <nav aria-label="فضاهای گزارش‌گیری" class="mt-4 flex flex-wrap gap-3">
-      {% if "reporting.reconciliation_run.view" in business_permission_codes %}{% if "reporting:reconciliation_workbench"|surface_exposed %}<a class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-blue-700" href="{% url 'reporting:reconciliation_workbench' %}">تطبیق منابع</a>{% endif %}{% endif %}
-      {% if "reporting.project_closeout_case.view" in business_permission_codes %}{% if "reporting:project_closeout_workbench"|surface_exposed %}<a class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-blue-700" href="{% url 'reporting:project_closeout_workbench' %}">آمادگی اختتام پروژه</a>{% endif %}{% endif %}
-    </nav>
-  </header>
-
-  <p class="text-sm text-slate-600">زمان مشاهده: {{ read_model.observed_at|jalali_datetime }} · نتایج تا: {{ read_model.as_of|jalali_datetime }}. وضعیت تازگی، وضعیت ثبت‌شده منبع در زمان مشاهده است.</p>
-  <nav aria-label="لایه‌های گزارش" class="flex flex-wrap gap-3">
-    {% for layer in read_model.layers %}<a class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-blue-700" href="#reporting-{{ layer.code }}">{{ layer.title }}</a>{% endfor %}
-  </nav>
+<div class="erp-dashboard erp-reference-list erp-reference-pattern" data-page-family="dashboard">
+  {% include "components/page_header.html" with page_title="گزارش‌های عملیاتی" page_description="وضعیت و پوشش آخرین نتایج قابل مشاهده؛ هر نتیجه با زمان و محدوده منبع خود ارائه می‌شود." page_icon="document" only %}
+  <div class="erp-insight-context"><span>زمان مشاهده: <bdi dir="ltr">{{ read_model.observed_at|jalali_datetime }}</bdi></span><span>نتایج تا: <bdi dir="ltr">{{ read_model.as_of|jalali_datetime }}</bdi></span></div>
+  <p class="erp-insight-note">وضعیت تازگی مربوط به زمان مشاهده است. نتیجه ناقص یا بررسی‌نشده مبنای تصمیم‌گیری نیست؛ اطلاعات این صفحه سوابق منبع را تغییر نمی‌دهد.</p>
+  {% if read_model.layers|length > 1 or 'reporting:drillthrough'|surface_exposed %}<nav aria-label="بخش‌های گزارش" class="erp-insight-nav">
+    {% for layer in read_model.layers %}<a href="#reporting-{{ layer.code }}">{{ layer.title }}</a>{% endfor %}
+    {% if "reporting.reconciliation_run.view" in business_permission_codes and "reporting:reconciliation_workbench"|surface_exposed %}<a href="{% url 'reporting:reconciliation_workbench' %}">تطبیق منابع</a>{% endif %}
+    {% if "reporting.project_closeout_case.view" in business_permission_codes and "reporting:project_closeout_workbench"|surface_exposed %}<a href="{% url 'reporting:project_closeout_workbench' %}">آمادگی اختتام پروژه</a>{% endif %}
+  </nav>{% endif %}
   {% for layer in read_model.layers %}
-  <section id="reporting-{{ layer.code }}" aria-labelledby="title-{{ layer.code }}" class="space-y-3">
-    <h2 id="title-{{ layer.code }}" class="text-lg font-bold text-slate-900">{{ layer.title }}</h2>
-    <details class="text-xs text-slate-500"><summary class="cursor-pointer">درباره شاخص‌های این بخش</summary><p class="mt-2">{{ layer.description }}</p></details>
-    {% if not layer.available %}
-      <p class="rounded-xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">این بخش برای حساب شما در دسترس نیست.</p>
-    {% else %}
-    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+  <section id="reporting-{{ layer.code }}" aria-labelledby="title-{{ layer.code }}">
+    <div class="erp-insight-heading"><h2 id="title-{{ layer.code }}">{{ layer.title }}</h2><span>آخرین نتیجه هر شاخص در محدوده مجاز</span></div>
+    <details class="erp-insight-note"><summary>درباره شاخص‌های این بخش</summary><p>{{ layer.description }}</p></details>
+    {% if not layer.available %}<p class="erp-insight-empty">این بخش برای حساب شما در دسترس نیست.</p>
+    {% else %}<div class="erp-insight-card-grid">
       {% for card in layer.cards %}
-        {% if layer.code == 'management' or layer.code == 'executive' or not 'reporting:drillthrough'|surface_exposed %}
-          {% include 'reporting/_read_model_card.html' with show_values=True %}
-        {% else %}
-          {% include 'reporting/_read_model_card.html' with show_values=False %}
-        {% endif %}
-      {% empty %}<p class="rounded-xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">نتیجه قابل نمایشی برای شما موجود نیست.</p>{% endfor %}
-    </div>
-    {% endif %}
-  </section>
-  {% endfor %}
-  {% if "reporting.export.create" in business_permission_codes and "reporting.export.download" in business_permission_codes %}{% if "reporting:export"|surface_exposed %}<form method="post" action="{% url 'reporting:export' %}">{% csrf_token %}
-    <input type="hidden" name="purpose" value="داشبورد مدیریتی">
-    <button class="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white" type="submit">دریافت گزارش CSV</button>
-  </form>{% endif %}{% endif %}
-
-{% if "reporting:drillthrough"|surface_exposed %}  <details class="rounded-xl border border-slate-200 bg-white p-5">
-    <summary class="cursor-pointer font-bold text-slate-700">تعریف و منابع شاخص‌ها</summary>
-    <div class="mt-4 overflow-x-auto"><table class="min-w-full text-right text-sm"><thead><tr class="border-b text-slate-500"><th class="p-2">شناسه</th><th class="p-2">نام فارسی</th><th class="p-2">دامنه منبع</th><th class="p-2">مالک منبع</th></tr></thead><tbody>{% for metric in definitions %}<tr class="border-b border-slate-100"><td class="p-2 font-mono" dir="ltr">{{ metric.code }}</td><td class="p-2 font-semibold">{{ metric.persian_name }}</td><td class="p-2">{{ metric.source_domain }}</td><td class="p-2">{{ metric.source_owner }}</td></tr>{% endfor %}</tbody></table></div>
-  </details>{% endif %}
+        {% if layer.code == 'management' or layer.code == 'executive' or not 'reporting:drillthrough'|surface_exposed %}{% include 'reporting/_read_model_card.html' with show_values=True %}
+        {% else %}{% include 'reporting/_read_model_card.html' with show_values=False %}{% endif %}
+      {% empty %}<p class="erp-insight-empty">نتیجه قابل نمایشی برای شما موجود نیست.</p>{% endfor %}
+    </div>{% endif %}
+  </section>{% endfor %}
+  {% if "reporting.export.create" in business_permission_codes and "reporting.export.download" in business_permission_codes and "reporting:export"|surface_exposed %}<form method="post" action="{% url 'reporting:export' %}">{% csrf_token %}<input type="hidden" name="purpose" value="داشبورد مدیریتی"><button class="erp-btn erp-btn--secondary" type="submit">دریافت گزارش CSV</button></form>{% endif %}
+  {% if "reporting:drillthrough"|surface_exposed %}<details class="erp-insight-section"><summary class="erp-insight-heading">تعریف و منابع شاخص‌ها</summary><div class="erp-report-table" role="region" aria-label="تعریف و منابع شاخص‌ها" tabindex="0"><table><thead><tr><th scope="col">شناسه</th><th scope="col">نام فارسی</th><th scope="col">دامنه منبع</th><th scope="col">مالک منبع</th></tr></thead><tbody>{% for metric in definitions %}<tr><td dir="ltr">{{ metric.code }}</td><td>{{ metric.persian_name }}</td><td>{{ metric.source_domain }}</td><td>{{ metric.source_owner }}</td></tr>{% endfor %}</tbody></table></div></details>{% endif %}
 </div>
 {% endblock %}

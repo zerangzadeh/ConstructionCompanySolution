@@ -1,11 +1,15 @@
 """Paginated, source-separated histories; filtering has no domain effects."""
 
+from datetime import date, timedelta
+from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
 
 from django import forms
 from django.core.paginator import Paginator
-from django.db.models import Exists, OuterRef, Q
+from django.db.models import Count, Exists, OuterRef, Q
 from django.db.models.functions import TruncDate
+from django.http import HttpRequest
+from django.utils import timezone
 
 from apps.organizations.authorization import (
     get_active_membership,
@@ -15,6 +19,8 @@ from apps.organizations.authorization import (
 from apps.workforce.field_forms import FieldFilterForm, searchable_choices
 from apps.workforce.field_selectors import context_employees, scoped_employees
 from apps.workforce.models import Employee
+from core.forms import parse_jalali_date
+from core.jalali import format_jalali, gregorian_to_jalali
 
 from .models import (
     AttendanceCorrectionRequest,
@@ -24,6 +30,93 @@ from .models import (
     Timesheet,
     TimesheetEntry,
 )
+
+JALALI_MONTH_NAMES = (
+    "فروردین",
+    "اردیبهشت",
+    "خرداد",
+    "تیر",
+    "مرداد",
+    "شهریور",
+    "مهر",
+    "آبان",
+    "آذر",
+    "دی",
+    "بهمن",
+    "اسفند",
+)
+
+
+def attendance_calendar(
+    request: HttpRequest, records, tenant_tz: ZoneInfo, date_from: date | None = None
+):
+    """Summarize the existing scoped attendance queryset by Jalali work date."""
+    query = request.GET.copy()
+    for key in (
+        "attendance_page",
+        "correction_page",
+        "leave_page",
+        "overtime_page",
+        "timesheet_page",
+        "view",
+        "month",
+    ):
+        query.pop(key, None)
+
+    def url(**values):
+        return f"?{urlencode({**query.dict(), **values})}"
+
+    result = {"list_url": url(), "calendar_url": url(view="calendar")}
+    if request.GET.get("view") != "calendar":
+        return result
+
+    def month_start(year, month):
+        return parse_jalali_date(f"{year:04d}/{month:02d}/01")
+
+    today = timezone.localdate(timezone=tenant_tz)
+    preferred_date = date_from or today
+    try:
+        year, month = map(int, request.GET.get("month", "").split("-"))
+        # Leave room for navigation at both ends of the Gregorian date range.
+        if not 1 < year < 9000 or not 1 <= month <= 12:
+            raise ValueError
+    except ValueError:
+        year, month, _day = gregorian_to_jalali(
+            preferred_date.year, preferred_date.month, preferred_date.day
+        )
+    previous = (year - 1, 12) if month == 1 else (year, month - 1)
+    following = (year + 1, 1) if month == 12 else (year, month + 1)
+    start, end = month_start(year, month), month_start(*following)
+    counts = dict(
+        records.filter(work_date__gte=start, work_date__lt=end)
+        .order_by()
+        .values("work_date")
+        .annotate(count=Count("pk", distinct=True))
+        .values_list("work_date", "count")
+    )
+    days = [None] * ((start.weekday() + 2) % 7)
+    for offset in range((end - start).days):
+        day = start + timedelta(days=offset)
+        label = format_jalali(day)
+        days.append(
+            {
+                "number": offset + 1,
+                "label": label,
+                "today": day == today,
+                "count": counts.get(day, 0),
+                "url": url(date_from=label, date_to=label),
+            }
+        )
+    result.update(
+        active=True,
+        days=days,
+        count=sum(counts.values()),
+        year=year,
+        month_name=JALALI_MONTH_NAMES[month - 1],
+        previous_url=url(view="calendar", month=f"{previous[0]}-{previous[1]:02d}"),
+        next_url=url(view="calendar", month=f"{following[0]}-{following[1]:02d}"),
+    )
+    return result
 
 
 def fully_scoped_timesheets(queryset, membership):
@@ -180,7 +273,13 @@ def history_context(request, context):
                 Q(pk__in=sheets.values("pk")) | Q(pk__in=own.values("pk"))
             ).select_related("employee")
 
-    result = {"history_form": form, "field_context": context}
+    result = {
+        "history_form": form,
+        "field_context": context,
+        "attendance_calendar": attendance_calendar(
+            request, attendance, tenant_tz, cleaned.get("date_from")
+        ),
+    }
     specs = (
         ("attendance_records", "attendance_page", attendance, "-work_date"),
         (

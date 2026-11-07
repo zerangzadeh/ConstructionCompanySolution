@@ -1,11 +1,29 @@
 from django.urls import path
 
-from apps.organizations import views
+from apps.organizations import platform_views, views
 from apps.organizations.reference_personas import reference_persona_catalogue
 
 app_name = "organizations"
 
 urlpatterns = [
+    path(
+        "platform/companies/", platform_views.company_list, name="platform_company_list"
+    ),
+    path(
+        "platform/companies/<uuid:organization_id>/",
+        platform_views.company_detail,
+        name="platform_company_detail",
+    ),
+    path(
+        "platform/companies/<uuid:organization_id>/edit/",
+        platform_views.company_edit,
+        name="platform_company_edit",
+    ),
+    path(
+        "platform/companies/<uuid:organization_id>/status/",
+        platform_views.company_status,
+        name="platform_company_status",
+    ),
     path(
         "platform/reference-personas/",
         reference_persona_catalogue,

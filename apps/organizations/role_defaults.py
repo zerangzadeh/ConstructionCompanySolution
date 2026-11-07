@@ -3,7 +3,10 @@ from apps.organizations.permission_catalog import (
     permission_codes,
     permission_codes_with_suffix,
 )
-from apps.organizations.permission_registry import registered_permission_codes
+from apps.organizations.permission_registry import (
+    PLATFORM_COMPANY_PERMISSIONS,
+    registered_permission_codes,
+)
 from apps.organizations.role_reconciliation import (
     ROLE_PERMISSION_ADDITIONS,
     SPECIALIST_ROLE_DESCRIPTIONS,
@@ -356,6 +359,7 @@ READ_ONLY_PERMISSIONS = (
 )
 MEMBER_OPERATION_PERMISSIONS = permission_codes(
     BusinessPermissionCode.DAILY_REPORTS_CREATE,
+    BusinessPermissionCode.DAILY_REPORTS_LINK_RECORDS,
     BusinessPermissionCode.DAILY_REPORTS_ADD_LABOR,
     BusinessPermissionCode.DAILY_REPORTS_ADD_EQUIPMENT,
     BusinessPermissionCode.DAILY_REPORTS_ADD_MATERIAL,
@@ -959,3 +963,7 @@ for _code, _description in SPECIALIST_ROLE_DESCRIPTIONS.items():
         "is_system": True,
         "is_owner": False,
     }
+
+# Platform company authority requires the independently assigned platform duty.
+for _permissions in DEFAULT_ROLE_PERMISSIONS.values():
+    _permissions.difference_update(PLATFORM_COMPANY_PERMISSIONS)

@@ -473,12 +473,14 @@ Use for:
 
 - organization context
 - contextual navigation
-- search where supported
 - notifications where supported
 - user/profile controls
 - mobile navigation trigger
 
 Do not place all ERP modules in the top header.
+
+Do not show the shared project/material search box in the top header or context
+bar. Keep business search within the relevant page's search/filter area.
 
 ---
 
@@ -663,7 +665,7 @@ RTL display.
 ### 14.2 Reference Create Form Pattern
 
 The Product Owner's [supplied Contract Create image](../output/contract-create-reference/reference.png)
-(2026-11-01) is the final visual acceptance reference for BONIRA Create forms.
+(2026-11-01) is the visual acceptance reference for the Contract Create family.
 `templates/contracts/create.html`
 implements the pattern; **Product Owner visual acceptance is PENDING**. This is
 not approval of the implementation or authorization to roll it out to other pages.
@@ -688,6 +690,103 @@ Acceptance requires functional checks and real Chrome evidence at 1440, 1024
 and 390px, direct screenshot comparison to the reference and separate Product
 Owner visual acceptance. Technical conformance does not issue that acceptance.
 See the [bounded implementation evidence](../output/contract-create-reference/REPORT.md).
+
+### 14.3 Compact Form Pattern
+
+The Product Owner approved the Compact Form design on 2026-11-05. The final
+[visual reference](compact-form-reference.png) and
+[layout specification](compact-form-specification.png) apply to standalone
+Create/Edit pages whose fields fit in one logical section. Warehouse Create is
+the implementation reference. Each rollout page has its own visual review.
+
+- Use the Warehouse List's shared working-context disclosure in the application
+  header. Show it once. Keep an inherited record parent and an editable form
+  relationship distinct from the global company/project/site controls.
+- Place breadcrumbs and a short title and description above one restrained
+  surface. Use the shared field and section components, canonical colors,
+  labels above fields, and two RTL columns for related controls. Use one column
+  below 640px. Keep long text readable and allow the card to grow with content.
+- Use the current bound fields, native or enhanced selectors, and required
+  indicators. Show errors beneath their controls and non-field errors above
+  the grid. Preserve values, keyboard focus indicators, and existing permissions.
+- Keep one action row inside the form in normal flow. Place the existing primary
+  action first in RTL reading order and stack the actions on mobile. Use the
+  existing authorized Cancel destination and respect read-only access.
+- Verify 1440px and 390px in Chrome, including errors, access, actions and
+  overflow. Keep specialized and multi-section forms in their own patterns.
+
+See the [Compact Form Reuse Guide](../templates/components/README.md#compact-form-reuse-guide).
+
+### 14.4 Sectioned Form Pattern
+
+Use the [Sectioned Form visual reference](sectioned-form-reference.png) for a
+standalone Create/Edit form with several logical field groups. Expense is the
+pilot. Safety Incident, Quality Issue and the classic Daily Report are suitable
+  adopters. These implementations require their own Product Owner visual review.
+
+Extend `components/sectioned_form_page.html` for the same application context
+header and page width as Compact Forms. Render a shared page header with the
+existing breadcrumbs and real description. Use `.erp-create-form.erp-sectioned-form`
+and `components/sectioned_form_fields.html`, with a profile from
+`apps/accounts/templatetags/form_layouts.py`. Profiles group bound fields for presentation.
+Hidden fields remain in the form and additional fields appear in a final section.
+
+Reuse `form_section_header.html`, `form_field.html`, `form_errors.html` and
+`form_footer.html`. Use the canonical colors, subtly tinted section headers,
+compact section spacing, two desktop columns and mobile stacking below 640px.
+Long text spans the row. Keep existing field types, required flags, choice
+widgets, parent relationships and dependent options. Show field errors beneath
+their controls and keep non-field errors visible above the sections. Use one
+real primary action and Cancel at the bottom in normal document flow. Preserve
+each action's existing destination and business meaning.
+
+Workforce and Timekeeping forms use the same section headers and footer. After
+an invalid submit, focus the first field with an error, including the visible
+search input for an enhanced selector. Keep the summary available for navigation
+and preserve the submitted values.
+
+Work Log uses separate hour and minute inputs for both the total and each
+allocation. Display recorded duration in hours and minutes. The period dates
+define the reporting range, and the application validates and stores duration
+in whole minutes. Keep Work Calendar and Shift selectors distinct from the
+Jalali date picker and the read-only monthly attendance view.
+
+Workforce and Timekeeping filter disclosures progressively enhance to a button
+with `aria-expanded` and `aria-controls`, preserving their existing form controls
+and explicit Apply action. Use this bounded enhancement where native details
+leave searchable controls hidden after opening. Retain native disclosure markup
+for operation without JavaScript.
+
+Sections stay expanded in this rollout so every field and error is immediately
+available. A future collapsible section must retain all submitted fields, expose
+errors automatically, provide keyboard operation and work without JavaScript.
+The illustration's uploads, statuses and calculations are examples only. Render
+them only when the consuming form already supports them.
+
+Daily Report Create now supports a separate related-record section: searchable
+multiple selectors for existing Safety/Quality records and DMS documents, plus
+the existing DMS title/type/file controls for an optional new document. Retain
+the free-text safety/quality notes. HSE references require
+`daily_reports.link_records` and source read access in the same project, site
+and phase; source context and review/workflow state never change. Reuse the
+shared selector assets, native fallback, field errors and single form footer.
+Only show controls the actor may use; recheck access on submission. A file must
+be selected again after an invalid POST, while text and record selections persist.
+
+Verify each adopted route in Chrome at 1440, 1024 and 390px, including errors,
+value retention, Save, Cancel, Tab navigation, RTL and restricted access. Keep
+line-item workspaces, financial commands, identity wizards, workflow editors
+and specialized field-worker entry flows in their existing patterns.
+
+Equipment Maintenance Create uses the `equipment_maintenance` Sectioned Form
+profile: service identity/schedule, project/site/provider, and work/cost/notes.
+All original fields and submission destinations remain. Equipment's existing
+text category uses the shared searchable control with an editable, opt-in local
+choice mode and a native datalist fallback. Suggestions come only from the active
+tenant's unarchived equipment. It is not a new category master or a restricted
+taxonomy; server text validation and newly entered category values remain valid.
+Record-specific selected values must survive invalid POSTs without delimiter
+splitting. Relationship selectors retain their non-creatable behavior.
 
 ## 15. Buttons
 
@@ -781,7 +880,7 @@ Approved detail-page structure:
 4. Business code/number, with LTR isolation where needed
 5. Semantic status badge
 6. Primary/secondary actions
-7. Compact KPI summary where useful
+7. Compact summary of existing identity, date, status and business values where useful
 8. Tabs/section navigation
 9. Information sections
 10. Related-domain lists
@@ -795,6 +894,51 @@ Record-section tabs do not replace the persistent sibling-page navigation
 defined in section 10.
 
 Prefer read-only information sections over disabled form inputs.
+
+### Record Detail Pattern
+
+The visual layout reference is `docs/detail-page-reference.png` (Expense example).
+It specifies presentation, not new fields or capabilities. Expense Detail is the
+first implementation. This rollout is technically reviewable; individual pages
+still require Product Owner visual review.
+
+- Extend `components/record_detail_page.html`. Reuse `page_header`, breadcrumbs,
+  `form_section_header`, status badges, document panels and existing related lists.
+  The shared application header owns working-context switching, as on Warehouse
+  List. A record's own project/site is information, not a context-switch control.
+- Keep identity and actual lifecycle actions together in a compact, wrapping
+  heading. Isolate codes and dates with `bdi` or the existing formatters. Show only
+  actions authorized for the current user and record state. Never infer Edit,
+  Print, Clone, workflow or financial actions from the illustration.
+- Use `record_summary_item.html` and `record_detail_value.html` for a small summary
+  of actual fields. Do not introduce calculated KPIs or duplicate an oversized
+  dashboard. Status uses the canonical badge labels and semantic colors.
+- Group actual content into labeled sections, with compact two-column definition
+  lists where suitable. Keep related operational tables and forms in their own
+  existing structures. Empty optional sections or tabs are omitted.
+- For several populated sections, use ordinary anchor links with an accessible
+  navigation label. No JavaScript is needed and validation stays visible. Use
+  URL-backed tabs only when independently addressable content warrants them.
+- Show actual historical metadata and existing review revisions, including their
+  actor, tenant-local timestamp and reason. `record_review_history.html` renders
+  existing HSE review evidence; it does not create a new audit/history authority.
+- Keep POST/CSRF, field names, attachments, value retention, validation and
+  permission restrictions intact. Every input has a unique associated label.
+  Destructive actions retain their existing reason and confirmation requirements.
+- Use the opt-in `erp_record_detail.css` and canonical tokens. At desktop/tablet,
+  summary cells fit the available content width and actions wrap. Below 768px,
+  information lists stack; below 480px, summary rows stack. Tables scroll within
+  their own container. No page-level horizontal overflow or fixed action footer.
+  Preserve visible keyboard focus and natural document order in RTL.
+- Combined detail/edit endpoints for Materials and expense categories retain the
+  approved Compact Form fields and footer; only existing-record identity and
+  summary adopt these conventions. Contract, Billing, Procurement, Inventory,
+  Workflow, DMS and Daily Report operational workspaces keep their specialized
+  forms, calculations, tables and lifecycle. Projects remains subject to section 30.
+
+Classifications and per-route browser evidence for this rollout are recorded in
+`output/detail-page-rollout/REPORT.md` and `catalog.md`. A passing template or test
+does not establish visual verification for an uncaptured page or state.
 
 ---
 
@@ -1083,7 +1227,7 @@ claim that any listed library is installed, integrated or qualified in BONIRA.
 | Capability | Preferred default | Use when needed | Keep the simpler approach when |
 | --- | --- | --- | --- |
 | Advanced selects | Tom Select | Large option sets, searchable/multi-select, autocomplete or remote/AJAX lookup for project, site, party, employee, material, contract and similar masters | A short native dropdown is sufficient. Select2 is not the default; do not introduce jQuery solely for a select widget when a strong dependency-free alternative exists. |
-| Confirmations and focused dialogs | SweetAlert2 | Important delete, void/cancel, irreversible or submit/approve/reject confirmations, or short success/error interactions that justify a modal under section 47 | Ordinary Django messages, inline validation, simple toast/status feedback or routine reversible actions suffice. Do not turn every message or workflow action into a modal. |
+| Toasts, confirmations and interactive alerts | SweetAlert2 (mandatory) | All MVP-visible transient feedback and existing consequential confirmations use the shared Stage 6 integration (section 55). | Validation, empty/loading states, status badges, persistent contextual guidance and 403/404/500 pages stay inline. Routine actions do not gain confirmations. |
 | Advanced data grids | Tabulator | A business table genuinely needs large-dataset handling, advanced filters/sort, grouping, frozen columns, remote pagination or interactive row operations, such as complex inventory/cardex, procurement or reporting views | A normal Django/Tailwind table with server-side sorting/filtering/pagination meets the need. Do not convert simple CRUD lists into grids. |
 | Charts | Chart.js | A chart improves a business decision: project progress, expense trends, procurement status, workforce/equipment utilization, safety/quality trends or inventory movements | KPI cards, tables or text communicate the result adequately. Never invent data or placeholder metrics to justify a chart. |
 | Jalali date/time input | JalaliDatePicker (`@majidh1/jalalidatepicker`), or a currently verified compatible equivalent when repository constraints justify it | Persian/Jalali input requires more than browser-native Gregorian controls | An existing verified shared solution already meets the requirement. Preserve section 32's `erp_jalali` / `JalaliDateMixin` contract; this preference neither orders replacement nor certifies the current helper as an equivalent library. |
@@ -1939,3 +2083,251 @@ Before a new or materially changed screen is accepted, verify:
   arbitrary or near-duplicate color values; and
 - representative browser verification plus applicable Django/template/tests and
   Ruff checks.
+
+
+## 52. Operational Workspace Pattern
+
+Operational workspaces compose the accepted Page Header, Filter Bar, List Page
+foundation, semantic Status Badges, empty states and responsive patterns. Use
+`components/operational_workspace.html` and the opt-in
+`css/erp_operational_workspace.css` for mixed operational pages. Do not change the
+application shell or accepted List, Compact Form, Sectioned Form or Detail patterns
+as part of workspace adoption. The supplied Operational Workspace Blueprint is
+visual guidance only; its sample counts, tabs and actions are not contracts.
+
+### Hierarchy and source authority
+
+- Start with one Persian page title and a short business description, followed by
+  the existing permitted actions and operational context.
+- Use compact summary strips only for counts already supplied by the authoritative
+  view/service. State whether counts cover the authorized queue before filters,
+  filtered results, or a bounded displayed history. Never sum overlapping routing
+  categories or label a capped history as an organization-wide total.
+- Follow with the existing GET filters, visible active-filter chips, result count
+  and the real records. Reuse `components/filter_bar.html`, `build_filter_bar`,
+  `list_result_summary.html` and `list_pagination.html` without a second filter
+  implementation. When search does not exist, use an existing leading selector;
+  do not invent text search, date ranges or other query semantics.
+- Keep states, deadlines and priorities only where the source already provides
+  them. Use shared Status Badges and Jalali date presentation. A summary is a
+  projection of its existing source, never a new task, financial or stock authority.
+
+### Workflow Inbox pilot
+
+The centralized Inbox remains the authoritative user work queue. Its membership,
+permission, project/site scope, candidacy, routing evidence, ordering, pagination,
+claim/release, CSRF, idempotency tokens, outcomes and domain handoffs remain owned
+by the existing workbench/runtime. `operational_workspaces.workflow_filter_bar`
+adapts the already-scoped choices for presentation only; it performs no queries
+or queue filtering. Workflow type is the leading selector; project/assignment are
+quick filters and site/position/priority/deadline remain secondary filters.
+
+Existing all-work, role/permission and position links retain their URLs and
+pre-filter counts. Categories can overlap; they are not status totals. Display the
+filtered paginator count beside the records. Retain assignment history and the
+Safety / Inventory reversal links to their specialized source forms. Empty
+filtered results keep filters and clear actions available.
+
+### Domain adaptation and responsive behavior
+
+- Inventory custody keeps reservations, counts, transfers, expiry and reconciliation
+  separate. Label bounded histories (20 reservations/counts/transfers, up to 20
+  lots and 20 serials for expiry); do not add unsupported filters or pagination.
+- Equipment operations retain daily capture, maintenance and planning groups,
+  the existing bounded summary, work-order lifecycle and evidence/spare links.
+- Timekeeping retains independent attendance, correction, leave/mission, overtime
+  and timesheet histories with their existing filters and independent pagination.
+  Keep calendar/shift setup secondary. Do not present mixed records as one task
+  queue or invent a combined actionable KPI.
+- Safety and Quality already use the accepted operational List pattern. Preserve
+  their lists, specialized detail/review forms and domain workflow. A new dashboard
+  or statistics layer is not required for workspace consistency.
+- On desktop use compact tables with a clear subject/state/action hierarchy. At
+  narrow widths use readable record cards or a labeled, keyboard-focusable local
+  scroll region. Retain every field and permitted action. Wrap text and action
+  groups; never create document-wide horizontal overflow or hide the only action.
+- Filters remain usable without JavaScript. Explicit Apply, removable chips,
+  browser Back/Forward and refresh must retain server-owned URL state. No new
+  bulk selection, tabs, statuses, priorities, deadlines, task aggregation or
+  capabilities are implied by this pattern.
+
+Adoption requires real browser evidence at 1440px, 1024px and 390px with populated
+and empty states, filtering where supported, permitted actions, access restrictions,
+RTL and navigation, plus focused regressions. Technical completion and screenshots
+do not constitute Product Owner acceptance.
+
+## 53. Dashboard Pattern
+
+Dashboard and Reporting are distinct page families with one visual language. The
+Stage 5 Dashboard & Reporting image guides hierarchy, compact panels and responsive
+composition; it does not define data, KPI formulas, periods or available actions.
+The Project command center is the Dashboard pilot. Home keeps its personal-work
+composition; operational metric reporting keeps source freshness/review/coverage;
+commercial exposure keeps currency, instrument type and issued/received sides apart.
+
+- Compose the existing Page Header (or established project identity header),
+  contextual navigation, a compact row of supported KPIs, primary analysis and
+  secondary source/operational sections. Use `erp-dashboard`, the opt-in
+  `css/erp_dashboard_reporting.css`, `components/dashboard_reporting_assets.html`
+  and `components/dashboard_metric.html` where the existing KPI shape applies.
+  Reuse Home metrics, `components/dashboard_chart.html`, Status Badges and the
+  existing locally bundled Chart.js presentation; do not create another chart API.
+- Give each KPI a meaningful label, exact source value, unit and scope/coverage note.
+  Use `erp_number`, organization/source currency and Jalali formatting. Keep
+  partial, unreviewed, stale and absent evidence explicit. Unknown is not zero.
+  No progress, variance, aggregate financial total, trend or comparison may be
+  inferred merely because the reference image shows one.
+- Show a chart only for the existing validated payload and semantic comparison.
+  Keep its exact server-rendered values accessible, including when JavaScript or
+  the chart asset fails. Tooltips remain Persian RTL. Drill-downs must already
+  exist and retain their tenant/project scope, permissions and Product Surface.
+- Give primary analysis more weight than secondary histories and quick links.
+  Wrap KPI values and navigation at 390px; stack analysis panels at tablet widths.
+  Use existing responsive tokens, visible keyboard focus and semantic headings.
+  Do not change accepted List, Filter Bar, Form, Detail or shell patterns.
+
+## 54. Reporting Pattern
+
+Use `erp-report` with the same opt-in assets. Reporting prioritizes scope, result
+interpretation and readable source records over dashboard cards. Project comparison
+and exception reports, Inventory valuation and Billing statutory operations retain
+their specialized business sections; adopting this pattern does not combine their
+sources, periods, statuses or authority.
+
+- Start with the existing Page Header, explicit tenant/project context and source
+  date/period semantics. Follow with permitted contextual navigation and existing
+  output actions, then a compact result heading, table and supporting evidence.
+  Label displayed bounded histories as the current view, never as a company total.
+- When GET filtering exists, reuse `components/filter_bar.html`, `build_filter_bar`,
+  active chips, `list_result_summary.html`, existing sorting and pagination. URL
+  state owns selected filters/context. Do not invent filters, sort keys, pagination,
+  date ranges or query support on a report that has none. The current specialized
+  adopters have no report-query controls; their selected project/source periods
+  remain explicit context. Existing accepted operational lists retain their filters
+  and exports without reclassification as analytical reports.
+- Reuse the List table foundation and the scoped `erp-report-table` presentation:
+  real table headings with column scope, aligned numbers with explicit currency or
+  unit, semantic Status Badges and a labeled keyboard-focusable local scroll region.
+  Tables may scroll locally at narrow widths; the page must not overflow horizontally.
+  Preserve empty/restricted states and every existing permitted source action.
+- Exports retain the existing server authorization and exact source/filter scope.
+  The Project controls CSV is explicitly labeled as the complete project control
+  report, not the current comparison subset. No PDF, Excel, print, metric refresh or
+  export control is added unless the capability already exists and is MVP-exposed.
+  Reporting drill-through/export/reconciliation and hidden financial/HR surfaces
+  remain closed by Product Surface.
+- Expose business references rather than UUIDs, raw enum keys or implementation
+  terminology. Retain internal source evidence for the governed internal surface;
+  hiding technical presentation does not change backend evidence or authority.
+
+Both families require actual source-value checks, supported context/filter/export
+checks, empty/restricted and chart fallback coverage, and real browser review at
+1440px, 1024px and 390px. Technical completion leaves Product Owner acceptance
+pending; no individual page is automatically Product Owner Accepted.
+
+
+### Operational Inbox visual alignment
+
+The Inbox uses a single compact framed panel following the supplied Operational
+Workspace visual reference: an icon-led shared Page Header, bounded summary tiles,
+a compact filter row, a subtle blue table header and alternating record rows.
+Summary tiles retain existing routing counts and labels; the reference's example
+status totals are not implemented capabilities. At desktop/tablet widths aim for
+roughly 50px record rows when existing content fits, with the subject taking the
+largest column. Preserve full subject text in the accessible DOM and context in title
+attributes when desktop text is ellipsized; mobile wraps it normally.
+
+Use the existing List Page native `details` row-action pattern and menu behavior
+for the Inbox's ellipsis control. Preserve the exact POST forms, CSRF/idempotency
+values, permission conditions, lifecycle outcomes, source handoffs and assignment
+history inside the menu. Menus must fit the viewport and work by keyboard; a
+read-only membership does not acquire mutation controls. This is presentation
+composition within the Inbox, not a change to the accepted List Page component.
+
+Use the shared Filter Bar's compact expanded-control option: primary filters and
+Apply remain directly accessible, while secondary filters are revealed by its
+existing More Filters control. No-JavaScript access keeps native secondary-filter
+disclosure. Do not render a text-search button when the leading control is a
+workflow selector. The accepted application shell remains unchanged. Validate a
+populated 21-item queue as well as empty and action states at all three widths.
+
+
+## 55. Stage 6 — SweetAlert2 and System States
+
+SweetAlert2 **11.26.25** is mandatory for toast notifications, confirmation dialogs
+and interactive alerts across MVP-visible pages. Local JS/CSS, MIT license,
+upstream registry integrity and SHA-256 provenance are retained under
+`apps/accounts/static/vendor/sweetalert2-11.26.25/`. No runtime CDN is used.
+The shared `base.html` loads `interaction_styles.html` and `interaction_scripts.html`
+once; pages must not load these again or call `Swal.fire()` directly.
+
+`erp_interactions.js` exposes a text-only API (no HTML or arbitrary Swal options):
+
+```javascript
+BoniraFeedback.success('اطلاعات با موفقیت ثبت شد.');
+BoniraFeedback.error('ثبت اطلاعات ممکن نشد.');
+BoniraFeedback.warning('پیش از ادامه اطلاعات را بازبینی کنید.');
+BoniraFeedback.info('اطلاعات به‌روزرسانی شد.');
+BoniraFeedback.notify('info', 'پیام اطلاعاتی');
+BoniraFeedback.alert('warning', 'لطفاً اطلاعات را بازبینی کنید.', 'نیاز به بررسی');
+const accepted = await BoniraFeedback.confirm({
+  title: 'بایگانی رکورد نمونه',
+  text: 'این رکورد از انتخاب‌های جدید خارج می‌شود و تاریخچه آن حفظ می‌شود.',
+  confirmLabel: 'بایگانی', danger: true,
+});
+// Continue an already-authorized operation only when accepted === true.
+```
+
+For existing native forms use declarative hooks, preserving action, method,
+CSRF, reason fields, validation and named submitter values:
+
+```html
+<form method="post" data-confirm-title="عنوان همان عملیات موجود"
+      data-confirm-text="پیامد و روش بازیابی همان عملیات موجود"
+      data-confirm-label="تأیید و ادامه" data-confirm-danger="true">
+  <!-- Existing CSRF token, fields and submit button remain here. -->
+</form>
+```
+
+Hooks can also live on a specific submit button. Do not invent confirmation
+requirements or business consequences. Cancel, Escape and close never submit;
+Cancel receives default focus, focus is trapped and restored. Asset failure
+blocks confirmed actions with safe inline guidance. Toasts do not steal focus.
+Success/info expire after six seconds and pause on hover/focus; warnings/errors
+remain dismissible until closed. A queue preserves multiple messages; dialogs
+hold queued feedback. Reduced motion, Persian RTL, Vazirmatn, canonical colors,
+44px dialog controls and narrow-screen wrapping are shared CSS responsibilities.
+
+`components/messages.html` is the only Django message adapter. It escapes even
+safe-marked input, reads text content, hides each fallback only when its toast
+opens and consumes a DOM message once. Without JavaScript/assets the inline
+fallback remains readable. Do not issue success on click, submit or arbitrary
+HTTP 2xx: only confirmed server business outcomes produce success. POST forms
+are guarded against repeat submission while preserving successful controls;
+page restore and HTMX completion release presentation locks. This is not a
+replacement for server idempotency or authorization.
+
+HTMX adapters reuse the same API. `hx-confirm` is intercepted before issuing
+its request. `htmx:beforeRequest`/`afterRequest` control mutation locks; failed
+requests produce safe localized text based on status, never response HTML,
+exception details or `statusText`. HTTP status codes and swap rules are unchanged.
+Partial producers should render the shared messages component into the existing
+`#bonira-feedback` OOB target; the workflow row partial consumes Django messages
+there, preventing a second notification on the next full request. Repeated swap
+and OOB lifecycle events do not reinstall handlers or repeat a consumed message.
+The current MVP templates use native form posts; this change does not activate
+HTMX requests on them or install a new product HTMX dependency.
+
+Other states remain persistent in their appropriate components:
+
+| State | Shared component / behavior |
+| --- | --- |
+| Validation | `form_errors.html` summary with focus and field links; `form_field.html` retains input, `aria-invalid`, described errors and required semantics. Never a popup. |
+| Empty / filtered empty | `empty_state.html`, authorized existing next action or clear filters, no new action permission. |
+| Loading | `global_loading.html` + `BoniraLoading`, local async states where already supported; no fake success or percentage. |
+| Status | `status_badge.html`, existing localized labels and semantic families; no workflow changes. |
+| Permission / missing / failure | `system_state.html` via 403/404/500 templates, safe Persian copy and home recovery, no object or exception detail. HTTP status retained. |
+| Persistent guidance | Existing contextual inline messages and read-only notices stay inline; they are not transient notifications. |
+
+Rollout and browser evidence: `output/stage6-system-states/REPORT.md`.
+Technical verification never marks a page Product Owner Accepted.

@@ -161,6 +161,91 @@ class DailyReport(UUIDModel, TimeStampedModel):
         super().save(*args, **kwargs)
 
 
+class DailyReportReferenceQuerySet(models.QuerySet):
+    def update(self, **kwargs: object) -> int:
+        raise ValidationError("ارجاع ثبت‌شده قابل تغییر نیست.")
+
+    def delete(self) -> tuple[int, dict[str, int]]:
+        raise ValidationError("ارجاع ثبت‌شده قابل حذف نیست.")
+
+
+class DailyReportRecordReference(UUIDModel, CreatedAtModel):
+    """Report-owned reference; never changes an HSE record's originating context."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    report = models.ForeignKey(
+        DailyReport, on_delete=models.PROTECT, related_name="record_references"
+    )
+    safety_incident = models.ForeignKey(
+        "safety.SafetyIncident",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="daily_report_references",
+    )
+    quality_issue = models.ForeignKey(
+        "quality.QualityIssue",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="daily_report_references",
+    )
+    created_by = models.ForeignKey("accounts.User", on_delete=models.PROTECT)
+    objects = DailyReportReferenceQuerySet.as_manager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.CheckConstraint(
+                condition=(
+                    models.Q(safety_incident__isnull=False, quality_issue__isnull=True)
+                    | models.Q(
+                        safety_incident__isnull=True, quality_issue__isnull=False
+                    )
+                ),
+                name="daily_ref_exactly_one_record",
+            ),
+            models.UniqueConstraint(
+                fields=["report", "safety_incident"], name="daily_ref_report_safety_uq"
+            ),
+            models.UniqueConstraint(
+                fields=["report", "quality_issue"], name="daily_ref_report_quality_uq"
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        record = (
+            self.safety_incident
+            if self.safety_incident_id
+            else self.quality_issue
+            if self.quality_issue_id
+            else None
+        )
+        if record is None or bool(self.safety_incident_id) == bool(
+            self.quality_issue_id
+        ):
+            raise ValidationError("دقیقاً یک رکورد ایمنی یا کیفیت را انتخاب کنید.")
+        validate_related_organizations(self, report=self.report, record=record)
+        if self.report.status != DailyReportStatus.DRAFT:
+            raise ValidationError("افزودن ارجاع فقط هنگام ثبت پیش‌نویس مجاز است.")
+        if any(
+            getattr(record, name) != getattr(self.report, name)
+            for name in ("project_id", "site_id", "phase_id")
+        ):
+            raise ValidationError("پروژه، کارگاه و فاز رکورد باید با گزارش یکسان باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("ارجاع ثبت‌شده قابل تغییر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("ارجاع ثبت‌شده قابل حذف نیست.")
+
+
 # P9-S01–S05 keeps the Field Operations models separate while registering them
 # under the existing Daily Reports app and its established project scope boundary.
 from apps.daily_reports.field_models import (  # noqa: F401
