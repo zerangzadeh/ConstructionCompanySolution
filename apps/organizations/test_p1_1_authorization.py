@@ -762,8 +762,12 @@ class P11RoleCatalogCloseoutTests(TestCase):
         self.client.force_login(self.platform_admin)
         response = self.client.get(reverse("organizations:select"))
         self.assertContains(response, "مدیریت پلتفرم")
-        self.assertContains(response, "کاتالوگ نقش‌ها")
-        self.assertContains(response, "عملیات حفاظت‌شده")
+        self.assertContains(response, "نقش‌ها و مجوزها")
+        self.assertContains(response, "تنظیمات پلتفرم")
+        settings_page = self.client.get(reverse("organizations:platform_settings"))
+        self.assertContains(
+            settings_page, reverse("organizations:protected_operation_catalog")
+        )
         self.assertEqual(
             self.client.get(
                 reverse("organizations:protected_operation_catalog")

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static erp_format table_filters %}
+{% block title %}نقش‌ها و مجوزها | بنیرا{% endblock %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'organizations/role_workspace.css' %}">
+  {{ tenant_selector.media }}
+{% endblock %}
+{% block extra_scripts %}<script src="{% static 'organizations/role_workspace.js' %}" defer></script>{% endblock %}
+{% block content %}
+<div class="role-workspace" data-role-workspace>
+  {% include "components/page_header.html" with page_eyebrow="مدیریت پلتفرم" page_title="نقش‌ها و مجوزها" page_description="نقش را پیدا کنید، دسترسی‌ها را بررسی کنید و تغییرات مجاز را ثبت کنید." only %}
+  {% include "organizations/platform_roles_navigation.html" %}
+  {% if tenant_mode %}
+    <form method="get" class="role-scope erp-surface">
+      <input type="hidden" name="section" value="tenant">
+      <div>{% include "components/form_field.html" with field=tenant_selector.organization only %}</div>
+      <button class="erp-btn erp-btn--secondary" type="submit">نمایش نقش‌ها</button>
+      {% if catalog_organization %}<p>شرکت هدف: <strong>{{ catalog_organization.name }}</strong><small>این انتخاب، شرکت فعال نشست شما را تغییر نمی‌دهد.</small></p>{% endif %}
+    </form>
+  {% else %}
+    <p class="role-notice">تغییر مجوز یک نقش سراسری بر همهٔ کاربران دارای آن نقش در شرکت‌های مختلف اثر می‌گذارد.</p>
+  {% endif %}
+  <div class="role-layout">
+    <aside class="role-list erp-surface" aria-labelledby="role-list-heading" id="role-list">
+      <div class="role-panel-heading"><h2 id="role-list-heading">فهرست نقش‌ها <span class="role-count">{{ page_obj.paginator.count|erp_number }}</span></h2>{% if not tenant_mode or catalog_organization %}<a href="{{ new_url }}#role-detail" class="role-link">+ نقش جدید</a>{% endif %}</div>
+      <form method="get" class="role-list-filters">
+        {% if tenant_mode %}<input type="hidden" name="section" value="tenant">{% endif %}
+        {% if catalog_organization %}<input type="hidden" name="organization" value="{{ catalog_organization.pk }}">{% endif %}
+        <label class="sr-only" for="role-search">نام یا کد نقش</label>
+        <input id="role-search" type="search" name="q" value="{{ search }}" maxlength="150" placeholder="جست‌وجوی نام یا کد نقش…">
+        <div class="role-filter-pair">
+          <div><label for="role-kind">نوع نقش</label><select id="role-kind" name="kind"><option value="">همه نقش‌ها</option value="system"{% if role_kind == 'system' %} selected{% endif %}>سیستمی</option><option value="custom"{% if role_kind == 'custom' %} selected{% endif %}>سفارشی</option></select></div>
+          <div><label for="role-status">وضعیت</label><select id="role-status" name="status"><option value="">همه وضعیت‌ها</option><option value="active"{% if role_status == 'active' %} selected{% endif %}>فعال</option><option value="archived"{% if role_status == 'archived' %} selected{% endif %}>بایگانی‌شده</option></select></div>
+        </div>
+        <button type="submit" class="erp-btn erp-btn--secondary">جست‌وجو</button>
+      </form>
+      <ul class="role-records">
+        {% for role in roles %}<li><a class="role-record{% if selected_role.pk == role.pk %} is-selected{% endif %}" href="{% querystring request.GET edit=role.pk mode='' new='' %}#role-detail"{% if selected_role.pk == role.pk %} aria-current="true"{% endif %}>
+          <span class="role-record-title"><strong dir="auto">{{ role.name }}</strong><span aria-hidden="true">‹</span></span>
+          <span class="role-record-meta"><span>{% if role.is_system %}سیستمی{% elif role.organization_id %}اختصاصی شرکت{% else %}سفارشی سراسری{% endif %}</span><span>{{ role.permissions.count|erp_number }} مجوز</span></span>
+          {% if role.presentation_protected %}<span class="role-tag">مجوزهای حفاظت‌شده</span>{% endif %}{% if not role.is_active %}<span class="role-tag">بایگانی · فقط مشاهده</span>{% endif %}
+        </a></li>{% empty %}<li class="role-empty">{% if tenant_mode and not catalog_organization %}برای مشاهده نقش‌های اختصاصی، شرکت هدف را انتخاب کنید.{% else %}نقشی با این فیلترها یافت نشد.{% endif %}</li>{% endfor %}
+      </ul>
+      {% include "components/bounded_table_pagination.html" %}
+    </aside>
+    <section class="role-detail erp-surface" id="role-detail" aria-labelledby="role-detail-heading" tabindex="-1">
+    {% if selected_role or creating %}
+      <div class="role-panel-heading">
+        <div><a class="role-mobile-back role-link" href="#role-list">بازگشت به فهرست نقش‌ها</a><p class="role-eyebrow">{% if editing %}ویرایش نقش{% else %}جزئیات نقش{% endif %}</p><h2 id="role-detail-heading" dir="auto">{% if selected_role %}{{ selected_role.name }}{% else %}ایجاد نقش سفارشی{% endif %}</h2></div>
+        {% if not editing and can_edit_role %}<a href="{{ edit_url }}#role-detail" class="erp-btn erp-btn--primary">ویرایش نقش</a>{% endif %}
+        {% if selected_role %}<div class="role-tags"><span class="role-tag">{% if selected_role.is_system %}سیستمی{% elif tenant_mode %}اختصاصی شرکت{% else %}سفارشی سراسری{% endif %}</span><span class="role-tag">{% if selected_role.is_active %}فعال{% else %}بایگانی‌شده · فقط مشاهده{% endif %}</span></div>{% endif %}
+      </div>
+      {% if permissions_locked %}<p class="role-notice">مجوزهای این نقش سیستمی حفاظت‌شده قابل تغییر نیستند. عنوان و توضیحات نقش فعال قابل ویرایش است.</p>{% endif %}
+      {% if unavailable_permissions %}<p class="role-notice">این نقش دارای مجوز غیرفعال یا غیرقابل تخصیص است. برای حفظ دسترسی‌های موجود، فقط مشاهده در دسترس است.</p>{% endif %}
+      <form method="post" data-role-editor data-editing="{% if editing and can_edit_role %}true{% else %}false{% endif %}">
+        {% csrf_token %}{% if selected_role %}<input type="hidden" name="role_id" value="{{ selected_role.pk }}">{% endif %}{% if catalog_organization %}<input type="hidden" name="catalog_organization" value="{{ catalog_organization.pk }}">{% endif %}
+        {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+        {% include "components/form_errors.html" with form=form only %}
+        {% if editing and can_edit_role %}
+          <div class="role-fields">{% include "components/form_field.html" with field=form.name only %}{% include "components/form_field.html" with field=form.code only %}<div class="role-field-wide">{% include "components/form_field.html" with field=form.description only %}</div></div>
+        {% else %}
+          <div class="role-overview"><p>{{ selected_role.description|default:"توضیحی برای این نقش ثبت نشده است." }}</p><span class="role-code" dir="ltr">{{ selected_role.code }}</span></div>
+        {% endif %}
+        <section class="role-permissions" aria-labelledby="permissions-heading">
+          <div class="role-panel-heading"><h3 id="permissions-heading">دسترسی‌های نقش</h3><span class="role-count"><span data-selected-count>{{ permission_selected|erp_number }}</span> از {{ permission_total|erp_number }} مجوز</span></div>
+          <div class="role-permission-tools" data-permission-tools hidden>
+            <div><label class="sr-only" for="permission-search">جست‌وجوی مجوز</label><input type="search" id="permission-search" placeholder="جست‌وجوی عنوان فارسی یا کد مجوز…" aria-controls="id_permissions"></div>
+            <label class="role-selected-filter"><input type="checkbox" id="selected-permissions"> فقط انتخاب‌شده‌ها</label>
+            <button type="button" class="role-link" data-collapse-groups>بستن همه گروه‌ها</button>
+          </div>
+          <p class="role-help" data-permission-result aria-live="polite">گروه موردنظر را باز کنید و مجوزها را بررسی کنید.</p>
+          <div id="id_permissions"{% if form.permissions.errors %} aria-invalid="true" aria-describedby="permissions-errors"{% endif %}>
+            {% for group in permission_groups %}
+              <details class="role-permission-group" data-permission-group>
+                <summary><span>{{ group.label }}</span><span class="role-group-count"><span data-group-selected>{{ group.selected|erp_number }}</span> / {{ group.items|length|erp_number }} <span class="role-chevron" aria-hidden="true">⌄</span></span></summary>
+                <div class="role-permission-items">
+                  {% for item in group.items %}<label class="role-permission{% if item.unavailable %} is-unavailable{% endif %}" data-permission-row>
+                    <input type="checkbox" name="permissions" value="{{ item.permission.pk }}"{% if item.selected %} checked{% endif %}{% if not editing or not can_edit_role or permissions_locked or item.unavailable %} disabled{% endif %}>
+                    <span><span class="role-permission-label">{{ item.permission.name }}</span><code dir="ltr">{{ item.permission.code }}</code>{% if item.unavailable %}<small>غیرفعال / غیرقابل تخصیص</small>{% elif permissions_locked %}<small>حفاظت‌شده</small>{% endif %}</span>
+                  </label>{% if permissions_locked and item.selected and not item.unavailable %}<input type="hidden" name="permissions" value="{{ item.permission.pk }}">{% endif %}{% endfor %}
+                </div>
+              </details>
+            {% endfor %}
+          </div>
+          {% if form.permissions.errors %}<p class="erp-field-error" id="permissions-errors" role="alert">{{ form.permissions.errors|striptags }}</p>{% endif %}
+          <p class="role-empty" data-permission-empty hidden>مجوزی با این جست‌وجو یافت نشد.</p>
+        </section>
+        {% if editing and can_edit_role %}
+          <div class="role-reason">{% include "components/form_field.html" with field=form.reason only %}</div>
+          <div class="role-savebar"><span data-unsaved-state aria-live="polite">تغییرات هنوز ذخیره نشده‌اند.</span><div><button type="submit" name="action" value="save" class="erp-btn erp-btn--primary">ذخیره تغییرات</button><a class="erp-btn erp-btn--secondary" href="{{ view_url }}#role-detail">انصراف</a>{% if selected_role and not selected_role.is_system and selected_role.is_active %}<button type="submit" name="action" value="archive" class="role-link role-archive" data-confirm-title="بایگانی نقش" data-confirm-text="این نقش از انتخاب‌های جدید خارج می‌شود و تاریخچه آن حفظ می‌شود." data-confirm-label="بایگانی" data-confirm-danger="true">بایگانی نقش</button>{% endif %}</div></div>
+        {% endif %}
+      </form>
+    {% else %}
+      <div class="role-empty"><h2 id="role-detail-heading">نقش‌ها در یک نگاه</h2><p>{% if tenant_mode and not catalog_organization %}ابتدا شرکت هدف را انتخاب کنید.{% else %}از فهرست یک نقش را انتخاب کنید یا نقش سفارشی جدید بسازید.{% endif %}</p></div>
+    {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

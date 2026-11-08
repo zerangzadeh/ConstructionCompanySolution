@@ -1,5 +1,6 @@
-"""IMB-0066: paginate only the service-authorized Audit event queryset."""
+"""List filters and pagination operate only on authorized audit events."""
 
+from datetime import UTC, date, datetime
 from unittest.mock import patch
 
 from django.db import connection
@@ -18,7 +19,9 @@ from apps.organizations.models import (
     MembershipStatus,
     OrganizationMembership,
     OrganizationRole,
+    OrganizationSettings,
 )
+from core.jalali import format_jalali
 
 
 class AuditListBoundingTests(TestCase):
@@ -176,6 +179,93 @@ class AuditListBoundingTests(TestCase):
             response = self.client.get(reverse("audit:log"), {"page": value})
             self.assertEqual(response.context["page_obj"].number, expected)
             self.assertLessEqual(len(response.context["events"]), 25)
+
+    def test_combined_filters_use_the_company_date_and_authorized_events(self) -> None:
+        OrganizationSettings.objects.update_or_create(
+            organization=self.organization, defaults={"timezone": "Asia/Tehran"}
+        )
+        inside = datetime(2026, 11, 6, 20, 30, tzinfo=UTC)
+        outside = datetime(2026, 11, 6, 20, 29, tzinfo=UTC)
+        for organization, actor, action, timestamp, reference in (
+            (
+                self.organization,
+                self.user,
+                AuditAction.PROJECT_CREATED,
+                inside,
+                "match",
+            ),
+            (
+                self.organization,
+                self.user,
+                AuditAction.PROJECT_CREATED,
+                outside,
+                "earlier",
+            ),
+            (
+                self.organization,
+                self.other_user,
+                AuditAction.PROJECT_CREATED,
+                inside,
+                "other-actor",
+            ),
+            (
+                self.other_organization,
+                self.user,
+                AuditAction.PROJECT_CREATED,
+                inside,
+                "other-company",
+            ),
+            (
+                self.organization,
+                self.user,
+                AuditAction.ORGANIZATION_CREATED,
+                inside,
+                "other-action",
+            ),
+        ):
+            with patch("django.utils.timezone.now", return_value=timestamp):
+                AuditEvent.objects.create(
+                    organization=organization,
+                    actor=actor,
+                    action=action,
+                    entity_type="projects.Project",
+                    entity_id=reference,
+                )
+
+        self._activate()
+        day = format_jalali(date(2026, 11, 7))
+        response = self.client.get(
+            reverse("audit:log"),
+            {
+                "q": AuditAction.PROJECT_CREATED.label,
+                "actor": "AUDIT-USER",
+                "action": AuditAction.PROJECT_CREATED,
+                "date_from": day,
+                "date_to": day,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            [event.entity_id for event in response.context["events"]], ["match"]
+        )
+        self.assertContains(response, 'data-filter-chip="date_from"')
+        self.assertContains(response, "۰۰:۰۰")
+
+    def test_page_size_sort_and_filters_are_retained_in_navigation(self) -> None:
+        events = self._events(22)
+        self._activate()
+        response = self.client.get(
+            reverse("audit:log"),
+            {"q": "audit-user", "sort": "date", "per_page": 10, "page": 2},
+        )
+        page = response.context["page_obj"]
+        expected = sorted(event.pk for event in events)
+        self.assertEqual([event.pk for event in page.object_list], expected[10:20])
+        self.assertEqual(page.paginator.count, 22)
+        self.assertContains(
+            response, "q=audit-user&amp;sort=date&amp;per_page=10&amp;page=3"
+        )
+        self.assertContains(response, 'href="/audit/?sort=date&amp;per_page=10"')
 
     def test_permission_scope_membership_tenant_and_login_fail_closed(self) -> None:
         user, role, membership = self._auditor([])

@@ -12,8 +12,11 @@ from apps.organizations.models import OrganizationSettings, OrganizationStatus
 from apps.organizations.platform_companies import (
     change_company_status,
     company_activity,
+    company_governors,
     filter_company_activity,
+    incomplete_company_onboarding,
     platform_companies,
+    retry_company_onboarding,
     update_platform_company,
 )
 from apps.organizations.platform_forms import (
@@ -50,6 +53,7 @@ def company_list(request: HttpRequest) -> HttpResponse:
         "organizations/platform_company_list.html",
         {
             "companies": page.object_list,
+            "platform_workspace": True,
             "page_obj": page,
             "search_form": form,
             "pagination_rendered": True,
@@ -64,6 +68,7 @@ def company_detail(request: HttpRequest, organization_id) -> HttpResponse:
         platform_companies(actor=request.user), pk=organization_id
     )
     events = company_activity(actor=request.user, organization=organization)
+    owners, tenant_admins = company_governors(organization)
     form = ActivitySearchForm(request.GET)
     if form.is_valid():
         events = filter_company_activity(events, search=form.cleaned_data["q"])
@@ -88,6 +93,12 @@ def company_detail(request: HttpRequest, organization_id) -> HttpResponse:
         "organizations/platform_company_detail.html",
         {
             "company": organization,
+            "platform_workspace": True,
+            "platform_target": organization,
+            "owners": owners,
+            "tenant_admins": tenant_admins,
+            "onboarding_incomplete": organization.is_active
+            and incomplete_company_onboarding(organization),
             "events": page.object_list,
             "page_obj": page,
             "search_form": form,
@@ -118,6 +129,21 @@ def company_status(request: HttpRequest, organization_id) -> HttpResponse:
             messages.success(request, "وضعیت شرکت به‌روزرسانی شد.")
     else:
         messages.error(request, "وضعیت، دلیل و نسخه اطلاعات شرکت را بررسی کنید.")
+    return redirect(
+        "organizations:platform_company_detail", organization_id=organization_id
+    )
+
+
+@login_required
+@require_POST
+def company_onboarding(request: HttpRequest, organization_id) -> HttpResponse:
+    get_object_or_404(platform_companies(actor=request.user), pk=organization_id)
+    try:
+        retry_company_onboarding(actor=request.user, organization_id=organization_id)
+    except ValidationError as exc:
+        messages.error(request, " ".join(exc.messages))
+    else:
+        messages.success(request, "گردش‌کارهای اولیه بررسی و تکمیل شدند.")
     return redirect(
         "organizations:platform_company_detail", organization_id=organization_id
     )
@@ -167,6 +193,8 @@ def company_edit(request: HttpRequest, organization_id) -> HttpResponse:
         "organizations/platform_company_edit.html",
         {
             "company": organization,
+            "platform_workspace": True,
+            "platform_target": organization,
             "profile_form": profile_form,
             "settings_form": settings_form,
             "change_form": change_form,

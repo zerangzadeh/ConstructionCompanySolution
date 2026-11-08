@@ -1,26 +1,15 @@
 """Read-only dependency probes; no public endpoint or production acceptance."""
 
 import json
-from uuid import uuid4
 
-from django.core.cache import cache
 from django.core.management.base import BaseCommand, CommandError
-from django.db import connection, transaction
 
-from core.operations import ALERT_SIGNALS, dependency_signals
-
-
-def probe_database() -> None:
-    with transaction.atomic(), connection.cursor() as cursor:
-        cursor.execute("SET TRANSACTION READ ONLY")
-        cursor.execute("SELECT 1")
-        if cursor.fetchone() != (1,):
-            raise ValueError("Unexpected database probe result.")
-
-
-def probe_cache() -> None:
-    # Read only; never overwrite or evict a business/session cache key.
-    cache.get(f"bonira-operational-probe:{uuid4()}")
+from core.operations import (
+    ALERT_SIGNALS,
+    dependency_signals,
+    probe_cache,
+    probe_database,
+)
 
 
 class Command(BaseCommand):

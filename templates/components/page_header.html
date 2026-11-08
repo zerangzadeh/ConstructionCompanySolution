@@ -10,9 +10,11 @@
             <p class="mt-1 text-sm text-slate-500">{{ page_description }}</p>
         {% endif %}
     </div>
-    {% if page_action_url and page_action_label and page_action_url|surface_url_exposed %}
+    {% with page_user=page_breadcrumb_user|default:None %}
+    {% if page_action_url and page_action_label and page_action_url|surface_url_exposed:page_user %}
         <a class="erp-page-header__action erp-btn erp-btn--primary shrink-0" href="{{ page_action_url }}">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ page_action_label }}
         </a>
     {% endif %}
+    {% endwith %}
 </header>

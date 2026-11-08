@@ -1,4 +1,10 @@
 {% load erp_format %}
 {% if reference_layout %}<div class="erp-list-result-summary">{% endif %}
-<p class="erp-list-result" role="status" data-filter-result-count><strong>{{ bar.result_count|erp_number }}</strong> {{ bar.result_label }}{% if not bar.chips and not bar.form.errors %}<span class="erp-list-muted"> · همه نتایج مجاز</span>{% endif %}</p>
+<p class="erp-list-result" role="status" data-filter-result-count>
+    {% if result_page %}
+        {% if result_page.paginator.count %}نمایش {{ result_page.start_index|erp_quantity_fa }} تا {{ result_page.end_index|erp_quantity_fa }} از {% endif %}<strong>{{ bar.result_count|erp_quantity_fa }}</strong> {{ bar.result_label }}
+    {% else %}
+        <strong>{{ bar.result_count|erp_number }}</strong> {{ bar.result_label }}{% if not bar.chips and not bar.form.errors %}<span class="erp-list-muted"> · همه نتایج مجاز</span>{% endif %}
+    {% endif %}
+</p>
 {% if reference_layout %}{% if total_amount != None %}<p class="erp-list-result-total" data-filter-result-total><span>مجموع مبلغ:</span> <strong data-money-display-enhanced="true"><bdi dir="ltr">{{ total_amount|erp_number }}</bdi></strong> <span>{{ currency }}</span><span class="sr-only">برای تمام قراردادهای همین نتایج</span></p>{% endif %}</div>{% endif %}

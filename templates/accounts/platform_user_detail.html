@@ -1,0 +1,125 @@
+{% extends "base.html" %}{% load erp_format %}
+{% block title %}پرونده کاربر | بنیرا{% endblock %}
+{% block content %}
+{% url 'organizations:platform_users' as directory_url %}
+<div class="erp-account-detail">
+    {% include "components/breadcrumbs.html" with page_breadcrumb_label="کاربران سامانه" page_breadcrumb_url=directory_url page_breadcrumb_user=request.user page_title="جزئیات کاربر" only %}
+    {% with full_name=account.get_full_name %}
+    <section class="erp-platform-panel erp-account-hero" aria-labelledby="erp-page-title">
+        <header class="erp-account-hero-heading">
+            <div class="erp-account-person">
+                {% include "accounts/platform_user_initials.html" with account=account only %}
+                <div class="min-w-0">
+                    <h1 id="erp-page-title"><bdi{% if not full_name %} dir="ltr"{% endif %}>{{ full_name|default:account.username }}</bdi></h1>
+                    {% if full_name %}<bdi class="erp-account-username" dir="ltr">{{ account.username }}</bdi>{% endif %}
+                    <div class="mt-2">{% include "accounts/platform_user_status_badge.html" with account=account only %}</div>
+                </div>
+            </div>
+            <div class="erp-account-primary-actions">
+                {% if can_edit %}<a class="erp-btn erp-btn--primary" href="{% url 'organizations:platform_user_edit' account.pk %}">{% include "components/form_icon.html" with icon="id-card" only %}ویرایش حساب</a>{% endif %}
+                <a class="erp-btn erp-btn--secondary" href="{{ directory_url }}"><span aria-hidden="true">→</span> بازگشت به فهرست</a>
+            </div>
+        </header>
+        <dl class="erp-account-overview" aria-label="خلاصه حساب">
+            <div><dt>{% include "components/form_icon.html" with icon="layers" only %} نقش پلتفرم</dt><dd>{% if account.platform_admin_effective %}<span class="erp-badge erp-badge--info">مدیر پلتفرم</span>{% else %}بدون تخصیص فعال{% endif %}</dd></div>
+            <div><dt>{% include "components/form_icon.html" with icon="company" only %} عضویت‌ها</dt><dd><a class="text-blue-700 hover:underline" href="#platform-account-memberships">{{ page_obj.paginator.count|erp_number }} شرکت</a></dd></div>
+            <div><dt>{% include "components/form_icon.html" with icon="calendar" only %} تاریخ ایجاد</dt><dd><time datetime="{{ account.created_at|date:'c' }}">{{ account.created_at|jalali_date }}</time></dd></div>
+            <div><dt>{% include "components/form_icon.html" with icon="clock" only %} آخرین ورود</dt><dd>{% if account.last_login %}<time datetime="{{ account.last_login|date:'c' }}">{{ account.last_login|jalali_datetime }}</time>{% else %}<span class="text-slate-600">ثبت نشده</span>{% endif %}</dd></div>
+        </dl>
+    </section>
+    {% endwith %}
+
+    <div class="erp-account-panels">
+        <div class="erp-account-column">
+            <section class="erp-platform-panel" aria-labelledby="platform-account-info">
+                <div class="erp-platform-panel-heading">{% include "components/form_icon.html" with icon="id-card" only %}<h2 id="platform-account-info">اطلاعات تماس حساب</h2></div>
+                <dl class="erp-account-contact">
+                    <div><dt>ایمیل بازیابی</dt><dd>{% if account.email %}<bdi dir="ltr">{{ account.email }}</bdi>{% else %}ثبت نشده{% endif %}</dd></div>
+                    <div><dt>شماره تماس</dt><dd>{% if account.phone_number %}<bdi dir="ltr">{{ account.phone_number }}</bdi>{% else %}ثبت نشده{% endif %}</dd></div>
+                </dl>
+                {% if account.must_change_password %}<p class="mt-3 text-xs text-amber-800">این حساب در انتظار تعیین گذرواژه شخصی است.</p>{% endif %}
+            </section>
+            <section class="erp-platform-panel" aria-labelledby="platform-account-actions">
+                <div class="erp-platform-panel-heading">{% include "components/form_icon.html" with icon="settings" only %}<h2 id="platform-account-actions">امنیت و وضعیت حساب</h2></div>
+                {% if can_change_status %}
+                <details id="platform-account-status" class="erp-account-status-control">
+                    <summary>{% include "components/form_icon.html" with icon="pause" only %}<span>{% if account.is_active %}غیرفعال‌سازی حساب{% else %}فعال‌سازی حساب{% endif %}</span></summary>
+                    <p class="my-2 text-xs leading-6 text-slate-600">{% if account.is_active %}با غیرفعال‌کردن <bdi dir="ltr">{{ account.username }}</bdi>، دسترسی ورود در تمام شرکت‌ها قطع می‌شود و نشست‌های فعلی اعتبار خود را از دست می‌دهند.{% else %}پس از فعال‌سازی، کاربر می‌تواند دوباره وارد شود. عضویت‌ها و مجوزهای ثبت‌شده ملاک دسترسی‌اند.{% endif %}</p>
+                    <form method="post" action="{% url 'organizations:platform_user_status' account.pk %}" class="space-y-3"
+                          data-confirm-title="{% if account.is_active %}غیرفعال‌سازی{% else %}فعال‌سازی{% endif %} حساب {{ account.username }}"
+                          data-confirm-text="این عملیات بر ورود کاربر در همه شرکت‌ها اثر دارد و در ممیزی ثبت می‌شود." data-confirm-label="تأیید تغییر وضعیت">
+                        {% csrf_token %}{% for field in status_form.hidden_fields %}{{ field }}{% endfor %}
+                        {% include "components/form_field.html" with field=status_form.reason only %}
+                        <button class="erp-btn {% if account.is_active %}erp-btn--danger{% else %}erp-btn--primary{% endif %}" type="submit">ثبت تغییر وضعیت</button>
+                    </form>
+                </details>
+                {% endif %}
+                {% if can_reset_temporary %}
+                <div class="erp-account-recovery">
+                    <a class="erp-btn erp-btn--secondary" href="{% url 'organizations:platform_user_temporary_password' account.pk %}">تنظیم گذرواژه موقت</a>
+                    <p class="mt-2 text-xs text-slate-600">به ایمیل نیاز ندارد. کاربر در ورود بعدی باید گذرواژه را تغییر دهد.</p>
+                </div>
+                {% endif %}
+                {% if can_recover %}
+                <div id="platform-account-recovery" class="erp-account-recovery">
+                    {% if recovery_configured and recovery_account_eligible %}
+                    <form method="post" action="{% url 'organizations:platform_user_reset' account.pk %}"
+                          data-confirm-title="بازنشانی رمز عبور {{ account.username }}"
+                          data-confirm-text="پیوند زمان‌دار بازیابی به ایمیل ثبت‌شدهٔ این حساب فرستاده می‌شود." data-confirm-label="درخواست ارسال پیوند">
+                        {% csrf_token %}<button class="erp-btn erp-btn--secondary" type="submit">ارسال پیوند بازیابی</button>
+                    </form>
+                    {% else %}
+                    <button class="erp-btn erp-btn--secondary" type="button" disabled aria-describedby="platform-recovery-help">ارسال پیوند بازیابی</button>
+                    <p id="platform-recovery-help" class="mt-2 text-xs text-amber-800">{% if not recovery_configured %}ارسال پیوند بازیابی به پیکربندی سرویس ایمیل نیاز دارد.{% elif not account.email %}برای این حساب ایمیل بازیابی ثبت نشده است.{% else %}این حساب از بازیابی با گذرواژه پشتیبانی نمی‌کند.{% endif %}</p>
+                    {% endif %}
+                </div>
+                {% elif not can_change_status %}<p class="text-sm text-slate-600">اقدام تغییر وضعیت یا بازیابی از این پرونده در دسترس نیست.</p>{% endif %}
+            </section>
+        </div>
+        <div class="erp-account-column">
+            <section id="platform-account-memberships" class="erp-platform-panel" aria-labelledby="platform-account-membership-title">
+                <div class="erp-platform-panel-heading">{% include "components/form_icon.html" with icon="company" only %}<h2 id="platform-account-membership-title">عضویت در شرکت‌ها</h2></div>
+                {% if membership_rows %}
+                <p class="mb-3 text-xs text-slate-600">نمایش نقش‌ها به مجوز مشاهدهٔ نقش در همان شرکت بستگی دارد.</p>
+                <table class="erp-account-membership-table" role="table">
+                    <thead role="rowgroup"><tr role="row"><th scope="col">شرکت</th><th scope="col">وضعیت عضویت</th><th scope="col">نقش‌ها</th>{% if show_membership_actions %}<th scope="col">اقدام</th>{% endif %}</tr></thead>
+                    <tbody role="rowgroup">
+                    {% for membership, roles, can_inspect_roles in membership_rows %}
+                    <tr role="row">
+                        <th scope="row" role="rowheader"><bdi>{{ membership.organization.name }}</bdi></th>
+                        <td role="cell" data-label="وضعیت عضویت">{% include "components/status_badge.html" with status=membership.status label=membership.get_status_display only %}</td>
+                        <td role="cell" data-label="نقش‌ها">
+                            {% if roles == None %}<span class="text-xs text-slate-600">نقش‌ها در این دامنه قابل مشاهده نیستند</span>{% else %}
+                            <div class="erp-account-roles">{% for role in roles %}<bdi class="erp-account-role">{{ role }}</bdi>{% empty %}<span class="text-xs text-slate-600">نقشی ثبت نشده است</span>{% endfor %}</div>
+                            {% endif %}
+                        </td>
+                        {% if show_membership_actions %}<td role="cell" class="erp-account-membership-action">{% if can_inspect_roles %}<a class="erp-btn erp-btn--secondary erp-btn--compact" href="{% url 'organizations:platform_member_authorization' membership.organization_id membership.pk %}">مشاهده نقش‌ها</a>{% else %}<span aria-hidden="true">—</span>{% endif %}</td>{% endif %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% include "components/bounded_table_pagination.html" %}
+                {% else %}
+                <p class="erp-account-empty">این حساب عضویت ثبت‌شده‌ای ندارد.</p>
+                {% endif %}
+            </section>
+            <section class="erp-platform-panel" aria-labelledby="platform-account-audit">
+                <div class="erp-platform-panel-heading">{% include "components/form_icon.html" with icon="clock" only %}<h2 id="platform-account-audit">آخرین رویدادهای حساب</h2></div>
+                <ol class="erp-account-activity">
+                    {% for event in audit_events %}
+                    <li>
+                        <span class="erp-account-icon">{% include "components/form_icon.html" with icon="notes" only %}</span>
+                        <div class="min-w-0">
+                            <strong>{% if event.temporary_password_set %}گذرواژه موقت تنظیم شد{% else %}{{ event.get_action_display }}{% endif %}</strong>
+                            <p class="mt-1 text-xs text-slate-600">عامل <bdi>{{ event.actor.username|default:"سامانه" }}</bdi></p>
+                            {% if event.recovery_unavailable %}<p class="mt-1 text-xs text-amber-800">پیوند ارسال نشد؛ سرویس ایمیل در دسترس نبود.</p>{% endif %}
+                        </div>
+                        <time class="text-xs text-slate-600" datetime="{{ event.created_at|date:'c' }}">{{ event.created_at|jalali_datetime }}</time>
+                    </li>
+                    {% empty %}<li class="erp-account-empty">رویدادی برای این حساب ثبت نشده است.</li>{% endfor %}
+                </ol>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}

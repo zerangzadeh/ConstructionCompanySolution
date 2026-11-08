@@ -13,7 +13,7 @@ from django.contrib.auth.forms import (
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import PermissionDenied
-from django.db import models
+from django.db import models, transaction
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils import timezone
@@ -332,6 +332,7 @@ class CustomUserAdmin(UserAdmin):
     ) -> bool:
         return request.user.is_superuser and super().has_delete_permission(request, obj)
 
+    @transaction.atomic
     def save_model(
         self,
         request: HttpRequest,
@@ -343,11 +344,19 @@ class CustomUserAdmin(UserAdmin):
             raise PermissionDenied(
                 "ایجاد هویت و عضویت سازمانی فقط از مسیر مدیریت مستأجر مجاز است."
             )
-        previous_status = None
-        previous = User.objects.get(pk=obj.pk)
+        from apps.organizations.access_services import (
+            lock_platform_duty_change,
+            protect_last_platform_admin,
+        )
+
+        lock_platform_duty_change()
+        previous = User.objects.select_for_update().get(pk=obj.pk)
+        obj.auth_session_revision = previous.auth_session_revision
+        if not obj.is_active:
+            protect_last_platform_admin(obj.pk)
         previous_status = previous.account_status
         super().save_model(request, obj, form, change)
-        if previous_status is not None and previous_status != obj.account_status:
+        if previous_status != obj.account_status:
             record_audit_event(
                 action=AuditAction.USER_ACCOUNT_STATUS_CHANGED,
                 entity_type="user",

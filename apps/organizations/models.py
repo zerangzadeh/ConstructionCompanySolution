@@ -238,6 +238,18 @@ class PolicyReviewDisposition(models.TextChoices):
 
 
 class BusinessPermissionCode(models.TextChoices):
+    PLATFORM_ADMIN_USERS_VIEW = "platform_admin.users_view", "مشاهده کاربران سامانه"
+    PLATFORM_ADMIN_USERS_MANAGE = "platform_admin.users_manage", "مدیریت کاربران سامانه"
+    PLATFORM_ADMIN_USERS_RECOVER = "platform_admin.users_recover", "بازیابی حساب کاربران سامانه"
+    PLATFORM_ADMIN_MANAGE_OPERATORS = (
+        "platform_admin.manage_operators", "مدیریت مدیران پلتفرم"
+    )
+    PLATFORM_ADMIN_INSPECT_AUDIT = (
+        "platform_admin.inspect_audit", "مشاهده ممیزی پلتفرم"
+    )
+    PLATFORM_ADMIN_INSPECT_HEALTH = (
+        "platform_admin.inspect_health", "مشاهده سلامت پلتفرم"
+    )
     PLATFORM_COMPANIES_VIEW = "platform_companies.view", "مشاهده شرکت‌های پلتفرم"
     PLATFORM_COMPANIES_CONFIGURE = "platform_companies.configure", "تنظیم شرکت‌های پلتفرم"
     PLATFORM_COMPANIES_CHANGE_STATUS = "platform_companies.change_status", "تغییر وضعیت شرکت‌های پلتفرم"

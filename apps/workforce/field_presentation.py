@@ -7,7 +7,44 @@ from urllib.parse import parse_qsl, urlencode, urlsplit
 from django import forms
 from django.core.exceptions import ValidationError
 
+from apps.organizations.authorization import has_business_permission
+from apps.organizations.models import BusinessPermissionCode as P
+from core.business_choices import contextual_url
 from core.list_filters import build_filter_bar
+from core.product_surface import route_exposed
+
+from .field_selectors import scoped_employees
+from .models import EmployeeStatus
+
+
+def timekeeping_empty_choice_action(request, kind, context):
+    """Offer an existing setup action for a genuinely empty Timekeeping selector."""
+    authority = {"user": request.user, "organization": request.organization}
+    project, site = context.project, context.site
+    if kind == "shift":
+        route, permission, label = (
+            "timekeeping:shift_create", P.TIME_CALENDARS_MANAGE, "ایجاد شیفت"
+        )
+    else:
+        route, permission, label = (
+            "workforce:field_create", P.EMPLOYEES_CREATE, "ثبت نیروی کار"
+        )
+        if project:
+            if (site and not site.is_active) or not has_business_permission(
+                **authority, permission=P.PROJECT_ASSIGNMENTS_CREATE
+            ):
+                return None
+            if scoped_employees(**authority).filter(status=EmployeeStatus.ACTIVE).exists():
+                route, permission, label = (
+                    "workforce:assignment_create", P.PROJECT_ASSIGNMENTS_CREATE,
+                    "تخصیص نیروی کار",
+                )
+    if route_exposed(route) and has_business_permission(**authority, permission=permission):
+        return {
+            "url": contextual_url(route, project=project, site=site),
+            "label": label,
+        }
+    return None
 
 
 def presentation_error(exc: Exception) -> str:

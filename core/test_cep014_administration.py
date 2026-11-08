@@ -22,7 +22,7 @@ PLATFORM_ROUTES = (
 
 
 class Cep014AdministrationTemplateTests(SimpleTestCase):
-    def test_platform_entry_is_separate_desktop_only_and_technical_boundary_is_explicit(
+    def test_platform_navigation_is_shared_between_desktop_and_mobile(
         self,
     ) -> None:
         template_root = Path(settings.BASE_DIR) / "templates"
@@ -35,9 +35,9 @@ class Cep014AdministrationTemplateTests(SimpleTestCase):
         self.assertIn('data-nav-id="NAV-042"', base)
         self.assertIn("platform_navigation_access", base)
         self.assertIn("lg:flex", base)
-        self.assertIn("دسترسی عملیاتی Tenant ایجاد نمی‌کنند", base)
-        self.assertIn("دسترسی فنی Django Admin", base)
-        self.assertIn("request.user.is_superuser", base)
+        self.assertEqual(
+            base.count('{% include "organizations/platform_navigation.html" %}'), 2
+        )
 
     def test_tenant_administration_remains_in_the_shared_company_navigation(
         self,
@@ -118,11 +118,23 @@ class Cep014AdministrationRouteTests(TestCase):
     def test_mvp_platform_admin_can_open_platform_tools_without_a_tenant(self) -> None:
         self.client.force_login(self.platform_admin)
         home = self.client.get(reverse("home"))
+        for route in (
+            "organizations:platform_dashboard",
+            "organizations:platform_company_list",
+            "organizations:platform_role_catalog",
+            "organizations:platform_settings",
+        ):
+            self.assertContains(home, f'href="{reverse(route)}"')
         for route in PLATFORM_ROUTES:
             with self.subTest(route=route):
                 url = reverse(route)
-                self.assertContains(home, f'href="{url}"')
                 self.assertEqual(self.client.get(url).status_code, 200)
+        settings_page = self.client.get(reverse("organizations:platform_settings"))
+        for route in (
+            "organizations:protected_operation_catalog",
+            "organizations:platform_policy_catalog",
+        ):
+            self.assertContains(settings_page, f'href="{reverse(route)}"')
         selector = self.client.get(reverse("organizations:select"))
         self.assertContains(selector, f'href="{reverse("organizations:create")}"')
         for route in ("admin:index", "organizations:reference_personas"):

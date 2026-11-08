@@ -1,32 +1,36 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}مجوزدهی عضو | سامانه مدیریت ساخت{% endblock %}
+{% block extra_head %}{% if platform_workspace %}<link rel="stylesheet" href="{% static 'organizations/role_workspace.css' %}">{% endif %}{% endblock %}
 {% block content %}
-<div class="mx-auto max-w-5xl space-y-6">
+<div class="mx-auto max-w-5xl space-y-6{% if platform_workspace %} role-workspace{% endif %}">
+  {% if platform_workspace %}{% include "organizations/platform_roles_navigation.html" %}{% endif %}
   {% include "components/page_header.html" with page_eyebrow="کنترل دسترسی" page_title="نقش و دسترسی عضو" page_description=membership.user.username only %}
+  {% if platform_workspace %}<p class="role-notice">شرکت هدف: <strong>{{ platform_target.name }}</strong> · عضو: <strong>{{ membership.user.username }}</strong><br>تخصیص و لغو نقش طبق اختیارات همین شرکت و با تأیید مستقل موجود انجام می‌شود.</p>{% endif %}
   {% if membership.authorization_quarantined_at %}<p class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">دسترسی این عضو موقتاً متوقف است. برای فعال‌شدن، دست‌کم یک نقش و دسترسی به شرکت، پروژه یا کارگاه با تأیید فرد مستقل ثبت کنید.</p>{% endif %}
-  <div class="grid gap-6 lg:grid-cols-2">
-    <form method="post" class="erp-surface space-y-4 rounded-xl p-5">
+  <div class="grid gap-6{% if not platform_workspace %} lg:grid-cols-2{% endif %}">
+    {% if not platform_workspace or can_assign_roles %}<form method="post" class="erp-surface space-y-4 rounded-xl p-5">
       {% csrf_token %}<input type="hidden" name="action" value="assign_role">
       <h2 class="font-bold text-slate-950">انتخاب نقش عضو</h2>
       {% include "components/form_errors.html" with form=role_form only %}
       {% for field in role_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
       <button class="erp-btn erp-btn--primary" type="submit">ثبت نقش با تأیید فرد مستقل</button>
-    </form>
-    <form method="post" class="erp-surface space-y-4 rounded-xl p-5">
+    </form>{% else %}<p class="role-notice">اختیار تخصیص نقش در این شرکت را ندارید. نقش‌های موجود برای مشاهده نمایش داده می‌شوند.</p>{% endif %}
+    {% if not platform_workspace %}<form method="post" class="erp-surface space-y-4 rounded-xl p-5">
       {% csrf_token %}<input type="hidden" name="action" value="grant_scope">
       <h2 class="font-bold text-slate-950">انتخاب شرکت، پروژه یا کارگاه</h2>
       {% include "components/form_errors.html" with form=scope_form only %}
       {% for field in scope_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
       <button class="erp-btn erp-btn--primary" type="submit">ثبت دسترسی با تأیید فرد مستقل</button>
-    </form>
+    </form>{% endif %}
   </div>
   <section class="erp-surface overflow-hidden rounded-xl p-5">
     <h2 class="mb-4 font-bold text-slate-950">تاریخچه نقش‌ها</h2>
-    {% for item in role_assignments %}<div class="mb-3 rounded-lg border p-3 text-sm"><b>{{ item.role.name }}</b> — {% if item.revoked_at %}لغوشده{% elif item.is_effective %}فعال{% else %}زمان‌بندی‌شده/منقضی{% endif %}{% if not item.revoked_at %}<form method="post" class="mt-2 flex flex-wrap gap-2">{% csrf_token %}<input type="hidden" name="action" value="revoke_role"><input type="hidden" name="assignment_id" value="{{ item.id }}"><select name="approver_membership_id" required aria-label="تأییدکننده مستقل برای لغو نقش {{ item.role.name }}" class="min-w-0 max-w-full rounded-lg border px-2 py-1">{% for approver in approvers %}<option value="{{ approver.id }}">{{ approver.user.username }}</option>{% endfor %}</select><input name="reason" required placeholder="دلیل لغو" aria-label="دلیل لغو نقش {{ item.role.name }}" class="min-w-0 max-w-full rounded-lg border px-2 py-1"><button class="text-red-700" type="submit" aria-label="لغو نقش {{ item.role.name }}">لغو</button></form>{% endif %}</div>{% empty %}<p class="text-sm text-slate-500">نقشی ثبت نشده است.</p>{% endfor %}
+    {% for item in role_assignments %}<div class="mb-3 rounded-lg border p-3 text-sm"><b>{{ item.role.name }}</b> — {% if item.revoked_at %}لغوشده{% elif item.is_effective %}فعال{% else %}زمان‌بندی‌شده/منقضی{% endif %}{% if not item.revoked_at %}{% if not platform_workspace or can_revoke_roles %}<form method="post" class="mt-2 flex flex-wrap gap-2">{% csrf_token %}<input type="hidden" name="action" value="revoke_role"><input type="hidden" name="assignment_id" value="{{ item.id }}"><select name="approver_membership_id" required aria-label="تأییدکننده مستقل برای لغو نقش {{ item.role.name }}" class="min-w-0 max-w-full rounded-lg border px-2 py-1">{% for approver in approvers %}<option value="{{ approver.id }}">{{ approver.user.username }}</option>{% endfor %}</select><input name="reason" required placeholder="دلیل لغو" aria-label="دلیل لغو نقش {{ item.role.name }}" class="min-w-0 max-w-full rounded-lg border px-2 py-1"><button class="text-red-700" type="submit" aria-label="لغو نقش {{ item.role.name }}">لغو</button></form>{% endif %}{% endif %}</div>{% empty %}<p class="text-sm text-slate-500">نقشی ثبت نشده است.</p>{% endfor %}
   </section>
-  <section class="erp-surface overflow-hidden rounded-xl p-5">
+  {% if not platform_workspace %}<section class="erp-surface overflow-hidden rounded-xl p-5">
     <h2 class="mb-4 font-bold text-slate-950">تاریخچه دسترسی به شرکت، پروژه و کارگاه</h2>
     {% for item in scope_grants %}<div class="mb-3 rounded-lg border p-3 text-sm"><b>{{ item.get_scope_type_display }}</b> {% if item.project %}— {{ item.project.name }}{% endif %}{% if item.site %} / {{ item.site.name }}{% endif %} — {% if item.revoked_at %}لغوشده{% elif item.is_effective %}فعال{% else %}زمان‌بندی‌شده/منقضی{% endif %}{% if not item.revoked_at %}<form method="post" class="mt-2 flex flex-wrap gap-2">{% csrf_token %}<input type="hidden" name="action" value="revoke_scope"><input type="hidden" name="grant_id" value="{{ item.id }}"><select name="approver_membership_id" required aria-label="تأییدکننده مستقل برای لغو دسترسی {{ item.get_scope_type_display }}" class="min-w-0 max-w-full rounded-lg border px-2 py-1">{% for approver in approvers %}<option value="{{ approver.id }}">{{ approver.user.username }}</option>{% endfor %}</select><input name="reason" required placeholder="دلیل لغو" aria-label="دلیل لغو دسترسی {{ item.get_scope_type_display }}" class="min-w-0 max-w-full rounded-lg border px-2 py-1"><button class="text-red-700" type="submit" aria-label="لغو دسترسی {{ item.get_scope_type_display }}">لغو</button></form>{% endif %}</div>{% empty %}<p class="text-sm text-slate-500">دسترسی به شرکت، پروژه یا کارگاه ثبت نشده است.</p>{% endfor %}
-  </section>
+  </section>{% endif %}
 </div>
 {% endblock %}

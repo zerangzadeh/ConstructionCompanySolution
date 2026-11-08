@@ -1,0 +1,98 @@
+.audit-log .audit-results {
+    margin-block-start: 12px;
+    min-width: 0;
+}
+
+.audit-log .audit-results__summary {
+    padding: 10px 16px;
+    border-block-end: 1px solid var(--bonira-light-gray);
+}
+
+.audit-log .audit-results__summary .erp-list-result {
+    display: block;
+    white-space: normal;
+}
+
+.audit-log .erp-responsive-list {
+    min-width: 0;
+}
+
+.audit-log .erp-responsive-list th {
+    background: #edf3fb;
+}
+
+.audit-log .erp-responsive-list th:nth-child(1) { width: 7%; }
+.audit-log .erp-responsive-list th:nth-child(2) { width: 39%; }
+.audit-log .erp-responsive-list th:nth-child(3) { width: 18%; }
+.audit-log .erp-responsive-list th:nth-child(4) { width: 17%; }
+.audit-log .erp-responsive-list th:nth-child(5) { width: 13%; }
+.audit-log .erp-responsive-list th:last-child { width: 6%; }
+
+.audit-log .erp-responsive-list tbody tr:nth-child(even) {
+    background: var(--bonira-soft);
+}
+
+.audit-log .erp-responsive-list tbody tr:hover,
+.audit-log .erp-responsive-list tbody tr:focus-within {
+    background: #edf3fb;
+}
+
+.audit-log .erp-badge svg {
+    width: 14px;
+    height: 14px;
+    flex: none;
+}
+
+.audit-log .erp-badge::before {
+    content: none;
+}
+
+.audit-log .audit-row-details__panel {
+    inset-block: calc(100% + 5px) auto;
+    width: min(18rem, calc(100vw - 64px));
+    padding: 10px 12px;
+}
+
+.audit-log tbody tr:last-child .audit-row-details__panel {
+    inset-block: auto calc(100% + 5px);
+}
+
+.audit-log .erp-list-footer {
+    border-block-start: 1px solid var(--bonira-light-gray);
+    padding: 12px 16px;
+}
+
+.audit-log .erp-list-footer select {
+    width: auto;
+    min-height: 36px;
+}
+
+@media (max-width: 767px) {
+    .audit-log .erp-responsive-list tbody tr {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    }
+
+    .audit-log .erp-responsive-list .erp-list-title {
+        grid-column: 1 / 3;
+        grid-row: 1;
+        padding-block-end: 0;
+        border: 0;
+    }
+
+    .audit-log .erp-responsive-list .erp-list-row-action {
+        grid-column: 3;
+        grid-row: 1 / 3;
+        padding: 0;
+        border: 0;
+    }
+
+    .audit-log .erp-responsive-list .erp-list-identifier {
+        grid-column: 1;
+        grid-row: 3;
+    }
+
+    .audit-log .erp-responsive-list .erp-list-status {
+        grid-column: 2 / 4;
+        grid-row: 3;
+    }
+}

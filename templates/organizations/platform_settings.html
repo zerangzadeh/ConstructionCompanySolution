@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}تنظیمات پلتفرم | بنیرا{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="مدیریت پلتفرم" page_title="تنظیمات پلتفرم" page_description="سیاست‌های سراسری و وضعیت نمایش قابلیت‌ها" only %}
+<section class="erp-surface mt-5 rounded-xl p-5">
+    <h2 class="font-bold">کنترل‌های سراسری</h2>
+    <div class="mt-3 flex flex-wrap gap-2">
+        <a class="erp-btn erp-btn--secondary" href="{% url 'organizations:protected_operation_catalog' %}">عملیات حفاظت‌شده</a>
+        <a class="erp-btn erp-btn--secondary" href="{% url 'organizations:platform_policy_catalog' %}">سیاست‌های نسخه‌دار</a>
+        <a class="erp-btn erp-btn--secondary" href="{% url 'organizations:platform_company_list' %}">تنظیمات هر شرکت</a>
+    </div>
+</section>
+<section class="erp-surface mt-4 rounded-xl p-5">
+    <h2 class="font-bold">نمایش قابلیت‌ها</h2>
+    <p class="mt-2 text-sm text-slate-600">نمایهٔ جاری {{ profile }} است. جدول وضعیت پایهٔ انتشار در MVP را نشان می‌دهد. نمایش هر عملیات به مجوز و شرایط همان قابلیت وابسته است.</p>
+    <ul class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {% for label, visible in capabilities %}
+        <li class="flex flex-wrap justify-between gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm">{{ label }} <span class="text-slate-600">{% if visible %}در سطح MVP{% else %}پنهان در MVP{% endif %}</span></li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

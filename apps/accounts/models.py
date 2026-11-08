@@ -6,6 +6,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.crypto import salted_hmac
 
 from core.identifiers import canonicalize_lower_identifier
 from core.models import TimeStampedModel
@@ -212,6 +213,7 @@ class User(AbstractUser):
         help_text="تا تعیین گذرواژه شخصی، دسترسی کاربر به سامانه محدود می‌شود.",
     )
     blocked_at = models.DateTimeField("زمان مسدودسازی", null=True, blank=True)
+    auth_session_revision = models.UUIDField(null=True, editable=False)
     created_at = models.DateTimeField("زمان ایجاد", auto_now_add=True)
     updated_at = models.DateTimeField("زمان آخرین به‌روزرسانی", auto_now=True)
 
@@ -263,6 +265,17 @@ class User(AbstractUser):
         if self.is_active:
             return AccountStatus.ACTIVE
         return AccountStatus.INACTIVE
+
+    def _get_session_auth_hash(self, secret=None) -> str:
+        original = super()._get_session_auth_hash(secret=secret)
+        if self.auth_session_revision is None:
+            return original
+        return salted_hmac(
+            "bonira.accounts.session_revision",
+            f"{original}:{self.auth_session_revision}",
+            secret=secret,
+            algorithm="sha256",
+        ).hexdigest()
 
     @property
     def account_status_label(self) -> str:

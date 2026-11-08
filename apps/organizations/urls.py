@@ -1,11 +1,71 @@
 from django.urls import path
 
-from apps.organizations import platform_views, views
+from apps.accounts import platform_user_views
+from apps.organizations import platform_console, platform_views, views
 from apps.organizations.reference_personas import reference_persona_catalogue
 
 app_name = "organizations"
 
 urlpatterns = [
+    path("platform/", platform_console.dashboard, name="platform_dashboard"),
+    path("platform/users/", platform_user_views.directory, name="platform_users"),
+    path(
+        "platform/users/create/",
+        platform_user_views.account_form,
+        name="platform_user_create",
+    ),
+    path(
+        "platform/users/<uuid:user_id>/",
+        platform_user_views.detail,
+        name="platform_user_detail",
+    ),
+    path(
+        "platform/users/<uuid:user_id>/edit/",
+        platform_user_views.account_form,
+        name="platform_user_edit",
+    ),
+    path(
+        "platform/users/<uuid:user_id>/status/",
+        platform_user_views.change_status,
+        name="platform_user_status",
+    ),
+    path(
+        "platform/users/<uuid:user_id>/reset-password/",
+        platform_user_views.reset_password,
+        name="platform_user_reset",
+    ),
+    path(
+        "platform/users/<uuid:user_id>/temporary-password/",
+        platform_user_views.temporary_password,
+        name="platform_user_temporary_password",
+    ),
+    path(
+        "platform/administrators/",
+        platform_console.administrators,
+        name="platform_administrators",
+    ),
+    path(
+        "platform/member-roles/",
+        platform_console.member_roles,
+        name="platform_member_roles",
+    ),
+    path(
+        "platform/companies/<uuid:organization_id>/members/<uuid:membership_id>/roles/",
+        platform_console.member_authorization,
+        name="platform_member_authorization",
+    ),
+    path(
+        "platform/settings/",
+        platform_console.platform_settings,
+        name="platform_settings",
+    ),
+    path("platform/activity/", platform_console.audit_log, name="platform_audit"),
+    path("platform/status/", platform_console.system_status, name="platform_status"),
+    path(
+        "platform/companies/<uuid:organization_id>/onboarding/",
+        platform_views.company_onboarding,
+        name="platform_company_onboarding",
+    ),
     path(
         "platform/companies/", platform_views.company_list, name="platform_company_list"
     ),

@@ -84,6 +84,12 @@ class SearchChoiceSelect(forms.Select):
     """Shared widget, retaining the qualified MVP-02 assets and template paths."""
 
     template_name = "workforce/widgets/search_choice.html"
+    empty_notice = None
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context["empty_notice"] = self.empty_notice
+        return context
 
     class Media:
         css: ClassVar = {

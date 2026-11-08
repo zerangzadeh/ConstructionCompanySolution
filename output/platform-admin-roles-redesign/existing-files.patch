@@ -1,0 +1,280 @@
+--- baseline/apps/organizations/views.py
++++ apps/organizations/views.py
+@@ -1,6 +1,5 @@
+ import json
+ from datetime import date
+-from urllib.parse import urlencode
+ 
+ from django.contrib import messages
+ from django.contrib.auth.decorators import login_required
+@@ -804,6 +803,9 @@
+                 role_form.add_error(None, str(exc))
+             else:
+                 scope_form.add_error(None, str(exc))
++    if platform_mode:
++        role_form.fields["role"].empty_label = "انتخاب نقش"
++        role_form.fields["approver_membership"].empty_label = "انتخاب تأییدکننده مستقل"
+     return render(
+         request,
+         "organizations/member_authorization.html",
+@@ -813,6 +815,20 @@
+             "platform_target": organization if platform_mode else None,
+             "role_form": role_form,
+             "scope_form": scope_form,
++            "can_assign_roles": has_business_permission(
++                user=request.user,
++                organization=organization,
++                permission=BusinessPermissionCode.AUTHORIZATION_ROLES_ASSIGN,
++            )
++            if platform_mode
++            else False,
++            "can_revoke_roles": has_business_permission(
++                user=request.user,
++                organization=organization,
++                permission=BusinessPermissionCode.AUTHORIZATION_ROLES_REVOKE,
++            )
++            if platform_mode
++            else False,
+             "role_assignments": MembershipRoleAssignment.objects.filter(
+                 organization=organization,
+                 membership=membership,
+@@ -899,6 +915,22 @@
+         roles = roles.filter(Q(name__icontains=search) | Q(code__icontains=search))
+     if tenant_mode and catalog_organization is None:
+         roles = roles.none()
++    if platform_mode:
++        from django.core.paginator import Paginator
++
++        if request.GET.get("kind") in {"system", "custom"}:
++            roles = roles.filter(is_system=request.GET["kind"] == "system")
++        if request.GET.get("status") in {"active", "archived"}:
++            roles = roles.filter(is_active=request.GET["status"] == "active")
++        if (
++            request.method == "GET"
++            and selected_role is None
++            and request.GET.get("new") != "1"
++        ):
++            page = Paginator(roles.order_by("name", "pk"), 10).get_page(
++                request.GET.get("page")
++            )
++            selected_role = next(iter(page.object_list), None)
+     form = OrganizationRoleCatalogForm(
+         request.POST or None,
+         platform_mode=platform_mode,
+@@ -923,7 +955,7 @@
+             elif form.is_valid():
+                 data = form.cleaned_data
+                 if selected_role is None:
+-                    create_organization_role(
++                    saved_role = create_organization_role(
+                         actor=request.user,
+                         organization=catalog_organization,
+                         code=data["code"],
+@@ -935,7 +967,7 @@
+                     )
+                     messages.success(request, "نقش سفارشی ایجاد شد.")
+                 else:
+-                    update_organization_role(
++                    saved_role = update_organization_role(
+                         actor=request.user,
+                         role_id=selected_role.pk,
+                         name=data["name"],
+@@ -949,7 +981,9 @@
+             else:
+                 return render(
+                     request,
+-                    "organizations/role_catalog.html",
++                    "organizations/platform_roles.html"
++                    if platform_mode
++                    else "organizations/role_catalog.html",
+                     _role_catalog_context(
+                         form,
+                         roles,
+@@ -958,16 +992,25 @@
+                         catalog_organization,
+                         tenant_mode,
+                         search,
++                        request=request,
+                     ),
+                 )
+         except (PermissionDenied, ValidationError, ValueError) as exc:
+-            form.add_error(None, str(exc))
++            form.add_error(
++                None, exc.messages if isinstance(exc, ValidationError) else str(exc)
++            )
+         else:
+-            if platform_mode and catalog_organization is not None:
++            if platform_mode:
+                 url = reverse("organizations:platform_role_catalog")
+-                return redirect(
+-                    f"{url}?{urlencode({'organization': catalog_organization.pk})}"
+-                )
++                query = request.GET.copy()
++                for key in ("mode", "new", "edit"):
++                    query.pop(key, None)
++                if catalog_organization is not None:
++                    query["section"] = "tenant"
++                    query["organization"] = str(catalog_organization.pk)
++                if action == "save":
++                    query["edit"] = str(saved_role.pk)
++                return redirect(f"{url}?{query.urlencode()}")
+             return redirect(
+                 "organizations:platform_role_catalog"
+                 if platform_mode
+@@ -976,7 +1019,9 @@
+ 
+     return render(
+         request,
+-        "organizations/role_catalog.html",
++        "organizations/platform_roles.html"
++        if platform_mode
++        else "organizations/role_catalog.html",
+         _role_catalog_context(
+             form,
+             roles,
+@@ -985,6 +1030,7 @@
+             catalog_organization,
+             tenant_mode,
+             search,
++            request=request,
+         ),
+     )
+ 
+@@ -997,10 +1043,12 @@
+     catalog_organization: Organization | None,
+     tenant_mode: bool = False,
+     search: str = "",
++    *,
++    request: HttpRequest | None = None,
+ ) -> dict[str, object]:
+-    return {
++    context = {
+         "form": form,
+-        "roles": roles.prefetch_related("permissions").order_by("name"),
++        "roles": roles.prefetch_related("permissions").order_by("name", "pk"),
+         "selected_role": selected_role,
+         "platform_mode": platform_mode,
+         "platform_workspace": platform_mode,
+@@ -1014,6 +1062,11 @@
+         if platform_mode
+         else None,
+     }
++    if platform_mode and request is not None:
++        from apps.organizations.role_presentation import workspace_context
++
++        return workspace_context(request, context)
++    return context
+ 
+ 
+ @login_required
+--- baseline/apps/organizations/platform_console.py
++++ apps/organizations/platform_console.py
+@@ -218,7 +218,7 @@
+         ),
+         archived=Count(
+             "pk",
+-            filter=Q(status=OrganizationStatus.ARCHIVED) | Q(archived_at__isnull=False),
++            filter=Q(status=OrganizationStatus.ARCHIVED),
+         ),
+     )
+     newest = list(
+@@ -527,6 +527,8 @@
+ @require_GET
+ @never_cache
+ def member_roles(request: HttpRequest) -> HttpResponse:
++    from apps.organizations.role_presentation import tenant_selector
++
+     _require_admin(request)
+     companies = Organization.objects.filter(
+         status=OrganizationStatus.ACTIVE,
+@@ -574,6 +576,9 @@
+             "platform_workspace": True,
+             "platform_target": company,
+             "companies": companies.order_by("name", "pk"),
++            "tenant_selector": tenant_selector(
++                companies.order_by("name", "pk"), company
++            ),
+             "company": company,
+             "page_obj": page,
+             "can_inspect": page is not None,
+--- baseline/templates/organizations/platform_roles_navigation.html
++++ templates/organizations/platform_roles_navigation.html
+@@ -1,5 +1,5 @@
+-<nav class="my-4 flex flex-wrap gap-2" aria-label="بخش‌های نقش‌ها و مجوزها">
+-    <a class="erp-btn erp-btn--secondary" href="{% url 'organizations:platform_role_catalog' %}"{% if platform_mode and not tenant_mode %} aria-current="page"{% endif %}>نقش‌های سراسری و سیستمی</a>
+-    <a class="erp-btn erp-btn--secondary" href="{% url 'organizations:platform_role_catalog' %}?section=tenant{% if platform_target %}&amp;organization={{ platform_target.pk }}{% endif %}"{% if platform_mode and tenant_mode %} aria-current="page"{% endif %}>نقش‌های شرکت</a>
+-    <a class="erp-btn erp-btn--secondary" href="{% url 'organizations:platform_member_roles' %}{% if platform_target %}?organization={{ platform_target.pk }}{% endif %}"{% if request.resolver_match.url_name == "platform_member_roles" %} aria-current="page"{% endif %}>نقش اعضا</a>
++<nav class="role-tabs my-4 flex flex-wrap gap-2" aria-label="بخش‌های نقش‌ها و مجوزها">
++    <a href="{% url 'organizations:platform_role_catalog' %}"{% if platform_mode and not tenant_mode %} aria-current="page"{% endif %}>نقش‌های سیستمی</a>
++    <a href="{% url 'organizations:platform_role_catalog' %}?section=tenant{% if platform_target %}&amp;organization={{ platform_target.pk }}{% endif %}"{% if platform_mode and tenant_mode %} aria-current="page"{% endif %}>نقش‌های اختصاصی</a>
++    <a href="{% url 'organizations:platform_member_roles' %}{% if platform_target %}?organization={{ platform_target.pk }}{% endif %}"{% if request.resolver_match.url_name == "platform_member_roles" or request.resolver_match.url_name == "platform_member_authorization" %} aria-current="page"{% endif %}>تخصیص نقش کاربران</a>
+ </nav>
+--- baseline/templates/organizations/platform_member_roles.html
++++ templates/organizations/platform_member_roles.html
+@@ -1,17 +1,21 @@
+ {% extends "base.html" %}
++{% load static %}
+ {% block title %}نقش اعضای شرکت | بنیرا{% endblock %}
++{% block extra_head %}<link rel="stylesheet" href="{% static 'organizations/role_workspace.css' %}">{{ tenant_selector.media }}{% endblock %}
+ {% block content %}
++<div class="role-workspace">
+ {% include "components/page_header.html" with page_eyebrow="نقش‌ها و مجوزها" page_title="نقش اعضای شرکت" page_description="مشاهده و تفویض طبق مجوزهای عضویت در شرکت هدف" only %}
+ {% include "organizations/platform_roles_navigation.html" %}
+ <form method="get" class="erp-surface grid items-end gap-3 rounded-xl p-4 sm:grid-cols-3">
+-    <div><label for="member-company" class="block text-sm">شرکت هدف</label><select id="member-company" name="organization" required><option value="">انتخاب شرکت</option>{% for item in companies %}<option value="{{ item.pk }}"{% if item.pk == company.pk %} selected{% endif %}>{{ item.name }}</option>{% endfor %}</select></div>
++    <div>{% include "components/form_field.html" with field=tenant_selector.organization only %}</div>
+     <div><label for="member-search" class="block text-sm">نام کاربری عضو</label><input id="member-search" name="q" maxlength="150" value="{{ request.GET.q }}"></div>
+     <div><button class="erp-btn erp-btn--primary" type="submit">نمایش اعضا</button></div>
+ </form>
+ {% if company %}
+     {% if can_inspect %}
+     <section class="erp-surface mt-4 rounded-xl p-4">
+-        <h2 class="mb-3 font-bold">{{ company.name }}</h2>
++        <h2 class="mb-3 font-bold">شرکت هدف: {{ company.name }}</h2>
++        <p class="mb-3 text-xs text-slate-500">عضو را پیدا کنید و برای تخصیص یا لغو نقش، «نقش و دسترسی» را باز کنید. شرکت فعال نشست تغییر نمی‌کند.</p>
+         <ul class="divide-y divide-slate-100">
+             {% for member in page_obj.object_list %}
+             <li class="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
+@@ -27,4 +31,5 @@
+     <p class="erp-surface mt-4 rounded-xl p-4 text-sm">مشاهدهٔ اعضای {{ company.name }} به عضویت و مجوزهای لازم در همین شرکت نیاز دارد.</p>
+     {% endif %}
+ {% endif %}
++</div>
+ {% endblock %}
+--- baseline/templates/organizations/member_authorization.html
++++ templates/organizations/member_authorization.html
+@@ -1,18 +1,21 @@
+ {% extends "base.html" %}
++{% load static %}
+ {% block title %}مجوزدهی عضو | سامانه مدیریت ساخت{% endblock %}
++{% block extra_head %}{% if platform_workspace %}<link rel="stylesheet" href="{% static 'organizations/role_workspace.css' %}">{% endif %}{% endblock %}
+ {% block content %}
+-<div class="mx-auto max-w-5xl space-y-6">
++<div class="mx-auto max-w-5xl space-y-6{% if platform_workspace %} role-workspace{% endif %}">
+   {% if platform_workspace %}{% include "organizations/platform_roles_navigation.html" %}{% endif %}
+   {% include "components/page_header.html" with page_eyebrow="کنترل دسترسی" page_title="نقش و دسترسی عضو" page_description=membership.user.username only %}
++  {% if platform_workspace %}<p class="role-notice">شرکت هدف: <strong>{{ platform_target.name }}</strong> · عضو: <strong>{{ membership.user.username }}</strong><br>تخصیص و لغو نقش طبق اختیارات همین شرکت و با تأیید مستقل موجود انجام می‌شود.</p>{% endif %}
+   {% if membership.authorization_quarantined_at %}<p class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">دسترسی این عضو موقتاً متوقف است. برای فعال‌شدن، دست‌کم یک نقش و دسترسی به شرکت، پروژه یا کارگاه با تأیید فرد مستقل ثبت کنید.</p>{% endif %}
+-  <div class="grid gap-6 lg:grid-cols-2">
+-    <form method="post" class="erp-surface space-y-4 rounded-xl p-5">
++  <div class="grid gap-6{% if not platform_workspace %} lg:grid-cols-2{% endif %}">
++    {% if not platform_workspace or can_assign_roles %}<form method="post" class="erp-surface space-y-4 rounded-xl p-5">
+       {% csrf_token %}<input type="hidden" name="action" value="assign_role">
+       <h2 class="font-bold text-slate-950">انتخاب نقش عضو</h2>
+       {% include "components/form_errors.html" with form=role_form only %}
+       {% for field in role_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
+       <button class="erp-btn erp-btn--primary" type="submit">ثبت نقش با تأیید فرد مستقل</button>
+-    </form>
++    </form>{% else %}<p class="role-notice">اختیار تخصیص نقش در این شرکت را ندارید. نقش‌های موجود برای مشاهده نمایش داده می‌شوند.</p>{% endif %}
+     {% if not platform_workspace %}<form method="post" class="erp-surface space-y-4 rounded-xl p-5">
+       {% csrf_token %}<input type="hidden" name="action" value="grant_scope">
+       <h2 class="font-bold text-slate-950">انتخاب شرکت، پروژه یا کارگاه</h2>
+@@ -23,7 +26,7 @@
+   </div>
+   <section class="erp-surface overflow-hidden rounded-xl p-5">
+     <h2 class="mb-4 font-bold text-slate-950">تاریخچه نقش‌ها</h2>
+-    {% for item in role_assignments %}<div class="mb-3 rounded-lg border p-3 text-sm"><b>{{ item.role.name }}</b> — {% if item.revoked_at %}لغوشده{% elif item.is_effective %}فعال{% else %}زمان‌بندی‌شده/منقضی{% endif %}{% if not item.revoked_at %}<form method="post" class="mt-2 flex flex-wrap gap-2">{% csrf_token %}<input type="hidden" name="action" value="revoke_role"><input type="hidden" name="assignment_id" value="{{ item.id }}"><select name="approver_membership_id" required aria-label="تأییدکننده مستقل برای لغو نقش {{ item.role.name }}" class="min-w-0 max-w-full rounded-lg border px-2 py-1">{% for approver in approvers %}<option value="{{ approver.id }}">{{ approver.user.username }}</option>{% endfor %}</select><input name="reason" required placeholder="دلیل لغو" aria-label="دلیل لغو نقش {{ item.role.name }}" class="min-w-0 max-w-full rounded-lg border px-2 py-1"><button class="text-red-700" type="submit" aria-label="لغو نقش {{ item.role.name }}">لغو</button></form>{% endif %}</div>{% empty %}<p class="text-sm text-slate-500">نقشی ثبت نشده است.</p>{% endfor %}
++    {% for item in role_assignments %}<div class="mb-3 rounded-lg border p-3 text-sm"><b>{{ item.role.name }}</b> — {% if item.revoked_at %}لغوشده{% elif item.is_effective %}فعال{% else %}زمان‌بندی‌شده/منقضی{% endif %}{% if not item.revoked_at %}{% if not platform_workspace or can_revoke_roles %}<form method="post" class="mt-2 flex flex-wrap gap-2">{% csrf_token %}<input type="hidden" name="action" value="revoke_role"><input type="hidden" name="assignment_id" value="{{ item.id }}"><select name="approver_membership_id" required aria-label="تأییدکننده مستقل برای لغو نقش {{ item.role.name }}" class="min-w-0 max-w-full rounded-lg border px-2 py-1">{% for approver in approvers %}<option value="{{ approver.id }}">{{ approver.user.username }}</option>{% endfor %}</select><input name="reason" required placeholder="دلیل لغو" aria-label="دلیل لغو نقش {{ item.role.name }}" class="min-w-0 max-w-full rounded-lg border px-2 py-1"><button class="text-red-700" type="submit" aria-label="لغو نقش {{ item.role.name }}">لغو</button></form>{% endif %}{% endif %}</div>{% empty %}<p class="text-sm text-slate-500">نقشی ثبت نشده است.</p>{% endfor %}
+   </section>
+   {% if not platform_workspace %}<section class="erp-surface overflow-hidden rounded-xl p-5">
+     <h2 class="mb-4 font-bold text-slate-950">تاریخچه دسترسی به شرکت، پروژه و کارگاه</h2>

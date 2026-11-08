@@ -1,0 +1,5 @@
+<nav class="role-tabs my-4 flex flex-wrap gap-2" aria-label="بخش‌های نقش‌ها و مجوزها">
+    <a href="{% url 'organizations:platform_role_catalog' %}"{% if platform_mode and not tenant_mode %} aria-current="page"{% endif %}>نقش‌های سیستمی</a>
+    <a href="{% url 'organizations:platform_role_catalog' %}?section=tenant{% if platform_target %}&amp;organization={{ platform_target.pk }}{% endif %}"{% if platform_mode and tenant_mode %} aria-current="page"{% endif %}>نقش‌های اختصاصی</a>
+    <a href="{% url 'organizations:platform_member_roles' %}{% if platform_target %}?organization={{ platform_target.pk }}{% endif %}"{% if request.resolver_match.url_name == "platform_member_roles" or request.resolver_match.url_name == "platform_member_authorization" %} aria-current="page"{% endif %}>تخصیص نقش کاربران</a>
+</nav>

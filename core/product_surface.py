@@ -13,6 +13,21 @@ from django.core.exceptions import ImproperlyConfigured
 from django.urls import Resolver404, resolve
 
 _PLATFORM_ADMIN_ROUTES = (
+    "organizations:platform_dashboard",
+    "organizations:platform_users",
+    "organizations:platform_user_create",
+    "organizations:platform_user_detail",
+    "organizations:platform_user_edit",
+    "organizations:platform_user_status",
+    "organizations:platform_user_reset",
+    "organizations:platform_user_temporary_password",
+    "organizations:platform_administrators",
+    "organizations:platform_member_roles",
+    "organizations:platform_member_authorization",
+    "organizations:platform_settings",
+    "organizations:platform_audit",
+    "organizations:platform_status",
+    "organizations:platform_company_onboarding",
     "organizations:platform_company_list",
     "organizations:platform_company_detail",
     "organizations:platform_company_edit",
@@ -177,24 +192,28 @@ def platform_administration_exposed(user) -> bool:
     return is_platform_admin(user)
 
 
+def is_platform_workspace_route(view_name: str) -> bool:
+    return view_name in _PLATFORM_ADMIN_ROUTES
+
+
 def route_exposed(
     view_name: str, route_kwargs: dict | None = None, *, user=None
 ) -> bool:
     return capability_exposed(route_capability(view_name, route_kwargs)) or (
-        view_name in _PLATFORM_ADMIN_ROUTES
+        is_platform_workspace_route(view_name)
         and user is not None
         and platform_administration_exposed(user)
     )
 
 
-def url_exposed(url: str) -> bool:
-    """Filter local dynamic source links, including query strings/fragments."""
+def url_exposed(url: str, user=None) -> bool:
+    """Filter local dynamic links with optional platform actor context."""
     parts = urlsplit(str(url))
     if parts.scheme or parts.netloc or not parts.path.startswith("/"):
         return False
     try:
         match = resolve(parts.path)
-        return route_exposed(match.view_name, match.kwargs)
+        return route_exposed(match.view_name, match.kwargs, user=user)
     except Resolver404:
         return False
 

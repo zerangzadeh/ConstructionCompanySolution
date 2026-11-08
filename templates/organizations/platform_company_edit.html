@@ -1,28 +1,21 @@
-{% extends "base.html" %}
+{% extends "components/sectioned_form_page.html" %}
 {% block title %}ویرایش {{ company.name }} | مدیریت پلتفرم بنیرا{% endblock %}
-{% block content %}
-<div class="max-w-3xl">
-    <a href="{% url 'organizations:platform_company_detail' company.pk %}" class="text-xs font-semibold text-blue-700">بازگشت به شرکت</a>
-    <h1 class="mt-2 text-2xl font-bold text-slate-950">مشخصات و تنظیمات {{ company.name }}</h1>
-    <form method="post" class="erp-surface mt-5 space-y-6 rounded-xl p-5">
+{% block sectioned_content %}
+    {% url 'organizations:platform_company_detail' company.pk as cancel_url %}
+    {% include "components/page_header.html" with page_breadcrumb_label=company.name page_breadcrumb_url=cancel_url page_breadcrumb_user=request.user page_title="ویرایش شرکت" page_description="مشخصات و تنظیمات شرکت را ویرایش کنید و دلیل تغییر را ثبت کنید." page_icon="company" only %}
+    <form class="erp-create-form erp-sectioned-form" method="post" aria-labelledby="erp-page-title" data-focus-first-error>
         {% csrf_token %}
-        {% for field in change_form.hidden_fields %}{{ field }}{% endfor %}
-        {% include "components/form_errors.html" with form=change_form only %}
-        <section class="space-y-3">
-            <h2 class="font-bold">مشخصات شرکت</h2>
-            {% include "components/form_errors.html" with form=profile_form only %}
-            {% for field in profile_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
+        {% include "components/sectioned_form_fields.html" with form=profile_form profile="company_profile" only %}
+        {% include "components/form_errors.html" with form=settings_form only %}
+        <section class="erp-form-section" aria-labelledby="form-company-settings">
+            {% include "components/form_section_header.html" with heading_id="form-company-settings" heading="تنظیمات شرکت" icon="layers" description="واحد پول، آغاز سال مالی و الگوهای شماره‌گذاری در این پنل فقط برای مشاهده هستند." only %}
+            <div class="erp-form-grid erp-form-grid--two">
+                {% for field in settings_form %}
+                    {% include "components/form_field.html" with field=field only %}
+                {% endfor %}
+            </div>
         </section>
-        <section class="space-y-3 border-t border-slate-100 pt-5">
-            <h2 class="font-bold">تنظیمات شرکت</h2>
-            {% include "components/form_errors.html" with form=settings_form only %}
-            {% for field in settings_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
-        </section>
-        {% include "components/form_field.html" with field=change_form.reason only %}
-        <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-4">
-            <button type="submit" class="erp-btn erp-btn--primary">ذخیره مشخصات و تنظیمات</button>
-            <a href="{% url 'organizations:platform_company_detail' company.pk %}" class="erp-btn erp-btn--secondary">انصراف</a>
-        </div>
+        {% include "components/sectioned_form_fields.html" with form=change_form profile="company_change" only %}
+        {% include "components/form_footer.html" with submit_label="ذخیره مشخصات و تنظیمات" cancel_url=cancel_url submit_icon="check-circle" only %}
     </form>
-</div>
 {% endblock %}

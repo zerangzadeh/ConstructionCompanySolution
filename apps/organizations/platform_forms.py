@@ -2,6 +2,7 @@ from django import forms
 
 from apps.organizations.forms import OrganizationSettingsForm
 from apps.organizations.models import OrganizationStatus
+from apps.organizations.platform_companies import PLATFORM_READ_ONLY_SETTINGS
 
 
 class CompanySearchForm(forms.Form):
@@ -38,6 +39,11 @@ class CompanyStatusForm(CompanyChangeForm):
 
 
 class PlatformCompanySettingsForm(OrganizationSettingsForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in PLATFORM_READ_ONLY_SETTINGS:
+            self.fields[field].disabled = True
+
     class Meta(OrganizationSettingsForm.Meta):
         fields = tuple(
             field for field in OrganizationSettingsForm.Meta.fields if field != "logo"

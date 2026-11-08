@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}نقش اعضای شرکت | بنیرا{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="نقش‌ها و مجوزها" page_title="نقش اعضای شرکت" page_description="مشاهده و تفویض طبق مجوزهای عضویت در شرکت هدف" only %}
+{% include "organizations/platform_roles_navigation.html" %}
+<form method="get" class="erp-surface grid items-end gap-3 rounded-xl p-4 sm:grid-cols-3">
+    <div><label for="member-company" class="block text-sm">شرکت هدف</label><select id="member-company" name="organization" required><option value="">انتخاب شرکت</option>{% for item in companies %}<option value="{{ item.pk }}"{% if item.pk == company.pk %} selected{% endif %}>{{ item.name }}</option>{% endfor %}</select></div>
+    <div><label for="member-search" class="block text-sm">نام کاربری عضو</label><input id="member-search" name="q" maxlength="150" value="{{ request.GET.q }}"></div>
+    <div><button class="erp-btn erp-btn--primary" type="submit">نمایش اعضا</button></div>
+</form>
+{% if company %}
+    {% if can_inspect %}
+    <section class="erp-surface mt-4 rounded-xl p-4">
+        <h2 class="mb-3 font-bold">{{ company.name }}</h2>
+        <ul class="divide-y divide-slate-100">
+            {% for member in page_obj.object_list %}
+            <li class="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
+                <span>{{ member.user.username }} · {{ member.get_status_display }}</span>
+                <span>{% if member.status == "active" and member.user.is_active %}{% for assignment in member.current_roles %}{{ assignment.role.name }}{% if not forloop.last %}، {% endif %}{% empty %}{% if not member.assignment_count and not member.authorization_migrated_at and member.role_definition.is_active %}{{ member.role_definition.name }}{% else %}بدون نقش فعال{% endif %}{% endfor %}{% else %}عضویت غیرفعال{% endif %}</span>
+                <a class="erp-btn erp-btn--secondary erp-btn--compact" href="{% url 'organizations:platform_member_authorization' company.pk member.pk %}">نقش و دسترسی</a>
+            </li>
+            {% empty %}<li class="py-3 text-slate-500">عضوی با این مشخصات یافت نشد.</li>{% endfor %}
+        </ul>
+        {% include "components/bounded_table_pagination.html" %}
+    </section>
+    {% else %}
+    <p class="erp-surface mt-4 rounded-xl p-4 text-sm">مشاهدهٔ اعضای {{ company.name }} به عضویت و مجوزهای لازم در همین شرکت نیاز دارد.</p>
+    {% endif %}
+{% endif %}
+{% endblock %}

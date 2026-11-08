@@ -5,9 +5,14 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView, PasswordResetConfirmView
+from django.contrib.auth.views import (
+    INTERNAL_RESET_SESSION_TOKEN,
+    LoginView,
+    PasswordResetConfirmView,
+)
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.db import transaction
 from django.http import (
     FileResponse,
     Http404,
@@ -18,6 +23,8 @@ from django.http import (
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.crypto import salted_hmac
+from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import TemplateView
 
@@ -29,7 +36,8 @@ from apps.accounts.forms import (
     RequiredPasswordChangeForm,
     UserLoginForm,
 )
-from apps.accounts.models import LoginPageSettings
+from apps.accounts.models import LoginPageSettings, User
+from apps.accounts.recovery import account_recovery_tokens
 from apps.accounts.services import (
     change_personal_password,
     initialize_personal_password,
@@ -81,6 +89,10 @@ class UserLoginView(LoginView):
     def get_success_url(self) -> str:
         if self.request.user.must_change_password:
             return reverse("accounts:required_password_change")
+        from apps.organizations.authorization import is_platform_admin
+
+        if not self.get_redirect_url() and is_platform_admin(self.request.user):
+            return reverse("organizations:platform_dashboard")
         return super().get_success_url()
 
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
@@ -122,6 +134,7 @@ class PublicPasswordResetRequestView(TemplateView):
                     )
                     form.save(
                         request=request,
+                        token_generator=account_recovery_tokens,
                         use_https=request.is_secure(),
                         email_template_name="accounts/emails/password_reset_email.txt",
                         subject_template_name="accounts/emails/password_reset_subject.txt",
@@ -143,8 +156,26 @@ class PublicPasswordResetConfirmView(PasswordResetConfirmView):
     form_class = PublicPasswordResetSetForm
     template_name = "accounts/password_reset_confirm.html"
     success_url = reverse_lazy("accounts:password_reset_complete")
+    token_generator = account_recovery_tokens
 
+    def get_user(self, uidb64):
+        user = super().get_user(uidb64)
+        return user if user is not None and user.is_active else None
+
+    @transaction.atomic
     def form_valid(self, form: PublicPasswordResetSetForm) -> HttpResponse:
+        locked_user = (
+            User.objects.select_for_update()
+            .filter(pk=self.user.pk, is_active=True)
+            .first()
+        )
+        session_token = self.request.session.get(INTERNAL_RESET_SESSION_TOKEN)
+        if locked_user is None or not self.token_generator.check_token(
+            locked_user, session_token
+        ):
+            self.validlink = False
+            return self.render_to_response(self.get_context_data())
+        form.user = locked_user
         user = form.save()
         record_audit_event(
             action=AuditAction.USER_PASSWORD_RESET_COMPLETED,
@@ -153,6 +184,7 @@ class PublicPasswordResetConfirmView(PasswordResetConfirmView):
             actor=user,
             metadata={"channel": "email"},
         )
+        del self.request.session[INTERNAL_RESET_SESSION_TOKEN]
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -162,8 +194,11 @@ class PublicPasswordResetCompleteView(TemplateView):
     template_name = "accounts/password_reset_complete.html"
 
 
+@sensitive_post_parameters("new_password1", "new_password2")
 @login_required
 @require_http_methods(["GET", "POST"])
+@never_cache
+@sensitive_variables("form")
 def required_password_change(request: HttpRequest) -> HttpResponse:
     """Require a personal password before allowing any application access."""
 
@@ -171,12 +206,16 @@ def required_password_change(request: HttpRequest) -> HttpResponse:
         return redirect("organizations:select")
     form = RequiredPasswordChangeForm(user=request.user, data=request.POST or None)
     if request.method == "POST" and form.is_valid():
-        updated_user = initialize_personal_password(
-            user=request.user, new_password=form.cleaned_data["new_password1"]
-        )
-        update_session_auth_hash(request, updated_user)
-        messages.success(request, "گذرواژه شخصی شما تعیین شد.")
-        return redirect("organizations:select")
+        try:
+            updated_user = initialize_personal_password(
+                user=request.user, new_password=form.cleaned_data["new_password1"]
+            )
+        except ValidationError as error:
+            form.add_error("new_password2", error)
+        else:
+            update_session_auth_hash(request, updated_user)
+            messages.success(request, "گذرواژه شخصی شما تعیین شد.")
+            return redirect("organizations:select")
     return render(request, "accounts/required_password_change.html", {"form": form})
 
 

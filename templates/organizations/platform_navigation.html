@@ -1,0 +1,8 @@
+{% if platform_navigation_access %}
+<nav class="erp-platform-navigation space-y-1" aria-label="مدیریت پلتفرم">
+    {% if not platform_workspace %}<p class="mb-2 mt-3 border-t border-slate-700 px-3 pt-3 text-xs font-semibold text-slate-300">مدیریت پلتفرم</p>{% endif %}
+    {% for label, route, selected, icon in platform_navigation %}
+        <a class="erp-nav-link{% if selected %} erp-nav-link--active{% endif %}" href="{% url route %}"{% if selected %} aria-current="page"{% endif %}>{% include "components/form_icon.html" with icon=icon only %}<span>{{ label }}</span></a>
+    {% endfor %}
+</nav>
+{% endif %}

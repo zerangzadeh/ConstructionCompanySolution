@@ -1,0 +1,79 @@
+{% extends "base.html" %}{% load static erp_format %}
+{% block title %}داشبورد پلتفرم | بنیرا{% endblock %}
+{% block content %}
+<div class="erp-platform-dashboard">
+    <div class="erp-platform-heading">
+        <div class="flex min-w-0 items-center gap-3">
+            <span class="erp-platform-heading__icon">{% include "components/form_icon.html" with icon="layers" only %}</span>
+            <div class="min-w-0">
+                <h1 class="text-xl font-bold sm:text-2xl">داشبورد پلتفرم</h1>
+                <p class="mt-1 text-xs leading-6 text-slate-600 sm:text-sm">نمای کلی وضعیت پلتفرم، شرکت‌ها و فعالیت‌های اخیر</p>
+            </div>
+        </div>
+        <time class="erp-platform-date" datetime="{{ checked_at|date:'c' }}">{% include "components/form_icon.html" with icon="calendar" only %}<bdi>{{ checked_at|jalali_date }}</bdi></time>
+    </div>
+    <section class="erp-platform-kpis" aria-label="آمار پلتفرم">
+        {% for metric in kpis %}{% include "components/dashboard_metric.html" with metric=metric only %}{% endfor %}
+    </section>
+    <div class="erp-platform-panels">
+        <section class="erp-platform-panel erp-platform-recent" aria-labelledby="platform-recent-title">
+            <div class="erp-platform-panel-heading">
+                {% include "components/form_icon.html" with icon="clock" only %}<h2 id="platform-recent-title">فعالیت‌های مدیریتی اخیر</h2>
+            </div>
+            <ol class="erp-platform-events">
+                {% for event in events %}
+                <li>
+                    <span class="erp-platform-event-icon">{% include "components/form_icon.html" with icon="notes" only %}</span>
+                    <div class="min-w-0">
+                        <p class="font-semibold">{{ event.get_action_display }}</p>
+                        <div class="mt-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs leading-5 text-slate-600"><span>{{ event.actor.username|default:"سامانه" }} · {{ event.organization.name|default:"سراسری" }}</span><time class="text-slate-500" datetime="{{ event.created_at|date:'c' }}">{{ event.created_at|jalali_datetime }}</time></div>
+                    </div>
+                </li>
+                {% empty %}<li class="erp-platform-empty">{% if can_audit %}هنوز فعالیت مدیریتی قابل نمایشی ثبت نشده است.{% else %}مشاهده فعالیت‌های مدیریتی در دسترس نیست.{% endif %}</li>{% endfor %}
+            </ol>
+            {% if can_audit %}<a class="erp-platform-link" href="{% url 'organizations:platform_audit' %}">مشاهده همه فعالیت‌ها <span aria-hidden="true">←</span></a>{% endif %}
+        </section>
+        <section class="erp-platform-panel" aria-label="فعالیت پلتفرم در هفت روز اخیر">
+            {% include "components/dashboard_chart.html" with chart_id="platform-weekly-activity" title="فعالیت پلتفرم" description="رویدادهای مدیریتی ثبت‌شده در هفت روز اخیر" rows=activity_rows unit="رویداد" icon="activity" empty_message="رویداد مدیریتی قابل نمایشی در این بازه وجود ندارد." only %}
+            {% if can_audit %}<p class="erp-platform-panel-note">{{ activity_total|erp_number }} رویداد در این بازه ثبت شده است.</p>{% else %}<p class="erp-platform-panel-note">مشاهده ممیزی پلتفرم در دسترس نیست.</p>{% endif %}
+        </section>
+        <section class="erp-platform-panel" aria-label="توزیع وضعیت شرکت‌ها">
+            {% include "components/dashboard_chart.html" with chart_id="platform-company-status" title="وضعیت شرکت‌ها" description="توزیع شرکت‌های ثبت‌شده، بدون موارد حذف‌شده" rows=company_status_rows ring=True total=counts.total unit="شرکت" icon="company" empty_message="هنوز شرکتی ثبت نشده است." only %}
+        </section>
+    </div>
+    <div class="erp-platform-bottom">
+        <section class="erp-platform-panel" aria-labelledby="platform-health-title">
+            <div class="erp-platform-panel-heading">
+                {% include "components/form_icon.html" with icon="activity" only %}<h2 id="platform-health-title">وضعیت سامانه</h2>
+            </div>
+            {% include "organizations/platform_health_signals.html" with compact=True %}
+            <div class="erp-platform-panel-footer">
+                {% if can_probe %}<p class="text-xs text-slate-500">بررسی دسترسی وابستگی‌ها · <time datetime="{{ checked_at|date:'c' }}">{{ checked_at|jalali_datetime }}</time></p><a class="erp-platform-link" href="{% url 'organizations:platform_status' %}">جزئیات وضعیت <span aria-hidden="true">←</span></a>{% else %}<p class="text-xs text-slate-500">منبع سلامت قابل بررسی در دسترس نیست.</p>{% endif %}
+            </div>
+        </section>
+        <section class="erp-platform-panel" aria-labelledby="platform-quick-title">
+            <div class="erp-platform-panel-heading">{% include "components/form_icon.html" with icon="bolt" only %}<h2 id="platform-quick-title">دسترسی سریع</h2></div>
+            <div class="erp-platform-quick-actions">
+                <a href="{% url 'organizations:create' %}">{% include "components/form_icon.html" with icon="plus" only %}<span>ایجاد شرکت جدید</span></a>
+                {% if can_view_platform_users %}<a href="{% url 'organizations:platform_users' %}">{% include "components/form_icon.html" with icon="id-card" only %}<span>مدیریت کاربران</span></a>{% endif %}
+                <a href="{% url 'organizations:platform_role_catalog' %}">{% include "components/form_icon.html" with icon="layers" only %}<span>نقش‌ها و مجوزها</span></a>
+                {% if can_manage_operators %}<a href="{% url 'organizations:platform_administrators' %}">{% include "components/form_icon.html" with icon="users" only %}<span>مدیران پلتفرم</span></a>{% endif %}
+                <a href="{% url 'organizations:platform_settings' %}">{% include "components/form_icon.html" with icon="settings" only %}<span>تنظیمات پلتفرم</span></a>
+            </div>
+        </section>
+    </div>
+    {% if onboarding_warnings %}
+    <aside class="erp-platform-onboarding" aria-labelledby="platform-onboarding-title">
+        {% include "components/form_icon.html" with icon="notes" only %}
+        <div><h2 id="platform-onboarding-title" class="text-sm font-semibold">راه‌اندازی نیازمند بررسی</h2><p class="mt-1 text-xs leading-6">بررسی گردش‌کارهای اولیه در پنج شرکت فعال اخیر</p>
+            <ul class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs">{% for company in onboarding_warnings %}<li><a class="underline underline-offset-4" href="{% url 'organizations:platform_company_detail' company.pk %}">{{ company.name }}</a></li>{% endfor %}</ul>
+        </div>
+    </aside>
+    {% endif %}
+    {{ dashboard_charts|json_script:"platform-dashboard-data" }}
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{% static 'projects/vendor/chartjs-4.6.1/chart.umd.min.js' %}" defer></script>
+<script src="{% static 'projects/dashboard_charts.js' %}?v=20261107-platform" defer></script>
+{% endblock %}

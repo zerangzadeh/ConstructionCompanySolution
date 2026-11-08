@@ -225,6 +225,12 @@ ROLE_PERMISSION_ADDITIONS: dict[str, set[str]] = {
 
 # Explicit reasons for omitting registered capabilities from tenant role defaults.
 UNASSIGNED_PERMISSION_REASONS = {
+    "platform_admin.manage_operators": "Requires active Platform Admin duty.",
+    "platform_admin.inspect_audit": "Requires active Platform Admin duty.",
+    "platform_admin.inspect_health": "Requires active Platform Admin duty.",
+    "platform_admin.users_view": "Requires active Platform Admin duty.",
+    "platform_admin.users_manage": "Requires active Platform Admin duty.",
+    "platform_admin.users_recover": "Requires active Platform Admin duty.",
     "support.audit_reconcile": "Reserved catalogue code; no implemented enforcement path.",
     "platform_companies.view": "Requires independently assigned Platform Admin authority.",
     "platform_companies.configure": "Requires independently assigned Platform Admin authority.",

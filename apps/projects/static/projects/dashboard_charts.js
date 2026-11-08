@@ -7,12 +7,21 @@
         return number + (fraction && /[1-9]/.test(fraction) ? '٫' + fraction.replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]) : '');
     };
     const mount = () => {
-        const source = document.getElementById('project-dashboard-data');
+        const source = document.getElementById('project-dashboard-data')
+            || document.getElementById('platform-dashboard-data');
         if (!source || typeof Chart !== 'function') return;
         const styles = getComputedStyle(document.documentElement);
         const color = token => styles.getPropertyValue('--bonira-' + token).trim();
         const palette = ['royal-blue', 'deep-navy', 'muted', 'light-gray'].map(color);
-        const statusColors = {planning: 'royal-blue', active: 'success', on_hold: 'warning', completed: 'deep-navy', cancelled: 'danger'};
+        const statusColors = {
+            planning: 'royal-blue',
+            active: 'success',
+            on_hold: 'warning',
+            suspended: 'warning',
+            completed: 'deep-navy',
+            cancelled: 'danger',
+            archived: 'muted',
+        };
         let configs;
         try { configs = JSON.parse(source.textContent); } catch { return; }
         for (const config of configs) {

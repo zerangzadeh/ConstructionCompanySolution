@@ -449,6 +449,7 @@ def update_organization_membership(
         for item in OrganizationMembership.objects.filter(
             organization=locked_organization,
             status=MembershipStatus.ACTIVE,
+            user__is_active=True,
         )
         .exclude(pk=locked_membership.pk)
         .select_related("role_definition")
@@ -505,12 +506,16 @@ def update_organization_membership(
     if (
         previous_status == MembershipStatus.PENDING_ROLE
         and status == MembershipStatus.ACTIVE
-        and not locked_membership.user.is_active
     ):
-        if locked_membership.user.blocked_at is not None:
-            raise PermissionDenied("حساب کاربر مسدود است و قابل فعال‌سازی نیست.")
-        locked_membership.user.is_active = True
-        locked_membership.user.save(update_fields=["is_active", "updated_at"])
+        account = User.objects.select_for_update().get(pk=locked_membership.user_id)
+        if account.is_active:
+            return locked_membership
+        if account.blocked_at is not None or account.auth_session_revision is not None:
+            raise PermissionDenied(
+                "فعال‌سازی این حساب به مدیریت کاربران سامانه نیاز دارد."
+            )
+        account.is_active = True
+        account.save(update_fields=["is_active", "updated_at"])
         record_audit_event(
             action=AuditAction.USER_ACCOUNT_STATUS_CHANGED,
             entity_type="user",
@@ -706,12 +711,26 @@ def create_organization_with_owner(
     contract_code_prefix: str = "CTR",
     site_code_prefix: str = "SITE",
     document_code_prefix: str = "DOC",
+    platform_actor: User | None = None,
 ) -> Organization:
     """Create an organization and its active owner membership atomically."""
 
+    if platform_actor is not None:
+        from apps.organizations.platform_grants import lock_platform_admin
+
+        try:
+            platform_actor = lock_platform_admin(platform_actor)
+        except PermissionDenied as exc:
+            raise PermissionDenied(
+                "فقط ادمین پلتفرم می‌تواند شرکت جدید ایجاد کند."
+            ) from exc
+        if owner.pk == platform_actor.pk:
+            raise ValidationError("مالک اولیه باید حسابی جدا از مدیر ایجادکننده باشد.")
+        owner = User.objects.select_for_update().get(pk=owner.pk)
     if not owner.is_authenticated or owner._state.adding or not owner.is_active:
         raise ValueError("کاربر واردشده به سامانه الزامی است.")
 
+    creator = platform_actor or owner
     organization = Organization(
         name=name,
         legal_name=legal_name,
@@ -726,8 +745,8 @@ def create_organization_with_owner(
         city=city,
         address=address,
         postal_code=postal_code,
-        created_by=owner,
-        updated_by=owner,
+        created_by=creator,
+        updated_by=creator,
     )
     organization.full_clean()
     organization.save()
@@ -772,26 +791,38 @@ def create_organization_with_owner(
         entity_type="organization",
         entity_id=organization.pk,
         organization=organization,
-        actor=owner,
-        metadata={"name": organization.name},
+        actor=creator,
+        allow_platform_actor=platform_actor is not None,
+        metadata={
+            "name": organization.name,
+            "initial_owner_id": str(owner.pk),
+            "control_plane": platform_actor is not None,
+        },
     )
+    from apps.daily_reports.workflow import ensure_daily_report_compatibility_workflow
     from apps.procurement.workflow import (
         ensure_purchase_request_compatibility_workflow,
     )
 
-    transaction.on_commit(
-        lambda: ensure_purchase_request_compatibility_workflow(
-            organization=organization,
-            actor=owner,
-        )
-    )
-    from apps.daily_reports.workflow import ensure_daily_report_compatibility_workflow
-
-    transaction.on_commit(
-        lambda: ensure_daily_report_compatibility_workflow(
+    if platform_actor is not None:
+        # Platform creation succeeds only when both starter workflows succeed.
+        ensure_purchase_request_compatibility_workflow(
             organization=organization, actor=owner
         )
-    )
+        ensure_daily_report_compatibility_workflow(
+            organization=organization, actor=owner
+        )
+    else:
+        transaction.on_commit(
+            lambda: ensure_purchase_request_compatibility_workflow(
+                organization=organization, actor=owner
+            )
+        )
+        transaction.on_commit(
+            lambda: ensure_daily_report_compatibility_workflow(
+                organization=organization, actor=owner
+            )
+        )
     return organization
 
 
@@ -825,17 +856,8 @@ def create_organization_by_system_admin(
 ) -> Organization:
     """Create a tenant only through the independently assigned platform-admin role."""
 
-    from apps.organizations.authorization import is_platform_admin
-
-    if (
-        not actor.is_authenticated
-        or actor._state.adding
-        or not actor.is_active
-        or not is_platform_admin(actor)
-    ):
-        raise PermissionDenied("فقط ادمین پلتفرم می‌تواند شرکت جدید ایجاد کند.")
-
     return create_organization_with_owner(
+        platform_actor=actor,
         owner=owner,
         name=name,
         slug=slug,

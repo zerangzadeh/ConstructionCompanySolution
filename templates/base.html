@@ -670,58 +670,62 @@
     {# Match the previous CDN compiler's late head insertion/cascade order. #}
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <link rel="stylesheet" href="{% static 'css/erp_output_actions.css' %}">
+    {% if platform_workspace %}<link rel="stylesheet" href="{% static 'css/erp_platform.css' %}?v=20261108-user-pages">{% endif %}
 </head>
 
-<body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
+<body class="min-h-screen bg-slate-50 text-slate-900 antialiased{% if platform_workspace %} erp-platform-workspace{% endif %}">
     <a class="erp-skip-link" href="#main-content">رفتن به محتوای اصلی</a> {% if request.user.is_authenticated %}
     <div class="min-h-screen lg:pr-[260px]">
         <aside class="erp-sidebar fixed inset-y-0 right-0 z-40 hidden w-[260px] flex-col overflow-hidden border-l border-slate-800 bg-slate-900 text-slate-200 lg:flex" aria-label="نوار کناری سامانه">
+            {% if platform_workspace %}
+            <a class="erp-platform-brand" href="{% url 'organizations:platform_dashboard' %}" aria-label="بنیرا، داشبورد مدیریت پلتفرم">
+                <img src="{% static 'accounts/images/bonira-logo.svg' %}" width="176" height="39" alt="بنیرا BONIRA">
+                <span>مدیریت پلتفرم</span>
+            </a>
+            {% else %}
             <a class="flex h-[72px] shrink-0 items-center gap-3 border-b border-slate-800 px-5" href="{% url 'home' %}">
                 <span class="grid h-10 w-10 place-items-center rounded-lg bg-blue-600 text-white ring-1 ring-blue-400/40"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 21h18M5 21V9l4-3v15M9 21V4l6-3v20M15 21V8l4 2v11M12 6v2m0 3v2m0 3v2"/></svg></span>
                 <span><strong class="block text-sm font-semibold text-white">بنیرا</strong><small class="mt-0.5 block text-[10px] text-slate-400">راهکار یکپارچه مدیریت ساخت</small></span>
             </a>
-            <div class="erp-scrollbar flex-1 overflow-y-auto px-3 py-4">
-                {% include "components/navigation_links.html" with product_navigation_groups=product_navigation_groups current_view_name=request.resolver_match.view_name navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available party_governance_available=party_governance_available party_governance_surface=party_governance_surface my_requests_workspace_available=my_requests_workspace_available manager_workspace_available=manager_workspace_available only %}
-            </div>
-            {% if platform_navigation_access %}
-            <section data-nav-id="NAV-042" class="border-t border-amber-400/30 bg-amber-500/10 px-3 py-3" aria-labelledby="platform-administration-title">
-                <h2 id="platform-administration-title" class="px-3 text-xs font-semibold text-amber-100">مدیریت پلتفرم</h2>
-                <p class="px-3 pt-1 text-[10px] leading-5 text-amber-100/75">کنترل‌های سراسری مستقل از شرکت فعال هستند و دسترسی عملیاتی Tenant ایجاد نمی‌کنند.</p>
-                <div class="mt-2 space-y-1">
-                    <a class="erp-nav-link" href="{% url 'organizations:platform_company_list' %}">مدیریت شرکت‌ها و فعالیت‌ها</a>
-                    <a class="erp-nav-link" href="{% url 'organizations:create' %}">شرکت جدید</a>
-                    <a class="erp-nav-link" href="{% url 'organizations:platform_role_catalog' %}">کاتالوگ نقش‌ها</a>
-                    <a class="erp-nav-link" href="{% url 'organizations:protected_operation_catalog' %}">عملیات حفاظت‌شده</a>
-                    <a class="erp-nav-link" href="{% url 'organizations:platform_policy_catalog' %}">سیاست‌های پلتفرم</a>
-                    {% if reference_persona_catalogue_enabled and "organizations:reference_personas"|surface_exposed %}<a class="erp-nav-link" href="{% url 'organizations:reference_personas' %}">پرسوناهای مرجع توسعه</a>{% endif %}
-                    {% if request.user.is_superuser and "admin:index"|surface_exposed %}<a class="erp-nav-link border-t border-amber-400/20 pt-2 text-amber-100" href="{% url 'admin:index' %}">دسترسی فنی Django Admin</a>{% endif %}
-                </div>
-            </section>
             {% endif %}
+            <div class="erp-scrollbar flex-1 overflow-y-auto px-3 py-4">
+                {% if not platform_workspace %}{% include "components/navigation_links.html" with product_navigation_groups=product_navigation_groups current_view_name=request.resolver_match.view_name navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available party_governance_available=party_governance_available party_governance_surface=party_governance_surface my_requests_workspace_available=my_requests_workspace_available manager_workspace_available=manager_workspace_available only %}{% endif %}
+                {% if platform_navigation_access %}
+                <div data-nav-id="NAV-042">
+                    {% include "organizations/platform_navigation.html" %}
+                </div>
+                {% endif %}
+            </div>
             <div class="border-t border-slate-800 p-3">
-                <div class="mb-2 flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2 text-[10px] text-slate-400"><span class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>فضای کاری فعال</span><span dir="ltr">ERP</span></div>
+                {% if platform_workspace %}<div class="erp-platform-profile"><span>نمایهٔ محصول</span><strong dir="ltr">{{ platform_surface_profile }}</strong></div>{% else %}<div class="mb-2 flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2 text-[10px] text-slate-400"><span class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>فضای کاری فعال</span><span dir="ltr">ERP</span></div>{% endif %}
                 <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 transition hover:bg-white/10 hover:text-white" type="submit"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14 5-5-5-5m5 5H9"/></svg>خروج از حساب</button></form>
             </div>
         </aside>
-        <header class="sticky top-0 z-30 h-[60px] border-b border-slate-200 bg-white md:h-[88px]">
+        <header class="sticky top-0 z-30 h-[60px] border-b border-slate-200 bg-white md:h-[88px]{% if platform_workspace %} erp-platform-header{% endif %}">
             <div class="mx-auto flex h-full max-w-[1600px] items-center gap-3 px-4 sm:px-6 lg:px-8">
                 <details class="erp-mobile-nav lg:hidden" data-mobile-nav>
                     <summary class="grid h-10 w-10 cursor-pointer list-none place-items-center rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50" aria-label="باز کردن فهرست" aria-expanded="false"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></summary>
                     <button class="erp-mobile-nav__backdrop" type="button" data-mobile-nav-close aria-label="بستن فهرست"></button>
-                    <div class="erp-mobile-nav__panel"><button class="erp-btn erp-btn--secondary mb-3 w-full" type="button" data-mobile-nav-close>بستن فهرست</button>{% include "components/navigation_links.html" with product_navigation_groups=product_navigation_groups current_view_name=request.resolver_match.view_name navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available party_governance_available=party_governance_available party_governance_surface=party_governance_surface my_requests_workspace_available=my_requests_workspace_available manager_workspace_available=manager_workspace_available only %}
+                    <div class="erp-mobile-nav__panel"><button class="erp-btn erp-btn--secondary mb-3 w-full" type="button" data-mobile-nav-close>بستن فهرست</button>{% if not platform_workspace %}{% include "components/navigation_links.html" with product_navigation_groups=product_navigation_groups current_view_name=request.resolver_match.view_name navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available party_governance_available=party_governance_available party_governance_surface=party_governance_surface my_requests_workspace_available=my_requests_workspace_available manager_workspace_available=manager_workspace_available only %}{% endif %}{% include "organizations/platform_navigation.html" %}
+                        {% if platform_workspace %}<div class="erp-platform-profile"><span>نمایهٔ محصول</span><strong dir="ltr">{{ platform_surface_profile }}</strong></div>{% endif %}
                         <form method="post" action="{% url 'accounts:logout' %}" class="mt-3">{% csrf_token %}<button class="erp-btn erp-btn--secondary w-full" type="submit">خروج از حساب</button></form>
                     </div>
                 </details>
+                {% if platform_workspace %}
+                <a class="erp-btn erp-btn--secondary erp-btn--compact erp-platform-context-link" href="{% url 'home' %}">{% include "components/form_icon.html" with icon="company" only %}<span class="hidden sm:inline">فضای کاری شرکت‌ها</span><span class="sr-only sm:hidden">فضای کاری شرکت‌ها</span></a>
+                <span class="min-w-0 truncate text-sm font-semibold text-slate-800" {% if platform_target %}title="{{ platform_target.name }}"{% endif %}>{% if platform_target %}شرکت هدف · {{ platform_target.name }}{% else %}مدیریت پلتفرم{% endif %}</span>
+                {% else %}
                 <a class="flex min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700" href="{% url 'organizations:select' %}"><svg class="h-4 w-4 shrink-0 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18M5 21V7h8v14m0-10h6v10M8 10h2m-2 4h2m-2 4h2m8-4h-2m2 4h-2"/></svg><span class="hidden text-slate-400 sm:inline">شرکت فعال:</span><span class="max-w-28 truncate sm:max-w-56">{{ request.organization.name|default:"انتخاب شرکت" }}</span></a>
                 {% include "components/module_selector.html" %}
+                {% endif %}
                 {% block header_working_context %}{% endblock %}
                 <div class="hidden h-5 w-px bg-slate-200 md:block"></div>
-                <span class="hidden text-[11px] text-slate-500 md:inline">سامانه جامع و یکپارچه مدیریت شرکت</span>
+                {% if not platform_workspace %}<span class="hidden text-[11px] text-slate-500 md:inline">سامانه جامع و یکپارچه مدیریت شرکت</span>{% endif %}
                 {% include "components/header_profile.html" %}
             </div>
             {% include "components/global_loading.html" %}
         </header>
-        {% block working_context %}{% if request.organization %}{% include "components/context_selector.html" %}{% endif %}{% endblock %}
+        {% block working_context %}{% if request.organization and not platform_workspace %}{% include "components/context_selector.html" %}{% endif %}{% endblock %}
         {% endif %}
         <main id="main-content" tabindex="-1" class="mx-auto min-w-0 {% if request.user.is_authenticated %}max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6{% else %}min-h-screen max-w-7xl px-4 py-10 sm:px-6 lg:px-8{% endif %}">
             <div id="bonira-feedback"></div>

@@ -1,0 +1,20 @@
+{% if compact %}
+<ul class="erp-platform-health" aria-label="وضعیت بررسی وابستگی‌ها">
+    {% for signal in health_signals %}
+    <li class="{% if 'unreachable' in signal %}is-unhealthy{% elif 'unverified' in signal %}is-unverified{% else %}is-healthy{% endif %}">
+        {% if 'database.' in signal %}{% include "components/form_icon.html" with icon="database" only %}<span>پایگاه داده</span>{% else %}{% include "components/form_icon.html" with icon="layers" only %}<span>حافظهٔ نهان</span>{% endif %}
+        {% if 'unreachable' in signal %}<strong class="text-red-700">خطای دسترسی</strong>{% elif 'unverified' in signal %}<strong class="text-amber-800">تأیید نشده</strong>{% else %}<strong class="text-emerald-700">در دسترس</strong>{% endif %}
+    </li>
+    {% empty %}<li class="is-unverified"><span>بررسی وابستگی‌ها</span><strong class="text-amber-800">تأیید نشده</strong></li>{% endfor %}
+</ul>
+{% else %}
+<ul class="space-y-2 text-sm">
+{% for signal in health_signals %}
+    <li>{% if signal == "database.reachable" %}پایگاه داده · <strong class="text-emerald-700">در دسترس</strong>
+    {% elif signal == "database.unreachable" %}پایگاه داده · <strong class="text-red-700">خطای بررسی دسترسی</strong>
+    {% elif signal == "cache.reachable" %}حافظهٔ نهان · <strong class="text-emerald-700">در دسترس</strong>
+    {% elif signal == "cache.unreachable" %}حافظهٔ نهان · <strong class="text-red-700">خطای بررسی دسترسی</strong>
+    {% elif signal == "cache.unverified" %}حافظهٔ نهان · <strong>تأیید نشده</strong>{% endif %}</li>
+{% empty %}<li class="text-slate-500">دسترسی وابستگی‌ها تأیید نشده است.</li>{% endfor %}
+</ul>
+{% endif %}

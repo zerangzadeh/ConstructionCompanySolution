@@ -12,7 +12,6 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.organizations.authorization import (
-    is_platform_admin,
     membership_has_role,
     require_business_permission,
 )
@@ -44,8 +43,9 @@ from apps.organizations.policy_specs import (
 
 
 def _require_platform_admin(actor: User) -> None:
-    if not is_platform_admin(actor):
-        raise PermissionDenied("فقط Platform Admin مجاز به مدیریت کاتالوگ سیاست است.")
+    from apps.organizations.platform_grants import lock_platform_admin
+
+    lock_platform_admin(actor)
 
 
 def _snapshot_version(version: PlatformPolicyVersion) -> dict[str, Any]:

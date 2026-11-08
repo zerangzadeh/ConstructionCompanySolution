@@ -85,6 +85,69 @@ class FieldTimekeepingTests(TestCase):
         self.client.force_login(self.owner)
         self.url = reverse("timekeeping:workbench")
 
+    def test_empty_worker_context_offers_the_existing_assignment_route(self):
+        site = ProjectSite.objects.create(
+            organization=self.organization, project=self.project,
+            code="UNSTAFFED", name="کارگاه بدون تخصیص",
+        )
+        context = {"project": str(self.project.pk), "site": str(site.pk)}
+        expected_url = (
+            f"{reverse('workforce:assignment_create')}?"
+            f"project={self.project.pk}&site={site.pk}"
+        )
+        form = self.client.get(reverse("timekeeping:attendance_create"), context)
+        self.assertContains(form, "نیروی کاری در محدوده انتخاب‌شده در دسترس نیست.")
+        self.assertContains(form, expected_url.replace("&", "&amp;"))
+        self.assertEqual(self.client.get(expected_url).status_code, 200)
+        lookup = reverse("workforce:field_choices", args=["employee"])
+        params = {**context, "purpose": "timekeeping"}
+        result = self.client.get(lookup, params).json()
+        self.assertEqual(result["empty_action"]["url"], expected_url)
+        self.assertNotIn("empty_action", self.client.get(lookup, {**params, "q": "missing"}).json())
+        self.assertNotIn("empty_action", self.client.get(lookup, {**params, "page": 2}).json())
+
+    def test_empty_company_offers_worker_creation_only_to_authorized_users(self):
+        owner = User.objects.create_user(username="empty-time-owner")
+        organization = create_organization_with_owner(
+            owner=owner, name="شرکت بدون نیرو", slug="empty-time-company"
+        )
+        attendance = reverse("timekeeping:attendance_create")
+        worker_create = reverse("workforce:field_create")
+        calendar_create = reverse("timekeeping:calendar_create")
+        self.client.force_login(owner)
+        response = self.client.get(attendance)
+        self.assertContains(response, f'href="{worker_create}"')
+        self.assertContains(response, f'href="{calendar_create}"')
+
+        recorder = User.objects.create_user(username="empty-time-recorder")
+        role = OrganizationRole.objects.create(
+            organization=organization, code="attendance_recorder", name="ثبت حضور"
+        )
+        role.permissions.add(BusinessPermission.objects.get(code="attendance.capture"))
+        membership = OrganizationMembership.objects.create(
+            organization=organization, user=recorder, role_definition=role, status="active"
+        )
+        MembershipScopeGrant.objects.create(
+            organization=organization, membership=membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+        )
+        self.client.force_login(recorder)
+        response = self.client.get(attendance)
+        self.assertContains(response, "نیروی کاری در محدوده انتخاب‌شده در دسترس نیست.")
+        self.assertNotContains(response, f'href="{worker_create}"')
+        self.assertNotContains(response, f'href="{calendar_create}"')
+        calendar = create_work_calendar(
+            organization=organization, actor=owner, code="NO-SHIFTS", name="بدون شیفت",
+            effective_from=date(2026, 1, 1), working_weekdays=[1, 2, 3, 4, 5],
+        )
+        lookup = reverse("workforce:field_choices", args=["shift"])
+        params = {"purpose": "timekeeping", "calendar": str(calendar.pk)}
+        self.assertNotIn("empty_action", self.client.get(lookup, params).json())
+        self.client.force_login(owner)
+        self.assertEqual(self.client.get(lookup, params).json()["empty_action"]["url"], reverse("timekeeping:shift_create"))
+        params["calendar"] = str(self.calendar.pk)
+        self.assertNotIn("empty_action", self.client.get(lookup, params).json())
+
     def test_saved_request_returns_to_its_actual_worker_project_and_site(self):
         from urllib.parse import parse_qs, urlsplit
 

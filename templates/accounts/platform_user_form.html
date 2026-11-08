@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{% if account %}ویرایش حساب{% else %}ایجاد حساب{% endif %} | بنیرا{% endblock %}
+{% block content %}
+{% url 'organizations:platform_users' as directory_url %}
+{% if account %}
+    {% url 'organizations:platform_user_detail' account.pk as cancel_url %}
+    {% include "components/page_header.html" with page_breadcrumb_label="کاربران سامانه" page_breadcrumb_url=directory_url page_breadcrumb_user=request.user page_title="ویرایش حساب" page_description=account.username page_icon="id-card" only %}
+{% else %}
+    {% include "components/page_header.html" with page_breadcrumb_label="کاربران سامانه" page_breadcrumb_url=directory_url page_breadcrumb_user=request.user page_title="ایجاد حساب" page_description="حساب مستقل در سامانه" page_icon="id-card" only %}
+{% endif %}
+<form method="post" class="erp-surface mt-4 max-w-3xl space-y-4 rounded-xl p-4" data-focus-first-error>
+    {% csrf_token %}
+    {% include "components/form_errors.html" with form=form only %}
+    {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+    <div class="grid gap-3 sm:grid-cols-2">
+        {% for field in form.visible_fields %}{% include "components/form_field.html" with field=field only %}{% endfor %}
+    </div>
+    {% if account %}<p class="text-xs text-slate-600">نام کاربری و ایمیل بازیابی در این فرم فقط‌خواندنی‌اند.</p>{% else %}<p class="text-xs leading-6 text-slate-600">پس از ثبت، از پروندهٔ حساب گذرواژه موقت تعیین کنید یا پیوند بازیابی بفرستید. عضویت شرکت از مسیر مدیریت همان شرکت انجام می‌شود.</p>{% endif %}
+    {% include "components/form_footer.html" with submit_label="ذخیره حساب" cancel_url=cancel_url|default:directory_url submit_icon="check-circle" only %}
+</form>
+{% endblock %}

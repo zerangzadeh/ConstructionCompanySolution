@@ -33,8 +33,15 @@
       const editableText = local && select.matches('input[data-editable-text-choice="true"]');
       const initiallyDisabled = select.disabled;
       let generation = 0, pending;
-      const message = (text, visible = false) => {
+      const message = (text, visible = false, action = null) => {
         status.textContent = text;
+        if (action) {
+          const link = document.createElement('a');
+          link.href = action.url;
+          link.className = 'font-semibold text-blue-700 underline';
+          link.textContent = action.label;
+          status.append(' ', link);
+        }
         status.classList.toggle('sr-only', !visible);
       };
       const emptyMessage = query => !query && select.dataset.emptyChoices || 'گزینه‌ای یافت نشد.';
@@ -73,7 +80,8 @@
               callback(data.results);
               const empty = data.results.length === 0;
               message(empty ? emptyMessage(query) : 'گزینه‌ها آماده انتخاب هستند.',
-                empty && !query && !!select.dataset.emptyChoices);
+                empty && !query && !!select.dataset.emptyChoices,
+                empty && !query ? data.empty_action : null);
             }).catch(error => {
               if (error.name !== 'AbortError' && version === generation) {
                 this.boniraFailed = true;

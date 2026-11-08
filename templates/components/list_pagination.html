@@ -1,6 +1,17 @@
 {% load erp_format %}
 <footer class="erp-list-footer">
+    {% if page_size_options %}
+    <form method="get" class="flex flex-wrap items-center gap-2" aria-label="تعداد نمایش">
+        {% for name, value in page_size_state.items %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}
+        <label for="list-per-page">تعداد در صفحه</label>
+        <select id="list-per-page" name="per_page" class="erp-input" aria-label="تعداد در صفحه">
+            {% for size in page_size_options %}<option value="{{ size }}"{% if size == page_obj.paginator.per_page %} selected{% endif %}>{{ size|erp_quantity_fa }}</option>{% endfor %}
+        </select>
+        <button class="erp-btn erp-btn--secondary erp-btn--compact" type="submit">اعمال</button>
+    </form>
+    {% else %}
     <p>{% if page_obj.paginator.count %}نمایش {{ page_obj.start_index|erp_number }} تا {{ page_obj.end_index|erp_number }} از {{ page_obj.paginator.count|erp_number }} {{ result_label }}{% else %}بدون نتیجه{% endif %}</p>
+    {% endif %}
     {% if reference_layout %}
     <nav class="erp-list-pages" aria-label="صفحه‌بندی">
         {% if page_obj.has_previous %}<a href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page=1" aria-label="صفحه اول">«</a><a href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}" rel="prev" aria-label="صفحه قبلی">‹</a>{% else %}<span aria-disabled="true" aria-label="صفحه اول">«</span><span aria-disabled="true" aria-label="صفحه قبلی">‹</span>{% endif %}

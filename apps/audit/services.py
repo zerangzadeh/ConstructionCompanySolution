@@ -21,9 +21,7 @@ _SENSITIVE_METADATA_KEY_PARTS = frozenset(
 )
 
 _STATUTORY_PAYROLL_AUDIT_ACTIONS = frozenset(
-    action
-    for action in AuditAction.values
-    if action.startswith("payroll.statutory_")
+    action for action in AuditAction.values if action.startswith("payroll.statutory_")
 )
 _CORE_PAYROLL_AUDIT_ACTIONS = frozenset(
     action
@@ -32,14 +30,19 @@ _CORE_PAYROLL_AUDIT_ACTIONS = frozenset(
 )
 
 
-def _validate_audit_metadata(metadata: dict[str, Any]) -> None:
+def _validate_audit_metadata(metadata: dict[str, Any] | list | tuple) -> None:
     """Reject metadata keys that could expose secrets in immutable evidence."""
 
-    for key, value in metadata.items():
-        normalized_key = str(key).lower()
-        if any(part in normalized_key for part in _SENSITIVE_METADATA_KEY_PARTS):
-            raise ValueError("فراداده ممیزی نباید شامل مقادیر حساس باشد.")
-        if isinstance(value, dict):
+    if isinstance(metadata, dict):
+        for key in metadata:
+            normalized_key = str(key).lower()
+            if any(part in normalized_key for part in _SENSITIVE_METADATA_KEY_PARTS):
+                raise ValueError("فراداده ممیزی نباید شامل مقادیر حساس باشد.")
+        values = metadata.values()
+    else:
+        values = metadata
+    for value in values:
+        if isinstance(value, (dict, list, tuple)):
             _validate_audit_metadata(value)
 
 

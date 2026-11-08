@@ -86,6 +86,7 @@ STATUS_FAMILIES = {
             "verified",
             "closed",
             "resolved",
+            "recorded",
         ),
         "success",
     ),

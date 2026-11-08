@@ -30,7 +30,11 @@ from .field_forms import (
     business_label,
     page_filter_values,
 )
-from .field_presentation import list_presentation, presentation_error
+from .field_presentation import (
+    list_presentation,
+    presentation_error,
+    timekeeping_empty_choice_action,
+)
 from .field_selectors import (
     FieldContext,
     context_employees,
@@ -449,13 +453,15 @@ def choices(request, kind):
             WorkCalendar if kind in ("calendar", "calendar_setup") else ShiftDefinition
         ).objects.filter(organization=request.organization, is_active=True)
         if kind == "shift":
+            calendar_id = request.GET.get("calendar")
             try:
                 records = (
-                    records.filter(calendar_id=request.GET.get("calendar"))
-                    if request.GET.get("calendar")
+                    records.filter(calendar_id=calendar_id)
+                    if calendar_id
                     else records.none()
                 )
             except (ValueError, ValidationError):
+                calendar_id = None
                 records = records.none()
     elif kind == "activity":
         from apps.projects.models import Activity
@@ -514,16 +520,30 @@ def choices(request, kind):
     batch = list(records.order_by("pk")[offset : offset + 41])
     next_query = request.GET.copy()
     next_query["page"] = page + 1
-    response = JsonResponse(
-        {
-            "results": [
-                {"value": str(record.pk), "label": business_label(record)}
-                for record in batch[:40]
-            ],
-            "next": f"{request.path}?{next_query.urlencode()}"
-            if len(batch) > 40
-            else None,
-        }
-    )
+    payload = {
+        "results": [
+            {"value": str(record.pk), "label": business_label(record)}
+            for record in batch[:40]
+        ],
+        "next": f"{request.path}?{next_query.urlencode()}" if len(batch) > 40 else None,
+    }
+    if (
+        not batch
+        and not q
+        and page == 1
+        and request.GET.get("purpose") == "timekeeping"
+        and (
+            kind == "employee"
+            or (
+                kind == "shift" and calendar_id and WorkCalendar.objects.filter(
+                    pk=calendar_id, organization=request.organization, is_active=True
+                ).exists()
+            )
+        )
+    ):
+        action = timekeeping_empty_choice_action(request, kind, context)
+        if action:
+            payload["empty_action"] = action
+    response = JsonResponse(payload)
     response["Cache-Control"] = "private, no-store"
     return response

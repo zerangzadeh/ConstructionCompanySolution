@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Any
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import transaction
+from django.db import connection, transaction
 from django.db.models import Q
 from django.utils import timezone
 
@@ -173,10 +173,12 @@ def _role(
     return resolved
 
 
-def _role_catalog_manager(*, actor: User, organization: Organization | None) -> None:
+def _role_catalog_manager(
+    *, actor: User, organization: Organization | None, platform_actor: bool
+) -> None:
     """Authorize platform-global or exact-tenant custom-role administration."""
 
-    if is_platform_admin(actor):
+    if platform_actor:
         return
     if organization is None:
         raise PermissionDenied("فقط Platform Admin می‌تواند نقش سراسری را مدیریت کند.")
@@ -188,7 +190,14 @@ def _role_catalog_manager(*, actor: User, organization: Organization | None) -> 
 
 
 def _permission_codes(permissions: Iterable[BusinessPermissionCode | str]) -> list[str]:
+    from apps.organizations.permission_registry import PLATFORM_COMPANY_PERMISSIONS
+
     codes = sorted({str(permission) for permission in permissions})
+    if any(
+        code in PLATFORM_COMPANY_PERMISSIONS or code.startswith("platform_admin.")
+        for code in codes
+    ):
+        raise ValidationError("مجوزهای پلتفرم به نقش‌های تجاری قابل تخصیص نیستند.")
     available = set(
         BusinessPermission.objects.filter(code__in=codes, is_active=True).values_list(
             "code", flat=True
@@ -200,9 +209,13 @@ def _permission_codes(permissions: Iterable[BusinessPermissionCode | str]) -> li
 
 
 def _assert_tenant_admin_permission_subset(
-    *, actor: User, organization: Organization | None, permission_codes: Iterable[str]
+    *,
+    actor: User,
+    organization: Organization | None,
+    permission_codes: Iterable[str],
+    platform_actor: bool,
 ) -> None:
-    if organization is None or is_platform_admin(actor):
+    if organization is None or platform_actor:
         return
     membership = get_active_membership(user=actor, organization=organization)
     if not set(permission_codes).issubset(membership_permission_codes(membership)):
@@ -221,17 +234,32 @@ def create_organization_role(
     description: str,
     permissions: Iterable[BusinessPermissionCode | str],
     reason: str,
+    platform_operation: bool | None = None,
 ) -> OrganizationRole:
     """Create a custom global or exact-tenant role from catalogued permissions."""
 
     if not reason.strip() or not name.strip():
         raise ValidationError("نام و دلیل ایجاد نقش الزامی است.")
+    platform_actor = (
+        is_platform_admin(actor) if platform_operation is None else platform_operation
+    )
+    if platform_actor:
+        from apps.organizations.platform_grants import lock_platform_admin
+
+        actor = lock_platform_admin(actor)
     if organization is not None:
         organization = Organization.objects.select_for_update().get(pk=organization.pk)
-    _role_catalog_manager(actor=actor, organization=organization)
+        if not organization.is_active:
+            raise PermissionDenied("شرکت فعال نیست.")
+    _role_catalog_manager(
+        actor=actor, organization=organization, platform_actor=platform_actor
+    )
     permission_codes = _permission_codes(permissions)
     _assert_tenant_admin_permission_subset(
-        actor=actor, organization=organization, permission_codes=permission_codes
+        actor=actor,
+        organization=organization,
+        permission_codes=permission_codes,
+        platform_actor=platform_actor,
     )
     role = OrganizationRole(
         organization=organization,
@@ -252,16 +280,35 @@ def create_organization_role(
         entity_id=role.pk,
         organization=organization,
         actor=actor,
-        allow_platform_actor=True,
+        allow_platform_actor=platform_actor,
         metadata={
             "role_code": role.code,
             "role_scope": "global" if organization is None else "tenant",
+            "control_plane": platform_actor,
             "previous_permissions": [],
             "new_permissions": permission_codes,
             "reason": reason.strip(),
         },
     )
     return role
+
+
+def _lock_catalog_role(role_id: object) -> OrganizationRole:
+    try:
+        organization_id = OrganizationRole.objects.values_list(
+            "organization_id", flat=True
+        ).get(pk=role_id)
+        if organization_id is not None:
+            organization = Organization.objects.select_for_update().get(
+                pk=organization_id
+            )
+            if not organization.is_active:
+                raise PermissionDenied("شرکت فعال نیست.")
+        return OrganizationRole.objects.select_for_update().get(
+            pk=role_id, organization_id=organization_id
+        )
+    except (ValueError, OrganizationRole.DoesNotExist) as exc:
+        raise PermissionDenied("نقش یافت نشد.") from exc
 
 
 @transaction.atomic
@@ -273,25 +320,64 @@ def update_organization_role(
     description: str,
     permissions: Iterable[BusinessPermissionCode | str],
     reason: str,
+    platform_operation: bool | None = None,
+    expected_updated_at: datetime | None = None,
 ) -> OrganizationRole:
     """Update role presentation and catalogued permissions without changing identity."""
 
     if not reason.strip() or not name.strip():
         raise ValidationError("نام و دلیل ویرایش نقش الزامی است.")
-    try:
-        role = OrganizationRole.objects.select_for_update().get(pk=role_id)
-    except (ValueError, OrganizationRole.DoesNotExist) as exc:
-        raise PermissionDenied("نقش یافت نشد.") from exc
-    _role_catalog_manager(actor=actor, organization=role.organization)
-    if role.is_system and not is_platform_admin(actor):
+    platform_actor = (
+        is_platform_admin(actor) if platform_operation is None else platform_operation
+    )
+    if platform_actor:
+        from apps.organizations.platform_grants import lock_platform_admin
+
+        actor = lock_platform_admin(actor)
+    role = _lock_catalog_role(role_id)
+    _role_catalog_manager(
+        actor=actor, organization=role.organization, platform_actor=platform_actor
+    )
+    if role.is_system and not platform_actor:
         raise PermissionDenied("فقط Platform Admin می‌تواند نقش سیستمی را ویرایش کند.")
     if not role.is_active:
         raise ValidationError("نقش بایگانی‌شده قابل ویرایش نیست.")
     permission_codes = _permission_codes(permissions)
     _assert_tenant_admin_permission_subset(
-        actor=actor, organization=role.organization, permission_codes=permission_codes
+        actor=actor,
+        organization=role.organization,
+        permission_codes=permission_codes,
+        platform_actor=platform_actor,
     )
     previous_permissions = sorted(role.permissions.values_list("code", flat=True))
+    if platform_operation and role.updated_at != expected_updated_at:
+        raise ValidationError("نقش تغییر کرده است. صفحه را تازه‌سازی کنید.")
+    if (
+        platform_actor
+        and set(permission_codes).difference(previous_permissions)
+        and (
+            MembershipRoleAssignment.objects.filter(
+                role=role,
+                membership__user=actor,
+                revoked_at__isnull=True,
+            )
+            .filter(Q(ends_at__isnull=True) | Q(ends_at__gt=timezone.now()))
+            .exists()
+            or OrganizationMembership.objects.filter(
+                role_definition=role,
+                user=actor,
+                role_assignments__isnull=True,
+                authorization_migrated_at__isnull=True,
+            ).exists()
+        )
+    ):
+        raise PermissionDenied("افزودن مجوز به نقش تجاری خود از پنل پلتفرم مجاز نیست.")
+    if (
+        role.is_system
+        and (role.is_owner or role.code in PRIVILEGED_TENANT_ROLES)
+        and previous_permissions != permission_codes
+    ):
+        raise PermissionDenied("مجوزهای این نقش سیستمی حفاظت‌شده قابل تغییر نیستند.")
     previous = {"name": role.name, "description": role.description}
     role.name = name.strip()
     role.description = description.strip()
@@ -305,10 +391,11 @@ def update_organization_role(
         entity_id=role.pk,
         organization=role.organization,
         actor=actor,
-        allow_platform_actor=True,
+        allow_platform_actor=platform_actor,
         metadata={
             "role_code": role.code,
             "previous": previous,
+            "control_plane": platform_actor,
             "current": {"name": role.name, "description": role.description},
             "previous_permissions": previous_permissions,
             "new_permissions": permission_codes,
@@ -320,17 +407,23 @@ def update_organization_role(
 
 @transaction.atomic
 def archive_organization_role(
-    *, actor: User, role_id: object, reason: str
+    *, actor: User, role_id: object, reason: str, platform_operation: bool | None = None
 ) -> OrganizationRole:
     """Archive a custom role while preserving members, assignments, and history."""
 
     if not reason.strip():
         raise ValidationError("دلیل بایگانی نقش الزامی است.")
-    try:
-        role = OrganizationRole.objects.select_for_update().get(pk=role_id)
-    except (ValueError, OrganizationRole.DoesNotExist) as exc:
-        raise PermissionDenied("نقش یافت نشد.") from exc
-    _role_catalog_manager(actor=actor, organization=role.organization)
+    platform_actor = (
+        is_platform_admin(actor) if platform_operation is None else platform_operation
+    )
+    if platform_actor:
+        from apps.organizations.platform_grants import lock_platform_admin
+
+        actor = lock_platform_admin(actor)
+    role = _lock_catalog_role(role_id)
+    _role_catalog_manager(
+        actor=actor, organization=role.organization, platform_actor=platform_actor
+    )
     if role.is_system:
         raise PermissionDenied("نقش سیستمی قابل حذف یا بایگانی نیست.")
     if not role.is_active:
@@ -358,11 +451,12 @@ def archive_organization_role(
         entity_id=role.pk,
         organization=role.organization,
         actor=actor,
-        allow_platform_actor=True,
+        allow_platform_actor=platform_actor,
         metadata={
             "role_code": role.code,
             "previous_permissions": previous_permissions,
             "new_permissions": previous_permissions,
+            "control_plane": platform_actor,
             "reason": reason.strip(),
         },
     )
@@ -459,7 +553,7 @@ def assign_membership_role(
 
     if not reason.strip():
         raise ValidationError("دلیل تخصیص نقش الزامی است.")
-    Organization.objects.select_for_update().get(pk=organization.pk)
+    organization = Organization.objects.select_for_update().get(pk=organization.pk)
     actor_membership = require_business_permission(
         user=actor,
         organization=organization,
@@ -543,6 +637,7 @@ def revoke_membership_role(
 ) -> MembershipRoleAssignment:
     if not reason.strip():
         raise ValidationError("دلیل لغو نقش الزامی است.")
+    organization = Organization.objects.select_for_update().get(pk=organization.pk)
     actor_membership = require_business_permission(
         user=actor,
         organization=organization,
@@ -580,6 +675,9 @@ def revoke_membership_role(
             .filter(
                 organization=organization,
                 role__code=MembershipRole.TENANT_OWNER,
+                role__is_active=True,
+                membership__status=MembershipStatus.ACTIVE,
+                membership__user__is_active=True,
                 starts_at__lte=now,
                 revoked_at__isnull=True,
             )
@@ -810,11 +908,59 @@ def revoke_membership_scope(
     return grant
 
 
+def lock_platform_duty_change() -> None:
+    # Serialize grants/revocations, including an empty assignment set.
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT pg_advisory_xact_lock(%s)", [741099301])
+
+
+def protect_last_platform_admin(user_id) -> None:
+    """Run within the transaction that disables a user or revokes their duty."""
+    lock_platform_duty_change()
+    now = timezone.now()
+    effective = PlatformRoleAssignment.objects.filter(
+        role=PlatformRoleCode.PLATFORM_ADMIN,
+        user__is_active=True,
+        revoked_at__isnull=True,
+        starts_at__lte=now,
+    ).filter(Q(ends_at__isnull=True) | Q(ends_at__gt=now))
+    if (
+        effective.filter(user_id=user_id).exists()
+        and not effective.exclude(user_id=user_id).exists()
+    ):
+        raise PermissionDenied("حذف دسترسی آخرین مدیر فعال پلتفرم مجاز نیست.")
+
+
+def _lock_platform_duty_operator(
+    actor: User, approver: User | None
+) -> tuple[User, User]:
+    from apps.organizations.platform_grants import lock_platform_admin
+
+    if approver is None:
+        actor = lock_platform_admin(actor)
+        if not BusinessPermission.objects.filter(
+            code=BusinessPermissionCode.PLATFORM_ADMIN_MANAGE_OPERATORS, is_active=True
+        ).exists():
+            raise PermissionDenied("مجوز مدیریت مدیران پلتفرم فعال نیست.")
+        return actor, actor
+    if not actor.is_authenticated or not approver.is_authenticated:
+        raise PermissionDenied("حساب معتبر برای عملیات فنی الزامی است.")
+    users = User.objects.select_for_update().filter(pk__in=(actor.pk, approver.pk))
+    by_id = {user.pk: user for user in users.order_by("pk")}
+    actor = by_id.get(actor.pk)
+    approver = by_id.get(approver.pk)
+    if not all(
+        user and user.is_active and user.is_superuser for user in (actor, approver)
+    ):
+        raise PermissionDenied("عملیات فنی نیازمند ابرکاربر فعال است.")
+    return actor, approver
+
+
 @transaction.atomic
 def assign_platform_role(
     *,
     actor: User,
-    approver: User,
+    approver: User | None = None,
     target: User,
     role: str,
     reason: str,
@@ -825,18 +971,30 @@ def assign_platform_role(
 
     if not reason.strip():
         raise ValidationError("دلیل تخصیص نقش پلتفرمی الزامی است.")
-    if not actor.is_active or not actor.is_superuser:
-        raise PermissionDenied("فقط Superuser می‌تواند نقش پلتفرمی تخصیص دهد.")
-    if not approver.is_active or not approver.is_superuser:
-        raise PermissionDenied("تأییدکننده نقش پلتفرمی باید Superuser فعال باشد.")
+    operational = approver is None
+    if operational and role != PlatformRoleCode.PLATFORM_ADMIN:
+        raise PermissionDenied("تنها نقش مدیر پلتفرم از این مسیر قابل تخصیص است.")
+    lock_platform_duty_change()
+    actor, approver = _lock_platform_duty_operator(actor, approver)
     if target.pk in (actor.pk, approver.pk):
         raise PermissionDenied("تخصیص یا تأیید نقش پلتفرمی خود ممنوع است.")
-    if not target.is_active:
+    target = (
+        User.objects.select_for_update().filter(pk=target.pk, is_active=True).first()
+    )
+    if target is None:
         raise ValidationError("نقش پلتفرمی فقط به کاربر فعال تخصیص می‌یابد.")
+    if operational and not target.has_usable_password():
+        raise ValidationError("حساب مقصد باید امکان ورود به سامانه داشته باشد.")
     if role not in PlatformRoleCode.values:
         raise ValidationError("نقش پلتفرمی معتبر نیست.")
     start = starts_at or timezone.now()
     _validate_interval(starts_at=start, ends_at=ends_at)
+    if PlatformRoleAssignment.objects.filter(
+        user=target, role=role, revoked_at__isnull=True
+    ).exists():
+        raise ValidationError(
+            "تخصیص باز برای این نقش وجود دارد. تاریخچه را بررسی کنید."
+        )
     assignment = PlatformRoleAssignment.objects.create(
         user=target,
         role=role,
@@ -855,6 +1013,9 @@ def assign_platform_role(
             "target_user_id": str(target.pk),
             "role": role,
             "approver_user_id": str(approver.pk),
+            "approval_mode": "platform_operator"
+            if operational
+            else "technical_recovery",
             "reason": reason.strip(),
         },
     )
@@ -887,15 +1048,16 @@ def assign_platform_admin(
 def revoke_platform_role(
     *,
     actor: User,
-    approver: User,
+    approver: User | None = None,
     assignment_id: object,
     reason: str,
 ) -> PlatformRoleAssignment:
     if not reason.strip():
         raise ValidationError("دلیل لغو نقش پلتفرمی الزامی است.")
-    if not actor.is_active or not actor.is_superuser:
-        raise PermissionDenied("فقط Superuser می‌تواند نقش پلتفرمی را لغو کند.")
-    if not approver.is_active or not approver.is_superuser or approver.pk == actor.pk:
+    operational = approver is None
+    lock_platform_duty_change()
+    actor, approver = _lock_platform_duty_operator(actor, approver)
+    if not operational and approver.pk == actor.pk:
         raise PermissionDenied("تأیید مستقل Superuser الزامی است.")
     try:
         assignment = PlatformRoleAssignment.objects.select_for_update().get(
@@ -903,11 +1065,16 @@ def revoke_platform_role(
         )
     except (ValueError, PlatformRoleAssignment.DoesNotExist) as exc:
         raise PermissionDenied("تخصیص نقش پلتفرمی یافت نشد.") from exc
+    if operational and assignment.role != PlatformRoleCode.PLATFORM_ADMIN:
+        raise PermissionDenied("تنها نقش مدیر پلتفرم از این مسیر قابل لغو است.")
     if assignment.revoked_at:
         return assignment
     if assignment.user_id in (actor.pk, approver.pk):
         raise PermissionDenied("لغو یا تأیید نقش پلتفرمی خود ممنوع است.")
-    assignment.revoked_at = timezone.now()
+    now = timezone.now()
+    if assignment.role == PlatformRoleCode.PLATFORM_ADMIN:
+        protect_last_platform_admin(assignment.user_id)
+    assignment.revoked_at = now
     assignment.revoked_by = actor
     assignment.revocation_reason = reason.strip()
     assignment.save(
@@ -922,6 +1089,9 @@ def revoke_platform_role(
             "target_user_id": str(assignment.user_id),
             "role": assignment.role,
             "approver_user_id": str(approver.pk),
+            "approval_mode": "platform_operator"
+            if operational
+            else "technical_recovery",
             "reason": reason.strip(),
         },
     )
@@ -943,8 +1113,9 @@ def create_protected_operation_version(
         raise ValidationError("کد عملیات حفاظت‌شده ثبت نشده است.")
     if not name.strip() or not description.strip() or not reason.strip():
         raise ValidationError("نام، شرح و دلیل طبقه‌بندی الزامی است.")
-    if not is_platform_admin(actor):
-        raise PermissionDenied("فقط Platform Admin می‌تواند طبقه‌بندی را تغییر دهد.")
+    from apps.organizations.platform_grants import lock_platform_admin
+
+    actor = lock_platform_admin(actor)
     previous = (
         ProtectedOperation.objects.select_for_update()
         .filter(code=code)
@@ -985,8 +1156,9 @@ def retire_protected_operation(
         raise ValidationError("کد عملیات حفاظت‌شده ثبت نشده است.")
     if not reason.strip():
         raise ValidationError("دلیل بازنشستگی الزامی است.")
-    if not is_platform_admin(actor):
-        raise PermissionDenied("فقط Platform Admin می‌تواند طبقه‌بندی را بازنشسته کند.")
+    from apps.organizations.platform_grants import lock_platform_admin
+
+    actor = lock_platform_admin(actor)
     try:
         item = (
             ProtectedOperation.objects.select_for_update()

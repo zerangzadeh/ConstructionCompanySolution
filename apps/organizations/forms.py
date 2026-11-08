@@ -136,10 +136,13 @@ class OrganizationForm(OrganizationProfileForm):
     )
 
     initial_owner_username = forms.CharField(
-        label="نام کاربری Tenant Owner اولیه",
+        label="نام کاربری مالک اولیه",
         max_length=150,
         widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS, "dir": "ltr"}),
-        help_text="مالک اولیه به‌صورت صریح و مستقل از Platform Admin انتخاب می‌شود.",
+        help_text=(
+            "نام کاربری یک حساب فعال را وارد کنید. "
+            "ثبت شرکت به مدیر پلتفرم دسترسی به فضای کاری شرکت نمی‌دهد."
+        ),
     )
 
     class Meta(OrganizationProfileForm.Meta):
@@ -554,6 +557,7 @@ class OrganizationRoleCatalogForm(forms.Form):
     reason = forms.CharField(
         label="دلیل تغییر", widget=forms.Textarea(attrs={"rows": 2})
     )
+    expected_updated_at = forms.DateTimeField(required=False, widget=forms.HiddenInput)
 
     def __init__(
         self,
@@ -564,14 +568,22 @@ class OrganizationRoleCatalogForm(forms.Form):
         **kwargs: object,
     ) -> None:
         super().__init__(*args, **kwargs)
-        self.fields["permissions"].queryset = BusinessPermission.objects.filter(
-            is_active=True
-        ).order_by("code")
+        self.fields["permissions"].queryset = (
+            BusinessPermission.objects.filter(is_active=True)
+            .exclude(code__startswith="platform_admin.")
+            .exclude(code__startswith="platform_companies.")
+            .order_by("code")
+        )
         self.fields["organization"].queryset = Organization.objects.filter(
             status="active", archived_at__isnull=True
         ).order_by("name")
         if not platform_mode:
             self.fields.pop("organization")
+            self.fields.pop("expected_updated_at")
+        else:
+            self.fields["organization"].disabled = True
+            self.fields["organization"].widget = forms.HiddenInput()
+            self.initial["organization"] = organization
         if role is not None:
             self.initial.update(
                 {
@@ -583,6 +595,8 @@ class OrganizationRoleCatalogForm(forms.Form):
                 }
             )
             self.fields["code"].disabled = True
+            if platform_mode:
+                self.initial["expected_updated_at"] = role.updated_at.isoformat()
             if platform_mode:
                 self.fields["organization"].disabled = True
         elif not platform_mode:

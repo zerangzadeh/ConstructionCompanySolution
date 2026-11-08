@@ -291,6 +291,9 @@ class AuditAction(models.TextChoices):
     )
     ORGANIZATION_CREATED = "organization.created", "سازمان ایجاد شد"
     ORGANIZATION_STATUS_CHANGED = "organization.status_changed", "وضعیت شرکت تغییر کرد"
+    ORGANIZATION_ONBOARDING_RETRIED = (
+        "organization.onboarding_retried", "راه‌اندازی شرکت بازبینی شد"
+    )
     ORGANIZATION_SETTINGS_UPDATED = (
         "organization_settings.updated",
         "تنظیمات سازمان به‌روزرسانی شد",
@@ -1597,6 +1600,8 @@ class AuditAction(models.TextChoices):
         "user.account_status_changed",
         "وضعیت حساب کاربر تغییر کرد",
     )
+    USER_ACCOUNT_CREATED = "user.account_created", "حساب سامانه ایجاد شد"
+    USER_ACCOUNT_UPDATED = "user.account_updated", "اطلاعات حساب سامانه ویرایش شد"
     USER_PERMISSIONS_CHANGED = (
         "user.permissions_changed",
         "مجوزهای ویژه کاربر تغییر کرد",

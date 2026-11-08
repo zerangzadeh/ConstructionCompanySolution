@@ -1,4 +1,4 @@
 <div class="erp-business-choice" data-field-search>
   {% include "django/forms/widgets/select.html" %}
-  <span class="sr-only erp-choice-status" data-choice-status aria-live="polite"></span>
+  <span class="{% if not empty_notice %}sr-only {% endif %}erp-choice-status" data-choice-status aria-live="polite">{% if empty_notice %}{{ empty_notice.message }}{% if empty_notice.action %} <a class="font-semibold text-blue-700 underline" href="{{ empty_notice.action.url }}">{{ empty_notice.action.label }}</a>{% endif %}{% endif %}</span>
 </div>

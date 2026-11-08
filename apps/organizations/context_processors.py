@@ -2,6 +2,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest
 
 from apps.accounts.header_identity import membership_header_identity
+from apps.accounts.platform_user_services import user_management_permissions
 from apps.organizations.authorization import (
     get_active_membership,
     membership_has_scope,
@@ -18,9 +19,56 @@ from apps.workflows.personal_workspaces import (
 )
 from apps.workforce.ess_services import has_ess_subject
 from core.product_surface import (
+    is_platform_workspace_route,
     navigation_groups,
     platform_administration_exposed,
     route_exposed,
+    surface_profile,
+)
+
+PLATFORM_NAVIGATION = (
+    ("داشبورد پلتفرم", "platform_dashboard", ("platform_dashboard",), "home"),
+    (
+        "شرکت‌ها",
+        "platform_company_list",
+        (
+            "create",
+            "platform_company_list",
+            "platform_company_detail",
+            "platform_company_edit",
+        ),
+        "company",
+    ),
+    (
+        "کاربران سامانه",
+        "platform_users",
+        (
+            "platform_users",
+            "platform_user_create",
+            "platform_user_detail",
+            "platform_user_edit",
+        ),
+        "id-card",
+    ),
+    ("مدیران پلتفرم", "platform_administrators", ("platform_administrators",), "users"),
+    (
+        "نقش‌ها و مجوزها",
+        "platform_role_catalog",
+        (
+            "platform_role_catalog",
+            "platform_member_roles",
+            "platform_member_authorization",
+        ),
+        "layers",
+    ),
+    (
+        "تنظیمات پلتفرم",
+        "platform_settings",
+        ("platform_settings", "protected_operation_catalog", "platform_policy_catalog"),
+        "settings",
+    ),
+    ("فعالیت‌ها و ممیزی", "platform_audit", ("platform_audit",), "notes"),
+    ("وضعیت سامانه", "platform_status", ("platform_status",), "activity"),
 )
 
 SITE_CONTEXT_NAMESPACES = frozenset(
@@ -121,6 +169,13 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
         else ()
     )
 
+    platform_access = platform_administration_exposed(request.user)
+    can_view_platform_users = (
+        platform_access
+        and BusinessPermissionCode.PLATFORM_ADMIN_USERS_VIEW
+        in user_management_permissions(request.user)
+    )
+    current_url_name = resolver_match.url_name if namespace == "organizations" else None
     return {
         "header_identity": header_identity,
         "product_navigation_groups": groups,
@@ -129,7 +184,19 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
         "party_governance_available": BusinessPermissionCode.PARTIES_VIEW
         in permission_codes
         and bool(permission_codes & GOVERNANCE_PERMISSIONS),
-        "platform_navigation_access": platform_administration_exposed(request.user),
+        "platform_navigation_access": platform_access,
+        "platform_workspace": bool(
+            platform_access and view_name and is_platform_workspace_route(view_name)
+        ),
+        "platform_navigation": [
+            (label, f"organizations:{route}", current_url_name in routes, icon)
+            for label, route, routes, icon in PLATFORM_NAVIGATION
+            if route != "platform_users" or can_view_platform_users
+        ]
+        if platform_access
+        else (),
+        "can_view_platform_users": can_view_platform_users,
+        "platform_surface_profile": surface_profile() if platform_access else "",
         "reference_persona_catalogue_enabled": reference_catalogue_enabled(),
         "can_view_contracts": BusinessPermissionCode.CONTRACTS_VIEW in permission_codes,
         "can_manage_contracts": BusinessPermissionCode.CONTRACTS_CREATE

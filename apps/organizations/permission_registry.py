@@ -25,6 +25,16 @@ PLATFORM_COMPANY_PERMISSIONS = frozenset({
 
 PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
     PermissionResource(
+        "platform_admin",
+        "اداره پلتفرم",
+        (),
+        (P.PLATFORM_ADMIN_MANAGE_OPERATORS, P.PLATFORM_ADMIN_INSPECT_AUDIT,
+         P.PLATFORM_ADMIN_INSPECT_HEALTH, P.PLATFORM_ADMIN_USERS_VIEW,
+         P.PLATFORM_ADMIN_USERS_MANAGE, P.PLATFORM_ADMIN_USERS_RECOVER),
+        ("apps.organizations.platform_console", "apps.organizations.access_services",
+         "apps.accounts.platform_user_services"),
+    ),
+    PermissionResource(
         "platform_companies", "مدیریت شرکت‌های پلتفرم",
         (),
         (P.PLATFORM_COMPANIES_VIEW, P.PLATFORM_COMPANIES_CONFIGURE,

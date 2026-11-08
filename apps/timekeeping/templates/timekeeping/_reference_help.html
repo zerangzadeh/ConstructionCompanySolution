@@ -9,7 +9,4 @@
       برای تنظیم آن با مسئول تقویم و شیفت شرکت تماس بگیرید.
     {% endif %}
   </p>
-{% elif request.resolver_match.url_name == "attendance_create" and "time_calendars.manage" in business_permission_codes %}
-  {% field_context_url "timekeeping:shift_create" as shift_setup_url %}
-  <p class="mt-3 text-sm text-slate-600">اگر شیفت موردنیاز در تقویم کاری تعریف نشده، از <a href="{{ shift_setup_url }}" class="font-semibold text-blue-700 underline">ایجاد شیفت</a> استفاده کنید.</p>
 {% endif %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}وضعیت سامانه | بنیرا{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="مدیریت پلتفرم" page_title="وضعیت سامانه" page_description="نتیجهٔ بررسی خواندنی وابستگی‌های این نمونه" only %}
+<section class="erp-surface mt-5 max-w-3xl space-y-3 rounded-xl p-5">
+    <h2 class="font-bold">بررسی در {{ checked_at|jalali_datetime }}</h2>
+    {% include "organizations/platform_health_signals.html" %}
+    <p class="text-sm text-slate-600">وضعیت آمادگی تولید، پشتیبان‌گیری، بازیابی و تحویل هشدارها در این صفحه تأیید نشده است.</p>
+</section>
+<section class="erp-surface mt-4 max-w-3xl space-y-3 rounded-xl p-5">
+    <h2 class="font-bold">آخرین هشدارهای ثبت‌شده</h2>
+    {% if alert_source_available %}
+    <p class="text-xs text-slate-600">بر اساس جدیدترین داده‌های موجود در همین نمونه طی ۲۴ ساعت گذشته.</p>
+    <ul class="space-y-2 text-sm">{% for observed, label in alerts %}<li>{{ label }} · {{ observed|jalali_datetime }}</li>{% empty %}<li>در داده‌های بررسی‌شده هشداری یافت نشد.</li>{% endfor %}</ul>
+    {% else %}<p class="text-sm text-slate-600">دسترسی به منبع هشدارها تأیید نشده است.</p>{% endif %}
+</section>
+{% endblock %}

@@ -9,6 +9,7 @@ import stat
 import tempfile
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
+from heapq import nlargest
 from pathlib import Path
 from typing import Self
 from uuid import uuid4
@@ -27,6 +28,21 @@ SIGNALS = frozenset(
 ALERT_SIGNALS = SIGNALS - {"database.reachable", "cache.reachable"}
 
 
+def probe_database() -> None:
+    from django.db import connection
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT 1")
+        if cursor.fetchone() != (1,):
+            raise ValueError("Unexpected database probe result.")
+
+
+def probe_cache() -> None:
+    from django.core.cache import cache
+
+    cache.get(f"bonira-operational-probe:{uuid4()}")
+
+
 def dependency_signals(
     *, database: Callable[[], None], cache: Callable[[], None]
 ) -> list[str]:
@@ -40,6 +56,52 @@ def dependency_signals(
         else:
             result.append(f"{name}.reachable")
     return result
+
+
+def recent_operations_alerts() -> list[tuple[datetime, str]] | None:
+    """Read the installed operations sink's allowlisted signals only."""
+    from core.production_operations import PRODUCTION_SIGNALS
+
+    handlers = logging.getLogger("bonira.request").handlers
+    sink = next(
+        (
+            handler.sink
+            for handler in handlers
+            if isinstance(getattr(handler, "sink", None), DevelopmentOperationsSink)
+        ),
+        None,
+    )
+    if sink is None:
+        return None
+    allowed = PRODUCTION_SIGNALS - {"database.reachable", "cache.reachable"}
+    now = datetime.now(UTC)
+    latest = {}
+    try:
+        with os.scandir(sink.directory) as files:
+            candidates = nlargest(
+                100,
+                (
+                    (file.stat(follow_symlinks=False).st_mtime, file.path)
+                    for file in files
+                    if file.name.endswith(".json")
+                    and file.is_file(follow_symlinks=False)
+                ),
+            )
+        for _, path in candidates:
+            try:
+                with Path(path).open(encoding="utf-8") as stream:
+                    record = json.loads(stream.read(16_384))
+                signal = record["signal"]
+                observed = datetime.fromisoformat(record["observed_at"])
+                if signal in allowed and now - timedelta(days=1) <= observed <= now:
+                    latest[signal] = max(latest.get(signal, observed), observed)
+            except (OSError, KeyError, ValueError, TypeError):
+                continue
+    except OSError:
+        return None
+    return sorted(
+        ((observed, signal) for signal, observed in latest.items()), reverse=True
+    )
 
 
 def request_failure_signal(record: dict) -> str | None:

@@ -1,1 +1,1 @@
-<span class="erp-badge erp-badge--{{ status|status_family }}">{{ label|default:status|status_fa }}</span>
+<span class="erp-badge erp-badge--{{ status|status_family }}">{% if icon %}{% include "components/form_icon.html" with icon=icon only %}{% endif %}{{ label|default:status|status_fa }}</span>

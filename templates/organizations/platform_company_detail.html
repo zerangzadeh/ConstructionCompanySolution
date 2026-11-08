@@ -10,11 +10,24 @@
     </div>
     {% if can_change %}<a href="{% url 'organizations:platform_company_edit' company.pk %}" class="erp-btn erp-btn--secondary">ویرایش مشخصات و تنظیمات</a>{% endif %}
 </div>
+<section class="erp-surface mb-5 space-y-2 rounded-xl p-4" aria-label="مالکیت و راه‌اندازی">
+    <p class="text-sm"><strong>ایجادکنندهٔ ثبت‌شده</strong> · {{ company.created_by.username|default:"ثبت نشده" }}</p>
+    <p class="text-sm"><strong>مالک فعال</strong> · {% for owner in owners %}{{ owner.username }}{% if not forloop.last %}، {% endif %}{% empty %}یافت نشد{% endfor %}</p>
+    <p class="text-sm"><strong>مدیر محلی فعال</strong> · {% for admin in tenant_admins %}{{ admin.username }}{% if not forloop.last %}، {% endif %}{% empty %}یافت نشد{% endfor %}</p>
+    {% if onboarding_incomplete %}
+    <p class="text-sm text-amber-800">یکی از گردش‌کارهای اولیهٔ این شرکت منتشر نشده است.</p>
+    <form method="post" action="{% url 'organizations:platform_company_onboarding' company.pk %}">
+        {% csrf_token %}<button class="erp-btn erp-btn--secondary" type="submit">تکمیل راه‌اندازی</button>
+    </form>
+    {% endif %}
+</section>
 {% if can_change %}
 <section class="erp-surface mb-5 rounded-xl p-4" aria-labelledby="company-status-title">
     <h2 id="company-status-title" class="font-bold">{% if suspending %}تعلیق شرکت{% else %}فعال‌سازی مجدد شرکت{% endif %}</h2>
     <p class="mt-2 text-sm text-slate-500">{% if suspending %}با تعلیق، دسترسی عملیاتی اعضا به فضای کاری این شرکت مسدود می‌شود.{% else %}با فعال‌سازی، دسترسی اعضا مطابق عضویت و مجوزهای فعلی آن‌ها برقرار می‌شود.{% endif %}</p>
-    <form method="post" action="{% url 'organizations:platform_company_status' company.pk %}" class="mt-3 max-w-xl space-y-3">
+    <form method="post" action="{% url 'organizations:platform_company_status' company.pk %}" class="mt-3 max-w-xl space-y-3"
+          data-confirm-title="{% if suspending %}تعلیق{% else %}فعال‌سازی مجدد{% endif %} · {{ company.name }}"
+          data-confirm-text="تغییر وضعیت با دلیل واردشده در تاریخچه شرکت ثبت می‌شود." data-confirm-label="ثبت تغییر وضعیت">
         {% csrf_token %}{% for field in status_form.hidden_fields %}{{ field }}{% endfor %}
         {% include "components/form_field.html" with field=status_form.reason only %}
         <button type="submit" class="erp-btn {% if suspending %}erp-btn--danger{% else %}erp-btn--primary{% endif %}">{% if suspending %}تعلیق شرکت{% else %}فعال‌سازی مجدد{% endif %}</button>

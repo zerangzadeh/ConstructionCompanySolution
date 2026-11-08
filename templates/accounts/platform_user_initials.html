@@ -1,0 +1,1 @@
+<span class="erp-account-initials" aria-hidden="true">{% if account.first_name or account.last_name %}{{ account.first_name|first }}{{ account.last_name|first }}{% else %}{{ account.username|first|upper }}{% endif %}</span>

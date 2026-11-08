@@ -57,6 +57,13 @@ and existing configuration, suspend an active company, or reactivate a suspended
 company. Mutations require a reason, current company version, transactional
 authorization checks and append-only audit evidence.
 
+The internal workspace has seven sections for overview, companies, platform
+administrators, roles and permissions, settings, audit and system status.
+An active Platform Admin may grant or revoke another account's Platform Admin
+duty with a recorded reason. Technical bootstrap and recovery retain their
+Superuser controls. Tenant member-role assignment continues to require
+explicit tenant membership, permission, scope and independent approval.
+
 **UI-Hidden** means excluded from MVP customer exposure. It does not mean removed,
 deprecated, abandoned or backend-disabled, nor does backend-active imply that all
 future behavior or statutory/production activation is implemented or authorized.

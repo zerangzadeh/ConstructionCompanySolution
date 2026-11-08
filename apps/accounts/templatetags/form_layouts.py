@@ -5,6 +5,35 @@ from django import template
 register = template.Library()
 
 SECTIONED_PROFILES = {
+    "company_profile": (
+        (
+            "identity",
+            "مشخصات ثبتی شرکت",
+            "company",
+            (
+                "name",
+                "legal_name",
+                "slug",
+                "registration_number",
+                "national_id",
+                "economic_code",
+            ),
+        ),
+        ("contact", "اطلاعات تماس", "document", ("phone", "email", "website")),
+        (
+            "location",
+            "نشانی شرکت",
+            "layers",
+            ("province", "city", "postal_code", "address"),
+        ),
+        (
+            "onboarding",
+            "راه‌اندازی شرکت",
+            "briefcase",
+            ("initial_owner_username", "timezone", "currency"),
+        ),
+    ),
+    "company_change": (("change", "ثبت دلیل تغییر", "notes", ("reason",)),),
     "equipment_maintenance": (
         (
             "record",

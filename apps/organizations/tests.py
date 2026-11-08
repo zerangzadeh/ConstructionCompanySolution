@@ -1191,13 +1191,16 @@ class OrganizationCreationViewTests(TestCase):
             },
         )
 
-        self.assertRedirects(response, reverse("organizations:select"))
         organization = Organization.objects.get(slug="created-company")
+        self.assertRedirects(response, reverse("organizations:platform_company_detail", args=[organization.pk]))
         membership = OrganizationMembership.objects.get(
             organization=organization,
             user=self.initial_owner,
         )
-        self.assertEqual(organization.created_by, self.initial_owner)
+        self.assertEqual(organization.created_by, self.platform_admin)
+        event = AuditEvent.objects.get(organization=organization, action=AuditAction.ORGANIZATION_CREATED)
+        self.assertEqual(event.actor, self.platform_admin)
+        self.assertEqual(event.metadata["initial_owner_id"], str(self.initial_owner.pk))
         self.assertEqual(membership.role, MembershipRole.COMPANY_OWNER)
         self.assertEqual(membership.status, MembershipStatus.ACTIVE)
         self.assertNotIn(

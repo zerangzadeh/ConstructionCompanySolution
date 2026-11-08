@@ -3,20 +3,24 @@
 {% block workspace_class %}erp-workspace--timekeeping{% endblock %}
 {% block workspace_content %}
 {% include "components/page_header.html" with page_eyebrow="عملیات پروژه و کارگاه" page_title="حضور، درخواست‌ها و کارکرد" page_description="حضور کارکنان، درخواست‌ها و کارکرد دوره را بررسی و پیگیری کنید." only %}
-{% include "components/xlsx_action.html" with export_description="حضور، کارکرد و اضافه‌کاری مجاز با فیلترهای فعلی" %}
 {% include "workforce/_field_context.html" %}
-{% field_navigation %}
 <section class="mt-5" aria-labelledby="daily-work"><h2 id="daily-work" class="font-bold">عملیات روزانه</h2><div class="mt-3 flex flex-wrap gap-2">
-
   {% if "attendance.capture" in business_permission_codes %}<a class="erp-btn erp-btn--primary" href="{% url 'timekeeping:attendance_create' %}?{{ history_query }}">ثبت حضور</a>{% endif %}
   {% if "attendance.import" in business_permission_codes and "timekeeping:attendance_import"|surface_exposed %}<a class="erp-btn erp-btn--secondary" href="{% url 'timekeeping:attendance_import' %}?{{ history_query }}">درون‌ریزی</a>{% endif %}
   {% if "leave_mission.request" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'timekeeping:leave_mission_create' %}?{{ history_query }}">مرخصی / مأموریت</a>{% endif %}
   {% if "overtime.request" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'timekeeping:overtime_create' %}?{{ history_query }}">اضافه‌کاری</a>{% endif %}
   {% if "timesheets.prepare" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'timekeeping:timesheet_create' %}?{{ history_query }}">کارکرد جدید</a>{% endif %}
 </div></section>
-<div class="erp-reference-list erp-contracts-list mt-5"><div class="erp-list-workspace">{% include "components/filter_bar.html" with bar=history_filter_bar reference_layout=True only %}{% include "workforce/_native_choices.html" with choice_form=history_form %}<div class="erp-list-toolbar">{% include "components/list_result_summary.html" with bar=history_filter_bar reference_layout=True only %}</div></div></div>
-
-
+<div class="erp-reference-list erp-contracts-list mt-5">
+  <div class="erp-list-workspace">
+    {% include "components/filter_bar.html" with bar=history_filter_bar reference_layout=True only %}
+    {% include "workforce/_native_choices.html" with choice_form=history_form %}
+    <div class="erp-list-toolbar">
+      {% include "components/list_result_summary.html" with bar=history_filter_bar reference_layout=True only %}
+      {% include "components/xlsx_action.html" with export_in_toolbar=True export_description="حضور، کارکرد و اضافه‌کاری مجاز با فیلترهای فعلی" %}
+    </div>
+  </div>
+</div>
 
 <section class="mt-5 grid gap-4 xl:grid-cols-2">
 

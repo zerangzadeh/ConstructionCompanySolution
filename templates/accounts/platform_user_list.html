@@ -1,0 +1,91 @@
+{% extends "base.html" %}{% load erp_format %}
+{% block title %}کاربران سامانه | بنیرا{% endblock %}
+{% block content %}
+<div class="erp-platform-directory">
+    {% include "components/page_header.html" with page_title="کاربران سامانه" page_description="مدیریت حساب‌های کاربری در سطح پلتفرم" page_icon="users" only %}
+    <section class="erp-platform-kpis erp-platform-directory-kpis mt-4" aria-label="خلاصه کاربران سامانه">
+        {% for metric in user_metrics %}{% include "components/dashboard_metric.html" with metric=metric only %}{% endfor %}
+    </section>
+
+    <form id="platform-user-filters" method="get" class="erp-surface erp-directory-filters" aria-label="جستجو و فیلتر کاربران">
+        <div class="erp-directory-search">
+            {% include "components/form_field.html" with field=form.q only %}
+            {% if can_manage %}<a class="erp-btn erp-btn--primary" href="{% url 'organizations:platform_user_create' %}">{% include "components/form_icon.html" with icon="plus" only %}ایجاد حساب جدید</a>{% endif %}
+        </div>
+        <div class="erp-directory-filter-grid">
+            {% include "components/form_field.html" with field=form.status only %}
+            {% include "components/form_field.html" with field=form.platform_admin only %}
+            {% include "components/form_field.html" with field=form.company only %}
+            <div class="erp-directory-filter-actions">
+                <button class="erp-btn erp-btn--primary" type="submit">جستجو</button>
+                <a class="erp-btn erp-btn--secondary" href="{% url 'organizations:platform_users' %}">پاک‌کردن فیلترها</a>
+            </div>
+        </div>
+    </form>
+
+    <section class="erp-surface erp-directory-results" aria-label="فهرست حساب‌ها">
+        {% if page_obj.object_list %}
+        <table class="erp-platform-user-table" role="table">
+            <thead role="rowgroup"><tr role="row">
+                <th scope="col">کاربر</th><th scope="col" class="erp-directory-secondary">ایمیل</th><th scope="col">وضعیت حساب</th>
+                <th scope="col">مدیر پلتفرم</th><th scope="col">عضویت‌ها</th><th scope="col" class="erp-directory-secondary">آخرین ورود</th>
+                <th scope="col" class="erp-directory-secondary">تاریخ ایجاد</th><th scope="col">اقدامات</th>
+            </tr></thead>
+            <tbody role="rowgroup">
+                {% for account in page_obj.object_list %}
+                {% url 'organizations:platform_user_detail' account.pk as detail_url %}
+                <tr role="row">
+                    <th scope="row" role="rowheader">
+                        <a class="erp-directory-identity" href="{{ detail_url }}">
+                            {% include "accounts/platform_user_initials.html" with account=account only %}
+                            <span class="erp-directory-name">
+                                {% if account.get_full_name %}
+                                <strong class="truncate" title="{{ account.get_full_name }}"><bdi>{{ account.get_full_name }}</bdi></strong>
+                                <bdi class="erp-directory-username" dir="ltr" title="{{ account.username }}">{{ account.username }}</bdi>
+                                {% else %}
+                                <bdi class="erp-directory-username erp-directory-username--primary" dir="ltr" title="{{ account.username }}">{{ account.username }}</bdi>
+                                {% endif %}
+                            </span>
+                        </a>
+                    </th>
+                    <td role="cell" class="erp-directory-secondary"><bdi class="erp-directory-email" dir="ltr" title="{{ account.email }}">{{ account.email|default:"—" }}</bdi></td>
+                    <td role="cell" data-label="وضعیت حساب">{% include "accounts/platform_user_status_badge.html" with account=account only %}</td>
+                    <td role="cell" data-label="مدیر پلتفرم">{% if account.platform_admin_effective %}<span class="erp-badge erp-badge--info">مدیر</span>{% else %}<span aria-label="بدون تخصیص فعال">—</span>{% endif %}</td>
+                    <td role="cell" data-label="عضویت‌ها"><a class="erp-directory-count" href="{{ detail_url }}#platform-account-memberships">{{ account.membership_count|erp_number }} شرکت</a></td>
+                    <td role="cell" class="erp-directory-secondary">{% if account.last_login %}<time class="whitespace-nowrap" datetime="{{ account.last_login|date:'c' }}">{{ account.last_login|jalali_datetime }}</time>{% else %}—{% endif %}</td>
+                    <td role="cell" class="erp-directory-secondary"><time class="whitespace-nowrap" datetime="{{ account.created_at|date:'c' }}">{{ account.created_at|jalali_date }}</time></td>
+                    <td role="cell" class="erp-directory-action">
+                        <details class="erp-directory-menu">
+                            <summary class="erp-btn erp-btn--secondary erp-btn--compact" aria-label="اقدام‌های {{ account.username }}"><span aria-hidden="true">•••</span><span class="sm:hidden">اقدام‌ها</span></summary>
+                            <div class="erp-directory-menu-links">
+                                <a href="{{ detail_url }}">مشاهده جزئیات</a>
+                                {% if account.directory_can_edit %}<a href="{% url 'organizations:platform_user_edit' account.pk %}">ویرایش حساب</a>{% endif %}
+                                {% if account.directory_can_change_status %}<a href="{{ detail_url }}#platform-account-status">{% if account.is_active %}غیرفعال‌سازی حساب{% else %}فعال‌سازی حساب{% endif %}</a>{% endif %}
+                                {% if account.directory_can_reset_temporary %}<a href="{% url 'organizations:platform_user_temporary_password' account.pk %}">تنظیم گذرواژه موقت</a>{% endif %}
+                                {% if account.directory_can_recover %}<a href="{{ detail_url }}#platform-account-recovery">ارسال پیوند بازیابی</a>{% endif %}
+                            </div>
+                        </details>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="erp-directory-empty"><span class="erp-account-icon">{% include "components/form_icon.html" with icon="users" only %}</span><p>حسابی با این مشخصات یافت نشد.</p><p class="text-xs text-slate-500">عبارت جستجو یا فیلترها را تغییر دهید.</p></div>
+        {% endif %}
+        <footer class="erp-directory-pagination">
+            <p>{% if page_obj.paginator.count %}نمایش {{ page_obj.start_index|erp_number }} تا {{ page_obj.end_index|erp_number }} از {{ page_obj.paginator.count|erp_number }} حساب{% else %}۰ حساب مطابق فیلترها{% endif %}</p>
+            <nav class="erp-directory-pages" aria-label="صفحه‌بندی کاربران">
+                {% if page_obj.has_previous %}<a class="erp-btn erp-btn--secondary erp-btn--compact" href="{% querystring request.GET page=page_obj.previous_page_number %}" rel="prev">قبلی</a>{% endif %}
+                <span aria-current="page">صفحه {{ page_obj.number|erp_number }} از {{ page_obj.paginator.num_pages|erp_number }}</span>
+                {% if page_obj.has_next %}<a class="erp-btn erp-btn--secondary erp-btn--compact" href="{% querystring request.GET page=page_obj.next_page_number %}" rel="next">بعدی</a>{% endif %}
+            </nav>
+            <div class="erp-directory-page-size">
+                <label for="{{ form.page_size.id_for_label }}">{{ form.page_size.label }}</label>{{ form.page_size }}
+                <button class="erp-btn erp-btn--secondary erp-btn--compact" type="submit" form="platform-user-filters">اعمال</button>
+                {% if form.page_size.errors %}<div class="basis-full text-red-700" id="{{ form.page_size.auto_id }}_error">{{ form.page_size.errors }}</div>{% endif %}
+            </div>
+        </footer>
+    </section>
+</div>
+{% endblock %}

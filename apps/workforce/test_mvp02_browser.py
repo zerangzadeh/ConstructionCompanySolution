@@ -36,6 +36,7 @@ class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
     def test_workforce_timekeeping_journeys(self):
         from datetime import time
 
+        from apps.projects.models import ProjectSite
         from apps.timekeeping.models import LeaveMissionRequest
         from apps.timekeeping.services import create_shift
         from apps.workforce.models import EmployeeProjectAssignment, WorkTeam
@@ -46,6 +47,10 @@ class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
             owner=owner, name="شرکت آزمون مسیر کارکرد", slug="journey-company"
         )
         project, site, team, employee, _report = make_field_fixture(owner, organization)
+        empty_site = ProjectSite.objects.create(
+            organization=organization, project=project, code="J-EMPTY-SITE",
+            name="کارگاه بدون تخصیص",
+        )
         evidence = "output/workforce-timekeeping-journey/after"
         work_date = "1405/08/10"
         recorded_date = parse_jalali_date(work_date)
@@ -79,6 +84,18 @@ class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
 
         def choice(name, query, record, **extra):
             return {"searchChoice": {"name": name, "query": query, "value": str(record.pk)}, **extra}
+
+        def choice_status(name, condition, description):
+            return {"description": description, "inspect": f"""(async () => {{
+                const status = document.querySelector('[name={name}]')
+                    .closest('[data-field-search]').querySelector('[data-choice-status]');
+                const deadline = performance.now() + 10000;
+                while (performance.now() < deadline) {{
+                    if (!status.classList.contains('sr-only') && ({condition})) return true;
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }}
+                return false;
+            }})()"""}
 
         for width in (1440, 1024, 390):
             with self.subTest(width=width):
@@ -135,17 +152,61 @@ class FieldWorkforceBrowserTests(StaticLiveServerTestCase):
                 kind = "mission" if width == 1024 else "leave"
                 self._probe(owner, [
                     scenario(
+                        "timekeeping-landing", history,
+                        {"inspect": """(() => {
+                            const main = document.querySelector('main');
+                            const daily = main.querySelector('[aria-labelledby=daily-work]');
+                            const toolbar = main.querySelector('.erp-list-toolbar');
+                            const paths = [...daily.querySelectorAll('a')].map(link => link.pathname);
+                            return !main.querySelector('[data-workforce-navigation], a[href^="/workforce/"]')
+                                && ['attendance', 'leave-mission', 'overtime', 'timesheets'].every(
+                                    section => paths.filter(path => path === `/timekeeping/${section}/new/`).length === 1
+                                )
+                                && !daily.querySelector('[href*="format=xlsx"]')
+                                && !!toolbar.querySelector('[href*="format=xlsx"]')
+                                && !!toolbar.querySelector('[data-filter-result-count]')
+                                && !!main.querySelector('nav a[href*="view=calendar"]');
+                        })()""", "description": "daily actions, export, count and monthly view have distinct locations"},
+                    ),
+                    scenario(
+                        "workforce-from-timekeeping-sidebar", history,
+                        *([{"toggleSelector": ".erp-mobile-nav > summary"}] if width == 390 else []),
+                        {"clickSelector": (
+                            ".erp-mobile-nav__panel" if width == 390 else ".erp-sidebar"
+                        ) + f' a[href="{reverse("workforce:field_list")}"]',
+                         "afterPath": reverse("workforce:field_list")},
+                        {"inspect": """(() => {
+                            const tabs = document.querySelector('main [data-workforce-navigation]');
+                            return tabs.querySelector('span[aria-current=page]').textContent.trim() === 'نیروها'
+                                && [...tabs.querySelectorAll('a')].map(a => a.textContent.trim()).join('|')
+                                   === 'تخصیص به پروژه و کارگاه|گروه‌های کاری';
+                        })()""", "description": "Workforce sidebar entry leads to existing management tabs"},
+                    ),
+                    scenario(
+                        "attendance-missing-assignment", f"{attendance}?project={project.pk}",
+                        {"inspect": "!document.querySelector('main [data-choice-status] a')",
+                         "description": "no prerequisite link when the existing context has workers"},
+                        choice("site", empty_site.code, empty_site),
+                        {"openChoice": "employee"},
+                        choice_status("employee", f"""(() => {{
+                            const link = status.querySelector('a');
+                            return link?.pathname === '{reverse('workforce:assignment_create')}'
+                                && new URL(link.href).searchParams.get('site') === '{empty_site.pk}';
+                        }})()""", "empty worker choices offer assignment for the selected site"),
+                    ),
+                    scenario(
                         "attendance", f"{attendance}?{query}",
-                        {"inspect": "document.querySelector('[name=shift]').tomselect.isDisabled", "description": "shift awaits calendar"},
+                        {"inspect": "document.querySelector('[name=shift]').tomselect.isDisabled && !document.querySelector('main a[href*=\"/shifts/new/\"]')", "description": "shift awaits calendar with no permanent setup link"},
                         choice("calendar", alternate.code, alternate),
                         {"openChoice": "shift"},
-                        {"inspect": """(() => {
-                            const status = document.querySelector('[name=shift]').closest('[data-field-search]').querySelector('[data-choice-status]');
-                            return !status.classList.contains('sr-only') && status.textContent.includes('شیفت فعالی');
-                        })()""", "waitMs": 550,
-                         "description": "empty dependent list explains its cause"},
+                        choice_status(
+                            "shift", """status.textContent.includes('شیفت فعالی')
+                                && !!status.querySelector('a[href*="/shifts/new/"]')""",
+                            "empty dependent list explains its cause and offers authorized setup",
+                        ),
                         choice("calendar", calendar.code, calendar),
                         choice("shift", shift.code, shift),
+                        {"inspect": "!document.querySelector('main a[href*=\"/shifts/new/\"]')", "description": "a populated calendar clears the setup link"},
                         {"fill": {"work_date": work_date, "check_in_at": f"{work_date} 08:00",
                                   "check_out_at": f"{work_date} 10:35"},
                          "inspect": "document.querySelector('[name=work_date]').value.length === 10",

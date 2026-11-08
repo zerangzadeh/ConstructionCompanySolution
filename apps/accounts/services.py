@@ -1,7 +1,10 @@
 from collections.abc import Mapping
 
+from django.contrib.auth.hashers import check_password
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils.crypto import constant_time_compare
+from django.views.decorators.debug import sensitive_variables
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
@@ -53,12 +56,19 @@ def change_personal_password(
 
 
 @transaction.atomic
+@sensitive_variables("new_password")
 def initialize_personal_password(*, user: User, new_password: str) -> User:
     """Replace a temporary password and release the first-login restriction."""
 
     locked_user = User.objects.select_for_update().get(pk=user.pk)
     if not locked_user.must_change_password:
         raise ValidationError("تغییر اجباری گذرواژه برای این حساب فعال نیست.")
+    if not locked_user.is_active or not constant_time_compare(
+        locked_user.get_session_auth_hash(), user.get_session_auth_hash()
+    ):
+        raise ValidationError("اعتبار ورود تغییر کرده است. دوباره وارد شوید.")
+    if check_password(new_password, locked_user.password):
+        raise ValidationError("گذرواژه شخصی باید با گذرواژه موقت متفاوت باشد.")
     locked_user.set_password(new_password)
     locked_user.must_change_password = False
     locked_user.save(update_fields=["password", "must_change_password", "updated_at"])

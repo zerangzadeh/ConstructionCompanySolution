@@ -138,6 +138,7 @@ def _form_page(
     request: HttpRequest, *, form, title: str, description: str, submit_label=""
 ) -> HttpResponse:
     context = _field_context(request)
+    _add_empty_choice_guidance(request, form, context)
     reference_name = "shift" if isinstance(form, ShiftBreakForm) else "calendar"
     reference_field = form.fields.get(reference_name)
     missing_reference = (
@@ -168,6 +169,37 @@ def _form_page(
             else reverse("home"),
         },
     )
+
+
+def _add_empty_choice_guidance(request, form, context):
+    from apps.workforce.field_forms import choice_value
+    from apps.workforce.field_presentation import timekeeping_empty_choice_action
+    from apps.workforce.field_selectors import FieldContext
+
+    if "employee" not in form.fields:
+        return
+    fields = ["employee", "shift"] if isinstance(form, AttendanceForm) else ["employee"]
+    for name in fields:
+        form.fields[name].widget.attrs["data-choice-purpose"] = "timekeeping"
+    if form.is_bound:
+        form.is_valid()  # Validate the submitted parents before using them in any link.
+        parents = {name: form.cleaned_data.get(name) for name in ("project", "site")}
+        if any(
+            choice_value(form, name) and not parent
+            for name, parent in parents.items() if name in form.fields
+        ):
+            return
+        if "project" in form.fields:
+            context = FieldContext(**parents)
+    for name in fields:
+        if name == "shift" and not getattr(form, "cleaned_data", {}).get("calendar"):
+            continue
+        field = form.fields[name]
+        if not field.queryset.exists():
+            field.widget.empty_notice = {
+                "message": field.widget.attrs["data-empty-choices"],
+                "action": timekeeping_empty_choice_action(request, name, context),
+            }
 
 
 def _scoped(queryset, request: HttpRequest):
