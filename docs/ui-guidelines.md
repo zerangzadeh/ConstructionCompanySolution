@@ -666,7 +666,7 @@ RTL display.
 
 The Product Owner's [supplied Contract Create image](../output/contract-create-reference/reference.png)
 (2026-11-01) is the visual acceptance reference for the Contract Create family.
-`templates/contracts/create.html`
+`apps/contracts/templates/contracts/create.html`
 implements the pattern; **Product Owner visual acceptance is PENDING**. This is
 not approval of the implementation or authorization to roll it out to other pages.
 
@@ -694,8 +694,8 @@ See the [bounded implementation evidence](../output/contract-create-reference/RE
 ### 14.3 Compact Form Pattern
 
 The Product Owner approved the Compact Form design on 2026-11-05. The final
-[visual reference](compact-form-reference.png) and
-[layout specification](compact-form-specification.png) apply to standalone
+[visual reference](design/references/compact-form-reference.png) and
+[layout specification](design/references/compact-form-specification.png) apply to standalone
 Create/Edit pages whose fields fit in one logical section. Warehouse Create is
 the implementation reference. Each rollout page has its own visual review.
 
@@ -719,7 +719,7 @@ See the [Compact Form Reuse Guide](../templates/components/README.md#compact-for
 
 ### 14.4 Sectioned Form Pattern
 
-Use the [Sectioned Form visual reference](sectioned-form-reference.png) for a
+Use the [Sectioned Form visual reference](design/references/sectioned-form-reference.png) for a
 standalone Create/Edit form with several logical field groups. Expense is the
 pilot. Safety Incident, Quality Issue and the classic Daily Report are suitable
   adopters. These implementations require their own Product Owner visual review.
@@ -897,7 +897,7 @@ Prefer read-only information sections over disabled form inputs.
 
 ### Record Detail Pattern
 
-The visual layout reference is `docs/detail-page-reference.png` (Expense example).
+The visual layout reference is `docs/design/references/detail-page-reference.png` (Expense example).
 It specifies presentation, not new fields or capabilities. Expense Detail is the
 first implementation. This rollout is technically reviewable; individual pages
 still require Product Owner visual review.
@@ -1284,7 +1284,7 @@ Keep these consistent:
 
 The authoritative BONIRA color system is maintained separately at:
 
-`design/BONIRA_UI_COLOR_SYSTEM.md`
+`docs/design/BONIRA_UI_COLOR_SYSTEM.md`
 
 That file is the **single source of truth** for:
 
@@ -1298,11 +1298,11 @@ That file is the **single source of truth** for:
 - approved hexadecimal registry
 
 All UI implementation must use the approved tokens from
-`design/BONIRA_UI_COLOR_SYSTEM.md`.
+`docs/design/BONIRA_UI_COLOR_SYSTEM.md`.
 
 Do not duplicate the full palette in this document. If this document and the
 color-system file ever appear to conflict on a color value or color-usage rule,
-`design/BONIRA_UI_COLOR_SYSTEM.md` governs color decisions.
+`docs/design/BONIRA_UI_COLOR_SYSTEM.md` governs color decisions.
 
 Do not introduce arbitrary or near-duplicate colors when an approved BONIRA
 token already covers the same semantic purpose. If a genuinely new color is
@@ -1334,7 +1334,7 @@ The authoritative Admin reference is the customized Django Admin shell/changelis
 
 **Product Owner decision: 2026-11-01. Contracts List UI/UX: ACCEPTED.**
 
-`Contracts List` (`templates/contracts/list.html` and its existing opt-in shared
+`Contracts List` (`apps/contracts/templates/contracts/list.html` and its existing opt-in shared
 list components) is BONIRA's official **Reference List Page** and reference
 implementation for designing or redesigning these List pages only:
 
@@ -1580,7 +1580,7 @@ Also:
 - verify existing Gregorian records render correctly without data migration
 - verify desktop/mobile behavior
 - verify no corrupted Persian literals remain
-- verify modified UI/CSS/templates against `design/BONIRA_UI_COLOR_SYSTEM.md`
+- verify modified UI/CSS/templates against `docs/design/BONIRA_UI_COLOR_SYSTEM.md`
 - search for newly introduced hard-coded colors and confirm each is an approved
   BONIRA token/derived alpha or a documented Design System change
 
@@ -1592,7 +1592,7 @@ Database test-permission problems are environment issues and must not trigger UI
 
 At the start of a new UI/UX session:
 
-> Follow applicable `AGENTS.md` instructions and read both `docs/ui-guidelines.md` and `design/BONIRA_UI_COLOR_SYSTEM.md` before UI/UX work. Treat the approved Application Shell, Dashboard, customized Django Admin patterns, and canonical BONIRA color tokens as shared references. For Estimates, Claims, Procurement and Inventory Lists, use the official Contracts List reference implementation under section 30. Projects is excluded and requires independent Product Owner direction; do not infer its final List/Detail design or roll out the Contracts pattern to it. Reuse established components, do not invent near-duplicate colors, and do not modify backend/domain behavior.
+> Follow applicable `AGENTS.md` instructions and read both `docs/ui-guidelines.md` and `docs/design/BONIRA_UI_COLOR_SYSTEM.md` before UI/UX work. Treat the approved Application Shell, Dashboard, customized Django Admin patterns, and canonical BONIRA color tokens as shared references. For Estimates, Claims, Procurement and Inventory Lists, use the official Contracts List reference implementation under section 30. Projects is excluded and requires independent Product Owner direction; do not infer its final List/Detail design or roll out the Contracts pattern to it. Reuse established components, do not invent near-duplicate colors, and do not modify backend/domain behavior.
 
 In the same session, do not repeat the entire UI specification. Keep prompts task-specific and concise.
 
@@ -1626,7 +1626,7 @@ In the same session, do not repeat the entire UI specification. Keep prompts tas
 
 **Admin keeps native behavior while matching the ERP design language.**
 
-**`design/BONIRA_UI_COLOR_SYSTEM.md` is the single source of truth for UI colors.**
+**`docs/design/BONIRA_UI_COLOR_SYSTEM.md` is the single source of truth for UI colors.**
 
 **Canonical color tokens before arbitrary colors.**
 
@@ -2079,7 +2079,7 @@ Before a new or materially changed screen is accepted, verify:
 - audit/source lineage, document evidence, reversal/void wording, and calculation
   explanation where relevant;
 - template reuse and absence of page-local inline styles or duplicated components;
-- compliance with `design/BONIRA_UI_COLOR_SYSTEM.md`, including absence of new
+- compliance with `docs/design/BONIRA_UI_COLOR_SYSTEM.md`, including absence of new
   arbitrary or near-duplicate color values; and
 - representative browser verification plus applicable Django/template/tests and
   Ruff checks.

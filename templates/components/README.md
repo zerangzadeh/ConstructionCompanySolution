@@ -94,8 +94,8 @@ visual acceptance; no other Create page adopts this pattern in this change.
 ## Compact Form Reuse Guide
 
 Use this pattern for a simple Create or Edit form with one logical section.
-Warehouse Create is the implementation reference. Use the approved [visual reference](../../docs/compact-form-reference.png)
-and [layout specification](../../docs/compact-form-specification.png) to review
+Warehouse Create is the implementation reference. Use the approved [visual reference](../../docs/design/references/compact-form-reference.png)
+and [layout specification](../../docs/design/references/compact-form-specification.png) to review
 the form inside the existing application shell.
 
 1. Extend `compact_form_page.html` for the canonical assets, working-context
@@ -150,7 +150,7 @@ Extend `record_detail_page.html` and populate `detail_heading` with the existing
 `page_header.html`, then `detail_actions`, `detail_summary`, `detail_navigation`
 and `detail_content` as needed. The base supplies the accepted shared application
 context header and the opt-in Record Detail styles. Do not duplicate context
-selectors. The visual reference is `docs/detail-page-reference.png`.
+selectors. The visual reference is `docs/design/references/detail-page-reference.png`.
 
 Inside a summary `dl.erp-record-summary`, include `record_summary_item.html` with
 `heading`, `value`, optional `kind` (`date`, `datetime`, `number`, `amount`,

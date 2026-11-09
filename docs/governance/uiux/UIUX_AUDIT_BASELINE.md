@@ -33,7 +33,7 @@ The audit must be grounded against the repository sources that govern product be
 - `Agents.md`
 - `ROADMAP.md`
 - `CEP_EXECUTION_REGISTRY.yaml`
-- `V1_IMPLEMENTATION_CLOSURE_20261020.md`
+- `docs/governance/history/V1_IMPLEMENTATION_CLOSURE_20261020.md`
 - `docs/PROJECT_STATUS.md`
 - `docs/ROADMAP_EXECUTION_PLAYBOOK.md`
 - `docs/ui-guidelines.md`

@@ -1,10 +1,12 @@
 import re
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlsplit
 
 from django.contrib.messages import get_messages
 from django.core import mail
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.mail.backends.locmem import EmailBackend
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
@@ -106,6 +108,50 @@ class PlatformUserTests(TestCase):
             "new_password2": password,
             "expected_updated_at": current.updated_at.isoformat(),
         }
+
+    def test_profile_image_replacement_is_shared_by_directory_and_settings(self):
+        settings_url = reverse("accounts:settings")
+        image_path = reverse("accounts:profile-image")
+        image_sources = re.compile(rf'src="({re.escape(image_path)}[^\"]*)"')
+
+        with (
+            TemporaryDirectory() as media_root,
+            override_settings(MEDIA_ROOT=media_root),
+        ):
+            previous_url = None
+            for contents in (b"\x89PNG\r\n\x1a\nold", b"\x89PNG\r\n\x1a\nnew"):
+                with self.captureOnCommitCallbacks(execute=True):
+                    saved = self.client.post(
+                        settings_url,
+                        {
+                            "action": "profile",
+                            "profile-profile_image": SimpleUploadedFile(
+                                "avatar.png", contents, content_type="image/png"
+                            ),
+                        },
+                    )
+                self.assertRedirects(saved, settings_url)
+
+                directory_page = self.client.get(self.url())
+                settings_page = self.client.get(settings_url)
+                self.assertContains(directory_page, f'href="{settings_url}"')
+                self.assertEqual(settings_page.status_code, 200)
+                directory_sources = image_sources.findall(
+                    directory_page.content.decode()
+                )
+                settings_sources = image_sources.findall(settings_page.content.decode())
+                self.assertEqual(len(directory_sources), 2)
+                image_url = directory_sources[0]
+                self.assertEqual(directory_sources, [image_url] * 2)
+                self.assertEqual(settings_sources, [image_url] * 3)
+                self.assertNotEqual(image_url, previous_url)
+                previous_url = image_url
+
+                image = self.client.get(image_url)
+                self.assertEqual(image.status_code, 200)
+                delivered = b"".join(image.streaming_content)
+                self.assertIn("no-store", image["Cache-Control"])
+                self.assertEqual(delivered, contents)
 
     def test_directory_search_filters_counts_and_pagination(self):
         for query in ("کاربر آزمایشی", "USERS-MEMBER", "member@example.test"):

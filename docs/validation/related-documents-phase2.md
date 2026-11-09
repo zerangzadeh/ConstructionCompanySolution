@@ -99,9 +99,9 @@ for denied access; success uses the normal redirect and Persian message flow.
 | `apps/documents/urls.py` | Three contextual routes within the existing Documents namespace |
 | `apps/documents/presentation.py` | Permission-aware contextual action URLs on the Phase 1 read projection |
 | `templates/components/related_documents.html` | Two actions in the existing section |
-| `templates/documents/upload.html` | Reuse upload form with fixed source context and source return |
-| `templates/documents/association_context.html` | Shared business-context presentation |
-| `templates/documents/contextual_link.html` | Compact existing-document form using shared components |
+| `apps/documents/templates/documents/upload.html` | Reuse upload form with fixed source context and source return |
+| `apps/documents/templates/documents/association_context.html` | Shared business-context presentation |
+| `apps/documents/templates/documents/contextual_link.html` | Compact existing-document form using shared components |
 | `apps/documents/static/documents/related_documents.css` | Section actions and responsive context/form styles using existing ERP tokens |
 | `apps/documents/test_contextual_association.py` | 21 focused request/service tests, including five-source subtests |
 | `docs/validation/related-documents-phase2.md` | This completion report |

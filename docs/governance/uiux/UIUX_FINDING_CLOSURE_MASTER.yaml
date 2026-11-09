@@ -222,7 +222,7 @@ findings:
   - RP-C03-EXCESSIVE-TECHNICAL-INPUT
   source_paths:
   - apps/timekeeping/forms.py
-  - templates/timekeeping/form.html
+  - apps/timekeeping/templates/timekeeping/form.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-08-task-inputs
@@ -231,7 +231,7 @@ findings:
     source_paths:
     - apps/timekeeping/forms.py:CalendarForm
     - apps/timekeeping/models.py:WorkCalendar.clean
-    - templates/timekeeping/form.html
+    - apps/timekeeping/templates/timekeeping/form.html
     changed_source:
     - apps/timekeeping/forms.py
     - core/test_cep003_localization_accessibility.py
@@ -262,17 +262,17 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   - RP-C06-GENERIC-FORM-ACTION
   source_paths:
-  - templates/timekeeping/form.html
+  - apps/timekeeping/templates/timekeeping/form.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-08-task-inputs
     source_verdict: REMEDIATED
     uat_impact: RESOLVED
     source_paths:
-    - templates/timekeeping/form.html
+    - apps/timekeeping/templates/timekeeping/form.html
     - apps/timekeeping/views.py
     changed_source:
-    - templates/timekeeping/form.html
+    - apps/timekeeping/templates/timekeeping/form.html
     result: Submit label uses the existing task title with a save action, distinguishing calendar/shift/attendance/request tasks
       without changing handlers.
     validation: View title contract review and changed-template compilation.
@@ -282,7 +282,7 @@ findings:
     classification: REOPENED_REMEDIATION_GAP
     resolution: RESOLVED
     batch: CC105-SYSTEMIC-CONFORMANCE-20261025
-    surfaces: ["templates/timekeeping/form.html"]
+    surfaces: ["apps/timekeeping/templates/timekeeping/form.html"]
     result: "The title-concatenated CTA repeats action words on request forms; explicit concise task labels and consistent cancel text now preserve the existing draft/submit distinction."
     verification: execution_history::CC105-SYSTEMIC-CONFORMANCE-20261025
 - finding_id: UIUX-F-004
@@ -346,7 +346,7 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   - RP-C05-TASK-GUIDANCE-DEFICIT
   source_paths:
-  - templates/payroll/workbench.html
+  - apps/payroll/templates/payroll/workbench.html
   runtime_or_closure_refs:
     wave_c_reentry:
       status: RUNTIME_VERIFIED_RESOLVED
@@ -378,7 +378,7 @@ findings:
   - RP-C04-WEAK-ACTION-HIERARCHY
   - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
   source_paths:
-  - templates/payroll/workbench.html
+  - apps/payroll/templates/payroll/workbench.html
   runtime_or_closure_refs:
     wave_c_reentry:
       status: RUNTIME_VERIFIED_RESOLVED
@@ -409,16 +409,16 @@ findings:
   - RP-C08-WEAK-EMPTY-STATE
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   source_paths:
-  - templates/payroll/workbench.html
+  - apps/payroll/templates/payroll/workbench.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-06-payroll-ess
     source_verdict: REMEDIATED
     uat_impact: RESOLVED
     source_paths:
-    - templates/payroll/workbench.html
+    - apps/payroll/templates/payroll/workbench.html
     changed_source:
-    - templates/payroll/workbench.html
+    - apps/payroll/templates/payroll/workbench.html
     result: Empty run/exception/result messages now describe the business state. Empty runs offer period/run creation only under
       the unchanged payroll.prepare permission and existing periods condition.
     validation: Static copy and permission-predicate review; changed-template compilation.
@@ -448,7 +448,7 @@ findings:
   - RP-C04-WEAK-ACTION-HIERARCHY
   - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
   source_paths:
-  - templates/procurement/rfq_buyer_workspace.html
+  - apps/procurement/templates/procurement/rfq_buyer_workspace.html
   runtime_or_closure_refs:
     wave_c_reentry:
       status: PARTIAL_RUNTIME_VERIFICATION
@@ -461,7 +461,7 @@ findings:
     source_verdict: ALREADY_RESOLVED_CURRENT_SOURCE
     uat_impact: RESOLVED
     source_paths:
-    - templates/procurement/rfq_buyer_workspace.html
+    - apps/procurement/templates/procurement/rfq_buyer_workspace.html
     - apps/procurement/rfq_actions.py:buyer_progress
     changed_source: []
     result: Current workspace shows RFQ display stage/version, quote count, capture prerequisites and a primary action only
@@ -492,7 +492,7 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   - RP-C05-TASK-GUIDANCE-DEFICIT
   source_paths:
-  - templates/procurement/rfq_buyer_workspace.html
+  - apps/procurement/templates/procurement/rfq_buyer_workspace.html
   runtime_or_closure_refs:
     wave_c_retest:
       status: RUNTIME_VERIFIED_RESOLVED
@@ -524,14 +524,14 @@ findings:
   root_pattern_candidate:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   source_paths:
-  - templates/parties/governance_list.html
+  - apps/parties/templates/parties/governance_list.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-11-governed-read-models
     source_verdict: DEFECT_REMAINS
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/parties/governance_list.html
+    - apps/parties/templates/parties/governance_list.html
     result: Party name/type/active-archived-merged state, search, create and history links are explicit. Governance/source wording
       in this secondary maintenance surface remains post-UAT copy work; operational party routes unchanged.
     validation: Current-source task/field/control review; no cosmetic closure or runtime PASS claimed.
@@ -565,7 +565,7 @@ findings:
   root_pattern_candidate:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   source_paths:
-  - templates/documents/list.html
+  - apps/documents/templates/documents/list.html
   runtime_or_closure_refs:
     wave_c_retest:
       status: RUNTIME_VERIFIED_RESOLVED
@@ -896,20 +896,20 @@ findings:
   root_pattern_candidate:
   - RP-C09-INCONSISTENT-DETAIL-AFFORDANCE
   source_paths:
-  - templates/projects/list.html
-  - templates/equipment/list.html
-  - templates/inventory/warehouse_list.html
-  - templates/inventory/custody_workbench.html
+  - apps/projects/templates/projects/list.html
+  - apps/equipment/templates/equipment/list.html
+  - apps/inventory/templates/inventory/warehouse_list.html
+  - apps/inventory/templates/inventory/custody_workbench.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-01-shared
     source_verdict: DEFECT_REMAINS
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/projects/list.html
-    - templates/equipment/list.html
-    - templates/inventory/warehouse_list.html
-    - templates/inventory/custody_workbench.html
+    - apps/projects/templates/projects/list.html
+    - apps/equipment/templates/equipment/list.html
+    - apps/inventory/templates/inventory/warehouse_list.html
+    - apps/inventory/templates/inventory/custody_workbench.html
     result: Different list affordances remain, but every cited record has a named native detail link and Project icon has an
       accessible name. Presentation consistency retained for post-UAT.
     original_status_basis: finding original/latest stored status only
@@ -942,7 +942,7 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   - RP-C05-TASK-GUIDANCE-DEFICIT
   source_paths:
-  - templates/projects/controls.html
+  - apps/projects/templates/projects/controls.html
   runtime_or_closure_refs:
     wave_c_retest:
       status: RUNTIME_VERIFIED_RESOLVED
@@ -977,7 +977,7 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   - RP-C05-TASK-GUIDANCE-DEFICIT
   source_paths:
-  - templates/organizations/member_authorization.html
+  - apps/organizations/templates/organizations/member_authorization.html
   runtime_or_closure_refs:
     runtime_assessment:
       wave: A
@@ -1001,7 +1001,7 @@ findings:
     source_verdict: DEFECT_REMAINS
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/organizations/member_authorization.html
+    - apps/organizations/templates/organizations/member_authorization.html
     result: Role and scope forms, effective dates, independent approver and revocation controls are explicit. Formal quarantine/dual-approval/scope
       terminology remains a security-administration copy residual; no weakening/relabeling of approval or quarantine policy.
     validation: Current-source task/field/control review; no cosmetic closure or runtime PASS claimed.
@@ -1038,14 +1038,14 @@ findings:
   - RP-C02-MODEL-REPRESENTATION-EXPOSED
   - RP-C08-WEAK-EMPTY-STATE
   source_paths:
-  - templates/workforce/ess_dashboard.html
+  - apps/workforce/templates/workforce/ess_dashboard.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-06-payroll-ess
     source_verdict: ALREADY_RESOLVED_CURRENT_SOURCE
     uat_impact: RESOLVED
     source_paths:
-    - templates/workforce/ess_dashboard.html
+    - apps/workforce/templates/workforce/ess_dashboard.html
     - apps/workforce/ess_dashboard.py
     - apps/workflows/personal_workspaces.py
     changed_source: []
@@ -1078,14 +1078,14 @@ findings:
   - RP-C11-INFORMATION-ARCHITECTURE-MISMATCH
   - RP-C04-WEAK-ACTION-HIERARCHY
   source_paths:
-  - templates/workforce/_ess_navigation.html
+  - apps/workforce/templates/workforce/_ess_navigation.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-06-payroll-ess
     source_verdict: DEFECT_REMAINS
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/workforce/_ess_navigation.html
+    - apps/workforce/templates/workforce/_ess_navigation.html
     result: ESS links remain a flat strip, with named destinations and existing permission predicates. Grouping is post-UAT
       information hierarchy work; current tasks remain directly navigable.
     original_status_basis: UIUX_FINDINGS_REGISTER.yaml::wave_de_fixture_closure.current_dispositions
@@ -1119,7 +1119,7 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   - RP-C05-TASK-GUIDANCE-DEFICIT
   source_paths:
-  - templates/inventory/custody_workbench.html
+  - apps/inventory/templates/inventory/custody_workbench.html
   runtime_or_closure_refs:
     wave_c_retest:
       status: RUNTIME_VERIFIED_RESOLVED
@@ -1153,7 +1153,7 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   - RP-C02-MODEL-REPRESENTATION-EXPOSED
   source_paths:
-  - templates/inventory/valuation_workbench.html
+  - apps/inventory/templates/inventory/valuation_workbench.html
   runtime_or_closure_refs:
     wave_c_retest:
       status: RUNTIME_VERIFIED_RESOLVED
@@ -1188,14 +1188,14 @@ findings:
   - RP-C04-WEAK-ACTION-HIERARCHY
   - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
   source_paths:
-  - templates/equipment/operations_workbench.html
+  - apps/equipment/templates/equipment/operations_workbench.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-09-workspaces
     source_verdict: DEFECT_REMAINS
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/equipment/operations_workbench.html
+    - apps/equipment/templates/equipment/operations_workbench.html
     result: The eight permitted actions remain equally weighted, but each has an explicit maintenance/usage purpose and permission
       condition. Role/state recommendation and alert hierarchy are post-UAT presentation/read-model work; no approved workflow
       priority invented.
@@ -1230,14 +1230,14 @@ findings:
   root_pattern_candidate:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   source_paths:
-  - templates/equipment/operations_workbench.html
+  - apps/equipment/templates/equipment/operations_workbench.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-09-workspaces
     source_verdict: DEFECT_REMAINS
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/equipment/operations_workbench.html
+    - apps/equipment/templates/equipment/operations_workbench.html
     result: Evidence/reference wording remains in maintenance summary and spare/evidence counts. Existing meter/usage/fuel/qualification/downtime/plan/order
       actions are business-named; wording is retained as post-UAT copy cleanup.
     validation: Current-source task/control review; no design closure or runtime PASS claimed.
@@ -1535,14 +1535,14 @@ findings:
   - RP-C13-OPERATIONAL-AUDIT-CONFLATION
   - RP-C05-TASK-GUIDANCE-DEFICIT
   source_paths:
-  - templates/reporting/dashboard.html
+  - apps/reporting/templates/reporting/dashboard.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-11-governed-read-models
     source_verdict: DEFECT_REMAINS
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/reporting/dashboard.html
+    - apps/reporting/templates/reporting/dashboard.html
     result: Existing metric layers/cards, values, observed/as-of freshness and source drill-down remain available. Governance
       catalogue/copy and desired executive trend hierarchy are post-UAT design work; no new business-question/metric projection
       invented.
@@ -1578,17 +1578,17 @@ findings:
   - RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
   source_paths:
   - templates/base.html
-  - templates/reporting/dashboard.html
+  - apps/reporting/templates/reporting/dashboard.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-05-landmarks
     source_verdict: REMEDIATED
     uat_impact: RESOLVED
     source_paths:
-    - templates/reporting/dashboard.html
+    - apps/reporting/templates/reporting/dashboard.html
     - templates/base.html
     changed_source:
-    - templates/reporting/dashboard.html
+    - apps/reporting/templates/reporting/dashboard.html
     result: Replaced only the inner main wrapper with div; the global main-content landmark remains authoritative.
     validation: Exact main-tag checks across the five cited children and base PASS; existing focused login landmark check PASS;
       no runtime matrix.
@@ -1618,16 +1618,16 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   - RP-C04-WEAK-ACTION-HIERARCHY
   source_paths:
-  - templates/compliance/workbench.html
+  - apps/compliance/templates/compliance/workbench.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-09-workspaces
     source_verdict: REMEDIATED
     uat_impact: RESOLVED
     source_paths:
-    - templates/compliance/workbench.html
+    - apps/compliance/templates/compliance/workbench.html
     changed_source:
-    - templates/compliance/workbench.html
+    - apps/compliance/templates/compliance/workbench.html
     result: Removed roadmap identifiers and expanded HSE/QA-QC/NCR/CAPA to Persian task names. Existing inspection/test/nonconformance/corrective-action
       sections and permission predicates retained.
     validation: Exact label/predicate diff review and changed-template compilation.
@@ -1744,7 +1744,7 @@ findings:
   - RP-C13-OPERATIONAL-AUDIT-CONFLATION
   - RP-C16-DEVELOPMENT-ARTEFACT-LEAK
   source_paths:
-  - templates/contracts/commercial_review.html
+  - apps/contracts/templates/contracts/commercial_review.html
   runtime_or_closure_refs:
     wave_c_retest:
       status: RUNTIME_VERIFIED_RESOLVED
@@ -1820,7 +1820,7 @@ findings:
   - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
   - RP-C11-INFORMATION-ARCHITECTURE-MISMATCH
   source_paths:
-  - templates/timekeeping/workbench.html
+  - apps/timekeeping/templates/timekeeping/workbench.html
   runtime_or_closure_refs:
     wave_c_reentry:
       status: RUNTIME_VERIFIED_RESOLVED
@@ -1853,7 +1853,7 @@ findings:
   - RP-C02-MODEL-REPRESENTATION-EXPOSED
   - RP-C05-TASK-GUIDANCE-DEFICIT
   source_paths:
-  - templates/timekeeping/workbench.html
+  - apps/timekeeping/templates/timekeeping/workbench.html
   runtime_or_closure_refs:
     wave_c_retest:
       status: RUNTIME_VERIFIED_RESOLVED
@@ -1889,14 +1889,14 @@ findings:
   - RP-C02-MODEL-REPRESENTATION-EXPOSED
   - RP-C08-WEAK-EMPTY-STATE
   source_paths:
-  - templates/payroll/ess_history.html
+  - apps/payroll/templates/payroll/ess_history.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-06-payroll-ess
     source_verdict: ALREADY_RESOLVED_CURRENT_SOURCE
     uat_impact: RESOLVED
     source_paths:
-    - templates/payroll/ess_history.html
+    - apps/payroll/templates/payroll/ess_history.html
     changed_source: []
     result: Current ESS history uses plain own-payslip copy, Jalali period dates, get_status_display and explicit availability/empty
       wording; raw source status is no longer shown.
@@ -1927,7 +1927,7 @@ findings:
   - RP-C13-OPERATIONAL-AUDIT-CONFLATION
   - RP-C16-DEVELOPMENT-ARTEFACT-LEAK
   source_paths:
-  - templates/reporting/reconciliation_workbench.html
+  - apps/reporting/templates/reporting/reconciliation_workbench.html
   runtime_or_closure_refs:
     runtime_assessment:
       wave: A
@@ -1940,7 +1940,7 @@ findings:
     source_verdict: DEFECT_REMAINS
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/reporting/reconciliation_workbench.html
+    - apps/reporting/templates/reporting/reconciliation_workbench.html
     result: Named Persian reconciliation pairs, cutoff/outcome/mismatch counts and execution/detail links exist. P10/raw pair/authority
       codes are residual specialist presentation; no reconciliation pairing or source policy changed.
     validation: Current-source task/field/control review; no cosmetic closure or runtime PASS claimed.
@@ -1973,7 +1973,7 @@ findings:
   - RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
   source_paths:
   - templates/base.html
-  - templates/reporting/reconciliation_workbench.html
+  - apps/reporting/templates/reporting/reconciliation_workbench.html
   runtime_or_closure_refs:
     runtime_assessment:
       wave: A
@@ -1986,10 +1986,10 @@ findings:
     source_verdict: REMEDIATED
     uat_impact: RESOLVED
     source_paths:
-    - templates/reporting/reconciliation_workbench.html
+    - apps/reporting/templates/reporting/reconciliation_workbench.html
     - templates/base.html
     changed_source:
-    - templates/reporting/reconciliation_workbench.html
+    - apps/reporting/templates/reporting/reconciliation_workbench.html
     result: Replaced only the inner main wrapper with div; the global main-content landmark remains authoritative.
     validation: Exact main-tag checks across the five cited children and base PASS; existing focused login landmark check PASS;
       no runtime matrix.
@@ -2020,7 +2020,7 @@ findings:
   - RP-C02-MODEL-REPRESENTATION-EXPOSED
   - RP-C13-OPERATIONAL-AUDIT-CONFLATION
   source_paths:
-  - templates/reporting/project_closeout_detail.html
+  - apps/reporting/templates/reporting/project_closeout_detail.html
   runtime_or_closure_refs:
     runtime_assessment:
       wave: A
@@ -2033,7 +2033,7 @@ findings:
     source_verdict: DEFECT_REMAINS_CONTRACT_BLOCKED
     uat_impact: BLOCKED_HUMAN_PRODUCT_DECISION
     source_paths:
-    - templates/reporting/project_closeout_detail.html
+    - apps/reporting/templates/reporting/project_closeout_detail.html
     - apps/reporting/project_closeout.py
     - apps/reporting/views.py:project_closeout_detail
     - apps/reporting/project_closeout_catalog.py
@@ -2058,7 +2058,7 @@ findings:
     changed_paths:
     - apps/reporting/closeout_ui.py
     - apps/reporting/views.py
-    - templates/reporting/project_closeout_detail.html
+    - apps/reporting/templates/reporting/project_closeout_detail.html
     validation: Closeout GET before/after assessment, Persian checklist, evidence visibility and sensitive-hash masking
       PASS; 15 existing closeout regression tests PASS. No source-domain transition or ownership/routing contract
       added.
@@ -2073,7 +2073,7 @@ findings:
     classification: REOPENED_REMEDIATION_GAP
     resolution: RESOLVED
     batch: CC105-SYSTEMIC-CONFORMANCE-20261025
-    surfaces: ["templates/reporting/project_closeout_detail.html"]
+    surfaces: ["apps/reporting/templates/reporting/project_closeout_detail.html"]
     result: "Assessment, acceptance and reopening CTAs still foregrounded implementation boundaries. Concise business actions now retain all permission gates, POST targets, revision values and adjacent safeguards."
     verification: execution_history::CC105-SYSTEMIC-CONFORMANCE-20261025
 - finding_id: UIUX-F-046
@@ -2101,7 +2101,7 @@ findings:
   - RP-C03-EXCESSIVE-TECHNICAL-INPUT
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   source_paths:
-  - templates/reporting/project_closeout_detail.html
+  - apps/reporting/templates/reporting/project_closeout_detail.html
   runtime_or_closure_refs:
     runtime_assessment:
       wave: A
@@ -2114,7 +2114,7 @@ findings:
     source_verdict: DEFECT_REMAINS_CONTRACT_BLOCKED
     uat_impact: BLOCKED_HUMAN_PRODUCT_DECISION
     source_paths:
-    - templates/reporting/project_closeout_detail.html
+    - apps/reporting/templates/reporting/project_closeout_detail.html
     - apps/reporting/views.py:project_closeout_evidence
     - apps/reporting/project_closeout.py:link_closeout_evidence
     - apps/documents/services.py:get_organization_documents
@@ -2138,7 +2138,7 @@ findings:
     changed_paths:
     - apps/reporting/closeout_ui.py
     - apps/reporting/views.py
-    - templates/reporting/project_closeout_detail.html
+    - apps/reporting/templates/reporting/project_closeout_detail.html
     validation: Authorized historical-version selection and exact hash pin, custom-purpose/legacy compatibility, unlinked/foreign
       document exclusion, unsafe version exclusion and missing membership denial PASS.
     shared_validation: Stage 3A focused tests 17/17 PASS; related regressions 31 PASS, 3 attributed baseline authorization-fixture
@@ -2169,7 +2169,7 @@ findings:
   - RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
   source_paths:
   - templates/base.html
-  - templates/reporting/project_closeout_detail.html
+  - apps/reporting/templates/reporting/project_closeout_detail.html
   runtime_or_closure_refs:
     runtime_assessment:
       wave: A
@@ -2182,7 +2182,7 @@ findings:
     source_verdict: ALREADY_RESOLVED_CURRENT_SOURCE
     uat_impact: RESOLVED
     source_paths:
-    - templates/reporting/project_closeout_detail.html
+    - apps/reporting/templates/reporting/project_closeout_detail.html
     - templates/base.html
     changed_source: []
     result: Current child template already uses a div wrapper and has no inner main; retains the single global main-content
@@ -2216,8 +2216,8 @@ findings:
   - RP-C02-MODEL-REPRESENTATION-EXPOSED
   - RP-C17-CONFIGURATION-NOT-VISUALIZED
   source_paths:
-  - templates/workflows/administration/detail.html
-  - templates/workflows/administration/form.html
+  - apps/workflows/templates/workflows/administration/detail.html
+  - apps/workflows/templates/workflows/administration/form.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-049
   module: Workforce
@@ -2241,7 +2241,7 @@ findings:
   - RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
   source_paths:
   - templates/base.html
-  - templates/workforce/employee_detail.html
+  - apps/workforce/templates/workforce/employee_detail.html
   runtime_or_closure_refs:
     runtime_assessment:
       wave: A
@@ -2255,7 +2255,7 @@ findings:
     source_verdict: ALREADY_RESOLVED_CURRENT_SOURCE
     uat_impact: RESOLVED
     source_paths:
-    - templates/workforce/employee_detail.html
+    - apps/workforce/templates/workforce/employee_detail.html
     - templates/base.html
     changed_source: []
     result: Current child template already uses a div wrapper and has no inner main; retains the single global main-content
@@ -2285,16 +2285,16 @@ findings:
   root_pattern_candidate:
   - RP-C02-MODEL-REPRESENTATION-EXPOSED
   source_paths:
-  - templates/daily_reports/detail.html
+  - apps/daily_reports/templates/daily_reports/detail.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-10-knowledge-identifiers
     source_verdict: REMEDIATED
     uat_impact: RESOLVED
     source_paths:
-    - templates/daily_reports/detail.html
+    - apps/daily_reports/templates/daily_reports/detail.html
     changed_source:
-    - templates/daily_reports/detail.html
+    - apps/daily_reports/templates/daily_reports/detail.html
     result: Report UUID moved from primary summary metric to an explicitly technical collapsed disclosure. No unapproved report
       number or record identity introduced.
     validation: Exact markup review and changed-template compilation.
@@ -2324,14 +2324,14 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   - RP-C13-OPERATIONAL-AUDIT-CONFLATION
   source_paths:
-  - templates/materials/governance.html
+  - apps/materials/templates/materials/governance.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-11-governed-read-models
     source_verdict: DEFECT_REMAINS
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/materials/governance.html
+    - apps/materials/templates/materials/governance.html
     result: Secondary master-data surface already groups alias/relationship/technical-approval/attribute/unit tasks in disclosures
       and links to operational materials. Versioning/segregation copy remains post-UAT; no approval or unit-conversion rule
       changed.
@@ -2454,7 +2454,7 @@ findings:
   - RP-C19-DERIVABLE-DATA-REENTRY
   source_paths:
   - apps/procurement/forms.py
-  - templates/procurement/form.html
+  - apps/procurement/templates/procurement/form.html
   runtime_or_closure_refs:
     runtime_revalidation_history:
     - finding_id: UIUX-F-054
@@ -2502,7 +2502,7 @@ findings:
   - RP-C18-CASCADE-FILTERING-INCONSISTENT
   source_paths:
   - apps/daily_reports/forms.py
-  - templates/daily_reports/create.html
+  - apps/daily_reports/templates/daily_reports/create.html
   runtime_or_closure_refs:
     runtime_revalidation_history:
     - finding_id: UIUX-F-055
@@ -2551,7 +2551,7 @@ findings:
   - RP-C03-EXCESSIVE-TECHNICAL-INPUT
   source_paths:
   - apps/daily_reports/forms.py
-  - templates/daily_reports/detail.html
+  - apps/daily_reports/templates/daily_reports/detail.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-03-input-contracts
@@ -2560,7 +2560,7 @@ findings:
     source_paths:
     - apps/daily_reports/forms.py:DailyReportMaterialEntryForm
     - apps/accounts/static/js/erp_context.js
-    - templates/daily_reports/detail.html
+    - apps/daily_reports/templates/daily_reports/detail.html
     changed_source:
     - apps/daily_reports/forms.py
     - apps/accounts/static/js/erp_context.js
@@ -2640,7 +2640,7 @@ findings:
   - RP-C18-CASCADE-FILTERING-INCONSISTENT
   source_paths:
   - apps/payroll/forms.py
-  - templates/payroll/form.html
+  - apps/payroll/templates/payroll/form.html
   runtime_or_closure_refs:
     wave_c_reentry:
       status: RUNTIME_VERIFIED_RESOLVED
@@ -2676,7 +2676,7 @@ findings:
   - RP-C19-DERIVABLE-DATA-REENTRY
   source_paths:
   - apps/payroll/forms.py
-  - templates/payroll/form.html
+  - apps/payroll/templates/payroll/form.html
   runtime_or_closure_refs:
     wave_c_reentry:
       status: PARTIAL_RUNTIME_VERIFICATION
@@ -2690,7 +2690,7 @@ findings:
     uat_impact: BLOCKED_HUMAN_PRODUCT_DECISION
     source_paths:
     - apps/payroll/forms.py
-    - templates/payroll/form.html
+    - apps/payroll/templates/payroll/form.html
     result: Ordinary timesheet input is now a governed selector, OrganizationForm generates hidden retry keys, and evidence/mapping
       JSON is disclosed separately. Aggregate still includes statutory export metadata and flexible evidence contracts.
     decision: Define the business schema/editor for payroll rule/evidence metadata and the permitted manual statutory-export
@@ -2707,7 +2707,7 @@ findings:
       an absent reference falls back to the local attempt key.
     changed_paths:
     - apps/payroll/forms.py
-    - templates/payroll/form.html
+    - apps/payroll/templates/payroll/form.html
     - core/ui_forms.py
     - templates/components/widgets/structured_data.html
     - apps/accounts/static/js/structured-data.js
@@ -2748,7 +2748,7 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   source_paths:
   - apps/procurement/forms.py
-  - templates/procurement/portal_context.html
+  - apps/procurement/templates/procurement/portal_context.html
   runtime_or_closure_refs:
     wave_c_reentry:
       status: BLOCKED_CANONICAL_INPUT_CONTRACT
@@ -2763,7 +2763,7 @@ findings:
     source_paths:
     - apps/procurement/forms.py:SupplierPortalSubmissionForm
     - apps/procurement/forms.py:SealedEvidenceUploadForm
-    - templates/procurement/portal_context.html
+    - apps/procurement/templates/procurement/portal_context.html
     result: Supplier form now requires original upload, uses hidden optional comparison hash and hidden retry key; supplier
       no longer computes a fingerprint. Internal sealed-evidence technical fields remain as a separate residual; do not relabel
       entire aggregate resolved.
@@ -2862,7 +2862,7 @@ findings:
   - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
   - RP-C13-OPERATIONAL-AUDIT-CONFLATION
   source_paths:
-  - templates/compliance/detail.html
+  - apps/compliance/templates/compliance/detail.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-11-governed-read-models
@@ -2870,10 +2870,10 @@ findings:
     uat_impact: RESOLVED
     source_paths:
     - apps/compliance/views.py:record_detail
-    - templates/compliance/detail.html
+    - apps/compliance/templates/compliance/detail.html
     changed_source:
     - apps/compliance/views.py
-    - templates/compliance/detail.html
+    - apps/compliance/templates/compliance/detail.html
     result: Action headings/buttons and history use the current record model's registered status labels. Hidden to_status/expected_status/operation
       keys and transition map are unchanged; original event codes remain in traceability details.
     validation: Source label-map/hidden-field/transition diff review; Django/template checks. No lifecycle event or transition-policy
@@ -3112,7 +3112,7 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   - RP-C13-OPERATIONAL-AUDIT-CONFLATION
   source_paths:
-  - templates/payroll/run_detail.html
+  - apps/payroll/templates/payroll/run_detail.html
   runtime_or_closure_refs:
     wave_c_reentry:
       status: PARTIAL_RUNTIME_VERIFICATION
@@ -3125,7 +3125,7 @@ findings:
     source_verdict: ALREADY_RESOLVED_CURRENT_SOURCE
     uat_impact: RESOLVED
     source_paths:
-    - templates/payroll/run_detail.html
+    - apps/payroll/templates/payroll/run_detail.html
     changed_source: []
     result: Period/type/display status/net results and state/permission-gated next actions are primary. Digest and detailed
       calculation lines are inside expandable details; no calculation-source semantics changed.
@@ -3157,7 +3157,7 @@ findings:
   - RP-C07-WORKFLOW-NOT-JOURNEY-ORIENTED
   - RP-C13-OPERATIONAL-AUDIT-CONFLATION
   source_paths:
-  - templates/payroll/statutory_workbench.html
+  - apps/payroll/templates/payroll/statutory_workbench.html
   runtime_or_closure_refs:
     wave_c_reentry:
       status: PARTIAL_RUNTIME_VERIFICATION
@@ -3170,7 +3170,7 @@ findings:
     source_verdict: PARTIALLY_REMEDIATED
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/payroll/statutory_workbench.html
+    - apps/payroll/templates/payroll/statutory_workbench.html
     result: Business-language journey, explicit prerequisite availability and secondary sending limitations already exist. Residual
       revision/schema/source traceability in table cells remains post-UAT presentation work; no statutory activation or full
       runtime journey PASS claimed.
@@ -3208,7 +3208,7 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   - RP-C13-OPERATIONAL-AUDIT-CONFLATION
   source_paths:
-  - templates/payroll/financial_handoff_workbench.html
+  - apps/payroll/templates/payroll/financial_handoff_workbench.html
   runtime_or_closure_refs:
     wave_c_reentry:
       status: PARTIAL_RUNTIME_VERIFICATION
@@ -3221,7 +3221,7 @@ findings:
     source_verdict: ALREADY_RESOLVED_CURRENT_SOURCE
     uat_impact: RESOLVED
     source_paths:
-    - templates/payroll/financial_handoff_workbench.html
+    - apps/payroll/templates/payroll/financial_handoff_workbench.html
     changed_source: []
     result: Destination family, run, amount, display review disposition and actionable exception status are primary. Predecessor
       UUID is inside a traceability disclosure; intro explains that handoff itself has no financial effect.
@@ -3320,7 +3320,7 @@ findings:
       weight or HR rubric is prescribed.
     changed_paths:
     - apps/workforce/forms.py
-    - templates/workforce/foundation_form.html
+    - apps/workforce/templates/workforce/foundation_form.html
     - core/ui_forms.py
     - templates/components/widgets/structured_data.html
     - apps/accounts/static/js/structured-data.js
@@ -3951,8 +3951,8 @@ findings:
   - RP-C06-GENERIC-FORM-ACTION
   source_paths:
   - apps/accounting/templates/accounting/form.html
-  - templates/procurement/form.html
-  - templates/payroll/form.html
+  - apps/procurement/templates/procurement/form.html
+  - apps/payroll/templates/payroll/form.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-08-task-inputs
@@ -3960,12 +3960,12 @@ findings:
     uat_impact: RESOLVED
     source_paths:
     - apps/accounting/templates/accounting/form.html
-    - templates/procurement/form.html
-    - templates/payroll/form.html
+    - apps/procurement/templates/procurement/form.html
+    - apps/payroll/templates/payroll/form.html
     changed_source:
     - apps/accounting/templates/accounting/form.html
-    - templates/procurement/form.html
-    - templates/payroll/form.html
+    - apps/procurement/templates/procurement/form.html
+    - apps/payroll/templates/payroll/form.html
     result: Generic submit text now identifies the existing task title. Forms, data, permission predicates and POST targets
       unchanged.
     validation: Existing view title context review and changed-template compilation.
@@ -3975,7 +3975,7 @@ findings:
     classification: REOPENED_REMEDIATION_GAP
     resolution: RESOLVED
     batch: CC105-SYSTEMIC-CONFORMANCE-20261025
-    surfaces: ["apps/accounting/templates/accounting/form.html", "templates/procurement/form.html", "templates/payroll/form.html"]
+    surfaces: ["apps/accounting/templates/accounting/form.html", "apps/procurement/templates/procurement/form.html", "apps/payroll/templates/payroll/form.html"]
     result: "Concatenating save with task titles produced long or duplicated actions. Explicit presentation labels identify each existing operation in 2-4 words without changing handlers."
     verification: execution_history::CC105-SYSTEMIC-CONFORMANCE-20261025
 - finding_id: UIUX-F-083
@@ -4301,8 +4301,8 @@ findings:
   - RP-C25-STATUS-SEMANTICS-INCOMPLETE
   source_paths:
   - templates/components/status_badge.html
-  - templates/safety/detail.html
-  - templates/quality/detail.html
+  - apps/safety/templates/safety/detail.html
+  - apps/quality/templates/quality/detail.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-01-shared
@@ -4310,8 +4310,8 @@ findings:
     uat_impact: NON_BLOCKING
     source_paths:
     - templates/components/status_badge.html
-    - templates/safety/detail.html
-    - templates/quality/detail.html
+    - apps/safety/templates/safety/detail.html
+    - apps/quality/templates/quality/detail.html
     result: Current shared badge handles verified/closed/action_in_progress. Other states still use neutral styling; explicit
       lifecycle labels remain the task authority. Residual color-family coverage deferred.
     original_status_basis: UIUX_FINDINGS_REGISTER.yaml::wave_d_e_runtime_reconciliation.current_dispositions
@@ -4349,8 +4349,8 @@ findings:
   - apps/accounting/templates/accounting/statement_list.html
   - apps/accounting/templates/accounting/statement_detail.html
   - apps/accounting/templates/accounting/period_list.html
-  - templates/safety/detail.html
-  - templates/quality/detail.html
+  - apps/safety/templates/safety/detail.html
+  - apps/quality/templates/quality/detail.html
   - apps/billing/templates/billing/payable_certificate_list.html
   - apps/billing/templates/billing/payable_certificate_detail.html
   runtime_or_closure_refs: {}
@@ -4362,14 +4362,14 @@ findings:
     - apps/accounting/templates/accounting/statement_list.html
     - apps/accounting/templates/accounting/statement_detail.html
     - apps/accounting/templates/accounting/period_list.html
-    - templates/safety/detail.html
-    - templates/quality/detail.html
+    - apps/safety/templates/safety/detail.html
+    - apps/quality/templates/quality/detail.html
     - apps/billing/templates/billing/payable_certificate_list.html
     - apps/billing/templates/billing/payable_certificate_detail.html
     changed_source:
     - apps/accounting/templates/accounting/period_list.html
-    - templates/safety/detail.html
-    - templates/quality/detail.html
+    - apps/safety/templates/safety/detail.html
+    - apps/quality/templates/quality/detail.html
     - apps/billing/templates/billing/payable_certificate_list.html
     - apps/billing/templates/billing/payable_certificate_detail.html
     result: Applied existing jalali_date/jalali_datetime to the exact raw date fields cited by the finding. Existing statement
@@ -4533,7 +4533,7 @@ findings:
       schema is invented.
     changed_paths:
     - apps/compliance/forms.py
-    - templates/compliance/form.html
+    - apps/compliance/templates/compliance/form.html
     - core/ui_forms.py
     - templates/components/widgets/structured_data.html
     - apps/accounts/static/js/structured-data.js
@@ -4573,14 +4573,14 @@ findings:
   - RP-C13-OPERATIONAL-AUDIT-CONFLATION
   - RP-C16-DEVELOPMENT-ARTEFACT-LEAK
   source_paths:
-  - templates/equipment/cost_workbench.html
+  - apps/equipment/templates/equipment/cost_workbench.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-09-workspaces
     source_verdict: DEFECT_REMAINS
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/equipment/cost_workbench.html
+    - apps/equipment/templates/equipment/cost_workbench.html
     result: P8/occurrence/consumer wording remains, while rate/allocation amount/display status and review/reconcile actions
       are explicit. Traceability presentation is post-UAT; unresolved source-key ownership is separately retained under F061/F078.
     validation: Current-source task/control review; no design closure or runtime PASS claimed.
@@ -4612,16 +4612,16 @@ findings:
   root_pattern_candidate:
   - RP-C26-JALALI-DISPLAY-INCONSISTENCY
   source_paths:
-  - templates/equipment/maintenance_list.html
+  - apps/equipment/templates/equipment/maintenance_list.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-04-date-presentation
     source_verdict: REMEDIATED
     uat_impact: RESOLVED
     source_paths:
-    - templates/equipment/maintenance_list.html
+    - apps/equipment/templates/equipment/maintenance_list.html
     changed_source:
-    - templates/equipment/maintenance_list.html
+    - apps/equipment/templates/equipment/maintenance_list.html
     result: Scheduled maintenance dates now use canonical jalali_date.
     validation: Static expression check and changed-template compilation.
     original_status_basis: finding original/latest stored status only
@@ -4649,14 +4649,14 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   - RP-C13-OPERATIONAL-AUDIT-CONFLATION
   source_paths:
-  - templates/workforce/foundation.html
+  - apps/workforce/templates/workforce/foundation.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-11-governed-read-models
     source_verdict: DEFECT_REMAINS
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/workforce/foundation.html
+    - apps/workforce/templates/workforce/foundation.html
     result: Explicit skill/qualification/training/performance/rate tasks remain permission gated. Tenant-local/access-boundary
       wording is a post-UAT copy residual; no new workforce identity, permission or financial effect inferred.
     validation: Current-source task/field/control review; no cosmetic closure or runtime PASS claimed.
@@ -4904,14 +4904,14 @@ findings:
   root_pattern_candidate:
   - RP-C02-MODEL-REPRESENTATION-EXPOSED
   source_paths:
-  - templates/audit/log.html
+  - apps/audit/templates/audit/log.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-10-knowledge-identifiers
     source_verdict: DEFECT_REMAINS
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/audit/log.html
+    - apps/audit/templates/audit/log.html
     result: Audit actions/date/actor are readable; exact entity type/ID remain diagnostic references. Business-title enrichment
       across domains is post-UAT and must preserve per-source access; no generic privileged object lookup introduced.
     original_status_basis: finding original/latest stored status only
@@ -4983,7 +4983,7 @@ findings:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   - RP-C05-TASK-GUIDANCE-DEFICIT
   source_paths:
-  - templates/estimates/create.html
+  - apps/estimates/templates/estimates/create.html
   runtime_or_closure_refs:
     runtime_revalidation_history:
     - finding_id: UIUX-F-105
@@ -4998,7 +4998,7 @@ findings:
     source_verdict: DEFECT_REMAINS
     uat_impact: NON_BLOCKING
     source_paths:
-    - templates/estimates/create.html
+    - apps/estimates/templates/estimates/create.html
     result: Existing project context and primary estimate form/action remain clear and functional. Context authorization disclaimer
       is secondary copy work for post-UAT; no scope/default or security behavior changed.
     validation: Current-source task/field/control review; no cosmetic closure or runtime PASS claimed.
@@ -5077,7 +5077,7 @@ findings:
   root_pattern_candidate:
   - RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
   source_paths:
-  - templates/accounts/login.html
+  - apps/accounts/templates/accounts/login.html
   - templates/base.html
   runtime_or_closure_refs:
     runtime_assessment:
@@ -5092,7 +5092,7 @@ findings:
     source_verdict: ALREADY_RESOLVED_CURRENT_SOURCE
     uat_impact: RESOLVED
     source_paths:
-    - templates/accounts/login.html
+    - apps/accounts/templates/accounts/login.html
     - templates/base.html
     changed_source: []
     result: Current child template already uses a div wrapper and has no inner main; retains the single global main-content
@@ -5122,14 +5122,14 @@ findings:
   root_pattern_candidate:
   - RP-C11-INFORMATION-ARCHITECTURE-MISMATCH
   source_paths:
-  - templates/workforce/work_team_list.html
+  - apps/workforce/templates/workforce/work_team_list.html
   runtime_or_closure_refs: {}
   stage2_revalidation:
     batch: S2-08-task-inputs
     source_verdict: ALREADY_RESOLVED_CURRENT_SOURCE
     uat_impact: RESOLVED
     source_paths:
-    - templates/workforce/work_team_list.html
+    - apps/workforce/templates/workforce/work_team_list.html
     - templates/base.html
     - core/templatetags/table_filters.py
     changed_source: []
@@ -5177,7 +5177,7 @@ findings:
     uat_impact: RESOLVED
     source_paths:
     - apps/organizations/views.py:members
-    - templates/organizations/members.html
+    - apps/organizations/templates/organizations/members.html
     changed_source: []
     result: Rows now summarize roles only when canonical membership_has_role confirms effectiveness; compatibility role label
       is separately identified. Scope availability/quarantine indicator uses membership_has_scope, without changing assignments
@@ -5302,7 +5302,7 @@ findings:
   source_paths:
   - apps/procurement/forms.py
   - apps/procurement/views.py
-  - templates/procurement/form.html
+  - apps/procurement/templates/procurement/form.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-114
   module: Procurement
@@ -5327,7 +5327,7 @@ findings:
   source_paths:
   - apps/procurement/forms.py
   - apps/procurement/views.py
-  - templates/procurement/form.html
+  - apps/procurement/templates/procurement/form.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-115
   module: Equipment
@@ -5352,7 +5352,7 @@ findings:
   source_paths:
   - apps/equipment/forms.py
   - apps/equipment/views.py
-  - templates/equipment/form.html
+  - apps/equipment/templates/equipment/form.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-116
   module: Contracts
@@ -5377,7 +5377,7 @@ findings:
   source_paths:
   - apps/contracts/forms.py
   - apps/contracts/views.py
-  - templates/contracts/create.html
+  - apps/contracts/templates/contracts/create.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-117
   module: Inventory
@@ -5402,7 +5402,7 @@ findings:
   source_paths:
   - apps/inventory/forms.py
   - apps/inventory/views.py
-  - templates/inventory/warehouse_form.html
+  - apps/inventory/templates/inventory/warehouse_form.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-118
   module: Inventory
@@ -5427,7 +5427,7 @@ findings:
   source_paths:
   - apps/inventory/forms.py
   - apps/inventory/views.py
-  - templates/inventory/transaction_form.html
+  - apps/inventory/templates/inventory/transaction_form.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-119
   module: Expenses
@@ -5454,7 +5454,7 @@ findings:
   source_paths:
   - apps/expenses/forms.py
   - apps/expenses/views.py
-  - templates/expenses/detail.html
+  - apps/expenses/templates/expenses/detail.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-120
   module: Expenses
@@ -5480,7 +5480,7 @@ findings:
   source_paths:
   - apps/expenses/forms.py
   - apps/expenses/views.py
-  - templates/expenses/recurrences.html
+  - apps/expenses/templates/expenses/recurrences.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-121
   module: Billing
@@ -5609,7 +5609,7 @@ findings:
   source_paths:
   - apps/workforce/forms.py
   - apps/workforce/views.py
-  - templates/workforce/foundation_form.html
+  - apps/workforce/templates/workforce/foundation_form.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-126
   module: Quality
@@ -5634,7 +5634,7 @@ findings:
   source_paths:
   - apps/quality/forms.py
   - apps/quality/views.py
-  - templates/quality/create.html
+  - apps/quality/templates/quality/create.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-127
   module: Safety
@@ -5659,7 +5659,7 @@ findings:
   source_paths:
   - apps/safety/forms.py
   - apps/safety/views.py
-  - templates/safety/create.html
+  - apps/safety/templates/safety/create.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-128
   module: Workforce
@@ -5708,7 +5708,7 @@ findings:
   root_pattern_candidate:
   - RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
   source_paths:
-  - templates/procurement/portal_accept.html
+  - apps/procurement/templates/procurement/portal_accept.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-130
   module: Inventory
@@ -5734,7 +5734,7 @@ findings:
   - RP-C05-TASK-GUIDANCE-DEFICIT
   source_paths:
   - apps/inventory/p8_views.py
-  - templates/inventory/valuation_workbench.html
+  - apps/inventory/templates/inventory/valuation_workbench.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-131
   module: Workforce
@@ -5756,7 +5756,7 @@ findings:
   needs_domain_review: false
   root_pattern_candidate: []
   source_paths:
-  - templates/workforce/employee_detail.html
+  - apps/workforce/templates/workforce/employee_detail.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-132
   module: Procurement
@@ -5800,7 +5800,7 @@ findings:
   root_pattern_candidate: []
   source_paths:
   - apps/workforce/employment_forms.py
-  - templates/workforce/employment_manage.html
+  - apps/workforce/templates/workforce/employment_manage.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-134
   module: Organizations / Platform administration
@@ -5825,7 +5825,7 @@ findings:
   root_pattern_candidate:
   - RP-C01-TECHNICAL-LANGUAGE-LEAK
   source_paths:
-  - templates/organizations/role_catalog.html
+  - apps/organizations/templates/organizations/role_catalog.html
   runtime_or_closure_refs: {}
 - finding_id: UIUX-F-135
   module: Shared Jalali calendar / Projects and Quality
@@ -5953,11 +5953,11 @@ execution_history:
   - apps/billing/templates/billing/commercial_form.html
   - apps/billing/templates/billing/payable_form.html
   - apps/accounting/templates/accounting/period_list.html
-  - templates/safety/detail.html
-  - templates/quality/detail.html
+  - apps/safety/templates/safety/detail.html
+  - apps/quality/templates/quality/detail.html
   - apps/billing/templates/billing/payable_certificate_list.html
   - apps/billing/templates/billing/payable_certificate_detail.html
-  - templates/equipment/maintenance_list.html
+  - apps/equipment/templates/equipment/maintenance_list.html
   - core/test_cep003_localization_accessibility.py
   expected: Reuse canonical date parsing/presentation and shared form components; preserve stored Gregorian dates, domain
     labels and business validation.
@@ -5974,8 +5974,8 @@ execution_history:
   - UIUX-F-049
   - UIUX-F-107
   touch_set:
-  - templates/reporting/dashboard.html
-  - templates/reporting/reconciliation_workbench.html
+  - apps/reporting/templates/reporting/dashboard.html
+  - apps/reporting/templates/reporting/reconciliation_workbench.html
   expected: Preserve one inherited document main landmark; no layout, route, role, event or data change.
   stop_conditions: Product/domain/authorization change, schema change, unbounded fix or attributable regression; isolate affected
     finding.
@@ -5992,7 +5992,7 @@ execution_history:
   - UIUX-F-068
   - UIUX-F-069
   touch_set:
-  - templates/payroll/workbench.html
+  - apps/payroll/templates/payroll/workbench.html
   expected: Retain existing confidential/own-data boundaries; close exact already-fixed label/disclosure defects, improve
     empty copy, defer navigation/style residuals.
   stop_conditions: Product/domain/authorization change, schema change, unbounded fix or attributable regression; isolate affected
@@ -6037,9 +6037,9 @@ execution_history:
   touch_set:
   - apps/timekeeping/forms.py
   - apps/timekeeping/views.py
-  - templates/timekeeping/form.html
-  - templates/payroll/form.html
-  - templates/procurement/form.html
+  - apps/timekeeping/templates/timekeeping/form.html
+  - apps/payroll/templates/payroll/form.html
+  - apps/procurement/templates/procurement/form.html
   - apps/accounting/templates/accounting/form.html
   - core/test_cep003_localization_accessibility.py
   expected: Present weekdays and submit tasks in business language while preserving ISO integer storage and legacy inputs;
@@ -6062,7 +6062,7 @@ execution_history:
   - UIUX-F-096
   - UIUX-F-106
   touch_set:
-  - templates/compliance/workbench.html
+  - apps/compliance/templates/compliance/workbench.html
   - apps/support/forms.py
   - apps/support/views.py
   - apps/support/templates/support/workbench.html
@@ -6086,7 +6086,7 @@ execution_history:
   touch_set:
   - apps/knowledge/templates/knowledge/catalogue.html
   - apps/knowledge/templates/knowledge/candidate_detail.html
-  - templates/daily_reports/detail.html
+  - apps/daily_reports/templates/daily_reports/detail.html
   - apps/support/templates/support/case_detail.html
   expected: Reuse Knowledge/source labels and shared fields; keep technical hashes/IDs secondary without inventing integrity
     PASS, source lookups or new domain behavior.
@@ -6111,7 +6111,7 @@ execution_history:
   - UIUX-F-105
   touch_set:
   - apps/compliance/views.py
-  - templates/compliance/detail.html
+  - apps/compliance/templates/compliance/detail.html
   expected: Localize existing lifecycle labels without changing transitions; retain Home/closeout owner/evidence semantics
     for Human decision; explicitly defer non-blocking secondary-surface copy.
   stop_conditions: Product/domain/authorization change, schema change, unbounded fix or attributable regression; isolate affected
@@ -6149,11 +6149,11 @@ execution_history:
   - templates/components/navigation_links.html
   - templates/components/record_detail_link.html
   - templates/components/status_badge.html
-  - templates/equipment/list.html
-  - templates/inventory/custody_workbench.html
-  - templates/inventory/warehouse_list.html
-  - templates/projects/list.html
-  - templates/workforce/_ess_navigation.html
+  - apps/equipment/templates/equipment/list.html
+  - apps/inventory/templates/inventory/custody_workbench.html
+  - apps/inventory/templates/inventory/warehouse_list.html
+  - apps/projects/templates/projects/list.html
+  - apps/workforce/templates/workforce/_ess_navigation.html
   result: 5 RESOLVED; No remaining attributable regression.
   validation: 26 shared/localization/reference SimpleTestCase checks PASS. Authenticated Projects/Equipment/Warehouses/Custody
     detail affordances, Safety/Quality badges and dedicated own-data ESS desktop/mobile observed; no identity inferred.
@@ -6172,13 +6172,13 @@ execution_history:
   touch_set:
   - apps/accounts/static/js/erp_context.js
   - apps/organizations/forms.py
-  - templates/estimates/create.html
-  - templates/materials/governance.html
-  - templates/organizations/member_authorization.html
-  - templates/organizations/members.html
-  - templates/parties/_surface_navigation.html
-  - templates/parties/governance_list.html
-  - templates/workforce/foundation.html
+  - apps/estimates/templates/estimates/create.html
+  - apps/materials/templates/materials/governance.html
+  - apps/organizations/templates/organizations/member_authorization.html
+  - apps/organizations/templates/organizations/members.html
+  - apps/parties/templates/parties/_surface_navigation.html
+  - apps/parties/templates/parties/governance_list.html
+  - apps/workforce/templates/workforce/foundation.html
   result: 5 RESOLVED; No remaining attributable regression.
   validation: Authenticated party/material/workforce/estimate/member authorization screens verified. Member forms
     retain required independent approver/reason/validity fields. Shared focused tests and template compilation PASS;
@@ -6210,7 +6210,7 @@ execution_history:
   - apps/treasury/templates/treasury/workbench.html
   - apps/treasury/test_cep060_workspace.py
   - apps/treasury/views.py
-  - templates/equipment/operations_workbench.html
+  - apps/equipment/templates/equipment/operations_workbench.html
   result: 10 RESOLVED; No remaining attributable regression.
   validation: Authenticated populated maintenance, Fixed Assets, obligations, Treasury movement/journal 17 and Accounting
     reconciliation verified. Native disclosures opened without submitting financial operations. Mobile layout checked;
@@ -6233,10 +6233,10 @@ execution_history:
   - apps/reporting/templates/reporting/_read_model_card.html
   - apps/reporting/test_p10_s02_s06.py
   - apps/reporting/test_p10_s07_s13.py
-  - templates/equipment/cost_workbench.html
+  - apps/equipment/templates/equipment/cost_workbench.html
   - templates/home.html
-  - templates/reporting/dashboard.html
-  - templates/reporting/reconciliation_workbench.html
+  - apps/reporting/templates/reporting/dashboard.html
+  - apps/reporting/templates/reporting/reconciliation_workbench.html
   result: 5 RESOLVED; No remaining attributable regression.
   validation: Authenticated Reporting specialist verified available/incomplete metric cards and reconciliation sources/readiness.
     Existing Owner verified Home, partner qualification and equipment cost UI. Desktop/mobile no page overflow;
@@ -6251,7 +6251,7 @@ execution_history:
   touch_set:
   - apps/payroll/test_p7_s23_s28_statutory_payroll.py
   - core/test_cep003_localization_accessibility.py
-  - templates/payroll/statutory_workbench.html
+  - apps/payroll/templates/payroll/statutory_workbench.html
   result: 1 RESOLVED; No remaining attributable regression.
   validation: Authenticated statutory workspace verified with explicit unavailable current prerequisites, without
     calculation/output/submission. Focused populated correction-row rendering and statutory permission/tenant/RTL
@@ -6275,8 +6275,8 @@ execution_history:
   - apps/knowledge/views.py
   - apps/procurement/forms.py
   - core/test_cep003_localization_accessibility.py
-  - templates/audit/log.html
-  - templates/procurement/sealed_evidence_custody.html
+  - apps/audit/templates/audit/log.html
+  - apps/procurement/templates/procurement/sealed_evidence_custody.html
   result: 2 RESOLVED; F076/F104 remain DEFERRED_NON_UAT_BLOCKING with explicit contract limitations.
   validation: Authenticated custodian sealed form verified hidden retry key, optional collapsed hash, keyboard expansion
     and mobile layout; no upload performed. Opening year changes retain only their own periods and clear stale selection.
@@ -6308,7 +6308,7 @@ execution_history:
   limitations: "No new fixture, permission broadening, impersonation or business record was used to fill browser coverage. Unavailable live branches remain unverified in this browser session; this does not change existing permissions or prior closure evidence."
   blockers: []
   git_writes: "NOT EXECUTED"
-  touch_set: ["templates/timekeeping/form.html", "templates/payroll/form.html", "templates/procurement/form.html", "apps/accounting/templates/accounting/form.html", "apps/billing/templates/billing/payable_form.html", "apps/billing/templates/billing/commercial_form.html", "apps/treasury/templates/treasury/operation_form.html", "templates/reporting/project_closeout_detail.html", "templates/materials/material_list.html", "templates/parties/detail.html", "apps/accounting/templates/accounting/journal_list.html", "templates/payroll/payslip.html", "templates/workforce/certificate_detail.html", "templates/workforce/personal_change_detail.html", "templates/payroll/ess_inquiry_detail.html", "templates/workforce/personal_change_requests.html", "templates/workforce/employment_history.html", "templates/workforce/ess_profile.html", "templates/workforce/certificate_form.html", "templates/workforce/personal_change_form.html", "templates/payroll/ess_inquiry_form.html", "templates/parties/list.html", "templates/parties/governance_detail.html", "templates/workflows/manager_workspace.html", "templates/workflows/my_requests.html", "apps/workforce/templates/workforce/ess_timekeeping_form.html", "templates/contracts/commercial_review.html", "templates/home.html", "apps/fixed_assets/templates/fixed_assets/workbench.html", "apps/reporting/templates/reporting/_read_model_card.html", "apps/accounts/templatetags/ui_actions.py", "apps/workforce/test_cep022.py", "apps/workforce/test_cep056.py", "apps/payroll/test_cep054.py", "docs/governance/uiux/UIUX_FINDING_CLOSURE_MASTER.yaml"]
+  touch_set: ["apps/timekeeping/templates/timekeeping/form.html", "apps/payroll/templates/payroll/form.html", "apps/procurement/templates/procurement/form.html", "apps/accounting/templates/accounting/form.html", "apps/billing/templates/billing/payable_form.html", "apps/billing/templates/billing/commercial_form.html", "apps/treasury/templates/treasury/operation_form.html", "apps/reporting/templates/reporting/project_closeout_detail.html", "apps/materials/templates/materials/material_list.html", "apps/parties/templates/parties/detail.html", "apps/accounting/templates/accounting/journal_list.html", "apps/payroll/templates/payroll/payslip.html", "apps/workforce/templates/workforce/certificate_detail.html", "apps/workforce/templates/workforce/personal_change_detail.html", "apps/payroll/templates/payroll/ess_inquiry_detail.html", "apps/workforce/templates/workforce/personal_change_requests.html", "apps/workforce/templates/workforce/employment_history.html", "apps/workforce/templates/workforce/ess_profile.html", "apps/workforce/templates/workforce/certificate_form.html", "apps/workforce/templates/workforce/personal_change_form.html", "apps/payroll/templates/payroll/ess_inquiry_form.html", "apps/parties/templates/parties/list.html", "apps/parties/templates/parties/governance_detail.html", "apps/workflows/templates/workflows/manager_workspace.html", "apps/workflows/templates/workflows/my_requests.html", "apps/workforce/templates/workforce/ess_timekeeping_form.html", "apps/contracts/templates/contracts/commercial_review.html", "templates/home.html", "apps/fixed_assets/templates/fixed_assets/workbench.html", "apps/reporting/templates/reporting/_read_model_card.html", "apps/accounts/templatetags/ui_actions.py", "apps/workforce/test_cep022.py", "apps/workforce/test_cep056.py", "apps/payroll/test_cep054.py", "docs/governance/uiux/UIUX_FINDING_CLOSURE_MASTER.yaml"]
 
 - batch: LIST-DETAIL-CONFORMANCE-20261026
   date: '2026-10-26'
@@ -6422,7 +6422,7 @@ execution_history:
     collections: bank and GL reconciliation runs (account Detail fixed separately)
   - template: apps/workforce/templates/workforce/ess_timekeeping_detail.html
     collections: mission routing evidence and timesheet entries
-  - template: templates/accounts/connection_requests.html
+  - template: apps/accounts/templates/accounts/connection_requests.html
     collections: connection requests
   - template: templates/admin/accounts/user/change_form.html
     collections: membership rows and account audit events
@@ -6434,166 +6434,166 @@ execution_history:
     collections: Admin log entries and native change-form destinations
   - template: templates/admin/object_history.html
     collections: Admin history events
-  - template: templates/audit/log.html
+  - template: apps/audit/templates/audit/log.html
     collections: audit events (no governed entity/source URL contract)
-  - template: templates/compliance/assurance.html
+  - template: apps/compliance/templates/compliance/assurance.html
     collections: compliance reconciliation exception rows
-  - template: templates/compliance/detail.html
+  - template: apps/compliance/templates/compliance/detail.html
     collections: compliance lifecycle events
-  - template: templates/compliance/workbench.html
+  - template: apps/compliance/templates/compliance/workbench.html
     collections: inspection template cards
-  - template: templates/contracts/contractual_record_detail.html
+  - template: apps/contracts/templates/contracts/contractual_record_detail.html
     collections: contractual evidence associations
-  - template: templates/contracts/detail.html
+  - template: apps/contracts/templates/contracts/detail.html
     collections: term versions and contract items
-  - template: templates/daily_reports/detail.html
+  - template: apps/daily_reports/templates/daily_reports/detail.html
     collections: daily labor, equipment, material, activity and delay entries
-  - template: templates/daily_reports/field_observation_detail.html
+  - template: apps/daily_reports/templates/daily_reports/field_observation_detail.html
     collections: observation transitions, evidence links and proposals
-  - template: templates/documents/detail.html
+  - template: apps/documents/templates/documents/detail.html
     collections: document versions, source links, retention applications and legal holds
-  - template: templates/documents/employee_detail.html
+  - template: apps/documents/templates/documents/employee_detail.html
     collections: own-document source links and version metadata (download is not Detail)
-  - template: templates/documents/list.html
+  - template: apps/documents/templates/documents/list.html
     collections: document source-reference chips (document Detail exists)
-  - template: templates/equipment/assignment_list.html
+  - template: apps/equipment/templates/equipment/assignment_list.html
     collections: equipment assignments (equipment Detail is a related source)
-  - template: templates/equipment/cost_workbench.html
+  - template: apps/equipment/templates/equipment/cost_workbench.html
     collections: equipment cost policies, allocations and handoffs
-  - template: templates/equipment/detail.html
+  - template: apps/equipment/templates/equipment/detail.html
     collections: equipment assignments and maintenance rows
-  - template: templates/equipment/maintenance_list.html
+  - template: apps/equipment/templates/equipment/maintenance_list.html
     collections: maintenance records (status form is not Detail)
-  - template: templates/equipment/operations_workbench.html
+  - template: apps/equipment/templates/equipment/operations_workbench.html
     collections: maintenance work orders (transition/evidence forms are not Detail)
-  - template: templates/estimates/detail.html
+  - template: apps/estimates/templates/estimates/detail.html
     collections: estimate revision items
-  - template: templates/expenses/detail.html
+  - template: apps/expenses/templates/expenses/detail.html
     collections: expense allocations and budget assessments
-  - template: templates/expenses/recurrences.html
+  - template: apps/expenses/templates/expenses/recurrences.html
     collections: recurrence templates and occurrences
-  - template: templates/inventory/count_detail.html
+  - template: apps/inventory/templates/inventory/count_detail.html
     collections: inventory count lines
-  - template: templates/inventory/custody_workbench.html
+  - template: apps/inventory/templates/inventory/custody_workbench.html
     collections: reservations and expiry-lot rows (count and transfer Detail already exist)
-  - template: templates/inventory/transfer_detail.html
+  - template: apps/inventory/templates/inventory/transfer_detail.html
     collections: transfer lines
-  - template: templates/inventory/valuation_workbench.html
+  - template: apps/inventory/templates/inventory/valuation_workbench.html
     collections: valuation pools, events and handoff evidence
-  - template: templates/materials/governance.html
+  - template: apps/materials/templates/materials/governance.html
     collections: aliases, relationships, approvals, attribute values/definitions and unit families
-  - template: templates/materials/unit_list.html
+  - template: apps/materials/templates/materials/unit_list.html
     collections: measurement units
-  - template: templates/organizations/member_authorization.html
+  - template: apps/organizations/templates/organizations/member_authorization.html
     collections: role assignments and scope grants
-  - template: templates/organizations/members.html
+  - template: apps/organizations/templates/organizations/members.html
     collections: members (member_update is Edit; relabeled explicitly)
-  - template: templates/organizations/platform_policy_catalog.html
+  - template: apps/organizations/templates/organizations/platform_policy_catalog.html
     collections: platform policy/classification/source/version records
-  - template: templates/organizations/protected_operation_catalog.html
+  - template: apps/organizations/templates/organizations/protected_operation_catalog.html
     collections: protected-operation catalogue versions
-  - template: templates/organizations/role_catalog.html
+  - template: apps/organizations/templates/organizations/role_catalog.html
     collections: role definitions (Edit exists)
-  - template: templates/organizations/select.html
+  - template: apps/organizations/templates/organizations/select.html
     collections: organization cards (switch is not Detail)
-  - template: templates/organizations/tenant_policy_configuration.html
+  - template: apps/organizations/templates/organizations/tenant_policy_configuration.html
     collections: tenant policy selection history and future-version rows
-  - template: templates/parties/detail.html
+  - template: apps/parties/templates/parties/detail.html
     collections: party roles and contacts
-  - template: templates/parties/governance_detail.html
+  - template: apps/parties/templates/parties/governance_detail.html
     collections: party identity history, aliases, classifications, representatives, restrictions, roles and contacts
-  - template: templates/payroll/audit_history.html
+  - template: apps/payroll/templates/payroll/audit_history.html
     collections: payroll audit events
-  - template: templates/payroll/configuration.html
+  - template: apps/payroll/templates/payroll/configuration.html
     collections: employment pay configurations, components and rule versions
-  - template: templates/payroll/ess_inquiry_detail.html
+  - template: apps/payroll/templates/payroll/ess_inquiry_detail.html
     collections: inquiry responses and attachment versions (only authorized download supplied)
-  - template: templates/payroll/financial_handoff_detail.html
+  - template: apps/payroll/templates/payroll/financial_handoff_detail.html
     collections: handoff lines and reconciliation evidence
-  - template: templates/payroll/payslip.html
+  - template: apps/payroll/templates/payroll/payslip.html
     collections: payslip lines
-  - template: templates/payroll/run_detail.html
+  - template: apps/payroll/templates/payroll/run_detail.html
     collections: run employee results, exceptions and result lines (payslip Detail is separate)
-  - template: templates/payroll/statutory_policies.html
+  - template: apps/payroll/templates/payroll/statutory_policies.html
     collections: statutory policies and versions
-  - template: templates/payroll/statutory_workbench.html
+  - template: apps/payroll/templates/payroll/statutory_workbench.html
     collections: statutory calculations, outputs and export evidence
-  - template: templates/payroll/workbench.html
+  - template: apps/payroll/templates/payroll/workbench.html
     collections: run exceptions and employee results (run Detail is a related source)
-  - template: templates/procurement/order_detail.html
+  - template: apps/procurement/templates/procurement/order_detail.html
     collections: order items
-  - template: templates/procurement/portal_context.html
+  - template: apps/procurement/templates/procurement/portal_context.html
     collections: supplier portal RFQ lines
-  - template: templates/procurement/portal_invitation_manage.html
+  - template: apps/procurement/templates/procurement/portal_invitation_manage.html
     collections: portal invitation and grant history
-  - template: templates/procurement/receipt_detail.html
+  - template: apps/procurement/templates/procurement/receipt_detail.html
     collections: receipt items
-  - template: templates/procurement/request_detail.html
+  - template: apps/procurement/templates/procurement/request_detail.html
     collections: purchase request items
-  - template: templates/procurement/rfq_buyer_workspace.html
+  - template: apps/procurement/templates/procurement/rfq_buyer_workspace.html
     collections: commercial comparisons/inputs, award preparations/decisions and allocations
-  - template: templates/procurement/rfq_detail.html
+  - template: apps/procurement/templates/procurement/rfq_detail.html
     collections: RFQ lines/versions/invitations, quote revisions, comparisons and awards; custody is an operation
-  - template: templates/projects/all_site_list.html
+  - template: apps/projects/templates/projects/all_site_list.html
     collections: sites (project site List is not site Detail)
-  - template: templates/projects/control_comparison.html
+  - template: apps/projects/templates/projects/control_comparison.html
     collections: budget comparison rows (no governed per-row drillthrough)
-  - template: templates/projects/control_exceptions.html
+  - template: apps/projects/templates/projects/control_exceptions.html
     collections: budget assessments and project register items
-  - template: templates/projects/controls.html
+  - template: apps/projects/templates/projects/controls.html
     collections: WBS nodes and project activities
-  - template: templates/projects/cost_reconciliation.html
+  - template: apps/projects/templates/projects/cost_reconciliation.html
     collections: cost reconciliation/source-fact/exclusion rows (no approved source navigation contract)
-  - template: templates/projects/detail.html
+  - template: apps/projects/templates/projects/detail.html
     collections: project cost facts (no approved per-fact Detail)
-  - template: templates/projects/site_list.html
+  - template: apps/projects/templates/projects/site_list.html
     collections: sites (phase List is separate navigation)
-  - template: templates/reporting/dashboard.html
+  - template: apps/reporting/templates/reporting/dashboard.html
     collections: metric definition catalogue (result drillthrough is a different entity)
-  - template: templates/reporting/drillthrough.html
+  - template: apps/reporting/templates/reporting/drillthrough.html
     collections: manifest source facts and versions (no governed per-source URL contract)
-  - template: templates/reporting/project_closeout_detail.html
+  - template: apps/reporting/templates/reporting/project_closeout_detail.html
     collections: closeout checklist snapshots and coordination events
-  - template: templates/reporting/reconciliation_detail.html
+  - template: apps/reporting/templates/reporting/reconciliation_detail.html
     collections: side snapshots, exceptions and exception events
-  - template: templates/reporting/reconciliation_workbench.html
+  - template: apps/reporting/templates/reporting/reconciliation_workbench.html
     collections: reconciliation pair definitions (run Detail fixed separately)
-  - template: templates/timekeeping/timesheet_detail.html
+  - template: apps/timekeeping/templates/timekeeping/timesheet_detail.html
     collections: timesheet entries
-  - template: templates/timekeeping/workbench.html
+  - template: apps/timekeeping/templates/timekeeping/workbench.html
     collections: work calendars, attendance, corrections, leave/mission and overtime (back-office Detail absent; own
       ESS route must not be substituted)
-  - template: templates/workflows/_work_item_row.html
+  - template: apps/workflows/templates/workflows/_work_item_row.html
     collections: equipment.maintenance_record source adapter resolves to a status form
-  - template: templates/workflows/_work_item_table.html
+  - template: apps/workflows/templates/workflows/_work_item_table.html
     collections: work-item table includes maintenance source rows without Detail
-  - template: templates/workflows/administration/detail.html
+  - template: apps/workflows/templates/workflows/administration/detail.html
     collections: workflow step and transition configuration rows
-  - template: templates/workflows/manager_workspace.html
+  - template: apps/workflows/templates/workflows/manager_workspace.html
     collections: manager source URLs are Timekeeping list fragments, not Detail
-  - template: templates/workflows/my_requests.html
+  - template: apps/workflows/templates/workflows/my_requests.html
     collections: legacy non-ESS Timekeeping source URLs are list fragments
-  - template: templates/workflows/workbench.html
+  - template: apps/workflows/templates/workflows/workbench.html
     collections: workbench includes maintenance source rows without Detail
-  - template: templates/workforce/_department_tree.html
+  - template: apps/workforce/templates/workforce/_department_tree.html
     collections: work teams in department tree
-  - template: templates/workforce/assignment_list.html
+  - template: apps/workforce/templates/workforce/assignment_list.html
     collections: project workforce assignments
-  - template: templates/workforce/department_detail.html
+  - template: apps/workforce/templates/workforce/department_detail.html
     collections: department work-team rows
-  - template: templates/workforce/employee_detail.html
+  - template: apps/workforce/templates/workforce/employee_detail.html
     collections: position/project assignments, qualifications, training, performance and labor-rate versions
-  - template: templates/workforce/employment_history.html
+  - template: apps/workforce/templates/workforce/employment_history.html
     collections: employment record versions (download is not Detail)
-  - template: templates/workforce/employment_manage.html
+  - template: apps/workforce/templates/workforce/employment_manage.html
     collections: employment records (manage/create surface only)
-  - template: templates/workforce/foundation.html
+  - template: apps/workforce/templates/workforce/foundation.html
     collections: skills, competencies and training requirements
-  - template: templates/workforce/own_evidence.html
+  - template: apps/workforce/templates/workforce/own_evidence.html
     collections: own qualifications, training and assignments
-  - template: templates/workforce/position_detail.html
+  - template: apps/workforce/templates/workforce/position_detail.html
     collections: position assignments (employee Detail is a related source)
-  - template: templates/workforce/work_team_list.html
+  - template: apps/workforce/templates/workforce/work_team_list.html
     collections: work teams
   - template: apps/accounting/templates/accounting/account_list.html
     collections: account-tree wrapper; no per-account Detail
@@ -6610,38 +6610,38 @@ execution_history:
   - apps/treasury/templates/treasury/statement_workbench.html
   - apps/treasury/templates/treasury/workbench.html
   - apps/workforce/templates/workforce/ess_timekeeping.html
-  - templates/compliance/_table.html
+  - apps/compliance/templates/compliance/_table.html
   - templates/components/record_detail_link.html
-  - templates/contracts/contractual_record_list.html
+  - apps/contracts/templates/contracts/contractual_record_list.html
   - templates/core/global_search.html
-  - templates/daily_reports/list.html
-  - templates/documents/list.html
-  - templates/equipment/list.html
-  - templates/estimates/list.html
-  - templates/inventory/warehouse_detail.html
-  - templates/inventory/warehouse_list.html
-  - templates/materials/material_list.html
-  - templates/organizations/members.html
-  - templates/parties/governance_list.html
-  - templates/parties/list.html
-  - templates/payroll/ess_history.html
-  - templates/payroll/run_detail.html
-  - templates/procurement/request_list.html
-  - templates/procurement/rfq_list.html
-  - templates/projects/all_site_list.html
-  - templates/projects/gallery.html
-  - templates/reporting/reconciliation_workbench.html
-  - templates/workflows/_work_item_row.html
-  - templates/workflows/manager_workspace.html
-  - templates/workflows/my_requests.html
-  - templates/workforce/_department_tree.html
-  - templates/workforce/_organization_chart_details.html
-  - templates/workforce/_organization_chart_node.html
-  - templates/workforce/employee_detail.html
-  - templates/workforce/employee_list.html
-  - templates/workforce/ess_dashboard.html
-  - templates/workforce/ess_profile.html
-  - templates/workforce/personal_change_requests.html
+  - apps/daily_reports/templates/daily_reports/list.html
+  - apps/documents/templates/documents/list.html
+  - apps/equipment/templates/equipment/list.html
+  - apps/estimates/templates/estimates/list.html
+  - apps/inventory/templates/inventory/warehouse_detail.html
+  - apps/inventory/templates/inventory/warehouse_list.html
+  - apps/materials/templates/materials/material_list.html
+  - apps/organizations/templates/organizations/members.html
+  - apps/parties/templates/parties/governance_list.html
+  - apps/parties/templates/parties/list.html
+  - apps/payroll/templates/payroll/ess_history.html
+  - apps/payroll/templates/payroll/run_detail.html
+  - apps/procurement/templates/procurement/request_list.html
+  - apps/procurement/templates/procurement/rfq_list.html
+  - apps/projects/templates/projects/all_site_list.html
+  - apps/projects/templates/projects/gallery.html
+  - apps/reporting/templates/reporting/reconciliation_workbench.html
+  - apps/workflows/templates/workflows/_work_item_row.html
+  - apps/workflows/templates/workflows/manager_workspace.html
+  - apps/workflows/templates/workflows/my_requests.html
+  - apps/workforce/templates/workforce/_department_tree.html
+  - apps/workforce/templates/workforce/_organization_chart_details.html
+  - apps/workforce/templates/workforce/_organization_chart_node.html
+  - apps/workforce/templates/workforce/employee_detail.html
+  - apps/workforce/templates/workforce/employee_list.html
+  - apps/workforce/templates/workforce/ess_dashboard.html
+  - apps/workforce/templates/workforce/ess_profile.html
+  - apps/workforce/templates/workforce/personal_change_requests.html
   boundaries: 135 Finding records and summary counts unchanged. No full audit, full regression, evidence pack, new backlog
     file, production action, business/workflow/authorization/schema/accounting-semantics change or Git write.
   git_writes: NOT EXECUTED
@@ -6878,7 +6878,7 @@ execution_history:
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 29
-    template: templates/accounts/connection_requests.html
+    template: apps/accounts/templates/accounts/connection_requests.html
     collections: connection requests
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
@@ -6914,22 +6914,22 @@ execution_history:
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 35
-    template: templates/audit/log.html
+    template: apps/audit/templates/audit/log.html
     collections: audit events (no governed entity/source URL contract)
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 36
-    template: templates/compliance/assurance.html
+    template: apps/compliance/templates/compliance/assurance.html
     collections: compliance reconciliation exception rows
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 37
-    template: templates/compliance/detail.html
+    template: apps/compliance/templates/compliance/detail.html
     collections: compliance lifecycle events
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 38
-    template: templates/compliance/workbench.html
+    template: apps/compliance/templates/compliance/workbench.html
     collections: inspection template cards
     classification: DETAIL_REQUIRED
     result: IMPLEMENTED
@@ -6937,103 +6937,103 @@ execution_history:
       from Publish.
     canonical_route: compliance:template_detail
   - inventory_item: 39
-    template: templates/contracts/contractual_record_detail.html
+    template: apps/contracts/templates/contracts/contractual_record_detail.html
     collections: contractual evidence associations
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 40
-    template: templates/contracts/detail.html
+    template: apps/contracts/templates/contracts/detail.html
     collections: term versions and contract items
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 41
-    template: templates/daily_reports/detail.html
+    template: apps/daily_reports/templates/daily_reports/detail.html
     collections: daily labor, equipment, material, activity and delay entries
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 42
-    template: templates/daily_reports/field_observation_detail.html
+    template: apps/daily_reports/templates/daily_reports/field_observation_detail.html
     collections: observation transitions, evidence links and proposals
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 43
-    template: templates/documents/detail.html
+    template: apps/documents/templates/documents/detail.html
     collections: document versions, source links, retention applications and legal holds
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 44
-    template: templates/documents/employee_detail.html
+    template: apps/documents/templates/documents/employee_detail.html
     collections: own-document source links and version metadata (download is not Detail)
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 45
-    template: templates/documents/list.html
+    template: apps/documents/templates/documents/list.html
     collections: document source-reference chips (document Detail exists)
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 46
-    template: templates/equipment/assignment_list.html
+    template: apps/equipment/templates/equipment/assignment_list.html
     collections: equipment assignments (equipment Detail is a related source)
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 47
-    template: templates/equipment/cost_workbench.html
+    template: apps/equipment/templates/equipment/cost_workbench.html
     collections: equipment cost policies, allocations and handoffs
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 48
-    template: templates/equipment/detail.html
+    template: apps/equipment/templates/equipment/detail.html
     collections: equipment assignments and maintenance rows
     classification: CANONICAL_SOURCE_NAVIGATION
     result: IMPLEMENTED
     reason: Maintenance rows link to their authoritative maintenance source; assignments remain owned child records.
     canonical_route: equipment:maintenance_detail
   - inventory_item: 49
-    template: templates/equipment/maintenance_list.html
+    template: apps/equipment/templates/equipment/maintenance_list.html
     collections: maintenance records (status form is not Detail)
     classification: DETAIL_REQUIRED
     result: IMPLEMENTED
     reason: Independently numbered maintenance record; no use of its status-transition form as Detail.
     canonical_route: equipment:maintenance_detail
   - inventory_item: 50
-    template: templates/equipment/operations_workbench.html
+    template: apps/equipment/templates/equipment/operations_workbench.html
     collections: maintenance work orders (transition/evidence forms are not Detail)
     classification: DETAIL_REQUIRED
     result: IMPLEMENTED
     reason: Independently numbered operational work order; no use of evidence/upload/transition forms as Detail.
     canonical_route: equipment:work_order_detail
   - inventory_item: 51
-    template: templates/estimates/detail.html
+    template: apps/estimates/templates/estimates/detail.html
     collections: estimate revision items
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 52
-    template: templates/expenses/detail.html
+    template: apps/expenses/templates/expenses/detail.html
     collections: expense allocations and budget assessments
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 53
-    template: templates/expenses/recurrences.html
+    template: apps/expenses/templates/expenses/recurrences.html
     collections: recurrence templates and occurrences
     classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 54
-    template: templates/inventory/count_detail.html
+    template: apps/inventory/templates/inventory/count_detail.html
     collections: inventory count lines
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 55
-    template: templates/inventory/custody_workbench.html
+    template: apps/inventory/templates/inventory/custody_workbench.html
     collections: reservations and expiry-lot rows (count and transfer Detail already exist)
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 56
-    template: templates/inventory/transfer_detail.html
+    template: apps/inventory/templates/inventory/transfer_detail.html
     collections: transfer lines
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 57
-    template: templates/inventory/valuation_workbench.html
+    template: apps/inventory/templates/inventory/valuation_workbench.html
     collections: valuation pools, events and handoff evidence
     classification: CANONICAL_SOURCE_NAVIGATION
     result: IMPLEMENTED
@@ -7041,22 +7041,22 @@ execution_history:
       exists. Pools/envelopes remain projections.
     canonical_route: inventory:transaction_detail
   - inventory_item: 58
-    template: templates/materials/governance.html
+    template: apps/materials/templates/materials/governance.html
     collections: aliases, relationships, approvals, attribute values/definitions and unit families
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 59
-    template: templates/materials/unit_list.html
+    template: apps/materials/templates/materials/unit_list.html
     collections: measurement units
     classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 60
-    template: templates/organizations/member_authorization.html
+    template: apps/organizations/templates/organizations/member_authorization.html
     collections: role assignments and scope grants
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 61
-    template: templates/organizations/members.html
+    template: apps/organizations/templates/organizations/members.html
     collections: members (member_update is Edit; relabeled explicitly)
     classification: DETAIL_REQUIRED
     result: IMPLEMENTED
@@ -7064,134 +7064,134 @@ execution_history:
       list; management remains separate.
     canonical_route: organizations:member_detail
   - inventory_item: 62
-    template: templates/organizations/platform_policy_catalog.html
+    template: apps/organizations/templates/organizations/platform_policy_catalog.html
     collections: platform policy/classification/source/version records
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 63
-    template: templates/organizations/protected_operation_catalog.html
+    template: apps/organizations/templates/organizations/protected_operation_catalog.html
     collections: protected-operation catalogue versions
     classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 64
-    template: templates/organizations/role_catalog.html
+    template: apps/organizations/templates/organizations/role_catalog.html
     collections: role definitions (Edit exists)
     classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 65
-    template: templates/organizations/select.html
+    template: apps/organizations/templates/organizations/select.html
     collections: organization cards (switch is not Detail)
     classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 66
-    template: templates/organizations/tenant_policy_configuration.html
+    template: apps/organizations/templates/organizations/tenant_policy_configuration.html
     collections: tenant policy selection history and future-version rows
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 67
-    template: templates/parties/detail.html
+    template: apps/parties/templates/parties/detail.html
     collections: party roles and contacts
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 68
-    template: templates/parties/governance_detail.html
+    template: apps/parties/templates/parties/governance_detail.html
     collections: party identity history, aliases, classifications, representatives, restrictions, roles and contacts
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 69
-    template: templates/payroll/audit_history.html
+    template: apps/payroll/templates/payroll/audit_history.html
     collections: payroll audit events
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 70
-    template: templates/payroll/configuration.html
+    template: apps/payroll/templates/payroll/configuration.html
     collections: employment pay configurations, components and rule versions
     classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 71
-    template: templates/payroll/ess_inquiry_detail.html
+    template: apps/payroll/templates/payroll/ess_inquiry_detail.html
     collections: inquiry responses and attachment versions (only authorized download supplied)
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 72
-    template: templates/payroll/financial_handoff_detail.html
+    template: apps/payroll/templates/payroll/financial_handoff_detail.html
     collections: handoff lines and reconciliation evidence
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 73
-    template: templates/payroll/payslip.html
+    template: apps/payroll/templates/payroll/payslip.html
     collections: payslip lines
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 74
-    template: templates/payroll/run_detail.html
+    template: apps/payroll/templates/payroll/run_detail.html
     collections: run employee results, exceptions and result lines (payslip Detail is separate)
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 75
-    template: templates/payroll/statutory_policies.html
+    template: apps/payroll/templates/payroll/statutory_policies.html
     collections: statutory policies and versions
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 76
-    template: templates/payroll/statutory_workbench.html
+    template: apps/payroll/templates/payroll/statutory_workbench.html
     collections: statutory calculations, outputs and export evidence
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 77
-    template: templates/payroll/workbench.html
+    template: apps/payroll/templates/payroll/workbench.html
     collections: run exceptions and employee results (run Detail is a related source)
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 78
-    template: templates/procurement/order_detail.html
+    template: apps/procurement/templates/procurement/order_detail.html
     collections: order items
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 79
-    template: templates/procurement/portal_context.html
+    template: apps/procurement/templates/procurement/portal_context.html
     collections: supplier portal RFQ lines
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 80
-    template: templates/procurement/portal_invitation_manage.html
+    template: apps/procurement/templates/procurement/portal_invitation_manage.html
     collections: portal invitation and grant history
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 81
-    template: templates/procurement/receipt_detail.html
+    template: apps/procurement/templates/procurement/receipt_detail.html
     collections: receipt items
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 82
-    template: templates/procurement/request_detail.html
+    template: apps/procurement/templates/procurement/request_detail.html
     collections: purchase request items
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 83
-    template: templates/procurement/rfq_buyer_workspace.html
+    template: apps/procurement/templates/procurement/rfq_buyer_workspace.html
     collections: commercial comparisons/inputs, award preparations/decisions and allocations
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 84
-    template: templates/procurement/rfq_detail.html
+    template: apps/procurement/templates/procurement/rfq_detail.html
     collections: RFQ lines/versions/invitations, quote revisions, comparisons and awards; custody is an operation
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 85
-    template: templates/projects/all_site_list.html
+    template: apps/projects/templates/projects/all_site_list.html
     collections: sites (project site List is not site Detail)
     classification: DETAIL_REQUIRED
     result: IMPLEMENTED
     reason: Site has its own code, name and project scope. New read Detail reuses the existing site selector.
     canonical_route: projects:site_detail
   - inventory_item: 86
-    template: templates/projects/control_comparison.html
+    template: apps/projects/templates/projects/control_comparison.html
     collections: budget comparison rows (no governed per-row drillthrough)
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 87
-    template: templates/projects/control_exceptions.html
+    template: apps/projects/templates/projects/control_exceptions.html
     collections: budget assessments and project register items
     classification: CANONICAL_SOURCE_NAVIGATION
     result: IMPLEMENTED
@@ -7199,59 +7199,59 @@ execution_history:
       items stay inline.
     canonical_route: expenses:detail
   - inventory_item: 88
-    template: templates/projects/controls.html
+    template: apps/projects/templates/projects/controls.html
     collections: WBS nodes and project activities
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 89
-    template: templates/projects/cost_reconciliation.html
+    template: apps/projects/templates/projects/cost_reconciliation.html
     collections: cost reconciliation/source-fact/exclusion rows (no approved source navigation contract)
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 90
-    template: templates/projects/detail.html
+    template: apps/projects/templates/projects/detail.html
     collections: project cost facts (no approved per-fact Detail)
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 91
-    template: templates/projects/site_list.html
+    template: apps/projects/templates/projects/site_list.html
     collections: sites (phase List is separate navigation)
     classification: DETAIL_REQUIRED
     result: IMPLEMENTED
     reason: Project-site list shares the same site Detail; phase navigation remains a separate list operation.
     canonical_route: projects:site_detail
   - inventory_item: 92
-    template: templates/reporting/dashboard.html
+    template: apps/reporting/templates/reporting/dashboard.html
     collections: metric definition catalogue (result drillthrough is a different entity)
     classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 93
-    template: templates/reporting/drillthrough.html
+    template: apps/reporting/templates/reporting/drillthrough.html
     collections: manifest source facts and versions (no governed per-source URL contract)
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 94
-    template: templates/reporting/project_closeout_detail.html
+    template: apps/reporting/templates/reporting/project_closeout_detail.html
     collections: closeout checklist snapshots and coordination events
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 95
-    template: templates/reporting/reconciliation_detail.html
+    template: apps/reporting/templates/reporting/reconciliation_detail.html
     collections: side snapshots, exceptions and exception events
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 96
-    template: templates/reporting/reconciliation_workbench.html
+    template: apps/reporting/templates/reporting/reconciliation_workbench.html
     collections: reconciliation pair definitions (run Detail fixed separately)
     classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 97
-    template: templates/timekeeping/timesheet_detail.html
+    template: apps/timekeeping/templates/timekeeping/timesheet_detail.html
     collections: timesheet entries
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 98
-    template: templates/timekeeping/workbench.html
+    template: apps/timekeeping/templates/timekeeping/workbench.html
     collections: work calendars, attendance, corrections, leave/mission and overtime (back-office Detail absent; own
       ESS route must not be substituted)
     classification: DETAIL_REQUIRED
@@ -7260,7 +7260,7 @@ execution_history:
       view/object scope; never substitute own-identity ESS endpoints. Calendars remain descriptive masters.
     canonical_route: timekeeping:record_detail
   - inventory_item: 99
-    template: templates/workflows/_work_item_row.html
+    template: apps/workflows/templates/workflows/_work_item_row.html
     collections: equipment.maintenance_record source adapter resolves to a status form
     classification: CANONICAL_SOURCE_NAVIGATION
     result: IMPLEMENTED
@@ -7268,19 +7268,19 @@ execution_history:
       semantics changed.
     canonical_route: equipment:maintenance_detail
   - inventory_item: 100
-    template: templates/workflows/_work_item_table.html
+    template: apps/workflows/templates/workflows/_work_item_table.html
     collections: work-item table includes maintenance source rows without Detail
     classification: CANONICAL_SOURCE_NAVIGATION
     result: IMPLEMENTED
     reason: Shared work-item row propagates the canonical subject source to this table wrapper.
     canonical_route: equipment:maintenance_detail
   - inventory_item: 101
-    template: templates/workflows/administration/detail.html
+    template: apps/workflows/templates/workflows/administration/detail.html
     collections: workflow step and transition configuration rows
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 102
-    template: templates/workflows/manager_workspace.html
+    template: apps/workflows/templates/workflows/manager_workspace.html
     collections: manager source URLs are Timekeeping list fragments, not Detail
     classification: CANONICAL_SOURCE_NAVIGATION
     result: IMPLEMENTED
@@ -7288,7 +7288,7 @@ execution_history:
       list fragment or ESS identity substitution.
     canonical_route: timekeeping:record_detail
   - inventory_item: 103
-    template: templates/workflows/my_requests.html
+    template: apps/workflows/templates/workflows/my_requests.html
     collections: legacy non-ESS Timekeeping source URLs are list fragments
     classification: CANONICAL_SOURCE_NAVIGATION
     result: IMPLEMENTED
@@ -7296,59 +7296,59 @@ execution_history:
       routes continue to override as before.
     canonical_route: timekeeping:record_detail
   - inventory_item: 104
-    template: templates/workflows/workbench.html
+    template: apps/workflows/templates/workflows/workbench.html
     collections: workbench includes maintenance source rows without Detail
     classification: CANONICAL_SOURCE_NAVIGATION
     result: IMPLEMENTED
     reason: Shared work-item row propagates the canonical subject source to the workbench wrapper.
     canonical_route: equipment:maintenance_detail
   - inventory_item: 105
-    template: templates/workforce/_department_tree.html
+    template: apps/workforce/templates/workforce/_department_tree.html
     collections: work teams in department tree
     classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 106
-    template: templates/workforce/assignment_list.html
+    template: apps/workforce/templates/workforce/assignment_list.html
     collections: project workforce assignments
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 107
-    template: templates/workforce/department_detail.html
+    template: apps/workforce/templates/workforce/department_detail.html
     collections: department work-team rows
     classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 108
-    template: templates/workforce/employee_detail.html
+    template: apps/workforce/templates/workforce/employee_detail.html
     collections: position/project assignments, qualifications, training, performance and labor-rate versions
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 109
-    template: templates/workforce/employment_history.html
+    template: apps/workforce/templates/workforce/employment_history.html
     collections: employment record versions (download is not Detail)
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 110
-    template: templates/workforce/employment_manage.html
+    template: apps/workforce/templates/workforce/employment_manage.html
     collections: employment records (manage/create surface only)
     classification: HISTORICAL_SNAPSHOT_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 111
-    template: templates/workforce/foundation.html
+    template: apps/workforce/templates/workforce/foundation.html
     collections: skills, competencies and training requirements
     classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 112
-    template: templates/workforce/own_evidence.html
+    template: apps/workforce/templates/workforce/own_evidence.html
     collections: own qualifications, training and assignments
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 113
-    template: templates/workforce/position_detail.html
+    template: apps/workforce/templates/workforce/position_detail.html
     collections: position assignments (employee Detail is a related source)
     classification: INLINE_CHILD_NO_DETAIL
     result: INTENTIONAL_NO_DETAIL
   - inventory_item: 114
-    template: templates/workforce/work_team_list.html
+    template: apps/workforce/templates/workforce/work_team_list.html
     collections: work teams
     classification: SIMPLE_MASTER_NO_DETAIL_REQUIRED
     result: INTENTIONAL_NO_DETAIL

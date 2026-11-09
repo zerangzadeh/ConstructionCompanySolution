@@ -88,13 +88,13 @@ Product:
 - `apps/procurement/rfq_workspace.py`: integrate configuration context, business
   state copy and PR quantity relation loading.
 - `apps/procurement/rfq_ui.py`: business wording for existing preparation errors.
-- `templates/procurement/rfq_detail.html`: coherent local journey and integrated
+- `apps/procurement/templates/procurement/rfq_detail.html`: coherent local journey and integrated
   configuration; issue prerequisites and issued-version framing.
-- `templates/procurement/rfq_configuration.html`: existing-item table, progressive
+- `apps/procurement/templates/procurement/rfq_configuration.html`: existing-item table, progressive
   advanced options, group entry point, contextual guidance and settings history.
-- `templates/procurement/configuration_entries.html`: shared current/historical
+- `apps/procurement/templates/procurement/configuration_entries.html`: shared current/historical
   business projection, including exact saved member quantities and inherited units.
-- `templates/procurement/scope_form.html`: compatible group selection/editing route.
+- `apps/procurement/templates/procurement/scope_form.html`: compatible group selection/editing route.
 - `apps/accounts/static/css/erp_rfq_configuration.css`: scoped responsive geometry
   using existing canonical color tokens and shared controls.
 

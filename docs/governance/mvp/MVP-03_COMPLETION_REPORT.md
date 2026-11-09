@@ -188,7 +188,7 @@ to `main` produced the final 15-scenario PASS without another product change.
 
 Product touch set: `apps/billing/journey_views.py`, `apps/billing/views.py`,
 `apps/contracts/views.py`, `apps/billing/templates/billing/claim_list.html`,
-`templates/contracts/detail.html`. Tests add the two Contract direction modules
+`apps/contracts/templates/contracts/detail.html`. Tests add the two Contract direction modules
 and update one scoped-filter assertion. No model, migration, calculation,
 service/domain workflow, permission or Product Surface policy changed. No
 Development/production business data writes, MVP-04 work, CEP lifecycle change,

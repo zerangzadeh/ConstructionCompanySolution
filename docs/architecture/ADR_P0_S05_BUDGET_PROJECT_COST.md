@@ -15,7 +15,7 @@ No cost producer, schema, permission, workflow or UI is implemented here.
 [Roadmap P0.1/P4.0/P4.1](../../ROADMAP.md) defines the scope;
 [Domain Model](DOMAIN_MODEL.md#2-domain-principles) and
 [Data Model](DATA_MODEL.md#6-transaction-source-of-truth-matrix) define target
-ownership. The [PPC-03 finding](PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md#19-pre-production-correction-register)
+ownership. The [PPC-03 finding](history/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md#19-pre-production-correction-register)
 requires one budget/actual authority before real cost history accumulates.
 Models/migrations remain current schema authority. The evidence below is static,
 not a new passing runtime test or production-data assessment.
@@ -221,7 +221,7 @@ not authorization to remove compatibility fields or silently change existing UI.
    field meaning, source provenance and a reviewed cutoff. Inspect all writers/
    readers before switch, including [Project forms](../../apps/projects/forms.py),
    [views](../../apps/projects/views.py), [Django Admin](../../apps/projects/admin.py),
-   [project detail](../../templates/projects/detail.html), lists and shared field
+   [project detail](../../apps/projects/templates/projects/detail.html), lists and shared field
    labels. These are confirmed consumers, not a complete migration inventory.
    Find seed/import/report/export dependencies in the authorized implementation
    slice; none is assumed absent from this narrow inspection.

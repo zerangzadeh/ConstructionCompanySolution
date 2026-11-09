@@ -309,6 +309,7 @@ def personal_settings(request: HttpRequest) -> HttpResponse:
 
 @login_required
 @require_GET
+@never_cache
 def profile_image(request: HttpRequest) -> FileResponse:
     """Serve only the authenticated user's current private profile image."""
 
@@ -330,7 +331,6 @@ def profile_image(request: HttpRequest) -> FileResponse:
         image.close()
         raise Http404
     response = FileResponse(image, content_type=content_type)
-    response["Cache-Control"] = "private, max-age=300"
     response["X-Content-Type-Options"] = "nosniff"
     return response
 

@@ -1299,9 +1299,9 @@ Final F touch set:
 
 - `apps/procurement/request_ui.py`, `apps/procurement/order_ui.py`:
   permission-scoped history query context.
-- `templates/procurement/request_detail.html`,
-  `templates/procurement/rfq_buyer_workspace.html`,
-  `templates/procurement/order_detail.html`: the corresponding business links.
+- `apps/procurement/templates/procurement/request_detail.html`,
+  `apps/procurement/templates/procurement/rfq_buyer_workspace.html`,
+  `apps/procurement/templates/procurement/order_detail.html`: the corresponding business links.
 - `apps/procurement/test_mvp04f.py`, `apps/procurement/test_mvp04f_browser.py`:
   connected HTTP secondary journeys and principal installed-Chrome journey.
 - This report and `output/mvp-04f/`: isolated validation harness, logs, screenshots,

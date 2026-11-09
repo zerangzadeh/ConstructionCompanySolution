@@ -230,7 +230,7 @@ Expense allocation is the explicit exception: invalid POST returns a bare 400.
 ### UIUX-F-119 — ALLOCATION_CODING_CHOICES
 
 - Gates: `expenses.view` for `apps/expenses/views.py:371` (`expense_detail`),
-  plus allocation capability/state visibility in `templates/expenses/detail.html`;
+  plus allocation capability/state visibility in `apps/expenses/templates/expenses/detail.html`;
   `expenses.allocate` for POST at `apps/expenses/views.py:390` (`expense_allocate`).
   Routes: `/expenses/<uuid:expense_id>/` and its `allocate/` action.
 - Form/query: `apps/expenses/forms.py:175` (`ExpenseAllocationForm`),
@@ -268,7 +268,7 @@ Expense allocation is the explicit exception: invalid POST returns a bare 400.
   No new recurrence scheduling or queue mechanism. Do not add an active-only list
   predicate merely because the existing heading says active templates.
 - POST/redisplay: both scoped collections must be reconstructed on invalid POST
-  or service-error render. `templates/expenses/recurrences.html` renders template
+  or service-error render. `apps/expenses/templates/expenses/recurrences.html` renders template
   descriptions, Project names and proposal-action UUIDs, not template amounts.
 - Mutation: `apps/expenses/services.py:711` (`create_recurring_expense_template`)
   and `propose_recurring_expense` validate template Project authority; preserve

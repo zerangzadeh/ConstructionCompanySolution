@@ -215,11 +215,11 @@ one-line diff are retained in the evidence baseline.
 | `apps/documents/evidence_views.py`, `apps/documents/urls.py` | Scoped evidence view, choices and registration routes |
 | `apps/documents/templatetags/document_evidence.py` | Shared presentation tags and commercial management visibility |
 | `templates/components/{document_evidence,evidence_nav,pinned_evidence_row}.html` | Specialized shared section/navigation and pinned row |
-| `templates/documents/{evidence_detail,evidence_register}.html` | Read-only witness view and existing-version registration form |
+| `apps/documents/templates/documents/{evidence_detail,evidence_register}.html` | Read-only witness view and existing-version registration form |
 | `templates/{safety,quality}/detail.html` | Review-evidence placement/navigation |
-| `templates/materials/material_form.html` | Material evidence placement/navigation |
-| `templates/daily_reports/field_observation_detail.html` | Evidence picker entry, pinned labels, Persian transition labels; removes hash-only business display |
-| `templates/contracts/contractual_record_detail.html` | Document-backed evidence section alongside retained lineage/non-document references |
+| `apps/materials/templates/materials/material_form.html` | Material evidence placement/navigation |
+| `apps/daily_reports/templates/daily_reports/field_observation_detail.html` | Evidence picker entry, pinned labels, Persian transition labels; removes hash-only business display |
+| `apps/contracts/templates/contracts/contractual_record_detail.html` | Document-backed evidence section alongside retained lineage/non-document references |
 | `apps/billing/forms.py`, `apps/billing/views.py` | Actor/source-aware commercial version choices and existing form callers |
 | `apps/billing/templates/billing/{commercial_form,commercial_record_detail}.html` | Widget assets, pinned witness section and business-friendly authorized references |
 | `apps/daily_reports/field_services.py` | Single replay field-name correction described above |

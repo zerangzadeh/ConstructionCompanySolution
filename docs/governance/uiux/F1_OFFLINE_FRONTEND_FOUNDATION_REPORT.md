@@ -16,7 +16,7 @@ below. Earlier failed commands and their original evidence remain failures.
   found a clean tree (`git status --short`, `git diff --name-status` and
   `git diff --stat` empty). Earlier MVP-02 work is now part of the baseline.
 - Shared ERP/authentication shell: `templates/base.html`; login:
-  `templates/accounts/login.html`. Admin extends Django's separate
+  `apps/accounts/templates/accounts/login.html`. Admin extends Django's separate
   `admin/base.html` through `templates/admin/base_site.html` and already uses
   local Django and BONIRA assets. App templates also occur under
   `apps/*/templates/`; fragments/components occur in both template trees.

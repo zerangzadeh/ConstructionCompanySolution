@@ -37,9 +37,9 @@ values survive disabled JavaScript or a blocked chart library.
 | apps/projects/dashboard.py | KPI presentation metadata, contract total, actual-evidence display guard |
 | apps/projects/static/projects/workspace.css | Responsive Projects layouts using canonical tokens |
 | apps/projects/static/projects/dashboard_charts.js | Semantic status colors, RTL Persian charts/tooltips and section-tab state |
-| templates/projects/list.html | Real summary/chart plus shared reference-list components |
-| templates/projects/detail.html | Compact command-center composition and permitted navigation |
-| templates/projects/commercial_summary.html | Compact source-backed commercial summary rows |
+| apps/projects/templates/projects/list.html | Real summary/chart plus shared reference-list components |
+| apps/projects/templates/projects/detail.html | Compact command-center composition and permitted navigation |
+| apps/projects/templates/projects/commercial_summary.html | Compact source-backed commercial summary rows |
 | templates/components/dashboard_chart.html | Existing chart component gains optional ring center/side legend/icon |
 | templates/components/page_header.html | Existing header supports the shared layers icon |
 | templates/components/form_icon.html | Extend the existing icon catalog |

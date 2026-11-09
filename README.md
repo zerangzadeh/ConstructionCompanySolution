@@ -70,8 +70,12 @@ state. A planned item alone grants no implementation or production authority.
 
 ## Repository conventions
 
+- See [Repository structure and retention](docs/REPOSITORY_STRUCTURE.md) for
+  directory ownership, relocated paths, and disposable-file rules.
 - Django applications are placed under `apps/`.
 - Shared technical and business support code is placed under `core/`.
+- App-owned templates live under `apps/<app>/templates/<app>/`; shared templates
+  and framework overrides remain under `templates/`.
 - Settings are split into base, development, and production modules.
 - Tests are placed under `tests/` and/or application test directories.
 - Environment-specific values must be provided through environment variables.

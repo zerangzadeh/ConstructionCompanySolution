@@ -94,7 +94,7 @@ findings:
   evidence:
     source_paths:
     - apps/timekeeping/forms.py
-    - templates/timekeeping/form.html
+    - apps/timekeeping/templates/timekeeping/form.html
     observed_literals:
     - روزهای کاری ISO
     - 'نمونه: 1,2,3,4,5'
@@ -123,7 +123,7 @@ findings:
     label.
   evidence:
     source_paths:
-    - templates/timekeeping/form.html
+    - apps/timekeeping/templates/timekeeping/form.html
     observed_literals:
     - ثبت کنترل‌شده
     - بازگشت
@@ -179,7 +179,7 @@ findings:
     vocabulary.
   evidence:
     source_paths:
-    - templates/payroll/workbench.html
+    - apps/payroll/templates/payroll/workbench.html
     observed_literals:
     - کارگاه حقوق و دستمزد
     - حریم خصوصی بالا
@@ -219,7 +219,7 @@ findings:
     normal payroll sequence or prerequisite relationship.
   evidence:
     source_paths:
-    - templates/payroll/workbench.html
+    - apps/payroll/templates/payroll/workbench.html
     observed_literals:
     - پیکربندی و قواعد
     - دوره جدید
@@ -259,7 +259,7 @@ findings:
   problem: Payroll empty states describe authorization scope instead of the business state and next action.
   evidence:
     source_paths:
-    - templates/payroll/workbench.html
+    - apps/payroll/templates/payroll/workbench.html
     observed_literals:
     - اجرایی در دامنه دسترسی نیست.
     - استثنای بازی در دامنه دسترسی نیست.
@@ -287,7 +287,7 @@ findings:
     under «عملیات مجاز» without identifying workflow stage or recommended next action.
   evidence:
     source_paths:
-    - templates/procurement/rfq_buyer_workspace.html
+    - apps/procurement/templates/procurement/rfq_buyer_workspace.html
     observed_structure: Loop over actions; every item rendered as erp-btn--secondary.
     observed_literals:
     - عملیات مجاز
@@ -329,7 +329,7 @@ findings:
     procurement language.
   evidence:
     source_paths:
-    - templates/procurement/rfq_buyer_workspace.html
+    - apps/procurement/templates/procurement/rfq_buyer_workspace.html
     observed_literals:
     - ثبت مستند در منبع تدارکات، با مجوز مرحله و تفکیک وظایف
     - دعوت‌نامه نسخه مؤثر استعلام
@@ -368,7 +368,7 @@ findings:
   problem: The Parties workspace uses abstract governance/source terminology for routine party management.
   evidence:
     source_paths:
-    - templates/parties/governance_list.html
+    - apps/parties/templates/parties/governance_list.html
     observed_literals:
     - حاکمیت طرف‌های تجاری
     - مدیریت داده‌های پایه · شرکت فعال
@@ -397,7 +397,7 @@ findings:
   problem: The operational document list exposes English technical architecture terms directly in Persian UI.
   evidence:
     source_paths:
-    - templates/documents/list.html
+    - apps/documents/templates/documents/list.html
     observed_literals:
     - نسخه‌های immutable با دسترسی مبتنی بر context
   user_impact: Ordinary document users are forced to understand implementation/security terminology that is unnecessary
@@ -660,10 +660,10 @@ findings:
   problem: The interaction used to open a record detail is inconsistent across modules.
   evidence:
     source_paths:
-    - templates/projects/list.html
-    - templates/equipment/list.html
-    - templates/inventory/warehouse_list.html
-    - templates/inventory/custody_workbench.html
+    - apps/projects/templates/projects/list.html
+    - apps/equipment/templates/equipment/list.html
+    - apps/inventory/templates/inventory/warehouse_list.html
+    - apps/inventory/templates/inventory/custody_workbench.html
     observed_patterns:
     - 'Projects: project code and project name are both links, plus a separate icon-only action in the Operations
       column.'
@@ -693,7 +693,7 @@ findings:
   problem: The Project Controls page exposes implementation/governance boundary language in the primary UI.
   evidence:
     source_paths:
-    - templates/projects/controls.html
+    - apps/projects/templates/projects/controls.html
     observed_literals:
     - شواهد محدود کنترل پروژه
     - فقط بودجه پذیرفته‌شده و هزینه تأییدشده/ثبت‌شده کدگذاری‌شده نمایش یا صادر می‌شود.
@@ -725,7 +725,7 @@ findings:
     «تأیید دوگانه» as its primary task language.
   evidence:
     source_paths:
-    - templates/organizations/member_authorization.html
+    - apps/organizations/templates/organizations/member_authorization.html
     observed_literals:
     - نقش‌ها و دامنه‌های عضو
     - این عضویت تا ثبت حداقل یک نقش و یک دامنه صریح در قرنطینه دسترسی است.
@@ -774,7 +774,7 @@ findings:
     employees.
   evidence:
     source_paths:
-    - templates/workforce/ess_dashboard.html
+    - apps/workforce/templates/workforce/ess_dashboard.html
     observed_literals:
     - اطلاعات شخصی و وضعیت درخواست‌ها از منابع مجاز شما نمایش داده می‌شود.
     - 'وضعیت منبع:'
@@ -807,7 +807,7 @@ findings:
     tasks by intent.
   evidence:
     source_paths:
-    - templates/workforce/_ess_navigation.html
+    - apps/workforce/templates/workforce/_ess_navigation.html
     observed_destinations:
     - مرخصی، حضور و کارکرد من
     - داشبورد من
@@ -843,7 +843,7 @@ findings:
     warehouse tasks.
   evidence:
     source_paths:
-    - templates/inventory/custody_workbench.html
+    - apps/inventory/templates/inventory/custody_workbench.html
     observed_literals:
     - رزرو، شمارش، انتقال، رهگیری و تطبیق؛ بدون ارزش‌گذاری یا ثبت مالی
     - مغایرت تخصیص
@@ -876,7 +876,7 @@ findings:
     UI.
   evidence:
     source_paths:
-    - templates/inventory/valuation_workbench.html
+    - apps/inventory/templates/inventory/valuation_workbench.html
     observed_literals:
     - استخر ارزش‌گذاری نهایی‌شده‌ای نیست.
     - نتایج تطبیق ارزش‌گذاری
@@ -908,7 +908,7 @@ findings:
     weight and no role/state-aware recommended action.
   evidence:
     source_paths:
-    - templates/equipment/operations_workbench.html
+    - apps/equipment/templates/equipment/operations_workbench.html
     observed_actions:
     - قرائت کنتور
     - ثبت کارکرد
@@ -942,7 +942,7 @@ findings:
   problem: Equipment Operations uses evidence/reference vocabulary in the main operational interface.
   evidence:
     source_paths:
-    - templates/equipment/operations_workbench.html
+    - apps/equipment/templates/equipment/operations_workbench.html
     observed_literals:
     - شواهد عملیاتی غیرمالی و پیوندهای مرجع انبار
     - پیوندهای قطعات یدکی و شواهد دستورکار
@@ -1173,7 +1173,7 @@ findings:
     decision dashboard.
   evidence:
     source_paths:
-    - templates/reporting/dashboard.html
+    - apps/reporting/templates/reporting/dashboard.html
     observed_literals:
     - داشبورد شاخص‌های حاکم‌شده
     - نتایج مدیریتی از شواهد حاکم‌شده
@@ -1210,7 +1210,7 @@ findings:
   evidence:
     source_paths:
     - templates/base.html
-    - templates/reporting/dashboard.html
+    - apps/reporting/templates/reporting/dashboard.html
     observed_structure: 'Nested main landmark: base.html renders <main id="main-content"> and reporting/dashboard.html
       begins with another <main>.'
   user_impact: Nested main landmarks create invalid/ambiguous document semantics for assistive technologies and
@@ -1236,7 +1236,7 @@ findings:
     concepts as primary user language.
   evidence:
     source_paths:
-    - templates/compliance/workbench.html
+    - apps/compliance/templates/compliance/workbench.html
     observed_literals:
     - P9-S06–S11
     - کارگاه بازرسی، HSE، QA/QC و CAPA
@@ -1338,7 +1338,7 @@ findings:
     page language.
   evidence:
     source_paths:
-    - templates/contracts/commercial_review.html
+    - apps/contracts/templates/contracts/commercial_review.html
     observed_literals:
     - مرور مشورتی P6
     - فقط شواهد و نسخه‌های موجود؛ بدون اثر خودکار بر قرارداد، برنامه یا مالی
@@ -1414,7 +1414,7 @@ findings:
     corrections, leave/mission, overtime and timesheets in one page with a broad top-level command strip.
   evidence:
     source_paths:
-    - templates/timekeeping/workbench.html
+    - apps/timekeeping/templates/timekeeping/workbench.html
     top_actions:
     - تقویم جدید
     - تعطیلی / روز جایگزین
@@ -1463,7 +1463,7 @@ findings:
     raw exception codes.
   evidence:
     source_paths:
-    - templates/timekeeping/workbench.html
+    - apps/timekeeping/templates/timekeeping/workbench.html
     observed_literals:
     - حضور واقعیت حضور است؛ کارکرد تخصیص مصوب زمان. تاریخچه قطعی فقط با اصلاح مستدل حفظ می‌شود.
     - صف استثنا و حضور
@@ -1497,7 +1497,7 @@ findings:
     its empty-state text uses «مجازی» rather than a natural business phrase.
   evidence:
     source_paths:
-    - templates/payroll/ess_history.html
+    - apps/payroll/templates/payroll/ess_history.html
     observed_literals:
     - فقط فیش‌های قطعی مجاز منبع حقوق نمایش داده می‌شوند.
     - 'وضعیت منبع:'
@@ -1527,7 +1527,7 @@ findings:
   problem: The reconciliation workbench exposes roadmap-stage metadata and governance model terms as core UI concepts.
   evidence:
     source_paths:
-    - templates/reporting/reconciliation_workbench.html
+    - apps/reporting/templates/reporting/reconciliation_workbench.html
     observed_literals:
     - P10 — شاهد کنترلی بدون اثر عملیاتی یا مالی
     - ۱۳ جفت حاکم‌شده
@@ -1570,7 +1570,7 @@ findings:
   evidence:
     source_paths:
     - templates/base.html
-    - templates/reporting/reconciliation_workbench.html
+    - apps/reporting/templates/reporting/reconciliation_workbench.html
     observed_structure: The page begins with <main ...> while base.html already wraps page content in <main id="main-content">.
   user_impact: Assistive-technology landmark navigation can become ambiguous because the rendered document has nested
     main landmarks.
@@ -1601,7 +1601,7 @@ findings:
     revision internals and raw workflow transitions in the primary UI.
   evidence:
     source_paths:
-    - templates/reporting/project_closeout_detail.html
+    - apps/reporting/templates/reporting/project_closeout_detail.html
     observed_literals:
     - شاهد کنترل مشتق — بدون اثر پایین‌دستی
     - نسخه وضعیت
@@ -1644,7 +1644,7 @@ findings:
     code.
   evidence:
     source_paths:
-    - templates/reporting/project_closeout_detail.html
+    - apps/reporting/templates/reporting/project_closeout_detail.html
     observed_literals:
     - پین نسخه دقیق سند DMS
     - شناسه نسخه سند
@@ -1682,7 +1682,7 @@ findings:
   evidence:
     source_paths:
     - templates/base.html
-    - templates/reporting/project_closeout_detail.html
+    - apps/reporting/templates/reporting/project_closeout_detail.html
     observed_structure: The page begins with <main ...> inside base.html's existing main-content landmark.
   user_impact: Landmark semantics are inconsistent for keyboard and assistive-technology users.
   root_pattern_candidate:
@@ -1711,8 +1711,8 @@ findings:
     source/target/outcome values and complete configuration text instead of a visual process model.
   evidence:
     source_paths:
-    - templates/workflows/administration/detail.html
-    - templates/workflows/administration/form.html
+    - apps/workflows/templates/workflows/administration/detail.html
+    - apps/workflows/templates/workflows/administration/form.html
     observed_literals:
     - گام‌ها و انتقال‌های ثبت‌شده
     - '{{ step.key }} · {{ step.step_type }}'
@@ -1745,7 +1745,7 @@ findings:
   evidence:
     source_paths:
     - templates/base.html
-    - templates/workforce/employee_detail.html
+    - apps/workforce/templates/workforce/employee_detail.html
     observed_structure: employee_detail.html contains <main class="min-w-0 space-y-5"> within base.html's <main
       id="main-content">.
   user_impact: Screen-reader landmark navigation sees inconsistent document structure on a major HR page.
@@ -1775,7 +1775,7 @@ findings:
   problem: The daily-report detail prominently exposes the report's raw UUID as a business summary metric.
   evidence:
     source_paths:
-    - templates/daily_reports/detail.html
+    - apps/daily_reports/templates/daily_reports/detail.html
     observed_literals:
     - شناسه گزارش
     - '{{ report.id }}'
@@ -1803,7 +1803,7 @@ findings:
     and immutable-source language rather than material-master tasks.
   evidence:
     source_paths:
-    - templates/materials/governance.html
+    - apps/materials/templates/materials/governance.html
     observed_literals:
     - مصالح و انبار / سطح ثانویه حاکمیت
     - همه اقدامات از سرویس‌های منبع نسخه‌دار و ممیزی‌شده استفاده می‌کنند.
@@ -1898,7 +1898,7 @@ findings:
   evidence:
     source_paths:
     - apps/procurement/forms.py
-    - templates/procurement/form.html
+    - apps/procurement/templates/procurement/form.html
     implementation_observation:
     - PurchaseOrderForm loads all active projects for the organization.
     - PurchaseOrderForm loads all approved purchase requests for the organization.
@@ -1938,7 +1938,7 @@ findings:
   evidence:
     source_paths:
     - apps/daily_reports/forms.py
-    - templates/daily_reports/create.html
+    - apps/daily_reports/templates/daily_reports/create.html
     implementation_observation:
     - Project queryset contains all organization projects.
     - Site queryset contains all active organization sites across projects.
@@ -1977,7 +1977,7 @@ findings:
   evidence:
     source_paths:
     - apps/daily_reports/forms.py
-    - templates/daily_reports/detail.html
+    - apps/daily_reports/templates/daily_reports/detail.html
     implementation_observation:
     - DailyReportMaterialEntryForm includes material, material_name, quantity, unit_of_measure, unit and notes.
     - clean() overwrites material_name, unit_of_measure and unit when material is selected.
@@ -2044,7 +2044,7 @@ findings:
   evidence:
     source_paths:
     - apps/payroll/forms.py
-    - templates/payroll/form.html
+    - apps/payroll/templates/payroll/form.html
     implementation_observation:
     - EmploymentConfigurationForm loads all organization Projects and Sites.
     - RuleForm also loads all organization Projects and Sites.
@@ -2079,7 +2079,7 @@ findings:
   evidence:
     source_paths:
     - apps/payroll/forms.py
-    - templates/payroll/form.html
+    - apps/payroll/templates/payroll/form.html
     observed_fields:
     - evidence_json — «شواهد JSON»
     - idempotency_key — «کلید تکرارناپذیری»
@@ -2087,7 +2087,7 @@ findings:
     - source_status — «وضعیت منبع»
     - source_payload_json — «snapshot منبع JSON»
     - mapping_reference — «مرجع نگاشت صریح»
-    template_observation: templates/payroll/form.html renders every form field with no progressive-disclosure layer.
+    template_observation: apps/payroll/templates/payroll/form.html renders every form field with no progressive-disclosure layer.
   user_impact: Payroll staff are required to behave like integration/debug operators and manually provide metadata
     that should normally be derived from selected source records or generated by the system.
   root_pattern_candidate:
@@ -2121,7 +2121,7 @@ findings:
   evidence:
     source_paths:
     - apps/procurement/forms.py
-    - templates/procurement/portal_context.html
+    - apps/procurement/templates/procurement/portal_context.html
     observed_fields:
     - integrity_fingerprint — «هش یکپارچگی SHA-256»
     - evidence_slot — «شناسه فنی پیوست»
@@ -2189,7 +2189,7 @@ findings:
   problem: Compliance detail exposes raw lifecycle states and immutable-control framing in the main user experience.
   evidence:
     source_paths:
-    - templates/compliance/detail.html
+    - apps/compliance/templates/compliance/detail.html
     observed_literals:
     - کنترل تغییرناپذیر
     - اقدامات مجاز چرخه عمر
@@ -2373,7 +2373,7 @@ findings:
     terminology.
   evidence:
     source_paths:
-    - templates/payroll/run_detail.html
+    - apps/payroll/templates/payroll/run_detail.html
     observed_literals:
     - ورودی، نسخه قاعده، مبنا، مقدار، نرخ، نتیجه و lineage برای بازتولید نگهداری می‌شوند.
     - هش محاسبه
@@ -2410,7 +2410,7 @@ findings:
     payroll operations.
   evidence:
     source_paths:
-    - templates/payroll/statutory_workbench.html
+    - apps/payroll/templates/payroll/statutory_workbench.html
     observed_literals:
     - correction lineage
     - شواهد export
@@ -2450,7 +2450,7 @@ findings:
     as the primary operating model.
   evidence:
     source_paths:
-    - templates/payroll/financial_handoff_workbench.html
+    - apps/payroll/templates/payroll/financial_handoff_workbench.html
     observed_literals:
     - پیشنهادهای تغییرناپذیر
     - بدون شناسایی بدهی، سند حسابداری، پرداخت یا هزینه واقعی پروژه
@@ -2857,8 +2857,8 @@ findings:
   evidence:
     source_paths:
     - apps/accounting/templates/accounting/form.html
-    - templates/procurement/form.html
-    - templates/payroll/form.html
+    - apps/procurement/templates/procurement/form.html
+    - apps/payroll/templates/payroll/form.html
     observed_literals:
     - ثبت
     - ثبت کنترل‌شده
@@ -3110,8 +3110,8 @@ findings:
   evidence:
     source_paths:
     - templates/components/status_badge.html
-    - templates/safety/detail.html
-    - templates/quality/detail.html
+    - apps/safety/templates/safety/detail.html
+    - apps/quality/templates/quality/detail.html
     observed_structure:
     - Shared mapping knows under_review/in_progress but not reported, assigned, action_in_progress, resolved, closed,
       awaiting_verification or verified.
@@ -3143,8 +3143,8 @@ findings:
     - apps/accounting/templates/accounting/statement_list.html
     - apps/accounting/templates/accounting/statement_detail.html
     - apps/accounting/templates/accounting/period_list.html
-    - templates/safety/detail.html
-    - templates/quality/detail.html
+    - apps/safety/templates/safety/detail.html
+    - apps/quality/templates/quality/detail.html
     - apps/billing/templates/billing/payable_certificate_list.html
     - apps/billing/templates/billing/payable_certificate_detail.html
     contrast:
@@ -3300,7 +3300,7 @@ findings:
     language directly in the operational UI.
   evidence:
     source_paths:
-    - templates/equipment/cost_workbench.html
+    - apps/equipment/templates/equipment/cost_workbench.html
     observed_literals:
     - P8 · غیرتولیدی
     - پیشنهاد Project Cost
@@ -3338,7 +3338,7 @@ findings:
   problem: The maintenance list renders scheduled dates directly instead of using the canonical Jalali display pattern.
   evidence:
     source_paths:
-    - templates/equipment/maintenance_list.html
+    - apps/equipment/templates/equipment/maintenance_list.html
     observed_expression: '{{ item.scheduled_date }}'
     contrast: Other BONIRA reporting surfaces already use the shared `jalali_date` filter.
   user_impact: Maintenance users can see a date presentation convention different from other Persian-first modules.
@@ -3362,7 +3362,7 @@ findings:
     its primary copy.
   evidence:
     source_paths:
-    - templates/workforce/foundation.html
+    - apps/workforce/templates/workforce/foundation.html
     observed_literals:
     - سوابق منابع انسانی با دسترسی کنترل‌شده؛ بدون اثر حقوق، مالی یا مجوز دسترسی
     - تعاریف Tenant-local؛ هیچ‌کدام نقش یا دسترسی ایجاد نمی‌کنند.
@@ -3558,7 +3558,7 @@ findings:
     event actions.
   evidence:
     source_paths:
-    - templates/audit/log.html
+    - apps/audit/templates/audit/log.html
     observed_expressions:
     - '{{ event.entity_type }}'
     - '{{ event.entity_id }}'
@@ -3585,7 +3585,7 @@ findings:
     form.
   evidence:
     source_paths:
-    - templates/estimates/create.html
+    - apps/estimates/templates/estimates/create.html
     observed_literals:
     - پروژه مؤثر این ثبت
     - انتخاب دامنه فقط گزینه‌ها را محدود می‌کند و مجوز تازه‌ای ایجاد نمی‌کند.
@@ -3653,7 +3653,7 @@ findings:
     landmark.
   evidence:
     source_paths:
-    - templates/accounts/login.html
+    - apps/accounts/templates/accounts/login.html
     - templates/base.html
     observed_structure: login.html renders `<main class="bonira-login__layout">` while the base layout already provides
       the document main landmark.
@@ -3686,7 +3686,7 @@ findings:
     unlike the dominant list pattern elsewhere.
   evidence:
     source_paths:
-    - templates/workforce/work_team_list.html
+    - apps/workforce/templates/workforce/work_team_list.html
     observed_structure: '`{% table_filters filters "work-team-filters" %}` appears after the closing result section.'
   user_impact: Users encounter the data before discovering the available filters, making the list feel inconsistent
     with other BONIRA data workspaces.
@@ -3890,7 +3890,7 @@ findings:
     source_paths:
     - apps/procurement/forms.py
     - apps/procurement/views.py
-    - templates/procurement/form.html
+    - apps/procurement/templates/procurement/form.html
     sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
     trace: f111_same_pattern_evidence/SOURCE_TRACE.json
     candidate_id: SP-001
@@ -3950,7 +3950,7 @@ findings:
     source_paths:
     - apps/procurement/forms.py
     - apps/procurement/views.py
-    - templates/procurement/form.html
+    - apps/procurement/templates/procurement/form.html
     sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
     trace: f111_same_pattern_evidence/SOURCE_TRACE.json
     candidate_id: SP-002
@@ -4012,7 +4012,7 @@ findings:
     source_paths:
     - apps/equipment/forms.py
     - apps/equipment/views.py
-    - templates/equipment/form.html
+    - apps/equipment/templates/equipment/form.html
     sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
     trace: f111_same_pattern_evidence/SOURCE_TRACE.json
     candidate_id: SP-003
@@ -4073,7 +4073,7 @@ findings:
     source_paths:
     - apps/contracts/forms.py
     - apps/contracts/views.py
-    - templates/contracts/create.html
+    - apps/contracts/templates/contracts/create.html
     sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
     trace: f111_same_pattern_evidence/SOURCE_TRACE.json
     candidate_id: SP-007
@@ -4133,7 +4133,7 @@ findings:
     source_paths:
     - apps/inventory/forms.py
     - apps/inventory/views.py
-    - templates/inventory/warehouse_form.html
+    - apps/inventory/templates/inventory/warehouse_form.html
     sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
     trace: f111_same_pattern_evidence/SOURCE_TRACE.json
     candidate_id: SP-009
@@ -4195,7 +4195,7 @@ findings:
     source_paths:
     - apps/inventory/forms.py
     - apps/inventory/views.py
-    - templates/inventory/transaction_form.html
+    - apps/inventory/templates/inventory/transaction_form.html
     sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
     trace: f111_same_pattern_evidence/SOURCE_TRACE.json
     candidate_id: SP-010
@@ -4260,7 +4260,7 @@ findings:
     source_paths:
     - apps/expenses/forms.py
     - apps/expenses/views.py
-    - templates/expenses/detail.html
+    - apps/expenses/templates/expenses/detail.html
     sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
     trace: f111_same_pattern_evidence/SOURCE_TRACE.json
     candidate_id: SP-011
@@ -4325,7 +4325,7 @@ findings:
     source_paths:
     - apps/expenses/forms.py
     - apps/expenses/views.py
-    - templates/expenses/recurrences.html
+    - apps/expenses/templates/expenses/recurrences.html
     sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
     trace: f111_same_pattern_evidence/SOURCE_TRACE.json
     candidate_id: SP-013
@@ -4749,7 +4749,7 @@ findings:
     source_paths:
     - apps/workforce/forms.py
     - apps/workforce/views.py
-    - templates/workforce/foundation_form.html
+    - apps/workforce/templates/workforce/foundation_form.html
     sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
     trace: f111_same_pattern_evidence/SOURCE_TRACE.json
     candidate_id: SP-030
@@ -4812,7 +4812,7 @@ findings:
     source_paths:
     - apps/quality/forms.py
     - apps/quality/views.py
-    - templates/quality/create.html
+    - apps/quality/templates/quality/create.html
     sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
     trace: f111_same_pattern_evidence/SOURCE_TRACE.json
     candidate_id: SP-035
@@ -4874,7 +4874,7 @@ findings:
     source_paths:
     - apps/safety/forms.py
     - apps/safety/views.py
-    - templates/safety/create.html
+    - apps/safety/templates/safety/create.html
     sweep_report: UIUX_F111_SAME_PATTERN_SECURITY_SWEEP.md
     trace: f111_same_pattern_evidence/SOURCE_TRACE.json
     candidate_id: SP-036
@@ -4961,7 +4961,7 @@ findings:
     after: wave_c_evidence/final_BROWSER.json
     tests: wave_c_evidence/focused_final.xml
     source_paths:
-    - templates/procurement/portal_accept.html
+    - apps/procurement/templates/procurement/portal_accept.html
   root_pattern_candidate:
   - RP-C14-SEMANTIC-LANDMARK-INCONSISTENCY
   recommendation: Keep the application main and use a labelled section in the acceptance content.
@@ -4991,7 +4991,7 @@ findings:
     direct: wave_c_evidence/DIRECT_SERVICE.json
     source_paths:
     - apps/inventory/p8_views.py
-    - templates/inventory/valuation_workbench.html
+    - apps/inventory/templates/inventory/valuation_workbench.html
   root_pattern_candidate:
   - RP-C05-TASK-GUIDANCE-DEFICIT
   recommendation: Render independently authorized valuation reads; retrieve/show optional reconciliation
@@ -5013,7 +5013,7 @@ findings:
   problem: The linked employee detail content introduces a nested main landmark inside the application main.
   evidence:
     source_paths:
-    - templates/workforce/employee_detail.html
+    - apps/workforce/templates/workforce/employee_detail.html
     runtime: wave_c_reentry/BROWSER_DELTA.json
     tests: wave_c_reentry/focused_final.xml
   remediation: Inner main replaced with a labelled section; no permission, identity or domain change.
@@ -5050,7 +5050,7 @@ findings:
   evidence:
     source_paths:
     - apps/workforce/employment_forms.py
-    - templates/workforce/employment_manage.html
+    - apps/workforce/templates/workforce/employment_manage.html
     tests: wave_c_final_closure/affected_final.xml
     http: wave_c_final_closure/FINAL_HTTP_DELTA.json
     browser: wave_c_final_closure/BROWSER_RECONCILIATION.json
@@ -5321,7 +5321,7 @@ wave_de_fixture_closure:
             "RV-EV-060"
           ],
           "source_paths": [
-            "templates/organizations/role_catalog.html"
+            "apps/organizations/templates/organizations/role_catalog.html"
           ],
           "screenshots": [
             "wave_de_fixture_closure/e_platform_admin_1440.jpg",

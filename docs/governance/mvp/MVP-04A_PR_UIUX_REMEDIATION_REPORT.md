@@ -23,7 +23,7 @@ No CEP lifecycle, Registry, Roadmap, production or Human sign-off event is claim
 
 Product files:
 
-- `templates/procurement/request_detail.html` — only the Purchase Request Detail
+- `apps/procurement/templates/procurement/request_detail.html` — only the Purchase Request Detail
   page, including its existing validation/decision response renders.
 - `apps/accounts/static/css/erp_purchase_request_detail.css` — scoped geometry
   and presentation using existing canonical tokens; no global rule or new color.

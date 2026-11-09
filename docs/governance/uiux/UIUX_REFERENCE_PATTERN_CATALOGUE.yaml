@@ -14,8 +14,8 @@ patterns:
   name_fa: اقدام بعدی متناسب با وضعیت
   status: CONFIRMED_GOOD_REFERENCE
   source_paths:
-  - templates/safety/detail.html
-  - templates/quality/detail.html
+  - apps/safety/templates/safety/detail.html
+  - apps/quality/templates/quality/detail.html
   strengths:
   - The detail page explicitly labels «اقدام بعدی».
   - Only the action valid for the current state and permission is rendered.
@@ -46,8 +46,8 @@ patterns:
   status: CONFIRMED_GOOD_REFERENCE
   source_paths:
   - templates/components/empty_state.html
-  - templates/projects/list.html
-  - templates/inventory/warehouse_list.html
+  - apps/projects/templates/projects/list.html
+  - apps/inventory/templates/inventory/warehouse_list.html
   strengths:
   - Explains what is absent.
   - Can explain what the user should do next.
@@ -61,9 +61,9 @@ patterns:
   name_fa: عملیات خرید متناسب با وضعیت و مجوز
   status: CONFIRMED_GOOD_REFERENCE
   source_paths:
-  - templates/procurement/request_detail.html
-  - templates/procurement/order_detail.html
-  - templates/procurement/receipt_detail.html
+  - apps/procurement/templates/procurement/request_detail.html
+  - apps/procurement/templates/procurement/order_detail.html
+  - apps/procurement/templates/procurement/receipt_detail.html
   strengths:
   - Actions are conditioned by record status and permission.
   - Destructive actions are visually separated or de-emphasized.
@@ -76,7 +76,7 @@ patterns:
   name_fa: فهرست کارمند وظیفه‌محور و ساده
   status: CONFIRMED_GOOD_REFERENCE
   source_paths:
-  - templates/workforce/employee_list.html
+  - apps/workforce/templates/workforce/employee_list.html
   strengths:
   - Clear page purpose and single creation CTA.
   - Human-readable identity, department/position/team and localized status.
@@ -89,7 +89,7 @@ patterns:
   name_fa: فرم چندبخشی بر اساس کار کاربر
   status: CONFIRMED_GOOD_REFERENCE
   source_paths:
-  - templates/daily_reports/create.html
+  - apps/daily_reports/templates/daily_reports/create.html
   strengths:
   - Fields are grouped into project scope, report conditions, work/progress and observations.
   - 'Primary action is task-specific: «ذخیره پیش‌نویس».'
@@ -158,7 +158,7 @@ patterns:
   status: CONFIRMED_GOOD_REFERENCE
   source_paths:
   - apps/workforce/forms.py
-  - templates/workforce/employee_form.html
+  - apps/workforce/templates/workforce/employee_form.html
   strengths:
   - The user can choose an existing organization account.
   - Shared personal data fields are hidden/disabled in that mode.
@@ -171,7 +171,7 @@ patterns:
   status: CONFIRMED_GOOD_REFERENCE
   source_paths:
   - apps/workforce/forms.py
-  - templates/workforce/assignment_form.html
+  - apps/workforce/templates/workforce/assignment_form.html
   strengths:
   - Site is disabled until a Project is chosen.
   - Changing Project fetches only sites for that project.
@@ -213,8 +213,8 @@ patterns:
   name_fa: نمای ساختار سازمانی حرفه‌ای با حالت درختی و لیستی
   status: CONFIRMED_GOOD_REFERENCE
   source_paths:
-  - templates/workforce/department_list.html
-  - templates/workforce/position_chart.html
+  - apps/workforce/templates/workforce/department_list.html
+  - apps/workforce/templates/workforce/position_chart.html
   strengths:
   - Tree and list representations are both available for hierarchical data.
   - Search/filter controls are task-specific.
@@ -242,7 +242,7 @@ patterns:
   status: CONFIRMED_GOOD_REFERENCE
   source_paths:
   - apps/estimates/forms.py
-  - templates/estimates/create.html
+  - apps/estimates/templates/estimates/create.html
   strengths:
   - Project choices can be membership-scoped and active Project can prefill.
   - Contract and Phase choices are narrowed to the selected Project.
@@ -258,7 +258,7 @@ patterns:
   name_fa: سلسله‌مراتب بصری داشبورد مالی
   status: CONFIRMED_GOOD_REFERENCE_PRESENTATION_ONLY
   source_paths:
-  - templates/financials/dashboard.html
+  - apps/financials/templates/financials/dashboard.html
   strengths:
   - A strong hero/header area establishes context.
   - KPI cards have differentiated semantic emphasis rather than one flat card treatment.
@@ -272,7 +272,7 @@ patterns:
   name_fa: سطح ورود هویت‌دار و واکنش‌گرا
   status: CONFIRMED_GOOD_REFERENCE_PRESENTATION_ONLY
   source_paths:
-  - templates/accounts/login.html
+  - apps/accounts/templates/accounts/login.html
   strengths:
   - BONIRA-specific palette and branding are applied consistently.
   - Form controls have explicit focus, validation and password-toggle states.

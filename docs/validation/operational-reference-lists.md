@@ -6,8 +6,8 @@ Branch `main`; start/end HEAD `560bc3c9f136a3b76c6816dc127a80d74bcb7a1d`.
 
 ## Changed files and shared implementation
 
-- `templates/expenses/list.html`, `templates/safety/list.html`,
-  `templates/quality/list.html`: domain-specific cells and existing permitted links.
+- `apps/expenses/templates/expenses/list.html`, `apps/safety/templates/safety/list.html`,
+  `apps/quality/templates/quality/list.html`: domain-specific cells and existing permitted links.
 - `templates/components/operational_list.html`: one inherited page shell for all
   three, using the current Contracts reference CSS and existing shared components.
 - `templates/components/list_detail_action.html`: shared vertical disclosure with

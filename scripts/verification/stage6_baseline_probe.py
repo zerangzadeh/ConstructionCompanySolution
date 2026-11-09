@@ -26,7 +26,7 @@ base = (
     .replace('            <div id="bonira-feedback"></div>\n', "")
 )
 replacements["base.html"] = base
-row = (root / "templates/workflows/_work_item_row.html").read_text(encoding="utf-8")
+row = (root / "apps/workflows/templates/workflows/_work_item_row.html").read_text(encoding="utf-8")
 replacements["workflows/_work_item_row.html"] = row.replace(
     '{% if request.META.HTTP_HX_REQUEST == \'true\' and messages %}<template><div hx-swap-oob="beforeend:#bonira-feedback">{% include "components/messages.html" %}</div></template>{% endif %}',
     "",

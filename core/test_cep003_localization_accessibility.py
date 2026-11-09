@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.paginator import Paginator
 from django.forms.models import ModelChoiceIteratorValue
 from django.template import Context, Template
+from django.template.loader import get_template
 from django.test import RequestFactory, SimpleTestCase
 
 from apps.projects.models import Project, ProjectSite
@@ -59,7 +60,7 @@ class Cep003LocalizationAccessibilityTests(SimpleTestCase):
 
     def test_login_landmarks_and_product_shell_are_persian_first(self) -> None:
         template_root = Path(settings.BASE_DIR) / "templates"
-        login = (template_root / "accounts" / "login.html").read_text(encoding="utf-8")
+        login = get_template("accounts/login.html").template.source
         base = (template_root / "base.html").read_text(encoding="utf-8")
 
         self.assertIn('<div class="bonira-login__layout">', login)

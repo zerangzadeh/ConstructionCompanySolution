@@ -196,7 +196,7 @@ no migration source or development migration state changed.
 ## Closeout and boundaries
 
 - Actual existing-file changes: `.gitignore`, shared `field_choices.js` and its
-  CSS, and `templates/procurement/request_detail.html`.
+  CSS, and `apps/procurement/templates/procurement/request_detail.html`.
 - New files: local vendor directory (JS/CSS/license/provenance/byte-preservation
   attributes), shared `erp_interactions.js`/CSS, two opt-in asset includes,
   `f2_validate.py`, `f2_browser.mjs`, `test_f2_shared_interactions.py`, this report

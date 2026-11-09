@@ -281,6 +281,17 @@ class User(AbstractUser):
     def account_status_label(self) -> str:
         return str(AccountStatus(self.account_status).label)
 
+    @property
+    def profile_image_version(self) -> str:
+        """Version the browser URL without exposing the private storage name."""
+        if not self.profile_image:
+            return ""
+        return salted_hmac(
+            "bonira.accounts.profile_image_version",
+            self.profile_image.name,
+            algorithm="sha256",
+        ).hexdigest()
+
     def __str__(self) -> str:
         return self.username
 

@@ -105,7 +105,7 @@ OFFLINE RUNTIME PRESERVED: PASS
 
 ## Product Owner follow-up — quantities layout and stale asset key
 
-The Human supplied Contract quantities and receivable-basis screenshots showing unpadded/right-compressed tables, crowded numeric columns, disorganized version metadata and large unused panel space. The correction is bounded to `templates/contracts/detail.html`, `templates/contracts/hub_quantities.html` and the existing Contract-local `detail.css`, with a focused synthetic fixture in `test_hub.py`.
+The Human supplied Contract quantities and receivable-basis screenshots showing unpadded/right-compressed tables, crowded numeric columns, disorganized version metadata and large unused panel space. The correction is bounded to `apps/contracts/templates/contracts/detail.html`, `apps/contracts/templates/contracts/hub_quantities.html` and the existing Contract-local `detail.css`, with a focused synthetic fixture in `test_hub.py`.
 
 A direct read of the running Development server's `contracts/detail.css?v=1` matched the source and included the prior quantity rules; `findstatic` located one source. The screenshot resembles the new markup with missing quantity styling. **Old client cache is a supported hypothesis, not a reproduced root cause in the Human browser session.** The template had retained the old `?v=1` URL after CSS/JS changes. Contract CSS and JS references now use `?v=20261102-quantities-2`; a live-server read of that CSS key matches the final source. [Before served-asset check](../../../output/contract-hub-remediation/quantities-layout-followup/served-css.json), [after](../../../output/contract-hub-remediation/quantities-layout-followup/served-css-after.json).
 
