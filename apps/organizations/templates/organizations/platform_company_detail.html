@@ -1,57 +1,139 @@
-{% extends "base.html" %}
+{% extends "components/record_detail_page.html" %}
+{% load static erp_format %}
+
 {% block title %}{{ company.name }} | مدیریت پلتفرم بنیرا{% endblock %}
+{% block extra_head %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/erp_platform_company_detail.css' %}">
+{% endblock %}
+{% block header_working_context %}{% endblock %}
 {% block table_filter_controls %}{% endblock %}
-{% block content %}
-<div class="mb-5 flex flex-wrap items-end justify-between gap-3">
-    <div>
-        <a href="{% url 'organizations:platform_company_list' %}" class="text-xs font-semibold text-blue-700">بازگشت به شرکت‌ها</a>
-        <h1 class="mt-2 text-2xl font-bold text-slate-950">{{ company.name }}</h1>
-        <p class="mt-2 text-sm text-slate-500">وضعیت {{ company.get_status_display }} · {{ company.member_count }} عضویت · ایجاد {{ company.created_at|jalali_datetime }}</p>
-    </div>
-    {% if can_change %}<a href="{% url 'organizations:platform_company_edit' company.pk %}" class="erp-btn erp-btn--secondary">ویرایش مشخصات و تنظیمات</a>{% endif %}
-</div>
-<section class="erp-surface mb-5 space-y-2 rounded-xl p-4" aria-label="مالکیت و راه‌اندازی">
-    <p class="text-sm"><strong>ایجادکنندهٔ ثبت‌شده</strong> · {{ company.created_by.username|default:"ثبت نشده" }}</p>
-    <p class="text-sm"><strong>مالک فعال</strong> · {% for owner in owners %}{{ owner.username }}{% if not forloop.last %}، {% endif %}{% empty %}یافت نشد{% endfor %}</p>
-    <p class="text-sm"><strong>مدیر محلی فعال</strong> · {% for admin in tenant_admins %}{{ admin.username }}{% if not forloop.last %}، {% endif %}{% empty %}یافت نشد{% endfor %}</p>
-    {% if onboarding_incomplete %}
-    <p class="text-sm text-amber-800">یکی از گردش‌کارهای اولیهٔ این شرکت منتشر نشده است.</p>
-    <form method="post" action="{% url 'organizations:platform_company_onboarding' company.pk %}">
-        {% csrf_token %}<button class="erp-btn erp-btn--secondary" type="submit">تکمیل راه‌اندازی</button>
-    </form>
-    {% endif %}
+{% block content %}<div class="erp-platform-company-detail">{{ block.super }}</div>{% endblock %}
+
+{% block detail_heading %}
+    {% include "components/page_header.html" with page_breadcrumbs=page_breadcrumbs page_breadcrumb_user=request.user page_title=company.name page_description="اطلاعات، وضعیت دسترسی، تنظیمات و سوابق فعالیت شرکت" page_icon="company" only %}
+{% endblock %}
+
+{% block detail_actions %}
+    <a href="{% url 'organizations:platform_company_list' %}" class="erp-btn erp-btn--secondary">بازگشت به فهرست شرکت‌ها <span aria-hidden="true">←</span></a>
+{% endblock %}
+
+{% block detail_summary %}
+<section id="company-information" class="erp-record-section company-summary" aria-labelledby="company-information-title">
+    <h2 id="company-information-title" class="sr-only">اطلاعات شرکت</h2>
+    <dl class="erp-record-summary">
+        <div class="erp-record-summary__item">
+            <dt>کد شرکت</dt>
+            <dd>
+                <details class="company-identifier">
+                    <summary><bdi dir="ltr" title="{{ company.slug }}">{{ company.slug|truncatechars:30 }}</bdi><span class="sr-only"> · نمایش کد کامل شرکت</span></summary>
+                    <p><bdi dir="ltr">{{ company.slug }}</bdi></p>
+                </details>
+            </dd>
+        </div>
+        {% include "components/record_summary_item.html" with heading="ایجادکننده" value=company.created_by.username|default:"ثبت نشده" kind="identifier" only %}
+        {% include "components/record_summary_item.html" with heading="وضعیت" value=company.status kind="status" label=company.get_status_display only %}
+        <div class="erp-record-summary__item">
+            <dt>مدیر محلی فعال</dt>
+            <dd>{% for admin in tenant_admins %}<bdi>{{ admin.username }}</bdi>{% if not forloop.last %}، {% endif %}{% empty %}یافت نشد{% endfor %}</dd>
+        </div>
+        {% include "components/record_summary_item.html" with heading="تاریخ ایجاد" value=company.created_at kind="datetime" only %}
+        {% include "components/record_summary_item.html" with heading="آخرین فعالیت ثبت‌شده" value=company.last_activity kind="datetime" only %}
+    </dl>
+    <div class="company-summary__illustration" aria-hidden="true">{% include "components/form_icon.html" with icon="company" only %}</div>
 </section>
+{% endblock %}
+
+{% block detail_navigation %}
+<nav class="erp-record-nav company-section-nav" aria-label="بخش‌های پرونده شرکت">
+    <a href="#company-activity">{% include "components/form_icon.html" with icon="activity" only %}فعالیت‌ها و سوابق</a>
+    <a href="#company-management">{% include "components/form_icon.html" with icon="settings" only %}مدیریت و تنظیمات</a>
+    {% if can_change %}<a href="#company-sensitive">{% include "components/form_icon.html" with icon="pause" only %}عملیات حساس</a>{% endif %}
+</nav>
+{% endblock %}
+
+{% block detail_content %}
+<section id="company-management" class="erp-record-section" aria-labelledby="company-management-title">
+    {% include "components/form_section_header.html" with heading_id="company-management-title" heading="مدیریت و تنظیمات شرکت" icon="settings" only %}
+    <div class="erp-record-section__body">
+        <dl class="erp-record-fields">
+            <div>
+                <dt>مالک فعال</dt>
+                <dd>{% for owner in owners %}<bdi>{{ owner.username }}</bdi>{% if not forloop.last %}، {% endif %}{% empty %}یافت نشد{% endfor %}</dd>
+            </div>
+            <div>
+                <dt>تعداد عضویت‌ها</dt>
+                <dd>{% include "components/record_detail_value.html" with value=company.member_count kind="number" only %}</dd>
+            </div>
+        </dl>
+        {% if can_change %}
+            <a href="{% url 'organizations:platform_company_edit' company.pk %}" class="erp-btn erp-btn--secondary company-settings-link">{% include "components/form_icon.html" with icon="settings" only %}ویرایش مشخصات و تنظیمات</a>
+        {% endif %}
+        {% if onboarding_incomplete %}
+            <form method="post" action="{% url 'organizations:platform_company_onboarding' company.pk %}" class="company-onboarding">
+                {% csrf_token %}
+                <p class="text-sm text-amber-800">یکی از گردش‌کارهای اولیهٔ این شرکت منتشر نشده است.</p>
+                <button class="erp-btn erp-btn--secondary" type="submit">تکمیل راه‌اندازی</button>
+            </form>
+        {% endif %}
+    </div>
+</section>
+
 {% if can_change %}
-<section class="erp-surface mb-5 rounded-xl p-4" aria-labelledby="company-status-title">
-    <h2 id="company-status-title" class="font-bold">{% if suspending %}تعلیق شرکت{% else %}فعال‌سازی مجدد شرکت{% endif %}</h2>
-    <p class="mt-2 text-sm text-slate-500">{% if suspending %}با تعلیق، دسترسی عملیاتی اعضا به فضای کاری این شرکت مسدود می‌شود.{% else %}با فعال‌سازی، دسترسی اعضا مطابق عضویت و مجوزهای فعلی آن‌ها برقرار می‌شود.{% endif %}</p>
-    <form method="post" action="{% url 'organizations:platform_company_status' company.pk %}" class="mt-3 max-w-xl space-y-3"
-          data-confirm-title="{% if suspending %}تعلیق{% else %}فعال‌سازی مجدد{% endif %} · {{ company.name }}"
-          data-confirm-text="تغییر وضعیت با دلیل واردشده در تاریخچه شرکت ثبت می‌شود." data-confirm-label="ثبت تغییر وضعیت">
-        {% csrf_token %}{% for field in status_form.hidden_fields %}{{ field }}{% endfor %}
-        {% include "components/form_field.html" with field=status_form.reason only %}
-        <button type="submit" class="erp-btn {% if suspending %}erp-btn--danger{% else %}erp-btn--primary{% endif %}">{% if suspending %}تعلیق شرکت{% else %}فعال‌سازی مجدد{% endif %}</button>
-    </form>
+<section id="company-sensitive" class="erp-record-section" aria-labelledby="company-sensitive-title">
+    <h2 id="company-sensitive-title" class="sr-only">عملیات حساس</h2>
+    <details class="company-status-disclosure{% if suspending %} company-status-disclosure--danger{% endif %}">
+        <summary>{% include "components/form_icon.html" with icon="pause" only %}<span>عملیات حساس <span class="company-status-label">· {% if suspending %}تعلیق شرکت{% else %}فعال‌سازی مجدد شرکت{% endif %}</span></span><span class="company-disclosure-chevron" aria-hidden="true">⌄</span></summary>
+        <div class="company-status-content">
+            <p id="company-status-description">
+                {% if suspending %}با تعلیق، دسترسی عملیاتی اعضا به فضای کاری این شرکت مسدود می‌شود.{% else %}با فعال‌سازی مجدد، دسترسی اعضا مطابق عضویت و مجوزهای فعلی آن‌ها برقرار می‌شود.{% endif %}
+            </p>
+            <form method="post" action="{% url 'organizations:platform_company_status' company.pk %}" aria-describedby="company-status-description"
+                  data-confirm-title="{% if suspending %}تعلیق شرکت{% else %}فعال‌سازی مجدد شرکت{% endif %} · {{ company.name }}"
+                  data-confirm-text="{% if suspending %}دسترسی عملیاتی اعضا مسدود می‌شود و دلیل تعلیق در تاریخچه شرکت ثبت خواهد شد.{% else %}دسترسی اعضا مطابق مجوزهای فعلی برقرار می‌شود و دلیل تغییر در تاریخچه شرکت ثبت خواهد شد.{% endif %}"
+                  data-confirm-label="{% if suspending %}تعلیق شرکت{% else %}فعال‌سازی مجدد شرکت{% endif %}"{% if suspending %} data-confirm-danger="true"{% endif %}>
+                {% csrf_token %}
+                {% for field in status_form.hidden_fields %}{{ field }}{% endfor %}
+                {% include "components/form_field.html" with field=status_form.reason only %}
+                <button type="submit" class="erp-btn {% if suspending %}erp-btn--danger{% else %}erp-btn--primary{% endif %}">{% if suspending %}تعلیق شرکت{% else %}فعال‌سازی مجدد شرکت{% endif %}</button>
+            </form>
+        </div>
+    </details>
 </section>
 {% endif %}
-<section class="erp-surface overflow-hidden rounded-xl" aria-labelledby="company-activity-title">
-    <div class="border-b border-slate-100 p-4">
-        <h2 id="company-activity-title" class="font-bold">فعالیت‌های ثبت‌شده شرکت</h2>
-        <p class="mt-1 text-xs text-slate-500">رویدادهای ممیزی شامل زمان، نوع عملیات و عامل ثبت‌شده</p>
-        <form method="get" class="mt-3 flex flex-wrap items-end gap-3">
-            {% include "components/form_field.html" with field=search_form.q only %}
-            <button type="submit" class="erp-btn erp-btn--secondary">جستجوی فعالیت</button>
-        </form>
+
+<section id="company-activity" class="erp-record-section erp-reference-pattern" aria-labelledby="company-activity-title">
+    {% include "components/form_section_header.html" with heading_id="company-activity-title" heading="فعالیت‌های ثبت‌شده شرکت" icon="clock" description="رویدادهای مدیریتی و فعالیت‌های ثبت‌شده، از جدیدترین به قدیمی‌ترین" only %}
+    <div class="erp-record-section__body">
+        {% include "components/filter_bar.html" with bar=activity_filter_bar reference_layout=True inline_filters=True fit_quick_filters=True restore_url_state=True submit_label="جست‌وجو" only %}
+        <div class="erp-list-toolbar">
+            {% include "components/list_result_summary.html" with bar=activity_filter_bar result_page=page_obj reference_layout=True total_amount=None only %}
+        </div>
+        {% if events %}
+            <table class="erp-responsive-list company-activity-table" aria-label="رویدادهای شرکت">
+                <thead>
+                    <tr>
+                        <th scope="col" aria-sort="descending">زمان <span aria-hidden="true">↓</span></th>
+                        <th scope="col">شرح رویداد</th>
+                        <th scope="col">عامل</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                        <tr>
+                            <td data-label="زمان"><time datetime="{{ event.created_at|date:'c' }}"><bdi>{{ event.created_at|jalali_datetime }}</bdi></time></td>
+                            <td class="erp-list-title">{{ event.get_action_display }}</td>
+                            <td data-label="عامل"><span class="company-event-actor">{% include "components/form_icon.html" with icon="users" only %}<bdi>{{ event.actor.username|default:"سامانه" }}</bdi></span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if page_obj.paginator.num_pages > 1 %}
+                {% include "components/list_pagination.html" with page_obj=page_obj pagination_query=pagination_query reference_layout=True result_label="رویداد" only %}
+            {% endif %}
+        {% else %}
+            {% include "components/empty_state.html" with empty_filtered=activity_filter_bar.chips|default:activity_filter_bar.form.errors empty_title="هنوز فعالیتی ثبت نشده است" only %}
+        {% endif %}
     </div>
-    <div class="overflow-x-auto">
-        <table class="w-full text-right text-sm">
-            <thead class="bg-slate-50 text-xs text-slate-600"><tr><th class="px-4 py-3">زمان</th><th class="px-4 py-3">عملیات</th><th class="px-4 py-3">عامل</th></tr></thead>
-            <tbody class="divide-y divide-slate-100">
-                {% for event in events %}<tr><td class="whitespace-nowrap px-4 py-3">{{ event.created_at|jalali_datetime }}</td><td class="px-4 py-3">{{ event.get_action_display }}</td><td class="px-4 py-3">{{ event.actor.username|default:"سامانه" }}</td></tr>
-                {% empty %}<tr><td colspan="3" class="p-8 text-center text-slate-500">رویدادی با این مشخصات ثبت نشده است.</td></tr>{% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% include "components/bounded_table_pagination.html" %}
 </section>
 {% endblock %}

@@ -14,6 +14,7 @@ from apps.projects.models import Activity, ProjectPhase, ProjectSite
 from apps.safety.models import SafetyIncident
 from apps.workforce.models import Employee
 from core.forms import JalaliDateMixin
+from core.organization_time import OrganizationDateTimeField, bind_organization_time
 
 
 class _StyledForm(JalaliDateMixin):
@@ -50,6 +51,8 @@ class SafetyContextSelect(forms.Select):
 
 
 class SafetyIncidentForm(_StyledForm, forms.ModelForm):
+    occurred_at = OrganizationDateTimeField(label="زمان وقوع")
+
     class Meta:
         model = SafetyIncident
         fields = [  # noqa: RUF012
@@ -79,6 +82,7 @@ class SafetyIncidentForm(_StyledForm, forms.ModelForm):
         **kwargs: object,
     ) -> None:
         super().__init__(*args, **kwargs)
+        bind_organization_time(self, organization)
         for protected in ("project", "site", "phase", "activity", "daily_report"):
             self.fields[protected].queryset = self.fields[protected].queryset.none()
         for optional in ("site", "phase", "activity", "daily_report"):

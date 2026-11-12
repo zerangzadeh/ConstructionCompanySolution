@@ -1,0 +1,369 @@
+{
+  "browser": "156.0.8078.80",
+  "profile": "MVP",
+  "db": "bonira_b02_run2",
+  "db_port": 59141,
+  "witness": "separate PostgreSQL connection, default_transaction_read_only=on",
+  "rows": {
+    "projects:detail": {
+      "scenario": "UAT-02",
+      "route": "projects:detail",
+      "variant": null,
+      "summary": "List to project hub to controls, scoped project identity",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "NAVIGATION_UX": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/?q=BRIDGE",
+          "status": 200,
+          "final": "/projects/"
+        },
+        {
+          "click": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/",
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/"
+        },
+        {
+          "db": {
+            "model": "projects.Project",
+            "id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "code": "BRIDGE",
+            "name": "پروژه پل آزمایشی",
+            "status": "planning",
+            "audit": []
+          }
+        },
+        {
+          "click": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/",
+          "status": 403,
+          "final": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/b590be19-fbf9-408e-8bb2-fb0730a2db84/",
+          "status": 403,
+          "final": "/projects/b590be19-fbf9-408e-8bb2-fb0730a2db84/"
+        }
+      ]
+    },
+    "projects:controls": {
+      "scenario": "UAT-02",
+      "route": "projects:controls",
+      "variant": null,
+      "summary": "Controls page shows separate WBS and activity empty states",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/b590be19-fbf9-408e-8bb2-fb0730a2db84/controls/",
+          "status": 403,
+          "final": "/projects/b590be19-fbf9-408e-8bb2-fb0730a2db84/controls/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/controls/",
+          "status": 403,
+          "final": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/controls/"
+        }
+      ]
+    },
+    "projects:controls_comparison": {
+      "scenario": "UAT-02",
+      "route": "projects:controls_comparison",
+      "variant": null,
+      "summary": "Project controls links to scoped budget comparison",
+      "axes": {
+        "BUSINESS_LOGIC": "PASS",
+        "FUNCTIONAL": "PASS",
+        "NAVIGATION_UX": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        },
+        {
+          "click": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/comparison/",
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/comparison/"
+        },
+        {
+          "budget_control_rows": 0
+        },
+        {
+          "method": "GET",
+          "url": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/controls/comparison/",
+          "status": 403,
+          "final": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/controls/comparison/"
+        }
+      ]
+    },
+    "projects:controls_exceptions": {
+      "scenario": "UAT-02",
+      "route": "projects:controls_exceptions",
+      "variant": null,
+      "summary": "Project controls links to scoped exceptions",
+      "axes": {
+        "BUSINESS_LOGIC": "PASS",
+        "FUNCTIONAL": "PASS",
+        "NAVIGATION_UX": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        },
+        {
+          "click": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/exceptions/",
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/exceptions/"
+        },
+        {
+          "budget_control_rows": 0
+        },
+        {
+          "method": "GET",
+          "url": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/controls/exceptions/",
+          "status": 403,
+          "final": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/controls/exceptions/"
+        }
+      ]
+    },
+    "projects:controls_export": {
+      "scenario": "UAT-02",
+      "route": "projects:controls_export",
+      "variant": null,
+      "summary": "Download and inspect scoped CSV from the controls link",
+      "axes": {
+        "BUSINESS_LOGIC": "PASS",
+        "FUNCTIONAL": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        },
+        {
+          "db": {
+            "model": "projects.Project",
+            "id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "code": "BRIDGE",
+            "audit": [
+              {
+                "action": "project_controls.exported",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "download": "project-controls-BRIDGE.csv",
+          "rows": 1,
+          "first_row": [
+            "section",
+            "cbs",
+            "wbs",
+            "cost_center",
+            "budget",
+            "expense",
+            "remaining",
+            "note"
+          ]
+        },
+        {
+          "method": "GET",
+          "url": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/controls/export/",
+          "status": 403,
+          "final": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/controls/export/"
+        }
+      ]
+    },
+    "projects:wbs_create": {
+      "scenario": "UAT-02",
+      "route": "projects:wbs_create",
+      "variant": null,
+      "summary": "Create root and child through inline controls, verify parent and reject duplicate",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        },
+        {
+          "action": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/wbs/",
+          "posts": [
+            [
+              "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/wbs/",
+              302
+            ]
+          ],
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "feedback": [
+            "×\nگره ساختار شکست کار افزوده شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "projects.WBSNode",
+            "id": "147a9f3d-a0dd-4a5d-bd17-606e652f23af",
+            "code": "B02-WBS",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "parent_id": null,
+            "audit": [
+              {
+                "action": "wbs_node.created",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        }
+      ],
+      "harness_or_assertion": "Missing form field code"
+    },
+    "projects:activity_create": {
+      "scenario": "UAT-02",
+      "route": "projects:activity_create",
+      "variant": null,
+      "summary": "Activity persists WBS, site and phase under the current project",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "'child'"
+    },
+    "projects:activity_transition": {
+      "scenario": "UAT-02",
+      "route": "projects:activity_transition",
+      "variant": null,
+      "summary": "Activate planned activity and verify state and audit",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "'activity'"
+    },
+    "projects:activity_archive": {
+      "scenario": "UAT-02",
+      "route": "projects:activity_archive",
+      "variant": null,
+      "summary": "Archive sacrificial activity while retaining its source row",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "'activity'"
+    },
+    "projects:wbs_archive": {
+      "scenario": "UAT-02",
+      "route": "projects:wbs_archive",
+      "variant": null,
+      "summary": "Archive leaf node, preserving ancestry",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "'child'"
+    },
+    "projects:photo_add": {
+      "scenario": "UAT-02",
+      "route": "projects:photo_add",
+      "variant": null,
+      "summary": "Upload generated PNG from gallery and compare linked document version",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/"
+        },
+        {
+          "upload_post_evidence": "project/browser-and-state.json projects:photo_add from earlier browser pass"
+        },
+        {
+          "db": {
+            "model": "documents.PhotoMetadata",
+            "id": "ccae69e7-47cc-40e0-9c21-dc55287313c5",
+            "document_id": "4df46dae-6779-48ef-a2cd-2faf356688ae",
+            "source": "camera",
+            "audit": []
+          }
+        }
+      ],
+      "harness_or_assertion": ""
+    },
+    "projects:gallery": {
+      "scenario": "UAT-02",
+      "route": "projects:gallery",
+      "variant": null,
+      "summary": "Gallery displays actual image bytes, foreign gallery and direct image are denied",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/"
+        },
+        {
+          "db": {
+            "model": "documents.PhotoMetadata",
+            "id": "ccae69e7-47cc-40e0-9c21-dc55287313c5",
+            "document_id": "4df46dae-6779-48ef-a2cd-2faf356688ae",
+            "source": "camera",
+            "audit": []
+          }
+        }
+      ],
+      "harness_or_assertion": "Locator.scroll_into_view_if_needed: Timeout 20000ms exceeded.\n"
+    }
+  }
+}

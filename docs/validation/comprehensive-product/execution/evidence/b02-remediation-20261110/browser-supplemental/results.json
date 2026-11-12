@@ -1,0 +1,608 @@
+{
+  "browser": "156.0.8078.80",
+  "db": "b02_retest_browser_final",
+  "profile": "MVP",
+  "witness_read_only": true,
+  "cases": [
+    {
+      "id": "ASSIGNMENT-CONTEXT-1440",
+      "description": "Complete from open row menu with keyboard, preserve context and verify feedback and audit",
+      "steps": [
+        {
+          "witness": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "a7efe333-d810-4ef2-8e42-8ad7fad5c543",
+            "employee": "5c1c30a9-e120-4a51-a4e4-a4b380e28331",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "planned_end_date": "2026-11-20",
+            "end_date": "None",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/workforce/assignments/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&q=%D9%85%D8%B3%D8%A6%D9%88%D9%84+%D8%A8%D8%A7%D8%B2%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%DB%8C+1440&sort=status&direction=asc",
+          "status": 200
+        },
+        {
+          "page": "assignment-completion-open",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "post": "/workforce/assignments/a7efe333-d810-4ef2-8e42-8ad7fad5c543/status/",
+          "status": 302,
+          "returned": "/workforce/assignments/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&q=%D9%85%D8%B3%D8%A6%D9%88%D9%84+%D8%A8%D8%A7%D8%B2%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%DB%8C+1440&sort=status&direction=asc"
+        },
+        {
+          "feedback": "وضعیت تخصیص به‌روزرسانی شد."
+        },
+        {
+          "witness": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "a7efe333-d810-4ef2-8e42-8ad7fad5c543",
+            "employee": "5c1c30a9-e120-4a51-a4e4-a4b380e28331",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "planned_end_date": "2026-11-20",
+            "end_date": "2026-11-11",
+            "status": "completed",
+            "audit": [
+              {
+                "action": "employee_project_assignment.status_changed",
+                "actor__username": "b02-owner"
+              },
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "page": "assignment-ended-return",
+          "width": 1440,
+          "overflow": false
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "CORRECTION-CONFLICT",
+      "description": "Independent 45-minute overlap denial, unchanged attendance and audit, then rejection",
+      "steps": [
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "2dbeb912-e961-43e7-ba9c-0f7f5c83f2ae",
+            "employee": "510b5700-f2e3-43ba-84c0-4a64709dd031",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-01",
+            "check_in_at": "2026-11-01 04:30:00+00:00",
+            "check_out_at": "2026-11-01 08:30:00+00:00",
+            "state": "finalized",
+            "audit": [
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "c88812e1-67ae-4e25-a686-f5d2b8c0f7d1",
+            "employee": "510b5700-f2e3-43ba-84c0-4a64709dd031",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-01",
+            "check_in_at": "2026-11-01 09:30:00+00:00",
+            "check_out_at": "2026-11-01 11:30:00+00:00",
+            "state": "finalized",
+            "audit": [
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/timekeeping/attendance/2dbeb912-e961-43e7-ba9c-0f7f5c83f2ae/corrections/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=510b5700-f2e3-43ba-84c0-4a64709dd031",
+          "status": 200
+        },
+        {
+          "post": "/timekeeping/attendance/2dbeb912-e961-43e7-ba9c-0f7f5c83f2ae/corrections/new/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=510b5700-f2e3-43ba-84c0-4a64709dd031",
+          "feedback": [
+            "×\nدرخواست اصلاح برای بررسی مستقل ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "4f0120d0-b4f5-4545-a476-1a6ac053ac96",
+            "replacement_check_in_at": "2026-11-01 04:30:00+00:00",
+            "replacement_check_out_at": "2026-11-01 10:15:00+00:00",
+            "status": "pending",
+            "requested_by": "e14bed65-14d0-45ea-b878-20a41b178ed7",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "get": "/timekeeping/records/correction/4f0120d0-b4f5-4545-a476-1a6ac053ac96/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=510b5700-f2e3-43ba-84c0-4a64709dd031",
+          "status": 200
+        },
+        {
+          "post": "/timekeeping/attendance/corrections/4f0120d0-b4f5-4545-a476-1a6ac053ac96/review/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=510b5700-f2e3-43ba-84c0-4a64709dd031",
+          "feedback": [
+            "×\nبازه جایگزین با حضور قطعی دیگری هم‌پوشانی دارد."
+          ]
+        },
+        {
+          "page": "conflict-blocked",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "4f0120d0-b4f5-4545-a476-1a6ac053ac96",
+            "replacement_check_in_at": "2026-11-01 04:30:00+00:00",
+            "replacement_check_out_at": "2026-11-01 10:15:00+00:00",
+            "status": "pending",
+            "requested_by": "e14bed65-14d0-45ea-b878-20a41b178ed7",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "2dbeb912-e961-43e7-ba9c-0f7f5c83f2ae",
+            "employee": "510b5700-f2e3-43ba-84c0-4a64709dd031",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-01",
+            "check_in_at": "2026-11-01 04:30:00+00:00",
+            "check_out_at": "2026-11-01 08:30:00+00:00",
+            "state": "finalized",
+            "audit": [
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "c88812e1-67ae-4e25-a686-f5d2b8c0f7d1",
+            "employee": "510b5700-f2e3-43ba-84c0-4a64709dd031",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-01",
+            "check_in_at": "2026-11-01 09:30:00+00:00",
+            "check_out_at": "2026-11-01 11:30:00+00:00",
+            "state": "finalized",
+            "audit": [
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "4f0120d0-b4f5-4545-a476-1a6ac053ac96",
+            "replacement_check_in_at": "2026-11-01 04:30:00+00:00",
+            "replacement_check_out_at": "2026-11-01 10:15:00+00:00",
+            "status": "pending",
+            "requested_by": "e14bed65-14d0-45ea-b878-20a41b178ed7",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "2dbeb912-e961-43e7-ba9c-0f7f5c83f2ae",
+            "employee": "510b5700-f2e3-43ba-84c0-4a64709dd031",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-01",
+            "check_in_at": "2026-11-01 04:30:00+00:00",
+            "check_out_at": "2026-11-01 08:30:00+00:00",
+            "state": "finalized",
+            "audit": [
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "c88812e1-67ae-4e25-a686-f5d2b8c0f7d1",
+            "employee": "510b5700-f2e3-43ba-84c0-4a64709dd031",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-01",
+            "check_in_at": "2026-11-01 09:30:00+00:00",
+            "check_out_at": "2026-11-01 11:30:00+00:00",
+            "state": "finalized",
+            "audit": [
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "4f0120d0-b4f5-4545-a476-1a6ac053ac96",
+            "replacement_check_in_at": "2026-11-01 04:30:00+00:00",
+            "replacement_check_out_at": "2026-11-01 10:15:00+00:00",
+            "status": "pending",
+            "requested_by": "e14bed65-14d0-45ea-b878-20a41b178ed7",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "get": "/timekeeping/records/correction/4f0120d0-b4f5-4545-a476-1a6ac053ac96/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=510b5700-f2e3-43ba-84c0-4a64709dd031",
+          "status": 200
+        },
+        {
+          "post": "/timekeeping/attendance/corrections/4f0120d0-b4f5-4545-a476-1a6ac053ac96/review/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=510b5700-f2e3-43ba-84c0-4a64709dd031",
+          "feedback": [
+            "×\nبازه جایگزین با حضور قطعی دیگری هم‌پوشانی دارد."
+          ]
+        },
+        {
+          "overlap_minutes": 45,
+          "originals_unchanged": true,
+          "replacement_count": 0,
+          "partial_audit_events": 0
+        },
+        {
+          "get": "/timekeeping/records/correction/4f0120d0-b4f5-4545-a476-1a6ac053ac96/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=510b5700-f2e3-43ba-84c0-4a64709dd031",
+          "status": 200
+        },
+        {
+          "post": "/timekeeping/attendance/corrections/4f0120d0-b4f5-4545-a476-1a6ac053ac96/review/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=510b5700-f2e3-43ba-84c0-4a64709dd031",
+          "feedback": [
+            "×\nدرخواست اصلاح تعیین تکلیف شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "4f0120d0-b4f5-4545-a476-1a6ac053ac96",
+            "replacement_check_in_at": "2026-11-01 04:30:00+00:00",
+            "replacement_check_out_at": "2026-11-01 10:15:00+00:00",
+            "status": "rejected",
+            "requested_by": "e14bed65-14d0-45ea-b878-20a41b178ed7",
+            "reviewed_by": "18ff4617-c4dd-4792-97c5-d4701ae85022",
+            "audit": []
+          }
+        },
+        {
+          "page": "conflict-rejected",
+          "width": 1440,
+          "overflow": false
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "ASSIGNMENT-CONTEXT-1024",
+      "description": "Complete from the open row menu, retain context and verify feedback and audit",
+      "steps": [
+        {
+          "witness": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "b4f98537-2f65-49ab-a6bc-0cdfa6098705",
+            "employee": "ef9e1ed0-4564-46c6-af6a-be1f392a9237",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "planned_end_date": "2026-11-20",
+            "end_date": "None",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/workforce/assignments/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&q=%D9%85%D8%B3%D8%A6%D9%88%D9%84+%D8%A8%D8%A7%D8%B2%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%DB%8C+%D9%86%D9%87%D8%A7%DB%8C%DB%8C+1024&sort=status&direction=asc",
+          "status": 200
+        },
+        {
+          "post": "/workforce/assignments/b4f98537-2f65-49ab-a6bc-0cdfa6098705/status/",
+          "status": 302,
+          "returned": "/workforce/assignments/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&q=%D9%85%D8%B3%D8%A6%D9%88%D9%84+%D8%A8%D8%A7%D8%B2%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%DB%8C+%D9%86%D9%87%D8%A7%DB%8C%DB%8C+1024&sort=status&direction=asc"
+        },
+        {
+          "feedback": "وضعیت تخصیص به‌روزرسانی شد."
+        },
+        {
+          "witness": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "b4f98537-2f65-49ab-a6bc-0cdfa6098705",
+            "employee": "ef9e1ed0-4564-46c6-af6a-be1f392a9237",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "planned_end_date": "2026-11-20",
+            "end_date": "2026-11-11",
+            "status": "completed",
+            "audit": [
+              {
+                "action": "employee_project_assignment.status_changed",
+                "actor__username": "b02-owner"
+              },
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "page": "assignment-ended-return",
+          "width": 1024,
+          "overflow": false
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "ASSIGNMENT-CONTEXT-390",
+      "description": "Complete from the open row menu, retain context and verify feedback and audit",
+      "steps": [
+        {
+          "witness": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "0e9cb725-4a4a-46e1-97a7-40a56758e057",
+            "employee": "b04e55d3-d0a6-4727-928b-97e55e95a955",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "planned_end_date": "2026-11-20",
+            "end_date": "None",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/workforce/assignments/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&q=%D9%85%D8%B3%D8%A6%D9%88%D9%84+%D8%A8%D8%A7%D8%B2%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%DB%8C+%D9%86%D9%87%D8%A7%DB%8C%DB%8C+390&sort=status&direction=asc",
+          "status": 200
+        },
+        {
+          "post": "/workforce/assignments/0e9cb725-4a4a-46e1-97a7-40a56758e057/status/",
+          "status": 302,
+          "returned": "/workforce/assignments/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&q=%D9%85%D8%B3%D8%A6%D9%88%D9%84+%D8%A8%D8%A7%D8%B2%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%DB%8C+%D9%86%D9%87%D8%A7%DB%8C%DB%8C+390&sort=status&direction=asc"
+        },
+        {
+          "feedback": "وضعیت تخصیص به‌روزرسانی شد."
+        },
+        {
+          "witness": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "0e9cb725-4a4a-46e1-97a7-40a56758e057",
+            "employee": "b04e55d3-d0a6-4727-928b-97e55e95a955",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "planned_end_date": "2026-11-20",
+            "end_date": "2026-11-11",
+            "status": "completed",
+            "audit": [
+              {
+                "action": "employee_project_assignment.status_changed",
+                "actor__username": "b02-owner"
+              },
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "page": "assignment-ended-return",
+          "width": 390,
+          "overflow": false
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "ASSIGNMENT-POINTER-1024",
+      "description": "Complete from the open row menu, retain context and verify feedback and audit",
+      "steps": [
+        {
+          "witness": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "74b52026-a93a-4b2a-b010-702621ed22e1",
+            "employee": "a2d7864c-d819-4333-8057-23cbb9e1694a",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "planned_end_date": "2026-11-20",
+            "end_date": "None",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/workforce/assignments/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&q=%D9%85%D8%B3%D8%A6%D9%88%D9%84+%D8%A8%D8%A7%D8%B2%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%DB%8C+%D8%A7%D9%86%D8%AA%D8%AE%D8%A7%D8%A8+%D8%AA%D8%A7%D8%B1%DB%8C%D8%AE+1024&sort=status&direction=asc",
+          "status": 200
+        },
+        {
+          "post": "/workforce/assignments/74b52026-a93a-4b2a-b010-702621ed22e1/status/",
+          "status": 302,
+          "returned": "/workforce/assignments/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&q=%D9%85%D8%B3%D8%A6%D9%88%D9%84+%D8%A8%D8%A7%D8%B2%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%DB%8C+%D8%A7%D9%86%D8%AA%D8%AE%D8%A7%D8%A8+%D8%AA%D8%A7%D8%B1%DB%8C%D8%AE+1024&sort=status&direction=asc"
+        },
+        {
+          "feedback": "وضعیت تخصیص به‌روزرسانی شد."
+        },
+        {
+          "witness": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "74b52026-a93a-4b2a-b010-702621ed22e1",
+            "employee": "a2d7864c-d819-4333-8057-23cbb9e1694a",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "planned_end_date": "2026-11-20",
+            "end_date": "2026-11-11",
+            "status": "completed",
+            "audit": [
+              {
+                "action": "employee_project_assignment.status_changed",
+                "actor__username": "b02-owner"
+              },
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "page": "assignment-pointer-return",
+          "width": 1024,
+          "overflow": false
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "ASSIGNMENT-POINTER-390",
+      "description": "Complete from the open row menu, retain context and verify feedback and audit",
+      "steps": [
+        {
+          "witness": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "7701b760-fc10-4e13-ad66-7adc83507d53",
+            "employee": "95c42ecc-92fd-4852-8d6b-750e0b3a79f0",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "planned_end_date": "2026-11-20",
+            "end_date": "None",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/workforce/assignments/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&q=%D9%85%D8%B3%D8%A6%D9%88%D9%84+%D8%A8%D8%A7%D8%B2%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%DB%8C+%D8%A7%D9%86%D8%AA%D8%AE%D8%A7%D8%A8+%D8%AA%D8%A7%D8%B1%DB%8C%D8%AE+390&sort=status&direction=asc",
+          "status": 200
+        },
+        {
+          "post": "/workforce/assignments/7701b760-fc10-4e13-ad66-7adc83507d53/status/",
+          "status": 302,
+          "returned": "/workforce/assignments/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&q=%D9%85%D8%B3%D8%A6%D9%88%D9%84+%D8%A8%D8%A7%D8%B2%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%DB%8C+%D8%A7%D9%86%D8%AA%D8%AE%D8%A7%D8%A8+%D8%AA%D8%A7%D8%B1%DB%8C%D8%AE+390&sort=status&direction=asc"
+        },
+        {
+          "feedback": "وضعیت تخصیص به‌روزرسانی شد."
+        },
+        {
+          "witness": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "7701b760-fc10-4e13-ad66-7adc83507d53",
+            "employee": "95c42ecc-92fd-4852-8d6b-750e0b3a79f0",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "planned_end_date": "2026-11-20",
+            "end_date": "2026-11-11",
+            "status": "completed",
+            "audit": [
+              {
+                "action": "employee_project_assignment.status_changed",
+                "actor__username": "b02-owner"
+              },
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "page": "assignment-pointer-return",
+          "width": 390,
+          "overflow": false
+        }
+      ],
+      "status": "PASS"
+    }
+  ]
+}

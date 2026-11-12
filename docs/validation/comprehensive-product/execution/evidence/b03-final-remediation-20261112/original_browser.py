@@ -1,0 +1,35 @@
+from pathlib import Path
+exec((Path(__file__).parent.parent/"bonira-b03-01a1cbfa"/"browser.py").read_text(encoding="utf-8").rsplit("with sync_playwright() as pw:",1)[0])
+targets=json.loads((root/db/"targets.json").read_text())
+with sync_playwright() as pw:
+    browser=pw.chromium.launch(executable_path=r"C:\Program Files\Google\Chrome\Application\chrome.exe",headless=False,args=["--no-first-run","--no-default-browser-check"])
+    owner=connect(browser,"b02-owner")
+    reviewer=connect(browser,"b02-field-reviewer")
+    report=get("DailyReport",reporting_date=date(2026,9,1),site_id=ids["site"])
+    url=daily+str(report.pk)+"/"
+    visit(owner,url)
+    click(form(owner,"/submit/"))
+    measure(owner,"0017-author-approval",False)
+    before=get("DailyReport",pk=report.pk).status
+    status=send(owner,url+"approve/")
+    approved=get("DailyReport",pk=report.pk)
+    row("0017_reproduced",before=="submitted" and approved.status=="approved" and approved.approved_by_id==approved.created_by_id,status=status,report=str(report.pk),audit=audit(report.pk),return_control=main(owner).locator('form[action*="return"]').count())
+    labor=get("DailyReport",reporting_date=date(2026,9,2),site_id=ids["site"])
+    url=daily+str(labor.pk)+"/"
+    visit(owner,url)
+    f=form(owner,"/labor/")
+    fill(f,team_name="گروه بازپخش",worker_count="4",hours_worked="6.50")
+    values=payload(f)
+    click(f)
+    retry=send(owner,url+"labor/",values)
+    row("0018_reproduced",labor.labor_entries.count()==2,report=str(labor.pk),rows=labor.labor_entries.count(),status=retry,entry_audit=[audit(e.pk) for e in labor.labor_entries.all()])
+    visit(owner,url)
+    measure(owner,"0018-duplicate-labor",False)
+    url=field+targets["observation"]+"/"
+    visit(reviewer,url)
+    count=main(reviewer).locator('form[action*="/proposals/"][action*="/review/"]').count()
+    measure(reviewer,"0019-missing-review",False)
+    row("0019_reproduced",count==0,observation=targets["observation"],submitted=model("FieldDownstreamProposal").objects.filter(observation_id=targets["observation"],status="submitted").count(),review_controls=count)
+    (out/"results.json").write_text(json.dumps({"browser":browser.version,"results":results,"pages":pages,"traffic":traffic},ensure_ascii=False,indent=2),encoding="utf-8")
+    browser.close()
+assert all(x["match"] for v in results.values() for x in v)

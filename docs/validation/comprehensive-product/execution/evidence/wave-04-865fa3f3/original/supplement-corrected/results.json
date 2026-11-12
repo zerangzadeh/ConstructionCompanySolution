@@ -1,0 +1,154 @@
+{
+  "safety:create": [
+    {
+      "ok": true,
+      "path": "/safety/f0d2ed21-8303-4acf-8ef9-d1b5853c943d/",
+      "errors": "",
+      "pk": "f0d2ed21-8303-4acf-8ef9-d1b5853c943d"
+    }
+  ],
+  "safety:evidence": [
+    {
+      "ok": true,
+      "actual_entry": "/documents/evidence/safety/f0d2ed21-8303-4acf-8ef9-d1b5853c943d/register/"
+    },
+    {
+      "ok": true,
+      "invalid": "foreign_version",
+      "status": 400
+    },
+    {
+      "ok": true,
+      "state": "submitted",
+      "pins": [
+        "75b1275f-91ec-4a2a-90a9-39ed5777b8ca"
+      ],
+      "operational": "reported"
+    },
+    {
+      "ok": true,
+      "exact_link": "/documents/evidence/safety/f0d2ed21-8303-4acf-8ef9-d1b5853c943d/75b1275f-91ec-4a2a-90a9-39ed5777b8ca/"
+    },
+    {
+      "ok": true,
+      "current": "ba2a71ba-9112-4b87-b947-5ebd79a01fa6",
+      "pin": "75b1275f-91ec-4a2a-90a9-39ed5777b8ca",
+      "download": 200,
+      "reader_download": 403
+    }
+  ],
+  "safety:record-decision": [
+    {
+      "ok": false,
+      "blocked": "No record approve/return/reject control or domain HTTP route in current MVP",
+      "forms": [
+        "/safety/f0d2ed21-8303-4acf-8ef9-d1b5853c943d/review/"
+      ],
+      "review_status": "submitted",
+      "operational_status": "reported"
+    }
+  ],
+  "quality:create": [
+    {
+      "ok": true,
+      "path": "/quality/aa8a0eb8-66f1-48a2-8675-f6a3b93e9882/",
+      "errors": "",
+      "pk": "aa8a0eb8-66f1-48a2-8675-f6a3b93e9882"
+    }
+  ],
+  "quality:evidence": [
+    {
+      "ok": true,
+      "actual_entry": "/documents/evidence/quality/aa8a0eb8-66f1-48a2-8675-f6a3b93e9882/register/"
+    },
+    {
+      "ok": true,
+      "invalid": "foreign_version",
+      "status": 400
+    },
+    {
+      "ok": true,
+      "state": "submitted",
+      "pins": [
+        "75b1275f-91ec-4a2a-90a9-39ed5777b8ca"
+      ],
+      "operational": "reported"
+    },
+    {
+      "ok": true,
+      "exact_link": "/documents/evidence/quality/aa8a0eb8-66f1-48a2-8675-f6a3b93e9882/75b1275f-91ec-4a2a-90a9-39ed5777b8ca/"
+    },
+    {
+      "ok": true,
+      "current": "ba2a71ba-9112-4b87-b947-5ebd79a01fa6",
+      "pin": "75b1275f-91ec-4a2a-90a9-39ed5777b8ca",
+      "download": 200,
+      "reader_download": 403
+    }
+  ],
+  "quality:record-decision": [
+    {
+      "ok": false,
+      "blocked": "No record approve/return/reject control or domain HTTP route in current MVP",
+      "forms": [
+        "/quality/aa8a0eb8-66f1-48a2-8675-f6a3b93e9882/review/"
+      ],
+      "review_status": "submitted",
+      "operational_status": "reported"
+    }
+  ],
+  "equipment:usage-context": [
+    {
+      "ok": false,
+      "needs_po_review": "Current usage form offers neither deployment nor operator; its new record is ineligible for cost allocation",
+      "fields": [
+        "csrfmiddlewaretoken",
+        "equipment",
+        "started_at",
+        "ended_at",
+        "runtime_hours",
+        "source_key",
+        "source_key_existing",
+        "evidence_reference"
+      ]
+    }
+  ],
+  "equipment:usage-interval": [
+    {
+      "ok": false,
+      "status": 302,
+      "accepted_runtime": "20.000",
+      "overlaps_existing": true,
+      "created": 0
+    }
+  ],
+  "mvp-financial-boundary": [
+    {
+      "ok": true,
+      "target_route": "accounting:dashboard",
+      "status": 403
+    }
+  ],
+  "financial-side-effects": [
+    {
+      "ok": true,
+      "model": "accounting.JournalEntry",
+      "count": 0
+    },
+    {
+      "ok": true,
+      "model": "treasury.TreasuryMovement",
+      "count": 0
+    },
+    {
+      "ok": true,
+      "model": "treasury.PaymentRequest",
+      "count": 0
+    },
+    {
+      "ok": true,
+      "model": "projects.ProjectCostFact",
+      "count": 0
+    }
+  ]
+}

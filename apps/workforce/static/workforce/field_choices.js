@@ -32,6 +32,7 @@
       const local = select.dataset.localChoices === 'true';
       const editableText = local && select.matches('input[data-editable-text-choice="true"]');
       const initiallyDisabled = select.disabled;
+      const originalAriaHidden = select.getAttribute('aria-hidden');
       let generation = 0, pending;
       const message = (text, visible = false, action = null) => {
         status.textContent = text;
@@ -113,6 +114,7 @@
           no_more_results: () => '<div class="no-more-results">پایان فهرست</div>',
         },
         onInitialize: function() {
+          if (select.dataset.hideEnhancedSource === 'true') select.setAttribute('aria-hidden', 'true');
           this.control_input.setAttribute('aria-label', select.dataset.placeholder);
           for (const attr of ['aria-describedby', 'aria-invalid']) {
             if (select.hasAttribute(attr)) this.control_input.setAttribute(attr, select.getAttribute(attr));
@@ -150,6 +152,10 @@
         // Tom Select may have disabled the native select for a missing parent.
         // Restore its configured state before a later HTMX mount.
         select.disabled = initiallyDisabled;
+        if (select.dataset.hideEnhancedSource === 'true') {
+          if (originalAriaHidden === null) select.removeAttribute('aria-hidden');
+          else select.setAttribute('aria-hidden', originalAriaHidden);
+        }
         container.removeEventListener('click', retry);
         for (const name of dependencies) parent(select, name)?.removeEventListener('change', reset);
       });

@@ -1,0 +1,64 @@
+{
+  "chrome": "156.0.8078.80",
+  "phase": "after-retry",
+  "results": [
+    {
+      "id": "BON-DEF-0003",
+      "status": "PASS",
+      "actual": "Cancel made no POST or state/audit change. Confirm made exactly one POST, retired the same version and appended exactly one audit event."
+    },
+    {
+      "id": "DATE-RESPONSIVE-VALIDATION",
+      "status": "FAIL",
+      "actual": "page.goto: net::ERR_ABORTED at http://127.0.0.1:8189/organizations/platform/activity/ Call log: \u001b[2m  - navigating to \"http://127.0.0.1:8189/organizations/platform/activity/\", waiting until \"load\"\u001b[22m"
+    }
+  ],
+  "observations": [
+    {
+      "key": "confirmation",
+      "text": "×\n!\nبازنشستگی کنترل آزمایشی بازآزمایی · authorization.self_grant · نسخه 3\nاین نسخه از کاتالوگ فعال عملیات حفاظت‌شده خارج می‌شود. تاریخچه و سوابق ممیزی حفظ می‌شوند؛ این اقدام به‌تنهایی دسترسی یا تأیید هیچ عملیاتی را اعطا نمی‌کند.\nتأیید بازنشستگی نسخه\nانصراف",
+      "dialogAx": "- dialog \"بازنشستگی کنترل آزمایشی بازآزمایی · authorization.self_grant · نسخه 3\":\n  - button \"بستن پیام\": ×\n  - text: \"!\"\n  - heading \"بازنشستگی کنترل آزمایشی بازآزمایی · authorization.self_grant · نسخه 3\" [level=2]\n  - text: این نسخه از کاتالوگ فعال عملیات حفاظت‌شده خارج می‌شود. تاریخچه و سوابق ممیزی حفظ می‌شوند؛ این اقدام به‌تنهایی دسترسی یا تأیید هیچ عملیاتی را اعطا نمی‌کند.\n  - button \"تأیید بازنشستگی نسخه\"\n  - button \"انصراف\""
+    },
+    {
+      "key": "confirmation-responsive",
+      "width": 1024,
+      "client": 1024,
+      "scroll": 1024
+    },
+    {
+      "key": "confirmation-responsive",
+      "width": 390,
+      "client": 390,
+      "scroll": 390
+    },
+    {
+      "key": "audit-labels",
+      "width": 1024,
+      "client": 1024,
+      "scroll": 1024,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "فعالیت‌ها و ممیزی"
+      ],
+      "targets": [
+        {
+          "label": "خانه",
+          "href": "/"
+        },
+        {
+          "label": "پاک‌کردن",
+          "href": "/organizations/platform/activity/"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/activity/"
+        }
+      ],
+      "mains": 1
+    }
+  ],
+  "errors": []
+}

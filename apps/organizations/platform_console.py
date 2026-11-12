@@ -45,6 +45,7 @@ from apps.organizations.models import (
 )
 from apps.organizations.platform_companies import incomplete_company_onboarding
 from apps.organizations.platform_grants import lock_platform_admin
+from core.forms import JalaliDateMixin
 from core.jalali import format_jalali
 from core.list_filters import paginate_table
 from core.operations import (
@@ -127,14 +128,14 @@ class OperatorRevocationForm(forms.Form):
     reason = forms.CharField(label="دلیل لغو", max_length=1000)
 
 
-class PlatformAuditFilter(forms.Form):
+class PlatformAuditFilter(JalaliDateMixin, forms.Form):
     start = forms.DateField(
-        label="از تاریخ میلادی",
+        label="از تاریخ شمسی",
         required=False,
         widget=forms.DateInput(attrs={"type": "date"}),
     )
     end = forms.DateField(
-        label="تا تاریخ میلادی",
+        label="تا تاریخ شمسی",
         required=False,
         widget=forms.DateInput(attrs={"type": "date"}),
     )

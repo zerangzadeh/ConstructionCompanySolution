@@ -1,3 +1,5 @@
+import uuid
+
 from django import forms
 
 from apps.daily_reports.models import (
@@ -145,6 +147,10 @@ class _DailyReportEntryForm(JalaliDateMixin, forms.ModelForm):
 
 
 class DailyReportLaborEntryForm(_DailyReportEntryForm):
+    operation_key = forms.UUIDField(
+        label="شناسه درخواست", widget=forms.HiddenInput, initial=uuid.uuid4
+    )
+
     class Meta:
         model = DailyReportLaborEntry
         fields = ["team_name", "worker_count", "hours_worked", "notes"]  # noqa: RUF012

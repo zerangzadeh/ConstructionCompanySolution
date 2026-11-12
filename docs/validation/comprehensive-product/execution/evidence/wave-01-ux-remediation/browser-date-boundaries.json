@@ -1,0 +1,95 @@
+{
+  "chrome": "156.0.8078.80",
+  "phase": "date-boundaries",
+  "results": [
+    {
+      "id": "DATE-RESPONSIVE-VALIDATION",
+      "status": "PASS",
+      "actual": "Tablet/mobile layout and labels, impossible date detected and bounded server invalid-date result verified. Invalid value redisplay concern UX-R-OBS-01 recorded."
+    }
+  ],
+  "observations": [
+    {
+      "key": "audit-labels",
+      "width": 1024,
+      "client": 1024,
+      "scroll": 1024,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "فعالیت‌ها و ممیزی"
+      ],
+      "targets": [
+        {
+          "label": "خانه",
+          "href": "/"
+        },
+        {
+          "label": "پاک‌کردن",
+          "href": "/organizations/platform/activity/"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/activity/"
+        }
+      ],
+      "mains": 1
+    },
+    {
+      "key": "invalid-date-state",
+      "width": 1024,
+      "url": "/organizations/platform/activity/?start=1405%2F13%2F50",
+      "value": ""
+    },
+    {
+      "key": "remaining-concern",
+      "id": "UX-R-OBS-01",
+      "width": 1024,
+      "actual": "Invalid date remains in URL, but the input redisplays empty after automatic filtering."
+    },
+    {
+      "key": "audit-labels",
+      "width": 390,
+      "client": 390,
+      "scroll": 390,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "فعالیت‌ها و ممیزی"
+      ],
+      "targets": [
+        {
+          "label": "خانه",
+          "href": "/"
+        },
+        {
+          "label": "پاک‌کردن",
+          "href": "/organizations/platform/activity/"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/activity/"
+        }
+      ],
+      "mains": 1,
+      "screenshot": "date-boundaries-audit-labels-390.png"
+    },
+    {
+      "key": "invalid-date-state",
+      "width": 390,
+      "url": "/organizations/platform/activity/?start=1405%2F13%2F50",
+      "value": ""
+    },
+    {
+      "key": "remaining-concern",
+      "id": "UX-R-OBS-01",
+      "width": 390,
+      "actual": "Invalid date remains in URL, but the input redisplays empty after automatic filtering."
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,178 @@
+{
+  "browser": "156.0.8078.80",
+  "db": "b02_retest_browser_final",
+  "profile": "MVP",
+  "witness_read_only": true,
+  "cases": [
+    {
+      "id": "LEAVE-RESERVED-DOWNSTREAM",
+      "description": "Submit and independently approve an actually reserved MVP draft",
+      "steps": [
+        {
+          "witness": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "ad77f52e-ba02-4207-a286-d543e09b76c9",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-01 10:30:00+00:00",
+            "ends_at": "2026-11-01 11:30:00+00:00",
+            "state": "draft",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "reservation": "04367b21-a8c4-4448-876b-3d175266c3ee",
+          "policy": "30833aed-489c-43c3-ac8d-4ee5b2a70842",
+          "relationship": "bb9f81fa-8e1a-49e7-a8fb-d50f8d76abee",
+          "minutes": "60.0000",
+          "fixture_source": "B02-RETEST-RESERVE"
+        },
+        {
+          "get": "/timekeeping/records/leave/ad77f52e-ba02-4207-a286-d543e09b76c9/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "reserved-leave-draft",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/leave-mission/ad77f52e-ba02-4207-a286-d543e09b76c9/submit/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست ارسال شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "ad77f52e-ba02-4207-a286-d543e09b76c9",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-01 10:30:00+00:00",
+            "ends_at": "2026-11-01 11:30:00+00:00",
+            "state": "submitted",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "None",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/timekeeping/records/leave/ad77f52e-ba02-4207-a286-d543e09b76c9/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "reserved-leave-review",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/leave-mission/ad77f52e-ba02-4207-a286-d543e09b76c9/review/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست تعیین تکلیف شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "ad77f52e-ba02-4207-a286-d543e09b76c9",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-01 10:30:00+00:00",
+            "ends_at": "2026-11-01 11:30:00+00:00",
+            "state": "approved",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "18ff4617-c4dd-4792-97c5-d4701ae85022",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "witness": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "ad77f52e-ba02-4207-a286-d543e09b76c9",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-01 10:30:00+00:00",
+            "ends_at": "2026-11-01 11:30:00+00:00",
+            "state": "approved",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "18ff4617-c4dd-4792-97c5-d4701ae85022",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "ledger": [
+            {
+              "kind": "reservation",
+              "quantity": "0.0000",
+              "reserved_quantity": "60.0000",
+              "source_key": "B02-RETEST-RESERVE"
+            }
+          ],
+          "requester_and_reviewer_distinct": true,
+          "native_approval_is_not_occurrence_consumption": true
+        },
+        {
+          "get": "/timekeeping/records/leave/ad77f52e-ba02-4207-a286-d543e09b76c9/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "reserved-leave-approved",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "get": "/timekeeping/records/leave/ad77f52e-ba02-4207-a286-d543e09b76c9/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "reserved-leave-approved",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "get": "/timekeeping/records/leave/ad77f52e-ba02-4207-a286-d543e09b76c9/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "reserved-leave-approved",
+          "width": 390,
+          "overflow": false
+        }
+      ],
+      "status": "PASS"
+    }
+  ]
+}

@@ -1,38 +1,168 @@
-{% extends "base.html" %}{% load static erp_format product_surface related_documents %}
+{% extends "base.html" %}
+{% load static erp_format product_surface related_documents %}
+
 {% block title %}{{ project.name }} | مرکز کنترل پروژه{% endblock %}
-{% block extra_head %}{% include "components/dashboard_reporting_assets.html" %}<link rel="stylesheet" href="{% static 'documents/related_documents.css' %}"><script src="{% static 'documents/related_documents.js' %}" defer></script>{% endblock %}
+{% block extra_head %}
+    {% include "components/dashboard_reporting_assets.html" %}
+    <link rel="stylesheet" href="{% static 'documents/related_documents.css' %}">
+    <link rel="stylesheet" href="{% static 'projects/detail_dashboard.css' %}">
+    <script src="{% static 'documents/related_documents.js' %}" defer></script>
+{% endblock %}
 {% block working_context %}{% endblock %}
+
 {% block content %}
 {% related_documents project as related_documents %}
-<div class="erp-command-center erp-reference-list erp-dashboard" data-page-family="dashboard">
-    {% url 'projects:list' as list_url %}{% breadcrumb_trail project.name 'پروژه‌ها' list_url as breadcrumbs %}
+<div class="erp-command-center erp-reference-list erp-dashboard project-dashboard" data-page-family="dashboard">
+    {% url 'projects:list' as list_url %}
+    {% breadcrumb_trail project.name 'پروژه‌ها' list_url as breadcrumbs %}
     {% include "components/breadcrumbs.html" with page_breadcrumbs=breadcrumbs only %}
-    <header class="erp-project-heading">
-        <div class="erp-project-heading__copy"><span class="erp-project-heading__icon">{% include "components/form_icon.html" with icon="layers" only %}</span><div class="erp-project-heading__identity"><h1>{{ project.name }}</h1>{% include "components/status_badge.html" with status=project.status label=project.get_status_display only %}</div><div class="erp-project-meta"><span>مرکز کنترل پروژه</span><bdi dir="ltr">{{ project.code }}</bdi><span>{{ request.organization.name }}</span><span>شروع: <bdi dir="ltr">{{ project.start_date|jalali_date|default:"—" }}</bdi></span><span>پایان: <bdi dir="ltr">{{ project.end_date|jalali_date|default:"—" }}</bdi></span></div></div>
+
+    <header class="project-hero erp-project-panel">
+        <div class="project-hero__body">
+            <div class="project-hero__copy">
+                <div class="erp-project-heading__identity">
+                    <span class="project-hero__icon">{% include "components/form_icon.html" with icon="layers" only %}</span>
+                    <h1>{{ project.name }}</h1>
+                    {% include "components/status_badge.html" with status=project.status label=project.get_status_display only %}
+                </div>
+                <dl class="project-hero__facts">
+                    <div><dt>شرکت</dt><dd>{{ request.organization.name }}</dd></div>
+                    <div><dt>کد پروژه</dt><dd><bdi dir="ltr">{{ project.code }}</bdi></dd></div>
+                    <div><dt>تاریخ شروع</dt><dd><bdi dir="ltr">{{ project.start_date|jalali_date|default:"—" }}</bdi></dd></div>
+                </dl>
+            </div>
+            {% with photo=related_documents.first_photo %}
+                {% if photo %}
+                    <img class="project-hero__image" src="{{ photo.photo_preview_url }}" alt="{{ photo.title }}" width="216" height="116">
+                {% else %}
+                    <div class="project-hero__placeholder" aria-hidden="true">{% include "components/form_icon.html" with icon="layers" only %}</div>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <nav class="erp-project-tabs" aria-label="بخش‌های پروژه">
+            <a class="is-current" href="#overview" aria-current="location">داشبورد</a>
+            <a href="#information">اطلاعات اصلی</a>
+            {% if dashboard.controls_url %}<a href="#progress">برنامه و پیشرفت</a>{% endif %}
+            {% for item in commercial_summary %}<a href="{{ item.list_url }}">{{ item.label }}</a>{% endfor %}
+            {% if dashboard.sites_url %}<a href="{{ dashboard.sites_url }}">کارگاه‌ها</a>{% endif %}
+            {% if cost_projection %}<a href="#costs">هزینه‌ها</a>{% endif %}
+            <a href="#recent">آخرین ثبت‌ها</a>
+            {% include "components/related_documents_nav.html" %}
+            {% if dashboard.gallery_url %}<a href="{{ dashboard.gallery_url }}">گالری تصاویر</a>{% endif %}
+        </nav>
     </header>
-    <nav class="erp-project-tabs" aria-label="بخش‌های پروژه"><a class="is-current" href="#overview" aria-current="location">داشبورد</a><a href="#information">اطلاعات اصلی</a>{% if dashboard.can_controls %}<a href="#progress">برنامه و پیشرفت</a>{% endif %}{% for item in commercial_summary %}<a href="{{ item.list_url }}">{{ item.label }}</a>{% endfor %}{% for link in dashboard.quick_links %}{% if link.label == "کارگاه‌ها" %}<a href="{{ link.url }}">کارگاه‌ها</a>{% endif %}{% endfor %}{% if cost_projection %}<a href="#costs">هزینه‌ها</a>{% endif %}<a href="#recent">آخرین ثبت‌ها</a>{% include "components/related_documents_nav.html" %}{% for link in dashboard.quick_links %}{% if link.label == 'اسناد و گالری' %}<a href="{{ link.url }}">گالری تصاویر</a>{% endif %}{% endfor %}</nav>
-    <p class="erp-insight-context">شاخص‌ها و سوابق این صفحه فقط برای همین پروژه و در محدوده دسترسی شما هستند؛ تفسیر هر شاخص در توضیح آن آمده است.</p>
+
     <section id="overview" class="erp-project-kpis erp-dashboard-kpis" aria-label="شاخص‌های پروژه">
-        {% for kpi in dashboard.kpis %}{% include "components/dashboard_metric.html" with metric=kpi only %}{% endfor %}
+        {% for kpi in dashboard.kpis %}
+            {% include "components/dashboard_metric.html" with metric=kpi localized=True only %}
+        {% endfor %}
+        {% if related_documents != None %}
+            <article class="erp-dashboard-metric" data-kpi-tone="documents">
+                <div class="erp-dashboard-metric__label">
+                    {% include "components/form_icon.html" with icon="document" only %}
+                    <p>اسناد مرتبط</p>
+                </div>
+                <div class="erp-dashboard-metric__value"><bdi dir="ltr">{{ related_documents.count|erp_quantity_fa }}</bdi><span>سند</span></div>
+                <a href="#related-documents" aria-label="مشاهده اسناد مرتبط">مشاهده ←</a>
+            </article>
+        {% endif %}
     </section>
-    <div class="erp-project-analytics">
-        {% if cost_projection %}<section id="costs" class="erp-project-panel">
-            {% include "components/dashboard_chart.html" with chart_id="project-cost-chart" title="بودجه و هزینه ثبت‌شده" description="مقایسه مبالغ؛ بودجه تخمینی با هزینه طبقه‌بندی‌شده هم‌ارز" rows=dashboard.cost_rows unit=request.organization.currency render_chart=dashboard.cost_comparable icon="layers" only %}
-            <p class="erp-project-coverage" role="note">پوشش ناقص — مبلغ صفر به معنی نبود هزینه نیست. هزینه ثبت‌شده، کل هزینه پروژه نیست.</p>
-            {% if dashboard.cost_rows|length == 1 %}<p class="erp-project-note">شواهد هم‌ارز کافی برای نمایش هزینه ثبت نشده است؛ مانده بودجه محاسبه نمی‌شود.</p>{% endif %}
-            <details class="erp-project-evidence"><summary>ردیابی منبع و پوشش</summary>{% if dashboard.cost_comparable %}<div class="erp-project-evidence__totals"><p>تعهد مجاز: <bdi dir="ltr">{{ cost_projection.authorized_commitment|erp_number }}</bdi></p><p>تعهد باز: <bdi dir="ltr">{{ cost_projection.open_commitment|erp_number }}</bdi></p><p>تعهد رفع‌شده: <bdi dir="ltr">{{ cost_projection.relieved_commitment|erp_number }}</bdi></p><p>هزینه تحقق‌یافته: <bdi dir="ltr">{{ cost_projection.accrual|erp_number }}</bdi></p><p>هزینه واقعی: <bdi dir="ltr">{{ cost_projection.actual_cost|erp_number }}</bdi></p></div>{% endif %}<p class="erp-project-note">واحد و تاریخ هر شاهد در سوابق زیر آمده است؛ این ارقام گواهی پوشش کامل نیستند.</p><ul>{% for fact in cost_projection.facts %}<li>{{ fact.get_kind_display }} · نسخه منبع {{ fact.contract.version|erp_number }} · <bdi dir="ltr">{{ fact.recognition_date|jalali_date }}</bdi> · <bdi dir="ltr">{{ fact.amount|erp_number }}</bdi> {{ fact.currency }}</li>{% empty %}<li>هنوز برون‌داد طبقه‌بندی‌شده‌ای ثبت نشده است.</li>{% endfor %}</ul></details>
-        </section>{% endif %}
-        {% if dashboard.has_contracts_access %}<section class="erp-project-panel">{% include "components/dashboard_chart.html" with chart_id="project-contracts-chart" title="وضعیت قراردادهای پروژه" description="ترکیب وضعیت قراردادهای قابل مشاهده در این پروژه" rows=dashboard.contract_rows ring=True total=dashboard.contract_total unit="قرارداد" icon="document" empty_message="هنوز قراردادی برای نمایش وضعیت وجود ندارد." only %}</section>{% endif %}
+
+    {% if cost_projection %}{% include "projects/dashboard_budget.html" %}{% endif %}
+
+    <div class="project-dashboard__pair">
+        <section id="recent" class="erp-project-panel erp-project-recent" aria-labelledby="project-recent-heading">
+            <div class="erp-project-section-heading">
+                {% include "components/form_icon.html" with icon="clock" only %}
+                <h2 id="project-recent-heading">آخرین موارد ثبت‌شده</h2>
+            </div>
+            <ul>
+                {% for item in dashboard.recent %}
+                    <li>
+                        <div>
+                            <span class="erp-project-record-kind">{{ item.kind }}</span>
+                            <a href="{{ item.url }}">{{ item.title }}</a>
+                            <time datetime="{{ item.date|date:'c' }}">{{ item.date|jalali_datetime }}</time>
+                        </div>
+                        {% include "components/status_badge.html" with status=item.status label=item.status_label only %}
+                    </li>
+                {% empty %}
+                    <li class="project-dashboard__empty">هنوز مورد قابل مشاهده‌ای ثبت نشده است.</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        {% if dashboard.has_contracts_access %}
+            <section class="erp-project-panel project-contracts" aria-labelledby="project-contracts-chart-title">
+                {% include "components/dashboard_chart.html" with chart_id="project-contracts-chart" title="وضعیت قراردادهای پروژه" description="توزیع قراردادهای قابل مشاهده بر اساس وضعیت" rows=dashboard.contract_rows ring=True total=dashboard.contract_total unit="قرارداد" icon="document" empty_message="هنوز قراردادی برای نمایش وضعیت وجود ندارد." only %}
+                {% for item in commercial_summary %}
+                    {% if item.label == "قراردادها" %}<a class="project-dashboard__section-link" href="{{ item.list_url }}">{{ item.list_label }} ←</a>{% endif %}
+                {% endfor %}
+            </section>
+        {% endif %}
     </div>
 
-    <div class="erp-project-operations">
-        {% include "projects/commercial_summary.html" %}
-        <section id="recent" class="erp-project-panel erp-project-recent"><div class="erp-project-section-heading">{% include "components/form_icon.html" with icon="clock" only %}<h2>آخرین موارد ثبت‌شده</h2><p>آخرین سوابق قابل مشاهده؛ به ترتیب زمان ثبت</p></div><ul>{% for item in dashboard.recent %}<li><div><span class="erp-project-record-kind">{{ item.kind }}</span><a href="{{ item.url }}">{{ item.title }}</a><time>{{ item.date|jalali_datetime }}</time></div>{% include "components/status_badge.html" with status=item.status label=item.status_label only %}</li>{% empty %}<li class="erp-project-note">هنوز مورد قابل مشاهده‌ای برای نمایش وجود ندارد.</li>{% endfor %}</ul></section>
-        {% if dashboard.quick_links %}<section class="erp-project-panel"><div class="erp-project-section-heading">{% include "components/form_icon.html" with icon="bolt" only %}<h2>دسترسی سریع</h2><p>عملیات همین پروژه در محدوده دسترسی شما</p></div><div class="erp-project-quick">{% for link in dashboard.quick_links %}<a href="{{ link.url }}">{% if link.label == "کارگاه‌ها" %}{% include "components/form_icon.html" with icon="hard-hat" only %}{% elif link.label == "اسناد و گالری" %}{% include "components/form_icon.html" with icon="notes" only %}{% elif link.label == "حضور و کارکرد" %}{% include "components/form_icon.html" with icon="clock" only %}{% else %}{% include "components/form_icon.html" with icon="document" only %}{% endif %}{% if link.label == "اسناد و گالری" %}گالری تصاویر{% else %}{{ link.label }}{% endif %} <span aria-hidden="true">←</span></a>{% endfor %}</div></section>{% endif %}
-    </div>
+    {% if commercial_summary or dashboard.quick_links %}
+        <div class="project-dashboard__pair">
+            {% include "projects/commercial_summary.html" %}
+            {% if dashboard.quick_links %}
+                <section class="erp-project-panel" aria-labelledby="project-quick-heading">
+                    <div class="erp-project-section-heading">
+                        {% include "components/form_icon.html" with icon="bolt" only %}
+                        <h2 id="project-quick-heading">دسترسی سریع</h2>
+                        <p>مشاهده اطلاعات این پروژه</p>
+                    </div>
+                    <div class="erp-project-quick">
+                        {% for link in dashboard.quick_links %}
+                            <a href="{{ link.url }}">
+                                {% include "components/form_icon.html" with icon=link.icon only %}
+                                {{ link.label }} <span aria-hidden="true">←</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if dashboard.controls_url %}
+        <section id="progress" class="erp-project-progress" aria-labelledby="project-progress-heading">
+            <div>
+                <h2 id="project-progress-heading">برنامه و پیشرفت</h2>
+                <p>پیشرفت برنامه‌ای و واقعی قابل اتکای پروژه ثبت نشده است.</p>
+            </div>
+            <a class="erp-btn erp-btn--secondary" href="{{ dashboard.controls_url }}">ساختار شکست و فعالیت‌ها ←</a>
+        </section>
+    {% endif %}
+
     {% include "components/related_documents.html" with source_label="پروژه" %}
-    <section id="information" class="erp-project-panel erp-project-information"><div class="erp-project-section-heading">{% include "components/form_icon.html" with icon="notes" only %}<h2>اطلاعات اصلی</h2><p>مشخصات و بودجه‌های ثبت‌شده پروژه</p></div><dl><div><dt>کد پروژه</dt><dd><bdi dir="ltr">{{ project.code }}</bdi></dd></div><div><dt>شرکت</dt><dd>{{ request.organization.name }}</dd></div><div><dt>تاریخ شروع</dt><dd><bdi dir="ltr">{{ project.start_date|jalali_date|default:"—" }}</bdi></dd></div><div><dt>تاریخ پایان</dt><dd><bdi dir="ltr">{{ project.end_date|jalali_date|default:"—" }}</bdi></dd></div><div><dt>بودجه تخمینی</dt><dd><bdi dir="ltr">{{ project.estimated_budget|erp_number }}</bdi> {{ request.organization.currency }}</dd></div><div><dt>بودجه واقعی</dt><dd><bdi dir="ltr">{{ project.actual_budget|erp_number }}</bdi> {{ request.organization.currency }}</dd></div></dl><div id="description"><h3>توضیحات</h3><p>{{ project.description|default:"توضیحی برای این پروژه ثبت نشده است."|linebreaksbr }}</p></div>    {% if dashboard.can_controls %}<section id="progress" class="erp-project-progress"><div><h2>برنامه و پیشرفت</h2><p>پیشرفت برنامه‌ای و واقعی قابل اتکای پروژه ثبت نشده است؛ نمودار پیشرفت ارائه نمی‌شود.</p></div><a href="{% url 'projects:controls' project.pk %}">ساختار شکست و فعالیت‌ها ←</a></section>{% endif %}{% if dashboard.can_archive %}<form id="management" method="post" action="{% url 'projects:archive' project.pk %}">{% csrf_token %}<button class="erp-project-archive" type="submit">بایگانی پروژه</button></form>{% endif %}</section>
+
+    <section id="information" class="erp-project-panel erp-project-information" aria-labelledby="project-information-heading">
+        <div class="erp-project-section-heading">
+            {% include "components/form_icon.html" with icon="notes" only %}
+            <h2 id="project-information-heading">اطلاعات اصلی</h2>
+        </div>
+        <dl>
+            <div><dt>تاریخ پایان</dt><dd><bdi dir="ltr">{{ project.end_date|jalali_date|default:"—" }}</bdi></dd></div>
+            <div><dt>بودجه واقعی در مشخصات پروژه</dt><dd><bdi dir="ltr">{{ project.actual_budget|erp_quantity_fa }}</bdi> {{ dashboard.currency_label }}</dd></div>
+        </dl>
+        <div id="description">
+            <h3>توضیحات</h3>
+            <p>{{ project.description|default:"توضیحی برای این پروژه ثبت نشده است."|linebreaksbr }}</p>
+        </div>
+        {% if dashboard.can_archive %}
+            <form id="management" method="post" action="{% url 'projects:archive' project.pk %}">
+                {% csrf_token %}
+                <button class="erp-project-archive" type="submit">بایگانی پروژه</button>
+            </form>
+        {% endif %}
+    </section>
     {{ dashboard.charts|json_script:"project-dashboard-data" }}
 </div>
 {% endblock %}
-{% block extra_scripts %}<script src="{% static 'projects/vendor/chartjs-4.6.1/chart.umd.min.js' %}" defer></script><script src="{% static 'projects/dashboard_charts.js' %}?v=20261103" defer></script>{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static 'projects/vendor/chartjs-4.6.1/chart.umd.min.js' %}" defer></script>
+    <script src="{% static 'projects/dashboard_charts.js' %}?v=20261111" defer></script>
+{% endblock %}

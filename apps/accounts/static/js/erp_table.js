@@ -48,6 +48,7 @@
             if (form.dataset.tableFilterBound) return;
             form.dataset.tableFilterBound = "true";
             form.addEventListener("submit", (event) => {
+                if (event.defaultPrevented) return;
                 event.preventDefault();
                 navigateWithFilters(form);
             });

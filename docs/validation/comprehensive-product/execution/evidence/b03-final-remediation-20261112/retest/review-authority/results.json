@@ -1,0 +1,256 @@
+{
+  "browser": "156.0.8078.80",
+  "results": {
+    "context_preserved": [
+      {
+        "match": true,
+        "width": 1440,
+        "status": 404
+      },
+      {
+        "match": true,
+        "width": 1024,
+        "status": 404
+      },
+      {
+        "match": true,
+        "width": 390,
+        "status": 404
+      }
+    ],
+    "accept_final_endpoint": [
+      {
+        "match": true,
+        "width": 1440,
+        "replay": 302,
+        "audit": [
+          [
+            "field_proposal.created",
+            "b02-owner"
+          ],
+          [
+            "field_proposal.submitted",
+            "b02-owner"
+          ],
+          [
+            "field_proposal.accepted",
+            "b02-field-reviewer"
+          ]
+        ],
+        "proposal": "32cf33a2-c198-4e7f-a60d-d6b516e784ce"
+      },
+      {
+        "match": true,
+        "width": 1024,
+        "replay": 302,
+        "audit": [
+          [
+            "field_proposal.created",
+            "b02-owner"
+          ],
+          [
+            "field_proposal.submitted",
+            "b02-owner"
+          ],
+          [
+            "field_proposal.accepted",
+            "b02-field-reviewer"
+          ]
+        ],
+        "proposal": "fbc94286-cb65-400b-b181-a21fd1e1c5e3"
+      },
+      {
+        "match": true,
+        "width": 390,
+        "replay": 302,
+        "audit": [
+          [
+            "field_proposal.created",
+            "b02-owner"
+          ],
+          [
+            "field_proposal.submitted",
+            "b02-owner"
+          ],
+          [
+            "field_proposal.accepted",
+            "b02-field-reviewer"
+          ]
+        ],
+        "proposal": "87d8cfa5-c470-472a-9294-814afc517509"
+      }
+    ],
+    "reject_final_endpoint": [
+      {
+        "match": true,
+        "width": 1440,
+        "replay": 302,
+        "audit": [
+          [
+            "field_proposal.created",
+            "b02-owner"
+          ],
+          [
+            "field_proposal.submitted",
+            "b02-owner"
+          ],
+          [
+            "field_proposal.rejected",
+            "b02-field-reviewer"
+          ]
+        ],
+        "proposal": "7c5d2740-5f52-4d00-b61a-a50471914728"
+      },
+      {
+        "match": true,
+        "width": 1024,
+        "replay": 302,
+        "audit": [
+          [
+            "field_proposal.created",
+            "b02-owner"
+          ],
+          [
+            "field_proposal.submitted",
+            "b02-owner"
+          ],
+          [
+            "field_proposal.rejected",
+            "b02-field-reviewer"
+          ]
+        ],
+        "proposal": "5028719b-8f8e-4c21-a1d5-a0755e04a6cb"
+      },
+      {
+        "match": true,
+        "width": 390,
+        "replay": 302,
+        "audit": [
+          [
+            "field_proposal.created",
+            "b02-owner"
+          ],
+          [
+            "field_proposal.submitted",
+            "b02-owner"
+          ],
+          [
+            "field_proposal.rejected",
+            "b02-field-reviewer"
+          ]
+        ],
+        "proposal": "fcdae682-7c4e-4fcf-94cf-4290da9cd0a9"
+      }
+    ]
+  },
+  "traffic": [
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/accounts/login/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "POST",
+      "/accounts/login/",
+      302
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "POST",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/proposals/32cf33a2-c198-4e7f-a60d-d6b516e784ce/review/accept/",
+      302
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "POST",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/proposals/7c5d2740-5f52-4d00-b61a-a50471914728/review/reject/",
+      302
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "POST",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/proposals/fbc94286-cb65-400b-b181-a21fd1e1c5e3/review/accept/",
+      302
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "POST",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/proposals/5028719b-8f8e-4c21-a1d5-a0755e04a6cb/review/reject/",
+      302
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "POST",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/proposals/87d8cfa5-c470-472a-9294-814afc517509/review/accept/",
+      302
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "POST",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/proposals/fcdae682-7c4e-4fcf-94cf-4290da9cd0a9/review/reject/",
+      302
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/field/77b49870-7b2b-47b6-b629-adbe1fa041d2/",
+      200
+    ]
+  ]
+}

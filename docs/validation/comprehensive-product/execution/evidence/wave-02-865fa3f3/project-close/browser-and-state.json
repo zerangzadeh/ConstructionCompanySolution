@@ -1,0 +1,184 @@
+{
+  "browser": "156.0.8078.80",
+  "profile": "MVP",
+  "db": "bonira_b02_run2",
+  "db_port": 59141,
+  "witness": "separate PostgreSQL connection, default_transaction_read_only=on",
+  "rows": {
+    "projects:wbs_create": {
+      "scenario": "UAT-02",
+      "route": "projects:wbs_create",
+      "variant": null,
+      "summary": "Create root and child through inline controls, verify parent and reject duplicate",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        },
+        {
+          "db": {
+            "model": "projects.WBSNode",
+            "id": "147a9f3d-a0dd-4a5d-bd17-606e652f23af",
+            "code": "B02-WBS",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "parent_id": null,
+            "audit": [
+              {
+                "action": "wbs_node.created",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "action": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/wbs/",
+          "posts": [
+            [
+              "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/wbs/",
+              302
+            ]
+          ],
+          "submitted": {
+            "sort_order": [
+              "2"
+            ]
+          },
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "feedback": [
+            "×\nفیلدهای ساختار شکست کار را بررسی و دوباره تلاش کنید."
+          ]
+        }
+      ],
+      "harness_or_assertion": "WBSNode matching query does not exist."
+    },
+    "projects:activity_create": {
+      "scenario": "UAT-02",
+      "route": "projects:activity_create",
+      "variant": null,
+      "summary": "Activity persists WBS, site and phase under the current project",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "'child'"
+    },
+    "projects:activity_transition": {
+      "scenario": "UAT-02",
+      "route": "projects:activity_transition",
+      "variant": null,
+      "summary": "Activate planned activity and verify state and audit",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "'activity'"
+    },
+    "projects:activity_archive": {
+      "scenario": "UAT-02",
+      "route": "projects:activity_archive",
+      "variant": null,
+      "summary": "Archive sacrificial activity while retaining its source row",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "'activity'"
+    },
+    "projects:wbs_archive": {
+      "scenario": "UAT-02",
+      "route": "projects:wbs_archive",
+      "variant": null,
+      "summary": "Archive leaf node, preserving ancestry",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "'child'"
+    },
+    "projects:photo_add": {
+      "scenario": "UAT-02",
+      "route": "projects:photo_add",
+      "variant": null,
+      "summary": "Upload generated PNG from gallery and compare linked document version",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/"
+        },
+        {
+          "upload_post_evidence": "project/browser-and-state.json projects:photo_add from earlier browser pass"
+        },
+        {
+          "db": {
+            "model": "documents.PhotoMetadata",
+            "id": "ccae69e7-47cc-40e0-9c21-dc55287313c5",
+            "document_id": "4df46dae-6779-48ef-a2cd-2faf356688ae",
+            "source": "camera",
+            "audit": []
+          }
+        }
+      ],
+      "harness_or_assertion": "Cannot resolve keyword 'site_id' into field. Choices are: created_at, created_by, created_by_id, document, document_id, id, legacy_link_id, organization, organization_id, project_site, project_site_id"
+    },
+    "projects:gallery": {
+      "scenario": "UAT-02",
+      "route": "projects:gallery",
+      "variant": null,
+      "summary": "Gallery displays actual image bytes, foreign gallery and direct image are denied",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/"
+        },
+        {
+          "db": {
+            "model": "documents.PhotoMetadata",
+            "id": "ccae69e7-47cc-40e0-9c21-dc55287313c5",
+            "document_id": "4df46dae-6779-48ef-a2cd-2faf356688ae",
+            "source": "camera",
+            "audit": []
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/gallery/",
+          "status": 403,
+          "final": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/gallery/"
+        }
+      ],
+      "harness_or_assertion": "Locator.get_attribute: Timeout 20000ms exceeded.\n"
+    }
+  }
+}

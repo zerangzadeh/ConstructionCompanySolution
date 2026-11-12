@@ -1,0 +1,20 @@
+{
+  "expenses:allocate": [
+    {
+      "ok": true,
+      "labels": "business name and code"
+    }
+  ],
+  "expenses:draft_create": [
+    {
+      "ok": true,
+      "replay_status": 200,
+      "amount": "5000.00",
+      "source": "B04-IDEMPOTENT"
+    },
+    {
+      "ok": true,
+      "missing_csrf": 403
+    }
+  ]
+}

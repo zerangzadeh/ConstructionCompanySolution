@@ -1,0 +1,196 @@
+/* Project Detail only. List, shell and shared Dashboard assets keep their layout. */
+.project-dashboard {
+    --project-gap: 14px;
+    --project-panel-pad: clamp(14px, 2vw, 22px);
+    display: grid;
+    gap: var(--project-gap);
+}
+
+.project-dashboard > :is(section, div, header) { min-width: 0; }
+.project-dashboard .project-hero { overflow: visible; }
+.project-hero__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: center;
+    padding: var(--project-panel-pad);
+}
+.project-hero__copy { min-width: 0; }
+.project-hero .erp-project-heading__identity { gap: 10px; }
+.project-hero h1 { font-size: clamp(20px, 2.2vw, 28px); font-weight: 700; line-height: 1.5; }
+.project-hero__icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 auto;
+    border-radius: 10px;
+    background: var(--bonira-soft);
+    color: var(--bonira-royal-blue);
+}
+.project-hero__icon svg { width: 26px; height: 26px; }
+.project-dashboard .project-hero__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    margin-block-start: 12px;
+    color: var(--bonira-ink);
+    font-size: 13px;
+}
+.project-hero__facts div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.project-hero__facts dt { color: var(--bonira-muted); font-size: 12px; }
+.project-hero__facts dd { overflow-wrap: anywhere; }
+.project-hero__facts bdi { font-weight: 600; }
+.project-hero__image, .project-hero__placeholder {
+    display: block;
+    width: clamp(120px, 16vw, 216px);
+    height: 104px;
+    object-fit: cover;
+    border: 1px solid var(--bonira-light-gray);
+    border-radius: 10px;
+    background: var(--bonira-soft);
+}
+.project-hero__placeholder {
+    display: grid;
+    place-items: center;
+    background: linear-gradient(145deg, var(--bonira-soft), var(--bonira-light-gray));
+    color: var(--bonira-royal-blue);
+}
+.project-hero__placeholder svg { width: 42px; height: 42px; }
+.project-dashboard .erp-project-tabs {
+    gap: 0 18px;
+    border-block-start: 1px solid var(--bonira-light-gray);
+    border-block-end: 0;
+    border-radius: 0 0 12px 12px;
+    padding-inline: var(--project-panel-pad);
+}
+.project-dashboard .erp-project-tabs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-block: 7px;
+    font-size: 12px;
+    font-weight: 500;
+}
+.project-dashboard .erp-project-tabs a.is-current { font-weight: 700; }
+
+.project-dashboard.erp-dashboard .erp-project-kpis {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 148px), 1fr));
+    margin: 0;
+    gap: 10px;
+}
+.project-dashboard.erp-dashboard .erp-project-kpis .erp-dashboard-metric {
+    padding: 12px 13px;
+    box-shadow: 0 2px 5px color-mix(in srgb, var(--bonira-deep-navy) 4%, transparent);
+}
+.project-dashboard .erp-dashboard-metric__label { gap: 6px; }
+.project-dashboard .erp-dashboard-metric__label svg { width: 20px; height: 20px; }
+.project-dashboard .erp-dashboard-metric__value { margin-block: 7px 2px; }
+.project-dashboard .erp-dashboard-metric__value bdi { font-size: clamp(16px, 1.55vw, 23px); line-height: 1.35; }
+.project-dashboard :is([data-kpi-tone="budget"], [data-kpi-tone="cost"]) .erp-dashboard-metric__value bdi {
+    font-size: clamp(14px, 1.3vw, 19px);
+}
+.project-dashboard.erp-dashboard .erp-project-kpis .erp-dashboard-metric > a { font-size: 11px; min-height: 32px; padding-block: 3px; }
+/* The approved accent is not declared by the current shared token sheet. */
+.project-dashboard [data-kpi-tone="cost"] svg { color: var(--bonira-amber-orange, #F59E0B); }
+
+.project-dashboard .erp-project-section-heading { margin: var(--project-panel-pad) var(--project-panel-pad) 10px; }
+.project-dashboard h2, .project-dashboard #commercial-summary > h2 { font-size: 15px; font-weight: 700; }
+.project-dashboard .erp-project-section-heading p, .project-dashboard .erp-project-chart figcaption p { font-size: 12px; }
+.project-budget__body { margin: 0 var(--project-panel-pad); border-block-start: 1px solid var(--bonira-light-gray); padding-block: 12px; }
+.project-budget__body--compared { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 18px; align-items: stretch; }
+.project-budget__amounts { display: grid; gap: 12px; }
+.project-budget__amounts > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 4px 10px; }
+.project-budget__amounts dt, .project-budget__result dt { color: var(--bonira-slate); font-size: 13px; }
+.project-budget__amounts dd { text-align: end; font-weight: 600; font-size: 14px; overflow-wrap: anywhere; }
+.project-budget__amounts dd span, .project-budget__result dd span { color: var(--bonira-muted); font-size: 11px; font-weight: 400; }
+.project-budget__bar { grid-column: 1 / -1; }
+.project-budget__amounts meter {
+    display: block;
+    width: 100%;
+    height: 12px;
+    border: 0;
+    appearance: none;
+    border-radius: 4px;
+    background: var(--bonira-light-gray);
+}
+.project-budget__amounts meter::-webkit-meter-bar { background: var(--bonira-light-gray); border: 0; border-radius: 4px; }
+.project-budget__amounts meter::-webkit-meter-optimum-value { background: var(--bonira-royal-blue); border-radius: 4px; }
+.project-budget__amounts meter::-moz-meter-bar { background: var(--bonira-royal-blue); border-radius: 4px; }
+.project-budget__amounts > div:first-child meter::-webkit-meter-optimum-value { background: color-mix(in srgb, var(--bonira-royal-blue) 60%, var(--bonira-white)); }
+.project-budget__amounts > div:first-child meter::-moz-meter-bar { background: color-mix(in srgb, var(--bonira-royal-blue) 60%, var(--bonira-white)); }
+.project-budget__result {
+    display: grid;
+    align-content: center;
+    gap: 8px;
+    border: 1px solid var(--bonira-light-gray);
+    border-radius: 8px;
+    background: var(--bonira-soft);
+    padding: 12px;
+}
+.project-budget__result dl {
+    display: grid;
+    grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr);
+    gap: 14px;
+}
+.project-budget__result dd { margin-block-start: 4px; font-size: 19px; font-weight: 700; overflow-wrap: anywhere; }
+.project-budget__result--over { border-color: color-mix(in srgb, var(--bonira-warning) 38%, var(--bonira-white)); background: color-mix(in srgb, var(--bonira-warning) 7%, var(--bonira-white)); }
+.project-budget__result--over dd, .project-budget__notice { color: var(--bonira-deep-navy); }
+.project-budget__notice { font-size: 12px; font-weight: 600; }
+.project-budget__message, .project-budget__coverage { margin: 0 var(--project-panel-pad) 8px; font-size: 12px; line-height: 1.8; color: var(--bonira-slate); }
+.project-budget__message { padding: 8px 10px; background: var(--bonira-soft); border-radius: 6px; }
+.project-budget .erp-project-evidence { margin: 4px var(--project-panel-pad) 13px; font-size: 12px; }
+.project-budget .erp-project-evidence summary { width: fit-content; padding-block: 4px; }
+
+.project-dashboard__pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--project-gap); align-items: start; }
+.project-dashboard__pair > :only-child { grid-column: 1 / -1; }
+.project-dashboard .erp-project-chart { padding: var(--project-panel-pad); }
+.project-dashboard .erp-project-chart__values { font-size: 13px; }
+.project-dashboard .erp-project-chart__values > div[data-chart-status="draft"] dt::before { background: var(--bonira-muted); }
+.project-dashboard .erp-project-chart__values > div[data-chart-status="terminated"] dt::before { background: var(--bonira-warning); }
+.project-dashboard .erp-project-chart__empty { min-height: 88px; }
+.project-dashboard__section-link { display: inline-flex; align-items: center; min-height: 40px; margin-inline: var(--project-panel-pad); color: var(--bonira-royal-blue); font-size: 12px; }
+.project-dashboard .erp-project-recent ul { padding-inline: var(--project-panel-pad); }
+.project-dashboard .erp-project-recent li { padding-block: 10px; }
+.project-dashboard .erp-project-recent li a { font-size: 13px; font-weight: 600; }
+.project-dashboard .erp-project-recent time, .project-dashboard .erp-project-record-kind { font-size: 11px; }
+.project-dashboard__empty { color: var(--bonira-muted); font-size: 13px; }
+.project-dashboard #commercial-summary { padding: var(--project-panel-pad); }
+.project-dashboard .erp-project-quick { padding: 4px var(--project-panel-pad) var(--project-panel-pad); }
+.project-dashboard .erp-project-quick a { min-height: 44px; font-size: 12px; }
+.project-dashboard .erp-project-progress { margin: 0; padding: 10px var(--project-panel-pad); }
+.project-dashboard .erp-project-progress a { min-height: 40px; font-size: 12px; }
+.project-dashboard .erp-related-documents, .project-dashboard .erp-project-information { margin: 0; }
+.project-dashboard .erp-project-information dl { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 4px var(--project-panel-pad) 12px; }
+.project-dashboard .erp-project-information dt, .project-dashboard .erp-project-information #description p { font-size: 12px; }
+.project-dashboard .erp-project-information dd { font-size: 14px; font-weight: 600; }
+.project-dashboard .erp-project-information #description { padding-inline: var(--project-panel-pad); }
+.project-dashboard .erp-project-information form { padding-inline: var(--project-panel-pad); }
+.project-dashboard a:hover { text-decoration: underline; }
+
+@media (max-width: 1100px) {
+    .project-dashboard__pair { grid-template-columns: minmax(0, 1fr); }
+    .project-dashboard .erp-project-chart--ring .erp-project-chart__body { max-width: 540px; margin-inline: auto; }
+}
+@media (min-width: 601px) and (max-width: 1199px) {
+    .project-dashboard.erp-dashboard .erp-project-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+    .project-dashboard { --project-gap: 10px; }
+    .project-dashboard .erp-project-kpis [data-kpi-tone="budget"] { grid-column: auto; }
+    .project-hero__body { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    .project-hero__facts { gap: 4px 14px; }
+    .project-hero__image { width: 100%; height: 102px; }
+    .project-hero__placeholder { display: none; }
+    .project-hero__icon { width: 32px; height: 32px; }
+    .project-hero__icon svg { width: 22px; height: 22px; }
+    .project-dashboard .erp-project-tabs { gap: 0 13px; }
+    .project-dashboard .erp-project-tabs a { font-size: 11px; }
+    .project-budget__body--compared { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .project-budget__amounts dt, .project-budget__result dt { font-size: 12px; }
+    .project-dashboard .erp-project-recent li { align-items: flex-start; }
+    .project-dashboard .erp-project-recent li > div { grid-template-columns: minmax(0, 1fr); }
+    .project-dashboard .erp-project-recent time { white-space: normal; }
+    .project-dashboard .erp-project-chart--ring .erp-project-chart__body { gap: 10px; }
+    .project-dashboard .erp-project-chart__values { font-size: 12px; }
+}

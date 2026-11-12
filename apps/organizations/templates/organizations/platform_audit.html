@@ -2,7 +2,7 @@
 {% block title %}فعالیت‌ها و ممیزی پلتفرم | بنیرا{% endblock %}
 {% block content %}
 {% include "components/page_header.html" with page_eyebrow="مدیریت پلتفرم" page_title="فعالیت‌ها و ممیزی" page_description="رویدادهای ثبت‌شدهٔ کنترل‌های پلتفرم و شرکت‌ها" only %}
-<form method="get" class="erp-surface mt-5 grid items-end gap-3 rounded-xl p-4 sm:grid-cols-2 lg:grid-cols-3">
+<form method="get" data-filter-submit="explicit" class="erp-surface mt-5 grid items-end gap-3 rounded-xl p-4 sm:grid-cols-2 lg:grid-cols-3">
     {% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
     <div class="flex flex-wrap gap-2"><button type="submit" class="erp-btn erp-btn--primary">فیلتر</button><a class="erp-btn erp-btn--secondary" href="{% url 'organizations:platform_audit' %}">پاک‌کردن</a></div>
 </form>

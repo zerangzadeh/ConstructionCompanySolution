@@ -1,0 +1,315 @@
+{
+  "browser": "156.0.8078.80",
+  "profile": "MVP",
+  "db": "bonira_b02_run2",
+  "db_port": 59141,
+  "witness": "separate PostgreSQL connection, default_transaction_read_only=on",
+  "rows": {
+    "workforce:field_create": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_create",
+      "variant": null,
+      "summary": "Reject invalid identifier, retain values, create non-login Worker plus explicit relationship",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/field/new/",
+          "status": 200,
+          "final": "/workforce/field/new/"
+        },
+        {
+          "action": "/workforce/field/new/",
+          "posts": [
+            [
+              "/workforce/field/new/",
+              200
+            ]
+          ],
+          "submitted": {},
+          "final": "/workforce/field/new/",
+          "feedback": [
+            "لطفاً موارد زیر را بررسی کنید:\n\nکد ملی: کد ملی معتبر نیست.",
+            "کد ملی معتبر نیست."
+          ]
+        },
+        {
+          "action": "/workforce/field/new/",
+          "posts": [
+            [
+              "/workforce/field/new/",
+              302
+            ]
+          ],
+          "submitted": {},
+          "final": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/",
+          "feedback": [
+            "×\nاطلاعات نیروی کار ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "workforce.Employee",
+            "id": "720f797d-3c6e-4b27-adbe-6e49a9c6e9d2",
+            "employee_number": "B02-W-UI",
+            "user_id": null,
+            "work_team_id": "dd16107c-e9eb-4a0c-b897-b6b9b5fdec76",
+            "hire_date": "2026-11-01",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee.created",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "identity": {
+            "explicit_relationship": "9e071902-7af1-4a77-88dd-7b6fc8bbbfe2",
+            "login": null
+          }
+        },
+        {
+          "negative_post": "/workforce/field/new/",
+          "status": 403
+        }
+      ]
+    },
+    "workforce:field_detail": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_detail",
+      "variant": null,
+      "summary": "Field detail shows worker code, grouping and non-login identity",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/",
+          "status": 200,
+          "final": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/"
+        },
+        {
+          "db": {
+            "model": "workforce.Employee",
+            "id": "720f797d-3c6e-4b27-adbe-6e49a9c6e9d2",
+            "employee_number": "B02-W-UI",
+            "user_id": null,
+            "status": "active",
+            "work_team_id": "dd16107c-e9eb-4a0c-b897-b6b9b5fdec76",
+            "audit": [
+              {
+                "action": "employee.created",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/field/3451383d-fc82-4adb-945d-0acbcf9ef24e/",
+          "status": 404,
+          "final": "/workforce/field/3451383d-fc82-4adb-945d-0acbcf9ef24e/"
+        }
+      ]
+    },
+    "workforce:field_edit": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_edit",
+      "variant": null,
+      "summary": "Edit existing worker without replacing the non-login identity",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "NAVIGATION_UX": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/",
+          "status": 200,
+          "final": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/"
+        },
+        {
+          "click": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/edit/",
+          "final": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/edit/"
+        },
+        {
+          "db": {
+            "model": "workforce.Employee",
+            "id": "720f797d-3c6e-4b27-adbe-6e49a9c6e9d2",
+            "employee_number": "B02-W-UI",
+            "phone_number": "",
+            "user_id": null,
+            "audit": [
+              {
+                "action": "employee.created",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "action": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/edit/",
+          "posts": [
+            [
+              "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/edit/",
+              302
+            ]
+          ],
+          "submitted": {},
+          "final": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/",
+          "feedback": [
+            "×\nاطلاعات نیروی کار ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "workforce.Employee",
+            "id": "720f797d-3c6e-4b27-adbe-6e49a9c6e9d2",
+            "employee_number": "B02-W-UI",
+            "phone_number": "02100000000",
+            "user_id": null,
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee.created",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/edit/",
+          "status": 403
+        },
+        {
+          "db": {
+            "model": "workforce.Employee",
+            "id": "720f797d-3c6e-4b27-adbe-6e49a9c6e9d2",
+            "phone_number": "02100000000",
+            "audit": [
+              {
+                "action": "employee.created",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "workforce:field_assign": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_assign",
+      "variant": null,
+      "summary": "Worker-detail assignment reuses worker and retains project/site after save",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "NAVIGATION_UX": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/",
+          "status": 200,
+          "final": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/"
+        },
+        {
+          "click": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/assign/",
+          "final": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/assign/"
+        },
+        {
+          "action": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/assign/",
+          "posts": [
+            [
+              "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/assign/",
+              302
+            ]
+          ],
+          "submitted": {},
+          "final": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/",
+          "feedback": [
+            "×\nتخصیص نیروی کار ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "e4c71d07-193a-449d-bf54-bbf659435e37",
+            "employee_id": "720f797d-3c6e-4b27-adbe-6e49a9c6e9d2",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "start_date": "2026-11-01",
+            "planned_end_date": "2026-11-17",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/workforce/field/720f797d-3c6e-4b27-adbe-6e49a9c6e9d2/assign/",
+          "status": 403
+        }
+      ]
+    },
+    "workforce:assignment_status_change": {
+      "scenario": "UAT-04",
+      "route": "workforce:assignment_status_change",
+      "variant": null,
+      "summary": "End the allocation with a distinct actual end date and compare the return context",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&q=B02-LEGACY",
+          "status": 200,
+          "final": "/workforce/assignments/"
+        }
+      ],
+      "harness_or_assertion": "Locator.all_inner_texts: Execution context was destroyed, most likely because of a navigation"
+    }
+  }
+}

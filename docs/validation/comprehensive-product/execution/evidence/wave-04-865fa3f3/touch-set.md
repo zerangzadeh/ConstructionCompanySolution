@@ -1,0 +1,1 @@
+B04 explicit user authorization: existing MVP defect fixes only. Touch set: core/organization_time.py; equipment forms/views; Safety/Quality forms/views; expense forms and history views; focused tests; B04 evidence, reports, MVP row results and shared defect register. No schema, permission catalog, financial workflow, surface-profile or production changes.

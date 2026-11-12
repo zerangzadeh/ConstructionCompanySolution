@@ -1,0 +1,430 @@
+{
+  "browser": "156.0.8078.80",
+  "profile": "MVP",
+  "db": "bonira_b02_run2",
+  "db_port": 59141,
+  "witness": "separate PostgreSQL connection, default_transaction_read_only=on",
+  "rows": {
+    "timekeeping:shift_break_create": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:shift_break_create",
+      "variant": null,
+      "summary": "Store the unpaid 30-minute shift break under the selected shift",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/shift-breaks/new/",
+          "status": 200,
+          "final": "/timekeeping/shift-breaks/new/"
+        }
+      ],
+      "harness_or_assertion": "Locator.all_inner_texts: Execution context was destroyed, most likely because of a navigation"
+    },
+    "timekeeping:attendance_correction_create": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:attendance_correction_create",
+      "variant": null,
+      "summary": "A separate corrector requests a 15-minute adjustment without changing original",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/"
+        },
+        {
+          "click": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/corrections/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "final": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/corrections/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+        },
+        {
+          "action": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/corrections/new/",
+          "posts": [
+            [
+              "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/corrections/new/",
+              302
+            ]
+          ],
+          "submitted": {},
+          "final": "/timekeeping/",
+          "feedback": [
+            "×\nدرخواست اصلاح برای بررسی مستقل ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "89d8ec0f-8acb-4250-9090-06575944dc4d",
+            "status": "pending",
+            "attendance_id": "dc72b016-4e71-4b51-865a-bba75a2e55f4",
+            "requested_by_id": "922f94c6-4b0c-4e39-bd92-d64a13dd5e69",
+            "replacement_check_out_at": "2026-11-01 12:15:00+00:00",
+            "audit": []
+          }
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "dc72b016-4e71-4b51-865a-bba75a2e55f4",
+            "state": "finalized",
+            "check_out_at": "2026-11-01 12:00:00+00:00",
+            "audit": [
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-clock"
+              },
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-review"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/corrections/new/",
+          "status": 404,
+          "final": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/corrections/new/"
+        }
+      ]
+    },
+    "timekeeping:attendance_correction_review": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:attendance_correction_review",
+      "variant": null,
+      "summary": "Reject self-review and independently approve a versioned 255-minute replacement",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/correction/89d8ec0f-8acb-4250-9090-06575944dc4d/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/correction/89d8ec0f-8acb-4250-9090-06575944dc4d/"
+        },
+        {
+          "self_post": 302
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "89d8ec0f-8acb-4250-9090-06575944dc4d",
+            "status": "pending",
+            "audit": []
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/correction/89d8ec0f-8acb-4250-9090-06575944dc4d/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/correction/89d8ec0f-8acb-4250-9090-06575944dc4d/"
+        },
+        {
+          "action": "/timekeeping/attendance/corrections/89d8ec0f-8acb-4250-9090-06575944dc4d/review/",
+          "posts": [
+            [
+              "/timekeeping/attendance/corrections/89d8ec0f-8acb-4250-9090-06575944dc4d/review/",
+              302
+            ]
+          ],
+          "submitted": {},
+          "final": "/timekeeping/",
+          "feedback": [
+            "×\nدرخواست اصلاح تعیین تکلیف شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "89d8ec0f-8acb-4250-9090-06575944dc4d",
+            "status": "approved",
+            "reviewed_by_id": "a4b59440-f07e-4ee3-87b9-7949412d6ccc",
+            "adjustment_id": "249cc5ef-7ec4-401f-a7f4-fe6c9c6522a8",
+            "audit": []
+          }
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "dc72b016-4e71-4b51-865a-bba75a2e55f4",
+            "state": "superseded",
+            "check_out_at": "2026-11-01 12:00:00+00:00",
+            "audit": [
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-clock"
+              },
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-review"
+              }
+            ]
+          }
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceAdjustment",
+            "id": "249cc5ef-7ec4-401f-a7f4-fe6c9c6522a8",
+            "replacement_id": "2be9edff-53e6-4924-88b4-56759f12eb9f",
+            "attendance_id": "dc72b016-4e71-4b51-865a-bba75a2e55f4",
+            "approved_by_id": "a4b59440-f07e-4ee3-87b9-7949412d6ccc",
+            "audit": [
+              {
+                "action": "time.attendance_corrected",
+                "actor__username": "b02-review"
+              }
+            ]
+          }
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "2be9edff-53e6-4924-88b4-56759f12eb9f",
+            "state": "finalized",
+            "check_in_at": "2026-11-01 08:00:00+00:00",
+            "check_out_at": "2026-11-01 12:15:00+00:00",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "audit": []
+          }
+        },
+        {
+          "negative_post": "/timekeeping/attendance/corrections/89d8ec0f-8acb-4250-9090-06575944dc4d/review/",
+          "status": 404
+        }
+      ]
+    },
+    "timekeeping:record_detail@correction": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:record_detail",
+      "variant": "correction",
+      "summary": "Match persisted correction history, status and role/tenant boundary",
+      "axes": {
+        "NAVIGATION_UX": "FAIL",
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "db": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "89d8ec0f-8acb-4250-9090-06575944dc4d",
+            "status": "approved",
+            "audit": []
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/correction/89d8ec0f-8acb-4250-9090-06575944dc4d/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/correction/89d8ec0f-8acb-4250-9090-06575944dc4d/"
+        },
+        {
+          "issue": "Approved correction detail omits the finalized replacement link required by UI guidelines §47"
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/correction/89d8ec0f-8acb-4250-9090-06575944dc4d/",
+          "status": 404,
+          "final": "/timekeeping/records/correction/89d8ec0f-8acb-4250-9090-06575944dc4d/"
+        }
+      ]
+    },
+    "timekeeping:attendance_correction_review@overlap": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:attendance_correction_review",
+      "variant": "overlap",
+      "summary": "Reject a replacement overlapping an independently finalized interval",
+      "axes": {
+        "BUSINESS_LOGIC": "FAIL",
+        "FUNCTIONAL": "PASS"
+      },
+      "trace": [
+        {
+          "db": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "2be9edff-53e6-4924-88b4-56759f12eb9f",
+            "state": "finalized",
+            "check_in_at": "2026-11-01 08:00:00+00:00",
+            "check_out_at": "2026-11-01 12:15:00+00:00",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "audit": []
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/attendance/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/attendance/new/"
+        },
+        {
+          "action": "/timekeeping/attendance/new/",
+          "posts": [
+            [
+              "/timekeeping/attendance/new/",
+              302
+            ]
+          ],
+          "submitted": {
+            "check_in_at": [
+              "2026-11-01T13:30"
+            ],
+            "check_out_at": [
+              "2026-11-01T15:00"
+            ]
+          },
+          "final": "/timekeeping/records/attendance/4036428b-3f0c-4fba-8d52-7153c6038f6c/",
+          "feedback": [
+            "×\nحضور برای بررسی ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "4036428b-3f0c-4fba-8d52-7153c6038f6c",
+            "state": "draft",
+            "check_in_at": "2026-11-01 13:30:00+00:00",
+            "check_out_at": "2026-11-01 15:00:00+00:00",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "audit": [
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-clock"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/attendance/4036428b-3f0c-4fba-8d52-7153c6038f6c/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/attendance/4036428b-3f0c-4fba-8d52-7153c6038f6c/"
+        },
+        {
+          "action": "/timekeeping/attendance/4036428b-3f0c-4fba-8d52-7153c6038f6c/finalize/",
+          "posts": [
+            [
+              "/timekeeping/attendance/4036428b-3f0c-4fba-8d52-7153c6038f6c/finalize/",
+              302
+            ]
+          ],
+          "submitted": {},
+          "final": "/timekeeping/",
+          "feedback": [
+            "×\nحضور قطعی شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "4036428b-3f0c-4fba-8d52-7153c6038f6c",
+            "state": "finalized",
+            "check_in_at": "2026-11-01 13:30:00+00:00",
+            "check_out_at": "2026-11-01 15:00:00+00:00",
+            "audit": [
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-clock"
+              },
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-review"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/attendance/2be9edff-53e6-4924-88b4-56759f12eb9f/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/attendance/2be9edff-53e6-4924-88b4-56759f12eb9f/"
+        },
+        {
+          "click": "/timekeeping/attendance/2be9edff-53e6-4924-88b4-56759f12eb9f/corrections/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "final": "/timekeeping/attendance/2be9edff-53e6-4924-88b4-56759f12eb9f/corrections/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+        },
+        {
+          "action": "/timekeeping/attendance/2be9edff-53e6-4924-88b4-56759f12eb9f/corrections/new/",
+          "posts": [
+            [
+              "/timekeeping/attendance/2be9edff-53e6-4924-88b4-56759f12eb9f/corrections/new/",
+              302
+            ]
+          ],
+          "submitted": {},
+          "final": "/timekeeping/",
+          "feedback": [
+            "×\nدرخواست اصلاح برای بررسی مستقل ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "2d2d8407-6c69-4384-a335-ac1d9859704e",
+            "status": "pending",
+            "replacement_check_out_at": "2026-11-01 14:15:00+00:00",
+            "attendance_id": "2be9edff-53e6-4924-88b4-56759f12eb9f",
+            "audit": []
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/correction/2d2d8407-6c69-4384-a335-ac1d9859704e/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/correction/2d2d8407-6c69-4384-a335-ac1d9859704e/"
+        },
+        {
+          "action": "/timekeeping/attendance/corrections/2d2d8407-6c69-4384-a335-ac1d9859704e/review/",
+          "posts": [
+            [
+              "/timekeeping/attendance/corrections/2d2d8407-6c69-4384-a335-ac1d9859704e/review/",
+              302
+            ]
+          ],
+          "submitted": {},
+          "final": "/timekeeping/",
+          "feedback": [
+            "×\nدرخواست اصلاح تعیین تکلیف شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "2d2d8407-6c69-4384-a335-ac1d9859704e",
+            "status": "approved",
+            "adjustment_id": "9a1a0184-b891-48dd-ad2b-606e2ff8e2a7",
+            "audit": []
+          }
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "a3f215a2-cc80-4cad-8adc-b935bced6f95",
+            "state": "finalized",
+            "check_in_at": "2026-11-01 08:00:00+00:00",
+            "check_out_at": "2026-11-01 14:15:00+00:00",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "audit": []
+          }
+        },
+        {
+          "overlap_minutes": 45,
+          "other_finalized": "4036428b-3f0c-4fba-8d52-7153c6038f6c",
+          "replacement": "a3f215a2-cc80-4cad-8adc-b935bced6f95"
+        },
+        {
+          "issue": "Correction approval persisted two overlapping finalized attendance intervals"
+        }
+      ]
+    }
+  }
+}

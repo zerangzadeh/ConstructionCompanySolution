@@ -30,6 +30,7 @@ from apps.workforce.models import Employee, EmployeeQualification
 from core.business_choices import SearchChoiceSelect, business_label
 from core.forms import JalaliDateMixin, attach_parent_choice_ui
 from core.jalali import format_jalali
+from core.organization_time import OrganizationDateTimeField, bind_organization_time
 from core.ui_forms import initialize_occurrence_key
 
 
@@ -54,8 +55,9 @@ class EquipmentCategoryInput(forms.TextInput):
 
 
 class _StyledForm(JalaliDateMixin, forms.Form):
-    def __init__(self, *args: object, **kwargs: object) -> None:
+    def __init__(self, *args: object, organization=None, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
+        bind_organization_time(self, organization)
         field_class = (
             "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 "
             "text-slate-900 outline-none focus:border-blue-500 focus:ring-2 "
@@ -88,7 +90,7 @@ class EquipmentForm(_StyledForm):
     )
 
     def __init__(self, *args, organization=None, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         categories = (
             Equipment.objects.filter(
                 organization=organization, archived_at__isnull=True
@@ -144,7 +146,7 @@ class EquipmentAssignmentForm(_StyledForm):
         membership: OrganizationMembership | None = None,
         **kwargs: object,
     ) -> None:
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         if not isinstance(membership, OrganizationMembership) or (
             membership.organization_id != organization.pk
         ):
@@ -225,7 +227,7 @@ class MaintenanceRecordForm(_StyledForm):
         membership: OrganizationMembership | None = None,
         **kwargs: object,
     ) -> None:
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         if not isinstance(membership, OrganizationMembership) or (
             membership.organization_id != organization.pk
         ):
@@ -311,7 +313,7 @@ class OperatorQualificationForm(_StyledForm):
     )
 
     def __init__(self, *args, organization, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         self.fields["equipment"].queryset = Equipment.objects.filter(
             organization=organization, archived_at__isnull=True
         )
@@ -336,7 +338,7 @@ class OperatorQualificationForm(_StyledForm):
 class DowntimeForm(_StyledForm):
     equipment = forms.ModelChoiceField(label="تجهیز", queryset=Equipment.objects.none())
     reason_code = forms.CharField(label="کد علت", max_length=50)
-    started_at = forms.DateTimeField(
+    started_at = OrganizationDateTimeField(
         label="شروع توقف", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
     )
     evidence_reference = forms.CharField(
@@ -347,7 +349,7 @@ class DowntimeForm(_StyledForm):
     )
 
     def __init__(self, *args, organization, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         self.fields["equipment"].queryset = Equipment.objects.filter(
             organization=organization, archived_at__isnull=True
         )
@@ -365,7 +367,7 @@ class MeterReadingForm(_StyledForm):
         label="کنتور", queryset=EquipmentMeter.objects.none()
     )
     value = forms.DecimalField(label="عدد قرائت", min_value=0, decimal_places=3)
-    observed_at = forms.DateTimeField(
+    observed_at = OrganizationDateTimeField(
         label="زمان مشاهده",
         widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
     )
@@ -381,7 +383,7 @@ class MeterReadingForm(_StyledForm):
     )
 
     def __init__(self, *args, organization, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         initialize_occurrence_key(self, "source_key")
         self.fields["meter"].queryset = EquipmentMeter.objects.filter(
             organization=organization, is_active=True
@@ -399,10 +401,10 @@ class MeterReadingForm(_StyledForm):
 
 class UsageForm(_StyledForm):
     equipment = forms.ModelChoiceField(label="تجهیز", queryset=Equipment.objects.none())
-    started_at = forms.DateTimeField(
+    started_at = OrganizationDateTimeField(
         label="شروع", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
     )
-    ended_at = forms.DateTimeField(
+    ended_at = OrganizationDateTimeField(
         label="پایان", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
     )
     runtime_hours = forms.DecimalField(
@@ -414,7 +416,7 @@ class UsageForm(_StyledForm):
     )
 
     def __init__(self, *args, organization, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         initialize_occurrence_key(self, "source_key")
         self.fields["equipment"].queryset = Equipment.objects.filter(
             organization=organization, archived_at__isnull=True
@@ -423,7 +425,7 @@ class UsageForm(_StyledForm):
 
 class FuelForm(_StyledForm):
     equipment = forms.ModelChoiceField(label="تجهیز", queryset=Equipment.objects.none())
-    occurred_at = forms.DateTimeField(
+    occurred_at = OrganizationDateTimeField(
         label="زمان", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
     )
     quantity = forms.DecimalField(label="مقدار", min_value=0.001, decimal_places=3)
@@ -434,7 +436,7 @@ class FuelForm(_StyledForm):
     )
 
     def __init__(self, *args, organization, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         initialize_occurrence_key(self, "source_key")
         self.fields["equipment"].queryset = Equipment.objects.filter(
             organization=organization, archived_at__isnull=True
@@ -451,7 +453,7 @@ class MaintenancePlanForm(_StyledForm):
     )
 
     def __init__(self, *args, organization, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         self.fields["equipment"].queryset = Equipment.objects.filter(
             organization=organization, archived_at__isnull=True
         )
@@ -471,7 +473,7 @@ class WorkOrderForm(_StyledForm):
     )
 
     def __init__(self, *args, organization, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         self.fields["equipment"].queryset = Equipment.objects.filter(
             organization=organization, archived_at__isnull=True
         )
@@ -505,7 +507,7 @@ class SpareLinkForm(_StyledForm):
     )
 
     def __init__(self, *args, organization, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         self.fields["inventory_transaction"].queryset = StockTransaction.objects.filter(
             organization=organization,
             status=StockTransactionStatus.POSTED,
@@ -555,7 +557,7 @@ class CostRateForm(_StyledForm):
     )
 
     def __init__(self, *args, organization, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         self.fields["policy"].queryset = EquipmentCostPolicyVersion.objects.filter(
             organization=organization,
             status__in=[CostPolicyStatus.DRAFT, CostPolicyStatus.REVIEWED],
@@ -578,7 +580,7 @@ class CostAllocationForm(_StyledForm):
     source_key = forms.CharField(label="کلید رخداد", max_length=120)
 
     def __init__(self, *args, organization, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         initialize_occurrence_key(self, "source_key")
         self.fields["usage"].queryset = EquipmentUsageLog.objects.filter(
             organization=organization, deployment__isnull=False
@@ -594,7 +596,7 @@ class CostHandoffForm(_StyledForm):
     )
 
     def __init__(self, *args, organization, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         self.organization = organization
         initialize_occurrence_key(
             self,

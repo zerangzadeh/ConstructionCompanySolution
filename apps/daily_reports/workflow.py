@@ -17,6 +17,7 @@ from apps.audit.services import record_audit_event
 from apps.organizations.authorization import (
     get_active_membership,
     membership_has_permission,
+    membership_has_scope,
     require_business_permission,
 )
 from apps.organizations.models import (
@@ -138,11 +139,12 @@ def _active_membership_id(organization: Organization, user_id: object) -> str | 
 def load_daily_report_subject(
     *, organization: Organization, subject_id: UUID, actor: User, for_update: bool
 ) -> SubjectSnapshot:
-    require_business_permission(
+    membership = require_business_permission(
         user=actor,
         organization=organization,
         permission=BusinessPermissionCode.DAILY_REPORTS_VIEW,
         message="اجازه مشاهده این گزارش روزانه را ندارید.",
+        allow_any_scope=True,
     )
     queryset = DailyReport.objects.select_related("project", "site")
     if for_update:
@@ -155,6 +157,9 @@ def load_daily_report_subject(
         report.project.organization_id != organization.pk
         or report.site.organization_id != organization.pk
         or report.site.project_id != report.project_id
+        or not membership_has_scope(
+            membership, project=report.project, site=report.site
+        )
     ):
         raise PermissionDenied("دامنه گزارش روزانه نامعتبر است.")
     return SubjectSnapshot(
@@ -447,11 +452,16 @@ def approve_daily_report_with_workflow(
         organization=organization,
         permission=BusinessPermissionCode.DAILY_REPORTS_APPROVE,
         message="اجازه تأیید گزارش‌های روزانه این سازمان را ندارید.",
-    ) or get_active_membership(user=actor, organization=organization)
+        allow_any_scope=True,
+    )
     try:
-        report = DailyReport.objects.get(pk=report_id, organization=organization)
+        report = DailyReport.objects.select_related("project", "site").get(
+            pk=report_id, organization=organization
+        )
     except DailyReport.DoesNotExist as exc:
         raise PermissionDenied("گزارش روزانه در این سازمان یافت نشد.") from exc
+    if not membership_has_scope(membership, project=report.project, site=report.site):
+        raise PermissionDenied("اجازه تأیید گزارش روزانه این کارگاه را ندارید.")
     if report.status != DailyReportStatus.SUBMITTED:
         raise ValueError("فقط گزارش‌های روزانه ارسال‌شده قابل تأیید هستند.")
     instance_exists = WorkflowInstance.objects.filter(

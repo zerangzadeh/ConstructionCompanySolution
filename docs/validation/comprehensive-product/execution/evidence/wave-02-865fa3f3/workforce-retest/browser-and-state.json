@@ -1,0 +1,299 @@
+{
+  "browser": "156.0.8078.80",
+  "profile": "MVP",
+  "db": "bonira_b02_run2",
+  "db_port": 59141,
+  "witness": "separate PostgreSQL connection, default_transaction_read_only=on",
+  "rows": {
+    "workforce:field_create": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_create",
+      "variant": null,
+      "summary": "Reject invalid identifier, retain values, create non-login Worker plus explicit relationship",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/field/new/",
+          "status": 200,
+          "final": "/workforce/field/new/"
+        },
+        {
+          "action": "/workforce/field/new/",
+          "posts": [
+            [
+              "/workforce/field/new/",
+              200
+            ]
+          ],
+          "final": "/workforce/field/new/",
+          "feedback": [
+            "لطفاً موارد زیر را بررسی کنید:\n\nکد ملی: کد ملی معتبر نیست.",
+            "کد ملی معتبر نیست."
+          ]
+        }
+      ],
+      "harness_or_assertion": "Locator.click: Timeout 7000ms exceeded.\n"
+    },
+    "workforce:field_detail": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_detail",
+      "variant": null,
+      "summary": "Field detail shows worker code, grouping and non-login identity",
+      "axes": {},
+      "trace": [],
+      "harness_or_assertion": "'workerui'"
+    },
+    "workforce:field_edit": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_edit",
+      "variant": null,
+      "summary": "Edit existing worker without replacing the non-login identity",
+      "axes": {},
+      "trace": [],
+      "harness_or_assertion": "'workerui'"
+    },
+    "workforce:field_choices": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_choices",
+      "variant": null,
+      "summary": "Enhanced live selector picks authorized site and scoped queries exclude others",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/create/?project=dad778f8-318a-4c1b-8933-a7397cc3c974",
+          "status": 200,
+          "final": "/workforce/assignments/create/"
+        },
+        {
+          "selector_xhr": [
+            [
+              "/workforce/field/choices/site/",
+              "q=EAST&project=dad778f8-318a-4c1b-8933-a7397cc3c974",
+              200
+            ],
+            [
+              "/workforce/field/choices/employee/",
+              "q=&project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&purpose=assignment",
+              200
+            ]
+          ],
+          "result_scope": "EAST returned; different project and tenant absent; limited sibling absent"
+        }
+      ]
+    },
+    "workforce:field_assign": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_assign",
+      "variant": null,
+      "summary": "Worker-detail assignment reuses worker and retains project/site after save",
+      "axes": {},
+      "trace": [],
+      "harness_or_assertion": "'workerui'"
+    },
+    "workforce:assignment_create": {
+      "scenario": "UAT-04",
+      "route": "workforce:assignment_create",
+      "variant": null,
+      "summary": "General assignment uses existing scoped selectors and dates",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "NAVIGATION_UX": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "db": {
+            "model": "workforce.Employee",
+            "id": "7667f371-0c27-4078-b971-bf5149f8a78a",
+            "status": "inactive",
+            "audit": [
+              {
+                "action": "employee.created",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.status_changed",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/field/7667f371-0c27-4078-b971-bf5149f8a78a/",
+          "status": 200,
+          "final": "/workforce/field/7667f371-0c27-4078-b971-bf5149f8a78a/"
+        },
+        {
+          "action": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/status/",
+          "posts": [
+            [
+              "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/status/",
+              302
+            ]
+          ],
+          "final": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/",
+          "feedback": [
+            "×\nوضعیت کارمند به‌روزرسانی شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "workforce.Employee",
+            "id": "7667f371-0c27-4078-b971-bf5149f8a78a",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee.created",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.status_changed",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.status_changed",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/assignments/"
+        },
+        {
+          "click": "/workforce/assignments/create/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "final": "/workforce/assignments/create/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18"
+        },
+        {
+          "action": "/workforce/assignments/create/",
+          "posts": [
+            [
+              "/workforce/assignments/create/",
+              302
+            ]
+          ],
+          "final": "/workforce/assignments/",
+          "feedback": [
+            "×\nکارمند به پروژه تخصیص یافت."
+          ]
+        },
+        {
+          "db": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "fd699374-84e8-4a6a-b787-69ed9714175f",
+            "employee_id": "7667f371-0c27-4078-b971-bf5149f8a78a",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "start_date": "2026-11-01",
+            "planned_end_date": "2026-11-17",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/workforce/assignments/create/",
+          "status": 403
+        }
+      ]
+    },
+    "workforce:assignment_list": {
+      "scenario": "UAT-04",
+      "route": "workforce:assignment_list",
+      "variant": null,
+      "summary": "Project/site filter shows assignment source and rejects out-of-scope rows",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/assignments/"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/assignments/"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/assignments/"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 403,
+          "final": "/workforce/assignments/"
+        },
+        {
+          "db": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "a56e03da-6803-48d2-b46f-0e60a14afcc5",
+            "employee_id": "9c34cd92-c920-443e-82df-cd2be5d047e9",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "workforce:assignment_status_change": {
+      "scenario": "UAT-04",
+      "route": "workforce:assignment_status_change",
+      "variant": null,
+      "summary": "End the allocation with a distinct actual end date and compare the return context",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&q=B02-LEGACY",
+          "status": 200,
+          "final": "/workforce/assignments/"
+        },
+        {
+          "action": "/workforce/assignments/fd699374-84e8-4a6a-b787-69ed9714175f/status/",
+          "posts": [],
+          "final": "/workforce/assignments/",
+          "feedback": []
+        }
+      ],
+      "harness_or_assertion": ""
+    }
+  }
+}

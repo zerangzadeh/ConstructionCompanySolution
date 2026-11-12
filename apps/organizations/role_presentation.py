@@ -55,6 +55,7 @@ def tenant_selector(organizations, selected=None):
             attrs={
                 "data-business-choice": "true",
                 "data-local-choices": "true",
+                "data-hide-enhanced-source": "true",
                 "data-placeholder": "جست‌وجو و انتخاب شرکت…",
             }
         ),

@@ -1496,6 +1496,20 @@ def assignment_sites(request: HttpRequest) -> HttpResponse:
 )
 @require_POST
 def assignment_status_change(request: HttpRequest, assignment_id: str) -> HttpResponse:
+    from .field_forms import AssignmentFilterForm, page_filter_values
+    from .field_selectors import resolve_field_context
+
+    values = page_filter_values(request)
+    resolve_field_context(
+        organization=request.organization, user=request.user,
+        values=values, include_employee=True,
+    )
+    filters = AssignmentFilterForm(
+        values or None, organization=request.organization, user=request.user
+    )
+    back_url = _assignment_journey_url(
+        "workforce:assignment_list", values if not values or filters.is_valid() else {}
+    )
     assignment = (
         get_organization_project_assignments(
             user=request.user, organization=request.organization
@@ -1532,7 +1546,7 @@ def assignment_status_change(request: HttpRequest, assignment_id: str) -> HttpRe
             messages.success(request, "وضعیت تخصیص به‌روزرسانی شد.")
     else:
         messages.error(request, "اطلاعات وضعیت تخصیص معتبر نیست.")
-    return redirect("workforce:assignment_list")
+    return redirect(back_url)
 
 
 @active_organization_required

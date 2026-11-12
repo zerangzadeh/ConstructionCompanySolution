@@ -426,7 +426,7 @@ class ProjectWorkspaceBrowserTests(
             source, ProjectCostFactKind.ACTUAL_RECOGNIZED, "123.45", "PCC-BROWSER"
         )
         detail = reverse("projects:detail", args=[self.project.pk])
-        ready = "!!Chart.getChart('project-cost-chart') && Chart.getChart('project-cost-chart').data.datasets[0].data[1]===123.45"
+        ready = "document.querySelectorAll('#costs meter').length===2 && document.querySelector('#costs .project-budget__amounts').textContent.includes('۱۲۳٫۴۵')"
         self.browser(
             self.preparer,
             [
@@ -434,14 +434,14 @@ class ProjectWorkspaceBrowserTests(
                     **BASE,
                     "name": "PCC-cost-evidence-desktop",
                     "path": detail,
-                    "mustText": ["پوشش ناقص", "بودجه و هزینه ثبت‌شده"],
+                    "mustText": ["پوشش ناقص", "وضعیت بودجه و هزینه‌های پروژه"],
                     "steps": [
                         inspect(
                             ready, "real producer-cost projection visualized exactly"
                         ),
                         inspect(
-                            "Chart.getChart('project-cost-chart').options.plugins.tooltip.callbacks.label({dataIndex:1}).includes('۱۲۳٫۴۵') && Chart.getChart('project-cost-chart').options.plugins.tooltip.rtl",
-                            "Persian exact-value financial tooltip",
+                            "document.querySelector('#costs .project-budget__result').textContent.includes('۱۲٫۴٪')",
+                            "Persian exact-value financial summary",
                         ),
                         {
                             "toggleSelector": ".erp-project-evidence summary",
@@ -458,8 +458,8 @@ class ProjectWorkspaceBrowserTests(
                     "steps": [
                         inspect(
                             ready
-                            + " && Chart.getChart('project-cost-chart').width<390",
-                            "real cost chart fits mobile",
+                            + " && document.querySelector('#costs meter').getBoundingClientRect().width<390",
+                            "real cost comparison fits mobile",
                         )
                     ],
                 },
@@ -548,7 +548,7 @@ class ProjectWorkspaceBrowserTests(
                     "path": detail,
                     "steps": [
                         inspect(
-                            "Chart.getChart('project-contracts-chart').data.datasets[0].data.join(',')==='1,1,1' && !document.getElementById('project-cost-chart')",
+                            "Chart.getChart('project-contracts-chart').data.datasets[0].data.join(',')==='1,1,1' && !document.querySelector('#costs meter')",
                             "real contracts and unavailable financial comparison",
                         )
                     ],

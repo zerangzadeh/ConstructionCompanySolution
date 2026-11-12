@@ -1,0 +1,26 @@
+[
+  {
+    "command": [
+      "node",
+      "--check",
+      "apps/accounts/static/js/erp_table.js"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check",
+      "--",
+      "apps/accounts/static/js/erp_table.js",
+      "apps/organizations/platform_console.py",
+      "apps/organizations/templates/organizations/platform_audit.html"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "warning: in the working copy of 'apps/organizations/platform_console.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'apps/organizations/templates/organizations/platform_audit.html', LF will be replaced by CRLF the next time Git touches it\n"
+  }
+]

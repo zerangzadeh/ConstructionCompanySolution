@@ -1,0 +1,47 @@
+{
+  "chrome": "156.0.8078.80",
+  "checks": [
+    {
+      "scenario": "PA-06",
+      "key": "temporary-password",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "PA-06",
+      "key": "recovery-secure",
+      "result": "FAIL",
+      "observed": "SMTP acceptance not communicated"
+    }
+  ],
+  "pages": [
+    {
+      "key": "platform-user-temp",
+      "pattern": "DC-06/DC-09/DC-10",
+      "route": "/organizations/platform/users/286f4a62-28b9-46f0-8a7c-299eed23fdb6/temporary-password/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "تنظیم گذرواژه موقت"
+      ],
+      "regions": [],
+      "nav": 2,
+      "tableHeaders": [],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "جزئیات کاربر",
+        "تنظیم گذرواژه موقت",
+        "انصراف"
+      ],
+      "screenshot": "platform-user-temp-1440.png"
+    }
+  ],
+  "faults": []
+}

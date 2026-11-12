@@ -65,6 +65,9 @@ def table_sort_header(context, sort_key, label):
             query.pop(key, None)
     current_key = query.get("sort", "")
     current_direction = query.get("direction", "asc").lower()
+    if applied_sort := context.get("applied_table_sort"):
+        current_key = applied_sort["key"]
+        current_direction = "desc" if applied_sort["descending"] else "asc"
     is_current = current_key == sort_key
     state = (
         current_direction

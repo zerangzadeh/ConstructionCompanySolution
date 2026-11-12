@@ -1,0 +1,763 @@
+{
+  "profile": "MVP",
+  "database": "isolated bonira_w01_browser",
+  "migration_count": 457,
+  "companies": [
+    {
+      "slug": "w01-a",
+      "state": "active",
+      "name": "شرکت نمونه موج الف",
+      "creator": "w01-owner",
+      "owners": [
+        "w01-owner"
+      ],
+      "admins": [],
+      "starter_incomplete": false
+    },
+    {
+      "slug": "w01-b",
+      "state": "active",
+      "name": "شرکت نمونه موج ب",
+      "creator": "w01-other",
+      "owners": [
+        "w01-other",
+        "w01-owner"
+      ],
+      "admins": [],
+      "starter_incomplete": false
+    },
+    {
+      "slug": "w01-browser-created",
+      "state": "active",
+      "name": "شرکت مرورگر موج یک",
+      "creator": "w01-platform",
+      "owners": [
+        "w01-initial-owner"
+      ],
+      "admins": [],
+      "starter_incomplete": false
+    },
+    {
+      "slug": "w01-delegate",
+      "state": "active",
+      "name": "شرکت نمونه واگذاری",
+      "creator": "w01-delegate",
+      "owners": [
+        "w01-delegate",
+        "w01-managed"
+      ],
+      "admins": [],
+      "starter_incomplete": false
+    },
+    {
+      "slug": "w01-legacy",
+      "state": "active",
+      "name": "شرکت نمونه تکمیل",
+      "creator": "w01-initial-owner",
+      "owners": [
+        "w01-initial-owner"
+      ],
+      "admins": [],
+      "starter_incomplete": false
+    },
+    {
+      "slug": "w01-legacy-retry",
+      "state": "active",
+      "name": "شرکت نمونه تکمیل راه‌اندازی",
+      "creator": "w01-initial-owner",
+      "owners": [
+        "w01-initial-owner"
+      ],
+      "admins": [],
+      "starter_incomplete": true
+    },
+    {
+      "slug": "w01-status",
+      "state": "active",
+      "name": "شرکت نمونه وضعیت",
+      "creator": "w01-initial-owner",
+      "owners": [
+        "w01-initial-owner"
+      ],
+      "admins": [],
+      "starter_incomplete": false
+    }
+  ],
+  "users": [
+    {
+      "actor": "w01-browser-new",
+      "active": true,
+      "forced_change": true,
+      "first_name": "ثبت",
+      "has_auth_revision": false,
+      "memberships": [],
+      "platform_assignments": []
+    },
+    {
+      "actor": "w01-candidate",
+      "active": true,
+      "forced_change": false,
+      "first_name": "نمونه",
+      "has_auth_revision": false,
+      "memberships": [],
+      "platform_assignments": [
+        [
+          "platform_admin",
+          "2026-11-09T21:32:20.760Z"
+        ]
+      ]
+    },
+    {
+      "actor": "w01-forced",
+      "active": true,
+      "forced_change": false,
+      "first_name": "نمونه",
+      "has_auth_revision": false,
+      "memberships": [],
+      "platform_assignments": []
+    },
+    {
+      "actor": "w01-managed",
+      "active": true,
+      "forced_change": false,
+      "first_name": "اصلاح موج یک",
+      "has_auth_revision": true,
+      "memberships": [
+        [
+          "w01-a",
+          "active"
+        ],
+        [
+          "w01-delegate",
+          "active"
+        ]
+      ],
+      "platform_assignments": []
+    },
+    {
+      "actor": "w01-recover",
+      "active": true,
+      "forced_change": false,
+      "first_name": "نمونه",
+      "has_auth_revision": false,
+      "memberships": [],
+      "platform_assignments": []
+    },
+    {
+      "actor": "w01-restricted",
+      "active": true,
+      "forced_change": false,
+      "first_name": "نمونه",
+      "has_auth_revision": false,
+      "memberships": [
+        [
+          "w01-a",
+          "active"
+        ]
+      ],
+      "platform_assignments": []
+    },
+    {
+      "actor": "w01-temporary",
+      "active": true,
+      "forced_change": false,
+      "first_name": "نمونه",
+      "has_auth_revision": false,
+      "memberships": [],
+      "platform_assignments": []
+    }
+  ],
+  "audit": [
+    {
+      "action": "authorization.platform_role_assigned",
+      "actor": "w01-root",
+      "company": null,
+      "entity_type": "organizations.PlatformRoleAssignment",
+      "at": "2026-11-09T21:30:30.031Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.platform_role_assigned",
+      "actor": "w01-root",
+      "company": null,
+      "entity_type": "organizations.PlatformRoleAssignment",
+      "at": "2026-11-09T21:30:30.036Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.scope_granted",
+      "actor": "w01-owner",
+      "company": "w01-a",
+      "entity_type": "organizations.MembershipScopeGrant",
+      "at": "2026-11-09T21:30:30.147Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.role_assigned",
+      "actor": "w01-owner",
+      "company": "w01-a",
+      "entity_type": "organizations.MembershipRoleAssignment",
+      "at": "2026-11-09T21:30:30.147Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "organization.created",
+      "actor": "w01-owner",
+      "company": "w01-a",
+      "entity_type": "organization",
+      "at": "2026-11-09T21:30:30.164Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.role_assigned",
+      "actor": "w01-other",
+      "company": "w01-b",
+      "entity_type": "organizations.MembershipRoleAssignment",
+      "at": "2026-11-09T21:30:30.186Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.scope_granted",
+      "actor": "w01-other",
+      "company": "w01-b",
+      "entity_type": "organizations.MembershipScopeGrant",
+      "at": "2026-11-09T21:30:30.195Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "organization.created",
+      "actor": "w01-other",
+      "company": "w01-b",
+      "entity_type": "organization",
+      "at": "2026-11-09T21:30:30.198Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "organization.created",
+      "actor": "w01-delegate",
+      "company": "w01-delegate",
+      "entity_type": "organization",
+      "at": "2026-11-09T21:30:30.228Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.role_assigned",
+      "actor": "w01-delegate",
+      "company": "w01-delegate",
+      "entity_type": "organizations.MembershipRoleAssignment",
+      "at": "2026-11-09T21:30:30.228Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.scope_granted",
+      "actor": "w01-delegate",
+      "company": "w01-delegate",
+      "entity_type": "organizations.MembershipScopeGrant",
+      "at": "2026-11-09T21:30:30.228Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.scope_granted",
+      "actor": "w01-initial-owner",
+      "company": "w01-status",
+      "entity_type": "organizations.MembershipScopeGrant",
+      "at": "2026-11-09T21:30:30.259Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "organization.created",
+      "actor": "w01-initial-owner",
+      "company": "w01-status",
+      "entity_type": "organization",
+      "at": "2026-11-09T21:30:30.259Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.role_assigned",
+      "actor": "w01-initial-owner",
+      "company": "w01-status",
+      "entity_type": "organizations.MembershipRoleAssignment",
+      "at": "2026-11-09T21:30:30.259Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.role_assigned",
+      "actor": "w01-owner",
+      "company": "w01-b",
+      "entity_type": "organizations.MembershipRoleAssignment",
+      "at": "2026-11-09T21:30:30.292Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.scope_granted",
+      "actor": "w01-owner",
+      "company": "w01-b",
+      "entity_type": "organizations.MembershipScopeGrant",
+      "at": "2026-11-09T21:30:30.292Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.role_assigned",
+      "actor": "w01-initial-owner",
+      "company": "w01-legacy",
+      "entity_type": "organizations.MembershipRoleAssignment",
+      "at": "2026-11-09T21:30:30.367Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "organization.created",
+      "actor": "w01-initial-owner",
+      "company": "w01-legacy",
+      "entity_type": "organization",
+      "at": "2026-11-09T21:30:30.370Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.scope_granted",
+      "actor": "w01-initial-owner",
+      "company": "w01-legacy",
+      "entity_type": "organizations.MembershipScopeGrant",
+      "at": "2026-11-09T21:30:30.370Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_definition.created",
+      "actor": "w01-owner",
+      "company": "w01-a",
+      "entity_type": "workflows.WorkflowDefinition",
+      "at": "2026-11-09T21:30:30.626Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_version.published",
+      "actor": "w01-owner",
+      "company": "w01-a",
+      "entity_type": "workflows.WorkflowVersion",
+      "at": "2026-11-09T21:30:30.631Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_version.published",
+      "actor": "w01-owner",
+      "company": "w01-a",
+      "entity_type": "workflows.WorkflowVersion",
+      "at": "2026-11-09T21:30:30.723Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_definition.created",
+      "actor": "w01-owner",
+      "company": "w01-a",
+      "entity_type": "workflows.WorkflowDefinition",
+      "at": "2026-11-09T21:30:30.723Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_definition.created",
+      "actor": "w01-other",
+      "company": "w01-b",
+      "entity_type": "workflows.WorkflowDefinition",
+      "at": "2026-11-09T21:30:30.836Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_version.published",
+      "actor": "w01-other",
+      "company": "w01-b",
+      "entity_type": "workflows.WorkflowVersion",
+      "at": "2026-11-09T21:30:30.841Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_definition.created",
+      "actor": "w01-other",
+      "company": "w01-b",
+      "entity_type": "workflows.WorkflowDefinition",
+      "at": "2026-11-09T21:30:30.923Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_version.published",
+      "actor": "w01-other",
+      "company": "w01-b",
+      "entity_type": "workflows.WorkflowVersion",
+      "at": "2026-11-09T21:30:30.923Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_definition.created",
+      "actor": "w01-delegate",
+      "company": "w01-delegate",
+      "entity_type": "workflows.WorkflowDefinition",
+      "at": "2026-11-09T21:30:31.051Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_version.published",
+      "actor": "w01-delegate",
+      "company": "w01-delegate",
+      "entity_type": "workflows.WorkflowVersion",
+      "at": "2026-11-09T21:30:31.053Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_definition.created",
+      "actor": "w01-delegate",
+      "company": "w01-delegate",
+      "entity_type": "workflows.WorkflowDefinition",
+      "at": "2026-11-09T21:30:31.162Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_version.published",
+      "actor": "w01-delegate",
+      "company": "w01-delegate",
+      "entity_type": "workflows.WorkflowVersion",
+      "at": "2026-11-09T21:30:31.163Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_definition.created",
+      "actor": "w01-initial-owner",
+      "company": "w01-status",
+      "entity_type": "workflows.WorkflowDefinition",
+      "at": "2026-11-09T21:30:31.280Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_version.published",
+      "actor": "w01-initial-owner",
+      "company": "w01-status",
+      "entity_type": "workflows.WorkflowVersion",
+      "at": "2026-11-09T21:30:31.280Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_definition.created",
+      "actor": "w01-initial-owner",
+      "company": "w01-status",
+      "entity_type": "workflows.WorkflowDefinition",
+      "at": "2026-11-09T21:30:31.390Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_version.published",
+      "actor": "w01-initial-owner",
+      "company": "w01-status",
+      "entity_type": "workflows.WorkflowVersion",
+      "at": "2026-11-09T21:30:31.390Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_definition.created",
+      "actor": "w01-initial-owner",
+      "company": "w01-legacy",
+      "entity_type": "workflows.WorkflowDefinition",
+      "at": "2026-11-09T21:30:31.538Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_version.published",
+      "actor": "w01-initial-owner",
+      "company": "w01-legacy",
+      "entity_type": "workflows.WorkflowVersion",
+      "at": "2026-11-09T21:30:31.542Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_version.published",
+      "actor": "w01-initial-owner",
+      "company": "w01-legacy",
+      "entity_type": "workflows.WorkflowVersion",
+      "at": "2026-11-09T21:30:31.640Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_definition.created",
+      "actor": "w01-initial-owner",
+      "company": "w01-legacy",
+      "entity_type": "workflows.WorkflowDefinition",
+      "at": "2026-11-09T21:30:31.640Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "user.password_initialized",
+      "actor": "w01-forced",
+      "company": null,
+      "entity_type": "user",
+      "at": "2026-11-09T21:31:20.579Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "user.password_reset_completed",
+      "actor": "w01-recover",
+      "company": null,
+      "entity_type": "user",
+      "at": "2026-11-09T21:31:31.970Z",
+      "channel": "email",
+      "delivery": null
+    },
+    {
+      "action": "authorization.role_assigned",
+      "actor": "w01-initial-owner",
+      "company": "w01-browser-created",
+      "entity_type": "organizations.MembershipRoleAssignment",
+      "at": "2026-11-09T21:31:42.460Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.scope_granted",
+      "actor": "w01-initial-owner",
+      "company": "w01-browser-created",
+      "entity_type": "organizations.MembershipScopeGrant",
+      "at": "2026-11-09T21:31:42.466Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "organization.created",
+      "actor": "w01-platform",
+      "company": "w01-browser-created",
+      "entity_type": "organization",
+      "at": "2026-11-09T21:31:42.471Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_definition.created",
+      "actor": "w01-initial-owner",
+      "company": "w01-browser-created",
+      "entity_type": "workflows.WorkflowDefinition",
+      "at": "2026-11-09T21:31:42.710Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_version.published",
+      "actor": "w01-initial-owner",
+      "company": "w01-browser-created",
+      "entity_type": "workflows.WorkflowVersion",
+      "at": "2026-11-09T21:31:42.714Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_definition.created",
+      "actor": "w01-initial-owner",
+      "company": "w01-browser-created",
+      "entity_type": "workflows.WorkflowDefinition",
+      "at": "2026-11-09T21:31:42.855Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "workflow_version.published",
+      "actor": "w01-initial-owner",
+      "company": "w01-browser-created",
+      "entity_type": "workflows.WorkflowVersion",
+      "at": "2026-11-09T21:31:42.860Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "organization.status_changed",
+      "actor": "w01-platform",
+      "company": "w01-status",
+      "entity_type": "organizations.Organization",
+      "at": "2026-11-09T21:31:50.928Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "organization.status_changed",
+      "actor": "w01-platform",
+      "company": "w01-status",
+      "entity_type": "organizations.Organization",
+      "at": "2026-11-09T21:31:52.700Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "user.account_created",
+      "actor": "w01-platform",
+      "company": null,
+      "entity_type": "user",
+      "at": "2026-11-09T21:32:03.771Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "user.account_updated",
+      "actor": "w01-platform",
+      "company": null,
+      "entity_type": "user",
+      "at": "2026-11-09T21:32:05.295Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "user.account_status_changed",
+      "actor": "w01-platform",
+      "company": null,
+      "entity_type": "user",
+      "at": "2026-11-09T21:32:10.054Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "user.account_status_changed",
+      "actor": "w01-platform",
+      "company": null,
+      "entity_type": "user",
+      "at": "2026-11-09T21:32:11.188Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "user.password_reset_requested",
+      "actor": "w01-platform",
+      "company": null,
+      "entity_type": "user",
+      "at": "2026-11-09T21:32:13.584Z",
+      "channel": "email",
+      "delivery": "unavailable"
+    },
+    {
+      "action": "authorization.platform_role_assigned",
+      "actor": "w01-platform",
+      "company": null,
+      "entity_type": "organizations.PlatformRoleAssignment",
+      "at": "2026-11-09T21:32:17.805Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.platform_role_revoked",
+      "actor": "w01-platform",
+      "company": null,
+      "entity_type": "organizations.PlatformRoleAssignment",
+      "at": "2026-11-09T21:32:20.768Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "role.created",
+      "actor": "w01-platform",
+      "company": null,
+      "entity_type": "organizations.OrganizationRole",
+      "at": "2026-11-09T21:32:28.716Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "policy.platform_created",
+      "actor": "w01-platform",
+      "company": null,
+      "entity_type": "organizations.InsuranceClassification",
+      "at": "2026-11-09T21:32:31.563Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.protected_operation_classified",
+      "actor": "w01-platform",
+      "company": null,
+      "entity_type": "organizations.ProtectedOperation",
+      "at": "2026-11-09T21:32:38.852Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.role_assigned",
+      "actor": "w01-initial-owner",
+      "company": "w01-legacy-retry",
+      "entity_type": "organizations.MembershipRoleAssignment",
+      "at": "2026-11-09T21:33:23.846Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "authorization.scope_granted",
+      "actor": "w01-initial-owner",
+      "company": "w01-legacy-retry",
+      "entity_type": "organizations.MembershipScopeGrant",
+      "at": "2026-11-09T21:33:23.851Z",
+      "channel": null,
+      "delivery": null
+    },
+    {
+      "action": "organization.created",
+      "actor": "w01-initial-owner",
+      "company": "w01-legacy-retry",
+      "entity_type": "organization",
+      "at": "2026-11-09T21:33:23.855Z",
+      "channel": null,
+      "delivery": null
+    }
+  ],
+  "project_count": 4,
+  "site_count": 4,
+  "total_accounts": 37,
+  "membership_count": 11,
+  "role_fixture": [
+    [
+      "w01-browser-role",
+      null,
+      "projects.view"
+    ]
+  ],
+  "insurance_fixture": [
+    [
+      "w01_qa",
+      true
+    ]
+  ],
+  "protected_fixture": [
+    [
+      "authorization.self_grant",
+      2,
+      null
+    ]
+  ]
+}

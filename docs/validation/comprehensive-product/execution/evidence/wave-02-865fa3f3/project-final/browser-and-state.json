@@ -1,0 +1,371 @@
+{
+  "browser": "156.0.8078.80",
+  "profile": "MVP",
+  "db": "bonira_b02_run2",
+  "db_port": 59141,
+  "witness": "separate PostgreSQL connection, default_transaction_read_only=on",
+  "rows": {
+    "projects:activity_create": {
+      "scenario": "UAT-02",
+      "route": "projects:activity_create",
+      "variant": null,
+      "summary": "Activity persists WBS, site and phase under the current project",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        },
+        {
+          "db": {
+            "model": "projects.WBSNode",
+            "id": "147a9f3d-a0dd-4a5d-bd17-606e652f23af",
+            "code": "B02-WBS",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "audit": [
+              {
+                "action": "wbs_node.created",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "action": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/activities/",
+          "posts": [
+            [
+              "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/activities/",
+              302
+            ]
+          ],
+          "submitted": {},
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "feedback": [
+            "×\nفعالیت افزوده شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "projects.Activity",
+            "id": "f0172da4-4f8a-4d2b-85ad-81215a25432f",
+            "code": "B02-ACT",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "phase_id": "683ddb63-734b-4dc9-bd30-d499439622ea",
+            "wbs_node_id": "147a9f3d-a0dd-4a5d-bd17-606e652f23af",
+            "status": "planning",
+            "audit": [
+              {
+                "action": "activity.created",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/controls/activities/",
+          "status": 403
+        }
+      ]
+    },
+    "projects:activity_transition": {
+      "scenario": "UAT-02",
+      "route": "projects:activity_transition",
+      "variant": null,
+      "summary": "Activate planned activity and verify state and audit",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        },
+        {
+          "action": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/activities/f0172da4-4f8a-4d2b-85ad-81215a25432f/transition/",
+          "posts": [
+            [
+              "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/activities/f0172da4-4f8a-4d2b-85ad-81215a25432f/transition/",
+              302
+            ]
+          ],
+          "submitted": {},
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "feedback": []
+        },
+        {
+          "db": {
+            "model": "projects.Activity",
+            "id": "f0172da4-4f8a-4d2b-85ad-81215a25432f",
+            "status": "active",
+            "archived_at": null,
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "audit": [
+              {
+                "action": "activity.created",
+                "actor__username": "b02-ops"
+              },
+              {
+                "action": "activity.status_changed",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/activities/f0172da4-4f8a-4d2b-85ad-81215a25432f/transition/",
+          "status": 403
+        }
+      ]
+    },
+    "projects:activity_archive": {
+      "scenario": "UAT-02",
+      "route": "projects:activity_archive",
+      "variant": null,
+      "summary": "Archive sacrificial activity while retaining its source row",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        },
+        {
+          "action": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/activities/f0172da4-4f8a-4d2b-85ad-81215a25432f/archive/",
+          "posts": [
+            [
+              "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/activities/f0172da4-4f8a-4d2b-85ad-81215a25432f/archive/",
+              302
+            ]
+          ],
+          "submitted": {},
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "feedback": []
+        },
+        {
+          "db": {
+            "model": "projects.Activity",
+            "id": "f0172da4-4f8a-4d2b-85ad-81215a25432f",
+            "status": "active",
+            "archived_at": "2026-11-10 16:55:35.276757+00:00",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "audit": [
+              {
+                "action": "activity.created",
+                "actor__username": "b02-ops"
+              },
+              {
+                "action": "activity.status_changed",
+                "actor__username": "b02-ops"
+              },
+              {
+                "action": "activity.archived",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/activities/f0172da4-4f8a-4d2b-85ad-81215a25432f/archive/",
+          "status": 403
+        }
+      ]
+    },
+    "projects:wbs_archive": {
+      "scenario": "UAT-02",
+      "route": "projects:wbs_archive",
+      "variant": null,
+      "summary": "Archive leaf node, preserving ancestry",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        },
+        {
+          "action": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/wbs/",
+          "posts": [
+            [
+              "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/wbs/",
+              302
+            ]
+          ],
+          "submitted": {
+            "sort_order": [
+              "4"
+            ]
+          },
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "feedback": [
+            "×\nگره ساختار شکست کار افزوده شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "projects.WBSNode",
+            "id": "fede65e8-bb73-4474-93cf-3fb6c24ba33d",
+            "code": "B02-WBS-ARC",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "audit": [
+              {
+                "action": "wbs_node.created",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "action": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/wbs/fede65e8-bb73-4474-93cf-3fb6c24ba33d/archive/",
+          "posts": [
+            [
+              "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/wbs/fede65e8-bb73-4474-93cf-3fb6c24ba33d/archive/",
+              302
+            ]
+          ],
+          "submitted": {},
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "feedback": []
+        },
+        {
+          "db": {
+            "model": "projects.WBSNode",
+            "id": "fede65e8-bb73-4474-93cf-3fb6c24ba33d",
+            "archived_at": "2026-11-10 16:55:55.846421+00:00",
+            "parent_id": null,
+            "audit": [
+              {
+                "action": "wbs_node.created",
+                "actor__username": "b02-ops"
+              },
+              {
+                "action": "wbs_node.archived",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/wbs/147a9f3d-a0dd-4a5d-bd17-606e652f23af/archive/",
+          "status": 403
+        }
+      ]
+    },
+    "projects:photo_add": {
+      "scenario": "UAT-02",
+      "route": "projects:photo_add",
+      "variant": null,
+      "summary": "Upload generated PNG from gallery and compare linked document version",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "NAVIGATION_UX": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/"
+        },
+        {
+          "upload_post_evidence": "project/browser-and-state.json projects:photo_add from earlier browser pass"
+        },
+        {
+          "db": {
+            "model": "documents.PhotoMetadata",
+            "id": "ccae69e7-47cc-40e0-9c21-dc55287313c5",
+            "document_id": "4df46dae-6779-48ef-a2cd-2faf356688ae",
+            "source": "camera",
+            "audit": []
+          }
+        },
+        {
+          "db": {
+            "model": "projects.ProjectDocumentLink",
+            "id": "d340a41a-2e2c-4a6a-a3fa-7ca4683876d5",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "document_id": "4df46dae-6779-48ef-a2cd-2faf356688ae",
+            "audit": []
+          }
+        },
+        {
+          "db": {
+            "model": "projects.ProjectSiteDocumentLink",
+            "id": "8a74ce25-389f-4ab3-8e25-f96cb11c9f15",
+            "project_site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "document_id": "4df46dae-6779-48ef-a2cd-2faf356688ae",
+            "audit": []
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/gallery/add/",
+          "status": 403,
+          "final": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/gallery/add/"
+        }
+      ]
+    },
+    "projects:gallery": {
+      "scenario": "UAT-02",
+      "route": "projects:gallery",
+      "variant": null,
+      "summary": "Gallery displays actual image bytes, foreign gallery and direct image are denied",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/"
+        },
+        {
+          "db": {
+            "model": "documents.PhotoMetadata",
+            "id": "ccae69e7-47cc-40e0-9c21-dc55287313c5",
+            "document_id": "4df46dae-6779-48ef-a2cd-2faf356688ae",
+            "source": "camera",
+            "audit": []
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/gallery/",
+          "status": 403,
+          "final": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/gallery/"
+        },
+        {
+          "method": "GET",
+          "url": "/documents/4df46dae-6779-48ef-a2cd-2faf356688ae/photo-preview/",
+          "status": 403,
+          "final": "/documents/4df46dae-6779-48ef-a2cd-2faf356688ae/photo-preview/"
+        }
+      ]
+    }
+  }
+}

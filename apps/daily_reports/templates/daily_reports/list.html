@@ -11,6 +11,9 @@
     <div class="erp-list-heading">
         {% if "daily_reports.create" in business_permission_codes %}{% url "daily_reports:create" as create_url %}{% endif %}
         {% include "components/page_header.html" with page_breadcrumbs=page_breadcrumbs page_title="گزارش‌های روزانه" page_description="ثبت و پیگیری فعالیت‌ها، نیروی کار و پیشرفت روزانه کارگاه‌ها" page_action_url=create_url page_action_label="گزارش روزانه جدید" page_icon="document" only %}
+        {% if "field_observations.view" in business_permission_codes %}
+            <a class="erp-btn erp-btn--secondary mt-3" href="{% url 'daily_reports:field_observation_list' %}">مشاهدات میدانی</a>
+        {% endif %}
     </div>
     <section class="daily-summary" aria-label="خلاصه گزارش‌های مجاز" aria-describedby="daily-summary-scope">
         <article class="daily-kpi"><div><h2>کل گزارش‌ها</h2><strong data-summary="total">{{ summary.total|erp_number }}</strong></div><span class="daily-kpi__icon" aria-hidden="true">{% include "daily_reports/list_icon.html" with icon="total" only %}</span></article>

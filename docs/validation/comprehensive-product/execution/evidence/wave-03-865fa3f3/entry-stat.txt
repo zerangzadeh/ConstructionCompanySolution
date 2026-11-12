@@ -1,0 +1,25 @@
+ apps/accounts/static/js/erp_table.js               |   1 +
+ apps/accounts/templatetags/table_filters.py        |   3 +
+ apps/organizations/platform_console.py             |   7 +-
+ apps/organizations/platform_forms.py               |  26 ++-
+ apps/organizations/platform_views.py               |  97 +++++++++++-
+ apps/organizations/role_presentation.py            |   1 +
+ .../templates/organizations/platform_audit.html    |   2 +-
+ .../organizations/platform_company_detail.html     | 176 +++++++++++++++------
+ .../organizations/platform_company_list.html       | 115 +++++++++-----
+ .../organizations/protected_operation_catalog.html |   2 +-
+ apps/organizations/test_platform_companies.py      |  97 ++++++++++++
+ apps/projects/dashboard.py                         |   5 +-
+ apps/projects/forms.py                             |   2 +
+ apps/projects/templates/projects/list.html         |   2 +-
+ apps/projects/test_photo_gallery.py                |  22 +--
+ apps/timekeeping/forms.py                          |  44 +++++-
+ apps/timekeeping/services.py                       |  42 +++++
+ .../templates/timekeeping/record_detail.html       |   3 +-
+ apps/timekeeping/views.py                          |  59 ++++++-
+ apps/workforce/static/workforce/field_choices.js   |   6 +
+ .../templates/workforce/assignment_list.html       |   2 +-
+ apps/workforce/views.py                            |  16 +-
+ templates/components/filter_bar.html               |   4 +-
+ templates/components/list_result_toolbar.html      |   2 +-
+ 24 files changed, 606 insertions(+), 130 deletions(-)

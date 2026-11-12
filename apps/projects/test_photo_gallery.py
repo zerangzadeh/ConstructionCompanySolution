@@ -16,12 +16,12 @@ from apps.documents.models import (
 from apps.documents.photo_services import create_photo, get_project_photos
 from apps.documents.services import archive_document, create_document
 from apps.organizations.models import (
-    MembershipRole,
-    MembershipStatus,
     Organization,
-    OrganizationSettings,
 )
-from apps.organizations.services import ACTIVE_ORGANIZATION_SESSION_KEY
+from apps.organizations.services import (
+    ACTIVE_ORGANIZATION_SESSION_KEY,
+    create_organization_with_owner,
+)
 from apps.projects.models import ProjectSiteDocumentLink
 from apps.projects.services import create_project, create_project_site
 
@@ -73,19 +73,7 @@ class ProjectPhotoGalleryTests(TestCase):
 
     @staticmethod
     def _organization(name: str, slug: str, owner: User) -> Organization:
-        organization = Organization.objects.create(
-            name=name,
-            slug=slug,
-            created_by=owner,
-            updated_by=owner,
-        )
-        OrganizationSettings.objects.create(organization=organization)
-        organization.memberships.create(
-            user=owner,
-            role=MembershipRole.COMPANY_OWNER,
-            status=MembershipStatus.ACTIVE,
-        )
-        return organization
+        return create_organization_with_owner(owner=owner, name=name, slug=slug)
 
     @staticmethod
     def _image(name: str = "photo.png", suffix: bytes = b"") -> SimpleUploadedFile:

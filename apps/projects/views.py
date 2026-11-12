@@ -2,10 +2,9 @@ from pathlib import Path
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
+from django.db.models import Count, QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.documents.models import PhotoSource
@@ -27,7 +26,7 @@ from apps.projects.forms import (
     WBSNodeForm,
 )
 from apps.projects.list_filters import ProjectListFilterForm
-from apps.projects.models import ProjectPhaseStatus, ProjectSite, ProjectStatus
+from apps.projects.models import Project, ProjectPhaseStatus, ProjectSite, ProjectStatus
 from apps.projects.services import (
     archive_activity,
     archive_project,
@@ -390,37 +389,7 @@ def project_site_list(request: HttpRequest, project_id: str) -> HttpResponse:
         organization=request.organization,
         project_id=project_id,
     )
-    sites = apply_table_filters(
-        sites,
-        request,
-        text_fields={"site": ("code", "name", "address")},
-    )
-    page = paginate_table(
-        sites,
-        request,
-        sort_fields={"code": "code", "name": "name", "address": "address"},
-        default_ordering=("name", "pk"),
-    )
-    return render(
-        request,
-        "projects/site_list.html",
-        {
-            "project": project,
-            "sites": page.object_list,
-            "page_obj": page,
-            "pagination_query": table_pagination_query(request),
-            "filters": build_table_filters(
-                request,
-                [
-                    {"name": "site", "kind": "text", "label": "کد، نام یا نشانی"},
-                    None,
-                    None,
-                    None,
-                ],
-            ),
-            "has_active_filters": has_active_table_filters(request),
-        },
-    )
+    return _render_site_list(request, sites, project=project)
 
 
 @active_organization_required
@@ -433,13 +402,24 @@ def site_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
+    return _render_site_list(request, sites)
+
+
+def _render_site_list(
+    request: HttpRequest,
+    sites: QuerySet[ProjectSite],
+    *,
+    project: Project | None = None,
+) -> HttpResponse:
+    text_fields = {"site": ("code", "name", "address")}
+    filter_columns = [{"name": "site", "kind": "text", "label": "کد، نام یا نشانی"}]
+    if project is None:
+        text_fields["project"] = ("project__name",)
+        filter_columns.append({"name": "project", "kind": "text", "label": "پروژه"})
     sites = apply_table_filters(
         sites,
         request,
-        text_fields={
-            "site": ("code", "name", "address"),
-            "project": ("project__name",),
-        },
+        text_fields=text_fields,
     )
     page = paginate_table(
         sites,
@@ -452,23 +432,25 @@ def site_list(request: HttpRequest) -> HttpResponse:
             "status": "is_active",
             "address": "address",
         },
-        default_ordering=("project__name", "name", "pk"),
+        default_ordering=("name", "pk") if project else ("project__name", "name", "pk"),
     )
     return render(
         request,
         "projects/all_site_list.html",
         {
+            "project": project,
+            "site_default_sort": "name" if project else "project",
+            "can_create_site": project is not None
+            and has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.PROJECT_SITES_CREATE,
+                project=project,
+            ),
             "sites": page.object_list,
             "page_obj": page,
             "pagination_query": table_pagination_query(request),
-            "filters": build_table_filters(
-                request,
-                [
-                    {"name": "site", "kind": "text", "label": "کد، نام یا نشانی"},
-                    {"name": "project", "kind": "text", "label": "پروژه"},
-                    None,
-                ],
-            ),
+            "filters": build_table_filters(request, filter_columns),
             "has_active_filters": has_active_table_filters(request),
         },
     )
@@ -979,20 +961,6 @@ def project_site_detail(
     )
     return render(
         request,
-        "components/read_only_record_detail.html",
-        {
-            "detail_title": site.name,
-            "detail_eyebrow": "جزئیات کارگاه",
-            "detail_breadcrumb_label": "کارگاه‌ها",
-            "detail_status_code": "active" if site.is_active else "inactive",
-            "field_project": site.project,
-            "field_site": site,
-            "back_url": reverse("projects:site_list", args=[site.project_id]),
-            "detail_rows": [
-                ("کد کارگاه", site.code, "identifier"),
-                ("پروژه", site.project.name, "text"),
-                ("نشانی", site.address, "text"),
-                ("وضعیت", "فعال" if site.is_active else "غیرفعال", "status"),
-            ],
-        },
+        "projects/site_detail.html",
+        {"site": site},
     )

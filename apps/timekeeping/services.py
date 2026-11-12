@@ -5,6 +5,7 @@ import json
 from collections.abc import Iterable, Mapping
 from datetime import date, datetime, time
 from typing import Any
+from uuid import UUID
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
@@ -309,6 +310,8 @@ def capture_attendance(
         site=site,
         shift=shift,
     )
+    if check_out_at is not None and check_out_at <= check_in_at:
+        raise ValidationError({"check_out_at": "زمان خروج باید پس از ورود باشد."})
     Employee.objects.select_for_update().get(pk=employee.pk)
     overlaps = (
         AttendanceRecord.objects.select_for_update()
@@ -354,6 +357,17 @@ def capture_attendance(
     return record
 
 
+def _lock_attendance_employee(
+    *, organization: Organization, attendance_id: UUID
+) -> None:
+    employee_id = AttendanceRecord.objects.values_list("employee_id", flat=True).get(
+        pk=attendance_id, organization=organization
+    )
+    # Capture, finalization and correction serialize on the same subject before
+    # locking attendance rows, including intervals that do not exist yet.
+    Employee.objects.select_for_update().get(pk=employee_id, organization=organization)
+
+
 @transaction.atomic
 def finalize_attendance(
     *,
@@ -362,6 +376,7 @@ def finalize_attendance(
     attendance: AttendanceRecord,
     reconciliation_reason: str = "",
 ) -> AttendanceRecord:
+    _lock_attendance_employee(organization=organization, attendance_id=attendance.pk)
     attendance = AttendanceRecord.objects.select_for_update().get(
         pk=attendance.pk, organization=organization
     )
@@ -429,6 +444,7 @@ def request_attendance_correction(
     reversal: bool = False,
     replacement_values: Mapping[str, Any] | None = None,
 ) -> AttendanceCorrectionRequest:
+    _lock_attendance_employee(organization=organization, attendance_id=attendance.pk)
     attendance = AttendanceRecord.objects.select_for_update().get(
         pk=attendance.pk, organization=organization
     )
@@ -475,6 +491,10 @@ def review_attendance_correction(
     approve: bool,
     review_reason: str,
 ) -> AttendanceCorrectionRequest:
+    attendance_id = AttendanceCorrectionRequest.objects.values_list(
+        "attendance_id", flat=True
+    ).get(pk=correction_request.pk, organization=organization)
+    _lock_attendance_employee(organization=organization, attendance_id=attendance_id)
     correction_request = (
         AttendanceCorrectionRequest.objects.select_for_update()
         .select_related("attendance")
@@ -507,6 +527,28 @@ def review_attendance_correction(
         raise ValidationError("حضور مبنا دیگر قطعی و قابل اصلاح نیست.")
     replacement = None
     if correction_request.kind == "correction":
+        if (
+            correction_request.replacement_check_in_at is None
+            or correction_request.replacement_check_out_at is None
+            or correction_request.replacement_check_out_at
+            <= correction_request.replacement_check_in_at
+        ):
+            raise ValidationError("پایان بازه جایگزین باید پس از شروع آن باشد.")
+        if (
+            AttendanceRecord.objects.filter(
+                organization=organization, state=AttendanceState.FINALIZED
+            )
+            .exclude(pk=attendance.pk)
+            .filter(
+                _attendance_overlap_query(
+                    employee=attendance.employee,
+                    check_in_at=correction_request.replacement_check_in_at,
+                    check_out_at=correction_request.replacement_check_out_at,
+                )
+            )
+            .exists()
+        ):
+            raise ValidationError("بازه جایگزین با حضور قطعی دیگری هم‌پوشانی دارد.")
         replacement = AttendanceRecord.objects.create(
             organization=organization,
             employee=attendance.employee,

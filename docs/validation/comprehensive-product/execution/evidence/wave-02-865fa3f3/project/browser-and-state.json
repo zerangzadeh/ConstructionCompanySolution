@@ -1,0 +1,815 @@
+{
+  "browser": "156.0.8078.80",
+  "profile": "MVP",
+  "db": "bonira_b02_run2",
+  "db_port": 59141,
+  "witness": "separate PostgreSQL connection, default_transaction_read_only=on",
+  "rows": {
+    "projects:list": {
+      "scenario": "UAT-02",
+      "route": "projects:list",
+      "variant": null,
+      "summary": "Projects list, visible pagination and site-scoped result",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/",
+          "status": 200,
+          "final": "/projects/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/",
+          "status": 200,
+          "final": "/projects/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/",
+          "status": 200,
+          "final": "/projects/"
+        },
+        {
+          "pagination": "page=2"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/",
+          "status": 200,
+          "final": "/projects/"
+        },
+        {
+          "authorized_project_count": 30
+        }
+      ]
+    },
+    "projects:create": {
+      "scenario": "UAT-02",
+      "route": "projects:create",
+      "variant": null,
+      "summary": "Invalid date order rejected and fields retained, then valid Jalali dates and budgets persisted",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/create/",
+          "status": 200,
+          "final": "/projects/create/"
+        },
+        {
+          "action": "/projects/create/",
+          "posts": [
+            [
+              "/projects/create/",
+              200
+            ]
+          ],
+          "final": "/projects/create/",
+          "feedback": [
+            "لطفاً موارد زیر را بررسی کنید:\n\nتاریخ پایان پروژه نمی‌تواند پیش از تاریخ شروع باشد.",
+            "تاریخ پایان پروژه نمی‌تواند پیش از تاریخ شروع باشد."
+          ]
+        },
+        {
+          "action": "/projects/create/",
+          "posts": [
+            [
+              "/projects/create/",
+              302
+            ]
+          ],
+          "final": "/projects/",
+          "feedback": []
+        },
+        {
+          "db": {
+            "model": "projects.Project",
+            "id": "847af9a0-b54f-4558-bcf6-60c0ea0333a6",
+            "code": "B02-UI-P",
+            "name": "پروژه آزمایشی موج دوم",
+            "description": "شرح مصنوعی B02",
+            "status": "active",
+            "start_date": "2026-11-03",
+            "end_date": "2026-11-16",
+            "estimated_budget": "125000.00",
+            "actual_budget": "5000.00",
+            "audit": [
+              {
+                "action": "project.created",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/projects/847af9a0-b54f-4558-bcf6-60c0ea0333a6/",
+          "status": 200,
+          "final": "/projects/847af9a0-b54f-4558-bcf6-60c0ea0333a6/"
+        },
+        {
+          "negative_post": "/projects/create/",
+          "status": 403
+        }
+      ]
+    },
+    "projects:detail": {
+      "scenario": "UAT-02",
+      "route": "projects:detail",
+      "variant": null,
+      "summary": "List to project hub to controls, scoped project identity",
+      "axes": {
+        "FUNCTIONAL": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/?q=BRIDGE",
+          "status": 200,
+          "final": "/projects/"
+        },
+        {
+          "click": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/",
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/"
+        },
+        {
+          "db": {
+            "model": "projects.Project",
+            "id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "code": "BRIDGE",
+            "name": "پروژه پل آزمایشی",
+            "status": "planning",
+            "audit": []
+          }
+        },
+        {
+          "click": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "Visible page missing 'ساختار شکست و فعالیت\\u200cها'"
+    },
+    "projects:all_site_list": {
+      "scenario": "UAT-02",
+      "route": "projects:all_site_list",
+      "variant": null,
+      "summary": "Company-wide site list intersects the limited site grant",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/sites/",
+          "status": 200,
+          "final": "/projects/sites/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/sites/",
+          "status": 200,
+          "final": "/projects/sites/"
+        }
+      ]
+    },
+    "projects:site_list": {
+      "scenario": "UAT-02",
+      "route": "projects:site_list",
+      "variant": null,
+      "summary": "Project list shows only its sites and intersects the limited actor grant",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/",
+          "status": 403,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/sites/",
+          "status": 403,
+          "final": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/sites/"
+        },
+        {
+          "db": {
+            "model": "projects.ProjectSite",
+            "id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "code": "EAST",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "audit": []
+          }
+        }
+      ]
+    },
+    "projects:site_create": {
+      "scenario": "UAT-02",
+      "route": "projects:site_create",
+      "variant": null,
+      "summary": "Site form creates a record under the URL parent",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/create/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/create/"
+        },
+        {
+          "action": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/create/",
+          "posts": [
+            [
+              "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/create/",
+              302
+            ]
+          ],
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/",
+          "feedback": []
+        },
+        {
+          "db": {
+            "model": "projects.ProjectSite",
+            "id": "dfe0e598-3674-460d-8d9c-9c1c78442b4e",
+            "code": "B02-SITE-UI",
+            "name": "کارگاه جدید موج دوم",
+            "address": "نشانی مصنوعی B02",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "audit": [
+              {
+                "action": "project_site.created",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/sites/create/",
+          "status": 403,
+          "final": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/sites/create/"
+        },
+        {
+          "negative_post": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/create/",
+          "status": 403
+        }
+      ]
+    },
+    "projects:site_detail": {
+      "scenario": "UAT-02",
+      "route": "projects:site_detail",
+      "variant": null,
+      "summary": "Site ancestry and project/site context into workforce and timekeeping",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS",
+        "NAVIGATION_UX": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/"
+        },
+        {
+          "click": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/",
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/"
+        },
+        {
+          "db": {
+            "model": "projects.ProjectSite",
+            "id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "code": "EAST",
+            "name": "کارگاه شرقی",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "audit": []
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/projects/b590be19-fbf9-408e-8bb2-fb0730a2db84/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/",
+          "status": 404,
+          "final": "/projects/b590be19-fbf9-408e-8bb2-fb0730a2db84/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/376d0fe8-9a3f-4dc5-9d71-8bf450dfcc26/",
+          "status": 404,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/376d0fe8-9a3f-4dc5-9d71-8bf450dfcc26/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/sites/3b2d5465-d789-43ba-88a3-0257de5bc4d1/",
+          "status": 404,
+          "final": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/sites/3b2d5465-d789-43ba-88a3-0257de5bc4d1/"
+        },
+        {
+          "method": "GET",
+          "url": "/accounts/login/?next=%2Fprojects%2F%3Fq%3DBRIDGE",
+          "status": 200,
+          "final": "/accounts/login/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/"
+        },
+        {
+          "click": "/workforce/field/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "final": "/workforce/field/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18"
+        },
+        {
+          "method": "GET",
+          "url": "/accounts/login/?next=%2Fprojects%2F%3Fq%3DBRIDGE",
+          "status": 200,
+          "final": "/accounts/login/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/"
+        },
+        {
+          "click": "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "final": "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18"
+        }
+      ]
+    },
+    "projects:phase_list": {
+      "scenario": "UAT-02",
+      "route": "projects:phase_list",
+      "variant": null,
+      "summary": "Empty phase list matches the site and denies a sibling site",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/376d0fe8-9a3f-4dc5-9d71-8bf450dfcc26/phases/",
+          "status": 403,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/376d0fe8-9a3f-4dc5-9d71-8bf450dfcc26/phases/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/sites/3b2d5465-d789-43ba-88a3-0257de5bc4d1/phases/",
+          "status": 403,
+          "final": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/sites/3b2d5465-d789-43ba-88a3-0257de5bc4d1/phases/"
+        }
+      ]
+    },
+    "projects:phase_create": {
+      "scenario": "UAT-02",
+      "route": "projects:phase_create",
+      "variant": null,
+      "summary": "Jalali dates and phase ancestry saved through site form",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/create/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/create/"
+        },
+        {
+          "action": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/create/",
+          "posts": [
+            [
+              "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/create/",
+              302
+            ]
+          ],
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/",
+          "feedback": []
+        },
+        {
+          "db": {
+            "model": "projects.ProjectPhase",
+            "id": "683ddb63-734b-4dc9-bd30-d499439622ea",
+            "code": "B02-PH",
+            "name": "فاز ساخت موج دوم",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "status": "planning",
+            "planned_start_date": "2026-11-01",
+            "planned_end_date": "2026-11-11",
+            "audit": [
+              {
+                "action": "project_phase.created",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/projects/b590be19-fbf9-408e-8bb2-fb0730a2db84/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/create/",
+          "status": 403,
+          "final": "/projects/b590be19-fbf9-408e-8bb2-fb0730a2db84/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/create/"
+        }
+      ]
+    },
+    "projects:phase_detail": {
+      "scenario": "UAT-02",
+      "route": "projects:phase_detail",
+      "variant": null,
+      "summary": "Saved phase is linked from its site list and shows both ancestors",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "NAVIGATION_UX": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/"
+        },
+        {
+          "click": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/683ddb63-734b-4dc9-bd30-d499439622ea/",
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/683ddb63-734b-4dc9-bd30-d499439622ea/"
+        },
+        {
+          "db": {
+            "model": "projects.ProjectPhase",
+            "id": "683ddb63-734b-4dc9-bd30-d499439622ea",
+            "code": "B02-PH",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "status": "planning",
+            "audit": [
+              {
+                "action": "project_phase.created",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/376d0fe8-9a3f-4dc5-9d71-8bf450dfcc26/phases/683ddb63-734b-4dc9-bd30-d499439622ea/",
+          "status": 403,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/376d0fe8-9a3f-4dc5-9d71-8bf450dfcc26/phases/683ddb63-734b-4dc9-bd30-d499439622ea/"
+        }
+      ]
+    },
+    "projects:phase_transition": {
+      "scenario": "UAT-02",
+      "route": "projects:phase_transition",
+      "variant": null,
+      "summary": "Planning phase activated through its form and a restricted transition denied",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/683ddb63-734b-4dc9-bd30-d499439622ea/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/683ddb63-734b-4dc9-bd30-d499439622ea/"
+        },
+        {
+          "action": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/683ddb63-734b-4dc9-bd30-d499439622ea/transition/",
+          "posts": [
+            [
+              "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/683ddb63-734b-4dc9-bd30-d499439622ea/transition/",
+              302
+            ]
+          ],
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/683ddb63-734b-4dc9-bd30-d499439622ea/",
+          "feedback": [
+            "×\nوضعیت فاز پروژه به‌روزرسانی شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "projects.ProjectPhase",
+            "id": "683ddb63-734b-4dc9-bd30-d499439622ea",
+            "status": "active",
+            "audit": [
+              {
+                "action": "project_phase.created",
+                "actor__username": "b02-ops"
+              },
+              {
+                "action": "project_phase.status_changed",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/sites/d9131b32-c4ba-4f14-95e5-2104d524fd18/phases/683ddb63-734b-4dc9-bd30-d499439622ea/transition/",
+          "status": 403
+        },
+        {
+          "db": {
+            "model": "projects.ProjectPhase",
+            "id": "683ddb63-734b-4dc9-bd30-d499439622ea",
+            "status": "active",
+            "audit": [
+              {
+                "action": "project_phase.created",
+                "actor__username": "b02-ops"
+              },
+              {
+                "action": "project_phase.status_changed",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "projects:controls": {
+      "scenario": "UAT-02",
+      "route": "projects:controls",
+      "variant": null,
+      "summary": "Controls page shows separate WBS and activity empty states",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 403,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/ HTTP 403, expected 200"
+    },
+    "projects:controls_comparison": {
+      "scenario": "UAT-02",
+      "route": "projects:controls_comparison",
+      "variant": null,
+      "summary": "Project controls links to scoped budget comparison",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 403,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/ HTTP 403, expected 200"
+    },
+    "projects:controls_exceptions": {
+      "scenario": "UAT-02",
+      "route": "projects:controls_exceptions",
+      "variant": null,
+      "summary": "Project controls links to scoped exceptions",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 403,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/ HTTP 403, expected 200"
+    },
+    "projects:controls_export": {
+      "scenario": "UAT-02",
+      "route": "projects:controls_export",
+      "variant": null,
+      "summary": "Download and inspect scoped CSV from the controls link",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 403,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/ HTTP 403, expected 200"
+    },
+    "projects:wbs_create": {
+      "scenario": "UAT-02",
+      "route": "projects:wbs_create",
+      "variant": null,
+      "summary": "Create root and child through inline controls, verify parent and reject duplicate",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 403,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/ HTTP 403, expected 200"
+    },
+    "projects:activity_create": {
+      "scenario": "UAT-02",
+      "route": "projects:activity_create",
+      "variant": null,
+      "summary": "Activity persists WBS, site and phase under the current project",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 403,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/ HTTP 403, expected 200"
+    },
+    "projects:activity_transition": {
+      "scenario": "UAT-02",
+      "route": "projects:activity_transition",
+      "variant": null,
+      "summary": "Activate planned activity and verify state and audit",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 403,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/ HTTP 403, expected 200"
+    },
+    "projects:activity_archive": {
+      "scenario": "UAT-02",
+      "route": "projects:activity_archive",
+      "variant": null,
+      "summary": "Archive sacrificial activity while retaining its source row",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 403,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/ HTTP 403, expected 200"
+    },
+    "projects:wbs_archive": {
+      "scenario": "UAT-02",
+      "route": "projects:wbs_archive",
+      "variant": null,
+      "summary": "Archive leaf node, preserving ancestry",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 403,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ],
+      "harness_or_assertion": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/ HTTP 403, expected 200"
+    },
+    "projects:photo_add": {
+      "scenario": "UAT-02",
+      "route": "projects:photo_add",
+      "variant": null,
+      "summary": "Upload generated PNG from gallery and compare linked document version",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/"
+        },
+        {
+          "click": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/add/",
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/add/"
+        },
+        {
+          "action": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/add/",
+          "posts": [
+            [
+              "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/add/",
+              302
+            ]
+          ],
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/",
+          "feedback": [
+            "×\n1 تصویر با موفقیت ثبت شد."
+          ]
+        }
+      ],
+      "harness_or_assertion": "'PhotoMetadata' object has no attribute 'project_id'"
+    },
+    "projects:gallery": {
+      "scenario": "UAT-02",
+      "route": "projects:gallery",
+      "variant": null,
+      "summary": "Gallery displays actual image bytes, foreign gallery and direct image are denied",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/"
+        }
+      ],
+      "harness_or_assertion": "'photo'"
+    },
+    "projects:archive": {
+      "scenario": "UAT-02",
+      "route": "projects:archive",
+      "variant": null,
+      "summary": "Sacrificial project archive hides the row and preserves stored history",
+      "axes": {
+        "AUTHORIZATION": "PASS",
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/847af9a0-b54f-4558-bcf6-60c0ea0333a6/",
+          "status": 200,
+          "final": "/projects/847af9a0-b54f-4558-bcf6-60c0ea0333a6/"
+        },
+        {
+          "negative_post": "/projects/847af9a0-b54f-4558-bcf6-60c0ea0333a6/archive/",
+          "status": 403
+        },
+        {
+          "action": "/projects/847af9a0-b54f-4558-bcf6-60c0ea0333a6/archive/",
+          "posts": [
+            [
+              "/projects/847af9a0-b54f-4558-bcf6-60c0ea0333a6/archive/",
+              302
+            ]
+          ],
+          "final": "/projects/",
+          "feedback": []
+        },
+        {
+          "db": {
+            "model": "projects.Project",
+            "id": "847af9a0-b54f-4558-bcf6-60c0ea0333a6",
+            "deleted_at": "2026-11-10 16:43:35.597823+00:00",
+            "code": "B02-UI-P",
+            "audit": [
+              {
+                "action": "project.created",
+                "actor__username": "b02-ops"
+              },
+              {
+                "action": "project.archived",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "destructive_confirmation": "No separate confirmation observed before persisted archive"
+        }
+      ]
+    }
+  }
+}

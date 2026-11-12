@@ -1,0 +1,1643 @@
+{
+  "chrome": "156.0.8078.80",
+  "phase": "after",
+  "results": [
+    {
+      "id": "PROTECTED-PAGES-RESPONSIVE",
+      "status": "PASS",
+      "actual": "Actual list-to-detail navigation, correct target owner, return/edit links and RTL/no overflow at three widths."
+    },
+    {
+      "id": "BON-DEF-0001",
+      "status": "PASS",
+      "actual": "One named combobox; same authorized company selected with keyboard and submitted at all widths."
+    },
+    {
+      "id": "BON-DEF-0002",
+      "status": "PASS",
+      "actual": "Shamsi labels and Jalali-to-ISO query conversion verified."
+    },
+    {
+      "id": "BON-DEF-0003",
+      "status": "FAIL",
+      "actual": "Consequences missing"
+    },
+    {
+      "id": "PA-03-LIST-FILTERS-PAGINATION",
+      "status": "PASS",
+      "actual": "Search empty state, status filter, page 2, detail code disclosure and absent example key verified on synthetic data."
+    },
+    {
+      "id": "AUTHORIZATION-CSRF",
+      "status": "PASS",
+      "actual": {
+        "denies": {
+          "/organizations/platform/companies/": 403,
+          "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/": 403,
+          "/organizations/platform/member-roles/": 403,
+          "/organizations/platform/activity/": 403,
+          "/organizations/platform/protected-operations/": 403
+        },
+        "tenantPost": 403,
+        "csrf": 403
+      }
+    }
+  ],
+  "observations": [
+    {
+      "key": "company-list",
+      "width": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "شرکت‌ها و فعالیت‌ها"
+      ],
+      "targets": [
+        {
+          "label": "مدیریت پلتفرم",
+          "href": "/organizations/platform/"
+        },
+        {
+          "label": "شرکت جدید",
+          "href": "/organizations/create/"
+        },
+        {
+          "label": "پاک‌سازی",
+          "href": "/organizations/platform/companies/"
+        },
+        {
+          "label": "شرکت↑",
+          "href": "/organizations/platform/companies/?sort=name&direction=desc"
+        },
+        {
+          "label": "وضعیت↕",
+          "href": "/organizations/platform/companies/?sort=status&direction=asc"
+        },
+        {
+          "label": "تعداد عضویت‌ها↕",
+          "href": "/organizations/platform/companies/?sort=members&direction=asc"
+        },
+        {
+          "label": "تاریخ ایجاد↕",
+          "href": "/organizations/platform/companies/?sort=created&direction=asc"
+        },
+        {
+          "label": "شرکت↑",
+          "href": "/organizations/platform/companies/?sort=name&direction=desc"
+        },
+        {
+          "label": "وضعیت↕",
+          "href": "/organizations/platform/companies/?sort=status&direction=asc"
+        },
+        {
+          "label": "تعداد عضویت‌ها↕",
+          "href": "/organizations/platform/companies/?sort=members&direction=asc"
+        },
+        {
+          "label": "تاریخ ایجاد↕",
+          "href": "/organizations/platform/companies/?sort=created&direction=asc"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 00",
+          "href": "/organizations/platform/companies/04f6eee9-809a-418b-be7e-ed3509e01bd5/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/04f6eee9-809a-418b-be7e-ed3509e01bd5/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 01",
+          "href": "/organizations/platform/companies/70e99771-046e-4662-96e8-d5627a414c2d/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/70e99771-046e-4662-96e8-d5627a414c2d/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 02",
+          "href": "/organizations/platform/companies/c340c47a-33d8-4793-88be-79a592bd2f2f/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/c340c47a-33d8-4793-88be-79a592bd2f2f/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 03",
+          "href": "/organizations/platform/companies/899fe559-2996-4864-b95d-dd4a2890a4b5/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/899fe559-2996-4864-b95d-dd4a2890a4b5/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 04",
+          "href": "/organizations/platform/companies/01b6a5dd-d868-4d1e-9398-19a9c0b90b62/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/01b6a5dd-d868-4d1e-9398-19a9c0b90b62/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 05",
+          "href": "/organizations/platform/companies/21bdbacb-89ce-4cc8-a45c-cd92b8d750a4/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/21bdbacb-89ce-4cc8-a45c-cd92b8d750a4/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 06",
+          "href": "/organizations/platform/companies/69ddca21-8ea5-4b7a-8c0b-882755bfe671/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/69ddca21-8ea5-4b7a-8c0b-882755bfe671/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 07",
+          "href": "/organizations/platform/companies/9ce5af90-cada-4129-86d7-3e05d76a622d/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/9ce5af90-cada-4129-86d7-3e05d76a622d/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 08",
+          "href": "/organizations/platform/companies/fc309cc2-04f4-4d03-959a-0acb79b5e7ba/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/fc309cc2-04f4-4d03-959a-0acb79b5e7ba/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 09",
+          "href": "/organizations/platform/companies/183a8e28-dbac-4cfd-a3ec-5cc1a4d89e80/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/183a8e28-dbac-4cfd-a3ec-5cc1a4d89e80/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 10",
+          "href": "/organizations/platform/companies/5048f61f-8467-463a-91db-50287656241b/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/5048f61f-8467-463a-91db-50287656241b/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 11",
+          "href": "/organizations/platform/companies/9d40dec6-a686-4450-a5e8-c34db785ae74/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/9d40dec6-a686-4450-a5e8-c34db785ae74/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 12",
+          "href": "/organizations/platform/companies/46e49d70-d43f-4cf2-99c6-7bf0a2eab784/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/46e49d70-d43f-4cf2-99c6-7bf0a2eab784/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 13",
+          "href": "/organizations/platform/companies/1784db4b-3c1c-42ef-b595-3fbb2413ce60/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/1784db4b-3c1c-42ef-b595-3fbb2413ce60/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 14",
+          "href": "/organizations/platform/companies/4f1dc631-e73a-497d-a21c-1b6c7798d45e/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/4f1dc631-e73a-497d-a21c-1b6c7798d45e/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 15",
+          "href": "/organizations/platform/companies/a6072335-4cea-453f-bae7-b0a02c1a70ae/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/a6072335-4cea-453f-bae7-b0a02c1a70ae/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 16",
+          "href": "/organizations/platform/companies/74f87cb0-7741-43b0-b2b9-1c761596ab49/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/74f87cb0-7741-43b0-b2b9-1c761596ab49/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 17",
+          "href": "/organizations/platform/companies/bff40044-008c-4406-a071-2bc87c77527b/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/bff40044-008c-4406-a071-2bc87c77527b/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 18",
+          "href": "/organizations/platform/companies/1151a18f-c697-4c75-bc4c-808dfe8c97f3/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/1151a18f-c697-4c75-bc4c-808dfe8c97f3/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 19",
+          "href": "/organizations/platform/companies/b4bde1ea-5da2-4de6-912d-8c369b4510e4/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/b4bde1ea-5da2-4de6-912d-8c369b4510e4/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 20",
+          "href": "/organizations/platform/companies/a00aca71-357c-49d8-a11a-95573d59d9e4/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/a00aca71-357c-49d8-a11a-95573d59d9e4/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 21",
+          "href": "/organizations/platform/companies/ba87b66c-690c-49a1-a82f-0f560eeba33a/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/ba87b66c-690c-49a1-a82f-0f560eeba33a/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 22",
+          "href": "/organizations/platform/companies/377210a5-cd17-429c-a713-c05cdc74d946/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/377210a5-cd17-429c-a713-c05cdc74d946/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 23",
+          "href": "/organizations/platform/companies/caadb363-a33c-4487-9c2f-fc46d4e47ca2/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/caadb363-a33c-4487-9c2f-fc46d4e47ca2/"
+        },
+        {
+          "label": "شرکت نمونه تکمیل",
+          "href": "/organizations/platform/companies/f9be0073-9791-4ef6-a939-5ecfe641e11a/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/f9be0073-9791-4ef6-a939-5ecfe641e11a/"
+        },
+        {
+          "label": "2",
+          "href": "?page=2"
+        },
+        {
+          "label": "›",
+          "href": "?page=2"
+        },
+        {
+          "label": "»",
+          "href": "?page=2"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/companies/"
+        }
+      ],
+      "mains": 1,
+      "screenshot": "after-company-list-1440.png"
+    },
+    {
+      "key": "company-detail",
+      "width": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "شرکت نمونه موج الف"
+      ],
+      "targets": [
+        {
+          "label": "مدیریت پلتفرم",
+          "href": "/organizations/platform/"
+        },
+        {
+          "label": "شرکت‌ها",
+          "href": "/organizations/platform/companies/"
+        },
+        {
+          "label": "ویرایش مشخصات و تنظیمات",
+          "href": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/edit/"
+        },
+        {
+          "label": "بازگشت به فهرست شرکت‌ها",
+          "href": "/organizations/platform/companies/"
+        },
+        {
+          "label": "مدیریت و تنظیمات",
+          "href": "#company-management"
+        },
+        {
+          "label": "سوابق فعالیت",
+          "href": "#company-activity"
+        },
+        {
+          "label": "عملیات حساس",
+          "href": "#company-sensitive"
+        },
+        {
+          "label": "پاک‌سازی",
+          "href": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/"
+        },
+        {
+          "label": "زمان↕",
+          "href": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/?sort=occurred_at&direction=asc"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/"
+        },
+        {
+          "method": "post",
+          "action": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/status/"
+        }
+      ],
+      "mains": 1,
+      "screenshot": "after-company-detail-1440.png"
+    },
+    {
+      "key": "company-list",
+      "width": 1024,
+      "client": 1024,
+      "scroll": 1024,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "شرکت‌ها و فعالیت‌ها"
+      ],
+      "targets": [
+        {
+          "label": "مدیریت پلتفرم",
+          "href": "/organizations/platform/"
+        },
+        {
+          "label": "شرکت جدید",
+          "href": "/organizations/create/"
+        },
+        {
+          "label": "پاک‌سازی",
+          "href": "/organizations/platform/companies/"
+        },
+        {
+          "label": "شرکت↑",
+          "href": "/organizations/platform/companies/?sort=name&direction=desc"
+        },
+        {
+          "label": "وضعیت↕",
+          "href": "/organizations/platform/companies/?sort=status&direction=asc"
+        },
+        {
+          "label": "تعداد عضویت‌ها↕",
+          "href": "/organizations/platform/companies/?sort=members&direction=asc"
+        },
+        {
+          "label": "تاریخ ایجاد↕",
+          "href": "/organizations/platform/companies/?sort=created&direction=asc"
+        },
+        {
+          "label": "شرکت↑",
+          "href": "/organizations/platform/companies/?sort=name&direction=desc"
+        },
+        {
+          "label": "وضعیت↕",
+          "href": "/organizations/platform/companies/?sort=status&direction=asc"
+        },
+        {
+          "label": "تعداد عضویت‌ها↕",
+          "href": "/organizations/platform/companies/?sort=members&direction=asc"
+        },
+        {
+          "label": "تاریخ ایجاد↕",
+          "href": "/organizations/platform/companies/?sort=created&direction=asc"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 00",
+          "href": "/organizations/platform/companies/04f6eee9-809a-418b-be7e-ed3509e01bd5/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/04f6eee9-809a-418b-be7e-ed3509e01bd5/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 01",
+          "href": "/organizations/platform/companies/70e99771-046e-4662-96e8-d5627a414c2d/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/70e99771-046e-4662-96e8-d5627a414c2d/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 02",
+          "href": "/organizations/platform/companies/c340c47a-33d8-4793-88be-79a592bd2f2f/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/c340c47a-33d8-4793-88be-79a592bd2f2f/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 03",
+          "href": "/organizations/platform/companies/899fe559-2996-4864-b95d-dd4a2890a4b5/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/899fe559-2996-4864-b95d-dd4a2890a4b5/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 04",
+          "href": "/organizations/platform/companies/01b6a5dd-d868-4d1e-9398-19a9c0b90b62/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/01b6a5dd-d868-4d1e-9398-19a9c0b90b62/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 05",
+          "href": "/organizations/platform/companies/21bdbacb-89ce-4cc8-a45c-cd92b8d750a4/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/21bdbacb-89ce-4cc8-a45c-cd92b8d750a4/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 06",
+          "href": "/organizations/platform/companies/69ddca21-8ea5-4b7a-8c0b-882755bfe671/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/69ddca21-8ea5-4b7a-8c0b-882755bfe671/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 07",
+          "href": "/organizations/platform/companies/9ce5af90-cada-4129-86d7-3e05d76a622d/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/9ce5af90-cada-4129-86d7-3e05d76a622d/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 08",
+          "href": "/organizations/platform/companies/fc309cc2-04f4-4d03-959a-0acb79b5e7ba/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/fc309cc2-04f4-4d03-959a-0acb79b5e7ba/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 09",
+          "href": "/organizations/platform/companies/183a8e28-dbac-4cfd-a3ec-5cc1a4d89e80/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/183a8e28-dbac-4cfd-a3ec-5cc1a4d89e80/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 10",
+          "href": "/organizations/platform/companies/5048f61f-8467-463a-91db-50287656241b/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/5048f61f-8467-463a-91db-50287656241b/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 11",
+          "href": "/organizations/platform/companies/9d40dec6-a686-4450-a5e8-c34db785ae74/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/9d40dec6-a686-4450-a5e8-c34db785ae74/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 12",
+          "href": "/organizations/platform/companies/46e49d70-d43f-4cf2-99c6-7bf0a2eab784/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/46e49d70-d43f-4cf2-99c6-7bf0a2eab784/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 13",
+          "href": "/organizations/platform/companies/1784db4b-3c1c-42ef-b595-3fbb2413ce60/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/1784db4b-3c1c-42ef-b595-3fbb2413ce60/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 14",
+          "href": "/organizations/platform/companies/4f1dc631-e73a-497d-a21c-1b6c7798d45e/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/4f1dc631-e73a-497d-a21c-1b6c7798d45e/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 15",
+          "href": "/organizations/platform/companies/a6072335-4cea-453f-bae7-b0a02c1a70ae/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/a6072335-4cea-453f-bae7-b0a02c1a70ae/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 16",
+          "href": "/organizations/platform/companies/74f87cb0-7741-43b0-b2b9-1c761596ab49/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/74f87cb0-7741-43b0-b2b9-1c761596ab49/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 17",
+          "href": "/organizations/platform/companies/bff40044-008c-4406-a071-2bc87c77527b/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/bff40044-008c-4406-a071-2bc87c77527b/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 18",
+          "href": "/organizations/platform/companies/1151a18f-c697-4c75-bc4c-808dfe8c97f3/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/1151a18f-c697-4c75-bc4c-808dfe8c97f3/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 19",
+          "href": "/organizations/platform/companies/b4bde1ea-5da2-4de6-912d-8c369b4510e4/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/b4bde1ea-5da2-4de6-912d-8c369b4510e4/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 20",
+          "href": "/organizations/platform/companies/a00aca71-357c-49d8-a11a-95573d59d9e4/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/a00aca71-357c-49d8-a11a-95573d59d9e4/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 21",
+          "href": "/organizations/platform/companies/ba87b66c-690c-49a1-a82f-0f560eeba33a/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/ba87b66c-690c-49a1-a82f-0f560eeba33a/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 22",
+          "href": "/organizations/platform/companies/377210a5-cd17-429c-a713-c05cdc74d946/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/377210a5-cd17-429c-a713-c05cdc74d946/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 23",
+          "href": "/organizations/platform/companies/caadb363-a33c-4487-9c2f-fc46d4e47ca2/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/caadb363-a33c-4487-9c2f-fc46d4e47ca2/"
+        },
+        {
+          "label": "شرکت نمونه تکمیل",
+          "href": "/organizations/platform/companies/f9be0073-9791-4ef6-a939-5ecfe641e11a/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/f9be0073-9791-4ef6-a939-5ecfe641e11a/"
+        },
+        {
+          "label": "2",
+          "href": "?page=2"
+        },
+        {
+          "label": "›",
+          "href": "?page=2"
+        },
+        {
+          "label": "»",
+          "href": "?page=2"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/companies/"
+        }
+      ],
+      "mains": 1,
+      "screenshot": "after-company-list-1024.png"
+    },
+    {
+      "key": "company-detail",
+      "width": 1024,
+      "client": 1024,
+      "scroll": 1024,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "شرکت نمونه موج الف"
+      ],
+      "targets": [
+        {
+          "label": "مدیریت پلتفرم",
+          "href": "/organizations/platform/"
+        },
+        {
+          "label": "شرکت‌ها",
+          "href": "/organizations/platform/companies/"
+        },
+        {
+          "label": "ویرایش مشخصات و تنظیمات",
+          "href": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/edit/"
+        },
+        {
+          "label": "بازگشت به فهرست شرکت‌ها",
+          "href": "/organizations/platform/companies/"
+        },
+        {
+          "label": "مدیریت و تنظیمات",
+          "href": "#company-management"
+        },
+        {
+          "label": "سوابق فعالیت",
+          "href": "#company-activity"
+        },
+        {
+          "label": "عملیات حساس",
+          "href": "#company-sensitive"
+        },
+        {
+          "label": "پاک‌سازی",
+          "href": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/"
+        },
+        {
+          "label": "زمان↕",
+          "href": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/?sort=occurred_at&direction=asc"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/"
+        },
+        {
+          "method": "post",
+          "action": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/status/"
+        }
+      ],
+      "mains": 1,
+      "screenshot": "after-company-detail-1024.png"
+    },
+    {
+      "key": "company-list",
+      "width": 390,
+      "client": 390,
+      "scroll": 390,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "شرکت‌ها و فعالیت‌ها"
+      ],
+      "targets": [
+        {
+          "label": "مدیریت پلتفرم",
+          "href": "/organizations/platform/"
+        },
+        {
+          "label": "شرکت جدید",
+          "href": "/organizations/create/"
+        },
+        {
+          "label": "پاک‌سازی",
+          "href": "/organizations/platform/companies/"
+        },
+        {
+          "label": "شرکت↑",
+          "href": "/organizations/platform/companies/?sort=name&direction=desc"
+        },
+        {
+          "label": "وضعیت↕",
+          "href": "/organizations/platform/companies/?sort=status&direction=asc"
+        },
+        {
+          "label": "تعداد عضویت‌ها↕",
+          "href": "/organizations/platform/companies/?sort=members&direction=asc"
+        },
+        {
+          "label": "تاریخ ایجاد↕",
+          "href": "/organizations/platform/companies/?sort=created&direction=asc"
+        },
+        {
+          "label": "شرکت↑",
+          "href": "/organizations/platform/companies/?sort=name&direction=desc"
+        },
+        {
+          "label": "وضعیت↕",
+          "href": "/organizations/platform/companies/?sort=status&direction=asc"
+        },
+        {
+          "label": "تعداد عضویت‌ها↕",
+          "href": "/organizations/platform/companies/?sort=members&direction=asc"
+        },
+        {
+          "label": "تاریخ ایجاد↕",
+          "href": "/organizations/platform/companies/?sort=created&direction=asc"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 00",
+          "href": "/organizations/platform/companies/04f6eee9-809a-418b-be7e-ed3509e01bd5/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/04f6eee9-809a-418b-be7e-ed3509e01bd5/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 01",
+          "href": "/organizations/platform/companies/70e99771-046e-4662-96e8-d5627a414c2d/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/70e99771-046e-4662-96e8-d5627a414c2d/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 02",
+          "href": "/organizations/platform/companies/c340c47a-33d8-4793-88be-79a592bd2f2f/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/c340c47a-33d8-4793-88be-79a592bd2f2f/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 03",
+          "href": "/organizations/platform/companies/899fe559-2996-4864-b95d-dd4a2890a4b5/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/899fe559-2996-4864-b95d-dd4a2890a4b5/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 04",
+          "href": "/organizations/platform/companies/01b6a5dd-d868-4d1e-9398-19a9c0b90b62/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/01b6a5dd-d868-4d1e-9398-19a9c0b90b62/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 05",
+          "href": "/organizations/platform/companies/21bdbacb-89ce-4cc8-a45c-cd92b8d750a4/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/21bdbacb-89ce-4cc8-a45c-cd92b8d750a4/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 06",
+          "href": "/organizations/platform/companies/69ddca21-8ea5-4b7a-8c0b-882755bfe671/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/69ddca21-8ea5-4b7a-8c0b-882755bfe671/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 07",
+          "href": "/organizations/platform/companies/9ce5af90-cada-4129-86d7-3e05d76a622d/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/9ce5af90-cada-4129-86d7-3e05d76a622d/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 08",
+          "href": "/organizations/platform/companies/fc309cc2-04f4-4d03-959a-0acb79b5e7ba/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/fc309cc2-04f4-4d03-959a-0acb79b5e7ba/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 09",
+          "href": "/organizations/platform/companies/183a8e28-dbac-4cfd-a3ec-5cc1a4d89e80/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/183a8e28-dbac-4cfd-a3ec-5cc1a4d89e80/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 10",
+          "href": "/organizations/platform/companies/5048f61f-8467-463a-91db-50287656241b/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/5048f61f-8467-463a-91db-50287656241b/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 11",
+          "href": "/organizations/platform/companies/9d40dec6-a686-4450-a5e8-c34db785ae74/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/9d40dec6-a686-4450-a5e8-c34db785ae74/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 12",
+          "href": "/organizations/platform/companies/46e49d70-d43f-4cf2-99c6-7bf0a2eab784/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/46e49d70-d43f-4cf2-99c6-7bf0a2eab784/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 13",
+          "href": "/organizations/platform/companies/1784db4b-3c1c-42ef-b595-3fbb2413ce60/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/1784db4b-3c1c-42ef-b595-3fbb2413ce60/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 14",
+          "href": "/organizations/platform/companies/4f1dc631-e73a-497d-a21c-1b6c7798d45e/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/4f1dc631-e73a-497d-a21c-1b6c7798d45e/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 15",
+          "href": "/organizations/platform/companies/a6072335-4cea-453f-bae7-b0a02c1a70ae/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/a6072335-4cea-453f-bae7-b0a02c1a70ae/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 16",
+          "href": "/organizations/platform/companies/74f87cb0-7741-43b0-b2b9-1c761596ab49/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/74f87cb0-7741-43b0-b2b9-1c761596ab49/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 17",
+          "href": "/organizations/platform/companies/bff40044-008c-4406-a071-2bc87c77527b/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/bff40044-008c-4406-a071-2bc87c77527b/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 18",
+          "href": "/organizations/platform/companies/1151a18f-c697-4c75-bc4c-808dfe8c97f3/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/1151a18f-c697-4c75-bc4c-808dfe8c97f3/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 19",
+          "href": "/organizations/platform/companies/b4bde1ea-5da2-4de6-912d-8c369b4510e4/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/b4bde1ea-5da2-4de6-912d-8c369b4510e4/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 20",
+          "href": "/organizations/platform/companies/a00aca71-357c-49d8-a11a-95573d59d9e4/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/a00aca71-357c-49d8-a11a-95573d59d9e4/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 21",
+          "href": "/organizations/platform/companies/ba87b66c-690c-49a1-a82f-0f560eeba33a/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/ba87b66c-690c-49a1-a82f-0f560eeba33a/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 22",
+          "href": "/organizations/platform/companies/377210a5-cd17-429c-a713-c05cdc74d946/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/377210a5-cd17-429c-a713-c05cdc74d946/"
+        },
+        {
+          "label": "شرکت آزمایشی صفحه 23",
+          "href": "/organizations/platform/companies/caadb363-a33c-4487-9c2f-fc46d4e47ca2/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/caadb363-a33c-4487-9c2f-fc46d4e47ca2/"
+        },
+        {
+          "label": "شرکت نمونه تکمیل",
+          "href": "/organizations/platform/companies/f9be0073-9791-4ef6-a939-5ecfe641e11a/"
+        },
+        {
+          "label": "فعالیت‌ها و عملیات",
+          "href": "/organizations/platform/companies/f9be0073-9791-4ef6-a939-5ecfe641e11a/"
+        },
+        {
+          "label": "2",
+          "href": "?page=2"
+        },
+        {
+          "label": "›",
+          "href": "?page=2"
+        },
+        {
+          "label": "»",
+          "href": "?page=2"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/companies/"
+        }
+      ],
+      "mains": 1,
+      "screenshot": "after-company-list-390.png"
+    },
+    {
+      "key": "company-detail",
+      "width": 390,
+      "client": 390,
+      "scroll": 390,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "شرکت نمونه موج الف"
+      ],
+      "targets": [
+        {
+          "label": "مدیریت پلتفرم",
+          "href": "/organizations/platform/"
+        },
+        {
+          "label": "شرکت‌ها",
+          "href": "/organizations/platform/companies/"
+        },
+        {
+          "label": "ویرایش مشخصات و تنظیمات",
+          "href": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/edit/"
+        },
+        {
+          "label": "بازگشت به فهرست شرکت‌ها",
+          "href": "/organizations/platform/companies/"
+        },
+        {
+          "label": "مدیریت و تنظیمات",
+          "href": "#company-management"
+        },
+        {
+          "label": "سوابق فعالیت",
+          "href": "#company-activity"
+        },
+        {
+          "label": "عملیات حساس",
+          "href": "#company-sensitive"
+        },
+        {
+          "label": "پاک‌سازی",
+          "href": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/"
+        },
+        {
+          "label": "زمان↕",
+          "href": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/?sort=occurred_at&direction=asc"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/"
+        },
+        {
+          "method": "post",
+          "action": "/organizations/platform/companies/b60b64fe-878b-4e43-896e-08d826d467d4/status/"
+        }
+      ],
+      "mains": 1,
+      "screenshot": "after-company-detail-390.png"
+    },
+    {
+      "key": "selector-ax",
+      "width": 1440,
+      "comboboxes": [
+        "  - combobox \"شرکت هدف (الزامی)\""
+      ],
+      "sourceAttributes": {
+        "ariaHidden": "true",
+        "tabIndex": -1,
+        "required": true,
+        "value": "",
+        "options": [
+          {
+            "value": "",
+            "label": "انتخاب شرکت"
+          },
+          {
+            "value": "04f6eee9-809a-418b-be7e-ed3509e01bd5",
+            "label": "شرکت آزمایشی صفحه 00"
+          },
+          {
+            "value": "70e99771-046e-4662-96e8-d5627a414c2d",
+            "label": "شرکت آزمایشی صفحه 01"
+          },
+          {
+            "value": "c340c47a-33d8-4793-88be-79a592bd2f2f",
+            "label": "شرکت آزمایشی صفحه 02"
+          },
+          {
+            "value": "899fe559-2996-4864-b95d-dd4a2890a4b5",
+            "label": "شرکت آزمایشی صفحه 03"
+          },
+          {
+            "value": "01b6a5dd-d868-4d1e-9398-19a9c0b90b62",
+            "label": "شرکت آزمایشی صفحه 04"
+          },
+          {
+            "value": "21bdbacb-89ce-4cc8-a45c-cd92b8d750a4",
+            "label": "شرکت آزمایشی صفحه 05"
+          },
+          {
+            "value": "69ddca21-8ea5-4b7a-8c0b-882755bfe671",
+            "label": "شرکت آزمایشی صفحه 06"
+          },
+          {
+            "value": "9ce5af90-cada-4129-86d7-3e05d76a622d",
+            "label": "شرکت آزمایشی صفحه 07"
+          },
+          {
+            "value": "fc309cc2-04f4-4d03-959a-0acb79b5e7ba",
+            "label": "شرکت آزمایشی صفحه 08"
+          },
+          {
+            "value": "183a8e28-dbac-4cfd-a3ec-5cc1a4d89e80",
+            "label": "شرکت آزمایشی صفحه 09"
+          },
+          {
+            "value": "5048f61f-8467-463a-91db-50287656241b",
+            "label": "شرکت آزمایشی صفحه 10"
+          },
+          {
+            "value": "9d40dec6-a686-4450-a5e8-c34db785ae74",
+            "label": "شرکت آزمایشی صفحه 11"
+          },
+          {
+            "value": "46e49d70-d43f-4cf2-99c6-7bf0a2eab784",
+            "label": "شرکت آزمایشی صفحه 12"
+          },
+          {
+            "value": "1784db4b-3c1c-42ef-b595-3fbb2413ce60",
+            "label": "شرکت آزمایشی صفحه 13"
+          },
+          {
+            "value": "4f1dc631-e73a-497d-a21c-1b6c7798d45e",
+            "label": "شرکت آزمایشی صفحه 14"
+          },
+          {
+            "value": "a6072335-4cea-453f-bae7-b0a02c1a70ae",
+            "label": "شرکت آزمایشی صفحه 15"
+          },
+          {
+            "value": "74f87cb0-7741-43b0-b2b9-1c761596ab49",
+            "label": "شرکت آزمایشی صفحه 16"
+          },
+          {
+            "value": "bff40044-008c-4406-a071-2bc87c77527b",
+            "label": "شرکت آزمایشی صفحه 17"
+          },
+          {
+            "value": "1151a18f-c697-4c75-bc4c-808dfe8c97f3",
+            "label": "شرکت آزمایشی صفحه 18"
+          },
+          {
+            "value": "b4bde1ea-5da2-4de6-912d-8c369b4510e4",
+            "label": "شرکت آزمایشی صفحه 19"
+          },
+          {
+            "value": "a00aca71-357c-49d8-a11a-95573d59d9e4",
+            "label": "شرکت آزمایشی صفحه 20"
+          },
+          {
+            "value": "ba87b66c-690c-49a1-a82f-0f560eeba33a",
+            "label": "شرکت آزمایشی صفحه 21"
+          },
+          {
+            "value": "377210a5-cd17-429c-a713-c05cdc74d946",
+            "label": "شرکت آزمایشی صفحه 22"
+          },
+          {
+            "value": "caadb363-a33c-4487-9c2f-fc46d4e47ca2",
+            "label": "شرکت آزمایشی صفحه 23"
+          },
+          {
+            "value": "f9be0073-9791-4ef6-a939-5ecfe641e11a",
+            "label": "شرکت نمونه تکمیل"
+          },
+          {
+            "value": "b60b64fe-878b-4e43-896e-08d826d467d4",
+            "label": "شرکت نمونه موج الف"
+          },
+          {
+            "value": "e87dd23c-0cdd-46b9-a9fe-9c85dd40da0b",
+            "label": "شرکت نمونه موج ب"
+          },
+          {
+            "value": "b0e7963f-95ed-44b4-8712-64ae3fb79e39",
+            "label": "شرکت نمونه واگذاری"
+          },
+          {
+            "value": "602bd889-d309-44fe-aba6-093f169433a5",
+            "label": "شرکت نمونه وضعیت"
+          }
+        ],
+        "disabled": false
+      }
+    },
+    {
+      "key": "selector",
+      "width": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "نقش اعضای شرکت"
+      ],
+      "targets": [
+        {
+          "label": "خانه",
+          "href": "/"
+        },
+        {
+          "label": "نقش‌های سیستمی",
+          "href": "/organizations/platform/roles/"
+        },
+        {
+          "label": "نقش‌های اختصاصی",
+          "href": "/organizations/platform/roles/?section=tenant"
+        },
+        {
+          "label": "تخصیص نقش کاربران",
+          "href": "/organizations/platform/member-roles/"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/member-roles/"
+        }
+      ],
+      "mains": 1
+    },
+    {
+      "key": "keyboard-options",
+      "width": 1440,
+      "items": [
+        "شرکت نمونه موج الف"
+      ]
+    },
+    {
+      "key": "selector-ax",
+      "width": 1024,
+      "comboboxes": [
+        "  - combobox \"شرکت هدف (الزامی)\""
+      ],
+      "sourceAttributes": {
+        "ariaHidden": "true",
+        "tabIndex": -1,
+        "required": true,
+        "value": "",
+        "options": [
+          {
+            "value": "",
+            "label": "انتخاب شرکت"
+          },
+          {
+            "value": "04f6eee9-809a-418b-be7e-ed3509e01bd5",
+            "label": "شرکت آزمایشی صفحه 00"
+          },
+          {
+            "value": "70e99771-046e-4662-96e8-d5627a414c2d",
+            "label": "شرکت آزمایشی صفحه 01"
+          },
+          {
+            "value": "c340c47a-33d8-4793-88be-79a592bd2f2f",
+            "label": "شرکت آزمایشی صفحه 02"
+          },
+          {
+            "value": "899fe559-2996-4864-b95d-dd4a2890a4b5",
+            "label": "شرکت آزمایشی صفحه 03"
+          },
+          {
+            "value": "01b6a5dd-d868-4d1e-9398-19a9c0b90b62",
+            "label": "شرکت آزمایشی صفحه 04"
+          },
+          {
+            "value": "21bdbacb-89ce-4cc8-a45c-cd92b8d750a4",
+            "label": "شرکت آزمایشی صفحه 05"
+          },
+          {
+            "value": "69ddca21-8ea5-4b7a-8c0b-882755bfe671",
+            "label": "شرکت آزمایشی صفحه 06"
+          },
+          {
+            "value": "9ce5af90-cada-4129-86d7-3e05d76a622d",
+            "label": "شرکت آزمایشی صفحه 07"
+          },
+          {
+            "value": "fc309cc2-04f4-4d03-959a-0acb79b5e7ba",
+            "label": "شرکت آزمایشی صفحه 08"
+          },
+          {
+            "value": "183a8e28-dbac-4cfd-a3ec-5cc1a4d89e80",
+            "label": "شرکت آزمایشی صفحه 09"
+          },
+          {
+            "value": "5048f61f-8467-463a-91db-50287656241b",
+            "label": "شرکت آزمایشی صفحه 10"
+          },
+          {
+            "value": "9d40dec6-a686-4450-a5e8-c34db785ae74",
+            "label": "شرکت آزمایشی صفحه 11"
+          },
+          {
+            "value": "46e49d70-d43f-4cf2-99c6-7bf0a2eab784",
+            "label": "شرکت آزمایشی صفحه 12"
+          },
+          {
+            "value": "1784db4b-3c1c-42ef-b595-3fbb2413ce60",
+            "label": "شرکت آزمایشی صفحه 13"
+          },
+          {
+            "value": "4f1dc631-e73a-497d-a21c-1b6c7798d45e",
+            "label": "شرکت آزمایشی صفحه 14"
+          },
+          {
+            "value": "a6072335-4cea-453f-bae7-b0a02c1a70ae",
+            "label": "شرکت آزمایشی صفحه 15"
+          },
+          {
+            "value": "74f87cb0-7741-43b0-b2b9-1c761596ab49",
+            "label": "شرکت آزمایشی صفحه 16"
+          },
+          {
+            "value": "bff40044-008c-4406-a071-2bc87c77527b",
+            "label": "شرکت آزمایشی صفحه 17"
+          },
+          {
+            "value": "1151a18f-c697-4c75-bc4c-808dfe8c97f3",
+            "label": "شرکت آزمایشی صفحه 18"
+          },
+          {
+            "value": "b4bde1ea-5da2-4de6-912d-8c369b4510e4",
+            "label": "شرکت آزمایشی صفحه 19"
+          },
+          {
+            "value": "a00aca71-357c-49d8-a11a-95573d59d9e4",
+            "label": "شرکت آزمایشی صفحه 20"
+          },
+          {
+            "value": "ba87b66c-690c-49a1-a82f-0f560eeba33a",
+            "label": "شرکت آزمایشی صفحه 21"
+          },
+          {
+            "value": "377210a5-cd17-429c-a713-c05cdc74d946",
+            "label": "شرکت آزمایشی صفحه 22"
+          },
+          {
+            "value": "caadb363-a33c-4487-9c2f-fc46d4e47ca2",
+            "label": "شرکت آزمایشی صفحه 23"
+          },
+          {
+            "value": "f9be0073-9791-4ef6-a939-5ecfe641e11a",
+            "label": "شرکت نمونه تکمیل"
+          },
+          {
+            "value": "b60b64fe-878b-4e43-896e-08d826d467d4",
+            "label": "شرکت نمونه موج الف"
+          },
+          {
+            "value": "e87dd23c-0cdd-46b9-a9fe-9c85dd40da0b",
+            "label": "شرکت نمونه موج ب"
+          },
+          {
+            "value": "b0e7963f-95ed-44b4-8712-64ae3fb79e39",
+            "label": "شرکت نمونه واگذاری"
+          },
+          {
+            "value": "602bd889-d309-44fe-aba6-093f169433a5",
+            "label": "شرکت نمونه وضعیت"
+          }
+        ],
+        "disabled": false
+      }
+    },
+    {
+      "key": "selector",
+      "width": 1024,
+      "client": 1024,
+      "scroll": 1024,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "نقش اعضای شرکت"
+      ],
+      "targets": [
+        {
+          "label": "خانه",
+          "href": "/"
+        },
+        {
+          "label": "نقش‌های سیستمی",
+          "href": "/organizations/platform/roles/"
+        },
+        {
+          "label": "نقش‌های اختصاصی",
+          "href": "/organizations/platform/roles/?section=tenant"
+        },
+        {
+          "label": "تخصیص نقش کاربران",
+          "href": "/organizations/platform/member-roles/"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/member-roles/"
+        }
+      ],
+      "mains": 1
+    },
+    {
+      "key": "keyboard-options",
+      "width": 1024,
+      "items": [
+        "شرکت نمونه موج الف"
+      ]
+    },
+    {
+      "key": "selector-ax",
+      "width": 390,
+      "comboboxes": [
+        "  - combobox \"شرکت هدف (الزامی)\""
+      ],
+      "sourceAttributes": {
+        "ariaHidden": "true",
+        "tabIndex": -1,
+        "required": true,
+        "value": "",
+        "options": [
+          {
+            "value": "",
+            "label": "انتخاب شرکت"
+          },
+          {
+            "value": "04f6eee9-809a-418b-be7e-ed3509e01bd5",
+            "label": "شرکت آزمایشی صفحه 00"
+          },
+          {
+            "value": "70e99771-046e-4662-96e8-d5627a414c2d",
+            "label": "شرکت آزمایشی صفحه 01"
+          },
+          {
+            "value": "c340c47a-33d8-4793-88be-79a592bd2f2f",
+            "label": "شرکت آزمایشی صفحه 02"
+          },
+          {
+            "value": "899fe559-2996-4864-b95d-dd4a2890a4b5",
+            "label": "شرکت آزمایشی صفحه 03"
+          },
+          {
+            "value": "01b6a5dd-d868-4d1e-9398-19a9c0b90b62",
+            "label": "شرکت آزمایشی صفحه 04"
+          },
+          {
+            "value": "21bdbacb-89ce-4cc8-a45c-cd92b8d750a4",
+            "label": "شرکت آزمایشی صفحه 05"
+          },
+          {
+            "value": "69ddca21-8ea5-4b7a-8c0b-882755bfe671",
+            "label": "شرکت آزمایشی صفحه 06"
+          },
+          {
+            "value": "9ce5af90-cada-4129-86d7-3e05d76a622d",
+            "label": "شرکت آزمایشی صفحه 07"
+          },
+          {
+            "value": "fc309cc2-04f4-4d03-959a-0acb79b5e7ba",
+            "label": "شرکت آزمایشی صفحه 08"
+          },
+          {
+            "value": "183a8e28-dbac-4cfd-a3ec-5cc1a4d89e80",
+            "label": "شرکت آزمایشی صفحه 09"
+          },
+          {
+            "value": "5048f61f-8467-463a-91db-50287656241b",
+            "label": "شرکت آزمایشی صفحه 10"
+          },
+          {
+            "value": "9d40dec6-a686-4450-a5e8-c34db785ae74",
+            "label": "شرکت آزمایشی صفحه 11"
+          },
+          {
+            "value": "46e49d70-d43f-4cf2-99c6-7bf0a2eab784",
+            "label": "شرکت آزمایشی صفحه 12"
+          },
+          {
+            "value": "1784db4b-3c1c-42ef-b595-3fbb2413ce60",
+            "label": "شرکت آزمایشی صفحه 13"
+          },
+          {
+            "value": "4f1dc631-e73a-497d-a21c-1b6c7798d45e",
+            "label": "شرکت آزمایشی صفحه 14"
+          },
+          {
+            "value": "a6072335-4cea-453f-bae7-b0a02c1a70ae",
+            "label": "شرکت آزمایشی صفحه 15"
+          },
+          {
+            "value": "74f87cb0-7741-43b0-b2b9-1c761596ab49",
+            "label": "شرکت آزمایشی صفحه 16"
+          },
+          {
+            "value": "bff40044-008c-4406-a071-2bc87c77527b",
+            "label": "شرکت آزمایشی صفحه 17"
+          },
+          {
+            "value": "1151a18f-c697-4c75-bc4c-808dfe8c97f3",
+            "label": "شرکت آزمایشی صفحه 18"
+          },
+          {
+            "value": "b4bde1ea-5da2-4de6-912d-8c369b4510e4",
+            "label": "شرکت آزمایشی صفحه 19"
+          },
+          {
+            "value": "a00aca71-357c-49d8-a11a-95573d59d9e4",
+            "label": "شرکت آزمایشی صفحه 20"
+          },
+          {
+            "value": "ba87b66c-690c-49a1-a82f-0f560eeba33a",
+            "label": "شرکت آزمایشی صفحه 21"
+          },
+          {
+            "value": "377210a5-cd17-429c-a713-c05cdc74d946",
+            "label": "شرکت آزمایشی صفحه 22"
+          },
+          {
+            "value": "caadb363-a33c-4487-9c2f-fc46d4e47ca2",
+            "label": "شرکت آزمایشی صفحه 23"
+          },
+          {
+            "value": "f9be0073-9791-4ef6-a939-5ecfe641e11a",
+            "label": "شرکت نمونه تکمیل"
+          },
+          {
+            "value": "b60b64fe-878b-4e43-896e-08d826d467d4",
+            "label": "شرکت نمونه موج الف"
+          },
+          {
+            "value": "e87dd23c-0cdd-46b9-a9fe-9c85dd40da0b",
+            "label": "شرکت نمونه موج ب"
+          },
+          {
+            "value": "b0e7963f-95ed-44b4-8712-64ae3fb79e39",
+            "label": "شرکت نمونه واگذاری"
+          },
+          {
+            "value": "602bd889-d309-44fe-aba6-093f169433a5",
+            "label": "شرکت نمونه وضعیت"
+          }
+        ],
+        "disabled": false
+      }
+    },
+    {
+      "key": "selector",
+      "width": 390,
+      "client": 390,
+      "scroll": 390,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "نقش اعضای شرکت"
+      ],
+      "targets": [
+        {
+          "label": "خانه",
+          "href": "/"
+        },
+        {
+          "label": "نقش‌های سیستمی",
+          "href": "/organizations/platform/roles/"
+        },
+        {
+          "label": "نقش‌های اختصاصی",
+          "href": "/organizations/platform/roles/?section=tenant"
+        },
+        {
+          "label": "تخصیص نقش کاربران",
+          "href": "/organizations/platform/member-roles/"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/member-roles/"
+        }
+      ],
+      "mains": 1,
+      "screenshot": "after-selector-390.png"
+    },
+    {
+      "key": "keyboard-options",
+      "width": 390,
+      "items": [
+        "شرکت نمونه موج الف"
+      ]
+    },
+    {
+      "key": "audit-labels",
+      "width": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "فعالیت‌ها و ممیزی"
+      ],
+      "targets": [
+        {
+          "label": "خانه",
+          "href": "/"
+        },
+        {
+          "label": "پاک‌کردن",
+          "href": "/organizations/platform/activity/"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/activity/"
+        }
+      ],
+      "mains": 1,
+      "screenshot": "after-audit-labels-1440.png"
+    },
+    {
+      "key": "date-conversion",
+      "labels": [
+        "\n        از تاریخ شمسی\n        \n    ",
+        "\n        تا تاریخ شمسی\n        \n    "
+      ],
+      "start": "2026-11-08",
+      "end": "2026-11-11"
+    },
+    {
+      "key": "company-empty",
+      "text": "مدیریت پلتفرم\nشرکت‌ها\nشرکت‌ها و فعالیت‌ها\n\nفهرست شرکت‌های ثبت‌شده و وضعیت دسترسی آن‌ها\n\nشرکت جدید\nنام یا کد شرکت\nوضعیت\nهمه وضعیت‌ها\nفعال\nتعلیق‌شده\nلغوشده\nبایگانی‌شده\nجست‌وجو\nپاک‌سازی\nفیلترهای فعال:\nنام یا کد شرکت: no-company-matches-ux\n×\n\n0\nشرکت\n\nمرتب‌سازی:\nشرکت\n· صعودی\n⌄\nنتیجه‌ای با این فیلترها یافت نشد\n\nفیلترها را تغییر دهید یا پاک کنید."
+    }
+  ],
+  "errors": []
+}

@@ -5,16 +5,21 @@ import uuid
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.daily_reports.field_forms import (
+    LOCATION_FIELDS,
     FieldObservationEvidenceForm,
     FieldObservationForm,
     FieldProposalForm,
     FieldReviewForm,
+    field_time_zone,
 )
+from apps.daily_reports.field_models import FieldDownstreamProposal
 from apps.daily_reports.field_services import (
     attach_field_evidence,
     create_field_observation,
@@ -59,11 +64,18 @@ def field_observation_list(request: HttpRequest) -> HttpResponse:
     observations = list_field_observations(
         organization=request.organization, actor=request.user
     )
-    return render(
-        request,
-        "daily_reports/field_observation_list.html",
-        {"observations": observations},
+    can_capture = has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.FIELD_OBSERVATIONS_CAPTURE,
+        allow_any_scope=True,
     )
+    with timezone.override(field_time_zone(request.organization)):
+        return render(
+            request,
+            "daily_reports/field_observation_list.html",
+            {"observations": observations, "can_capture": can_capture},
+        )
 
 
 @active_organization_required
@@ -99,7 +111,9 @@ def field_observation_create(request: HttpRequest) -> HttpResponse:
                 location_mismatch_note=data["location_mismatch_note"],
                 operation_key=data["operation_key"],
             )
-        except (PermissionDenied, ValidationError, ValueError) as exc:
+        except ValidationError as exc:
+            form.add_error(None, ValidationError(exc.messages))
+        except (PermissionDenied, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             messages.success(request, "مشاهده میدانی در پیش‌نویس ذخیره شد.")
@@ -130,50 +144,74 @@ def field_observation_detail(request: HttpRequest, observation_id: str) -> HttpR
         project=observation.project,
         site=observation.site,
     )
-    return render(
-        request,
-        "daily_reports/field_observation_detail.html",
-        {
-            "observation": observation,
-            "can_view_location": can_view_location,
-            "evidence_form": FieldObservationEvidenceForm(),
-            "review_form": FieldReviewForm(),
-            "proposal_form": FieldProposalForm(),
-            "observation_form": FieldObservationForm(
-                instance=observation,
-                organization=request.organization,
-                user=request.user,
-            ),
-            "can_capture": has_business_permission(
-                user=request.user,
-                organization=request.organization,
-                permission=BusinessPermissionCode.FIELD_OBSERVATIONS_CAPTURE,
-                project=observation.project,
-                site=observation.site,
-            ),
-            "can_submit": has_business_permission(
-                user=request.user,
-                organization=request.organization,
-                permission=BusinessPermissionCode.FIELD_OBSERVATIONS_SUBMIT,
-                project=observation.project,
-                site=observation.site,
-            ),
-            "can_review": has_business_permission(
-                user=request.user,
-                organization=request.organization,
-                permission=BusinessPermissionCode.FIELD_OBSERVATIONS_REVIEW,
-                project=observation.project,
-                site=observation.site,
-            ),
-            "can_prepare_proposal": has_business_permission(
-                user=request.user,
-                organization=request.organization,
-                permission=BusinessPermissionCode.FIELD_PROPOSALS_PREPARE,
-                project=observation.project,
-                site=observation.site,
-            ),
-        },
+    can_review_proposals = has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.FIELD_PROPOSALS_REVIEW,
+        project=observation.project,
+        site=observation.site,
     )
+    proposal_rows = []
+    for proposal in observation.proposals.all():
+        review_form = FieldReviewForm(auto_id=f"proposal-{proposal.pk}-%s")
+        review_form.fields["reason"].required = True
+        proposal_rows.append(
+            {
+                "proposal": proposal,
+                "review_form": review_form,
+                "can_review": (
+                    can_review_proposals
+                    and proposal.status == "submitted"
+                    and request.user.pk not in (
+                        proposal.created_by_id, proposal.submitted_by_id
+                    )
+                ),
+            }
+        )
+    context = {
+        "observation": observation,
+        "proposal_rows": proposal_rows,
+        "can_view_location": can_view_location,
+        "evidence_form": FieldObservationEvidenceForm(),
+        "review_form": FieldReviewForm(),
+        "proposal_form": FieldProposalForm(organization=request.organization),
+        "observation_form": FieldObservationForm(
+            instance=observation,
+            organization=request.organization,
+            user=request.user,
+            include_location=can_view_location,
+        ),
+        "can_capture": has_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission=BusinessPermissionCode.FIELD_OBSERVATIONS_CAPTURE,
+            project=observation.project,
+            site=observation.site,
+        ),
+        "can_submit": has_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission=BusinessPermissionCode.FIELD_OBSERVATIONS_SUBMIT,
+            project=observation.project,
+            site=observation.site,
+        ),
+        "can_review": has_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission=BusinessPermissionCode.FIELD_OBSERVATIONS_REVIEW,
+            project=observation.project,
+            site=observation.site,
+        ),
+        "can_prepare_proposal": has_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission=BusinessPermissionCode.FIELD_PROPOSALS_PREPARE,
+            project=observation.project,
+            site=observation.site,
+        ),
+    }
+    with timezone.override(field_time_zone(request.organization)):
+        return render(request, "daily_reports/field_observation_detail.html", context)
 
 
 @active_organization_required
@@ -185,11 +223,19 @@ def field_observation_save(request: HttpRequest, observation_id: str) -> HttpRes
         actor=request.user,
         observation_id=observation_id,
     )
+    can_view_location = has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.FIELD_OBSERVATIONS_LOCATION_VIEW,
+        project=observation.project,
+        site=observation.site,
+    )
     form = FieldObservationForm(
         request.POST,
         organization=request.organization,
         user=request.user,
         instance=observation,
+        include_location=can_view_location,
     )
     if form.is_valid():
         data = form.cleaned_data
@@ -198,7 +244,7 @@ def field_observation_save(request: HttpRequest, observation_id: str) -> HttpRes
                 organization=request.organization,
                 actor=request.user,
                 observation_id=observation_id,
-                expected_revision=observation.revision,
+                expected_revision=data["expected_revision"],
                 operation_key=data["operation_key"],
                 project=data["project"],
                 site=data["site"],
@@ -211,15 +257,12 @@ def field_observation_save(request: HttpRequest, observation_id: str) -> HttpRes
                 manual_context=data["manual_context"],
                 captured_at=data["captured_at"],
                 effective_at=data["effective_at"],
-                location_permission=data["location_permission"],
-                latitude=data["latitude"],
-                longitude=data["longitude"],
-                horizontal_accuracy_meters=data["horizontal_accuracy_meters"],
-                location_captured_at=data["location_captured_at"],
-                location_mismatch_note=data["location_mismatch_note"],
                 client_context={},
+                **{name: data[name] for name in LOCATION_FIELDS if name in data},
             )
-        except (PermissionDenied, ValidationError, ValueError) as exc:
+        except ValidationError as exc:
+            form.add_error(None, ValidationError(exc.messages))
+        except (PermissionDenied, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             messages.success(request, "پیش‌نویس مشاهده ذخیره شد.")
@@ -229,7 +272,13 @@ def field_observation_save(request: HttpRequest, observation_id: str) -> HttpRes
     return render(
         request,
         "daily_reports/field_observation_form.html",
-        {"form": form, "title": "ویرایش مشاهده میدانی"},
+        {
+            "form": form,
+            "title": "ویرایش مشاهده میدانی",
+            "cancel_url": reverse(
+                "daily_reports:field_observation_detail", args=[observation_id]
+            ),
+        },
     )
 
 
@@ -334,7 +383,7 @@ def field_observation_review_decide(
 @organization_permission_required(BusinessPermissionCode.FIELD_PROPOSALS_PREPARE)
 @require_POST
 def field_proposal_create(request: HttpRequest, observation_id: str) -> HttpResponse:
-    form = FieldProposalForm(request.POST)
+    form = FieldProposalForm(request.POST, organization=request.organization)
     if form.is_valid():
         data = form.cleaned_data
         try:
@@ -392,6 +441,12 @@ def field_proposal_submit(
 def field_proposal_review(
     request: HttpRequest, proposal_id: str, observation_id: str, accepted: str
 ) -> HttpResponse:
+    get_object_or_404(
+        FieldDownstreamProposal,
+        organization=request.organization,
+        pk=proposal_id,
+        observation_id=observation_id,
+    )
     form = FieldReviewForm(request.POST)
     if form.is_valid():
         try:

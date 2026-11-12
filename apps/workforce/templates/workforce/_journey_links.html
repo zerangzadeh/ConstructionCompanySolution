@@ -1,1 +1,10 @@
-{% if links %}<nav class="mt-4 flex flex-wrap gap-2" aria-label="عملیات نیروی کار">{% for link in links %}<a class="erp-btn erp-btn--secondary" href="{{ link.url }}">{{ link.label }}</a>{% endfor %}</nav>{% endif %}
+{% if links %}
+    <nav class="flex flex-wrap gap-2 {% if header_actions %}erp-record-journeys{% else %}mt-4{% endif %}" aria-label="{% if header_actions %}دسترسی‌های مرتبط با کارگاه{% else %}عملیات نیروی کار{% endif %}">
+        {% for link in links %}
+            <a class="erp-btn {% if header_actions and forloop.first %}erp-btn--primary{% else %}erp-btn--secondary{% endif %}" href="{{ link.url }}">
+                {% if header_actions %}{% include "components/form_icon.html" with icon=link.icon only %}{% endif %}
+                {{ link.label }}
+            </a>
+        {% endfor %}
+    </nav>
+{% endif %}

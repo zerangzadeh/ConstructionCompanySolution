@@ -1,0 +1,138 @@
+{
+  "expenses:category_create": [
+    {
+      "ok": true,
+      "path": "/expenses/categories/",
+      "errors": "",
+      "pk": "ce01db26-d3c0-4aea-9fb1-0560688e8a76"
+    }
+  ],
+  "expenses:category_detail": [
+    {
+      "ok": true
+    }
+  ],
+  "expenses:category_list": [
+    {
+      "ok": true
+    }
+  ],
+  "expenses:draft_create": [
+    {
+      "ok": true,
+      "path": "/expenses/072ff45e-ace9-41ef-925c-6ae1c34f47b2/",
+      "errors": "",
+      "pk": "072ff45e-ace9-41ef-925c-6ae1c34f47b2"
+    },
+    {
+      "ok": true,
+      "path": "/expenses/4cf66aa5-e76d-4bf3-9e80-9d3bb108a553/",
+      "errors": "",
+      "pk": "4cf66aa5-e76d-4bf3-9e80-9d3bb108a553"
+    },
+    {
+      "ok": true,
+      "boundary": "reader"
+    }
+  ],
+  "expenses:detail": [
+    {
+      "ok": true,
+      "amount": "125000.00",
+      "status": "draft"
+    },
+    {
+      "ok": true,
+      "boundary": "foreign"
+    }
+  ],
+  "expenses:allocate": [
+    {
+      "ok": true,
+      "allocations": [
+        {
+          "amount": "125000.00",
+          "project_id": "6b0be132-b5b4-4ef1-8efa-d15642ade401",
+          "wbs_node_id": "53ff3ab0-4d18-43a0-9fe4-2d048ebc0a3e",
+          "cbs_node_id": "37cdc356-450c-4aa1-beac-f52be54cf342",
+          "cost_center_id": "8da80c7c-b914-492b-82a0-4c564f894f87"
+        }
+      ]
+    }
+  ],
+  "expenses:submit": [
+    {
+      "ok": true,
+      "state": "submitted",
+      "expected": "submitted"
+    },
+    {
+      "ok": true,
+      "state": "submitted",
+      "expected": "submitted"
+    }
+  ],
+  "expenses:approve": [
+    {
+      "ok": true,
+      "boundary": "self approval"
+    },
+    {
+      "ok": true,
+      "state": "approved",
+      "expected": "approved"
+    },
+    {
+      "ok": true,
+      "replay_status": 400
+    }
+  ],
+  "expenses:return": [
+    {
+      "ok": true,
+      "state": "returned",
+      "expected": "returned"
+    }
+  ],
+  "expenses:void": [
+    {
+      "ok": true,
+      "state": "void",
+      "expected": "void"
+    }
+  ],
+  "expenses:create": [
+    {
+      "ok": true,
+      "path": "/expenses/",
+      "errors": "",
+      "pk": "ba3bd3aa-d305-4e35-8173-d07a002be4e4"
+    }
+  ],
+  "expenses:recurrences": [
+    {
+      "ok": true,
+      "path": "/expenses/recurrences/",
+      "errors": "",
+      "pk": "8083295f-52d4-416b-a96e-e5958673dbb6"
+    }
+  ],
+  "expenses:recurrence_propose": [
+    {
+      "ok": true,
+      "feedback": "خانه\nهزینه‌ها\nجزئیات هزینه\nجزئیات هزینه\n\nتکرار مصنوعی B04\n\nارسال برای تأیید\nمرجع هزینه\nB04-REC:۱۴۰۵/۰۸/۲۱\nتاریخ هزینه\n1405/08/21\nمبلغ\n75,000 ریال\nوضعیت\nپیش‌نویس\nاطلاعات اصلی\nتخصیص و کدگذاری\nاسناد مرتبط (0)\nسوابق ثبت و تغییر وضعیت\nاقدامات رکورد\nاطلاعات عمومی\nشرح هزینه\nتکرار مصنوعی B04\nپروژه\nExpense control project\nنوع هزینه\nمستقیم\nگروه هزینه\nسایر\nدسته هزینه\n—\nفروشنده / طرف تجاری\n—\nمرجع رسید\n—\nتخصیص و کدگذاری\n\nهنوز تخصیصی ثبت نشده است.\n\nپروژه *\n(الزامی)\n---------\nEXP-CONTROL - Expense control project\nگره ساختار شکست کار *\n(الزامی)\n---------\nW1 — Work\nفعالیت\n---------\nگره ساختار شکست هزینه *\n(الزامی)\n---------\nDirect · C1\nمرکز هزینه\n---------\nResponsibility · CC1\nمبلغ *\n(الزامی)\nریال\nمرجع مبنای تخصیص *\n(الزامی)\nافزودن تخصیص\nاسناد مرتبط\n0\n\nاسناد قابل مشاهده مرتبط با این هزینه\n\nبارگذاری سند جدید\nپیوند سند موجود\n\nسند مرتبط قابل مشاهده‌ای برای این هزینه وجود ندارد.\n\nسوابق ثبت و تغییر وضعیت\nثبت: 1405/08/20 21:04 · expense-control-maker\nاقدامات رکورد\nدلیل ابطال\nابطال"
+    }
+  ],
+  "expenses:category_archive": [
+    {
+      "ok": true,
+      "status": 302,
+      "archived": "2026-11-11 21:04:08.947375+00:00"
+    }
+  ],
+  "expenses:list": [
+    {
+      "ok": true
+    }
+  ]
+}

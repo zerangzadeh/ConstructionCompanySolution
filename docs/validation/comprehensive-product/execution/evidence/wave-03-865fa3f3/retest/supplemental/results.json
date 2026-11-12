@@ -1,0 +1,173 @@
+{
+  "results": {
+    "print_control": [
+      {
+        "match": true,
+        "path": "/daily-reports/77b66eed-808d-4ea9-a1b1-bc06f1c24706/"
+      }
+    ],
+    "scoped_daily_record_to_approval": [
+      {
+        "match": true,
+        "report": "c906cd0d-9cb6-4bea-97d0-168406f9fa0e",
+        "state": "approved",
+        "audit": [
+          [
+            "daily_report.created",
+            "b02-field-recorder"
+          ],
+          [
+            "daily_report.submitted",
+            "b02-field-recorder"
+          ],
+          [
+            "daily_report.approved",
+            "b02-field-reviewer"
+          ]
+        ]
+      }
+    ],
+    "proposal_replay": [
+      {
+        "match": true,
+        "state": "accepted",
+        "history": 2
+      }
+    ],
+    "source_references_preserved": [
+      {
+        "match": true,
+        "refs": [
+          {
+            "safety_incident_id": null,
+            "quality_issue_id": "48327c1a-74d0-4acd-be4c-4fdcf28b5d68",
+            "created_by__username": "b02-owner"
+          },
+          {
+            "safety_incident_id": "b366fbb2-1989-4d54-9f51-a3b1a7d6c500",
+            "quality_issue_id": null,
+            "created_by__username": "b02-owner"
+          }
+        ],
+        "safety_state": "reported",
+        "quality_state": "reported"
+      }
+    ]
+  },
+  "traffic": [
+    [
+      "b02-owner",
+      "GET",
+      "/accounts/login/",
+      200
+    ],
+    [
+      "b02-owner",
+      "POST",
+      "/accounts/login/",
+      302
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b02-field-recorder",
+      "GET",
+      "/accounts/login/",
+      200
+    ],
+    [
+      "b02-field-recorder",
+      "POST",
+      "/accounts/login/",
+      302
+    ],
+    [
+      "b02-field-recorder",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/accounts/login/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "POST",
+      "/accounts/login/",
+      302
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/77b66eed-808d-4ea9-a1b1-bc06f1c24706/",
+      200
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/77b66eed-808d-4ea9-a1b1-bc06f1c24706/",
+      200
+    ],
+    [
+      "b02-field-recorder",
+      "GET",
+      "/daily-reports/create/",
+      200
+    ],
+    [
+      "b02-field-recorder",
+      "POST",
+      "/daily-reports/create/",
+      302
+    ],
+    [
+      "b02-field-recorder",
+      "GET",
+      "/daily-reports/c906cd0d-9cb6-4bea-97d0-168406f9fa0e/",
+      200
+    ],
+    [
+      "b02-field-recorder",
+      "POST",
+      "/daily-reports/c906cd0d-9cb6-4bea-97d0-168406f9fa0e/submit/",
+      302
+    ],
+    [
+      "b02-field-recorder",
+      "GET",
+      "/daily-reports/c906cd0d-9cb6-4bea-97d0-168406f9fa0e/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/c906cd0d-9cb6-4bea-97d0-168406f9fa0e/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "POST",
+      "/daily-reports/c906cd0d-9cb6-4bea-97d0-168406f9fa0e/approve/",
+      302
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/c906cd0d-9cb6-4bea-97d0-168406f9fa0e/",
+      200
+    ]
+  ]
+}

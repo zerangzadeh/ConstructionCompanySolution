@@ -1,44 +1,85 @@
 {% extends "base.html" %}
+{% load static erp_format table_filters %}
 {% block title %}مدیریت شرکت‌ها | بنیرا{% endblock %}
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/erp_platform_company_list.css' %}">
+{% endblock %}
 {% block table_filter_controls %}{% endblock %}
+{% block list_pagination %}{% endblock %}
 {% block content %}
-<div class="mb-5 flex flex-wrap items-end justify-between gap-3">
-    <div>
-        <p class="text-xs font-semibold text-blue-600">مدیریت پلتفرم</p>
-        <h1 class="mt-1 text-2xl font-bold text-slate-950">شرکت‌ها و فعالیت‌ها</h1>
-        <p class="mt-2 text-sm text-slate-500">فهرست شرکت‌های ثبت‌شده و وضعیت دسترسی آن‌ها</p>
+{% url 'organizations:create' as create_url %}
+<div class="erp-reference-list erp-reference-pattern erp-platform-company-list">
+    <div class="erp-list-heading">
+        {% include "components/page_header.html" with page_breadcrumbs=page_breadcrumbs page_breadcrumb_user=request.user page_title="شرکت‌ها و فعالیت‌ها" page_description="فهرست شرکت‌های ثبت‌شده و وضعیت دسترسی آن‌ها" page_action_url=create_url page_action_label="شرکت جدید" page_icon="company" only %}
     </div>
-    <a class="erp-btn erp-btn--primary" href="{% url 'organizations:create' %}">شرکت جدید</a>
+    <section class="erp-platform-kpis erp-company-summary" aria-label="نمای کلی شرکت‌های پلتفرم">
+        {% for metric in company_summary %}
+            {% include "components/dashboard_metric.html" with metric=metric only %}
+        {% endfor %}
+    </section>
+    {% include "components/filter_bar.html" with bar=filter_bar reference_layout=True inline_filters=True restore_url_state=True submit_label="جست‌وجو" clear_label="پاک کردن فیلترها" action_icons=True only %}
+
+    <div class="erp-surface erp-platform-company-results">
+        {% with applied_table_sort=list_sort %}
+        {% include "components/list_result_toolbar.html" with bar=filter_bar sort=list_sort result_page=page_obj total_amount=None reference_layout=True %}
+        {% if companies %}
+        <section class="overflow-x-auto" aria-label="فهرست شرکت‌ها" tabindex="0">
+            <table class="erp-responsive-list" aria-label="شرکت‌های پلتفرم">
+                <thead>
+                    <tr>
+                        {% for option in list_sort.options %}
+                        <th scope="col"{% if list_sort.key == option.key %} aria-sort="{{ list_sort.descending|yesno:'descending,ascending' }}"{% endif %}>
+                            {% table_sort_header option.key option.label %}
+                        </th>
+                        {% endfor %}
+                        <th scope="col">آخرین فعالیت ثبت‌شده</th>
+                        <th scope="col">مدیریت</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for company in companies %}
+                    {% url 'organizations:platform_company_detail' company.pk as company_url %}
+                    <tr>
+                        <td class="erp-list-identifier">
+                            <a href="{{ company_url }}">{{ company.name }}</a>
+                            <span class="erp-list-subtitle"><bdi dir="ltr">{{ company.slug }}</bdi></span>
+                        </td>
+                        <td class="erp-list-status" data-label="وضعیت">
+                            {% if company.status == "active" %}
+                                {% include "components/status_badge.html" with status=company.status label=company.get_status_display icon="check-circle" only %}
+                            {% else %}
+                                {% include "components/status_badge.html" with status=company.status label=company.get_status_display only %}
+                            {% endif %}
+                        </td>
+                        <td data-label="تعداد عضویت‌ها"><bdi dir="ltr">{{ company.member_count|erp_quantity_fa }}</bdi></td>
+                        <td data-label="تاریخ ایجاد"><bdi dir="ltr">{{ company.created_at|jalali_datetime }}</bdi></td>
+                        <td data-label="آخرین فعالیت ثبت‌شده">
+                            {% if company.last_activity %}
+                            <bdi dir="ltr">{{ company.last_activity|jalali_datetime }}</bdi>
+                            {% else %}
+                            <span class="erp-list-muted">رویدادی ثبت نشده</span>
+                            {% endif %}
+                        </td>
+                        <td class="erp-list-row-action">
+                            <a class="erp-btn erp-btn--secondary erp-btn--compact" href="{{ company_url }}" aria-label="فعالیت‌ها و عملیات {{ company.name }}">
+                                {% include "components/form_icon.html" with icon="layers" only %}فعالیت‌ها و عملیات
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+        {% elif filter_bar.chips or filter_bar.form.errors %}
+            {% include "components/empty_state.html" with empty_filtered=True only %}
+        {% else %}
+            {% include "components/empty_state.html" with empty_title="هنوز شرکتی ثبت نشده است" empty_description="برای شروع، یک شرکت جدید ایجاد کنید." only %}
+        {% endif %}
+        {% endwith %}
+        {% if page_obj.has_other_pages %}
+            {% include "components/list_pagination.html" with page_obj=page_obj pagination_query=pagination_query result_label="شرکت" reference_layout=True only %}
+        {% endif %}
+    </div>
 </div>
-<form method="get" class="erp-surface mb-4 grid gap-3 rounded-xl p-4 sm:grid-cols-3">
-    {% for field in search_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
-    <div class="flex items-end gap-2">
-        <button type="submit" class="erp-btn erp-btn--primary">جستجو</button>
-        <a href="{% url 'organizations:platform_company_list' %}" class="erp-btn erp-btn--secondary">پاک‌کردن فیلترها</a>
-    </div>
-</form>
-<section class="erp-surface overflow-hidden rounded-xl" aria-label="شرکت‌های پلتفرم">
-    <div class="overflow-x-auto">
-        <table class="w-full text-right text-sm">
-            <thead class="bg-slate-50 text-xs text-slate-600"><tr>
-                <th class="px-4 py-3">شرکت</th><th class="px-4 py-3">وضعیت</th>
-                <th class="px-4 py-3">تعداد عضویت‌ها</th><th class="px-4 py-3">تاریخ ایجاد</th>
-                <th class="px-4 py-3">آخرین فعالیت ثبت‌شده</th><th class="px-4 py-3">مدیریت</th>
-            </tr></thead>
-            <tbody class="divide-y divide-slate-100">
-                {% for company in companies %}
-                <tr>
-                    <td class="px-4 py-3"><a class="font-semibold text-blue-700" href="{% url 'organizations:platform_company_detail' company.pk %}">{{ company.name }}</a><p class="mt-1 text-xs text-slate-500" dir="ltr">{{ company.slug }}</p></td>
-                    <td class="px-4 py-3">{{ company.get_status_display }}</td>
-                    <td class="px-4 py-3">{{ company.member_count }}</td>
-                    <td class="whitespace-nowrap px-4 py-3">{{ company.created_at|jalali_datetime }}</td>
-                    <td class="whitespace-nowrap px-4 py-3">{% if company.last_activity %}{{ company.last_activity|jalali_datetime }}{% else %}رویدادی ثبت نشده{% endif %}</td>
-                    <td class="px-4 py-3"><a class="erp-btn erp-btn--secondary erp-btn--compact" href="{% url 'organizations:platform_company_detail' company.pk %}">فعالیت‌ها و عملیات</a></td>
-                </tr>
-                {% empty %}<tr><td colspan="6" class="p-8 text-center text-slate-500">شرکتی با این مشخصات پیدا نشد.</td></tr>{% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% include "components/bounded_table_pagination.html" %}
-</section>
 {% endblock %}

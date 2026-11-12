@@ -2,6 +2,7 @@
 
 import json
 from datetime import date
+from decimal import Decimal
 from html.parser import HTMLParser
 from unittest.mock import patch
 
@@ -197,6 +198,14 @@ class CommandCenterTests(JourneyFixture, TestCase):
             title="برآورد ساحلی",
         )
         self._claim()
+        Contract.objects.create(
+            organization=self.organization,
+            project=self.project,
+            contract_number="CENTER-C",
+            title="قرارداد دوم",
+            counterparty_name="پیمانکار آزمون",
+            status="active",
+        )
         site = ProjectSite.objects.create(
             organization=self.organization,
             project=self.project,
@@ -216,7 +225,7 @@ class CommandCenterTests(JourneyFixture, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(dict(self.client.session), before)
         self.assertEqual(
-            [item.total for item in response.context["commercial_summary"]], [1, 1, 1]
+            [item.total for item in response.context["commercial_summary"]], [1, 2, 1]
         )
         self.assertEqual(response.context["dashboard"]["reports_count"], 1)
         self.assertContains(response, "آخرین موارد ثبت‌شده")
@@ -225,12 +234,18 @@ class CommandCenterTests(JourneyFixture, TestCase):
         contract_chart = next(
             item for item in payload if item["id"] == "project-contracts-chart"
         )
-        self.assertEqual(contract_chart["rows"], [{"label": "فعال", "value": "1"}])
+        self.assertEqual(
+            contract_chart["rows"],
+            [{"status": "active", "label": "فعال", "value": "2"}],
+        )
         self.assertNotIn("progress", str(payload))
         self.assertContains(
             response, "پیشرفت برنامه‌ای و واقعی قابل اتکای پروژه ثبت نشده است"
         )
-        self.assertNotContains(response, '<canvas id="project-cost-chart"')
+        controls = reverse("projects:controls", args=[self.project.pk])
+        self.assertContains(response, f'href="{controls}"', count=1)
+        self.assertContains(response, 'href="#progress"', count=1)
+        self.assertNotContains(response, "<meter")
         self.assertContains(response, "پوشش ناقص")
 
     def test_restricted_metrics_never_load_or_leak_and_context_is_isolated(self):
@@ -297,7 +312,8 @@ class CommandCenterTests(JourneyFixture, TestCase):
         self.assertNotContains(response, "قرارداد پنهان")
         self.assertEqual(response.context["commercial_summary"][1].total, 1)
         empty = self.client.get(reverse("projects:detail", args=[sibling.pk]))
-        self.assertContains(empty, "شواهد هم‌ارز کافی")
+        self.assertContains(empty, "هنوز هزینه‌ای در سوابق هزینه پروژه ثبت نشده است.")
+        self.assertNotContains(empty, "<meter")
 
 
 class CostEvidenceFixture:
@@ -341,10 +357,8 @@ class CommandCenterCostTests(CostEvidenceFixture, TestCase):
             "CENTER-COMMITMENT",
         )
         response = self.client.get(reverse("projects:detail", args=[self.project.pk]))
-        self.assertFalse(response.context["dashboard"]["cost_comparable"])
-        self.assertNotIn(
-            "project-cost-chart", [chart["id"] for chart in chart_payload(response)]
-        )
+        self.assertIsNone(response.context["dashboard"]["budget_comparison"])
+        self.assertNotContains(response, "<meter")
         self.assertIsNone(response.context["dashboard"]["kpis"][1]["value"])
 
     def test_exact_projection_and_currency_guard_without_legacy_budget_substitution(
@@ -355,26 +369,41 @@ class CommandCenterCostTests(CostEvidenceFixture, TestCase):
             source, ProjectCostFactKind.ACTUAL_RECOGNIZED, "123.45", "CENTER-COST"
         )
         response = self.client.get(reverse("projects:detail", args=[self.project.pk]))
-        chart = next(
-            item
-            for item in chart_payload(response)
-            if item["id"] == "project-cost-chart"
-        )
-        self.assertEqual(
-            chart["rows"],
-            [
-                {"label": "بودجه تخمینی", "value": "999.00"},
-                {"label": "هزینه ثبت‌شده", "value": "123.45"},
-            ],
-        )
+        dashboard = response.context["dashboard"]
+        self.assertEqual(dashboard["actual_cost"], Decimal("123.45"))
+        self.assertEqual(dashboard["budget_comparison"]["remaining"], Decimal("875.55"))
+        self.assertEqual(dashboard["budget_comparison"]["percent"], Decimal("12.4"))
+        self.assertContains(response, "۱۲۳٫۴۵")
+        self.assertContains(response, "<meter", count=2)
         self.assertFalse(response.context["cost_projection"].coverage_complete)
         self.assertContains(response, "پوشش ناقص")
-        self.assertNotEqual(chart["rows"][1]["value"], str(self.project.actual_budget))
+        self.assertNotEqual(dashboard["actual_cost"], self.project.actual_budget)
         # Legacy currency mismatch is a read-model guard, never a conversion.
         self.organization.currency = "USD"
         self.organization.save()
         response = self.client.get(reverse("projects:detail", args=[self.project.pk]))
-        self.assertFalse(response.context["dashboard"]["cost_comparable"])
-        self.assertNotIn(
-            "project-cost-chart", [item["id"] for item in chart_payload(response)]
-        )
+        self.assertIsNone(response.context["dashboard"]["actual_cost"])
+        self.assertIsNone(response.context["dashboard"]["budget_comparison"])
+        self.assertNotContains(response, "<meter")
+
+    def test_cost_stays_visible_without_budget_and_overrun_is_exact(self):
+        source = self._contract(ProjectCostMeasure.ACTUAL)
+        self._fact(source, ProjectCostFactKind.ACTUAL_RECOGNIZED, "150", "CENTER-OVER")
+        detail = reverse("projects:detail", args=[self.project.pk])
+        self.project.estimated_budget = Decimal(0)
+        self.project.save(update_fields=["estimated_budget"])
+        response = self.client.get(detail)
+        self.assertEqual(response.context["dashboard"]["actual_cost"], Decimal(150))
+        self.assertIsNone(response.context["dashboard"]["budget_comparison"])
+        self.assertContains(response, "بودجه تخمینی مثبت ثبت نشده است.")
+        self.assertNotContains(response, "<meter")
+
+        self.project.estimated_budget = Decimal(100)
+        self.project.save(update_fields=["estimated_budget"])
+        response = self.client.get(detail)
+        comparison = response.context["dashboard"]["budget_comparison"]
+        self.assertEqual(comparison["percent"], Decimal(150))
+        self.assertEqual(comparison["remaining"], Decimal(-50))
+        self.assertEqual(comparison["actual_bar"], Decimal(100))
+        self.assertEqual(comparison["budget_bar"], Decimal("66.67"))
+        self.assertContains(response, "هزینه ثبت‌شده از بودجه تخمینی بیشتر است.")

@@ -1,0 +1,935 @@
+{
+  "rows": [
+    {
+      "id": "INV-ACCOUNTS-PASSWORD-RESET--CV-AUTH-01",
+      "status": "NEEDS_PO_REVIEW",
+      "actual": "Neutral recovery response for eligible/unknown/inactive accounts; isolated recipient received one link; completion, expired link and replay checked. Throttle exercised by focused test.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-expired-auth.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "NEEDS_PO_REVIEW",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-01/DC-09",
+      "page": "password_reset",
+      "po_review": "REFERENCE_MISSING. Confirm the page-specific approved visual reference; shared requirements were checked."
+    },
+    {
+      "id": "INV-ACCOUNTS-PASSWORD-RESET-COMPLETE--CV-AUTH-01",
+      "status": "NEEDS_PO_REVIEW",
+      "actual": "Neutral recovery response for eligible/unknown/inactive accounts; isolated recipient received one link; completion, expired link and replay checked. Throttle exercised by focused test.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-expired-auth.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "NEEDS_PO_REVIEW",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-01/DC-09",
+      "page": "password_reset_complete",
+      "po_review": "REFERENCE_MISSING. Confirm the page-specific approved visual reference; shared requirements were checked."
+    },
+    {
+      "id": "INV-ACCOUNTS-PASSWORD-RESET-CONFIRM--CV-AUTH-01",
+      "status": "NEEDS_PO_REVIEW",
+      "actual": "Neutral recovery response for eligible/unknown/inactive accounts; isolated recipient received one link; completion, expired link and replay checked. Throttle exercised by focused test.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-expired-auth.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "NEEDS_PO_REVIEW",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-01/DC-09",
+      "page": "password_reset_confirm",
+      "po_review": "REFERENCE_MISSING. Confirm the page-specific approved visual reference; shared requirements were checked."
+    },
+    {
+      "id": "INV-ACCOUNTS-PASSWORD-RESET-DONE--CV-AUTH-01",
+      "status": "NEEDS_PO_REVIEW",
+      "actual": "Neutral recovery response for eligible/unknown/inactive accounts; isolated recipient received one link; completion, expired link and replay checked. Throttle exercised by focused test.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-expired-auth.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "NEEDS_PO_REVIEW",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-01/DC-09",
+      "page": "password_reset_done",
+      "po_review": "REFERENCE_MISSING. Confirm the page-specific approved visual reference; shared requirements were checked."
+    },
+    {
+      "id": "INV-ACCOUNTS-PROFILE-IMAGE--CV-AUTH-01",
+      "status": "PASS",
+      "actual": "Authenticated image returned HTTP 200 after isolated synthetic upload. Existing focused anonymous and spoofed file assertions retained.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-retry-auth.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "FUNCTIONAL": "PASS",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ACCOUNTS-REQUIRED-PASSWORD-CHANGE--CV-AUTH-01",
+      "status": "PASS",
+      "actual": "First login confined to the credential form; direct bypass redirected; personal credential saved and reopened through fresh login.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-06/DC-09",
+      "page": "required-password"
+    },
+    {
+      "id": "INV-ACCOUNTS-SETTINGS--CV-AUTH-01",
+      "status": "PASS",
+      "actual": "Profile update and synthetic image upload from the page survived reload. Current profile and password boundaries checked through focused suite.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-retry-auth.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-03/DC-06",
+      "page": "personal-settings"
+    },
+    {
+      "id": "INV-ADMIN--CV-GUARD-01",
+      "status": "PASS",
+      "actual": "Restricted authenticated request denied HTTP 403 at the technical Admin mount; no hidden page rendered.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ACCOUNTS-LOGIN--UAT-01",
+      "status": "NEEDS_PO_REVIEW",
+      "actual": "Real login, invalid credentials, inactive account, safe return, and accessible single main at all three widths.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "NEEDS_PO_REVIEW",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-01",
+      "page": "login",
+      "po_review": "REFERENCE_MISSING. Confirm the page-specific approved visual reference; shared requirements were checked."
+    },
+    {
+      "id": "INV-ACCOUNTS-LOGIN-BACKGROUND--UAT-01",
+      "status": "PASS",
+      "actual": "Safe fallback/no-config image response in Chrome; targeted configured image test passed.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "FUNCTIONAL": "PASS",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ACCOUNTS-LOGIN-PANEL-IMAGE--UAT-01",
+      "status": "PASS",
+      "actual": "Safe fallback/no-config image response in Chrome; targeted configured image test passed.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "FUNCTIONAL": "PASS",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ACCOUNTS-LOGOUT--UAT-01",
+      "status": "PASS",
+      "actual": "Logout POST cleared authenticated access; protected bookmark redirected to login.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-GLOBAL-SEARCH--UAT-01",
+      "status": "PASS",
+      "actual": "Same-code fixture yielded current-company project only, followed to actual detail; empty search copy avoids authorization jargon.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-02/DC-03",
+      "page": "global-search"
+    },
+    {
+      "id": "INV-HOME--UAT-01",
+      "status": "PASS",
+      "actual": "Real user Home presents entitled navigation and correct company/project context, with usable restricted menu in all three widths.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-retry-auth.json",
+      "FUNCTIONAL": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-02/DC-08",
+      "page": "tenant-home"
+    },
+    {
+      "id": "INV-BILLING-CLAIM-ACTION-APPROVE--UAT-15",
+      "status": "BLOCKED",
+      "actual": "Restricted request returned 403 using an absent domain record. Exact foreign-object boundary requires a valid foreign-domain fixture.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json",
+      "AUTHORIZATION": "PASS",
+      "reason": "Cross-tenant record fixture for this domain was unavailable in Wave 01."
+    },
+    {
+      "id": "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-PROJECT--UAT-15",
+      "status": "PASS",
+      "actual": "Foreign real Project key was denied on the contextual selector (HTTP 403).",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-DOCUMENTS-VERSION-DOWNLOAD--UAT-15",
+      "status": "BLOCKED",
+      "actual": "Restricted request returned 403 using an absent domain record. Exact foreign-object boundary requires a valid foreign-domain fixture.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json",
+      "AUTHORIZATION": "PASS",
+      "reason": "Cross-tenant record fixture for this domain was unavailable in Wave 01."
+    },
+    {
+      "id": "INV-GLOBAL-SEARCH--UAT-15",
+      "status": "PASS",
+      "actual": "Foreign same-code project omitted; exact current tenant project reached.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-retry-auth.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-02/DC-03"
+    },
+    {
+      "id": "INV-HOME--UAT-15",
+      "status": "PASS",
+      "actual": "Restricted actor menus present at 1440/1024/390; unauthorized platform links absent. Keyboard-opened drawer checked.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-retry-auth.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-02/DC-03",
+      "page": "restricted-menu"
+    },
+    {
+      "id": "INV-INVENTORY-TRANSACTION-POST--UAT-15",
+      "status": "BLOCKED",
+      "actual": "Restricted request returned 403 using an absent domain record. Exact foreign-object boundary requires a valid foreign-domain fixture.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json",
+      "AUTHORIZATION": "PASS",
+      "reason": "Cross-tenant record fixture for this domain was unavailable in Wave 01."
+    },
+    {
+      "id": "INV-ORGANIZATIONS-SWITCH--UAT-15",
+      "status": "PASS",
+      "actual": "Forged cross-tenant switch returned HTTP 403 and foreign project stayed inaccessible.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-retry-auth.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-UPDATE-CONTEXT--UAT-15",
+      "status": "PASS",
+      "actual": "Forged project/site context returned HTTP 403 and did not widen access.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-retry-auth.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-PROJECTS-DETAIL--UAT-15",
+      "status": "PASS",
+      "actual": "Same-tenant project HTTP 200 and foreign project HTTP 403.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-retry-auth.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-PROJECTS-SITE-DETAIL--UAT-15",
+      "status": "PASS",
+      "actual": "Foreign site with real parent project returned scoped HTTP 404.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-retry-auth.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-REPORTING-DASHBOARD--UAT-15",
+      "status": "PASS",
+      "actual": "Restricted account without report permission received HTTP 403.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-retry-auth.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-TIMEKEEPING-WORKBENCH--UAT-15",
+      "status": "PASS",
+      "actual": "Restricted account without workbench permission received HTTP 403, including the Timekeeping XLSX variant.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-retry-auth.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-TIMEKEEPING-WORKBENCH-XLSX--UAT-15",
+      "status": "PASS",
+      "actual": "Restricted account without workbench permission received HTTP 403, including the Timekeeping XLSX variant.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-retry-auth.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-WORKFLOWS-WORKBENCH--UAT-15",
+      "status": "PASS",
+      "actual": "Restricted account without workbench permission received HTTP 403, including the Timekeeping XLSX variant.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-retry-auth.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-DASHBOARD--PA-01",
+      "status": "PASS",
+      "actual": "Platform login routed to the dashboard. Eight destinations and three viewport layouts checked. Read-only snapshot reconciled 5 companies, 36 accounts and 9 memberships.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-before.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-02/DC-08",
+      "page": "platform-dashboard"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-CREATE--PA-02",
+      "status": "PASS",
+      "actual": "Invalid same-actor owner rejected; valid separate owner created company and both starter workflows atomically. Current form grouping and validation behavior checked.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-07/DC-10",
+      "page": "platform-company-create"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-DETAIL--PA-02",
+      "status": "NEEDS_PO_REVIEW",
+      "actual": "Target company detail showed separate creator/owner, onboarding and activity. Shared detail requirements checked; dedicated company visual reference unestablished.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "NEEDS_PO_REVIEW",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-05/DC-10",
+      "page": "platform-company-detail",
+      "po_review": "REFERENCE_MISSING. Confirm the page-specific approved visual reference; shared requirements were checked."
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-ONBOARDING--PA-02",
+      "status": "PASS",
+      "actual": "On a prepared legacy company with one active owner, the real Retry button created both starters and disappeared; audited operation and rollback test verified.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-retry-platform.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-before-retry.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-EDIT--PA-03",
+      "status": "PASS",
+      "actual": "Prefixed company editor preserved disabled currency, required reason, saved synthetic name and returned to exact record. Read-only witness confirmed.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-company-edit.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-07/DC-10",
+      "page": "platform-company-edit"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-LIST--PA-03",
+      "status": "NEEDS_PO_REVIEW",
+      "actual": "Company search led to the correct selected company. Dedicated company visual reference unestablished.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "NEEDS_PO_REVIEW",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-04/DC-10",
+      "page": "platform-companies",
+      "po_review": "REFERENCE_MISSING. Confirm the page-specific approved visual reference; shared requirements were checked."
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-STATUS--PA-03",
+      "status": "PASS",
+      "actual": "Cancel preserved state; confirmed suspension blocked affected tenant access; reactivation restored active state. Audit and stale/rollback assertions verified.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-09"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-STATUS-REACTIVATE--PA-03",
+      "status": "PASS",
+      "actual": "Cancel preserved state; confirmed suspension blocked affected tenant access; reactivation restored active state. Audit and stale/rollback assertions verified.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-09"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-STATUS-SUSPEND--PA-03",
+      "status": "PASS",
+      "actual": "Cancel preserved state; confirmed suspension blocked affected tenant access; reactivation restored active state. Audit and stale/rollback assertions verified.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-09"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-CREATE--PA-04",
+      "status": "PASS",
+      "actual": "Browser-created independent account was found by filter. Snapshot verified no tenant membership and an initial password change requirement.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-10",
+      "page": "platform-user-create"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-DETAIL--PA-04",
+      "status": "PASS",
+      "actual": "Identity, state, contact, security, membership and activity panels followed the reference. Platform-only session could not inspect target tenant role links.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-10",
+      "page": "platform-user-detail"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-EDIT--PA-04",
+      "status": "PASS",
+      "actual": "Changed permitted profile name from the account form and returned to exact detail. Snapshot reconciled saved identity and audit.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-10",
+      "page": "platform-user-edit"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USERS--PA-04",
+      "status": "PASS",
+      "actual": "Directory search navigated to the exact account. KPI/filter/table/card layout compared to current implementation references; focused pagination and filter assertions passed.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-10",
+      "page": "platform-users"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-STATUS--PA-05",
+      "status": "PASS",
+      "actual": "Confirmation cancel and both status transitions ran in Chrome. Old sessions stayed invalid after reactivation and fresh credentials worked; last-owner/admin and stale-token protections passed in focused tests.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-09/DC-10"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-STATUS-DEACTIVATE--PA-05",
+      "status": "PASS",
+      "actual": "Confirmation cancel and both status transitions ran in Chrome. Old sessions stayed invalid after reactivation and fresh credentials worked; last-owner/admin and stale-token protections passed in focused tests.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-09/DC-10"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-STATUS-REACTIVATE--PA-05",
+      "status": "PASS",
+      "actual": "Confirmation cancel and both status transitions ran in Chrome. Old sessions stayed invalid after reactivation and fresh credentials worked; last-owner/admin and stale-token protections passed in focused tests.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-09/DC-10"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET--PA-06",
+      "status": "PASS",
+      "actual": "HTTPS recovery confirmed local SMTP acceptance, stored recipient, consumed and replayed link, cooldown, and refused transport feedback. Independent tests covered permission and failure branches.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-secure-recovery.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-09/DC-10"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET-COOLDOWN--PA-06",
+      "status": "PASS",
+      "actual": "HTTPS recovery confirmed local SMTP acceptance, stored recipient, consumed and replayed link, cooldown, and refused transport feedback. Independent tests covered permission and failure branches.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-secure-recovery.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-09/DC-10"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET-TRANSPORT-ACCEPTED--PA-06",
+      "status": "PASS",
+      "actual": "HTTPS recovery confirmed local SMTP acceptance, stored recipient, consumed and replayed link, cooldown, and refused transport feedback. Independent tests covered permission and failure branches.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-secure-recovery.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-09/DC-10"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET-TRANSPORT-FAILED--PA-06",
+      "status": "PASS",
+      "actual": "HTTPS recovery confirmed local SMTP acceptance, stored recipient, consumed and replayed link, cooldown, and refused transport feedback. Independent tests covered permission and failure branches.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-secure-recovery.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-09/DC-10"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET-TRANSPORT-UNAVAILABLE--PA-06",
+      "status": "PASS",
+      "actual": "Unconfigured transport displayed disabled recovery and explanation; direct POST was safely reported and recorded unavailable without delivery.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-09/DC-10"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-TEMPORARY-PASSWORD--PA-06",
+      "status": "PASS",
+      "actual": "Insecure HTTP correctly denied; HTTPS form succeeded, forced personal change and invalidated prior authentication revision. Browser target accepted new personal credential.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-secure-platform.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-06/DC-09/DC-10",
+      "page": "platform-user-temp"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-ADMINISTRATORS--PA-07",
+      "status": "PASS",
+      "actual": "Existing administrators page showed history. Real grant exposed the platform workspace and reasoned revoke immediately denied the existing target session. Snapshot preserved revoked assignment.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-11",
+      "page": "platform-admins"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-ADMINISTRATORS-GRANT--PA-07",
+      "status": "PASS",
+      "actual": "Existing administrators page showed history. Real grant exposed the platform workspace and reasoned revoke immediately denied the existing target session. Snapshot preserved revoked assignment.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-11",
+      "page": "platform-admins"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-ADMINISTRATORS-REVOKE--PA-07",
+      "status": "PASS",
+      "actual": "Existing administrators page showed history. Real grant exposed the platform workspace and reasoned revoke immediately denied the existing target session. Snapshot preserved revoked assignment.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-11",
+      "page": "platform-admins"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-MEMBER-AUTHORIZATION--PA-08",
+      "status": "PASS",
+      "actual": "Platform-only GET denied. Explicit tenant delegation allowed a named different approver, grant and revoke through real forms. Persisted history reconciled both actors.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-11",
+      "page": "delegate-member-authority"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-MEMBER-ROLES--PA-08",
+      "status": "FAIL",
+      "actual": "Chooser and role workspace render; Chromium accessibility tree exposes an unnamed company combobox beside the labeled replacement.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-design-review.json; execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "FUNCTIONAL": "PASS",
+      "DESIGN_CONFORMANCE": "FAIL",
+      "NAVIGATION_UX": "FAIL",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-11/DC-09",
+      "page": "member-selector-accessible",
+      "defect": "BON-DEF-0001"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-ROLE-CATALOG--PA-08",
+      "status": "PASS",
+      "actual": "Global role created through actual editor with projects.view; exact saved grant verified. Existing stale-write, scope and protected-grant tests passed.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-11",
+      "page": "platform-roles"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-POLICY-CATALOG--PA-09",
+      "status": "NOT_RUN",
+      "actual": "Settings link and insurance-classification create verified in Chrome and database. Full policy draft, review, publication, retirement and stale-version branch still pending.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-11",
+      "page": "platform-policy"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-SETTINGS--PA-09",
+      "status": "PASS",
+      "actual": "Settings shows effective MVP profile and navigates to both real versioned catalogs. Profile remains informational.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "FUNCTIONAL": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-11",
+      "page": "platform-settings"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PROTECTED-OPERATION-CATALOG--PA-09",
+      "status": "FAIL",
+      "actual": "Actual form appended version 2 and retained retired history. A single click retired the active platform-wide control version without confirmation.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/browser-catalog-audit.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "FAIL",
+      "NAVIGATION_UX": "FAIL",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-11/DC-09",
+      "page": "platform-protected",
+      "defect": "BON-DEF-0003"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-AUDIT--PA-10",
+      "status": "FAIL",
+      "actual": "Chrome combined company, actor and Jalali range filters and matched 2 authorized events. Both input labels say Gregorian although the control accepts Jalali.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-audit-date.json; execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "FAIL",
+      "NAVIGATION_UX": "FAIL",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-11/DC-09",
+      "page": "platform-audit-date",
+      "defect": "BON-DEF-0002"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-STATUS--PA-10",
+      "status": "PASS",
+      "actual": "Healthy dependency status and labels observed in Chrome. Focused fault tests confirmed sanitized failure and unverified alert-source behavior.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-11",
+      "page": "platform-status"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-CREATE--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-ADMINISTRATORS--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-ADMINISTRATORS-GRANT--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-ADMINISTRATORS-REVOKE--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-AUDIT--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-DETAIL--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-EDIT--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-LIST--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-ONBOARDING--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-STATUS--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-STATUS-REACTIVATE--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-STATUS-SUSPEND--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-DASHBOARD--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-MEMBER-AUTHORIZATION--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-MEMBER-ROLES--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-POLICY-CATALOG--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-ROLE-CATALOG--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-SETTINGS--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-STATUS--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-CREATE--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-DETAIL--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-EDIT--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET-COOLDOWN--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET-TRANSPORT-ACCEPTED--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET-TRANSPORT-FAILED--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET-TRANSPORT-UNAVAILABLE--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-STATUS--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-STATUS-DEACTIVATE--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-STATUS-REACTIVATE--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USER-TEMPORARY-PASSWORD--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PLATFORM-USERS--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-PROTECTED-OPERATION-CATALOG--PA-11",
+      "status": "PASS",
+      "actual": "Tenant owner received HTTP 403 and anonymous actor redirected on this Platform URL. Mutable endpoints also rejected authenticated tenant-owner POST. Platform-only actor could not reach tenant project data; authorized delegation used explicit grants.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log; execution/evidence/wave-01-865fa3f3/browser-delegate.json; execution/evidence/wave-01-865fa3f3/state-final.json",
+      "AUTHORIZATION": "PASS"
+    },
+    {
+      "id": "INV-ORGANIZATIONS-SELECT--UAT-01",
+      "status": "PASS",
+      "actual": "Company selector listed eligible organizations; activating the A card made the A project visible in scoped search.",
+      "evidence": "execution/evidence/wave-01-865fa3f3/browser-all.json; execution/evidence/wave-01-865fa3f3/test.log",
+      "FUNCTIONAL": "PASS",
+      "BUSINESS_LOGIC": "PASS",
+      "DESIGN_CONFORMANCE": "PASS",
+      "NAVIGATION_UX": "PASS",
+      "AUTHORIZATION": "PASS",
+      "pattern": "DC-03/DC-09",
+      "page": "tenant-selector"
+    }
+  ]
+}

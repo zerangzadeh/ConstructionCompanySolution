@@ -15,11 +15,13 @@
         const palette = ['royal-blue', 'deep-navy', 'muted', 'light-gray'].map(color);
         const statusColors = {
             planning: 'royal-blue',
+            draft: 'muted',
             active: 'success',
             on_hold: 'warning',
             suspended: 'warning',
             completed: 'deep-navy',
             cancelled: 'danger',
+            terminated: 'warning',
             archived: 'muted',
         };
         let configs;

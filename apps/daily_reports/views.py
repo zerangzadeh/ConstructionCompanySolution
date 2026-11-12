@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError
+from django.forms import BaseForm
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import never_cache
@@ -14,6 +15,7 @@ from apps.daily_reports.forms import (
     DelayEventForm,
 )
 from apps.daily_reports.list_presentation import daily_report_list_context
+from apps.daily_reports.models import DailyReport
 from apps.daily_reports.reference_forms import (
     DailyReportCreateForm,
     DailyReportUploadForm,
@@ -44,6 +46,7 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from core.product_surface import surface_profile
 
 
 @active_organization_required
@@ -201,11 +204,40 @@ def daily_report_detail(request: HttpRequest, report_id: str) -> HttpResponse:
         from .print_outputs import daily_document
 
         return print_response(request, daily_document(report))
+    return _render_daily_report_detail(request, report)
+
+
+def _render_daily_report_detail(
+    request: HttpRequest, report: DailyReport, **bound_forms: BaseForm
+) -> HttpResponse:
     return render(
         request,
         "daily_reports/detail.html",
         {
             "report": report,
+            "can_approve_daily_report": (
+                (surface_profile() != "MVP" or report.created_by_id != request.user.pk)
+                and has_business_permission(
+                    user=request.user,
+                    organization=request.organization,
+                    permission=BusinessPermissionCode.DAILY_REPORTS_APPROVE,
+                    project=report.project,
+                    site=report.site,
+                )
+            ),
+            "can_view_report_project": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.PROJECTS_VIEW,
+                project=report.project,
+            ),
+            "can_view_report_site": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.PROJECT_SITES_VIEW,
+                project=report.project,
+                site=report.site,
+            ),
             "record_references": report_reference_rows(
                 actor=request.user, organization=request.organization, report=report
             ),
@@ -220,6 +252,7 @@ def daily_report_detail(request: HttpRequest, report_id: str) -> HttpResponse:
                 report=report, auto_id="daily-activity-%s"
             ),
             "delay_event_form": DelayEventForm(report=report, auto_id="daily-delay-%s"),
+            **bound_forms,
         },
     )
 
@@ -228,7 +261,7 @@ def daily_report_detail(request: HttpRequest, report_id: str) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_ADD_LABOR)
 @require_POST
 def daily_report_labor_add(request: HttpRequest, report_id: str) -> HttpResponse:
-    form = DailyReportLaborEntryForm(request.POST)
+    form = DailyReportLaborEntryForm(request.POST, auto_id="daily-labor-%s")
     if form.is_valid():
         data = form.cleaned_data
         try:
@@ -237,6 +270,7 @@ def daily_report_labor_add(request: HttpRequest, report_id: str) -> HttpResponse
                 report_id=report_id,
                 actor=request.user,
                 team_name=data["team_name"],
+                operation_key=data["operation_key"],
                 worker_count=data["worker_count"],
                 hours_worked=data["hours_worked"],
                 notes=data["notes"],
@@ -246,7 +280,10 @@ def daily_report_labor_add(request: HttpRequest, report_id: str) -> HttpResponse
         else:
             messages.success(request, "رکورد نیروی انسانی افزوده شد.")
     else:
-        messages.error(request, "فیلدهای نیروی انسانی را بررسی و دوباره تلاش کنید.")
+        report = get_organization_daily_report(
+            user=request.user, organization=request.organization, report_id=report_id
+        )
+        return _render_daily_report_detail(request, report, labor_form=form)
     return redirect("daily_reports:detail", report_id=report_id)
 
 
@@ -254,7 +291,7 @@ def daily_report_labor_add(request: HttpRequest, report_id: str) -> HttpResponse
 @organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_ADD_EQUIPMENT)
 @require_POST
 def daily_report_equipment_add(request: HttpRequest, report_id: str) -> HttpResponse:
-    form = DailyReportEquipmentEntryForm(request.POST)
+    form = DailyReportEquipmentEntryForm(request.POST, auto_id="daily-equipment-%s")
     if form.is_valid():
         data = form.cleaned_data
         try:
@@ -271,7 +308,10 @@ def daily_report_equipment_add(request: HttpRequest, report_id: str) -> HttpResp
         else:
             messages.success(request, "رکورد تجهیز افزوده شد.")
     else:
-        messages.error(request, "فیلدهای تجهیز را بررسی و دوباره تلاش کنید.")
+        report = get_organization_daily_report(
+            user=request.user, organization=request.organization, report_id=report_id
+        )
+        return _render_daily_report_detail(request, report, equipment_form=form)
     return redirect("daily_reports:detail", report_id=report_id)
 
 
@@ -280,7 +320,9 @@ def daily_report_equipment_add(request: HttpRequest, report_id: str) -> HttpResp
 @require_POST
 def daily_report_material_add(request: HttpRequest, report_id: str) -> HttpResponse:
     form = DailyReportMaterialEntryForm(
-        request.POST, organization_id=request.organization.id
+        request.POST,
+        organization_id=request.organization.id,
+        auto_id="daily-material-%s",
     )
     if form.is_valid():
         data = form.cleaned_data
@@ -301,7 +343,10 @@ def daily_report_material_add(request: HttpRequest, report_id: str) -> HttpRespo
         else:
             messages.success(request, "رکورد مصالح افزوده شد.")
     else:
-        messages.error(request, "فیلدهای مصالح را بررسی و دوباره تلاش کنید.")
+        report = get_organization_daily_report(
+            user=request.user, organization=request.organization, report_id=report_id
+        )
+        return _render_daily_report_detail(request, report, material_form=form)
     return redirect("daily_reports:detail", report_id=report_id)
 
 
@@ -312,7 +357,7 @@ def daily_activity_add(request: HttpRequest, report_id: str) -> HttpResponse:
     report = get_organization_daily_report(
         user=request.user, organization=request.organization, report_id=report_id
     )
-    form = DailyActivityForm(request.POST, report=report)
+    form = DailyActivityForm(request.POST, report=report, auto_id="daily-activity-%s")
     if form.is_valid():
         try:
             add_daily_activity(
@@ -326,7 +371,7 @@ def daily_activity_add(request: HttpRequest, report_id: str) -> HttpResponse:
         else:
             messages.success(request, "رکورد فعالیت افزوده شد.")
     else:
-        messages.error(request, "فیلدهای فعالیت را بررسی و دوباره تلاش کنید.")
+        return _render_daily_report_detail(request, report, daily_activity_form=form)
     return redirect("daily_reports:detail", report_id=report_id)
 
 
@@ -337,7 +382,7 @@ def delay_event_add(request: HttpRequest, report_id: str) -> HttpResponse:
     report = get_organization_daily_report(
         user=request.user, organization=request.organization, report_id=report_id
     )
-    form = DelayEventForm(request.POST, report=report)
+    form = DelayEventForm(request.POST, report=report, auto_id="daily-delay-%s")
     if form.is_valid():
         try:
             add_delay_event(
@@ -351,7 +396,7 @@ def delay_event_add(request: HttpRequest, report_id: str) -> HttpResponse:
         else:
             messages.success(request, "رویداد تأخیر افزوده شد.")
     else:
-        messages.error(request, "فیلدهای رویداد تأخیر را بررسی و دوباره تلاش کنید.")
+        return _render_daily_report_detail(request, report, delay_event_form=form)
     return redirect("daily_reports:detail", report_id=report_id)
 
 

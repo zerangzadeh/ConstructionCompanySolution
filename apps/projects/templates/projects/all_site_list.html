@@ -6,9 +6,17 @@
 {% block table_filter_controls %}{% endblock %}
 {% block list_pagination %}{% endblock %}
 {% block content %}
-{% reference_list_state "sites" as list_ui %}
+{% reference_list_state "sites" site_default_sort as list_ui %}
 <div class="erp-reference-list erp-contracts-list erp-secondary-list erp-sites-list">
-    <div class="erp-list-heading">{% include "components/page_header.html" with page_title="کارگاه‌ها" page_description="کارگاه‌های همه پروژه‌های شرکت" page_icon="document" only %}</div>
+    <div class="erp-list-heading">
+        {% if project %}
+            {% url "projects:detail" project.id as project_detail_url %}
+            {% if can_create_site %}{% url "projects:site_create" project.id as site_create_url %}{% endif %}
+            {% include "components/page_header.html" with page_breadcrumb_label=project.name page_breadcrumb_url=project_detail_url page_eyebrow=project.code page_title="کارگاه‌ها" page_description="کارگاه‌های فعال و تاریخی این پروژه" page_icon="document" page_action_url=site_create_url page_action_label="افزودن کارگاه" only %}
+        {% else %}
+            {% include "components/page_header.html" with page_title="کارگاه‌ها" page_description="کارگاه‌های همه پروژه‌های شرکت" page_icon="document" only %}
+        {% endif %}
+    </div>
     <div class="erp-list-workspace">
         {% include "components/filter_bar.html" with bar=list_ui.bar reference_layout=True only %}
         {% include "components/reference_list_toolbar.html" %}
@@ -19,13 +27,24 @@
                 <tbody>{% for site in sites %}<tr>
                     <td class="erp-list-identifier" data-label="کد کارگاه"><a href="{% url 'projects:site_detail' site.project_id site.id %}"><bdi dir="ltr">{{ site.code }}</bdi></a></td>
                     <td class="erp-list-title"><a href="{% url 'projects:site_detail' site.project_id site.id %}">{{ site.name }}</a></td>
-                    <td data-label="پروژه"><a href="{% url 'projects:site_list' site.project.id %}">{{ site.project.name }}</a><span class="erp-list-subtitle"><bdi dir="ltr">{{ site.project.code }}</bdi></span></td>
+                    <td data-label="پروژه">{% if project %}{{ project.name }}{% else %}<a href="{% url 'projects:site_list' site.project_id %}">{{ site.project.name }}</a>{% endif %}<span class="erp-list-subtitle"><bdi dir="ltr">{{ site.project.code }}</bdi></span></td>
                     <td class="erp-list-status" data-label="وضعیت">{% if site.is_active %}{% include "components/status_badge.html" with status="active" label="فعال" only %}{% else %}{% include "components/status_badge.html" with status="inactive" label="غیرفعال" only %}{% endif %}</td>
                     <td class="erp-list-address" data-label="نشانی">{{ site.address|default:"—" }}</td>
-                    <td class="erp-list-row-action"><details class="erp-list-row-menu"><summary class="erp-list-action" aria-label="عملیات کارگاه {{ site.name }}، پروژه {{ site.project.name }}"><span aria-hidden="true">⋮</span></summary><div class="erp-list-row-menu__items"><a href="{% url 'projects:site_detail' site.project_id site.id %}" target="_blank" rel="noopener">باز کردن جزئیات در زبانه جدید</a></div></details></td>
+                    <td class="erp-list-row-action">
+                        <details class="erp-list-row-menu">
+                            <summary class="erp-list-action" aria-label="عملیات کارگاه {{ site.name }}، پروژه {{ site.project.name }}"><span aria-hidden="true">⋮</span></summary>
+                            <div class="erp-list-row-menu__items{% if project %} flex{% endif %}">
+                                <a href="{% url 'projects:site_detail' site.project_id site.id %}" target="_blank" rel="noopener">باز کردن جزئیات در زبانه جدید</a>
+                                {% if project and "project_phases.view" in business_permission_codes %}
+                                    <a href="{% url 'projects:phase_list' site.project_id site.id %}">مشاهده فازها</a>
+                                {% endif %}
+                            </div>
+                        </details>
+                    </td>
                 </tr>{% endfor %}</tbody>
             </table>
             {% elif list_ui.bar.chips %}{% include "components/filtered_empty_state.html" with clear_filters_url=list_ui.bar.clear_url %}
+            {% elif project %}{% include "components/empty_state.html" with empty_title="هنوز کارگاهی اضافه نشده است" empty_description="نخستین کارگاه این پروژه را ثبت کنید." empty_action_url=site_create_url empty_action_label="افزودن کارگاه" only %}
             {% else %}{% include "components/empty_state.html" with empty_title="هنوز کارگاهی ثبت نشده است" empty_description="برای افزودن کارگاه، ابتدا پروژه موردنظر را باز کنید." only %}{% endif %}
         </section>
         {% include "components/list_pagination.html" with page_obj=page_obj pagination_query=pagination_query result_label="کارگاه" reference_layout=True only %}

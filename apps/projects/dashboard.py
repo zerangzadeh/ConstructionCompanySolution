@@ -1,8 +1,10 @@
 """Read-only dashboard composition. Source services retain all business authority.
 
-No progress rollup, cost recognition, currency conversion or financial remainder
-is defined here. Decimal values remain exact strings through JSON serialization.
+Project Cost remains the authority for recognized amounts. Budget comparison
+here describes the visible evidence and does not write financial state.
 """
+
+from decimal import Decimal
 
 from django.db.models import Count
 from django.http import HttpRequest
@@ -20,7 +22,21 @@ from apps.projects.services import (
     get_organization_project_sites,
     get_project_cost_projection,
 )
+from core.business_choices import contextual_url
 from core.product_surface import route_exposed
+
+
+def _budget_comparison(budget: Decimal, actual: Decimal | None) -> dict | None:
+    if budget <= 0 or actual is None or actual < 0:
+        return None
+    scale = max(budget, actual)
+    return {
+        "remaining": budget - actual,
+        "percent": (actual * 100 / budget).quantize(Decimal("0.1")),
+        "budget_bar": (budget * 100 / scale).quantize(Decimal("0.01")),
+        "actual_bar": (actual * 100 / scale).quantize(Decimal("0.01")),
+        "over_budget": actual > budget,
+    }
 
 
 def project_dashboard(request: HttpRequest, project: Project) -> dict:
@@ -48,19 +64,21 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
         for item in commercial
         if item.recent_url
     ]
+    currency = request.organization.currency
+    currency_label = "ریال" if currency == "IRR" else currency
     kpis = [
         {
             "label": "بودجه تخمینی پروژه",
             "value": project.estimated_budget,
-            "unit": request.organization.currency,
-            "note": "مبلغ ثبت‌شده در مشخصات پروژه",
+            "unit": currency_label,
             "icon": "layers",
             "tone": "budget",
         }
     ]
     projection = None
-    comparable = False
-    cost_rows = []
+    actual = None
+    comparison = None
+    cost_message = ""
     charts = []
     if access(P.PROJECT_COSTS_VIEW, "projects:detail"):
         projection = get_project_cost_projection(
@@ -77,35 +95,30 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
             }
             for fact in projection.facts
         )
-        comparable = has_actual_evidence and currencies == {
-            request.organization.currency
-        }
-        cost_rows = [{"label": "بودجه تخمینی", "value": str(project.estimated_budget)}]
-        if comparable:
-            cost_rows.append(
-                {"label": "هزینه ثبت‌شده", "value": str(projection.actual_cost)}
-            )
+        if not has_actual_evidence:
+            cost_message = "هنوز هزینه‌ای در سوابق هزینه پروژه ثبت نشده است."
+        elif currencies != {currency}:
+            cost_message = "واحد پول شواهد هزینه با بودجه پروژه هم‌ارز نیست."
+        else:
+            actual = projection.actual_cost
+            comparison = _budget_comparison(project.estimated_budget, actual)
+            if project.estimated_budget <= 0:
+                cost_message = "بودجه تخمینی مثبت ثبت نشده است."
+            elif actual < 0:
+                cost_message = (
+                    "خالص هزینه پس از برگشت‌ها منفی است و درصد مصرف نمایش داده نمی‌شود."
+                )
         kpis.append(
             {
                 "label": "هزینه ثبت‌شده",
-                "value": projection.actual_cost if comparable else None,
-                "unit": request.organization.currency if comparable else "",
-                "note": "پوشش ناقص؛ کل هزینه پروژه نیست"
-                if comparable
-                else "شواهد هم‌ارز کافی ثبت نشده است",
+                "value": actual,
+                "unit": currency_label if actual is not None else "",
+                "note": "داده هم‌ارز در دسترس نیست" if actual is None else "",
+                "url": "#costs",
                 "icon": "coins",
                 "tone": "cost",
             }
         )
-        if comparable:
-            charts.append(
-                {
-                    "id": "project-cost-chart",
-                    "type": "bar",
-                    "rows": cost_rows,
-                    "unit": request.organization.currency,
-                }
-            )
     contracts = next((item for item in commercial if item.label == "قراردادها"), None)
     contract_rows = []
     if contracts is not None:
@@ -114,7 +127,6 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
                 "label": "قراردادهای فعال",
                 "value": contracts.state_count,
                 "unit": "قرارداد",
-                "note": "از قراردادهای قابل مشاهده پروژه",
                 "url": contracts.list_url,
                 "icon": "document",
                 "tone": "contracts",
@@ -125,12 +137,13 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
                 user=request.user, organization=request.organization
             )
             .filter(project=project)
+            .order_by()
             .values("status")
             .annotate(total=Count("pk"))
             .values_list("status", "total")
         )
         contract_rows = [
-            {"label": label, "value": str(counts.get(status, 0))}
+            {"status": status, "label": label, "value": str(counts[status])}
             for status, label in ContractStatus.choices
             if counts.get(status)
         ]
@@ -143,24 +156,22 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
                     "unit": "قرارداد",
                 }
             )
-    links = []
+    sites_url = ""
     if access(P.PROJECT_SITES_VIEW, "projects:site_list", site_parent=True):
         sites = get_organization_project_sites(
             user=request.user, organization=request.organization, project_id=project.pk
         )
-        url = reverse("projects:site_list", args=[project.pk])
+        sites_url = reverse("projects:site_list", args=[project.pk])
         kpis.append(
             {
                 "label": "کارگاه‌ها",
                 "value": sites.count(),
                 "unit": "کارگاه",
-                "note": "در محدوده دسترسی شما",
-                "url": url,
+                "url": sites_url,
                 "icon": "hard-hat",
                 "tone": "sites",
             }
         )
-        links.append({"label": "کارگاه‌ها", "url": url})
     reports_count = None
     for permission, route, loader, kind in (
         (
@@ -183,11 +194,16 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
                     "label": "گزارش‌های روزانه",
                     "value": reports_count,
                     "unit": "گزارش",
-                    "note": "سوابق قابل مشاهده پروژه",
+                    "url": contextual_url(
+                        "daily_reports:list", project_filter=project.pk
+                    )
+                    if route_exposed("daily_reports:list")
+                    else "",
                     "icon": "calendar",
                     "tone": "reports",
                 }
             )
+            records = records.select_related("site")
         for record in records.order_by("-created_at", "pk")[:3]:
             recent.append(
                 {
@@ -203,43 +219,45 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
                     "url": reverse(route, args=[record.pk]),
                 }
             )
-    for permission, route, label in (
-        (P.EMPLOYEES_VIEW, "workforce:field_list", "نیروهای کار"),
-        (P.ATTENDANCE_VIEW, "timekeeping:workbench", "حضور و کارکرد"),
+    links = []
+    for permission, route, label, icon in (
+        (P.EMPLOYEES_VIEW, "workforce:field_list", "نیروهای کار", "users"),
+        (P.ATTENDANCE_VIEW, "timekeeping:workbench", "حضور و کارکرد", "clock"),
     ):
         if access(permission, route, site_parent=True):
             links.append(
-                {"label": label, "url": f"{reverse(route)}?project={project.pk}"}
+                {
+                    "label": label,
+                    "url": contextual_url(route, project=project.pk),
+                    "icon": icon,
+                }
             )
-    can_controls = access(P.PROJECT_CONTROLS_VIEW, "projects:controls")
-    if can_controls:
-        links.append(
-            {
-                "label": "ساختار شکست و فعالیت‌ها",
-                "url": reverse("projects:controls", args=[project.pk]),
-            }
-        )
-    if access(P.DOCUMENTS_VIEW, "projects:gallery"):
-        links.append(
-            {
-                "label": "اسناد و گالری",
-                "url": reverse("projects:gallery", args=[project.pk]),
-            }
-        )
+    can_controls = all(
+        access(permission, "projects:controls")
+        for permission in (P.PROJECT_CONTROLS_VIEW, P.WBS_NODES_VIEW, P.ACTIVITIES_VIEW)
+    )
     return {
         "commercial_summary": commercial,
         "cost_projection": projection,
         "dashboard": {
             "kpis": kpis,
             "charts": charts,
-            "cost_rows": cost_rows,
-            "cost_comparable": comparable,
+            "currency_label": currency_label,
+            "actual_cost": actual,
+            "budget_comparison": comparison,
+            "cost_message": cost_message,
             "contract_rows": contract_rows,
             "contract_total": contracts.total if contracts else 0,
             "has_contracts_access": contracts is not None,
             "recent": sorted(recent, key=lambda item: item["date"], reverse=True)[:6],
             "quick_links": links,
-            "can_controls": can_controls,
+            "sites_url": sites_url,
+            "controls_url": reverse("projects:controls", args=[project.pk])
+            if can_controls
+            else "",
+            "gallery_url": reverse("projects:gallery", args=[project.pk])
+            if access(P.DOCUMENTS_VIEW, "projects:gallery")
+            else "",
             "can_archive": access(P.PROJECTS_ARCHIVE, "projects:archive"),
             "reports_count": reports_count,
         },

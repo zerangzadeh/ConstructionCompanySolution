@@ -1,0 +1,302 @@
+/* Companies list adaptations of the shared filter bar and responsive list. */
+.erp-platform-company-list .erp-page-header__icon {
+    color: var(--bonira-royal-blue);
+}
+
+.erp-platform-company-list .erp-page-header__icon svg {
+    width: 30px;
+    height: 30px;
+}
+
+.erp-platform-company-list .erp-company-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.erp-platform-company-list .erp-company-summary .erp-dashboard-metric {
+    display: grid;
+    grid-template-columns: 50px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 12px;
+    padding: 12px 16px;
+    border-color: var(--bonira-light-gray);
+    background: var(--bonira-white);
+}
+
+.erp-platform-company-list .erp-company-summary [data-kpi-tone="active"] {
+    --metric-color: var(--bonira-success);
+}
+
+.erp-platform-company-list .erp-company-summary [data-kpi-tone="suspended"] {
+    --metric-color: var(--bonira-warning);
+}
+
+.erp-platform-company-list .erp-company-summary .erp-dashboard-metric__label {
+    display: contents;
+}
+
+.erp-platform-company-list .erp-company-summary .erp-dashboard-metric__label svg {
+    grid-row: 1 / 3;
+    width: 50px;
+    height: 50px;
+    padding: 11px;
+    border-radius: 50%;
+}
+
+.erp-platform-company-list .erp-company-summary .erp-dashboard-metric__label p {
+    grid-column: 2;
+    grid-row: 2;
+    color: var(--bonira-slate);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.erp-platform-company-list .erp-company-summary .erp-dashboard-metric__value {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+    text-align: start;
+    font-size: 22px;
+    line-height: 1.3;
+}
+
+.erp-platform-company-list .erp-list-filters__top {
+    display: flex;
+    align-items: flex-end;
+    padding: 14px 16px;
+}
+
+.erp-platform-company-list .erp-list-filters .erp-list-options {
+    flex: 0 0 auto;
+}
+
+.erp-platform-company-list .erp-list-quick {
+    align-items: flex-end;
+    margin: 0;
+}
+
+.erp-platform-company-list .erp-list-quick > div:not(.erp-list-filter-actions) {
+    flex: 1 1 160px;
+}
+
+.erp-platform-company-list .erp-list-search__label,
+.erp-platform-company-list .erp-list-quick > div > label {
+    position: static;
+    width: auto;
+    height: auto;
+    clip-path: none;
+    margin-bottom: 4px;
+}
+
+.erp-platform-company-list .erp-list-filter-actions .erp-list-clear {
+    min-height: 40px;
+    padding-inline: 12px;
+}
+
+.erp-platform-company-list .erp-list-filter-actions svg {
+    width: 18px;
+    height: 18px;
+}
+
+.erp-platform-company-list .erp-list-filter-actions .erp-btn,
+.erp-platform-company-list .erp-list-filter-actions .erp-list-clear {
+    font-size: 13px;
+}
+
+.erp-platform-company-results {
+    margin-top: 14px;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px color-mix(in srgb, var(--bonira-deep-navy) 7%, transparent);
+}
+
+.erp-platform-company-results .erp-list-toolbar {
+    border: 0;
+    padding: 10px 16px;
+}
+
+.erp-platform-company-results .erp-list-footer {
+    border-top: 1px solid var(--bonira-light-gray);
+    padding: 12px 16px;
+}
+
+.erp-platform-company-results .erp-list-identifier a {
+    font-size: 14px;
+}
+
+.erp-platform-company-results .erp-list-identifier .erp-list-subtitle {
+    color: var(--bonira-slate);
+    font-weight: 400;
+    font-size: 12px;
+}
+
+.erp-platform-company-list .erp-responsive-list .erp-badge {
+    min-height: 28px;
+    padding: 3px 10px;
+    border: 0;
+    border-radius: 999px;
+    font-size: 13px;
+}
+
+.erp-platform-company-list .erp-badge--success {
+    background: color-mix(in srgb, var(--bonira-success) 12%, var(--bonira-white));
+    color: var(--bonira-success);
+}
+
+.erp-platform-company-list .erp-badge:has(svg)::before {
+    display: none;
+}
+
+.erp-platform-company-list .erp-badge svg {
+    width: 17px;
+    height: 17px;
+}
+
+.erp-platform-company-results td:is(:nth-child(4), :nth-child(5)) bdi {
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.erp-platform-company-results .erp-list-row-action .erp-btn {
+    min-height: 36px;
+    color: var(--bonira-royal-blue);
+}
+
+.erp-platform-company-results .erp-list-row-action svg {
+    width: 16px;
+    height: 16px;
+}
+
+@media (min-width: 768px) {
+    .erp-platform-company-list .erp-list-search {
+        display: block;
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .erp-platform-company-list .erp-list-quick {
+        flex-wrap: nowrap;
+    }
+
+    .erp-platform-company-list .erp-list-quick > div:not(.erp-list-filter-actions) {
+        flex: none;
+        inline-size: 160px;
+    }
+
+    .erp-platform-company-list .erp-responsive-list {
+        min-width: 680px;
+    }
+
+    .erp-platform-company-list .erp-responsive-list th:nth-child(1) { width: 24%; }
+    .erp-platform-company-list .erp-responsive-list th:nth-child(2) { width: 11%; }
+    .erp-platform-company-list .erp-responsive-list th:nth-child(3) { width: 10%; }
+    .erp-platform-company-list .erp-responsive-list th:nth-child(4) { width: 16%; }
+    .erp-platform-company-list .erp-responsive-list th:nth-child(5) { width: 18%; }
+    .erp-platform-company-list .erp-responsive-list th:last-child { width: 21%; }
+
+    .erp-platform-company-list .erp-responsive-list :is(th, td):not(:first-child) {
+        text-align: center;
+    }
+
+    .erp-platform-company-list .erp-responsive-list td {
+        padding-block: 10px;
+    }
+
+    .erp-platform-company-list .erp-responsive-list td.erp-list-row-action {
+        padding-inline: 4px;
+    }
+
+    .erp-platform-company-results td:is(:nth-child(4), :nth-child(5)) {
+        padding-inline: 6px;
+    }
+}
+
+@media (min-width: 1280px) {
+    .erp-platform-company-list .erp-list-search {
+        flex: 0 1 38%;
+    }
+
+    .erp-platform-company-list .erp-list-quick > div:not(.erp-list-filter-actions) {
+        inline-size: 240px;
+    }
+
+    .erp-platform-company-list .erp-list-filter-actions .erp-btn {
+        min-width: 108px;
+    }
+
+    .erp-platform-company-list .erp-list-filter-actions .erp-list-clear {
+        min-width: 150px;
+    }
+}
+
+@media (max-width: 767px) {
+    .erp-platform-company-list .erp-list-heading > header {
+        flex-wrap: wrap;
+    }
+
+    .erp-platform-company-list .erp-list-search,
+    .erp-platform-company-list .erp-list-filters .erp-list-options {
+        flex: 1 1 100%;
+        margin: 0;
+    }
+
+    .erp-platform-company-list .erp-list-quick {
+        margin: 0;
+    }
+
+    .erp-platform-company-list .erp-company-summary {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .erp-platform-company-list .erp-company-summary .erp-dashboard-metric {
+        grid-template-columns: 38px minmax(0, 1fr) auto;
+        grid-template-rows: auto;
+        column-gap: 10px;
+        padding: 10px 12px;
+    }
+
+    .erp-platform-company-list .erp-company-summary .erp-dashboard-metric__label svg {
+        grid-row: 1;
+        width: 38px;
+        height: 38px;
+        padding: 8px;
+    }
+
+    .erp-platform-company-list .erp-company-summary .erp-dashboard-metric__label p {
+        grid-row: 1;
+        font-size: 12px;
+    }
+
+    .erp-platform-company-list .erp-company-summary .erp-dashboard-metric__value {
+        grid-column: 3;
+        font-size: 20px;
+    }
+
+    .erp-platform-company-results {
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .erp-platform-company-results .erp-list-toolbar {
+        padding-inline: 0;
+    }
+
+    .erp-platform-company-results .erp-list-result-summary {
+        flex-basis: auto;
+    }
+
+    .erp-platform-company-list .erp-responsive-list .erp-list-identifier {
+        align-self: start;
+    }
+
+    .erp-platform-company-list .erp-responsive-list .erp-list-row-action {
+        grid-column: auto;
+        justify-self: end;
+        align-self: end;
+        border: 0;
+        padding: 0;
+    }
+}

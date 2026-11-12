@@ -136,6 +136,103 @@ class PlatformCompanyTests(TestCase):
             404,
         )
 
+    def test_company_detail_renders_activity_search_and_retains_it_in_pagination(self):
+        for _ in range(26):
+            record_audit_event(
+                action=AuditAction.PROJECT_CREATED,
+                actor=self.admin,
+                organization=self.company,
+                entity_type="project",
+                allow_platform_actor=True,
+            )
+
+        response = self.client.get(self.url(), {"q": self.admin.username})
+        self.assertEqual(len(response.context["events"]), 25)
+        self.assertContains(response, 'href="?q=company-admin&amp;page=2"')
+        self.assertContains(response, "پروژه ایجاد شد")
+
+        next_page = self.client.get(self.url(), {"q": self.admin.username, "page": 2})
+        self.assertEqual(len(next_page.context["events"]), 1)
+        self.assertContains(next_page, 'value="company-admin"')
+
+        empty = self.client.get(self.url(), {"q": "no-such-actor"})
+        self.assertContains(empty, "نتیجه‌ای با این فیلترها یافت نشد")
+        self.assertNotContains(empty, 'aria-label="صفحه‌بندی"')
+
+    def test_company_list_sorts_and_paginates_the_existing_filtered_results(self):
+        url = reverse("organizations:platform_company_list")
+        companies = Organization.objects.bulk_create(
+            [
+                Organization(name="شرکت آزمایشی", slug=f"list-qa-{index:02}")
+                for index in range(27)
+            ]
+        )
+        Organization.objects.filter(pk=companies[-1].pk).update(
+            status=OrganizationStatus.SUSPENDED
+        )
+        query = {
+            "q": "list-qa-",
+            "status": "active",
+            "sort": "name",
+            "direction": "desc",
+        }
+        ordered = sorted((company.pk for company in companies[:-1]), reverse=True)
+
+        first = self.client.get(url, query)
+        second = self.client.get(url, {**query, "page": 2})
+        self.assertEqual(
+            [company.pk for company in first.context["companies"]], ordered[:25]
+        )
+        self.assertEqual(
+            [company.pk for company in second.context["companies"]], ordered[25:]
+        )
+        self.assertContains(first, 'aria-sort="descending"')
+        self.assertContains(first, 'rel="next"')
+        self.assertContains(second, 'rel="prev"')
+        self.assertEqual(second.context["filter_bar"]["result_count"], 26)
+
+        unsupported = self.client.get(url, {**query, "sort": "legal_name"})
+        self.assertEqual(unsupported.context["list_sort"]["key"], "name")
+        self.assertEqual(
+            [company.pk for company in unsupported.context["companies"]],
+            ordered[::-1][:25],
+        )
+
+        single = self.client.get(url, {"q": companies[-1].slug})
+        self.assertNotContains(single, 'aria-label="صفحه‌بندی"')
+        self.assertContains(single, self.url(company=companies[-1]))
+        self.assertContains(single, reverse("organizations:create"))
+        self.assertContains(single, "رویدادی ثبت نشده")
+
+    def test_company_list_distinguishes_empty_inventory_and_empty_filter(self):
+        url = reverse("organizations:platform_company_list")
+        self.assertContains(
+            self.client.get(url, {"q": "no-company"}),
+            "نتیجه‌ای با این فیلترها یافت نشد",
+        )
+        with patch("apps.organizations.platform_views.platform_companies") as read:
+            read.return_value = Organization.objects.none()
+            self.assertContains(self.client.get(url), "هنوز شرکتی ثبت نشده است")
+
+    def test_company_list_summary_uses_authorized_records_before_search(self):
+        Organization.objects.filter(pk=self.other.pk).update(
+            status=OrganizationStatus.SUSPENDED
+        )
+        Organization.objects.create(
+            name="شرکت حذف‌شده",
+            slug="summary-deleted",
+            deleted_at=timezone.now(),
+        )
+        url = reverse("organizations:platform_company_list")
+        for query in ({}, {"q": self.company.slug}, {"status": "invalid"}):
+            response = self.client.get(url, query)
+            self.assertEqual(
+                [item["value"] for item in response.context["company_summary"]],
+                [2, 1, 1],
+            )
+            self.assertContains(response, "شرکت‌های ثبت‌شده")
+            self.assertContains(response, "شرکت‌های تعلیق‌شده")
+
     def test_owner_and_superuser_without_platform_duty_cannot_read_or_write(self):
         for user in (self.owner, self.root):
             self.client.force_login(user)

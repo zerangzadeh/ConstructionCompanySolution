@@ -9,12 +9,12 @@ register = template.Library()
 
 
 @register.inclusion_tag("workforce/_journey_links.html", takes_context=True)
-def field_journey(context, project, site=None):
+def field_journey(context, project, site=None, *, header_actions=False):
     request = context["request"]
     links = []
-    for route, permission, label in (
-        ("workforce:field_list", "employees.view", "نیروهای کار"),
-        ("timekeeping:workbench", "attendance.view", "حضور و کارکرد"),
+    for route, permission, label, icon in (
+        ("workforce:field_list", "employees.view", "نیروهای کار", "users"),
+        ("timekeeping:workbench", "attendance.view", "حضور و کارکرد", "clock"),
     ):
         if route_exposed(route) and has_business_permission(
             user=request.user,
@@ -25,8 +25,10 @@ def field_journey(context, project, site=None):
             allow_site_parent=True,
         ):
             query = FieldContext(project=project, site=site).query
-            links.append({"label": label, "url": f"{reverse(route)}?{query}"})
-    return {"links": links}
+            links.append(
+                {"label": label, "url": f"{reverse(route)}?{query}", "icon": icon}
+            )
+    return {"links": links, "header_actions": header_actions}
 
 
 @register.simple_tag(takes_context=True)

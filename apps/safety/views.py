@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.organizations.authorization import get_active_membership
@@ -40,6 +40,7 @@ from core.list_filters import (
     paginate_table,
     table_pagination_query,
 )
+from core.organization_time import render_in_organization_time as render
 
 
 @active_organization_required

@@ -159,7 +159,7 @@ PROFILES = {
 
 
 @register.simple_tag(takes_context=True)
-def reference_list_state(context, profile):
+def reference_list_state(context, profile, default_sort=None):
     """Adapt only the filter definitions and authorized page supplied by a view."""
     config = PROFILES[profile]
     request = context["request"]
@@ -244,7 +244,7 @@ def reference_list_state(context, profile):
         key = "status"
     explicit_sort = key in labels
     if not explicit_sort:
-        key = config["default_sort"]
+        key = default_sort or config["default_sort"]
     return {
         "restore_url_state": config.get("restore_url_state", False),
         "bar": bar,

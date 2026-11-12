@@ -2,7 +2,7 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}">
 <link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}">
-<link rel="stylesheet" href="{% static 'css/erp_record_detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/erp_record_detail.css' %}?v=20261111-1">
 {% endblock %}
 {% block header_working_context %}{% if request.organization %}{% include "components/list_working_context.html" with request=request csrf_token=csrf_token active_project=active_project active_site=active_site context_projects=context_projects context_sites=context_sites context_requires_project=context_requires_project site_context_relevant=site_context_relevant header_layout=True fit_tablet_panel=True context_note="زمینه کاری سراسری مستقل از مشخصات این رکورد است." only %}{% endif %}{% endblock %}
 {% block working_context %}{% endblock %}

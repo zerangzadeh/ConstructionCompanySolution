@@ -1,0 +1,1402 @@
+{
+  "browser": "156.0.8078.80",
+  "profile": "MVP",
+  "db": "bonira_b02_run2",
+  "db_port": 59141,
+  "witness": "separate PostgreSQL connection, default_transaction_read_only=on",
+  "rows": {
+    "timekeeping:calendar_create": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:calendar_create",
+      "variant": null,
+      "summary": "Start from explicit no-calendar guidance and save a Jalali effective calendar",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/calendars/new/",
+          "status": 200,
+          "final": "/timekeeping/calendars/new/"
+        },
+        {
+          "prior_browser_write": "B02-CAL already committed by earlier Chrome probe after no-calendar guidance. Continue with authoritative witness."
+        },
+        {
+          "db": {
+            "model": "timekeeping.WorkCalendar",
+            "id": "e55ba9bf-ec52-4831-bd74-d0247a8adbb2",
+            "code": "B02-CAL",
+            "name": "تقویم موج دوم",
+            "working_weekdays": [
+              6,
+              7,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "effective_from": "2026-10-23",
+            "audit": [
+              {
+                "action": "time.calendar_configured",
+                "actor__username": "b02-clock"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/",
+          "status": 200,
+          "final": "/timekeeping/"
+        },
+        {
+          "negative_post": "/timekeeping/calendars/new/",
+          "status": 403
+        }
+      ]
+    },
+    "timekeeping:shift_create": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:shift_create",
+      "variant": null,
+      "summary": "Shift picker uses saved calendar and persists 08:00–16:00",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/shifts/new/",
+          "status": 200,
+          "final": "/timekeeping/shifts/new/"
+        },
+        {
+          "action": "/timekeeping/shifts/new/",
+          "posts": [
+            [
+              "/timekeeping/shifts/new/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/",
+          "feedback": [
+            "×\nشیفت کاری ثبت شد؛ دوره‌های استراحت باید از سرویس کنترل‌شده ثبت شوند."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.ShiftDefinition",
+            "id": "a76b59e5-ddc3-4823-9a0f-f4d147fd5258",
+            "calendar_id": "e55ba9bf-ec52-4831-bd74-d0247a8adbb2",
+            "starts_at": "08:00:00",
+            "ends_at": "16:00:00",
+            "effective_from": "2026-10-23",
+            "audit": [
+              {
+                "action": "time.calendar_configured",
+                "actor__username": "b02-clock"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/timekeeping/shifts/new/",
+          "status": 403
+        }
+      ]
+    },
+    "timekeeping:holiday_create": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:holiday_create",
+      "variant": null,
+      "summary": "Holiday date and parent calendar persist",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/holidays/new/",
+          "status": 200,
+          "final": "/timekeeping/holidays/new/"
+        },
+        {
+          "action": "/timekeeping/holidays/new/",
+          "posts": [
+            [
+              "/timekeeping/holidays/new/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/",
+          "feedback": [
+            "×\nروز تقویمی با منبع و دلیل ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.CalendarHoliday",
+            "id": "d39fd2f1-3117-42da-b568-891fe7a791e4",
+            "calendar_id": "e55ba9bf-ec52-4831-bd74-d0247a8adbb2",
+            "date": "2026-11-12",
+            "name": "تعطیلی مصنوعی",
+            "audit": [
+              {
+                "action": "time.calendar_configured",
+                "actor__username": "b02-clock"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/timekeeping/holidays/new/",
+          "status": 403
+        }
+      ]
+    },
+    "timekeeping:shift_break_create": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:shift_break_create",
+      "variant": null,
+      "summary": "Store the unpaid 30-minute shift break under the selected shift",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/shift-breaks/new/",
+          "status": 200,
+          "final": "/timekeeping/shift-breaks/new/"
+        },
+        {
+          "action": "/timekeeping/shift-breaks/new/",
+          "posts": [
+            [
+              "/timekeeping/shift-breaks/new/",
+              200
+            ]
+          ],
+          "final": "/timekeeping/shift-breaks/new/",
+          "feedback": [
+            "لطفاً موارد زیر را بررسی کنید:\n\nترتیب: این فیلد لازم است.",
+            "این فیلد لازم است."
+          ]
+        }
+      ],
+      "harness_or_assertion": "ShiftBreak matching query does not exist."
+    },
+    "timekeeping:attendance_create": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:attendance_create",
+      "variant": null,
+      "summary": "Real attendance form with inherited context, keyboard Jalali picker and independent 240-minute interval",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/attendance/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/attendance/new/"
+        },
+        {
+          "jalali_picker": {
+            "opened_by_keyboard": true,
+            "escape_closed": true
+          }
+        },
+        {
+          "action": "/timekeeping/attendance/new/",
+          "posts": [
+            [
+              "/timekeeping/attendance/new/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/",
+          "feedback": [
+            "×\nحضور برای بررسی ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "dc72b016-4e71-4b51-865a-bba75a2e55f4",
+            "work_date": "2026-11-01",
+            "state": "draft",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "calendar_id": "e55ba9bf-ec52-4831-bd74-d0247a8adbb2",
+            "shift_id": "a76b59e5-ddc3-4823-9a0f-f4d147fd5258",
+            "check_in_at": "2026-11-01 08:00:00+00:00",
+            "check_out_at": "2026-11-01 12:00:00+00:00",
+            "captured_by_id": "77200643-60df-4505-a462-b48e07aafdaf",
+            "audit": [
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-clock"
+              }
+            ]
+          }
+        }
+      ],
+      "harness_or_assertion": ""
+    },
+    "timekeeping:attendance_finalize": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:attendance_finalize",
+      "variant": null,
+      "summary": "Review by an independent user and verify original times and finalizer",
+      "axes": {
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS",
+        "FUNCTIONAL": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/"
+        },
+        {
+          "negative_post": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/finalize/",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/"
+        },
+        {
+          "action": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/finalize/",
+          "posts": [
+            [
+              "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/finalize/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/",
+          "feedback": [
+            "×\nحضور قطعی شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "dc72b016-4e71-4b51-865a-bba75a2e55f4",
+            "state": "finalized",
+            "check_in_at": "2026-11-01 08:00:00+00:00",
+            "check_out_at": "2026-11-01 12:00:00+00:00",
+            "finalized_by_id": "a4b59440-f07e-4ee3-87b9-7949412d6ccc",
+            "audit": [
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-clock"
+              },
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-review"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/"
+        }
+      ]
+    },
+    "timekeeping:timesheet_create": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:timesheet_create",
+      "variant": null,
+      "summary": "Zero duration rejected. 2 h 35 min saved as 155 while attendance remains independent",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "NAVIGATION_UX": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/timesheets/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/timesheets/new/"
+        },
+        {
+          "action": "/timekeeping/timesheets/new/",
+          "posts": [
+            [
+              "/timekeeping/timesheets/new/",
+              200
+            ]
+          ],
+          "final": "/timekeeping/timesheets/new/",
+          "feedback": [
+            "لطفاً موارد زیر را بررسی کنید:\n\nمدت کل کارکرد: مدت را بیشتر از صفر و در محدوده مجاز وارد کنید.",
+            "مدت را بیشتر از صفر و در محدوده مجاز وارد کنید."
+          ]
+        },
+        {
+          "action": "/timekeeping/timesheets/new/",
+          "posts": [
+            [
+              "/timekeeping/timesheets/new/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/",
+          "feedback": [
+            "×\nپیش‌نویس کارکرد ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.Timesheet",
+            "id": "0b31fae0-4a05-444d-a0a8-236057ef3873",
+            "employee_id": "9c34cd92-c920-443e-82df-cd2be5d047e9",
+            "period_start": "2026-11-01",
+            "period_end": "2026-11-01",
+            "declared_minutes": 155,
+            "state": "draft",
+            "audit": []
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/timesheets/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 404,
+          "final": "/timekeeping/timesheets/new/"
+        }
+      ]
+    },
+    "timekeeping:timesheet_detail": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:timesheet_detail",
+      "variant": null,
+      "summary": "Record detail adds one scoped allocation with the inherited date and site",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/"
+        },
+        {
+          "action": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/",
+          "posts": [
+            [
+              "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/",
+          "feedback": [
+            "×\nردیف تخصیص زمان ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.TimesheetEntry",
+            "id": "eafd0779-1c89-4c8b-88f1-e8c974103d24",
+            "work_date": "2026-11-01",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "minutes": 155,
+            "audit": []
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 404,
+          "final": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/"
+        }
+      ]
+    },
+    "timekeeping:timesheet_submit": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:timesheet_submit",
+      "variant": null,
+      "summary": "Submit only the reconciled 155-minute allocation",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/"
+        },
+        {
+          "action": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/submit/",
+          "posts": [
+            [
+              "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/submit/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/",
+          "feedback": [
+            "×\nکارکرد با تاریخچه تغییرناپذیر ارسال شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.Timesheet",
+            "id": "0b31fae0-4a05-444d-a0a8-236057ef3873",
+            "state": "submitted",
+            "declared_minutes": 155,
+            "employee_id": "9c34cd92-c920-443e-82df-cd2be5d047e9",
+            "audit": [
+              {
+                "action": "time.timesheet_submitted",
+                "actor__username": "b02-clock"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/submit/",
+          "status": 403
+        }
+      ]
+    },
+    "timekeeping:timesheet_review": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:timesheet_review",
+      "variant": null,
+      "summary": "Approve through an independent reviewer, with preparer POST denied",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/"
+        },
+        {
+          "negative_post": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/review/",
+          "status": 403
+        },
+        {
+          "action": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/review/",
+          "posts": [
+            [
+              "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/review/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/",
+          "feedback": [
+            "×\nکارکرد بررسی شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.Timesheet",
+            "id": "0b31fae0-4a05-444d-a0a8-236057ef3873",
+            "state": "approved",
+            "declared_minutes": 155,
+            "employee_id": "9c34cd92-c920-443e-82df-cd2be5d047e9",
+            "audit": [
+              {
+                "action": "time.timesheet_submitted",
+                "actor__username": "b02-clock"
+              }
+            ]
+          }
+        },
+        {
+          "db": {
+            "model": "timekeeping.TimesheetReview",
+            "id": "8c68a44f-ca30-4297-adbd-fb90b24505a5",
+            "timesheet_id": "0b31fae0-4a05-444d-a0a8-236057ef3873",
+            "audit": [
+              {
+                "action": "time.timesheet_reviewed",
+                "actor__username": "b02-review"
+              }
+            ]
+          }
+        },
+        {
+          "review": "8c68a44f-ca30-4297-adbd-fb90b24505a5"
+        },
+        {
+          "negative_post": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/review/",
+          "status": 403
+        }
+      ]
+    },
+    "timekeeping:timesheet_preview": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:timesheet_preview",
+      "variant": null,
+      "summary": "Create non-financial preview preserving approved source and minute total",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/"
+        },
+        {
+          "action": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/preview/",
+          "posts": [
+            [
+              "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/preview/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/",
+          "feedback": [
+            "×\nپیش‌نمایش غیرمالی و غیرقابل‌ارسال توزیع زمان نگهداری شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.Timesheet",
+            "id": "0b31fae0-4a05-444d-a0a8-236057ef3873",
+            "state": "approved",
+            "declared_minutes": 155,
+            "employee_id": "9c34cd92-c920-443e-82df-cd2be5d047e9",
+            "audit": [
+              {
+                "action": "time.timesheet_submitted",
+                "actor__username": "b02-clock"
+              }
+            ]
+          }
+        },
+        {
+          "db": {
+            "model": "timekeeping.LaborDistributionPreview",
+            "id": "4f983b8d-327a-4a57-8c42-d1df5d7d0350",
+            "total_minutes": 155,
+            "audit": [
+              {
+                "action": "time.distribution_previewed",
+                "actor__username": "b02-review"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/preview/",
+          "status": 403
+        }
+      ]
+    },
+    "timekeeping:workbench": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:workbench",
+      "variant": null,
+      "summary": "Distinct attendance and work-log history, monthly drill-down and Workforce navigation through sidebar",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "NAVIGATION_UX": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405/08/10&date_to=1405/08/10",
+          "status": 200,
+          "final": "/timekeeping/"
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405/08/10&date_to=1405/08/10",
+          "status": 200,
+          "final": "/timekeeping/"
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405/08/10&date_to=1405/08/10",
+          "status": 200,
+          "final": "/timekeeping/"
+        },
+        {
+          "mobile_filter_keyboard": true
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405/08/10&date_to=1405/08/10",
+          "status": 200,
+          "final": "/timekeeping/"
+        },
+        {
+          "db": {
+            "model": "timekeeping.Timesheet",
+            "id": "0b31fae0-4a05-444d-a0a8-236057ef3873",
+            "declared_minutes": 155,
+            "state": "approved",
+            "audit": [
+              {
+                "action": "time.timesheet_submitted",
+                "actor__username": "b02-clock"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405/08/10&date_to=1405/08/10",
+          "status": 404,
+          "final": "/timekeeping/"
+        },
+        {
+          "method": "GET",
+          "url": "/payroll/",
+          "status": 403,
+          "final": "/payroll/"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/foundation/",
+          "status": 403,
+          "final": "/workforce/foundation/"
+        }
+      ]
+    },
+    "timekeeping:attendance_correction_create": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:attendance_correction_create",
+      "variant": null,
+      "summary": "A separate corrector requests a 15-minute adjustment without changing original",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/"
+        },
+        {
+          "click": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/corrections/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "final": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/corrections/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+        },
+        {
+          "action": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/corrections/new/",
+          "posts": [
+            [
+              "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/corrections/new/",
+              200
+            ]
+          ],
+          "final": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/corrections/new/",
+          "feedback": [
+            "لطفاً موارد زیر را بررسی کنید:\n\nبرای اصلاح، زمان ورود و خروج جایگزین الزامی است.",
+            "برای اصلاح، زمان ورود و خروج جایگزین الزامی است."
+          ]
+        }
+      ],
+      "harness_or_assertion": "AttendanceCorrectionRequest matching query does not exist."
+    },
+    "timekeeping:attendance_correction_review": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:attendance_correction_review",
+      "variant": null,
+      "summary": "Reject self-review and independently approve a versioned 255-minute replacement",
+      "axes": {},
+      "trace": [],
+      "harness_or_assertion": "'correction'"
+    },
+    "timekeeping:leave_mission_create": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:leave_mission_create",
+      "variant": null,
+      "summary": "Create both leave and mission drafts and verify the visible leave reservation prerequisite",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/leave-mission/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/leave-mission/new/"
+        },
+        {
+          "action": "/timekeeping/leave-mission/new/",
+          "posts": [
+            [
+              "/timekeeping/leave-mission/new/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/",
+          "feedback": [
+            "×\nپیش‌نویس درخواست ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "c4e004a2-0ed3-446c-a99b-d7c27b4456ea",
+            "employee_id": "9c34cd92-c920-443e-82df-cd2be5d047e9",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "state": "draft",
+            "starts_at": "2026-11-01 13:00:00+00:00",
+            "ends_at": "2026-11-01 14:00:00+00:00",
+            "policy_reference": "B02-ISOLATED-POLICY",
+            "audit": []
+          }
+        },
+        {
+          "authoritative_duration_minutes": 60.0
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/leave-mission/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 404,
+          "final": "/timekeeping/leave-mission/new/"
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/leave-mission/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/leave-mission/new/"
+        },
+        {
+          "action": "/timekeeping/leave-mission/new/",
+          "posts": [
+            [
+              "/timekeeping/leave-mission/new/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/records/leave/eea769f0-9b15-4fc8-8199-3bd64cbdbc4d/",
+          "feedback": [
+            "×\nپیش‌نویس درخواست ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "eea769f0-9b15-4fc8-8199-3bd64cbdbc4d",
+            "employee_id": "9c34cd92-c920-443e-82df-cd2be5d047e9",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "state": "draft",
+            "starts_at": "2026-11-01 11:00:00+00:00",
+            "ends_at": "2026-11-01 12:00:00+00:00",
+            "policy_reference": "",
+            "audit": []
+          }
+        },
+        {
+          "authoritative_duration_minutes": 60.0
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/leave-mission/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 404,
+          "final": "/timekeeping/leave-mission/new/"
+        }
+      ],
+      "partial": "Leave draft and guard verified. Connected reservation is outside the active MVP journey; positive submit/review uses Mission."
+    },
+    "timekeeping:overtime_create": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:overtime_create",
+      "variant": null,
+      "summary": "Save 95-minute overtime and reject overlapping duplicate",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/overtime/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/overtime/new/"
+        },
+        {
+          "action": "/timekeeping/overtime/new/",
+          "posts": [
+            [
+              "/timekeeping/overtime/new/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/",
+          "feedback": [
+            "×\nپیش‌نویس اضافه‌کاری ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.OvertimeRequest",
+            "id": "2b064fb4-3458-441b-b394-6bc34d03fe7f",
+            "employee_id": "9c34cd92-c920-443e-82df-cd2be5d047e9",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "state": "draft",
+            "starts_at": "2026-11-01 16:30:00+00:00",
+            "ends_at": "2026-11-01 18:05:00+00:00",
+            "policy_reference": "B02-ISOLATED-POLICY",
+            "audit": []
+          }
+        },
+        {
+          "authoritative_duration_minutes": 95.0
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/overtime/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 404,
+          "final": "/timekeeping/overtime/new/"
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/overtime/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/overtime/new/"
+        },
+        {
+          "action": "/timekeeping/overtime/new/",
+          "posts": [
+            [
+              "/timekeeping/overtime/new/",
+              200
+            ]
+          ],
+          "final": "/timekeeping/overtime/new/",
+          "feedback": [
+            "لطفاً موارد زیر را بررسی کنید:\n\nدرخواست اضافه‌کاری همپوشان وجود دارد.",
+            "درخواست اضافه‌کاری همپوشان وجود دارد."
+          ]
+        },
+        {
+          "overlap_rejected": true
+        }
+      ]
+    },
+    "timekeeping:leave_mission_submit": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:leave_mission_submit",
+      "variant": null,
+      "summary": "Submit the Mission branch as its requester and verify persisted transition",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/"
+        },
+        {
+          "action": "/timekeeping/leave-mission/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/submit/",
+          "posts": [
+            [
+              "/timekeeping/leave-mission/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/submit/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/",
+          "feedback": [
+            "×\nدرخواست ارسال شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "c4e004a2-0ed3-446c-a99b-d7c27b4456ea",
+            "state": "submitted",
+            "requested_by_id": "77200643-60df-4505-a462-b48e07aafdaf",
+            "reviewed_by_id": null,
+            "starts_at": "2026-11-01 13:00:00+00:00",
+            "ends_at": "2026-11-01 14:00:00+00:00",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-clock"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/"
+        },
+        {
+          "negative_post": "/timekeeping/leave-mission/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/submit/",
+          "status": 404
+        }
+      ]
+    },
+    "timekeeping:leave_mission_review": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:leave_mission_review",
+      "variant": null,
+      "summary": "Approve the synthetic Mission independently with a policy reference",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/"
+        },
+        {
+          "negative_post": "/timekeeping/leave-mission/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/review/",
+          "status": 403
+        },
+        {
+          "action": "/timekeeping/leave-mission/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/review/",
+          "posts": [
+            [
+              "/timekeeping/leave-mission/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/review/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/",
+          "feedback": [
+            "×\nدرخواست تعیین تکلیف شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "c4e004a2-0ed3-446c-a99b-d7c27b4456ea",
+            "state": "approved",
+            "requested_by_id": "77200643-60df-4505-a462-b48e07aafdaf",
+            "reviewed_by_id": "a4b59440-f07e-4ee3-87b9-7949412d6ccc",
+            "starts_at": "2026-11-01 13:00:00+00:00",
+            "ends_at": "2026-11-01 14:00:00+00:00",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-clock"
+              },
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-review"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/"
+        },
+        {
+          "negative_post": "/timekeeping/leave-mission/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/review/",
+          "status": 404
+        }
+      ]
+    },
+    "timekeeping:overtime_submit": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:overtime_submit",
+      "variant": null,
+      "summary": "Submit existing overtime as its requester",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/"
+        },
+        {
+          "action": "/timekeeping/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/submit/",
+          "posts": [
+            [
+              "/timekeeping/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/submit/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/",
+          "feedback": [
+            "×\nدرخواست ارسال شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.OvertimeRequest",
+            "id": "2b064fb4-3458-441b-b394-6bc34d03fe7f",
+            "state": "submitted",
+            "requested_by_id": "77200643-60df-4505-a462-b48e07aafdaf",
+            "reviewed_by_id": null,
+            "starts_at": "2026-11-01 16:30:00+00:00",
+            "ends_at": "2026-11-01 18:05:00+00:00",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-clock"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/"
+        },
+        {
+          "negative_post": "/timekeeping/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/submit/",
+          "status": 404
+        }
+      ]
+    },
+    "timekeeping:overtime_review": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:overtime_review",
+      "variant": null,
+      "summary": "Independently approve overtime and preserve original interval",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/"
+        },
+        {
+          "negative_post": "/timekeeping/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/review/",
+          "status": 403
+        },
+        {
+          "action": "/timekeeping/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/review/",
+          "posts": [
+            [
+              "/timekeeping/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/review/",
+              302
+            ]
+          ],
+          "final": "/timekeeping/",
+          "feedback": [
+            "×\nدرخواست تعیین تکلیف شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "timekeeping.OvertimeRequest",
+            "id": "2b064fb4-3458-441b-b394-6bc34d03fe7f",
+            "state": "approved",
+            "requested_by_id": "77200643-60df-4505-a462-b48e07aafdaf",
+            "reviewed_by_id": "a4b59440-f07e-4ee3-87b9-7949412d6ccc",
+            "starts_at": "2026-11-01 16:30:00+00:00",
+            "ends_at": "2026-11-01 18:05:00+00:00",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-clock"
+              },
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-review"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/"
+        },
+        {
+          "negative_post": "/timekeeping/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/review/",
+          "status": 404
+        }
+      ]
+    },
+    "timekeeping:record_detail@attendance": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:record_detail",
+      "variant": "attendance",
+      "summary": "Match persisted attendance history, status and role/tenant boundary",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS",
+        "NAVIGATION_UX": "PASS"
+      },
+      "trace": [
+        {
+          "db": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "dc72b016-4e71-4b51-865a-bba75a2e55f4",
+            "state": "finalized",
+            "audit": [
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-clock"
+              },
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-review"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/"
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/",
+          "status": 404,
+          "final": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/"
+        }
+      ]
+    },
+    "timekeeping:record_detail@correction": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:record_detail",
+      "variant": "correction",
+      "summary": "Match persisted correction history, status and role/tenant boundary",
+      "axes": {},
+      "trace": [],
+      "harness_or_assertion": "'correction'"
+    },
+    "timekeeping:record_detail@leave": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:record_detail",
+      "variant": "leave",
+      "summary": "Match persisted leave history, status and role/tenant boundary",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS",
+        "NAVIGATION_UX": "PASS"
+      },
+      "trace": [
+        {
+          "db": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "c4e004a2-0ed3-446c-a99b-d7c27b4456ea",
+            "state": "approved",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-clock"
+              },
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-review"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/"
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/",
+          "status": 404,
+          "final": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/"
+        }
+      ]
+    },
+    "timekeeping:record_detail@overtime": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:record_detail",
+      "variant": "overtime",
+      "summary": "Match persisted overtime history, status and role/tenant boundary",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS",
+        "NAVIGATION_UX": "PASS"
+      },
+      "trace": [
+        {
+          "db": {
+            "model": "timekeeping.OvertimeRequest",
+            "id": "2b064fb4-3458-441b-b394-6bc34d03fe7f",
+            "state": "approved",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-clock"
+              },
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-review"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/"
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/",
+          "status": 404,
+          "final": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/"
+        }
+      ]
+    },
+    "timekeeping:record_detail": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:record_detail",
+      "variant": null,
+      "summary": "Generic dispatch verified by the four specific record routes and unknown kind rejection",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/unregistered/dc72b016-4e71-4b51-865a-bba75a2e55f4/",
+          "status": 404,
+          "final": "/timekeeping/records/unregistered/dc72b016-4e71-4b51-865a-bba75a2e55f4/"
+        }
+      ],
+      "harness_or_assertion": ""
+    },
+    "timekeeping:attendance_correction_review@overlap": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:attendance_correction_review",
+      "variant": "overlap",
+      "summary": "Reject a replacement overlapping an independently finalized interval",
+      "axes": {},
+      "trace": [],
+      "harness_or_assertion": "'replacement'"
+    },
+    "timekeeping:attendance_correction_create@site-scope": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:attendance_correction_create",
+      "variant": "site-scope",
+      "summary": "Direct correction URL for a real attendance record on an ungranted sibling site",
+      "axes": {
+        "AUTHORIZATION": "FAIL",
+        "FUNCTIONAL": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/attendance/30d4b520-58f7-4584-bcca-2994df028f4b/corrections/new/",
+          "status": 200,
+          "final": "/timekeeping/attendance/30d4b520-58f7-4584-bcca-2994df028f4b/corrections/new/"
+        },
+        {
+          "same_tenant_sibling": "376d0fe8-9a3f-4dc5-9d71-8bf450dfcc26",
+          "http": 200
+        },
+        {
+          "issue": "Site-limited corrector can open the correction form for an ungranted valid attendance record"
+        },
+        {
+          "action": "/timekeeping/attendance/30d4b520-58f7-4584-bcca-2994df028f4b/corrections/new/",
+          "posts": [
+            [
+              "/timekeeping/attendance/30d4b520-58f7-4584-bcca-2994df028f4b/corrections/new/",
+              200
+            ]
+          ],
+          "final": "/timekeeping/attendance/30d4b520-58f7-4584-bcca-2994df028f4b/corrections/new/",
+          "feedback": [
+            "لطفاً موارد زیر را بررسی کنید:\n\nمجوز یا دامنه لازم برای این عملیات را ندارید.",
+            "مجوز یا دامنه لازم برای این عملیات را ندارید."
+          ]
+        },
+        {
+          "no_write": true
+        }
+      ]
+    },
+    "timekeeping:leave_mission_submit@leave-reservation": {
+      "scenario": "CV-TIME-01",
+      "route": "timekeeping:leave_mission_submit",
+      "variant": "leave-reservation",
+      "summary": "Visible and server-side leave reservation guard",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/records/leave/eea769f0-9b15-4fc8-8199-3bd64cbdbc4d/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/records/leave/eea769f0-9b15-4fc8-8199-3bd64cbdbc4d/"
+        },
+        {
+          "direct_submit_http": 302
+        },
+        {
+          "db": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "eea769f0-9b15-4fc8-8199-3bd64cbdbc4d",
+            "state": "draft",
+            "kind": "leave",
+            "audit": []
+          }
+        }
+      ],
+      "blocked": "Positive leave submission/review needs the authoritative reservation branch; MVP gives explicit prerequisite guidance."
+    }
+  }
+}

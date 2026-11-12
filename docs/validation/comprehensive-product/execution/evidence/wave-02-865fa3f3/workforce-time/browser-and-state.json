@@ -1,0 +1,702 @@
+{
+  "browser": "156.0.8078.80",
+  "profile": "MVP",
+  "db": "bonira_b02_run2",
+  "db_port": 59141,
+  "witness": "separate PostgreSQL connection, default_transaction_read_only=on",
+  "rows": {
+    "workforce:field_list": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_list",
+      "variant": null,
+      "summary": "Scoped workforce list and query empty state, including mobile layout",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/field/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/field/"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/field/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/field/"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/field/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/field/"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/field/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/field/"
+        },
+        {
+          "db": {
+            "model": "workforce.Employee",
+            "id": "9c34cd92-c920-443e-82df-cd2be5d047e9",
+            "employee_number": "FIELD-001",
+            "user_id": null,
+            "audit": [
+              {
+                "action": "employee.created",
+                "actor__username": "b02-owner"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/field/?q=B02-NO-MATCH",
+          "status": 200,
+          "final": "/workforce/field/"
+        },
+        {
+          "filtered_empty": "پروژه صفحه‌بندی 24 · B02-PAGE-24\nپروژه صفحه‌بندی 25 · B02-PAGE-25\nپروژه صفحه‌بندی 26 · B02-PAGE-26\nپروژه صفحه‌بندی 27 · B02-PAGE-27\nپروژه پل آزمایشی · BRIDGE\nکارگاه\nانتخاب کارگاه\nوضعیت\nهمه وضعیت‌ها\nفعال\nغیرفعال\nخاتمه همکاری\nاعمال فیلتر\nفیلترهای فعال:\nجست‌وجوی نام یا شماره پرسنلی: B02-NO-MATCH\n×\n×\nپاک کردن همه\n\n0\nنیرو\n\nمرتب‌سازی: نام نیرو · صعودی\n⌄\nبا فیلترهای فعلی نتیجه‌ای یافت نشد.\n\nفیلترهای جست‌وجو را تغییر دهید یا پاک کنید؛ زمینه انتخاب‌شده حفظ می‌شود.\n\nپاک‌کردن فیلترها\n\nبدون نتیجه\n\n«\n‹\n1\n›\n»"
+        }
+      ]
+    },
+    "workforce:employee_list": {
+      "scenario": "UAT-04",
+      "route": "workforce:employee_list",
+      "variant": null,
+      "summary": "Legacy list route renders the active MVP field list",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/"
+        },
+        {
+          "db": {
+            "model": "workforce.Employee",
+            "id": "9c34cd92-c920-443e-82df-cd2be5d047e9",
+            "employee_number": "FIELD-001",
+            "user_id": null,
+            "audit": [
+              {
+                "action": "employee.created",
+                "actor__username": "b02-owner"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/?q=B02-NO-MATCH",
+          "status": 200,
+          "final": "/workforce/"
+        },
+        {
+          "filtered_empty": "پروژه صفحه‌بندی 24 · B02-PAGE-24\nپروژه صفحه‌بندی 25 · B02-PAGE-25\nپروژه صفحه‌بندی 26 · B02-PAGE-26\nپروژه صفحه‌بندی 27 · B02-PAGE-27\nپروژه پل آزمایشی · BRIDGE\nکارگاه\nانتخاب کارگاه\nوضعیت\nهمه وضعیت‌ها\nفعال\nغیرفعال\nخاتمه همکاری\nاعمال فیلتر\nفیلترهای فعال:\nجست‌وجوی نام یا شماره پرسنلی: B02-NO-MATCH\n×\n×\nپاک کردن همه\n\n0\nنیرو\n\nمرتب‌سازی: نام نیرو · صعودی\n⌄\nبا فیلترهای فعلی نتیجه‌ای یافت نشد.\n\nفیلترهای جست‌وجو را تغییر دهید یا پاک کنید؛ زمینه انتخاب‌شده حفظ می‌شود.\n\nپاک‌کردن فیلترها\n\nبدون نتیجه\n\n«\n‹\n1\n›\n»"
+        }
+      ]
+    },
+    "workforce:work_team_create": {
+      "scenario": "UAT-04",
+      "route": "workforce:work_team_create",
+      "variant": null,
+      "summary": "Create a work team from its list and read independent stored record",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "NAVIGATION_UX": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/teams/",
+          "status": 200,
+          "final": "/workforce/teams/"
+        },
+        {
+          "click": "/workforce/teams/create/",
+          "final": "/workforce/teams/create/"
+        },
+        {
+          "action": "/workforce/teams/create/",
+          "posts": [
+            [
+              "/workforce/teams/create/",
+              302
+            ]
+          ],
+          "final": "/workforce/teams/",
+          "feedback": [
+            "×\nگروه کاری ایجاد شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "workforce.WorkTeam",
+            "id": "42225a0e-8882-4e96-be46-d922f5eaf993",
+            "code": "B02-TEAM",
+            "name": "گروه کار مصنوعی موج دوم",
+            "archived_at": null,
+            "audit": [
+              {
+                "action": "work_team.created",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/workforce/teams/create/",
+          "status": 403
+        }
+      ]
+    },
+    "workforce:work_team_list": {
+      "scenario": "UAT-04",
+      "route": "workforce:work_team_list",
+      "variant": null,
+      "summary": "Workforce tab opens team list and the active tab is non-reloading",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "NAVIGATION_UX": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/field/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/field/"
+        },
+        {
+          "click": "/workforce/teams/",
+          "final": "/workforce/teams/"
+        },
+        {
+          "db": {
+            "model": "workforce.WorkTeam",
+            "id": "42225a0e-8882-4e96-be46-d922f5eaf993",
+            "code": "B02-TEAM",
+            "name": "گروه کار مصنوعی موج دوم",
+            "audit": [
+              {
+                "action": "work_team.created",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/teams/",
+          "status": 403,
+          "final": "/workforce/teams/"
+        }
+      ]
+    },
+    "workforce:field_create": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_create",
+      "variant": null,
+      "summary": "Reject invalid identifier, retain values, create non-login Worker plus explicit relationship",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/field/new/",
+          "status": 200,
+          "final": "/workforce/field/new/"
+        },
+        {
+          "action": "/workforce/field/new/",
+          "posts": [
+            [
+              "/workforce/field/new/",
+              200
+            ]
+          ],
+          "final": "/workforce/field/new/",
+          "feedback": [
+            "لطفاً موارد زیر را بررسی کنید:\n\nکد ملی: کد ملی معتبر نیست.",
+            "کد ملی معتبر نیست."
+          ]
+        }
+      ],
+      "harness_or_assertion": "Locator.click: Timeout 20000ms exceeded.\n"
+    },
+    "workforce:employee_create": {
+      "scenario": "UAT-04",
+      "route": "workforce:employee_create",
+      "variant": null,
+      "summary": "Legacy create entry uses non-login MVP form and explicit identity link",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/employees/create/",
+          "status": 200,
+          "final": "/workforce/employees/create/"
+        },
+        {
+          "action": "/workforce/employees/create/",
+          "posts": [
+            [
+              "/workforce/employees/create/",
+              302
+            ]
+          ],
+          "final": "/workforce/field/7667f371-0c27-4078-b971-bf5149f8a78a/",
+          "feedback": [
+            "×\nاطلاعات نیروی کار ثبت شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "workforce.Employee",
+            "id": "7667f371-0c27-4078-b971-bf5149f8a78a",
+            "employee_number": "B02-LEGACY",
+            "user_id": null,
+            "work_team_id": null,
+            "hire_date": "2026-11-01",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee.created",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "identity": {
+            "explicit_relationship": "8d605745-872c-4657-ad7c-80d468e21bf7",
+            "login": null
+          }
+        },
+        {
+          "negative_post": "/workforce/employees/create/",
+          "status": 403
+        }
+      ]
+    },
+    "workforce:field_detail": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_detail",
+      "variant": null,
+      "summary": "Field detail shows worker code, grouping and non-login identity",
+      "axes": {},
+      "trace": [],
+      "harness_or_assertion": "'workerui'"
+    },
+    "workforce:employee_detail": {
+      "scenario": "UAT-04",
+      "route": "workforce:employee_detail",
+      "variant": null,
+      "summary": "Legacy detail renders governed MVP worker detail",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/",
+          "status": 200,
+          "final": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/"
+        },
+        {
+          "db": {
+            "model": "workforce.Employee",
+            "id": "7667f371-0c27-4078-b971-bf5149f8a78a",
+            "employee_number": "B02-LEGACY",
+            "user_id": null,
+            "status": "active",
+            "work_team_id": null,
+            "audit": [
+              {
+                "action": "employee.created",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/employees/3451383d-fc82-4adb-945d-0acbcf9ef24e/",
+          "status": 404,
+          "final": "/workforce/employees/3451383d-fc82-4adb-945d-0acbcf9ef24e/"
+        }
+      ]
+    },
+    "workforce:field_edit": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_edit",
+      "variant": null,
+      "summary": "Edit existing worker without replacing the non-login identity",
+      "axes": {},
+      "trace": [],
+      "harness_or_assertion": "'workerui'"
+    },
+    "workforce:field_choices": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_choices",
+      "variant": null,
+      "summary": "Enhanced live selector picks authorized site and scoped queries exclude others",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/create/?project=dad778f8-318a-4c1b-8933-a7397cc3c974",
+          "status": 200,
+          "final": "/workforce/assignments/create/"
+        }
+      ],
+      "harness_or_assertion": "Locator.click: Timeout 20000ms exceeded.\n"
+    },
+    "workforce:field_assign": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_assign",
+      "variant": null,
+      "summary": "Worker-detail assignment reuses worker and retains project/site after save",
+      "axes": {},
+      "trace": [],
+      "harness_or_assertion": "'workerui'"
+    },
+    "workforce:assignment_create": {
+      "scenario": "UAT-04",
+      "route": "workforce:assignment_create",
+      "variant": null,
+      "summary": "General assignment uses existing scoped selectors and dates",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/assignments/"
+        },
+        {
+          "click": "/workforce/assignments/create/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "final": "/workforce/assignments/create/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18"
+        }
+      ],
+      "harness_or_assertion": "Locator.click: Timeout 20000ms exceeded.\n"
+    },
+    "workforce:assignment_sites": {
+      "scenario": "UAT-04",
+      "route": "workforce:assignment_sites",
+      "variant": null,
+      "summary": "MVP compatibility options fragment respects selected project and permission",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "fragment": "/workforce/assignments/sites/?project=dad778f8-318a-4c1b-8933-a7397cc3c974",
+          "status": 200,
+          "selected_site_present": true
+        },
+        {
+          "restricted_fragment_status": 403
+        }
+      ]
+    },
+    "workforce:assignment_list": {
+      "scenario": "UAT-04",
+      "route": "workforce:assignment_list",
+      "variant": null,
+      "summary": "Project/site filter shows assignment source and rejects out-of-scope rows",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/assignments/"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/assignments/"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 200,
+          "final": "/workforce/assignments/"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18",
+          "status": 403,
+          "final": "/workforce/assignments/"
+        }
+      ],
+      "harness_or_assertion": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18 HTTP 403, expected 200"
+    },
+    "workforce:assignment_status_change": {
+      "scenario": "UAT-04",
+      "route": "workforce:assignment_status_change",
+      "variant": null,
+      "summary": "End the allocation with a distinct actual end date and compare the return context",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&q=B02-LEGACY",
+          "status": 200,
+          "final": "/workforce/assignments/"
+        }
+      ],
+      "harness_or_assertion": "'legacyasgn'"
+    },
+    "workforce:employee_status_change": {
+      "scenario": "UAT-04",
+      "route": "workforce:employee_status_change",
+      "variant": null,
+      "summary": "Worker status updates after closing assignments and remains permission gated",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/field/7667f371-0c27-4078-b971-bf5149f8a78a/",
+          "status": 200,
+          "final": "/workforce/field/7667f371-0c27-4078-b971-bf5149f8a78a/"
+        },
+        {
+          "action": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/status/",
+          "posts": [
+            [
+              "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/status/",
+              302
+            ]
+          ],
+          "final": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/",
+          "feedback": [
+            "×\nوضعیت کارمند به‌روزرسانی شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "workforce.Employee",
+            "id": "7667f371-0c27-4078-b971-bf5149f8a78a",
+            "status": "inactive",
+            "user_id": null,
+            "audit": [
+              {
+                "action": "employee.created",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.operational_updated",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee.status_changed",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/status/",
+          "status": 403
+        }
+      ]
+    },
+    "workforce:work_team_archive": {
+      "scenario": "UAT-04",
+      "route": "workforce:work_team_archive",
+      "variant": null,
+      "summary": "Archive team from row action and verify persisted history",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/teams/",
+          "status": 200,
+          "final": "/workforce/teams/"
+        },
+        {
+          "action": "/workforce/teams/42225a0e-8882-4e96-be46-d922f5eaf993/archive/",
+          "posts": [
+            [
+              "/workforce/teams/42225a0e-8882-4e96-be46-d922f5eaf993/archive/",
+              302
+            ]
+          ],
+          "final": "/workforce/teams/",
+          "feedback": [
+            "×\nگروه کاری بایگانی شد."
+          ]
+        },
+        {
+          "db": {
+            "model": "workforce.WorkTeam",
+            "id": "42225a0e-8882-4e96-be46-d922f5eaf993",
+            "code": "B02-TEAM",
+            "archived_at": "2026-11-10 16:44:14.894164+00:00",
+            "is_active": false,
+            "audit": [
+              {
+                "action": "work_team.created",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "work_team.archived",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "negative_post": "/workforce/teams/42225a0e-8882-4e96-be46-d922f5eaf993/archive/",
+          "status": 403
+        }
+      ]
+    },
+    "workforce:employee_archive": {
+      "scenario": "UAT-04",
+      "route": "workforce:employee_archive",
+      "variant": null,
+      "summary": "Check archive exposure on the current MVP field detail and restricted POST",
+      "axes": {
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/",
+          "status": 200,
+          "final": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/"
+        },
+        {
+          "mvp_affordances": 0,
+          "route": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/archive/",
+          "method": "POST"
+        },
+        {
+          "negative_post": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/archive/",
+          "status": 403
+        }
+      ],
+      "blocked": "MVP field detail has no visible affordance for this compatibility operation. No authorized positive browser interaction was available."
+    },
+    "workforce:employee_profile_image_update": {
+      "scenario": "UAT-04",
+      "route": "workforce:employee_profile_image_update",
+      "variant": null,
+      "summary": "Check image upload exposure on MVP field detail and restricted POST",
+      "axes": {
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/",
+          "status": 200,
+          "final": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/"
+        },
+        {
+          "mvp_affordances": 0,
+          "route": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/profile-image/update/",
+          "method": "POST"
+        },
+        {
+          "negative_post": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/profile-image/update/",
+          "status": 403
+        }
+      ],
+      "blocked": "MVP field detail has no visible affordance for this compatibility operation. No authorized positive browser interaction was available."
+    },
+    "workforce:employee_profile_image": {
+      "scenario": "UAT-04",
+      "route": "workforce:employee_profile_image",
+      "variant": null,
+      "summary": "Check no-image direct behavior and foreign employee boundary",
+      "axes": {
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/",
+          "status": 200,
+          "final": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/"
+        },
+        {
+          "mvp_affordances": 0,
+          "route": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/profile-image/",
+          "method": "GET"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/profile-image/",
+          "status": 404,
+          "final": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/profile-image/"
+        },
+        {
+          "own_image_without_upload": 404
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/profile-image/",
+          "status": 404,
+          "final": "/workforce/employees/7667f371-0c27-4078-b971-bf5149f8a78a/profile-image/"
+        }
+      ],
+      "blocked": "MVP field detail has no visible affordance for this compatibility operation. No authorized positive browser interaction was available."
+    }
+  }
+}

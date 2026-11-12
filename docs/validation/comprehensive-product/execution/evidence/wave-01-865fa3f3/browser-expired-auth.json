@@ -1,0 +1,37 @@
+{
+  "chrome": "156.0.8078.80",
+  "checks": [
+    {
+      "scenario": "CV-AUTH-01",
+      "key": "expired-recovery",
+      "result": "PASS",
+      "observed": "Expired but correctly signed synthetic token denied with no password form."
+    }
+  ],
+  "pages": [
+    {
+      "key": "public-reset-expired",
+      "pattern": "DC-01/DC-09",
+      "route": "/accounts/password/reset/<redacted>/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "پیوند بازیابی معتبر نیست"
+      ],
+      "regions": [],
+      "nav": 0,
+      "tableHeaders": [],
+      "formCount": 0,
+      "unnamedFields": [],
+      "visibleActions": [
+        "درخواست بازیابی جدید"
+      ]
+    }
+  ],
+  "faults": []
+}

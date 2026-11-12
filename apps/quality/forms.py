@@ -14,6 +14,7 @@ from apps.projects.models import Activity, ProjectPhase, ProjectSite
 from apps.quality.models import QualityIssue
 from apps.workforce.models import Employee
 from core.forms import JalaliDateMixin
+from core.organization_time import OrganizationDateTimeField, bind_organization_time
 
 
 class _StyledForm(JalaliDateMixin):
@@ -28,6 +29,8 @@ class _StyledForm(JalaliDateMixin):
 
 
 class QualityIssueForm(_StyledForm, forms.ModelForm):
+    identified_at = OrganizationDateTimeField(label="زمان شناسایی")
+
     class Meta:
         model = QualityIssue
         fields = [  # noqa: RUF012
@@ -57,6 +60,7 @@ class QualityIssueForm(_StyledForm, forms.ModelForm):
         **kwargs: object,
     ) -> None:
         super().__init__(*args, **kwargs)
+        bind_organization_time(self, organization)
         for protected in ("project", "site", "phase", "activity", "daily_report"):
             self.fields[protected].queryset = self.fields[protected].queryset.none()
         for optional in ("site", "phase", "activity", "daily_report"):

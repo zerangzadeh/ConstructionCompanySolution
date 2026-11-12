@@ -267,13 +267,26 @@ class ReadOnlyDetailBoundaryTests(TestCase):
     @override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
     def test_resolution_details_are_get_only_read_views(self):
         self.login(self.owner)
+        site_url = reverse(
+            "projects:site_detail", args=[self.project.pk, self.sites[0].pk]
+        )
         for url in self.urls():
             with self.subTest(url=url):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 200)
-                self.assertTemplateUsed(
-                    response, "components/read_only_record_detail.html"
-                )
+                if url == site_url:
+                    self.assertTemplateUsed(response, "projects/site_detail.html")
+                    self.assertTemplateUsed(
+                        response, "components/record_detail_page.html"
+                    )
+                    self.assertContains(response, 'aria-label="خلاصه کارگاه"')
+                    self.assertContains(
+                        response, reverse("projects:site_list", args=[self.project.pk])
+                    )
+                else:
+                    self.assertTemplateUsed(
+                        response, "components/read_only_record_detail.html"
+                    )
                 main = (
                     response.content.decode()
                     .split("<main", 1)[1]

@@ -1,0 +1,3074 @@
+[
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "تقویم کاری جدید",
+      "اطلاعات اصلی"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/"
+      ]
+    ],
+    "buttons": [
+      "▦",
+      "▦",
+      "ثبت تقویم کاری"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/calendars/new/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "code",
+            "label": "کد * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "name",
+            "label": "نام * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "effective_from",
+            "label": "شروع اعتبار * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "effective_to",
+            "label": "پایان اعتبار",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "working_weekdays",
+            "label": "شنبه",
+            "required": false,
+            "type": "checkbox"
+          },
+          {
+            "name": "working_weekdays",
+            "label": "یکشنبه",
+            "required": false,
+            "type": "checkbox"
+          },
+          {
+            "name": "working_weekdays",
+            "label": "دوشنبه",
+            "required": false,
+            "type": "checkbox"
+          },
+          {
+            "name": "working_weekdays",
+            "label": "سه‌شنبه",
+            "required": false,
+            "type": "checkbox"
+          },
+          {
+            "name": "working_weekdays",
+            "label": "چهارشنبه",
+            "required": false,
+            "type": "checkbox"
+          },
+          {
+            "name": "working_weekdays",
+            "label": "پنجشنبه",
+            "required": false,
+            "type": "checkbox"
+          },
+          {
+            "name": "working_weekdays",
+            "label": "جمعه",
+            "required": false,
+            "type": "checkbox"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nتقویم کاری جدید",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_reference_list.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/calendars/new/",
+    "actor": "clock",
+    "width": 1440,
+    "label": "calendar-create",
+    "capture": "calendar-create-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "حضور، درخواست‌ها و کارکرد",
+      "عملیات روزانه",
+      "حضور و موارد نیازمند بررسی (0)",
+      "اصلاحات در انتظار بررسی مستقل (0)",
+      "مرخصی و مأموریت (0)",
+      "اضافه‌کاری (0)",
+      "کارکرد و توزیع زمان (0)",
+      ""
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "ثبت حضور",
+        "/timekeeping/attendance/new/"
+      ],
+      [
+        "مرخصی / مأموریت",
+        "/timekeeping/leave-mission/new/"
+      ],
+      [
+        "اضافه‌کاری",
+        "/timekeeping/overtime/new/"
+      ],
+      [
+        "کارکرد جدید",
+        "/timekeeping/timesheets/new/"
+      ],
+      [
+        "خروجی اکسل",
+        "/timekeeping/?format=xlsx"
+      ],
+      [
+        "نمای ماهانه",
+        "/timekeeping/?view=calendar"
+      ],
+      [
+        "نیروی کار ↕",
+        "/timekeeping/?sort=labor_count&direction=asc"
+      ],
+      [
+        "تاریخ ↕",
+        "/timekeeping/?sort=paid_on&direction=asc"
+      ],
+      [
+        "پروژه و کارگاه ↕",
+        "/timekeeping/?sort=project&direction=asc"
+      ],
+      [
+        "وضعیت ↕",
+        "/timekeeping/?sort=status&direction=asc"
+      ],
+      [
+        "",
+        "/timekeeping/calendars/new/"
+      ],
+      [
+        "",
+        "/timekeeping/holidays/new/"
+      ],
+      [
+        "",
+        "/timekeeping/shifts/new/"
+      ],
+      [
+        "",
+        "/timekeeping/shift-breaks/new/"
+      ]
+    ],
+    "buttons": [
+      "فیلترهای بیشتر ⌄",
+      "اعمال فیلتر",
+      "راه‌اندازی و تنظیمات تقویم و شیفت"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/",
+        "method": "get",
+        "fields": [
+          {
+            "name": "employee",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "نیروی کار",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "project",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "پروژه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "site",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "کارگاه",
+            "required": false,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "heading": [
+          "نیروی کار ↕",
+          "تاریخ ↕",
+          "پروژه و کارگاه ↕",
+          "ورود",
+          "خروج",
+          "وضعیت ↕",
+          "اقدام"
+        ],
+        "rows": 1
+      }
+    ],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور، درخواست‌ها و کارکرد",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/erp_reference_list.css",
+      "/static/css/erp_operational_workspace.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css"
+    ],
+    "url": "/timekeeping/",
+    "actor": "clock",
+    "width": 1440,
+    "label": null
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "شیفت کاری جدید",
+      "اطلاعات اصلی"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/"
+      ]
+    ],
+    "buttons": [
+      "▦",
+      "ثبت شیفت کاری"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/shifts/new/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "calendar",
+            "label": null,
+            "required": true,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "تقویم کاری * (الزامی)",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "code",
+            "label": "کد * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "name",
+            "label": "نام * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "starts_at",
+            "label": "شروع * (الزامی)",
+            "required": true,
+            "type": "time"
+          },
+          {
+            "name": "ends_at",
+            "label": "پایان * (الزامی)",
+            "required": true,
+            "type": "time"
+          },
+          {
+            "name": "crosses_midnight",
+            "label": "عبور از نیمه‌شب",
+            "required": false,
+            "type": "checkbox"
+          },
+          {
+            "name": "effective_from",
+            "label": "شروع اعتبار * (الزامی)",
+            "required": true,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nشیفت کاری جدید",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_reference_list.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/shifts/new/",
+    "actor": "clock",
+    "width": 1440,
+    "label": "shift",
+    "capture": "shift-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "تعطیلی یا روز کاری جایگزین",
+      "اطلاعات اصلی"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/"
+      ]
+    ],
+    "buttons": [
+      "▦",
+      "ثبت تعطیلی/روز کاری"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/holidays/new/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "calendar",
+            "label": null,
+            "required": true,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "تقویم کاری * (الزامی)",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "holiday_date",
+            "label": "تاریخ * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "name",
+            "label": "عنوان * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "reason",
+            "label": "دلیل * (الزامی)",
+            "required": true,
+            "type": "textarea"
+          },
+          {
+            "name": "source_reference",
+            "label": "مرجع منبع",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "is_working_override",
+            "label": "روز کاری جایگزین",
+            "required": false,
+            "type": "checkbox"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nتعطیلی یا روز کاری جایگزین",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_reference_list.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/holidays/new/",
+    "actor": "clock",
+    "width": 1440,
+    "label": "holiday",
+    "capture": "holiday-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "بازه استراحت شیفت",
+      "اطلاعات اصلی"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/"
+      ]
+    ],
+    "buttons": [
+      "ثبت استراحت شیفت"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/shift-breaks/new/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "shift",
+            "label": null,
+            "required": true,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "شیفت * (الزامی)",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "sequence",
+            "label": "ترتیب * (الزامی)",
+            "required": true,
+            "type": "number"
+          },
+          {
+            "name": "starts_at",
+            "label": "شروع * (الزامی)",
+            "required": true,
+            "type": "time"
+          },
+          {
+            "name": "ends_at",
+            "label": "پایان * (الزامی)",
+            "required": true,
+            "type": "time"
+          },
+          {
+            "name": "ends_next_day",
+            "label": "پایان در روز بعد",
+            "required": false,
+            "type": "checkbox"
+          },
+          {
+            "name": "is_paid",
+            "label": "استراحت پرداخت‌شونده طبق سیاست",
+            "required": false,
+            "type": "checkbox"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nبازه استراحت شیفت",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_reference_list.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/shift-breaks/new/",
+    "actor": "clock",
+    "width": 1440,
+    "label": "shift-break",
+    "capture": "shift-break-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "ثبت دستی حضور",
+      "نیرو و محل فعالیت",
+      "تاریخ و زمان",
+      "جزئیات و توضیحات"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "▦",
+      "▦",
+      "▦",
+      "ثبت حضور"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/attendance/new/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "project",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "پروژه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "site",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "کارگاه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "employee",
+            "label": null,
+            "required": true,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "نیروی کار * (الزامی)",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "calendar",
+            "label": null,
+            "required": true,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "تقویم کاری * (الزامی)",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "shift",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "شیفت",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "work_date",
+            "label": "تاریخ کار * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "check_in_at",
+            "label": "زمان ورود * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "check_out_at",
+            "label": "خروج",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "source_reference",
+            "label": "مرجع ثبت",
+            "required": false,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nثبت دستی حضور",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/erp_sectioned_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/attendance/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "clock",
+    "width": 1440,
+    "label": "attendance-create",
+    "capture": "attendance-create-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "سابقه حضور",
+      "نیروی آزمایشی",
+      "قطعی‌سازی حضور"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "قطعی‌سازی حضور"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/finalize/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "reason",
+            "label": "دلیل اقدام (اختیاری)",
+            "required": false,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nسابقه حضور",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "review",
+    "width": 1440,
+    "label": "attendance-review",
+    "capture": "attendance-review-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "کارکرد جدید",
+      "نیرو و محل فعالیت",
+      "تاریخ و زمان"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "▦",
+      "▦",
+      "ذخیره و افزودن تخصیص"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/timesheets/new/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "employee",
+            "label": null,
+            "required": true,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "نیروی کار * (الزامی)",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "period_start",
+            "label": "شروع دوره * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "period_end",
+            "label": "پایان دوره * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "declared_minutes_hours",
+            "label": "مدت کل کارکرد * (الزامی) ساعت",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "declared_minutes_minutes",
+            "label": "دقیقه",
+            "required": false,
+            "type": "number"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nکارکرد جدید",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/erp_sectioned_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/timesheets/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "clock",
+    "width": 1440,
+    "label": "timesheet-create",
+    "capture": "timesheet-create-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "کارکرد جدید",
+      "نیرو و محل فعالیت",
+      "تاریخ و زمان"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ],
+      [
+        "مدت کل کارکرد",
+        "/timekeeping/timesheets/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "▦",
+      "▦",
+      "ذخیره و افزودن تخصیص"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/timesheets/new/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "employee",
+            "label": null,
+            "required": true,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "نیروی کار * (الزامی)",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "period_start",
+            "label": "شروع دوره * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "period_end",
+            "label": "پایان دوره * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "declared_minutes_hours",
+            "label": "مدت کل کارکرد * (الزامی) ساعت",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "declared_minutes_minutes",
+            "label": "دقیقه",
+            "required": false,
+            "type": "number"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [
+      "لطفاً موارد زیر را بررسی کنید: مدت کل کارکرد: مدت را بیشتر از صفر و در محدوده مجاز وارد کنید.",
+      "مدت را بیشتر از صفر و در محدوده مجاز وارد کنید."
+    ],
+    "breadcrumb": "خانه\nحضور و کارکرد\nکارکرد جدید",
+    "focus": "declared_minutes_hours",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/erp_sectioned_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/timesheets/new/",
+    "actor": "clock",
+    "width": 1440,
+    "label": "timesheet-invalid",
+    "capture": "timesheet-invalid-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "جزئیات کارکرد",
+      "FIELD-001 - نیروی آزمایشی",
+      "افزودن تخصیص",
+      "نیرو و محل فعالیت",
+      "تاریخ و زمان",
+      "جزئیات و توضیحات"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "▦",
+      "افزودن تخصیص"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "project",
+            "label": null,
+            "required": true,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "پروژه * (الزامی)",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "site",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "کارگاه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "activity",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "فعالیت",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "work_date",
+            "label": "تاریخ * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "minutes_hours",
+            "label": "مدت تخصیص * (الزامی) ساعت",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "minutes_minutes",
+            "label": "دقیقه",
+            "required": false,
+            "type": "number"
+          },
+          {
+            "name": "note",
+            "label": "شرح",
+            "required": false,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "heading": [
+          "تاریخ",
+          "پروژه",
+          "کارگاه",
+          "فعالیت",
+          "مدت"
+        ],
+        "rows": 1
+      }
+    ],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nجزئیات کارکرد",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/erp_sectioned_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "clock",
+    "width": 1440,
+    "label": "timesheet-detail",
+    "capture": "timesheet-detail-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "حضور، درخواست‌ها و کارکرد",
+      "عملیات روزانه",
+      "حضور و موارد نیازمند بررسی (1)",
+      "اصلاحات در انتظار بررسی مستقل (0)",
+      "مرخصی و مأموریت (0)",
+      "اضافه‌کاری (0)",
+      "کارکرد و توزیع زمان (1)",
+      ""
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "ثبت حضور",
+        "/timekeeping/attendance/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "مرخصی / مأموریت",
+        "/timekeeping/leave-mission/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "اضافه‌کاری",
+        "/timekeeping/overtime/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "کارکرد جدید",
+        "/timekeeping/timesheets/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "پروژه: پروژه پل آزمایشی · BRIDGE ×",
+        "/timekeeping/?date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "کارگاه: کارگاه شرقی · EAST ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "نیروی کار: نیروی آزمایشی · FIELD-001 ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "از تاریخ: 1405/08/10 ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_to=1405%2F08%2F10"
+      ],
+      [
+        "تا تاریخ: 1405/08/10 ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10"
+      ],
+      [
+        "× پاک کردن همه",
+        "/timekeeping/"
+      ],
+      [
+        "پاک کردن",
+        "/timekeeping/"
+      ],
+      [
+        "خروجی اکسل",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&format=xlsx"
+      ],
+      [
+        "نمای ماهانه",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "نیروی کار ↕",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&sort=labor_count&direction=asc"
+      ],
+      [
+        "تاریخ ↕",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&sort=paid_on&direction=asc"
+      ],
+      [
+        "پروژه و کارگاه ↕",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&sort=project&direction=asc"
+      ],
+      [
+        "وضعیت ↕",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&sort=status&direction=asc"
+      ],
+      [
+        "1405/08/10",
+        "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "مشاهده جزئیات",
+        "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "FIELD-001 - نیروی آزمایشی 1405/08/10 تا 1405/08/10 · تأیید‌شده",
+        "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "",
+        "/timekeeping/calendars/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "",
+        "/timekeeping/holidays/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "",
+        "/timekeeping/shifts/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "",
+        "/timekeeping/shift-breaks/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ]
+    ],
+    "buttons": [
+      "فیلترهای بیشتر ⌄",
+      "اعمال فیلتر",
+      "▦",
+      "▦",
+      "اعمال فیلترهای بیشتر",
+      "راه‌اندازی و تنظیمات تقویم و شیفت"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/",
+        "method": "get",
+        "fields": [
+          {
+            "name": "employee",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "نیروی کار",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "project",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "پروژه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "site",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "کارگاه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "date_from",
+            "label": "از تاریخ",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "date_to",
+            "label": "تا تاریخ",
+            "required": false,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "heading": [
+          "نیروی کار ↕",
+          "تاریخ ↕",
+          "پروژه و کارگاه ↕",
+          "ورود",
+          "خروج",
+          "وضعیت ↕",
+          "اقدام"
+        ],
+        "rows": 1
+      }
+    ],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور، درخواست‌ها و کارکرد",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/erp_reference_list.css",
+      "/static/css/erp_operational_workspace.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css"
+    ],
+    "url": "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405/08/10&date_to=1405/08/10",
+    "actor": "clock",
+    "width": 1440,
+    "label": "time-workbench",
+    "capture": "time-workbench-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1024,
+    "scrollWidth": 1024,
+    "mainCount": 1,
+    "heading": [
+      "حضور، درخواست‌ها و کارکرد",
+      "عملیات روزانه",
+      "حضور و موارد نیازمند بررسی (1)",
+      "اصلاحات در انتظار بررسی مستقل (0)",
+      "مرخصی و مأموریت (0)",
+      "اضافه‌کاری (0)",
+      "کارکرد و توزیع زمان (1)",
+      ""
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "ثبت حضور",
+        "/timekeeping/attendance/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "مرخصی / مأموریت",
+        "/timekeeping/leave-mission/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "اضافه‌کاری",
+        "/timekeeping/overtime/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "کارکرد جدید",
+        "/timekeeping/timesheets/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "پروژه: پروژه پل آزمایشی · BRIDGE ×",
+        "/timekeeping/?date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "کارگاه: کارگاه شرقی · EAST ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "نیروی کار: نیروی آزمایشی · FIELD-001 ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "از تاریخ: 1405/08/10 ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_to=1405%2F08%2F10"
+      ],
+      [
+        "تا تاریخ: 1405/08/10 ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10"
+      ],
+      [
+        "× پاک کردن همه",
+        "/timekeeping/"
+      ],
+      [
+        "پاک کردن",
+        "/timekeeping/"
+      ],
+      [
+        "خروجی اکسل",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&format=xlsx"
+      ],
+      [
+        "نمای ماهانه",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "نیروی کار ↕",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&sort=labor_count&direction=asc"
+      ],
+      [
+        "تاریخ ↕",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&sort=paid_on&direction=asc"
+      ],
+      [
+        "پروژه و کارگاه ↕",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&sort=project&direction=asc"
+      ],
+      [
+        "وضعیت ↕",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&sort=status&direction=asc"
+      ],
+      [
+        "1405/08/10",
+        "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "مشاهده جزئیات",
+        "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "FIELD-001 - نیروی آزمایشی 1405/08/10 تا 1405/08/10 · تأیید‌شده",
+        "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "",
+        "/timekeeping/calendars/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "",
+        "/timekeeping/holidays/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "",
+        "/timekeeping/shifts/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "",
+        "/timekeeping/shift-breaks/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ]
+    ],
+    "buttons": [
+      "جست‌وجو",
+      "فیلترها (5)",
+      "فیلترهای بیشتر",
+      "▦",
+      "▦",
+      "اعمال فیلترهای بیشتر",
+      "راه‌اندازی و تنظیمات تقویم و شیفت"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/",
+        "method": "get",
+        "fields": [
+          {
+            "name": "employee",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "نیروی کار",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "date_from",
+            "label": "از تاریخ",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "date_to",
+            "label": "تا تاریخ",
+            "required": false,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "heading": [
+          "نیروی کار ↕",
+          "تاریخ ↕",
+          "پروژه و کارگاه ↕",
+          "ورود",
+          "خروج",
+          "وضعیت ↕",
+          "اقدام"
+        ],
+        "rows": 1
+      }
+    ],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور، درخواست‌ها و کارکرد",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/erp_reference_list.css",
+      "/static/css/erp_operational_workspace.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css"
+    ],
+    "url": "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405/08/10&date_to=1405/08/10",
+    "actor": "clock",
+    "width": 1024,
+    "label": "time-workbench",
+    "capture": "time-workbench-1024.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 390,
+    "scrollWidth": 390,
+    "mainCount": 1,
+    "heading": [
+      "حضور، درخواست‌ها و کارکرد",
+      "عملیات روزانه",
+      "حضور و موارد نیازمند بررسی (1)",
+      "اصلاحات در انتظار بررسی مستقل (0)",
+      "مرخصی و مأموریت (0)",
+      "اضافه‌کاری (0)",
+      "کارکرد و توزیع زمان (1)",
+      ""
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "ثبت حضور",
+        "/timekeeping/attendance/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "مرخصی / مأموریت",
+        "/timekeeping/leave-mission/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "اضافه‌کاری",
+        "/timekeeping/overtime/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "کارکرد جدید",
+        "/timekeeping/timesheets/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "پروژه: پروژه پل آزمایشی · BRIDGE ×",
+        "/timekeeping/?date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "کارگاه: کارگاه شرقی · EAST ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "نیروی کار: نیروی آزمایشی · FIELD-001 ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "از تاریخ: 1405/08/10 ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_to=1405%2F08%2F10"
+      ],
+      [
+        "تا تاریخ: 1405/08/10 ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10"
+      ],
+      [
+        "× پاک کردن همه",
+        "/timekeeping/"
+      ],
+      [
+        "پاک کردن",
+        "/timekeeping/"
+      ],
+      [
+        "خروجی اکسل",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&format=xlsx"
+      ],
+      [
+        "نمای ماهانه",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "نیروی کار ↕",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&sort=labor_count&direction=asc"
+      ],
+      [
+        "تاریخ ↕",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&sort=paid_on&direction=asc"
+      ],
+      [
+        "پروژه و کارگاه ↕",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&sort=project&direction=asc"
+      ],
+      [
+        "وضعیت ↕",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&sort=status&direction=asc"
+      ],
+      [
+        "1405/08/10",
+        "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "مشاهده جزئیات",
+        "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "FIELD-001 - نیروی آزمایشی 1405/08/10 تا 1405/08/10 · تأیید‌شده",
+        "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "",
+        "/timekeeping/calendars/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "",
+        "/timekeeping/holidays/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "",
+        "/timekeeping/shifts/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "",
+        "/timekeeping/shift-breaks/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ]
+    ],
+    "buttons": [
+      "جست‌وجو",
+      "فیلترها (5)",
+      "فیلترهای بیشتر",
+      "▦",
+      "▦",
+      "اعمال فیلترهای بیشتر",
+      "راه‌اندازی و تنظیمات تقویم و شیفت"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/",
+        "method": "get",
+        "fields": [
+          {
+            "name": "employee",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "نیروی کار",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "date_from",
+            "label": "از تاریخ",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "date_to",
+            "label": "تا تاریخ",
+            "required": false,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "heading": [
+          "نیروی کار ↕",
+          "تاریخ ↕",
+          "پروژه و کارگاه ↕",
+          "ورود",
+          "خروج",
+          "وضعیت ↕",
+          "اقدام"
+        ],
+        "rows": 1
+      }
+    ],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور، درخواست‌ها و کارکرد",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/erp_reference_list.css",
+      "/static/css/erp_operational_workspace.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css"
+    ],
+    "url": "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405/08/10&date_to=1405/08/10",
+    "actor": "clock",
+    "width": 390,
+    "label": "time-workbench",
+    "capture": "time-workbench-390.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "حضور، درخواست‌ها و کارکرد",
+      "عملیات روزانه",
+      "حضور و موارد نیازمند بررسی (1)",
+      "آبان 1405",
+      "اصلاحات در انتظار بررسی مستقل (0)",
+      "مرخصی و مأموریت (0)",
+      "اضافه‌کاری (0)",
+      "کارکرد و توزیع زمان (1)",
+      ""
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "ثبت حضور",
+        "/timekeeping/attendance/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "مرخصی / مأموریت",
+        "/timekeeping/leave-mission/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "اضافه‌کاری",
+        "/timekeeping/overtime/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "کارکرد جدید",
+        "/timekeeping/timesheets/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "پروژه: پروژه پل آزمایشی · BRIDGE ×",
+        "/timekeeping/?date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "کارگاه: کارگاه شرقی · EAST ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "نیروی کار: نیروی آزمایشی · FIELD-001 ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "از تاریخ: 1405/08/10 ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "تا تاریخ: 1405/08/10 ×",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "× پاک کردن همه",
+        "/timekeeping/?view=calendar"
+      ],
+      [
+        "پاک کردن",
+        "/timekeeping/?view=calendar"
+      ],
+      [
+        "خروجی اکسل",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar&format=xlsx"
+      ],
+      [
+        "فهرست",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "ماه قبل",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar&month=1405-07"
+      ],
+      [
+        "ماه بعد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar&month=1405-09"
+      ],
+      [
+        "10 (1)",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10"
+      ],
+      [
+        "FIELD-001 - نیروی آزمایشی 1405/08/10 تا 1405/08/10 · تأیید‌شده",
+        "/timekeeping/timesheets/0b31fae0-4a05-444d-a0a8-236057ef3873/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "",
+        "/timekeeping/calendars/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "",
+        "/timekeeping/holidays/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "",
+        "/timekeeping/shifts/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ],
+      [
+        "",
+        "/timekeeping/shift-breaks/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9&date_from=1405%2F08%2F10&date_to=1405%2F08%2F10&view=calendar"
+      ]
+    ],
+    "buttons": [
+      "فیلترهای بیشتر ⌄",
+      "اعمال فیلتر",
+      "▦",
+      "▦",
+      "اعمال فیلترهای بیشتر",
+      "راه‌اندازی و تنظیمات تقویم و شیفت"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/",
+        "method": "get",
+        "fields": [
+          {
+            "name": "employee",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "نیروی کار",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "project",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "پروژه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "site",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "کارگاه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "date_from",
+            "label": "از تاریخ",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "date_to",
+            "label": "تا تاریخ",
+            "required": false,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور، درخواست‌ها و کارکرد",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/erp_reference_list.css",
+      "/static/css/erp_operational_workspace.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/timekeeping/attendance_calendar.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css"
+    ],
+    "url": "/timekeeping/",
+    "actor": "clock",
+    "width": 1440,
+    "label": "attendance-month",
+    "capture": "attendance-month-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "درخواست اصلاح حضور",
+      "تاریخ و زمان",
+      "جزئیات و توضیحات"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "▦",
+      "▦",
+      "▦",
+      "ثبت درخواست اصلاح حضور"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/corrections/new/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "replacement_work_date",
+            "label": "تاریخ کار جایگزین",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "replacement_check_in_at",
+            "label": "ورود جایگزین",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "replacement_check_out_at",
+            "label": "خروج جایگزین",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "kind",
+            "label": "نوع * (الزامی)",
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "reason",
+            "label": "دلیل * (الزامی)",
+            "required": true,
+            "type": "textarea"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nدرخواست اصلاح حضور",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/erp_sectioned_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/corrections/new/",
+    "actor": "limited",
+    "width": 1440,
+    "label": "correction-create",
+    "capture": "correction-create-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "درخواست مرخصی یا مأموریت",
+      "نیرو و محل فعالیت",
+      "تاریخ و زمان",
+      "جزئیات و توضیحات"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "▦",
+      "▦",
+      "ذخیره پیش‌نویس درخواست"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/leave-mission/new/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "project",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "پروژه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "site",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "کارگاه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "employee",
+            "label": null,
+            "required": true,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "نیروی کار * (الزامی)",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "starts_at",
+            "label": "شروع * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "ends_at",
+            "label": "پایان * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "reason",
+            "label": "دلیل * (الزامی)",
+            "required": true,
+            "type": "textarea"
+          },
+          {
+            "name": "policy_reference",
+            "label": "مرجع سیاست مصوب",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "kind",
+            "label": "نوع * (الزامی)",
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "category_code",
+            "label": "دسته درخواست * (الزامی)",
+            "required": true,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nدرخواست مرخصی یا مأموریت",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/erp_sectioned_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/leave-mission/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "clock",
+    "width": 1440,
+    "label": "leave_mission-mission",
+    "capture": "leave_mission-mission-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "درخواست مرخصی یا مأموریت",
+      "نیرو و محل فعالیت",
+      "تاریخ و زمان",
+      "جزئیات و توضیحات"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "▦",
+      "▦",
+      "ذخیره پیش‌نویس درخواست"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/leave-mission/new/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "project",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "پروژه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "site",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "کارگاه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "employee",
+            "label": null,
+            "required": true,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "نیروی کار * (الزامی)",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "starts_at",
+            "label": "شروع * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "ends_at",
+            "label": "پایان * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "reason",
+            "label": "دلیل * (الزامی)",
+            "required": true,
+            "type": "textarea"
+          },
+          {
+            "name": "policy_reference",
+            "label": "مرجع سیاست مصوب",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "kind",
+            "label": "نوع * (الزامی)",
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "category_code",
+            "label": "دسته درخواست * (الزامی)",
+            "required": true,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nدرخواست مرخصی یا مأموریت",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/erp_sectioned_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/leave-mission/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "clock",
+    "width": 1440,
+    "label": "leave_mission-leave",
+    "capture": "leave_mission-leave-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "درخواست اضافه‌کاری",
+      "نیرو و محل فعالیت",
+      "تاریخ و زمان",
+      "جزئیات و توضیحات"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "▦",
+      "▦",
+      "ذخیره پیش‌نویس درخواست"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/overtime/new/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "project",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "پروژه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "site",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "کارگاه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "employee",
+            "label": null,
+            "required": true,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "نیروی کار * (الزامی)",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "starts_at",
+            "label": "شروع * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "ends_at",
+            "label": "پایان * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "reason",
+            "label": "دلیل * (الزامی)",
+            "required": true,
+            "type": "textarea"
+          },
+          {
+            "name": "policy_reference",
+            "label": "مرجع سیاست مصوب",
+            "required": false,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nدرخواست اضافه‌کاری",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/erp_sectioned_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/overtime/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "clock",
+    "width": 1440,
+    "label": "overtime-draft",
+    "capture": "overtime-draft-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "درخواست اضافه‌کاری",
+      "نیرو و محل فعالیت",
+      "تاریخ و زمان",
+      "جزئیات و توضیحات"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "▦",
+      "▦",
+      "ذخیره پیش‌نویس درخواست"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/overtime/new/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "project",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "پروژه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "site",
+            "label": null,
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "کارگاه",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "employee",
+            "label": null,
+            "required": true,
+            "type": "select-one"
+          },
+          {
+            "name": "",
+            "label": "نیروی کار * (الزامی)",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "starts_at",
+            "label": "شروع * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "ends_at",
+            "label": "پایان * (الزامی)",
+            "required": true,
+            "type": "text"
+          },
+          {
+            "name": "reason",
+            "label": "دلیل * (الزامی)",
+            "required": true,
+            "type": "textarea"
+          },
+          {
+            "name": "policy_reference",
+            "label": "مرجع سیاست مصوب",
+            "required": false,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nدرخواست اضافه‌کاری",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/workforce/vendor/tom-select-2.6.2/tom-select.default.min.css",
+      "/static/workforce/field_choices.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/erp_sectioned_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/overtime/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "clock",
+    "width": 1440,
+    "label": "overtime-overlap",
+    "capture": "overtime-overlap-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "مأموریت",
+      "نیروی آزمایشی",
+      "ارسال درخواست"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "ارسال درخواست"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/leave-mission/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/submit/",
+        "method": "post",
+        "fields": []
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nمأموریت",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "clock",
+    "width": 1440,
+    "label": "leave_mission-submit",
+    "capture": "leave_mission-submit-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "مأموریت",
+      "نیروی آزمایشی",
+      "بررسی درخواست"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "تأیید",
+      "رد درخواست"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/leave-mission/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/review/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "reason",
+            "label": "دلیل اقدام",
+            "required": true,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nمأموریت",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "review",
+    "width": 1440,
+    "label": "leave_mission-review",
+    "capture": "leave_mission-review-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "درخواست اضافه‌کاری",
+      "نیروی آزمایشی",
+      "ارسال درخواست"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "ارسال درخواست"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/submit/",
+        "method": "post",
+        "fields": []
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nدرخواست اضافه‌کاری",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "clock",
+    "width": 1440,
+    "label": "overtime-submit",
+    "capture": "overtime-submit-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "درخواست اضافه‌کاری",
+      "نیروی آزمایشی",
+      "بررسی درخواست"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [
+      "تأیید",
+      "رد درخواست"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/review/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "reason",
+            "label": "دلیل اقدام",
+            "required": true,
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nدرخواست اضافه‌کاری",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "review",
+    "width": 1440,
+    "label": "overtime-review",
+    "capture": "overtime-review-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "سابقه حضور",
+      "نیروی آزمایشی"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [],
+    "forms": [],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nسابقه حضور",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/records/attendance/dc72b016-4e71-4b51-865a-bba75a2e55f4/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "clock",
+    "width": 1440,
+    "label": "history-attendance",
+    "capture": "history-attendance-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "مأموریت",
+      "نیروی آزمایشی"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [],
+    "forms": [],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nمأموریت",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/records/leave/c4e004a2-0ed3-446c-a99b-d7c27b4456ea/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "clock",
+    "width": 1440,
+    "label": "history-leave",
+    "capture": "history-leave-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "درخواست اضافه‌کاری",
+      "نیروی آزمایشی"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9"
+      ]
+    ],
+    "buttons": [],
+    "forms": [],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nدرخواست اضافه‌کاری",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/records/overtime/2b064fb4-3458-441b-b394-6bc34d03fe7f/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+    "actor": "clock",
+    "width": 1440,
+    "label": "history-overtime",
+    "capture": "history-overtime-1440.png"
+  },
+  {
+    "lang": "fa",
+    "dir": "rtl",
+    "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "heading": [
+      "درخواست اصلاح حضور",
+      "تاریخ و زمان",
+      "جزئیات و توضیحات"
+    ],
+    "links": [
+      [
+        "خانه",
+        "/"
+      ],
+      [
+        "حضور و کارکرد",
+        "/timekeeping/"
+      ],
+      [
+        "انصراف",
+        "/timekeeping/"
+      ]
+    ],
+    "buttons": [
+      "▦",
+      "▦",
+      "▦",
+      "ثبت درخواست اصلاح حضور"
+    ],
+    "forms": [
+      {
+        "action": "/timekeeping/attendance/30d4b520-58f7-4584-bcca-2994df028f4b/corrections/new/",
+        "method": "post",
+        "fields": [
+          {
+            "name": "replacement_work_date",
+            "label": "تاریخ کار جایگزین",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "replacement_check_in_at",
+            "label": "ورود جایگزین",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "replacement_check_out_at",
+            "label": "خروج جایگزین",
+            "required": false,
+            "type": "text"
+          },
+          {
+            "name": "kind",
+            "label": "نوع * (الزامی)",
+            "required": false,
+            "type": "select-one"
+          },
+          {
+            "name": "reason",
+            "label": "دلیل * (الزامی)",
+            "required": true,
+            "type": "textarea"
+          }
+        ]
+      }
+    ],
+    "tables": [],
+    "alerts": [],
+    "breadcrumb": "خانه\nحضور و کارکرد\nدرخواست اصلاح حضور",
+    "focus": "",
+    "stylesheets": [
+      "/static/css/bonira_tokens.css",
+      "/static/vendor/sweetalert2-11.26.25/sweetalert2.min.css",
+      "/static/css/erp_interactions.css",
+      "/static/css/erp_jalali.css",
+      "/static/css/erp_money.css",
+      "/static/css/erp_loading.css",
+      "/static/css/erp_module_selector.css",
+      "/static/css/bonira_tokens.css",
+      "/static/css/erp_create_form.css",
+      "/static/css/erp_sectioned_form.css",
+      "/static/css/tailwind.css",
+      "/static/css/erp_output_actions.css"
+    ],
+    "url": "/timekeeping/attendance/30d4b520-58f7-4584-bcca-2994df028f4b/corrections/new/",
+    "actor": "limited",
+    "width": 1440,
+    "label": "out-of-scope-correction-form",
+    "capture": "out-of-scope-correction-form-1440.png"
+  }
+]

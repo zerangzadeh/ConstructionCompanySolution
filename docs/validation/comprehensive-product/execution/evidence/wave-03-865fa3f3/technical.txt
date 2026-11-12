@@ -1,0 +1,15 @@
+B03 focused qualification | 2026-11-11
+
+Final focused pytest: 17 passed, 36 deselected, 11 subtests passed in 59.79s.
+Fresh test_b03_final restored from the clean template. The test database was in the B03 PostgreSQL cluster.
+Selection: B03 field operations tests, DailyListTests, B02 tenant-local datetime tests, observation pin and site-scoped evidence tests, exact-version download permissions, and Daily Report reference scoping and validation tests.
+Django check: 0 issues.
+Django makemigrations --check --dry-run: no changes detected.
+Targeted Ruff check: PASS.
+Chrome print output: 2 pages, 594.96 by 841.92 pt, A4.
+Chrome bound-form validation: 5/5 PASS after correction. The five original losses remain in original evidence.
+
+Earlier technical attempts:
+- The plain Django test runner combined legacy fixtures with the current catalog and lacked the repository pytest fixture setup. Its results are excluded from the focused qualification.
+- Original pytest selection had 20 passed, one older browser fixture failure and four subtests passed. That fixture assumed the cookie name sessionid. The independently authenticated Chrome B03 run used a dedicated cookie name and exercised the actual reference journey.
+- A reused pytest database later lacked a seeded workflow template after an earlier test run. The final focused run used a newly restored technical clone and passed the same check.

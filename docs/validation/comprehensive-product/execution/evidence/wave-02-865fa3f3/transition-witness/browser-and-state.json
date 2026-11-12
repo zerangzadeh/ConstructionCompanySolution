@@ -1,0 +1,140 @@
+{
+  "browser": "156.0.8078.80",
+  "profile": "MVP",
+  "db": "bonira_b02_run2",
+  "db_port": 59141,
+  "witness": "separate PostgreSQL connection, default_transaction_read_only=on",
+  "rows": {
+    "projects:wbs_create@child-parent": {
+      "scenario": "UAT-02",
+      "route": "projects:wbs_create",
+      "variant": "child-parent",
+      "summary": "Valid existing parent selected in same project. Child is rejected before persistence.",
+      "axes": {
+        "FUNCTIONAL": "FAIL",
+        "BUSINESS_LOGIC": "FAIL"
+      },
+      "trace": [
+        {
+          "db": {
+            "model": "projects.WBSNode",
+            "id": "147a9f3d-a0dd-4a5d-bd17-606e652f23af",
+            "code": "B02-WBS",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "archived_at": null,
+            "audit": [
+              {
+                "action": "wbs_node.created",
+                "actor__username": "b02-ops"
+              }
+            ]
+          }
+        },
+        {
+          "actual_bound_form_errors": {
+            "parent": [
+              {
+                "message": "گره والد ساختار شکست باید متعلق به همین پروژه باشد.",
+                "code": ""
+              }
+            ]
+          },
+          "instance_project_id": null,
+          "instance_organization_id": null,
+          "previous_browser_submit": "project-close/browser-and-state.json"
+        }
+      ]
+    },
+    "workforce:assignment_status_change": {
+      "scenario": "UAT-04",
+      "route": "workforce:assignment_status_change",
+      "variant": null,
+      "summary": "End date preserved and independent record confirms completed state. Return lost all three filters.",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "NAVIGATION_UX": "FAIL",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "db": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "fd699374-84e8-4a6a-b787-69ed9714175f",
+            "status": "completed",
+            "end_date": "2026-11-11",
+            "planned_end_date": "2026-11-17",
+            "project_id": "dad778f8-318a-4c1b-8933-a7397cc3c974",
+            "site_id": "d9131b32-c4ba-4f14-95e5-2104d524fd18",
+            "audit": [
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-site"
+              },
+              {
+                "action": "employee_project_assignment.status_changed",
+                "actor__username": "b02-site"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/assignments/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&q=B02-LEGACY",
+          "status": 200,
+          "final": "/workforce/assignments/"
+        },
+        {
+          "browser_post": "302 to unfiltered assignment list from project/site/q-filtered list. See sanitized transition proof."
+        },
+        {
+          "negative_post": "/workforce/assignments/fd699374-84e8-4a6a-b787-69ed9714175f/status/",
+          "status": 403
+        }
+      ]
+    },
+    "timekeeping:shift_break_create": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:shift_break_create",
+      "variant": null,
+      "summary": "Observe setup form, verified browser POST and actual stored unpaid 30-minute break",
+      "axes": {
+        "FUNCTIONAL": "PASS",
+        "BUSINESS_LOGIC": "PASS",
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "db": {
+            "model": "timekeeping.ShiftBreak",
+            "id": "5b236aee-8723-4702-8aa9-ba9923a5b9e0",
+            "shift_id": "a76b59e5-ddc3-4823-9a0f-f4d147fd5258",
+            "sequence": 1,
+            "starts_at": "12:00:00",
+            "ends_at": "12:30:00",
+            "is_paid": false,
+            "audit": [
+              {
+                "action": "time.calendar_configured",
+                "actor__username": "b02-clock"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/shift-breaks/new/",
+          "status": 200,
+          "final": "/timekeeping/shift-breaks/new/"
+        },
+        {
+          "browser_post": "302 from submitted break form. See sanitized transition proof."
+        },
+        {
+          "negative_post": "/timekeeping/shift-breaks/new/",
+          "status": 403
+        }
+      ]
+    }
+  }
+}

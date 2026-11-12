@@ -1,0 +1,376 @@
+{
+  "equipment:create": [
+    {
+      "ok": true,
+      "path": "/equipment/f9208933-3f27-4965-bcbe-22a0817388b1/",
+      "errors": "",
+      "pk": "f9208933-3f27-4965-bcbe-22a0817388b1"
+    },
+    {
+      "ok": true,
+      "restricted_status": "/equipment/create/"
+    }
+  ],
+  "equipment:list": [
+    {
+      "ok": true,
+      "headings": [
+        "تجهیزات"
+      ]
+    }
+  ],
+  "equipment:operations_workbench": [
+    {
+      "ok": true,
+      "headings": [
+        "عملیات تجهیزات"
+      ]
+    }
+  ],
+  "equipment:assignment_list": [
+    {
+      "ok": true,
+      "headings": [
+        "تخصیص تجهیزات"
+      ]
+    }
+  ],
+  "equipment:maintenance_list": [
+    {
+      "ok": true,
+      "headings": [
+        "سرویس و تعمیرات"
+      ]
+    }
+  ],
+  "equipment:detail": [
+    {
+      "ok": true,
+      "foreign_status": 404
+    },
+    {
+      "ok": true,
+      "boundary": "foreign tenant"
+    }
+  ],
+  "equipment:assignment_create": [
+    {
+      "ok": true,
+      "path": "/equipment/f9208933-3f27-4965-bcbe-22a0817388b1/",
+      "errors": "",
+      "pk": "34c4bef9-8848-4245-b749-bd68032f4e2d"
+    },
+    {
+      "ok": true,
+      "overlap_rejected": "خانه\nتجهیزات\nتخصیص تجهیز\nتخصیص تجهیز\n\nشرکت آزمون اصلاحات\n\nاطلاعات اصلی\n\nلطفاً موارد زیر را بررسی کنید:\n\nبازه تخصیص معتبر نیست یا با تخصیص دیگری از همین تجهیز هم‌پوشانی دارد.\nتجهیز *\n(الزامی)\n---------\nB04-EQ-BASE - بیل مکانیکی مبنا\nB04-EQ-UI - لودر آزمون مرورگر\nپروژه *\n(الزامی)\n---------\nB04-P2 - پروژه دوم B04\nBRIDGE - پروژه پل آزمایشی\nکارگاه\nبدون کارگاه\nBRIDGE · SIBLING - کارگاه دیگر\nBRIDGE · EAST - کارگاه شرقی\nتاریخ شروع *\n(الزامی)\n▦\nتاریخ پایان\n▦\nهدف تخصیص\nیادداشت‌ها\nثبت\nانصراف"
+    },
+    {
+      "ok": true,
+      "restricted_status": "/equipment/assignments/create/"
+    }
+  ],
+  "equipment:assignment_status_change": [
+    {
+      "ok": true,
+      "state": "cancelled"
+    }
+  ],
+  "equipment:status_change": [
+    {
+      "ok": true,
+      "state": "retired",
+      "expected": "retired"
+    }
+  ],
+  "equipment:archive": [
+    {
+      "ok": true,
+      "archived": "2026-11-11 20:52:20.390456+00:00"
+    }
+  ],
+  "equipment:maintenance_create": [
+    {
+      "ok": true,
+      "path": "/equipment/ec1f9e38-28a7-4c6a-93a6-9a37d06eaf5e/",
+      "errors": "",
+      "pk": "3dce2f65-d832-4c7d-a01c-696143427748"
+    }
+  ],
+  "equipment:maintenance_detail": [
+    {
+      "ok": true
+    }
+  ],
+  "equipment:maintenance_status_change": [
+    {
+      "ok": true,
+      "state": "completed"
+    }
+  ],
+  "equipment:meter_reading_create": [
+    {
+      "ok": true,
+      "path": "/equipment/operations/",
+      "errors": "",
+      "pk": "0bad0633-a0ac-496c-b98d-abeb6f3be281"
+    },
+    {
+      "ok": false,
+      "stored": "2026-11-12 11:00:00+00:00",
+      "expected_local": "11:00"
+    },
+    {
+      "ok": true,
+      "lower_meter_error": "خانه\nتجهیزات\nثبت یا اصلاح قرائت کنتور\nثبت یا اصلاح قرائت کنتور\n\nشرکت آزمون اصلاحات\n\nاطلاعات اصلی\n\nلطفاً موارد زیر را بررسی کنید:\n\nقرائت نهایی کنتور نمی‌تواند کاهش یابد؛ رویداد بازنشانی/اصلاح ثبت کنید.\nکنتور *\n(الزامی)\n---------\nبیل مکانیکی مبنا · B04-EQ-BASE · ساعت موتور\nعدد قرائت *\n(الزامی)\nزمان مشاهده *\n(الزامی)\n▦\nمرجع ثبت (خودکار) *\n(الزامی)\nثبت از منبع موجود / حفظ مرجع قبلی (اختیاری)\nمرجع مدرک\nاصلاح قرائت\n---------\nساعت موتور · 100.000 · 1405/08/21 04:30\nساعت موتور · 103.000 · 1405/08/21 11:00\nعلت اصلاح\nثبت\nانصراف"
+    }
+  ],
+  "equipment:usage_create": [
+    {
+      "ok": true,
+      "path": "/equipment/operations/",
+      "errors": "",
+      "pk": "7755e747-d83e-4fe2-92cd-0dc5afe22f6e"
+    },
+    {
+      "ok": false,
+      "stored": "2026-11-12 13:00:00+00:00",
+      "runtime": "2.000",
+      "deployment": null,
+      "operator": null
+    },
+    {
+      "ok": false,
+      "invalid_page": "دریافت اطلاعات ممکن نشد\n\nلطفاً کمی بعد دوباره تلاش کنید. اگر مشکل ادامه داشت، با پشتیبانی سامانه تماس بگیرید.\n\nبازگشت به خانه"
+    },
+    {
+      "ok": true,
+      "restricted_status": "/equipment/operations/usage/create/"
+    }
+  ],
+  "equipment:maintenance_plan_create": [
+    {
+      "ok": true,
+      "path": "/equipment/operations/",
+      "errors": "",
+      "pk": "fd3a52c2-5992-4975-8875-ba6b8e5d20d2"
+    }
+  ],
+  "equipment:work_order_create": [
+    {
+      "ok": true,
+      "path": "/equipment/operations/",
+      "errors": "",
+      "pk": "009fa5ef-2b84-4cc3-b46d-74e19767d0e7"
+    }
+  ],
+  "equipment:work_order_detail": [
+    {
+      "ok": true
+    }
+  ],
+  "equipment:work_order_evidence_create": [
+    {
+      "ok": true
+    }
+  ],
+  "equipment:spare_link_create": [
+    {
+      "ok": true
+    }
+  ],
+  "equipment:work_order_transition": [
+    {
+      "ok": true,
+      "state": "scheduled"
+    },
+    {
+      "ok": true,
+      "state": "in_progress"
+    },
+    {
+      "ok": true,
+      "state": "completed"
+    }
+  ],
+  "HARNESS:costs": [
+    {
+      "ok": false,
+      "error": "('equipment:cost_policy_create', 500)",
+      "traceback": "Traceback (most recent call last):\n  File \"E:\\Construction_Company_Solution\\output\\b04_browser.py\", line 103, in task\n    try:fn()\n        ^^^^\n  File \"E:\\Construction_Company_Solution\\output\\b04_browser.py\", line 251, in <lambda>\n    if selected in ['all','costs']:task('costs',lambda:costs(owner,reviewer))\n                                                       ^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\Construction_Company_Solution\\output\\b04_browser.py\", line 163, in costs\n    policy=create(owner,'equipment:cost_policy_create',dict(code='B04-POL',version='1',effective_from='2026-11-01',monetary_policy_code='B04-synthetic',monetary_policy_version='1',decimal_places='2'), 'equipment','EquipmentCostPolicyVersion',dict(organization_id=ids['org'],code='B04-POL'),True)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\Construction_Company_Solution\\output\\b04_browser.py\", line 73, in create\n    status=visit(p,reverse(route));assert status==200,(route,status)\n                                          ^^^^^^^^^^^\nAssertionError: ('equipment:cost_policy_create', 500)\n"
+    }
+  ],
+  "safety:create": [
+    {
+      "ok": true,
+      "path": "/safety/34a2263e-0225-407b-b0d3-d06d7362d397/",
+      "errors": "",
+      "pk": "34a2263e-0225-407b-b0d3-d06d7362d397"
+    },
+    {
+      "ok": false,
+      "stored": "2026-11-10 09:30:00+00:00",
+      "local": "2026-11-10 13:00:00+03:30"
+    },
+    {
+      "ok": true,
+      "boundary": "reader"
+    }
+  ],
+  "safety:detail": [
+    {
+      "ok": true,
+      "project": "cb57c79c-d012-4bc3-a7c4-602b92b1a06d",
+      "site": "fc2171b4-dc68-439a-8f30-19edbb012c4b",
+      "review_status": "draft"
+    },
+    {
+      "ok": true,
+      "boundary": "foreign and sibling site"
+    },
+    {
+      "ok": false,
+      "operational_status": "resolved",
+      "review_status": "draft",
+      "review_revisions": [],
+      "record_review_controls": 0
+    }
+  ],
+  "safety:review": [
+    {
+      "ok": true,
+      "state": "under_review",
+      "expected": "under_review"
+    }
+  ],
+  "safety:assign": [
+    {
+      "ok": true,
+      "state": "assigned",
+      "expected": "assigned"
+    }
+  ],
+  "safety:corrective_action": [
+    {
+      "ok": true,
+      "state": "action_in_progress",
+      "expected": "action_in_progress"
+    }
+  ],
+  "safety:resolve": [
+    {
+      "ok": true,
+      "state": "resolved",
+      "expected": "resolved"
+    }
+  ],
+  "safety:close": [
+    {
+      "ok": false,
+      "state": "resolved",
+      "expected": "closed"
+    },
+    {
+      "ok": true,
+      "restricted_post": 403
+    }
+  ],
+  "safety:list": [
+    {
+      "ok": true
+    }
+  ],
+  "quality:create": [
+    {
+      "ok": true,
+      "path": "/quality/37d0e6c2-1fce-4b04-b923-dd9c9c4966cf/",
+      "errors": "",
+      "pk": "37d0e6c2-1fce-4b04-b923-dd9c9c4966cf"
+    },
+    {
+      "ok": false,
+      "stored": "2026-11-10 09:30:00+00:00",
+      "local": "2026-11-10 13:00:00+03:30"
+    },
+    {
+      "ok": true,
+      "boundary": "reader"
+    }
+  ],
+  "quality:detail": [
+    {
+      "ok": true,
+      "project": "cb57c79c-d012-4bc3-a7c4-602b92b1a06d",
+      "site": "fc2171b4-dc68-439a-8f30-19edbb012c4b",
+      "review_status": "draft"
+    },
+    {
+      "ok": true,
+      "boundary": "foreign and sibling site"
+    },
+    {
+      "ok": false,
+      "operational_status": "verified",
+      "review_status": "draft",
+      "review_revisions": [],
+      "record_review_controls": 0
+    }
+  ],
+  "quality:review": [
+    {
+      "ok": true,
+      "state": "under_review",
+      "expected": "under_review"
+    }
+  ],
+  "quality:assign": [
+    {
+      "ok": true,
+      "state": "assigned",
+      "expected": "assigned"
+    }
+  ],
+  "quality:corrective_action": [
+    {
+      "ok": true,
+      "state": "action_in_progress",
+      "expected": "action_in_progress"
+    }
+  ],
+  "quality:submit_for_verification": [
+    {
+      "ok": true,
+      "state": "awaiting_verification",
+      "expected": "awaiting_verification"
+    }
+  ],
+  "quality:verify": [
+    {
+      "ok": true,
+      "state": "verified",
+      "expected": "verified"
+    }
+  ],
+  "quality:close": [
+    {
+      "ok": false,
+      "state": "verified",
+      "expected": "closed"
+    },
+    {
+      "ok": true,
+      "restricted_post": 403
+    }
+  ],
+  "quality:list": [
+    {
+      "ok": true
+    }
+  ],
+  "HARNESS:expenses": [
+    {
+      "ok": false,
+      "error": "Locator.evaluate: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"main\").first.locator(\"form[method=\\\"post\\\"]\").first.locator(\"[name=\\\"code__iexact\\\"]\")\n",
+      "traceback": "Traceback (most recent call last):\n  File \"E:\\Construction_Company_Solution\\output\\b04_browser.py\", line 103, in task\n    try:fn()\n        ^^^^\n  File \"E:\\Construction_Company_Solution\\output\\b04_browser.py\", line 253, in <lambda>\n    if selected in ['all','expenses']:task('expenses',lambda:expenses(people['expense-control-maker'],people['expense-control-approver'],reader,foreign))\n                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\Construction_Company_Solution\\output\\b04_browser.py\", line 212, in expenses\n    category=create(maker,'expenses:category_create',dict(code__iexact='B04-CAT',name='هزینه کارگاهی B04',primary_group=group.pk),'expenses','ExpenseCategory',dict(organization_id=ids['expense_org'],code__iexact='B04-CAT'))\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"E:\\Construction_Company_Solution\\output\\b04_browser.py\", line 74, in create\n    f=form(p);fill(f,**values);capture(p,route.replace(':','-'),shots)\n              ^^^^^^^^^^^^^^^^\n  File \"E:\\Construction_Company_Solution\\output\\b04_browser.py\", line 40, in fill\n    if el.evaluate('e=>e.tagName')=='SELECT':\n       ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\azera\\AppData\\Local\\Temp\\bonira-b02-01a1c63c\\pylibs\\playwright\\sync_api\\_generated.py\", line 11515, in evaluate\n    self._sync(\n  File \"C:\\Users\\azera\\AppData\\Local\\Temp\\bonira-b02-01a1c63c\\pylibs\\playwright\\_impl\\_sync_base.py\", line 124, in _sync\n    return task.result()\n           ^^^^^^^^^^^^^\n  File \"C:\\Users\\azera\\AppData\\Local\\Temp\\bonira-b02-01a1c63c\\pylibs\\playwright\\_impl\\channel_owner.py\", line 387, in finish\n    raise e from None\n  File \"C:\\Users\\azera\\AppData\\Local\\Temp\\bonira-b02-01a1c63c\\pylibs\\playwright\\_impl\\channel_owner.py\", line 352, in finish\n    result = await zone.run_async(lambda: awaitable)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\azera\\AppData\\Local\\Temp\\bonira-b02-01a1c63c\\pylibs\\playwright\\_impl\\utils\\zones.py\", line 58, in run_async\n    return await func()\n           ^^^^^^^^^^^^\n  File \"C:\\Users\\azera\\AppData\\Local\\Temp\\bonira-b02-01a1c63c\\pylibs\\playwright\\_impl\\locator.py\", line 327, in evaluate\n    return await self._with_element(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\azera\\AppData\\Local\\Temp\\bonira-b02-01a1c63c\\pylibs\\playwright\\_impl\\locator.py\", line 162, in _with_element\n    result = await self._frame._channel.waitForSelector(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\azera\\AppData\\Local\\Temp\\bonira-b02-01a1c63c\\pylibs\\playwright\\_impl\\channel_owner.py\", line 398, in _mapped\n    return mapper(await awaitable)\n                  ^^^^^^^^^^^^^^^\nplaywright._impl._errors.TimeoutError: Locator.evaluate: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\"main\").first.locator(\"form[method=\\\"post\\\"]\").first.locator(\"[name=\\\"code__iexact\\\"]\")\n\n"
+    }
+  ]
+}

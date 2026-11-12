@@ -29,6 +29,7 @@ from apps.projects.models import (
     ProjectPhase,
     WBSNode,
 )
+from core.business_choices import business_label
 from core.forms import JalaliDateMixin
 
 
@@ -202,6 +203,8 @@ class ExpenseAllocationForm(forms.ModelForm):
         self, *args, organization=None, membership=None, expense=None, **kwargs
     ):
         super().__init__(*args, **kwargs)
+        for name in ("cbs_node", "cost_center"):
+            self.fields[name].label_from_instance = business_label
         for name in ("project", "wbs_node", "activity"):
             self.fields[name].queryset = self.fields[name].queryset.none()
         self.fields["cbs_node"].queryset = CBSNode.objects.filter(

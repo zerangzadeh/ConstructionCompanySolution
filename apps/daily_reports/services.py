@@ -1,5 +1,6 @@
 from datetime import date
 from decimal import Decimal
+from uuid import UUID
 
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -7,7 +8,7 @@ from django.db.models import QuerySet
 from django.utils import timezone
 
 from apps.accounts.models import User
-from apps.audit.models import AuditAction
+from apps.audit.models import AuditAction, AuditEvent
 from apps.audit.services import record_audit_event
 from apps.daily_reports.models import (
     DailyActivity,
@@ -35,6 +36,7 @@ from apps.projects.models import (
     ProjectPhaseStatus,
     ProjectSite,
 )
+from core.product_surface import surface_profile
 
 
 def _validate_active_access(user: User, organization: Organization) -> None:
@@ -132,6 +134,7 @@ def _get_draft_report_for_update(
     report_id: str,
     actor: User,
     permission: BusinessPermissionCode,
+    require_draft: bool = True,
 ) -> DailyReport:
     try:
         report = (
@@ -154,7 +157,7 @@ def _get_draft_report_for_update(
         permission=permission,
     ):
         raise PermissionDenied("اجازه به‌روزرسانی این گزارش روزانه را ندارید.")
-    if report.status != DailyReportStatus.DRAFT:
+    if require_draft and report.status != DailyReportStatus.DRAFT:
         raise ValueError("فقط گزارش روزانه پیش‌نویس قابل به‌روزرسانی است.")
     return report
 
@@ -343,6 +346,7 @@ def add_daily_report_labor_entry(
     worker_count: int,
     hours_worked: Decimal,
     notes: str = "",
+    operation_key: UUID | None = None,
 ) -> DailyReportLaborEntry:
     """Add a validated labor record to a draft daily report."""
 
@@ -351,7 +355,34 @@ def add_daily_report_labor_entry(
         report_id=report_id,
         actor=actor,
         permission=BusinessPermissionCode.DAILY_REPORTS_ADD_LABOR,
+        require_draft=False,
     )
+    # The parent lock serializes retries; the immutable audit event is the
+    # durable receipt. Authorization is rechecked even for an exact replay.
+    if operation_key is not None:
+        operation_key = UUID(str(operation_key))
+        receipt = AuditEvent.objects.filter(
+            organization=organization,
+            actor=actor,
+            action=AuditAction.DAILY_REPORT_LABOR_ADDED,
+            entity_type="daily_report_labor_entry",
+            correlation_id=operation_key,
+            metadata__report_id=str(report.pk),
+        ).first()
+        if receipt:
+            entry = DailyReportLaborEntry.objects.get(
+                pk=receipt.entity_id, organization=organization, report=report
+            )
+            if (
+                entry.team_name != team_name.strip()
+                or entry.worker_count != worker_count
+                or entry.hours_worked != hours_worked
+                or entry.notes != notes.strip()
+            ):
+                raise ValueError("کلید تکرار با داده متفاوت استفاده شده است.")
+            return entry
+    if report.status != DailyReportStatus.DRAFT:
+        raise ValueError("فقط گزارش روزانه پیش‌نویس قابل به‌روزرسانی است.")
     if not team_name.strip():
         raise ValueError("وارد کردن نام گروه کاری الزامی است.")
     if worker_count <= 0:
@@ -375,6 +406,7 @@ def add_daily_report_labor_entry(
         entity_id=entry.pk,
         organization=organization,
         actor=actor,
+        correlation_id=operation_key,
         metadata={"report_id": str(report.pk), "worker_count": entry.worker_count},
     )
     return entry
@@ -653,6 +685,8 @@ def _approve_daily_report_domain(
         site=report.site,
     ):
         raise PermissionDenied("اجازه تأیید گزارش‌های روزانه این سازمان را ندارید.")
+    if surface_profile() == "MVP" and report.created_by_id == actor.pk:
+        raise PermissionDenied("ایجادکننده نمی‌تواند گزارش روزانه خود را تأیید کند.")
     if report.status != DailyReportStatus.SUBMITTED:
         raise ValueError("فقط گزارش‌های روزانه ارسال‌شده قابل تأیید هستند.")
 

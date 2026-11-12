@@ -1,0 +1,658 @@
+{
+  "chrome": "156.0.8078.80",
+  "db": "b03_original_full",
+  "results": {
+    "list": [
+      {
+        "match": true,
+        "pagination": "?page=2"
+      },
+      {
+        "match": true,
+        "sibling_link": 0,
+        "create_link": 0
+      }
+    ],
+    "create": [
+      {
+        "match": true,
+        "report": "9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab",
+        "date": "2026-11-08",
+        "audit": [
+          [
+            "daily_report.created",
+            "b02-owner"
+          ],
+          [
+            "daily_report.record_referenced",
+            "b02-owner"
+          ],
+          [
+            "daily_report.record_referenced",
+            "b02-owner"
+          ]
+        ]
+      }
+    ],
+    "detail": [
+      {
+        "match": true,
+        "negative": "foreign tenant and sibling-site reviewer"
+      },
+      {
+        "match": true,
+        "negative": "post approval mutation"
+      },
+      {
+        "match": true,
+        "print_link": "?format=print",
+        "print": true
+      },
+      {
+        "match": true,
+        "negative": "viewer entry POST"
+      }
+    ],
+    "historical_uuid": [
+      {
+        "match": true,
+        "visible_uuid": false
+      }
+    ],
+    "daily_links": [
+      {
+        "match": true,
+        "source_references": 2,
+        "dms": true
+      }
+    ],
+    "labor_add": [
+      {
+        "match": true,
+        "invalid_status": 302,
+        "rows_before_valid": 0
+      },
+      {
+        "match": true,
+        "saved": {
+          "team_name": "گروه آرماتور آزمون",
+          "worker_count": "4",
+          "hours_worked": "6.50",
+          "created_by": "e5d66485-e2d4-425d-a911-b59b138c9367"
+        }
+      }
+    ],
+    "daily_entry_replay": [
+      {
+        "match": false,
+        "status": 302,
+        "durable_rows": 2,
+        "exact_identical_POST": true
+      }
+    ],
+    "equipment_add": [
+      {
+        "match": true,
+        "invalid_status": 302,
+        "rows_before_valid": 0
+      },
+      {
+        "match": true,
+        "saved": {
+          "equipment_name": "جرثقیل آزمایشی",
+          "hours_used": "2.25",
+          "created_by": "e5d66485-e2d4-425d-a911-b59b138c9367"
+        }
+      }
+    ],
+    "historical_material": [
+      {
+        "match": true,
+        "derived_name": [
+          "میلگرد آزمایشی",
+          true
+        ]
+      }
+    ],
+    "material_add": [
+      {
+        "match": true,
+        "invalid_status": 302,
+        "rows_before_valid": 0
+      },
+      {
+        "match": true,
+        "saved": {
+          "material_name": "میلگرد آزمایشی",
+          "material": "04190c5a-59b1-4649-9d7e-0fe9a87fc364",
+          "quantity": "12.0000",
+          "unit": "m",
+          "created_by": "e5d66485-e2d4-425d-a911-b59b138c9367"
+        }
+      }
+    ],
+    "activity_add": [
+      {
+        "match": true,
+        "invalid_status": 302,
+        "rows_before_valid": 0
+      },
+      {
+        "match": true,
+        "saved": {
+          "activity": "70552590-933a-4670-a2f2-609a140e3ede",
+          "description": "نصب آرماتور آزمایشی",
+          "quantity": "12.0000",
+          "unit_of_measure": "f57819e1-1a42-44b0-bbfa-793bebaad76d",
+          "progress_percent": "45.00",
+          "created_by": "e5d66485-e2d4-425d-a911-b59b138c9367"
+        }
+      }
+    ],
+    "delay_add": [
+      {
+        "match": true,
+        "invalid_status": 302,
+        "rows_before_valid": 0
+      },
+      {
+        "match": true,
+        "saved": {
+          "activity": "70552590-933a-4670-a2f2-609a140e3ede",
+          "occurred_on": "2026-11-08",
+          "category": "آب‌وهوا",
+          "cause": "بارش آزمایشی",
+          "duration_hours": "1.50",
+          "created_by": "e5d66485-e2d4-425d-a911-b59b138c9367"
+        }
+      }
+    ],
+    "submit": [
+      {
+        "match": true,
+        "csrf": 403,
+        "replay": 403,
+        "state": "submitted",
+        "workflow": "active",
+        "candidates": [
+          "b02-org-reviewer",
+          "b02-owner",
+          "b02-field-reviewer"
+        ],
+        "audit": [
+          [
+            "daily_report.created",
+            "b02-owner"
+          ],
+          [
+            "daily_report.record_referenced",
+            "b02-owner"
+          ],
+          [
+            "daily_report.record_referenced",
+            "b02-owner"
+          ],
+          [
+            "daily_report.submitted",
+            "b02-owner"
+          ]
+        ]
+      }
+    ],
+    "approve": [
+      {
+        "match": true,
+        "viewer": 403,
+        "wrong_site": 403
+      },
+      {
+        "match": true,
+        "state": "approved",
+        "actor": "b02-org-reviewer",
+        "workflow": "completed",
+        "item": "completed",
+        "retry": 403,
+        "audit": [
+          [
+            "daily_report.created",
+            "b02-owner"
+          ],
+          [
+            "daily_report.record_referenced",
+            "b02-owner"
+          ],
+          [
+            "daily_report.record_referenced",
+            "b02-owner"
+          ],
+          [
+            "daily_report.submitted",
+            "b02-owner"
+          ],
+          [
+            "daily_report.approved",
+            "b02-org-reviewer"
+          ]
+        ]
+      }
+    ],
+    "daily_scoped_approval": [
+      {
+        "match": false,
+        "body": "اجازه تأیید گزارش‌های روزانه این سازمان را ندارید.",
+        "state": "submitted"
+      }
+    ],
+    "daily_separation": [
+      {
+        "match": false,
+        "state": "approved",
+        "approval_control": 1,
+        "audit": [
+          [
+            "daily_report.created",
+            "b02-owner"
+          ],
+          [
+            "daily_report.submitted",
+            "b02-owner"
+          ],
+          [
+            "daily_report.approved",
+            "b02-owner"
+          ]
+        ],
+        "return_action": 0
+      }
+    ],
+    "daily_context": [
+      {
+        "match": true,
+        "review_workbench": "/workflows/workbench/",
+        "status": "/workflows/workbench/"
+      },
+      {
+        "match": false,
+        "project_link": 0
+      },
+      {
+        "match": true,
+        "persona": "scoped recorder"
+      }
+    ],
+    "anonymous": [
+      {
+        "match": true,
+        "destination": "/accounts/login/"
+      }
+    ]
+  },
+  "traffic": [
+    [
+      "b02-owner",
+      "GET",
+      "/accounts/login/",
+      200
+    ],
+    [
+      "b02-owner",
+      "POST",
+      "/accounts/login/",
+      302
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/accounts/login/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "POST",
+      "/accounts/login/",
+      302
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b02-field-viewer",
+      "GET",
+      "/accounts/login/",
+      200
+    ],
+    [
+      "b02-field-viewer",
+      "POST",
+      "/accounts/login/",
+      302
+    ],
+    [
+      "b02-field-viewer",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b02-wrong-site",
+      "GET",
+      "/accounts/login/",
+      200
+    ],
+    [
+      "b02-wrong-site",
+      "POST",
+      "/accounts/login/",
+      302
+    ],
+    [
+      "b02-wrong-site",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b03-foreign",
+      "GET",
+      "/accounts/login/",
+      200
+    ],
+    [
+      "b03-foreign",
+      "POST",
+      "/accounts/login/",
+      302
+    ],
+    [
+      "b03-foreign",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b02-field-recorder",
+      "GET",
+      "/accounts/login/",
+      200
+    ],
+    [
+      "b02-field-recorder",
+      "POST",
+      "/accounts/login/",
+      302
+    ],
+    [
+      "b02-field-recorder",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b02-org-reviewer",
+      "GET",
+      "/accounts/login/",
+      200
+    ],
+    [
+      "b02-org-reviewer",
+      "POST",
+      "/accounts/login/",
+      302
+    ],
+    [
+      "b02-org-reviewer",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b02-field-viewer",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b03-foreign",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      403
+    ],
+    [
+      "b02-wrong-site",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      403
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-owner",
+      "POST",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/labor/",
+      302
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-owner",
+      "POST",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/equipment/",
+      302
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-owner",
+      "POST",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/materials/",
+      302
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-owner",
+      "POST",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/activities/",
+      302
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-owner",
+      "POST",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/delays/",
+      302
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-owner",
+      "POST",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/submit/",
+      302
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-field-reviewer",
+      "POST",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/approve/",
+      403
+    ],
+    [
+      "b02-org-reviewer",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-org-reviewer",
+      "POST",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/approve/",
+      302
+    ],
+    [
+      "b02-org-reviewer",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-org-reviewer",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/create/",
+      200
+    ],
+    [
+      "b02-owner",
+      "POST",
+      "/daily-reports/create/",
+      302
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/65490f0b-3905-4fbe-930c-b329a83d97b9/",
+      200
+    ],
+    [
+      "b02-owner",
+      "POST",
+      "/daily-reports/65490f0b-3905-4fbe-930c-b329a83d97b9/submit/",
+      302
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/65490f0b-3905-4fbe-930c-b329a83d97b9/",
+      200
+    ],
+    [
+      "b02-owner",
+      "POST",
+      "/daily-reports/65490f0b-3905-4fbe-930c-b329a83d97b9/approve/",
+      302
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/65490f0b-3905-4fbe-930c-b329a83d97b9/",
+      200
+    ],
+    [
+      "b02-org-reviewer",
+      "GET",
+      "/workflows/workbench/",
+      200
+    ],
+    [
+      "b02-owner",
+      "GET",
+      "/daily-reports/9599ea6e-dd78-4dc1-9af2-1a0217d1e3ab/",
+      200
+    ],
+    [
+      "b02-field-recorder",
+      "GET",
+      "/daily-reports/create/",
+      200
+    ]
+  ]
+}

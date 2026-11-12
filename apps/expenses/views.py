@@ -3,7 +3,7 @@ import uuid
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 
 from apps.expenses.forms import (
     ExpenseAllocationForm,
@@ -59,6 +59,7 @@ from core.list_filters import (
     paginate_table,
     table_pagination_query,
 )
+from core.organization_time import render_in_organization_time as render
 
 
 @active_organization_required

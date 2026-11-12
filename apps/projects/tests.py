@@ -313,6 +313,51 @@ class ProjectServiceTests(TestCase):
             ),
         )
 
+    def test_project_site_list_shares_reference_layout_and_keeps_project_scope(
+        self,
+    ) -> None:
+        project = self.organization.projects.create(code="P-ONE", name="First project")
+        sibling = self.organization.projects.create(code="P-TWO", name="Second project")
+        site = self.organization.project_sites.create(
+            project=project, code="SITE-A", name="First worksite", is_active=False
+        )
+        self.organization.project_sites.create(
+            project=project, code="SITE-B", name="Second worksite"
+        )
+        self.organization.project_sites.create(
+            project=sibling, code="SITE-C", name="Other project worksite"
+        )
+        self.client.force_login(self.owner)
+        session = self.client.session
+        session[ACTIVE_ORGANIZATION_SESSION_KEY] = str(self.organization.pk)
+        session.save()
+        url = reverse("projects:site_list", args=[project.pk])
+
+        response = self.client.get(url, {"sort": "status", "direction": "desc"})
+
+        self.assertTemplateUsed(response, "projects/all_site_list.html")
+        self.assertContains(response, 'class="erp-responsive-list"')
+        self.assertContains(response, 'name="site"')
+        self.assertContains(response, "غیرفعال")
+        self.assertContains(
+            response, reverse("projects:site_create", args=[project.pk])
+        )
+        self.assertContains(
+            response, reverse("projects:phase_list", args=[project.pk, site.pk])
+        )
+        self.assertNotContains(response, 'name="project"')
+        self.assertNotContains(response, "Other project worksite")
+        self.assertEqual(
+            [row.code for row in response.context["sites"]], ["SITE-B", "SITE-A"]
+        )
+
+        response = self.client.get(url, {"site": "SITE-B", "project": sibling.name})
+        self.assertEqual([row.code for row in response.context["sites"]], ["SITE-B"])
+
+        response = self.client.get(url, {"site": "SITE-C"})
+        self.assertTemplateUsed(response, "components/filtered_empty_state.html")
+        self.assertEqual(response.context["page_obj"].paginator.count, 0)
+
     def test_project_detail_is_tenant_scoped(self) -> None:
         project = self.organization.projects.create(
             code="P-007",

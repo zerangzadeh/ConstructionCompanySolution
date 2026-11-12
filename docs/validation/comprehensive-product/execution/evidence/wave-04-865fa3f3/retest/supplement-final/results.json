@@ -1,0 +1,457 @@
+{
+  "safety:evidence": [
+    {
+      "ok": false,
+      "actual_entry": "/documents/evidence/safety/7872b548-1ecf-4be0-8d7a-4b85e8587524/register/"
+    },
+    {
+      "ok": true,
+      "state": "submitted",
+      "pins": [
+        "eb061a8b-fe15-452d-b3a1-a149ecbcc152"
+      ],
+      "operational": "reported"
+    },
+    {
+      "ok": true,
+      "exact_link": "/documents/evidence/safety/7872b548-1ecf-4be0-8d7a-4b85e8587524/eb061a8b-fe15-452d-b3a1-a149ecbcc152/"
+    },
+    {
+      "ok": true,
+      "current": "9dde589a-c3cf-466c-8b90-dceed1a8ef19",
+      "pin": "eb061a8b-fe15-452d-b3a1-a149ecbcc152",
+      "download": 200,
+      "reader_download": 403
+    }
+  ],
+  "safety:record-decision": [
+    {
+      "ok": false,
+      "blocked": "No record approve/return/reject control or domain HTTP route in current MVP",
+      "forms": [
+        "/safety/7872b548-1ecf-4be0-8d7a-4b85e8587524/review/"
+      ],
+      "review_status": "submitted",
+      "operational_status": "reported"
+    }
+  ],
+  "quality:evidence": [
+    {
+      "ok": false,
+      "actual_entry": "/documents/evidence/quality/f5612335-7254-46f3-ab6d-3e4bb7c6e679/register/"
+    },
+    {
+      "ok": true,
+      "state": "submitted",
+      "pins": [
+        "eb061a8b-fe15-452d-b3a1-a149ecbcc152"
+      ],
+      "operational": "reported"
+    },
+    {
+      "ok": true,
+      "exact_link": "/documents/evidence/quality/f5612335-7254-46f3-ab6d-3e4bb7c6e679/eb061a8b-fe15-452d-b3a1-a149ecbcc152/"
+    },
+    {
+      "ok": true,
+      "current": "9dde589a-c3cf-466c-8b90-dceed1a8ef19",
+      "pin": "eb061a8b-fe15-452d-b3a1-a149ecbcc152",
+      "download": 200,
+      "reader_download": 403
+    }
+  ],
+  "quality:record-decision": [
+    {
+      "ok": false,
+      "blocked": "No record approve/return/reject control or domain HTTP route in current MVP",
+      "forms": [
+        "/quality/f5612335-7254-46f3-ab6d-3e4bb7c6e679/review/"
+      ],
+      "review_status": "submitted",
+      "operational_status": "reported"
+    }
+  ],
+  "equipment:usage-context": [
+    {
+      "ok": false,
+      "needs_po_review": "Current usage form offers neither deployment nor operator; its new record is ineligible for cost allocation",
+      "fields": [
+        "csrfmiddlewaretoken",
+        "equipment",
+        "started_at",
+        "ended_at",
+        "runtime_hours",
+        "source_key",
+        "source_key_existing",
+        "evidence_reference"
+      ]
+    }
+  ],
+  "equipment:usage-interval": [
+    {
+      "ok": false,
+      "status": 302,
+      "accepted_runtime": "20.000",
+      "overlaps_existing": true,
+      "created": 1
+    }
+  ],
+  "equipment:cost_allocation_reverse": [
+    {
+      "ok": true,
+      "state": "reversed",
+      "reversal_amount": "-375000.000000",
+      "original_amount": "375000.000000"
+    },
+    {
+      "ok": true,
+      "replay_status": 302
+    }
+  ],
+  "equipment:cost_handoff_create": [
+    {
+      "ok": true,
+      "source_after_reversal": "reversed",
+      "retained_snapshot": "375000.000000",
+      "envelope_status": "reconciled"
+    }
+  ],
+  "equipment:cost-scope": [
+    {
+      "ok": true,
+      "source_site": "6feb5c9c-54fe-4534-bce7-2af789f3038a",
+      "actor_scope": "4516ff7e-9862-4c68-b455-dbf02b25a635",
+      "visible_source_actions": 0
+    }
+  ],
+  "mvp-financial-boundary": [
+    {
+      "ok": true,
+      "target_route": "accounting:dashboard",
+      "status": 403
+    }
+  ],
+  "financial-side-effects": [
+    {
+      "ok": true,
+      "model": "accounting.JournalEntry",
+      "count": 0
+    },
+    {
+      "ok": true,
+      "model": "treasury.TreasuryMovement",
+      "count": 0
+    },
+    {
+      "ok": true,
+      "model": "treasury.PaymentRequest",
+      "count": 0
+    },
+    {
+      "ok": true,
+      "model": "projects.ProjectCostFact",
+      "count": 0
+    }
+  ],
+  "restricted:equipment:cost_allocation_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:cost_allocation_finalize": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:cost_allocation_reverse": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:cost_handoff_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:cost_handoff_reconcile": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:cost_handoff_review": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:cost_policy_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:cost_policy_transition": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:cost_rate_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:downtime_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:fuel_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:operator_qualification_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:spare_link_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:expenses:allocate": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:expenses:approve": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:expenses:category_archive": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:expenses:category_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:expenses:create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:expenses:draft_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:expenses:recurrence_propose": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:expenses:return": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:expenses:submit": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:expenses:void": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:archive": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:assignment_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:assignment_status_change": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:maintenance_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:maintenance_plan_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:maintenance_status_change": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:meter_reading_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:status_change": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:usage_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:work_order_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:work_order_evidence_create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:equipment:work_order_transition": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:quality:assign": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:quality:close": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:quality:corrective_action": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:quality:create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:quality:review": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:quality:submit_for_verification": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:quality:verify": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:safety:assign": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:safety:close": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:safety:corrective_action": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:safety:create": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:safety:resolve": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted:safety:review": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "restricted-no-audit-writes": [
+    {
+      "ok": true,
+      "before": 203,
+      "after": 203
+    }
+  ]
+}

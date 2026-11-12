@@ -1,7 +1,9 @@
 import json
+from zoneinfo import ZoneInfo
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from apps.organizations.authorization import (
     get_active_membership,
@@ -90,6 +92,20 @@ class DurationField(forms.MultiValueField):
         return total
 
 
+class OrganizationDateTimeField(forms.DateTimeField):
+    time_zone: ZoneInfo | None = None
+
+    def to_python(self, value):
+        if value not in self.empty_values and self.time_zone is None:
+            raise ValidationError("منطقه زمانی شرکت برای ثبت زمان مشخص نشده است.")
+        with timezone.override(self.time_zone):
+            return super().to_python(value)
+
+    def prepare_value(self, value):
+        with timezone.override(self.time_zone):
+            return super().prepare_value(value)
+
+
 class StyledForm(JalaliDateMixin, forms.Form):
     def __init__(self, *args, organization=None, user=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -105,6 +121,11 @@ class StyledForm(JalaliDateMixin, forms.Form):
             )
             if isinstance(field, forms.DateTimeField):
                 field.widget.attrs["data-jalali-time-control"] = "true"
+            if (
+                isinstance(field, OrganizationDateTimeField)
+                and organization is not None
+            ):
+                field.time_zone = ZoneInfo(organization.settings.timezone)
 
 
 class WorkingWeekdaysField(forms.TypedMultipleChoiceField):
@@ -282,12 +303,12 @@ class AttendanceForm(ScopedForm):
     work_date = forms.DateField(
         label="تاریخ کار", widget=forms.DateInput(attrs={"type": "date"})
     )
-    check_in_at = forms.DateTimeField(
+    check_in_at = OrganizationDateTimeField(
         label="زمان ورود",
         widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
         help_text="روز و ساعت را از انتخابگر وارد کنید، یا زمان را به شکل ۰۸:۳۰ بنویسید.",
     )
-    check_out_at = forms.DateTimeField(
+    check_out_at = OrganizationDateTimeField(
         label="خروج",
         required=False,
         widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
@@ -321,14 +342,21 @@ class AttendanceForm(ScopedForm):
         for name in ("calendar", "shift"):
             searchable_choices(self, name, name)
 
+    def clean(self):
+        cleaned = super().clean()
+        start, end = cleaned.get("check_in_at"), cleaned.get("check_out_at")
+        if start and end and end <= start:
+            self.add_error("check_out_at", "زمان خروج باید پس از ورود باشد.")
+        return cleaned
+
 
 class TimeRequestForm(ScopedForm):
-    starts_at = forms.DateTimeField(
+    starts_at = OrganizationDateTimeField(
         label="شروع",
         widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
         help_text="روز و ساعت را از انتخابگر وارد کنید، یا زمان را به شکل ۰۸:۳۰ بنویسید.",
     )
-    ends_at = forms.DateTimeField(
+    ends_at = OrganizationDateTimeField(
         label="پایان", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
     )
     reason = forms.CharField(label="دلیل", widget=forms.Textarea(attrs={"rows": 3}))
@@ -541,12 +569,12 @@ class AttendanceCorrectionForm(StyledForm):
         required=False,
         widget=forms.DateInput(attrs={"type": "date"}),
     )
-    replacement_check_in_at = forms.DateTimeField(
+    replacement_check_in_at = OrganizationDateTimeField(
         label="ورود جایگزین",
         required=False,
         widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
     )
-    replacement_check_out_at = forms.DateTimeField(
+    replacement_check_out_at = OrganizationDateTimeField(
         label="خروج جایگزین",
         required=False,
         widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
@@ -559,4 +587,8 @@ class AttendanceCorrectionForm(StyledForm):
             and cleaned.get("replacement_check_out_at")
         ):
             raise ValidationError("برای اصلاح، زمان ورود و خروج جایگزین الزامی است.")
+        start = cleaned.get("replacement_check_in_at")
+        end = cleaned.get("replacement_check_out_at")
+        if start and end and end <= start:
+            self.add_error("replacement_check_out_at", "پایان باید پس از شروع باشد.")
         return cleaned

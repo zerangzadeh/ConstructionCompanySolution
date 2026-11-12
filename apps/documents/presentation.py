@@ -13,6 +13,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.urls import reverse
 
 from apps.documents.link_registry import registered_link_type
+from apps.documents.models import DocumentType
 from apps.documents.services import (
     _validate_target_access,
     get_document_version_for_download,
@@ -64,6 +65,7 @@ class RelatedDocumentRow:
     available: bool
     detail_url: str
     download_url: str
+    photo_preview_url: str = ""
 
 
 @dataclass(frozen=True)
@@ -83,6 +85,10 @@ class RelatedDocuments:
     @property
     def remaining_rows(self) -> tuple[RelatedDocumentRow, ...]:
         return self.rows[5:]
+
+    @property
+    def first_photo(self) -> RelatedDocumentRow | None:
+        return next((row for row in self.rows if row.photo_preview_url), None)
 
 
 def _sources(*, kind: str, user: "User", organization: "Organization") -> "QuerySet":
@@ -201,6 +207,15 @@ def related_documents_for(
                 download_url = reverse(
                     "documents:version-download", args=[document.pk, version.pk]
                 )
+        photo_preview_url = ""
+        if (
+            kind == "project"
+            and download_url
+            and document.document_type == DocumentType.PHOTO
+            and version.content_type.startswith("image/")
+            and route_exposed("documents:photo-preview")
+        ):
+            photo_preview_url = reverse("documents:photo-preview", args=[document.pk])
         rows.append(
             RelatedDocumentRow(
                 title=document.title,
@@ -211,6 +226,7 @@ def related_documents_for(
                 + "?"
                 + source.query,
                 download_url=download_url,
+                photo_preview_url=photo_preview_url,
             )
         )
     can_associate = has_business_permission(

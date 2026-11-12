@@ -1,0 +1,1673 @@
+{
+  "chrome": "156.0.8078.80",
+  "checks": [
+    {
+      "scenario": "UAT-01",
+      "key": "login-layout",
+      "result": "PASS",
+      "observed": "Login rendered in Chrome at all three widths with one main landmark, RTL and no page overflow."
+    },
+    {
+      "scenario": "UAT-01",
+      "key": "login-assets",
+      "result": "PASS",
+      "observed": "Both configured-image endpoints returned image or safe no-custom-image response. Resource records [[\"/static/accounts/images/bonira-login-visual.png\",200]]"
+    },
+    {
+      "scenario": "UAT-01",
+      "key": "invalid-and-inactive",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "UAT-01",
+      "key": "owner-entry",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "UAT-01",
+      "key": "scoped-search",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "UAT-01",
+      "key": "historical-navigation",
+      "result": "PASS",
+      "observed": "{\"searchCopyClear\":true,\"rfqLinksPerNav\":[1,1,0],\"disabledLinksPerNav\":[0,0,0]}"
+    },
+    {
+      "scenario": "UAT-15",
+      "key": "restricted-and-foreign",
+      "result": "PASS",
+      "observed": "{\"project-local\":200,\"project-foreign\":403,\"site-foreign\":404,\"hidden-admin\":403,\"timekeeping\":403,\"reporting\":403,\"workbench\":403,\"protected-xlsx\":403,\"switch\":403,\"context\":403}"
+    },
+    {
+      "scenario": "UAT-15",
+      "key": "protected-action-probes",
+      "result": "PASS",
+      "observed": "{\"documents:contextual-choices\":403,\"documents:version-download\":403,\"billing:claim_action\":403,\"inventory:transaction_post\":403} (foreign Project key for contextual choice, nonexistent IDs for other domains; no cross-domain fixture assertion)."
+    },
+    {
+      "scenario": "UAT-15",
+      "key": "responsive-menu",
+      "result": "PASS",
+      "observed": "[{\"width\":1440,\"links\":5},{\"width\":1024,\"links\":5},{\"width\":390,\"links\":0}]"
+    },
+    {
+      "scenario": "UAT-01",
+      "key": "logout",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "CV-AUTH-01",
+      "key": "settings",
+      "result": "BLOCKED",
+      "observed": "TimeoutError in scripted interaction"
+    },
+    {
+      "scenario": "CV-AUTH-01",
+      "key": "required-change",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "CV-AUTH-01",
+      "key": "public-reset",
+      "result": "PASS",
+      "observed": "One captured synthetic recipient; same neutral response for unknown and inactive requests; token consumed and replay denied. Token omitted."
+    },
+    {
+      "scenario": "PA-01",
+      "key": "landing",
+      "result": "PASS",
+      "observed": "Real login and eight expected destination hrefs. Dashboard measured at all three widths. Visible metric text [\"همه شرکت‌ها\\n\\n5\",\"همه شرکت‌ها\",\"5\",\"شرکت‌های فعال\\n\\n5\",\"شرکت‌های فعال\",\"5\",\"شرکت‌های تعلیق‌شده\\n\\n0\",\"شرکت‌های تعلیق‌شده\",\"0\",\"حساب‌های ثبت‌شده\\n\\n36\\nمشاهده ←\",\"حساب‌های ثبت‌شده\",\"36\",\"عضویت‌های ثبت‌شده\\n\\n9\",\"عضویت‌های ثبت‌شده\",\"9\"]"
+    },
+    {
+      "scenario": "PA-03",
+      "key": "companies",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "PA-02",
+      "key": "create-company",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "PA-02",
+      "key": "retry-onboarding",
+      "result": "BLOCKED",
+      "observed": "Error in scripted interaction"
+    },
+    {
+      "scenario": "PA-03",
+      "key": "company-edit",
+      "result": "BLOCKED",
+      "observed": "TimeoutError in scripted interaction"
+    },
+    {
+      "scenario": "PA-03",
+      "key": "company-lifecycle",
+      "result": "PASS",
+      "observed": "Cancel preserved state, confirmed suspension and reactivation, affected-session project status 302"
+    },
+    {
+      "scenario": "PA-04",
+      "key": "directory",
+      "result": "PASS",
+      "observed": "Directory search and real detail navigation matched. Role link absent for platform-only account."
+    },
+    {
+      "scenario": "PA-04",
+      "key": "create-user",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "PA-04",
+      "key": "edit-user",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "PA-05",
+      "key": "account-lifecycle",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "PA-06",
+      "key": "recovery-unavailable",
+      "result": "PASS",
+      "observed": "File-captured public mail configured; Platform SMTP intentionally unavailable in browser process. Protected transport variants are exercised with focused existing tests."
+    },
+    {
+      "scenario": "PA-06",
+      "key": "temporary-password",
+      "result": "FAIL",
+      "observed": "Temporary password did not require personal change"
+    },
+    {
+      "scenario": "PA-07",
+      "key": "grant-and-revoke",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "PA-08",
+      "key": "roles-and-members",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "PA-08",
+      "key": "role-create",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "PA-09",
+      "key": "settings-and-catalogs",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "PA-09",
+      "key": "catalog-classification",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "PA-10",
+      "key": "activity-and-health",
+      "result": "PASS",
+      "observed": "Expected assertion matched"
+    },
+    {
+      "scenario": "PA-11",
+      "key": "authority-both-directions",
+      "result": "PASS",
+      "observed": "{\"platform\":[[\"platform_dashboard\",[403,302,null]],[\"platform_company_list\",[403,302,null]],[\"platform_company_detail\",[403,302,null]],[\"platform_company_edit\",[403,302,403]],[\"platform_company_status\",[403,302,403]],[\"platform_company_onboarding\",[403,302,403]],[\"platform_users\",[403,302,null]],[\"platform_user_detail\",[403,302,null]],[\"platform_user_edit\",[403,302,403]],[\"platform_user_create\",[403,302,403]],[\"platform_user_status\",[403,302,403]],[\"platform_user_reset\",[403,302,403]],[\"platform_user_temporary_password\",[403,302,403]],[\"platform_administrators\",[403,302,403]],[\"platform_role_catalog\",[403,302,403]],[\"platform_member_roles\",[403,302,null]],[\"platform_member_authorization\",[403,302,403]],[\"platform_settings\",[403,302,null]],[\"platform_audit\",[403,302,null]],[\"platform_status\",[403,302,null]],[\"protected_operation_catalog\",[403,302,403]],[\"platform_policy_catalog\",[403,302,403]],[\"create\",[403,302,403]]],\"columns\":[\"tenant owner GET\",\"anonymous GET\",\"tenant owner POST\"],\"platformOnly\":{\"/projects/\":302,\"/projects/836c43f1-4055-4864-9637-e449f6ccd895/\":302,\"/timekeeping/?format=xlsx\":302,\"/accounts/login/\":302},\"tenantOwnerPost\":403}"
+    },
+    {
+      "scenario": "PA-09",
+      "key": "protected-version",
+      "result": "PASS",
+      "observed": "Created next version of authorization.self_grant in the private database."
+    }
+  ],
+  "pages": [
+    {
+      "key": "login",
+      "pattern": "DC-01",
+      "route": "/accounts/login/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "Bonira - ورود به بنیرا"
+      ],
+      "regions": [],
+      "nav": 0,
+      "tableHeaders": [],
+      "formCount": 1,
+      "unnamedFields": [],
+      "visibleActions": [
+        "فراموشی گذرواژه",
+        "ورود به سامانه"
+      ],
+      "screenshot": "login-1440.png"
+    },
+    {
+      "key": "login",
+      "pattern": "DC-01",
+      "route": "/accounts/login/",
+      "viewport": 1024,
+      "client": 1024,
+      "scroll": 1024,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "Bonira - ورود به بنیرا"
+      ],
+      "regions": [],
+      "nav": 0,
+      "tableHeaders": [],
+      "formCount": 1,
+      "unnamedFields": [],
+      "visibleActions": [
+        "فراموشی گذرواژه",
+        "ورود به سامانه"
+      ],
+      "screenshot": "login-1024.png"
+    },
+    {
+      "key": "login",
+      "pattern": "DC-01",
+      "route": "/accounts/login/",
+      "viewport": 390,
+      "client": 390,
+      "scroll": 390,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "Bonira - ورود به بنیرا"
+      ],
+      "regions": [],
+      "nav": 0,
+      "tableHeaders": [],
+      "formCount": 1,
+      "unnamedFields": [],
+      "visibleActions": [
+        "فراموشی گذرواژه",
+        "ورود به سامانه"
+      ],
+      "screenshot": "login-390.png"
+    },
+    {
+      "key": "login-invalid",
+      "pattern": "DC-01/DC-09",
+      "route": "/accounts/login/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "Bonira - ورود به بنیرا"
+      ],
+      "regions": [],
+      "nav": 0,
+      "tableHeaders": [],
+      "formCount": 1,
+      "unnamedFields": [],
+      "visibleActions": [
+        "فراموشی گذرواژه",
+        "ورود به سامانه"
+      ]
+    },
+    {
+      "key": "tenant-selector",
+      "pattern": "DC-03/DC-09",
+      "route": "/organizations/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "انتخاب شرکت"
+      ],
+      "regions": [
+        "شرکت نمونه موج الف",
+        "شرکت نمونه موج ب"
+      ],
+      "nav": 1,
+      "tableHeaders": [],
+      "formCount": 3,
+      "unnamedFields": [],
+      "visibleActions": [
+        "درخواست‌های اتصال",
+        "ورود به شرکت",
+        "ورود به شرکت"
+      ],
+      "screenshot": "tenant-selector-1440.png"
+    },
+    {
+      "key": "tenant-home",
+      "pattern": "DC-02/DC-08",
+      "route": "/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "میز کار من"
+      ],
+      "regions": [
+        "پروژه‌های فعال",
+        "قراردادهای فعال",
+        "گزارش‌های روزانه",
+        "درخواست‌های خرید ارسال‌شده",
+        "کارهای در انتظار اقدام من",
+        "دسترسی سریع",
+        "آخرین فعالیت‌ها",
+        "اقدامات نیازمند توجه",
+        "وضعیت پروژه‌ها",
+        "مرور حوزه‌ها",
+        "عملیات پروژه و کارگاه",
+        "پیمان و برآورد",
+        "تدارکات و خرید"
+      ],
+      "nav": 1,
+      "tableHeaders": [],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "تغییر سازمان ←",
+        "پروژه‌های فعال 0 از پروژه‌های قابل مشاهده شما",
+        "قراردادهای فعال 0 قراردادهای با وضعیت فعال",
+        "گزارش‌های روزانه 0 همه گزارش‌های قابل مشاهده",
+        "درخواست‌های خرید ارسال‌شده 0 با وضعیت ارسال‌شده",
+        "کارهای در انتظار اقدام من 0 کارهای باز و قبول‌شده کارتابل",
+        "پروژه‌ها",
+        "قراردادها",
+        "برآورد و فهرست‌بها",
+        "صورت‌وضعیت و صورتحساب",
+        "درخواست‌های خرید",
+        "گزارش‌های روزانه",
+        "پروژه پروژه نمونه a 1405/08/18 21:30",
+        "کارتابل ←",
+        "پروژه‌ها",
+        "گزارش‌های روزانه"
+      ],
+      "screenshot": "tenant-home-1440.png"
+    },
+    {
+      "key": "global-search",
+      "pattern": "DC-02/DC-03",
+      "route": "/search/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "جستجوی پروژه و مصالح"
+      ],
+      "regions": [
+        "جستجوی پروژه و مصالح",
+        "نتایج جستجو"
+      ],
+      "nav": 2,
+      "tableHeaders": [
+        "نوع",
+        "عنوان",
+        "کد",
+        "منبع"
+      ],
+      "formCount": 3,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "جستجو",
+        "پروژه نمونه a",
+        "مشاهده جزئیات"
+      ]
+    },
+    {
+      "key": "project-detail",
+      "pattern": "DC-03/DC-05 Projects exception",
+      "route": "/projects/836c43f1-4055-4864-9637-e449f6ccd895/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "پروژه نمونه a"
+      ],
+      "regions": [
+        "بودجه و هزینه ثبت‌شده",
+        "وضعیت قراردادهای پروژه",
+        "مرکز تجاری پروژه",
+        "برآوردها",
+        "قراردادها",
+        "صورت‌وضعیت‌ها",
+        "آخرین موارد ثبت‌شده",
+        "دسترسی سریع",
+        "اسناد مرتبط 0",
+        "اطلاعات اصلی",
+        "توضیحات",
+        "برنامه و پیشرفت"
+      ],
+      "nav": 3,
+      "tableHeaders": [],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "پروژه‌ها",
+        "داشبورد",
+        "اطلاعات اصلی",
+        "برنامه و پیشرفت",
+        "برآوردها",
+        "قراردادها",
+        "صورت‌وضعیت‌ها",
+        "کارگاه‌ها",
+        "هزینه‌ها",
+        "آخرین ثبت‌ها",
+        "اسناد مرتبط 0",
+        "گالری تصاویر",
+        "مشاهده ←",
+        "مشاهده ←",
+        "مشاهده همه ←"
+      ]
+    },
+    {
+      "key": "restricted-home",
+      "pattern": "DC-02/DC-08",
+      "route": "/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "میز کار من"
+      ],
+      "regions": [
+        "پروژه‌های فعال",
+        "دسترسی سریع",
+        "آخرین فعالیت‌ها",
+        "وضعیت پروژه‌ها",
+        "مرور حوزه‌ها",
+        "عملیات پروژه و کارگاه"
+      ],
+      "nav": 1,
+      "tableHeaders": [],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "تغییر سازمان ←",
+        "پروژه‌های فعال 0 از پروژه‌های قابل مشاهده شما",
+        "پروژه‌ها",
+        "پروژه پروژه نمونه a 1405/08/18 21:30",
+        "پروژه‌ها",
+        "تنظیمات شخصی"
+      ]
+    },
+    {
+      "key": "restricted-menu",
+      "pattern": "DC-02/DC-03",
+      "route": "/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "میز کار من"
+      ],
+      "regions": [
+        "پروژه‌های فعال",
+        "دسترسی سریع",
+        "آخرین فعالیت‌ها",
+        "وضعیت پروژه‌ها",
+        "مرور حوزه‌ها",
+        "عملیات پروژه و کارگاه"
+      ],
+      "nav": 1,
+      "tableHeaders": [],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "تغییر سازمان ←",
+        "پروژه‌های فعال 0 از پروژه‌های قابل مشاهده شما",
+        "پروژه‌ها",
+        "پروژه پروژه نمونه a 1405/08/18 21:30",
+        "پروژه‌ها",
+        "تنظیمات شخصی"
+      ]
+    },
+    {
+      "key": "restricted-menu",
+      "pattern": "DC-02/DC-03",
+      "route": "/",
+      "viewport": 1024,
+      "client": 1024,
+      "scroll": 1024,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "میز کار من"
+      ],
+      "regions": [
+        "پروژه‌های فعال",
+        "دسترسی سریع",
+        "آخرین فعالیت‌ها",
+        "وضعیت پروژه‌ها",
+        "مرور حوزه‌ها",
+        "عملیات پروژه و کارگاه"
+      ],
+      "nav": 1,
+      "tableHeaders": [],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "تغییر سازمان ←",
+        "پروژه‌های فعال 0 از پروژه‌های قابل مشاهده شما",
+        "پروژه‌ها",
+        "پروژه پروژه نمونه a 1405/08/18 21:30",
+        "پروژه‌ها",
+        "تنظیمات شخصی"
+      ]
+    },
+    {
+      "key": "restricted-menu",
+      "pattern": "DC-02/DC-03",
+      "route": "/",
+      "viewport": 390,
+      "client": 390,
+      "scroll": 390,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "میز کار من"
+      ],
+      "regions": [
+        "پروژه‌های فعال",
+        "دسترسی سریع",
+        "آخرین فعالیت‌ها",
+        "وضعیت پروژه‌ها",
+        "مرور حوزه‌ها",
+        "عملیات پروژه و کارگاه"
+      ],
+      "nav": 0,
+      "tableHeaders": [],
+      "formCount": 1,
+      "unnamedFields": [],
+      "visibleActions": [
+        "تغییر سازمان ←",
+        "پروژه‌های فعال 0 از پروژه‌های قابل مشاهده شما",
+        "پروژه‌ها",
+        "پروژه پروژه نمونه a 1405/08/18 21:30",
+        "پروژه‌ها",
+        "تنظیمات شخصی"
+      ],
+      "screenshot": "restricted-menu-390.png"
+    },
+    {
+      "key": "required-password",
+      "pattern": "DC-06/DC-09",
+      "route": "/accounts/password/required/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "گذرواژه شخصی خود را تعیین کنید"
+      ],
+      "regions": [],
+      "nav": 1,
+      "tableHeaders": [],
+      "formCount": 3,
+      "unnamedFields": [],
+      "visibleActions": [
+        "ثبت گذرواژه و ادامه",
+        "خروج از حساب"
+      ],
+      "screenshot": "required-password-1440.png"
+    },
+    {
+      "key": "public-reset",
+      "pattern": "DC-01/DC-09",
+      "route": "/accounts/password/reset/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "بازیابی گذرواژه"
+      ],
+      "regions": [],
+      "nav": 0,
+      "tableHeaders": [],
+      "formCount": 1,
+      "unnamedFields": [],
+      "visibleActions": [
+        "ارسال راهنمای بازیابی",
+        "بازگشت به ورود"
+      ],
+      "screenshot": "public-reset-1440.png"
+    },
+    {
+      "key": "public-reset-done",
+      "pattern": "DC-01/DC-09",
+      "route": "/accounts/password/reset/done/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "درخواست بازیابی ثبت شد"
+      ],
+      "regions": [],
+      "nav": 0,
+      "tableHeaders": [],
+      "formCount": 0,
+      "unnamedFields": [],
+      "visibleActions": [
+        "بازگشت به ورود"
+      ]
+    },
+    {
+      "key": "public-reset-confirm",
+      "pattern": "DC-01/DC-09",
+      "route": "/accounts/password/reset/<redacted>/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "تعیین گذرواژه جدید"
+      ],
+      "regions": [],
+      "nav": 0,
+      "tableHeaders": [],
+      "formCount": 1,
+      "unnamedFields": [],
+      "visibleActions": [
+        "ثبت گذرواژه جدید"
+      ]
+    },
+    {
+      "key": "public-reset-complete",
+      "pattern": "DC-01/DC-09",
+      "route": "/accounts/password/reset/complete/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "گذرواژه شما به‌روزرسانی شد"
+      ],
+      "regions": [],
+      "nav": 0,
+      "tableHeaders": [],
+      "formCount": 0,
+      "unnamedFields": [],
+      "visibleActions": [
+        "ورود به سامانه"
+      ]
+    },
+    {
+      "key": "platform-dashboard",
+      "pattern": "DC-02/DC-08",
+      "route": "/organizations/platform/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "داشبورد پلتفرم"
+      ],
+      "regions": [
+        "فعالیت‌های مدیریتی اخیر",
+        "فعالیت پلتفرم",
+        "وضعیت شرکت‌ها",
+        "وضعیت سامانه",
+        "دسترسی سریع"
+      ],
+      "nav": 1,
+      "tableHeaders": [],
+      "formCount": 1,
+      "unnamedFields": [],
+      "visibleActions": [
+        "مشاهده ←",
+        "مشاهده همه فعالیت‌ها ←",
+        "جزئیات وضعیت ←",
+        "ایجاد شرکت جدید",
+        "مدیریت کاربران",
+        "نقش‌ها و مجوزها",
+        "مدیران پلتفرم",
+        "تنظیمات پلتفرم"
+      ],
+      "screenshot": "platform-dashboard-1440.png"
+    },
+    {
+      "key": "platform-dashboard",
+      "pattern": "DC-02/DC-08",
+      "route": "/organizations/platform/",
+      "viewport": 1024,
+      "client": 1024,
+      "scroll": 1024,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "داشبورد پلتفرم"
+      ],
+      "regions": [
+        "فعالیت‌های مدیریتی اخیر",
+        "فعالیت پلتفرم",
+        "وضعیت شرکت‌ها",
+        "وضعیت سامانه",
+        "دسترسی سریع"
+      ],
+      "nav": 1,
+      "tableHeaders": [],
+      "formCount": 1,
+      "unnamedFields": [],
+      "visibleActions": [
+        "مشاهده ←",
+        "مشاهده همه فعالیت‌ها ←",
+        "جزئیات وضعیت ←",
+        "ایجاد شرکت جدید",
+        "مدیریت کاربران",
+        "نقش‌ها و مجوزها",
+        "مدیران پلتفرم",
+        "تنظیمات پلتفرم"
+      ],
+      "screenshot": "platform-dashboard-1024.png"
+    },
+    {
+      "key": "platform-dashboard",
+      "pattern": "DC-02/DC-08",
+      "route": "/organizations/platform/",
+      "viewport": 390,
+      "client": 390,
+      "scroll": 390,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "داشبورد پلتفرم"
+      ],
+      "regions": [
+        "فعالیت‌های مدیریتی اخیر",
+        "فعالیت پلتفرم",
+        "وضعیت شرکت‌ها",
+        "وضعیت سامانه",
+        "دسترسی سریع"
+      ],
+      "nav": 0,
+      "tableHeaders": [],
+      "formCount": 0,
+      "unnamedFields": [],
+      "visibleActions": [
+        "مشاهده ←",
+        "مشاهده همه فعالیت‌ها ←",
+        "جزئیات وضعیت ←",
+        "ایجاد شرکت جدید",
+        "مدیریت کاربران",
+        "نقش‌ها و مجوزها",
+        "مدیران پلتفرم",
+        "تنظیمات پلتفرم"
+      ],
+      "screenshot": "platform-dashboard-390.png"
+    },
+    {
+      "key": "platform-companies",
+      "pattern": "DC-04/DC-10",
+      "route": "/organizations/platform/companies/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "شرکت‌ها و فعالیت‌ها"
+      ],
+      "regions": [],
+      "nav": 1,
+      "tableHeaders": [
+        "شرکت",
+        "وضعیت",
+        "تعداد عضویت‌ها",
+        "تاریخ ایجاد",
+        "آخرین فعالیت ثبت‌شده",
+        "مدیریت"
+      ],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "شرکت جدید",
+        "جستجو",
+        "پاک‌کردن فیلترها",
+        "شرکت نمونه تکمیل",
+        "فعالیت‌ها و عملیات",
+        "شرکت نمونه موج الف",
+        "فعالیت‌ها و عملیات",
+        "شرکت نمونه موج ب",
+        "فعالیت‌ها و عملیات",
+        "شرکت نمونه واگذاری",
+        "فعالیت‌ها و عملیات",
+        "شرکت نمونه وضعیت",
+        "فعالیت‌ها و عملیات"
+      ],
+      "screenshot": "platform-companies-1440.png"
+    },
+    {
+      "key": "platform-company-detail",
+      "pattern": "DC-05/DC-10",
+      "route": "/organizations/platform/companies/128ee91c-a715-444c-9a5c-11811a7f05ea/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "شرکت نمونه موج الف"
+      ],
+      "regions": [
+        "تعلیق شرکت",
+        "فعالیت‌های ثبت‌شده شرکت"
+      ],
+      "nav": 1,
+      "tableHeaders": [
+        "زمان",
+        "عملیات",
+        "عامل"
+      ],
+      "formCount": 3,
+      "unnamedFields": [],
+      "visibleActions": [
+        "بازگشت به شرکت‌ها",
+        "ویرایش مشخصات و تنظیمات",
+        "تعلیق شرکت",
+        "جستجوی فعالیت"
+      ],
+      "screenshot": "platform-company-detail-1440.png"
+    },
+    {
+      "key": "platform-company-create",
+      "pattern": "DC-07/DC-10",
+      "route": "/organizations/create/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "ایجاد شرکت"
+      ],
+      "regions": [
+        "مشخصات ثبتی شرکت",
+        "اطلاعات تماس",
+        "نشانی شرکت",
+        "راه‌اندازی شرکت"
+      ],
+      "nav": 2,
+      "tableHeaders": [],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "شرکت‌ها",
+        "ایجاد شرکت",
+        "انصراف"
+      ]
+    },
+    {
+      "key": "platform-company-edit",
+      "pattern": "DC-07/DC-10",
+      "route": "/organizations/platform/companies/128ee91c-a715-444c-9a5c-11811a7f05ea/edit/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "ویرایش شرکت"
+      ],
+      "regions": [
+        "مشخصات ثبتی شرکت",
+        "اطلاعات تماس",
+        "نشانی شرکت",
+        "تنظیمات شرکت",
+        "ثبت دلیل تغییر"
+      ],
+      "nav": 2,
+      "tableHeaders": [],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "شرکت نمونه موج الف",
+        "ذخیره مشخصات و تنظیمات",
+        "انصراف"
+      ]
+    },
+    {
+      "key": "platform-users",
+      "pattern": "DC-04/DC-10",
+      "route": "/organizations/platform/users/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "کاربران سامانه"
+      ],
+      "regions": [],
+      "nav": 3,
+      "tableHeaders": [
+        "کاربر",
+        "ایمیل",
+        "وضعیت حساب",
+        "مدیر پلتفرم",
+        "عضویت‌ها",
+        "آخرین ورود",
+        "تاریخ ایجاد",
+        "اقدامات"
+      ],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "ایجاد حساب جدید",
+        "جستجو",
+        "پاک‌کردن فیلترها",
+        "نc نمونه candidate w01-candidate",
+        "0 شرکت",
+        "نd نمونه delegate w01-delegate",
+        "1 شرکت",
+        "کن کاربر نمونه w01-directory-00",
+        "0 شرکت",
+        "کن کاربر نمونه w01-directory-01",
+        "0 شرکت",
+        "کن کاربر نمونه w01-directory-02",
+        "0 شرکت",
+        "کن کاربر نمونه w01-directory-03",
+        "0 شرکت"
+      ],
+      "screenshot": "platform-users-1440.png"
+    },
+    {
+      "key": "platform-user-detail",
+      "pattern": "DC-05/DC-10",
+      "route": "/organizations/platform/users/33d0dda9-c9cc-4999-8135-8c312b2b122b/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "نمونه managed"
+      ],
+      "regions": [
+        "اطلاعات تماس حساب",
+        "امنیت و وضعیت حساب",
+        "عضویت در شرکت‌ها",
+        "آخرین رویدادهای حساب"
+      ],
+      "nav": 2,
+      "tableHeaders": [
+        "شرکت",
+        "وضعیت عضویت",
+        "نقش‌ها"
+      ],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "کاربران سامانه",
+        "ویرایش حساب",
+        "→ بازگشت به فهرست",
+        "2 شرکت",
+        "تنظیم گذرواژه موقت",
+        "ارسال پیوند بازیابی"
+      ],
+      "screenshot": "platform-user-detail-1440.png"
+    },
+    {
+      "key": "platform-users",
+      "pattern": "DC-04/DC-10",
+      "route": "/organizations/platform/users/",
+      "viewport": 1024,
+      "client": 1024,
+      "scroll": 1024,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "کاربران سامانه"
+      ],
+      "regions": [],
+      "nav": 3,
+      "tableHeaders": [
+        "کاربر",
+        "وضعیت حساب",
+        "مدیر پلتفرم",
+        "عضویت‌ها",
+        "اقدامات"
+      ],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "ایجاد حساب جدید",
+        "جستجو",
+        "پاک‌کردن فیلترها",
+        "نc نمونه candidate w01-candidate",
+        "0 شرکت",
+        "نd نمونه delegate w01-delegate",
+        "1 شرکت",
+        "کن کاربر نمونه w01-directory-00",
+        "0 شرکت",
+        "کن کاربر نمونه w01-directory-01",
+        "0 شرکت",
+        "کن کاربر نمونه w01-directory-02",
+        "0 شرکت",
+        "کن کاربر نمونه w01-directory-03",
+        "0 شرکت"
+      ],
+      "screenshot": "platform-users-1024.png"
+    },
+    {
+      "key": "platform-user-detail",
+      "pattern": "DC-05/DC-10",
+      "route": "/organizations/platform/users/33d0dda9-c9cc-4999-8135-8c312b2b122b/",
+      "viewport": 1024,
+      "client": 1024,
+      "scroll": 1024,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "نمونه managed"
+      ],
+      "regions": [
+        "اطلاعات تماس حساب",
+        "امنیت و وضعیت حساب",
+        "عضویت در شرکت‌ها",
+        "آخرین رویدادهای حساب"
+      ],
+      "nav": 2,
+      "tableHeaders": [
+        "شرکت",
+        "وضعیت عضویت",
+        "نقش‌ها"
+      ],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "کاربران سامانه",
+        "ویرایش حساب",
+        "→ بازگشت به فهرست",
+        "2 شرکت",
+        "تنظیم گذرواژه موقت",
+        "ارسال پیوند بازیابی"
+      ]
+    },
+    {
+      "key": "platform-users",
+      "pattern": "DC-04/DC-10",
+      "route": "/organizations/platform/users/",
+      "viewport": 390,
+      "client": 390,
+      "scroll": 390,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "کاربران سامانه"
+      ],
+      "regions": [],
+      "nav": 2,
+      "tableHeaders": [
+        "کاربر",
+        "وضعیت حساب",
+        "مدیر پلتفرم",
+        "عضویت‌ها",
+        "اقدامات"
+      ],
+      "formCount": 1,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "ایجاد حساب جدید",
+        "جستجو",
+        "پاک‌کردن فیلترها",
+        "نc نمونه candidate w01-candidate",
+        "0 شرکت",
+        "نd نمونه delegate w01-delegate",
+        "1 شرکت",
+        "کن کاربر نمونه w01-directory-00",
+        "0 شرکت",
+        "کن کاربر نمونه w01-directory-01",
+        "0 شرکت",
+        "کن کاربر نمونه w01-directory-02",
+        "0 شرکت",
+        "کن کاربر نمونه w01-directory-03",
+        "0 شرکت"
+      ],
+      "screenshot": "platform-users-390.png"
+    },
+    {
+      "key": "platform-user-detail",
+      "pattern": "DC-05/DC-10",
+      "route": "/organizations/platform/users/33d0dda9-c9cc-4999-8135-8c312b2b122b/",
+      "viewport": 390,
+      "client": 390,
+      "scroll": 390,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "نمونه managed"
+      ],
+      "regions": [
+        "اطلاعات تماس حساب",
+        "امنیت و وضعیت حساب",
+        "عضویت در شرکت‌ها",
+        "آخرین رویدادهای حساب"
+      ],
+      "nav": 1,
+      "tableHeaders": [
+        "شرکت",
+        "وضعیت عضویت",
+        "نقش‌ها"
+      ],
+      "formCount": 1,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "کاربران سامانه",
+        "ویرایش حساب",
+        "→ بازگشت به فهرست",
+        "2 شرکت",
+        "تنظیم گذرواژه موقت",
+        "ارسال پیوند بازیابی"
+      ],
+      "screenshot": "platform-user-detail-390.png"
+    },
+    {
+      "key": "platform-user-create",
+      "pattern": "DC-06/DC-10",
+      "route": "/organizations/platform/users/create/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "ایجاد حساب"
+      ],
+      "regions": [],
+      "nav": 2,
+      "tableHeaders": [],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "کاربران سامانه",
+        "ذخیره حساب",
+        "انصراف"
+      ],
+      "screenshot": "platform-user-create-1440.png"
+    },
+    {
+      "key": "platform-user-edit",
+      "pattern": "DC-06/DC-10",
+      "route": "/organizations/platform/users/33d0dda9-c9cc-4999-8135-8c312b2b122b/edit/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "ویرایش حساب"
+      ],
+      "regions": [],
+      "nav": 2,
+      "tableHeaders": [],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "کاربران سامانه",
+        "ذخیره حساب",
+        "انصراف"
+      ]
+    },
+    {
+      "key": "platform-user-temp",
+      "pattern": "DC-06/DC-09/DC-10",
+      "route": "/organizations/platform/users/286f4a62-28b9-46f0-8a7c-299eed23fdb6/temporary-password/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "تنظیم گذرواژه موقت"
+      ],
+      "regions": [],
+      "nav": 2,
+      "tableHeaders": [],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "جزئیات کاربر",
+        "تنظیم گذرواژه موقت",
+        "انصراف"
+      ],
+      "screenshot": "platform-user-temp-1440.png"
+    },
+    {
+      "key": "platform-admins",
+      "pattern": "DC-11",
+      "route": "/organizations/platform/administrators/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "مدیران پلتفرم"
+      ],
+      "regions": [
+        "افزودن مدیر",
+        "تخصیص‌ها و تاریخچه"
+      ],
+      "nav": 2,
+      "tableHeaders": [],
+      "formCount": 3,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "ثبت دسترسی"
+      ],
+      "screenshot": "platform-admins-1440.png"
+    },
+    {
+      "key": "platform-roles",
+      "pattern": "DC-11",
+      "route": "/organizations/platform/roles/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "نقش‌ها و مجوزها"
+      ],
+      "regions": [
+        "فهرست نقش‌ها 28",
+        "Accountant",
+        "دسترسی‌های نقش"
+      ],
+      "nav": 4,
+      "tableHeaders": [],
+      "formCount": 3,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "نقش‌های سیستمی",
+        "نقش‌های اختصاصی",
+        "تخصیص نقش کاربران",
+        "+ نقش جدید",
+        "جست‌وجو",
+        "Accountant ‹ سیستمی 179 مجوز",
+        "Accounting Reviewer ‹ سیستمی 7 مجوز",
+        "Company Manager ‹ سیستمی 491 مجوز",
+        "Company Owner ‹ سیستمی 522 مجوز مجوزهای حفاظت‌شده",
+        "Hr Administrator ‹ سیستمی 14 مجوز",
+        "Hr Reviewer ‹ سیستمی 6 مجوز",
+        "Member ‹ سیستمی 123 مجوز",
+        "Operations Manager ‹ سیستمی 397 مجوز",
+        "Payroll Reviewer ‹ سیستمی 13 مجوز",
+        "Payroll Specialist ‹ سیستمی 21 مجوز"
+      ],
+      "screenshot": "platform-roles-1440.png"
+    },
+    {
+      "key": "platform-member-roles",
+      "pattern": "DC-11",
+      "route": "/organizations/platform/member-roles/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "نقش اعضای شرکت"
+      ],
+      "regions": [],
+      "nav": 3,
+      "tableHeaders": [],
+      "formCount": 2,
+      "unnamedFields": [
+        "organization"
+      ],
+      "visibleActions": [
+        "خانه",
+        "نقش‌های سیستمی",
+        "نقش‌های اختصاصی",
+        "تخصیص نقش کاربران",
+        "نمایش اعضا"
+      ]
+    },
+    {
+      "key": "platform-member-authorization",
+      "pattern": "DC-11",
+      "route": "/organizations/platform/companies/866be280-20b7-4f69-93a7-6fcb69a1e491/members/cf9f7430-d57a-46bc-90a6-8a06b562b1be/roles/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "نقش و دسترسی عضو"
+      ],
+      "regions": [
+        "انتخاب نقش عضو",
+        "تاریخچه نقش‌ها"
+      ],
+      "nav": 3,
+      "tableHeaders": [],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "نقش‌های سیستمی",
+        "نقش‌های اختصاصی",
+        "تخصیص نقش کاربران",
+        "خانه",
+        "ثبت نقش با تأیید فرد مستقل"
+      ]
+    },
+    {
+      "key": "platform-role-create",
+      "pattern": "DC-11",
+      "route": "/organizations/platform/roles/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "نقش‌ها و مجوزها"
+      ],
+      "regions": [
+        "فهرست نقش‌ها 28",
+        "ایجاد نقش سفارشی",
+        "دسترسی‌های نقش"
+      ],
+      "nav": 4,
+      "tableHeaders": [],
+      "formCount": 3,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "نقش‌های سیستمی",
+        "نقش‌های اختصاصی",
+        "تخصیص نقش کاربران",
+        "+ نقش جدید",
+        "جست‌وجو",
+        "Accountant ‹ سیستمی 179 مجوز",
+        "Accounting Reviewer ‹ سیستمی 7 مجوز",
+        "Company Manager ‹ سیستمی 491 مجوز",
+        "Company Owner ‹ سیستمی 522 مجوز مجوزهای حفاظت‌شده",
+        "Hr Administrator ‹ سیستمی 14 مجوز",
+        "Hr Reviewer ‹ سیستمی 6 مجوز",
+        "Member ‹ سیستمی 123 مجوز",
+        "Operations Manager ‹ سیستمی 397 مجوز",
+        "Payroll Reviewer ‹ سیستمی 13 مجوز",
+        "Payroll Specialist ‹ سیستمی 21 مجوز"
+      ]
+    },
+    {
+      "key": "platform-settings",
+      "pattern": "DC-11",
+      "route": "/organizations/platform/settings/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "تنظیمات پلتفرم"
+      ],
+      "regions": [
+        "کنترل‌های سراسری",
+        "نمایش قابلیت‌ها"
+      ],
+      "nav": 2,
+      "tableHeaders": [],
+      "formCount": 1,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "عملیات حفاظت‌شده",
+        "سیاست‌های نسخه‌دار",
+        "تنظیمات هر شرکت"
+      ]
+    },
+    {
+      "key": "platform-protected",
+      "pattern": "DC-11",
+      "route": "/organizations/platform/protected-operations/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "عملیات حفاظت‌شده"
+      ],
+      "regions": [
+        "تاریخچه نسخه‌ها",
+        "نسخه جدید"
+      ],
+      "nav": 2,
+      "tableHeaders": [
+        "کد",
+        "نسخه",
+        "عنوان",
+        "وضعیت",
+        "عامل",
+        ""
+      ],
+      "formCount": 17,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "بازنشستگی",
+        "بازنشستگی",
+        "بازنشستگی",
+        "بازنشستگی",
+        "بازنشستگی",
+        "بازنشستگی",
+        "بازنشستگی",
+        "بازنشستگی",
+        "بازنشستگی",
+        "بازنشستگی",
+        "بازنشستگی",
+        "بازنشستگی",
+        "بازنشستگی",
+        "بازنشستگی",
+        "بازنشستگی"
+      ]
+    },
+    {
+      "key": "platform-policy",
+      "pattern": "DC-11",
+      "route": "/organizations/platform/accounting-policies/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "مدیریت سیاست‌ها و مقررات پلتفرم"
+      ],
+      "regions": [
+        "طبقه‌بندی بیمه قرارداد",
+        "ایجاد نسخه پیش‌نویس یا جایگزین",
+        "منبع، بررسی و انتشار"
+      ],
+      "nav": 1,
+      "tableHeaders": [
+        "سیاست",
+        "مصرف‌کننده",
+        "وضعیت تعریف",
+        "نسخه‌ها",
+        "اقدام"
+      ],
+      "formCount": 23,
+      "unnamedFields": [],
+      "visibleActions": [
+        "ثبت طبقه‌بندی",
+        "ثبت تعریف",
+        "ثبت تعریف",
+        "ثبت تعریف",
+        "ثبت تعریف",
+        "ثبت تعریف",
+        "ثبت تعریف",
+        "ثبت تعریف",
+        "ثبت تعریف",
+        "ثبت تعریف",
+        "ثبت تعریف",
+        "ثبت تعریف",
+        "ثبت تعریف",
+        "ثبت تعریف",
+        "ثبت تعریف",
+        "ثبت تعریف"
+      ]
+    },
+    {
+      "key": "platform-audit",
+      "pattern": "DC-11",
+      "route": "/organizations/platform/activity/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "فعالیت‌ها و ممیزی"
+      ],
+      "regions": [],
+      "nav": 2,
+      "tableHeaders": [
+        "زمان",
+        "عامل",
+        "عملیات",
+        "هدف",
+        "نتیجه"
+      ],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "▦",
+        "▦",
+        "فیلتر",
+        "پاک‌کردن"
+      ]
+    },
+    {
+      "key": "platform-status",
+      "pattern": "DC-11",
+      "route": "/organizations/platform/status/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "وضعیت سامانه"
+      ],
+      "regions": [
+        "بررسی در 1405/08/18 21:32",
+        "آخرین هشدارهای ثبت‌شده"
+      ],
+      "nav": 2,
+      "tableHeaders": [],
+      "formCount": 1,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه"
+      ]
+    }
+  ],
+  "faults": []
+}

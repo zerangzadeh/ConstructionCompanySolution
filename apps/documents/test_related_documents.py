@@ -4,6 +4,7 @@ from datetime import date, timedelta
 from html.parser import HTMLParser
 from urllib.parse import parse_qs, urlsplit
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.template.loader import render_to_string
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
@@ -13,7 +14,12 @@ from apps.audit.models import AuditEvent
 from apps.contracts.models import Contract
 from apps.daily_reports.models import DailyReport
 from apps.documents import tests as dms_fixture
-from apps.documents.models import DocumentLink, DocumentProcessingAssessment
+from apps.documents.models import (
+    DocumentLink,
+    DocumentProcessingAssessment,
+    PhotoSource,
+)
+from apps.documents.photo_services import create_photo
 from apps.documents.presentation import (
     document_return_source,
     document_sources_for,
@@ -111,6 +117,29 @@ class RelatedDocumentsTests(TestCase):
             adapter_code="isolated-fixture",
             recorded_by=self.owner,
         )
+
+    def test_project_photo_preview_requires_clean_version_and_download_authority(self):
+        photo = create_photo(
+            organization=self.organization,
+            actor=self.owner,
+            project=self.project,
+            target=self.project,
+            source=PhotoSource.UPLOAD,
+            title="تصویر آزمون",
+            upload=SimpleUploadedFile(
+                "test.png", b"\x89PNG\r\n\x1a\nfixture", content_type="image/png"
+            ),
+        )
+        self.assertIsNone(self.panel().first_photo)
+        self.clean_version(photo.current_version)
+        self.assertEqual(
+            self.panel().first_photo.photo_preview_url,
+            reverse("documents:photo-preview", args=[photo.pk]),
+        )
+        reader = self.reader(["projects.view", "documents.view"], project=self.project)
+        panel = self.panel(user=reader)
+        self.assertEqual(panel.count, 1)
+        self.assertIsNone(panel.first_photo)
 
     def targets(self):
         contract = Contract.objects.create(

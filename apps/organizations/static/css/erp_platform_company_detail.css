@@ -1,0 +1,207 @@
+/* Company Detail composition of the shared Record Detail and List patterns. */
+.erp-platform-company-detail .erp-record-heading { margin-block-end: 16px; }
+.erp-platform-company-detail h1 { font-size: 1.5rem; }
+.erp-platform-company-detail .erp-page-header__icon { color: var(--bonira-deep-navy); }
+.erp-platform-company-detail .erp-record-section {
+    border-color: var(--bonira-light-gray);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary) 6%, transparent);
+}
+.erp-platform-company-detail .erp-record-section > .erp-form-section__header {
+    padding: 18px 20px 0;
+    border: 0;
+    background: transparent;
+}
+.erp-platform-company-detail .erp-record-section > .erp-form-section__header h2 { font-size: 1rem; }
+.erp-platform-company-detail .erp-form-section__header p {
+    margin-block-start: 5px;
+    color: var(--bonira-muted);
+    font-size: .75rem;
+    font-weight: 400;
+    line-height: 1.8;
+}
+.erp-platform-company-detail .erp-record-section__body { padding: 16px 20px; }
+
+.erp-platform-company-detail .company-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 128px;
+    align-items: center;
+    gap: 20px;
+    padding: 12px 20px;
+}
+.erp-platform-company-detail .company-summary .erp-record-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border: 0;
+    border-radius: 0;
+    margin: 0;
+}
+.erp-platform-company-detail .company-summary .erp-record-summary__item {
+    padding: 12px 16px;
+    border: 0;
+}
+.erp-platform-company-detail .company-summary .erp-record-summary__item:nth-child(-n+3) {
+    border-block-end: 1px solid var(--bonira-light-gray);
+}
+.erp-platform-company-detail .company-summary dt { color: var(--bonira-slate); }
+.erp-platform-company-detail .company-summary dd { font-size: .8125rem; }
+.company-summary__illustration {
+    display: grid;
+    place-items: center;
+    min-height: 118px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--color-primary) 9%, var(--bonira-white));
+    color: var(--bonira-royal-blue);
+}
+.company-summary__illustration svg { width: 72px; height: 72px; stroke-width: 1.2; }
+.company-identifier > summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: var(--bonira-deep-navy);
+    list-style: none;
+}
+.company-identifier > summary::-webkit-details-marker { display: none; }
+.company-identifier > summary::after { content: "⌄"; color: var(--bonira-muted); }
+.company-identifier > summary bdi {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.company-identifier > p {
+    margin-block-start: 8px;
+    color: var(--bonira-slate);
+    font-size: .75rem;
+    font-weight: 400;
+    overflow-wrap: anywhere;
+}
+
+.erp-platform-company-detail .company-section-nav {
+    flex-wrap: nowrap;
+    gap: 0;
+    margin-block: 16px 20px;
+    border: 1px solid var(--bonira-light-gray);
+    border-radius: 10px;
+    background: var(--bonira-white);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary) 5%, transparent);
+}
+.erp-platform-company-detail .company-section-nav a {
+    flex: 1 1 0;
+    justify-content: center;
+    min-width: 0;
+    padding: 13px 10px;
+    border: 0;
+    border-block-end: 3px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    font-weight: 600;
+}
+.company-section-nav svg { width: 18px; height: 18px; flex: 0 0 auto; }
+.erp-platform-company-detail:not(:has(#company-management:target, #company-sensitive:target)) .company-section-nav a[href="#company-activity"],
+.erp-platform-company-detail:has(#company-management:target) .company-section-nav a[href="#company-management"],
+.erp-platform-company-detail:has(#company-sensitive:target) .company-section-nav a[href="#company-sensitive"] {
+    border-block-end-color: var(--bonira-royal-blue);
+    color: var(--bonira-royal-blue);
+}
+
+#company-management .erp-record-section__body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+}
+#company-management .erp-record-fields { flex: 1 1 380px; }
+#company-management .erp-record-fields > div { padding-block: 0; border: 0; }
+.company-settings-link { font-size: .8125rem; }
+.company-settings-link svg { width: 17px; height: 17px; }
+.company-onboarding {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-basis: 100%;
+    gap: 8px 16px;
+}
+
+#company-activity .erp-list-options { flex: 0 0 auto; }
+#company-activity .erp-list-filters__top { border: 0; border-radius: 0; box-shadow: none; padding: 0; }
+#company-activity .erp-list-toolbar { justify-content: flex-end; min-height: 36px; }
+#company-activity .company-activity-table { min-width: 0; }
+#company-activity .company-activity-table th:first-child { width: 24%; }
+#company-activity .company-activity-table th:nth-child(2) { width: 54%; }
+#company-activity .company-activity-table th:last-child { width: 22%; text-align: start; padding-inline: 10px; }
+#company-activity .company-activity-table td { padding-block: 10px; font-size: .8125rem; }
+#company-activity .company-activity-table .erp-list-title { font-weight: 500; }
+#company-activity .erp-list-footer { padding-block-start: 14px; }
+.company-event-actor { display: inline-flex; align-items: center; gap: 7px; max-width: 100%; }
+.company-event-actor svg { width: 15px; height: 15px; flex: 0 0 auto; color: var(--bonira-muted); }
+.company-event-actor bdi { min-width: 0; }
+
+.company-status-disclosure { border-radius: 12px; }
+.erp-platform-company-detail #company-sensitive:has(.company-status-disclosure--danger) {
+    border-color: color-mix(in srgb, var(--color-danger) 20%, var(--bonira-white));
+    box-shadow: none;
+}
+.company-status-disclosure > summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    cursor: pointer;
+    font-size: .875rem;
+    font-weight: 600;
+    list-style: none;
+}
+.company-status-disclosure > summary::-webkit-details-marker { display: none; }
+.company-status-disclosure > summary svg { width: 20px; height: 20px; flex: 0 0 auto; }
+.company-status-disclosure--danger > summary { color: var(--color-danger); }
+.company-status-label { font-size: .8125rem; font-weight: 400; }
+.company-disclosure-chevron { margin-inline-start: auto; }
+.company-status-disclosure[open] .company-disclosure-chevron { transform: rotate(180deg); }
+.company-status-content {
+    border-block-start: 1px solid var(--bonira-light-gray);
+    padding: 16px 20px;
+    color: var(--bonira-slate);
+    font-size: .8125rem;
+}
+.company-status-content form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 12px 20px;
+    margin-block-start: 12px;
+}
+.company-status-content textarea { width: 100%; }
+.company-status-content button { justify-self: start; }
+
+@media (min-width: 768px) {
+    #company-activity .erp-list-filters__top { display: flex; }
+}
+@media (min-width: 768px) and (max-width: 1100px) {
+    .erp-platform-company-detail .company-summary { grid-template-columns: minmax(0, 1fr) 96px; gap: 8px; }
+    .erp-platform-company-detail .company-summary .erp-record-summary__item { padding-inline: 8px; }
+    .company-summary__illustration svg { width: 60px; height: 60px; }
+}
+@media (max-width: 767px) {
+    .erp-platform-company-detail h1 { font-size: 1.25rem; }
+    .erp-platform-company-detail .company-summary { display: block; padding: 8px 12px; }
+    .erp-platform-company-detail .company-summary .erp-record-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .company-summary__illustration { display: none; }
+    .erp-platform-company-detail .company-section-nav a { flex-direction: column; font-size: .75rem; padding: 10px 6px; }
+    .company-section-nav svg { width: 16px; height: 16px; }
+    .erp-platform-company-detail .erp-record-section > .erp-form-section__header { padding: 16px 14px 0; }
+    .erp-platform-company-detail .erp-record-section__body,
+    .company-status-content { padding: 14px; }
+    #company-management .erp-record-fields { row-gap: 8px; }
+    #company-activity .company-activity-table tbody { padding: 0; }
+    #company-activity .company-activity-table td { padding-block: 0; }
+    #company-activity .company-activity-table .erp-list-title { grid-row: 1; padding-block-end: 6px; }
+    .company-status-disclosure > summary { padding: 14px; }
+    .company-status-content form { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 479px) {
+    .erp-platform-company-detail .company-summary .erp-record-summary { grid-template-columns: minmax(0, 1fr); }
+    .erp-platform-company-detail .company-summary .erp-record-summary__item { padding: 9px 0; }
+    .erp-platform-company-detail .company-summary .erp-record-summary__item:not(:last-child) { border-block-end: 1px solid var(--bonira-light-gray); }
+    .erp-platform-company-detail .company-summary dd { max-width: 65%; }
+}

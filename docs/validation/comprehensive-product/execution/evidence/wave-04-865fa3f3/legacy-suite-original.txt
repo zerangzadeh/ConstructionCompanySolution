@@ -1,0 +1,45 @@
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: اجازه مدیریت تجهیزات این شرکت را ندارید.
+
+apps\organizations\authorization.py:443: PermissionDenied
+=========================== short test summary info ===========================
+FAILED apps/equipment/tests.py::EquipmentServiceTests::test_assignment_lifecycle_preserves_history_and_derived_status
+FAILED apps/equipment/tests.py::EquipmentServiceTests::test_assignment_service_rejects_cross_tenant_and_overlap
+FAILED apps/equipment/tests.py::EquipmentServiceTests::test_create_and_scoped_read_enforce_rbac_and_audit
+FAILED apps/equipment/tests.py::EquipmentServiceTests::test_maintenance_lifecycle_updates_equipment_and_audits
+FAILED apps/equipment/tests.py::EquipmentPanelTests::test_owner_can_open_scoped_equipment_pages
+FAILED apps/equipment/test_p8_s18_s23.py::P8EquipmentOperationsTests::test_meter_idempotency_and_correction_preserve_history
+FAILED apps/equipment/test_p8_s18_s23.py::P8EquipmentOperationsTests::test_operations_enforce_permission_tenant_project_and_site_scope
+FAILED apps/equipment/test_p8_s18_s23.py::P8EquipmentOperationsTests::test_operations_have_no_downstream_financial_or_fixed_asset_effect
+FAILED apps/equipment/test_p8_s18_s23.py::P8EquipmentOperationsTests::test_plan_and_work_order_lifecycle
+FAILED apps/equipment/test_p8_s18_s23.py::P8EquipmentOperationsTests::test_qualification_uses_workforce_authority_and_fails_closed
+FAILED apps/equipment/test_p8_s18_s23.py::P8EquipmentOperationsTests::test_rtl_operations_workbench_and_mutation_routes_are_navigable
+FAILED apps/equipment/test_p8_s18_s23.py::P8EquipmentOperationsTests::test_spare_references_link_posted_issue_and_reversal_without_inventory_mutation
+FAILED apps/equipment/test_p8_s18_s23.py::P8EquipmentOperationsTests::test_spare_references_reject_unposted_foreign_duplicate_and_foreign_work_order
+FAILED apps/equipment/test_p8_s18_s23.py::P8EquipmentOperationsTests::test_usage_and_downtime_are_operational_and_single_open
+FAILED apps/equipment/test_workflow.py::MaintenanceWorkflowTests::test_cancellation_is_a_terminal_workbench_outcome
+FAILED apps/equipment/test_workflow.py::MaintenanceWorkflowTests::test_create_restores_missing_platform_catalog
+FAILED apps/equipment/test_workflow.py::MaintenanceWorkflowTests::test_cycle_uses_workbench_domain_service_due_date_and_terminal_history
+FAILED apps/equipment/test_workflow.py::MaintenanceWorkflowTests::test_open_only_backfill_shadow_and_legacy_compatibility_path
+FAILED apps/equipment/test_workflow.py::MaintenanceWorkflowTests::test_tenant_scope_and_candidacy_are_rechecked
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_create_expense_records_decimal_amount_and_audit
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_create_view_limits_project_choices
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_create_view_records_expense
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_list_requires_active_organization
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_optionally_scopes_to_a_project_phase
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_queryset_is_tenant_scoped
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_rejects_cross_tenant_project
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_rejects_negative_amount
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_rejects_phase_from_another_project
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_uses_scoped_party_and_category_snapshots
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_void_view_rejects_blank_reason_without_mutation
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_expense_void_view_rejects_cross_tenant_expense_identifier
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_member_cannot_create_expense
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_member_cannot_void_expense
+FAILED apps/expenses/tests.py::ExpenseServiceTests::test_void_expense_preserves_amount_and_records_audit
+FAILED apps/equipment/test_workflow.py::MaintenanceWorkflowConcurrencyTests::test_competing_start_actions_commit_once
+ERROR apps/equipment/test_workflow.py::MaintenanceWorkflowConcurrencyTests::test_competing_start_actions_commit_once
+35 failed, 35 passed, 1 error, 15 subtests passed in 81.91s (0:01:21)

@@ -1,0 +1,23 @@
+{
+  "id": "TIMEZONE-ATTENDANCE-1440",
+  "description": "Jalali entry, invalid order, timezone persistence, reload and independent finalization",
+  "steps": [
+    {
+      "get": "/timekeeping/attendance/new/?project=85a585c3-a250-41ca-b9e8-519c527f17e2&site=410e80e9-a207-4961-8abd-c2a3ada6ea80&employee=3577ac0e-5d6d-4931-8a3e-3552b68bed34",
+      "status": 200
+    },
+    {
+      "page": "attendance-form",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "post": "/timekeeping/attendance/new/",
+      "status": 500,
+      "returned": "/timekeeping/attendance/new/?project=85a585c3-a250-41ca-b9e8-519c527f17e2&site=410e80e9-a207-4961-8abd-c2a3ada6ea80&employee=3577ac0e-5d6d-4931-8a3e-3552b68bed34",
+      "feedback": []
+    }
+  ],
+  "status": "FAIL",
+  "error": ""
+}

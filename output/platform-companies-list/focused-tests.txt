@@ -1,0 +1,519 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: platform_companies_validation_settings (from option)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 38 items
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_anonymous_and_csrf_guards PASSED [  2%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_cancelled_and_archived_companies_remain_inspectable PASSED [  5%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_company_detail_renders_activity_search_and_retains_it_in_pagination PASSED [  7%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_company_list_distinguishes_empty_inventory_and_empty_filter PASSED [ 10%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_company_list_sorts_and_paginates_the_existing_filtered_results PASSED [ 13%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_edit_rejects_stale_version_and_invalid_configuration PASSED [ 15%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_filters_pagination_and_unknown_company PASSED [ 18%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_list_and_activity_are_platform_scoped_without_selecting_a_tenant PASSED [ 21%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_mutations_recheck_expired_revoked_and_inactive_platform_authority PASSED [ 23%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_owner_and_superuser_without_platform_duty_cannot_read_or_write 
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_owner_and_superuser_without_platform_duty_cannot_read_or_write PASSED [ 26%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants 
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants PASSED [ 28%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_settings_reuse_authoritative_configuration_and_record_reason PASSED [ 31%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_stale_or_invalid_status_and_blank_reason_cannot_mutate PASSED [ 34%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_status_and_settings_roll_back_when_audit_fails 
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_status_and_settings_roll_back_when_audit_fails PASSED [ 36%]
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_suspend_and_reactivate_preserve_memberships_and_audit_transitions PASSED [ 39%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_all_seven_destinations_are_reachable_and_separate 
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_all_seven_destinations_are_reachable_and_separate PASSED [ 42%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_audit_excludes_tenant_business_events_and_nested_sensitive_metadata 
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_audit_excludes_tenant_business_events_and_nested_sensitive_metadata PASSED [ 44%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_dashboard_counts_and_history_use_actual_safe_records PASSED [ 47%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_dashboard_hides_unavailable_actions_and_handles_zero_companies PASSED [ 50%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_explicit_tenant_authority_can_assign_and_revoke_through_console PASSED [ 52%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_legacy_onboarding_retry_is_safe_and_creation_failure_rolls_back PASSED [ 55%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_operator_grants_and_revokes_without_superuser_or_tenant_authority PASSED [ 57%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_platform_login_default_and_no_self_owner_assignment PASSED [ 60%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_platform_permissions_cannot_be_transferred_into_business_roles 
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_platform_permissions_cannot_be_transferred_into_business_roles PASSED [ 63%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_platform_role_catalog_protects_owner_grants_and_stale_versions PASSED [ 65%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_platform_settings_reject_financial_configuration_changes PASSED [ 68%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_role_only_operator_cannot_inspect_or_change_tenant_member_assignments PASSED [ 71%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_status_sanitizes_probe_failures_and_marks_missing_sources_unverified PASSED [ 73%]
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_tenant_catalog_entry_does_not_inherit_platform_definition_authority PASSED [ 76%]
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_amount_summary_uses_filtered_results_before_pagination PASSED [ 78%]
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_business_search_covers_each_requested_source 
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_business_search_covers_each_requested_source PASSED [ 81%]
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_combined_side_status_search_and_project_filters_intersect PASSED [ 84%]
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_general_list_has_one_search_compact_filters_and_business_side_labels PASSED [ 86%]
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_invalid_filters_do_not_broaden_results 
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_invalid_filters_do_not_broaden_results PASSED [ 89%]
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_legacy_bookmarked_filters_remain_secondary_and_removable PASSED [ 92%]
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_project_choices_and_filter_deny_foreign_and_out_of_scope_projects PASSED [ 94%]
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_project_context_has_no_duplicate_selector_and_survives_chip_clear PASSED [ 97%]
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_remote_options_paginate_and_pin_selected_projects_beyond_initial_window PASSED [100%]
+
+=================================== PASSES ====================================
+_____________ PlatformCompanyTests.test_anonymous_and_csrf_guards _____________
+---------------------------- Captured stderr setup ----------------------------
+Using existing test database for alias 'default'...
+
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:35:59.048996+00:00","event":"http.response","request_id":"f03fcaca-fdfe-4c7f-8765-c5dfe60a80a3","method":"GET","route":"organizations:platform_company_detail","status_code":302,"duration_ms":8}
+{"timestamp":"2026-11-10T17:35:59.145251+00:00","event":"http.response","request_id":"c81d8edc-3ebd-42fa-8d47-cca5fa0e392b","method":"POST","route":"organizations:platform_company_status","status_code":403,"duration_ms":79}
+{"timestamp":"2026-11-10T17:35:59.158881+00:00","event":"http.response","request_id":"7b298346-582b-4262-9b92-40b3af699c7e","method":"POST","route":"organizations:platform_company_edit","status_code":403,"duration_ms":11}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.security.csrf:log.py:253 Forbidden (CSRF cookie not set.): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/status/
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.security.csrf:log.py:253 Forbidden (CSRF cookie not set.): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/edit/
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformCompanyTests.test_cancelled_and_archived_companies_remain_inspectable _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:35:59.330030+00:00","event":"http.response","request_id":"a845cbd3-495e-4683-bb80-c94fcdae5ade","method":"GET","route":"organizations:platform_company_detail","status_code":200,"duration_ms":139}
+{"timestamp":"2026-11-10T17:35:59.420866+00:00","event":"http.response","request_id":"b06237c5-c7eb-490e-8359-51bcd614711e","method":"GET","route":"organizations:platform_company_detail","status_code":200,"duration_ms":63}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformCompanyTests.test_company_detail_renders_activity_search_and_retains_it_in_pagination _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:35:59.672651+00:00","event":"http.response","request_id":"c2373af7-66dc-4996-94cc-989cd69d31b8","method":"GET","route":"organizations:platform_company_detail","status_code":200,"duration_ms":111}
+{"timestamp":"2026-11-10T17:35:59.750362+00:00","event":"http.response","request_id":"67bda517-c18b-4426-a22e-7ab9b2a46c0c","method":"GET","route":"organizations:platform_company_detail","status_code":200,"duration_ms":76}
+{"timestamp":"2026-11-10T17:35:59.828706+00:00","event":"http.response","request_id":"3ef3b367-a6f3-49ba-a4ab-2d6ecb4e6f00","method":"GET","route":"organizations:platform_company_detail","status_code":200,"duration_ms":76}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformCompanyTests.test_company_list_distinguishes_empty_inventory_and_empty_filter _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:35:59.917249+00:00","event":"http.response","request_id":"990f36fd-9ed9-4268-b363-be4f4dd17f7c","method":"GET","route":"organizations:platform_company_list","status_code":200,"duration_ms":63}
+{"timestamp":"2026-11-10T17:35:59.959160+00:00","event":"http.response","request_id":"17a52e23-60e7-4151-8799-bc5409c550d9","method":"GET","route":"organizations:platform_company_list","status_code":200,"duration_ms":39}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformCompanyTests.test_company_list_sorts_and_paginates_the_existing_filtered_results _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:00.065810+00:00","event":"http.response","request_id":"b3f7449e-1a66-44b8-bd2f-f219b388412c","method":"GET","route":"organizations:platform_company_list","status_code":200,"duration_ms":75}
+{"timestamp":"2026-11-10T17:36:00.120292+00:00","event":"http.response","request_id":"abae6ed7-fb1b-443b-ada3-20f85dbe5b63","method":"GET","route":"organizations:platform_company_list","status_code":200,"duration_ms":52}
+{"timestamp":"2026-11-10T17:36:00.191321+00:00","event":"http.response","request_id":"9e65fac7-92cb-4f89-a964-bf4b6a5abd57","method":"GET","route":"organizations:platform_company_list","status_code":200,"duration_ms":69}
+{"timestamp":"2026-11-10T17:36:00.239305+00:00","event":"http.response","request_id":"6435fa8d-e373-4b10-bfbf-056e80a3a26d","method":"GET","route":"organizations:platform_company_list","status_code":200,"duration_ms":47}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformCompanyTests.test_edit_rejects_stale_version_and_invalid_configuration _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:00.328632+00:00","event":"http.response","request_id":"c9d1d640-45e9-4279-810a-184acf18a383","method":"GET","route":"organizations:platform_company_edit","status_code":200,"duration_ms":64}
+{"timestamp":"2026-11-10T17:36:00.381591+00:00","event":"http.response","request_id":"cf5cef9d-0995-42f4-ac8c-4a55cd5debc6","method":"POST","route":"organizations:platform_company_status","status_code":302,"duration_ms":49}
+{"timestamp":"2026-11-10T17:36:00.464024+00:00","event":"http.response","request_id":"a14fa367-3f53-4b78-a9a6-e8b190e78656","method":"POST","route":"organizations:platform_company_edit","status_code":200,"duration_ms":80}
+{"timestamp":"2026-11-10T17:36:00.525169+00:00","event":"http.response","request_id":"9554ffdc-fb6a-44a0-a0ef-1edb4a41aba6","method":"GET","route":"organizations:platform_company_edit","status_code":200,"duration_ms":54}
+{"timestamp":"2026-11-10T17:36:00.599115+00:00","event":"http.response","request_id":"c70d2f77-c86e-4c01-8d97-8ab5a24935ca","method":"POST","route":"organizations:platform_company_edit","status_code":200,"duration_ms":73}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+______ PlatformCompanyTests.test_filters_pagination_and_unknown_company _______
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:00.677556+00:00","event":"http.response","request_id":"080d9101-8164-4ebb-be65-ed98d1d9fbac","method":"GET","route":"organizations:platform_company_list","status_code":200,"duration_ms":54}
+{"timestamp":"2026-11-10T17:36:00.722801+00:00","event":"http.response","request_id":"42c41198-091f-4c1b-9686-9f847edfe403","method":"GET","route":"organizations:platform_company_list","status_code":200,"duration_ms":44}
+{"timestamp":"2026-11-10T17:36:00.799922+00:00","event":"http.response","request_id":"8319b8eb-5572-440f-b861-bc3f268f3c52","method":"GET","route":"organizations:platform_company_detail","status_code":200,"duration_ms":75}
+{"timestamp":"2026-11-10T17:36:00.838903+00:00","event":"http.response","request_id":"af9c5491-0cd7-4d51-bbd5-af3e0020225c","method":"GET","route":"organizations:platform_company_detail","status_code":404,"duration_ms":38}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /organizations/platform/companies/dec44714-674e-4210-a1d6-d09934dc0eac/
+_ PlatformCompanyTests.test_list_and_activity_are_platform_scoped_without_selecting_a_tenant _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:00.911138+00:00","event":"http.response","request_id":"498c082d-7c74-45e6-8ada-a886758c5bb4","method":"GET","route":"organizations:platform_company_list","status_code":200,"duration_ms":51}
+{"timestamp":"2026-11-10T17:36:00.954703+00:00","event":"http.response","request_id":"b85326a1-51fb-4291-a414-3a64f91f24d1","method":"GET","route":"home","status_code":200,"duration_ms":41}
+{"timestamp":"2026-11-10T17:36:01.035546+00:00","event":"http.response","request_id":"a7712caa-9dbf-4ab6-b53b-ba12f7ab2610","method":"GET","route":"organizations:platform_company_detail","status_code":200,"duration_ms":72}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformCompanyTests.test_owner_and_superuser_without_platform_duty_cannot_read_or_write _
+---------------------------- Captured stdout call -----------------------------
+SUBPASSED(user='company-owner', route='detail') [ 26%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_owner_and_superuser_without_platform_duty_cannot_read_or_write SUBPASSED(user='company-owner', route='edit') [ 26%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_owner_and_superuser_without_platform_duty_cannot_read_or_write SUBPASSED(user='company-owner', route='status') [ 26%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_owner_and_superuser_without_platform_duty_cannot_read_or_write SUBPASSED(user='company-root', route='detail') [ 26%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_owner_and_superuser_without_platform_duty_cannot_read_or_write SUBPASSED(user='company-root', route='edit') [ 26%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_owner_and_superuser_without_platform_duty_cannot_read_or_write SUBPASSED(user='company-root', route='status') [ 26%]
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:01.123762+00:00","event":"http.response","request_id":"aea1052c-42c3-4f43-9ff3-90ae1d48ae24","method":"GET","route":"organizations:platform_company_list","status_code":403,"duration_ms":20}
+{"timestamp":"2026-11-10T17:36:01.140774+00:00","event":"http.response","request_id":"ebab4e24-cf4b-489c-9cb4-78cc3bc86a29","method":"GET","route":"organizations:platform_company_detail","status_code":403,"duration_ms":16}
+{"timestamp":"2026-11-10T17:36:01.162687+00:00","event":"http.response","request_id":"4c8ee572-a425-490a-ab22-f8108677991d","method":"POST","route":"organizations:platform_company_detail","status_code":403,"duration_ms":18}
+{"timestamp":"2026-11-10T17:36:01.182333+00:00","event":"http.response","request_id":"14c16b2e-6d22-4beb-a389-1486f097cabe","method":"GET","route":"organizations:platform_company_edit","status_code":403,"duration_ms":18}
+{"timestamp":"2026-11-10T17:36:01.202070+00:00","event":"http.response","request_id":"6c55516c-34b5-4eca-b45f-a027ccb8f59e","method":"POST","route":"organizations:platform_company_edit","status_code":403,"duration_ms":19}
+{"timestamp":"2026-11-10T17:36:01.223665+00:00","event":"http.response","request_id":"43e0f18f-f6f5-4a6e-a102-9f2b00a66120","method":"GET","route":"organizations:platform_company_status","status_code":403,"duration_ms":17}
+{"timestamp":"2026-11-10T17:36:01.248939+00:00","event":"http.response","request_id":"e5a85cbf-b472-4762-847c-eda4dc378454","method":"POST","route":"organizations:platform_company_status","status_code":403,"duration_ms":22}
+{"timestamp":"2026-11-10T17:36:01.282888+00:00","event":"http.response","request_id":"720ba4f4-ef10-452a-b682-0a9ac661f87e","method":"GET","route":"organizations:platform_company_list","status_code":403,"duration_ms":25}
+{"timestamp":"2026-11-10T17:36:01.303826+00:00","event":"http.response","request_id":"1f672ca4-de4a-40ca-a8e8-df6d5aa6872b","method":"GET","route":"organizations:platform_company_detail","status_code":403,"duration_ms":20}
+{"timestamp":"2026-11-10T17:36:01.329602+00:00","event":"http.response","request_id":"70eec6a3-23d1-43da-b326-f6ff95a3e4bb","method":"POST","route":"organizations:platform_company_detail","status_code":403,"duration_ms":21}
+{"timestamp":"2026-11-10T17:36:01.355577+00:00","event":"http.response","request_id":"a493c4e5-ccf8-49cb-8ed6-98aa7accc8af","method":"GET","route":"organizations:platform_company_edit","status_code":403,"duration_ms":23}
+{"timestamp":"2026-11-10T17:36:01.381594+00:00","event":"http.response","request_id":"76441f5c-67e7-40dd-b7f9-0b25da3f358b","method":"POST","route":"organizations:platform_company_edit","status_code":403,"duration_ms":22}
+{"timestamp":"2026-11-10T17:36:01.403990+00:00","event":"http.response","request_id":"8384d0e7-a447-4a6e-9b2d-26db14a680bd","method":"GET","route":"organizations:platform_company_status","status_code":403,"duration_ms":20}
+{"timestamp":"2026-11-10T17:36:01.428438+00:00","event":"http.response","request_id":"6ff14b26-6d86-4c47-a26b-e6e4b514dddf","method":"POST","route":"organizations:platform_company_status","status_code":403,"duration_ms":21}
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/edit/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/edit/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/status/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/status/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/edit/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/edit/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/status/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/status/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response
+_ PlatformCompanyTests.test_platform_permissions_have_no_tenant_default_grants _
+---------------------------- Captured stdout call -----------------------------
+SUBPASSED(role=MembershipRole.TENANT_OWNER) [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role=MembershipRole.TENANT_ADMIN) [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role=MembershipRole.TENANT_MANAGER) [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role=MembershipRole.PROJECT_MANAGER) [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role=MembershipRole.ACCOUNTANT) [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role=MembershipRole.SUPERVISOR) [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role=MembershipRole.COMPANY_OWNER) [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role=MembershipRole.COMPANY_MANAGER) [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role=MembershipRole.OPERATIONS_MANAGER) [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role=MembershipRole.MEMBER) [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role=MembershipRole.VIEWER) [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='accounting_reviewer') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='project_controls_reviewer') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='hr_administrator') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='hr_reviewer') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='payroll_specialist') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='payroll_reviewer') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='rfq_custodian') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='rfq_opener') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='rfq_opening_approver') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='supplier_portal_manager') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='reporting_analyst') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='reporting_reviewer') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='reporting_auditor') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='reporting_sensitive_reader') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='support_operator') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='support_access_confirmer') [ 28%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants SUBPASSED(role='support_access_approver') [ 28%]
+_ PlatformCompanyTests.test_settings_reuse_authoritative_configuration_and_record_reason _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:01.560882+00:00","event":"http.response","request_id":"298408dd-6ac3-40a9-adca-bece908f83fe","method":"GET","route":"organizations:platform_company_edit","status_code":200,"duration_ms":60}
+{"timestamp":"2026-11-10T17:36:01.642112+00:00","event":"http.response","request_id":"a700b3c9-1792-42d5-ae3b-f60b662f2658","method":"POST","route":"organizations:platform_company_edit","status_code":302,"duration_ms":81}
+{"timestamp":"2026-11-10T17:36:01.712145+00:00","event":"http.response","request_id":"bfb8c858-d1f5-4134-948c-593356f197f0","method":"GET","route":"organizations:platform_company_detail","status_code":200,"duration_ms":68}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformCompanyTests.test_stale_or_invalid_status_and_blank_reason_cannot_mutate _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:01.782581+00:00","event":"http.response","request_id":"f6f87207-4d7e-45d3-86b6-0c38e475ddd9","method":"POST","route":"organizations:platform_company_status","status_code":302,"duration_ms":42}
+{"timestamp":"2026-11-10T17:36:01.799022+00:00","event":"http.response","request_id":"5fb92947-9461-4743-a4cc-b41185e3d2d5","method":"POST","route":"organizations:platform_company_status","status_code":302,"duration_ms":22}
+{"timestamp":"2026-11-10T17:36:01.830605+00:00","event":"http.response","request_id":"4531156f-68b0-49b1-890d-2a2295c7f801","method":"POST","route":"organizations:platform_company_status","status_code":302,"duration_ms":18}
+{"timestamp":"2026-11-10T17:36:01.851539+00:00","event":"http.response","request_id":"373a75a5-9f59-46bc-9dbe-5999726b57c0","method":"POST","route":"organizations:platform_company_status","status_code":302,"duration_ms":20}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+__ PlatformCompanyTests.test_status_and_settings_roll_back_when_audit_fails ___
+---------------------------- Captured stdout call -----------------------------
+SUBPASSED(target='status') [ 36%]
+
+apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_status_and_settings_roll_back_when_audit_fails SUBPASSED(target='settings') [ 36%]
+_ PlatformCompanyTests.test_suspend_and_reactivate_preserve_memberships_and_audit_transitions _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:01.964300+00:00","event":"http.response","request_id":"2c5e5254-fc96-426c-9dbe-4296d2880290","method":"GET","route":"organizations:platform_company_status","status_code":405,"duration_ms":9}
+{"timestamp":"2026-11-10T17:36:01.998256+00:00","event":"http.response","request_id":"1fe7ffd7-4301-456a-a698-794058dc47a5","method":"POST","route":"organizations:platform_company_status","status_code":302,"duration_ms":32}
+{"timestamp":"2026-11-10T17:36:02.053882+00:00","event":"http.response","request_id":"47ccb579-c22e-4b33-bb52-ec4d0de30765","method":"GET","route":"organizations:platform_company_detail","status_code":200,"duration_ms":49}
+{"timestamp":"2026-11-10T17:36:02.088223+00:00","event":"http.response","request_id":"bf2440e7-2816-4c7c-878b-4ec364c091bd","method":"POST","route":"organizations:platform_company_status","status_code":302,"duration_ms":29}
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:253 Method Not Allowed (GET): /organizations/platform/companies/2e59d29e-45db-43ab-805e-935ec8a8e957/status/
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformConsoleTests.test_all_seven_destinations_are_reachable_and_separate _
+---------------------------- Captured stdout call -----------------------------
+SUBPASSED(section='platform_dashboard') [ 42%]
+
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_all_seven_destinations_are_reachable_and_separate SUBPASSED(section='platform_company_list') [ 42%]
+
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_all_seven_destinations_are_reachable_and_separate SUBPASSED(section='platform_users') [ 42%]
+
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_all_seven_destinations_are_reachable_and_separate SUBPASSED(section='platform_administrators') [ 42%]
+
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_all_seven_destinations_are_reachable_and_separate SUBPASSED(section='platform_role_catalog') [ 42%]
+
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_all_seven_destinations_are_reachable_and_separate SUBPASSED(section='platform_settings') [ 42%]
+
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_all_seven_destinations_are_reachable_and_separate SUBPASSED(section='platform_audit') [ 42%]
+
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_all_seven_destinations_are_reachable_and_separate SUBPASSED(section='platform_status') [ 42%]
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:02.337219+00:00","event":"http.response","request_id":"02d2da4a-d80f-4d30-8a7d-feceaac53598","method":"GET","route":"organizations:platform_dashboard","status_code":200,"duration_ms":91}
+{"timestamp":"2026-11-10T17:36:02.385357+00:00","event":"http.response","request_id":"f2e8775b-d835-4778-b913-4f01b2c187ed","method":"GET","route":"organizations:platform_dashboard","status_code":200,"duration_ms":47}
+{"timestamp":"2026-11-10T17:36:02.416560+00:00","event":"http.response","request_id":"b24fea24-7c17-467e-97c6-14f56c15ebbc","method":"GET","route":"organizations:platform_company_list","status_code":200,"duration_ms":29}
+{"timestamp":"2026-11-10T17:36:02.461835+00:00","event":"http.response","request_id":"02208f77-b7b4-4ec9-914e-7cd3ef30e31d","method":"GET","route":"organizations:platform_users","status_code":200,"duration_ms":45}
+{"timestamp":"2026-11-10T17:36:02.487852+00:00","event":"http.response","request_id":"89422df4-9c19-4d7d-b900-b874d7051671","method":"GET","route":"organizations:platform_administrators","status_code":200,"duration_ms":24}
+{"timestamp":"2026-11-10T17:36:02.652978+00:00","event":"http.response","request_id":"89869651-93f6-496a-81ea-c9b3b7d5b0aa","method":"GET","route":"organizations:platform_role_catalog","status_code":200,"duration_ms":163}
+{"timestamp":"2026-11-10T17:36:02.680084+00:00","event":"http.response","request_id":"06ecc8a2-2d91-4027-9bb0-ef06fd9193b1","method":"GET","route":"organizations:platform_settings","status_code":200,"duration_ms":26}
+{"timestamp":"2026-11-10T17:36:02.727389+00:00","event":"http.response","request_id":"4e191ba9-1c8d-4a73-b993-3d13abea8093","method":"GET","route":"organizations:platform_audit","status_code":200,"duration_ms":45}
+{"timestamp":"2026-11-10T17:36:02.758030+00:00","event":"http.response","request_id":"7b9c720b-c703-4923-9abc-4d9dbf6c8a55","method":"GET","route":"organizations:platform_status","status_code":200,"duration_ms":28}
+{"timestamp":"2026-11-10T17:36:03.067453+00:00","event":"http.response","request_id":"b3b18c37-3f67-468a-9b53-6f687015d19e","method":"GET","route":"organizations:platform_dashboard","status_code":403,"duration_ms":299}
+{"timestamp":"2026-11-10T17:36:03.220895+00:00","event":"http.response","request_id":"8e2ba847-8def-4d58-9d7f-220b03f5fcd4","method":"GET","route":"organizations:platform_company_list","status_code":403,"duration_ms":153}
+{"timestamp":"2026-11-10T17:36:03.361368+00:00","event":"http.response","request_id":"bf66f15c-3a30-4503-9e88-382eb80bc8b2","method":"GET","route":"organizations:platform_users","status_code":403,"duration_ms":150}
+{"timestamp":"2026-11-10T17:36:03.523165+00:00","event":"http.response","request_id":"750e60da-faad-4617-bf9f-6c50ecb531a5","method":"GET","route":"organizations:platform_administrators","status_code":403,"duration_ms":149}
+{"timestamp":"2026-11-10T17:36:03.678764+00:00","event":"http.response","request_id":"f5781c75-9ae5-41c8-ac75-1c9c1e682b3d","method":"GET","route":"organizations:platform_role_catalog","status_code":403,"duration_ms":155}
+{"timestamp":"2026-11-10T17:36:03.818870+00:00","event":"http.response","request_id":"e8c63cdf-2e41-4243-8b9b-596ce8d198c8","method":"GET","route":"organizations:platform_settings","status_code":403,"duration_ms":139}
+{"timestamp":"2026-11-10T17:36:03.998135+00:00","event":"http.response","request_id":"dd9eec8c-b95a-4fd4-9476-0496ce3f8dc4","method":"GET","route":"organizations:platform_audit","status_code":403,"duration_ms":184}
+{"timestamp":"2026-11-10T17:36:04.190054+00:00","event":"http.response","request_id":"6938dc60-1fe0-41ec-a3f7-ee73f21fd8b8","method":"GET","route":"organizations:platform_status","status_code":403,"duration_ms":186}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/users/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/administrators/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/roles/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/settings/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/activity/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/status/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 185, in _get_response\n    response = middleware_method(\n               ^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\core\\product_surface_middleware.py", line 21, in process_view\n    raise PermissionDenied("\u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0627\u06cc\u0646 \u0635\u0641\u062d\u0647 \u062f\u0631 \u062f\u0633\u062a\u0631\u0633 \u0646\u06cc\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response
+_ PlatformConsoleTests.test_audit_excludes_tenant_business_events_and_nested_sensitive_metadata _
+---------------------------- Captured stdout call -----------------------------
+SUBPASSED(field='metadata') [ 44%]
+
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_audit_excludes_tenant_business_events_and_nested_sensitive_metadata SUBPASSED(field='changes') [ 44%]
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:04.269858+00:00","event":"http.response","request_id":"ca3e6b7b-b390-4f64-8918-332e87337661","method":"GET","route":"organizations:platform_audit","status_code":200,"duration_ms":48}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformConsoleTests.test_dashboard_counts_and_history_use_actual_safe_records _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:04.376633+00:00","event":"http.response","request_id":"e78cb777-df67-403e-ade0-e2475d947ee4","method":"GET","route":"organizations:platform_dashboard","status_code":200,"duration_ms":63}
+{"timestamp":"2026-11-10T17:36:04.419724+00:00","event":"http.response","request_id":"3264765b-06fd-4d07-819a-a4f242526a73","method":"GET","route":"organizations:create","status_code":200,"duration_ms":39}
+{"timestamp":"2026-11-10T17:36:04.561639+00:00","event":"http.response","request_id":"34598224-361d-4625-bd0e-09e7d9493aba","method":"GET","route":"organizations:platform_role_catalog","status_code":200,"duration_ms":142}
+{"timestamp":"2026-11-10T17:36:04.590655+00:00","event":"http.response","request_id":"f8ba7d7f-5a61-475c-9561-19e0c4c6e67f","method":"GET","route":"organizations:platform_administrators","status_code":200,"duration_ms":26}
+{"timestamp":"2026-11-10T17:36:04.610715+00:00","event":"http.response","request_id":"510b18e3-fff2-46e8-927b-bf36a7014b10","method":"GET","route":"organizations:platform_settings","status_code":200,"duration_ms":19}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformConsoleTests.test_dashboard_hides_unavailable_actions_and_handles_zero_companies _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:04.661894+00:00","event":"http.response","request_id":"831327a7-2c3c-4f5a-9ca8-b5064928dffb","method":"GET","route":"organizations:platform_dashboard","status_code":200,"duration_ms":33}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformConsoleTests.test_explicit_tenant_authority_can_assign_and_revoke_through_console _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:04.920192+00:00","event":"http.response","request_id":"73a074e4-c49f-44d9-8f9f-db0f566aecb7","method":"GET","route":"organizations:platform_member_roles","status_code":200,"duration_ms":180}
+{"timestamp":"2026-11-10T17:36:05.130080+00:00","event":"http.response","request_id":"ad4f16e2-27c5-45b9-a6a1-aee46577ad37","method":"GET","route":"organizations:platform_member_authorization","status_code":200,"duration_ms":219}
+{"timestamp":"2026-11-10T17:36:05.261580+00:00","event":"http.response","request_id":"b53c677d-ee83-42ab-8399-5fdef3d09658","method":"POST","route":"organizations:platform_member_authorization","status_code":302,"duration_ms":126}
+{"timestamp":"2026-11-10T17:36:05.656815+00:00","event":"http.response","request_id":"ae688071-cebe-4052-a7e5-8d4f7b8ff582","method":"GET","route":"organizations:platform_member_authorization","status_code":200,"duration_ms":388}
+{"timestamp":"2026-11-10T17:36:05.877588+00:00","event":"http.response","request_id":"c974bb4d-5bf5-4786-8002-5a3b03ca16df","method":"POST","route":"organizations:platform_member_authorization","status_code":404,"duration_ms":218}
+{"timestamp":"2026-11-10T17:36:06.020140+00:00","event":"http.response","request_id":"5e4baa89-deb6-45a2-8eda-4810a3e6b911","method":"POST","route":"organizations:platform_member_authorization","status_code":302,"duration_ms":141}
+{"timestamp":"2026-11-10T17:36:06.256638+00:00","event":"http.response","request_id":"bfbc6a7d-f964-4255-a1d0-78f4e9d6b516","method":"GET","route":"organizations:platform_member_authorization","status_code":200,"duration_ms":235}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+WARNING  django.request:log.py:253 Not Found: /organizations/platform/companies/66fad2d5-0be5-4bbe-88de-137a06328f0a/members/7b1e5b64-999d-406c-92d0-20b1f8cea231/roles/
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformConsoleTests.test_operator_grants_and_revokes_without_superuser_or_tenant_authority _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:06.641565+00:00","event":"http.response","request_id":"c365aeaf-f98f-4ab2-8f97-75a88f594685","method":"POST","route":"organizations:platform_administrators","status_code":302,"duration_ms":19}
+{"timestamp":"2026-11-10T17:36:06.661475+00:00","event":"http.response","request_id":"cdbd76cf-54c7-4504-891d-ce009fc76d26","method":"GET","route":"organizations:platform_administrators","status_code":200,"duration_ms":23}
+{"timestamp":"2026-11-10T17:36:06.686643+00:00","event":"http.response","request_id":"024f3f6c-2bc3-419a-b979-a7a7f6753c83","method":"POST","route":"organizations:platform_administrators","status_code":302,"duration_ms":16}
+{"timestamp":"2026-11-10T17:36:06.694898+00:00","event":"http.response","request_id":"b965b253-a5fb-4e73-be48-ab4bff0e30c8","method":"GET","route":"organizations:platform_administrators","status_code":200,"duration_ms":21}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformConsoleTests.test_platform_login_default_and_no_self_owner_assignment _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:06.738584+00:00","event":"http.response","request_id":"f2aff090-246f-40a6-8060-9fe79a4ba2ef","method":"GET","route":"accounts:login","status_code":302,"duration_ms":5}
+{"timestamp":"2026-11-10T17:36:06.771876+00:00","event":"http.response","request_id":"fee05cfc-7278-43d7-9c52-416a66f7b008","method":"GET","route":"organizations:platform_dashboard","status_code":200,"duration_ms":32}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ PlatformConsoleTests.test_platform_permissions_cannot_be_transferred_into_business_roles _
+---------------------------- Captured stdout call -----------------------------
+SUBPASSED(permission=BusinessPermissionCode.PLATFORM_ADMIN_MANAGE_OPERATORS) [ 63%]
+
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_platform_permissions_cannot_be_transferred_into_business_roles SUBPASSED(permission=BusinessPermissionCode.PLATFORM_ADMIN_INSPECT_AUDIT) [ 63%]
+
+apps/organizations/test_platform_console.py::PlatformConsoleTests::test_platform_permissions_cannot_be_transferred_into_business_roles SUBPASSED(permission=BusinessPermissionCode.PLATFORM_ADMIN_INSPECT_HEALTH) [ 63%]
+_ PlatformConsoleTests.test_role_only_operator_cannot_inspect_or_change_tenant_member_assignments _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:06.877765+00:00","event":"http.response","request_id":"f8d0f339-23da-4d8c-9e2c-b60bad41b897","method":"GET","route":"organizations:platform_member_roles","status_code":200,"duration_ms":20}
+{"timestamp":"2026-11-10T17:36:06.907358+00:00","event":"http.response","request_id":"ba9c2913-af36-4941-b21d-913f225eb196","method":"GET","route":"organizations:platform_member_authorization","status_code":403,"duration_ms":18}
+{"timestamp":"2026-11-10T17:36:06.911681+00:00","event":"http.response","request_id":"3c367cae-ad84-4743-9fce-a74e06483a02","method":"POST","route":"organizations:platform_member_authorization","status_code":403,"duration_ms":18}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/453a3474-6e7d-4206-89ac-240d8ce9d928/members/a56db126-cd5a-4ba1-bdba-87878ee82d08/roles/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 197, in _get_response\n    response = wrapped_callback(request, *callback_args, **callback_kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\contrib\\auth\\decorators.py", line 59, in _view_wrapper\n    return view_func(request, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\views\\decorators\\http.py", line 64, in inner\n    return func(request, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\views\\decorators\\cache.py", line 80, in _view_wrapper\n    response = view_func(request, *args, **kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\platform_console.py", line 613, in member_authorization\n    raise PermissionDenied("\u0645\u062c\u0648\u0632 \u0645\u0634\u0627\u0647\u062f\u0647 \u0646\u0642\u0634\u200c\u0647\u0627\u06cc \u0627\u0639\u0636\u0627\u06cc \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u0644\u0627\u0632\u0645 \u0627\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0645\u062c\u0648\u0632 \u0645\u0634\u0627\u0647\u062f\u0647 \u0646\u0642\u0634\u200c\u0647\u0627\u06cc \u0627\u0639\u0636\u0627\u06cc \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u0644\u0627\u0632\u0645 \u0627\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /organizations/platform/companies/453a3474-6e7d-4206-89ac-240d8ce9d928/members/a56db126-cd5a-4ba1-bdba-87878ee82d08/roles/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 197, in _get_response\n    response = wrapped_callback(request, *callback_args, **callback_kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\contrib\\auth\\decorators.py", line 59, in _view_wrapper\n    return view_func(request, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\views\\decorators\\http.py", line 64, in inner\n    return func(request, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\views\\decorators\\cache.py", line 80, in _view_wrapper\n    response = view_func(request, *args, **kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\platform_console.py", line 613, in member_authorization\n    raise PermissionDenied("\u0645\u062c\u0648\u0632 \u0645\u0634\u0627\u0647\u062f\u0647 \u0646\u0642\u0634\u200c\u0647\u0627\u06cc \u0627\u0639\u0636\u0627\u06cc \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u0644\u0627\u0632\u0645 \u0627\u0633\u062a.")\ndjango.core.exceptions.PermissionDenied: \u0645\u062c\u0648\u0632 \u0645\u0634\u0627\u0647\u062f\u0647 \u0646\u0642\u0634\u200c\u0647\u0627\u06cc \u0627\u0639\u0636\u0627\u06cc \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u0644\u0627\u0632\u0645 \u0627\u0633\u062a.\nINFO     bonira.request:telemetry.py:78 http.response
+_ PlatformConsoleTests.test_status_sanitizes_probe_failures_and_marks_missing_sources_unverified _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:06.955208+00:00","event":"http.response","request_id":"65c7c118-7d54-4e95-af02-bd2933eb1a44","method":"GET","route":"organizations:platform_status","status_code":200,"duration_ms":15}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+_ ContractFilterTests.test_amount_summary_uses_filtered_results_before_pagination _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:07.872881+00:00","event":"http.response","request_id":"a9d3cd07-6094-4ba3-95f3-9797a0a92392","method":"GET","route":"contracts:list","status_code":200,"duration_ms":225}
+{"timestamp":"2026-11-10T17:36:08.051142+00:00","event":"http.response","request_id":"5e68d0bf-7286-4cf2-8f97-a0657875cfb9","method":"GET","route":"contracts:list","status_code":200,"duration_ms":176}
+{"timestamp":"2026-11-10T17:36:08.227859+00:00","event":"http.response","request_id":"d8873ccf-3cd4-4590-a6a8-b9267a09e8f4","method":"GET","route":"contracts:list","status_code":200,"duration_ms":175}
+{"timestamp":"2026-11-10T17:36:08.394551+00:00","event":"http.response","request_id":"7108f0dc-e2da-4085-a86f-a9a6152445de","method":"GET","route":"contracts:list","status_code":200,"duration_ms":168}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+____ ContractFilterTests.test_business_search_covers_each_requested_source ____
+---------------------------- Captured stdout call -----------------------------
+SUBPASSED(term='SIDE-2026') [ 81%]
+
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_business_search_covers_each_requested_source SUBPASSED(term='\u062f\u06cc\u0648\u0627\u0631 \u0633\u0627\u062d\u0644\u06cc') [ 81%]
+
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_business_search_covers_each_requested_source SUBPASSED(term='\u067e\u0644 \u0633\u0627\u062d\u0644\u06cc') [ 81%]
+
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_business_search_covers_each_requested_source SUBPASSED(term='\u062a\u0623\u0645\u06cc\u0646\\u200c\u06a9\u0646\u0646\u062f\u0647 \u0646\u0645\u0648\u0646\u0647') [ 81%]
+
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_business_search_covers_each_requested_source SUBPASSED(term='\u0637\u0631\u0641 \u0628\u0647\\u200c\u0631\u0648\u0632\u0634\u062f\u0647 \u0622\u0632\u0645\u0627\u06cc\u0634\u06cc') [ 81%]
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:09.135270+00:00","event":"http.response","request_id":"b1238e08-b47e-4ab6-8626-15b2ffbd0129","method":"GET","route":"contracts:list","status_code":200,"duration_ms":269}
+{"timestamp":"2026-11-10T17:36:09.371804+00:00","event":"http.response","request_id":"8fede112-5d5b-44cd-8d9b-d85b01e266f1","method":"GET","route":"contracts:list","status_code":200,"duration_ms":236}
+{"timestamp":"2026-11-10T17:36:09.667055+00:00","event":"http.response","request_id":"e19e0278-e291-4ed8-a84b-28b69fe97ffa","method":"GET","route":"contracts:list","status_code":200,"duration_ms":292}
+{"timestamp":"2026-11-10T17:36:09.911781+00:00","event":"http.response","request_id":"a6b506c5-c45a-4d09-8878-1710399ecfad","method":"GET","route":"contracts:list","status_code":200,"duration_ms":247}
+{"timestamp":"2026-11-10T17:36:10.184725+00:00","event":"http.response","request_id":"d4cee589-f2ae-4e39-a9a6-b023df527eef","method":"GET","route":"contracts:list","status_code":200,"duration_ms":267}
+{"timestamp":"2026-11-10T17:36:10.430233+00:00","event":"http.response","request_id":"2bbb66fb-f632-4d8c-bc23-6e5fc776e601","method":"GET","route":"contracts:list","status_code":200,"duration_ms":253}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ ContractFilterTests.test_combined_side_status_search_and_project_filters_intersect _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:11.069969+00:00","event":"http.response","request_id":"8b9ddc2f-d9d5-45e6-9770-15feec776fd9","method":"GET","route":"contracts:list","status_code":200,"duration_ms":213}
+{"timestamp":"2026-11-10T17:36:11.314502+00:00","event":"http.response","request_id":"64c0bb27-9e8d-4e19-a16c-f4631e154d90","method":"GET","route":"contracts:list","status_code":200,"duration_ms":244}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ ContractFilterTests.test_general_list_has_one_search_compact_filters_and_business_side_labels _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:12.013498+00:00","event":"http.response","request_id":"909a9c15-6b50-4c5a-b311-afe6d94cdca4","method":"GET","route":"contracts:list","status_code":200,"duration_ms":250}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+_______ ContractFilterTests.test_invalid_filters_do_not_broaden_results _______
+---------------------------- Captured stdout call -----------------------------
+SUBPASSED(query={'project': 'bad'}) [ 89%]
+
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_invalid_filters_do_not_broaden_results SUBPASSED(query={'status': 'forged'}) [ 89%]
+
+apps/contracts/test_filter_bar.py::ContractFilterTests::test_invalid_filters_do_not_broaden_results SUBPASSED(query={'side': 'forged'}) [ 89%]
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:12.603755+00:00","event":"http.response","request_id":"8bd28e07-617b-4349-b42e-a18c9fee6dc1","method":"GET","route":"contracts:list","status_code":200,"duration_ms":213}
+{"timestamp":"2026-11-10T17:36:12.791840+00:00","event":"http.response","request_id":"26670af2-0306-4008-8843-d664ea2fe477","method":"GET","route":"contracts:list","status_code":200,"duration_ms":187}
+{"timestamp":"2026-11-10T17:36:12.998365+00:00","event":"http.response","request_id":"e77b089a-0845-4f19-a162-a9b99a7067af","method":"GET","route":"contracts:list","status_code":200,"duration_ms":204}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+_ ContractFilterTests.test_legacy_bookmarked_filters_remain_secondary_and_removable _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:13.647628+00:00","event":"http.response","request_id":"dc20211e-e03d-4466-9891-1e5f31a4ca57","method":"GET","route":"contracts:list","status_code":200,"duration_ms":209}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+_ ContractFilterTests.test_project_choices_and_filter_deny_foreign_and_out_of_scope_projects _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:14.211394+00:00","event":"http.response","request_id":"44aab597-9ec8-4b3e-a5a2-b0fe9a5e37cf","method":"GET","route":"contracts:list","status_code":200,"duration_ms":180}
+{"timestamp":"2026-11-10T17:36:14.406921+00:00","event":"http.response","request_id":"08193e8e-3649-4abd-a0a9-cde16c96533b","method":"GET","route":"contracts:list","status_code":200,"duration_ms":191}
+{"timestamp":"2026-11-10T17:36:14.452317+00:00","event":"http.response","request_id":"ae2c017f-e446-4bef-8b7e-42c5360e0670","method":"GET","route":"contracts:list","status_code":200,"duration_ms":49}
+{"timestamp":"2026-11-10T17:36:14.602388+00:00","event":"http.response","request_id":"463d8758-ddfc-4569-91a2-0027b05aef76","method":"GET","route":"contracts:list","status_code":200,"duration_ms":129}
+{"timestamp":"2026-11-10T17:36:14.637377+00:00","event":"http.response","request_id":"c8b4d5f8-b836-4d5b-b28d-f38cc4545086","method":"GET","route":"contracts:list","status_code":200,"duration_ms":39}
+{"timestamp":"2026-11-10T17:36:14.804479+00:00","event":"http.response","request_id":"a82bda65-079a-4602-8e4a-3c56749e8002","method":"GET","route":"contracts:list","status_code":200,"duration_ms":159}
+{"timestamp":"2026-11-10T17:36:14.837802+00:00","event":"http.response","request_id":"ba8906fb-1136-46c0-a5a5-33eba7da8581","method":"GET","route":"contracts:list","status_code":200,"duration_ms":32}
+{"timestamp":"2026-11-10T17:36:14.962318+00:00","event":"http.response","request_id":"0c0bb7fb-678a-47f3-924d-ae1eac01750e","method":"GET","route":"contracts:list","status_code":200,"duration_ms":123}
+{"timestamp":"2026-11-10T17:36:15.011328+00:00","event":"http.response","request_id":"4443da40-544d-4d6b-aee1-dd0a83f379b3","method":"GET","route":"contracts:list","status_code":403,"duration_ms":51}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nINFO     bonira.request:telemetry.py:78 http.response\nWARNING  django.request:log.py:253 Forbidden (Permission denied): /contracts/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 197, in _get_response\n    response = wrapped_callback(request, *callback_args, **callback_kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 52, in wrapped\n    return view_func(request, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 76, in wrapped\n    require_organization_permission(request, permission, message)\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 30, in require_organization_permission\n    raise PermissionDenied(message)\ndjango.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0627\u06cc\u0646 \u0639\u0645\u0644\u06cc\u0627\u062a \u062f\u0631 \u0634\u0631\u06a9\u062a \u0641\u0639\u0627\u0644 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.\nINFO     bonira.request:telemetry.py:78 http.response
+_ ContractFilterTests.test_project_context_has_no_duplicate_selector_and_survives_chip_clear _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:15.620194+00:00","event":"http.response","request_id":"8f6f5edf-09ef-4400-89b8-5bca75e864fd","method":"GET","route":"contracts:list","status_code":200,"duration_ms":245}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+_ ContractFilterTests.test_remote_options_paginate_and_pin_selected_projects_beyond_initial_window _
+---------------------------- Captured stderr call -----------------------------
+{"timestamp":"2026-11-10T17:36:16.142854+00:00","event":"http.response","request_id":"d10e2787-7b47-4359-8444-512a98e18a72","method":"GET","route":"contracts:list","status_code":200,"duration_ms":63}
+{"timestamp":"2026-11-10T17:36:16.373641+00:00","event":"http.response","request_id":"25b6ff2c-d475-43db-a08f-03e6ce0e6c04","method":"GET","route":"contracts:list","status_code":200,"duration_ms":230}
+{"timestamp":"2026-11-10T17:36:16.410909+00:00","event":"http.response","request_id":"700dfb67-9810-4a76-97f5-e1d1e12193cd","method":"GET","route":"contracts:list","status_code":200,"duration_ms":44}
+{"timestamp":"2026-11-10T17:36:16.636377+00:00","event":"http.response","request_id":"24b32118-9b4e-4989-8b8c-0865f0637050","method":"GET","route":"contracts:list","status_code":200,"duration_ms":217}
+------------------------------ Captured log call ------------------------------
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+INFO     bonira.request:telemetry.py:78 http.response
+=========================== short test summary info ===========================
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_anonymous_and_csrf_guards
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_cancelled_and_archived_companies_remain_inspectable
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_company_detail_renders_activity_search_and_retains_it_in_pagination
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_company_list_distinguishes_empty_inventory_and_empty_filter
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_company_list_sorts_and_paginates_the_existing_filtered_results
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_edit_rejects_stale_version_and_invalid_configuration
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_filters_pagination_and_unknown_company
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_list_and_activity_are_platform_scoped_without_selecting_a_tenant
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_mutations_recheck_expired_revoked_and_inactive_platform_authority
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_owner_and_superuser_without_platform_duty_cannot_read_or_write
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_platform_permissions_have_no_tenant_default_grants
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_settings_reuse_authoritative_configuration_and_record_reason
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_stale_or_invalid_status_and_blank_reason_cannot_mutate
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_status_and_settings_roll_back_when_audit_fails
+PASSED apps/organizations/test_platform_companies.py::PlatformCompanyTests::test_suspend_and_reactivate_preserve_memberships_and_audit_transitions
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_all_seven_destinations_are_reachable_and_separate
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_audit_excludes_tenant_business_events_and_nested_sensitive_metadata
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_dashboard_counts_and_history_use_actual_safe_records
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_dashboard_hides_unavailable_actions_and_handles_zero_companies
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_explicit_tenant_authority_can_assign_and_revoke_through_console
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_legacy_onboarding_retry_is_safe_and_creation_failure_rolls_back
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_operator_grants_and_revokes_without_superuser_or_tenant_authority
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_platform_login_default_and_no_self_owner_assignment
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_platform_permissions_cannot_be_transferred_into_business_roles
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_platform_role_catalog_protects_owner_grants_and_stale_versions
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_platform_settings_reject_financial_configuration_changes
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_role_only_operator_cannot_inspect_or_change_tenant_member_assignments
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_status_sanitizes_probe_failures_and_marks_missing_sources_unverified
+PASSED apps/organizations/test_platform_console.py::PlatformConsoleTests::test_tenant_catalog_entry_does_not_inherit_platform_definition_authority
+PASSED apps/contracts/test_filter_bar.py::ContractFilterTests::test_amount_summary_uses_filtered_results_before_pagination
+PASSED apps/contracts/test_filter_bar.py::ContractFilterTests::test_business_search_covers_each_requested_source
+PASSED apps/contracts/test_filter_bar.py::ContractFilterTests::test_combined_side_status_search_and_project_filters_intersect
+PASSED apps/contracts/test_filter_bar.py::ContractFilterTests::test_general_list_has_one_search_compact_filters_and_business_side_labels
+PASSED apps/contracts/test_filter_bar.py::ContractFilterTests::test_invalid_filters_do_not_broaden_results
+PASSED apps/contracts/test_filter_bar.py::ContractFilterTests::test_legacy_bookmarked_filters_remain_secondary_and_removable
+PASSED apps/contracts/test_filter_bar.py::ContractFilterTests::test_project_choices_and_filter_deny_foreign_and_out_of_scope_projects
+PASSED apps/contracts/test_filter_bar.py::ContractFilterTests::test_project_context_has_no_duplicate_selector_and_survives_chip_clear
+PASSED apps/contracts/test_filter_bar.py::ContractFilterTests::test_remote_options_paginate_and_pin_selected_projects_beyond_initial_window
+=================== 38 passed, 57 subtests passed in 51.11s ===================

@@ -1,0 +1,214 @@
+{
+  "browser": "156.0.8078.80",
+  "profile": "MVP",
+  "db": "bonira_b02_run2",
+  "db_port": 59141,
+  "witness": "separate PostgreSQL connection, default_transaction_read_only=on",
+  "rows": {
+    "projects:wbs_create": {
+      "scenario": "UAT-02",
+      "route": "projects:wbs_create",
+      "variant": null,
+      "summary": "Denied mutations leave no WBS rows. Scoped inline controls checked at 1024 and 390.",
+      "axes": {
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "negative_post": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/wbs/",
+          "status": 403
+        },
+        {
+          "negative_post": "/projects/3022a5e0-3056-4d3c-b2b2-4654b6e06f43/controls/wbs/",
+          "status": 403
+        },
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/controls/"
+        }
+      ]
+    },
+    "projects:create": {
+      "scenario": "UAT-02",
+      "route": "projects:create",
+      "variant": null,
+      "summary": "Compact project form at tablet and mobile, plus Cancel returning to Projects",
+      "axes": {
+        "NAVIGATION_UX": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/create/",
+          "status": 200,
+          "final": "/projects/create/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/create/",
+          "status": 200,
+          "final": "/projects/create/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/create/",
+          "status": 200,
+          "final": "/projects/create/"
+        },
+        {
+          "click": "/projects/",
+          "final": "/projects/"
+        }
+      ]
+    },
+    "projects:gallery": {
+      "scenario": "UAT-02",
+      "route": "projects:gallery",
+      "variant": null,
+      "summary": "Gallery layout and bounded add/cancel navigation",
+      "axes": {
+        "NAVIGATION_UX": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/"
+        },
+        {
+          "method": "GET",
+          "url": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/",
+          "status": 200,
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/"
+        },
+        {
+          "click": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/add/",
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/add/"
+        },
+        {
+          "click": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/",
+          "final": "/projects/dad778f8-318a-4c1b-8933-a7397cc3c974/gallery/"
+        }
+      ]
+    },
+    "timekeeping:attendance_create": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:attendance_create",
+      "variant": null,
+      "summary": "Foreign contextual attendance form rejected; owned form tested at narrow widths",
+      "axes": {
+        "AUTHORIZATION": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/attendance/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 404,
+          "final": "/timekeeping/attendance/new/"
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/attendance/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/attendance/new/"
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/attendance/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/attendance/new/"
+        }
+      ]
+    },
+    "workforce:field_create": {
+      "scenario": "UAT-04",
+      "route": "workforce:field_create",
+      "variant": null,
+      "summary": "Worker form responsive check and Cancel to workforce list",
+      "axes": {
+        "NAVIGATION_UX": "PASS"
+      },
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/workforce/field/new/",
+          "status": 200,
+          "final": "/workforce/field/new/"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/field/new/",
+          "status": 200,
+          "final": "/workforce/field/new/"
+        },
+        {
+          "method": "GET",
+          "url": "/workforce/field/new/",
+          "status": 200,
+          "final": "/workforce/field/new/"
+        },
+        {
+          "click": "/workforce/field/",
+          "final": "/workforce/field/"
+        }
+      ]
+    },
+    "timekeeping:timesheet_create": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:timesheet_create",
+      "variant": null,
+      "summary": "Sectioned work-log duration fields at tablet and mobile",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/timesheets/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/timesheets/new/"
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/timesheets/new/?project=dad778f8-318a-4c1b-8933-a7397cc3c974&site=d9131b32-c4ba-4f14-95e5-2104d524fd18&employee=9c34cd92-c920-443e-82df-cd2be5d047e9",
+          "status": 200,
+          "final": "/timekeeping/timesheets/new/"
+        }
+      ]
+    },
+    "timekeeping:calendar_create": {
+      "scenario": "UAT-04",
+      "route": "timekeeping:calendar_create",
+      "variant": null,
+      "summary": "Compact calendar form at tablet and mobile",
+      "axes": {},
+      "trace": [
+        {
+          "method": "GET",
+          "url": "/timekeeping/calendars/new/",
+          "status": 200,
+          "final": "/timekeeping/calendars/new/"
+        },
+        {
+          "method": "GET",
+          "url": "/timekeeping/calendars/new/",
+          "status": 200,
+          "final": "/timekeeping/calendars/new/"
+        }
+      ]
+    }
+  }
+}

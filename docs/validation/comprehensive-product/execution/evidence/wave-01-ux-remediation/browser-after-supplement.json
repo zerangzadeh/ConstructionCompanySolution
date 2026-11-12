@@ -1,0 +1,58 @@
+{
+  "chrome": "156.0.8078.80",
+  "phase": "after-supplement",
+  "results": [
+    {
+      "id": "DATE-RESPONSIVE-VALIDATION",
+      "status": "FAIL",
+      "actual": "Invalid input lost"
+    },
+    {
+      "id": "SELECTOR-FALLBACK",
+      "status": "PASS",
+      "actual": "Destroy restores original accessibility; no-JavaScript fallback submits unchanged company choices."
+    },
+    {
+      "id": "PROTECTED-COMPANY-LIFECYCLE",
+      "status": "PASS",
+      "actual": "Protected detail cancel made no changes; existing confirmation and service suspended/reactivated synthetic company with retained audit."
+    }
+  ],
+  "observations": [
+    {
+      "key": "audit-labels",
+      "width": 1024,
+      "client": 1024,
+      "scroll": 1024,
+      "dir": "rtl",
+      "font": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "headings": [
+        "فعالیت‌ها و ممیزی"
+      ],
+      "targets": [
+        {
+          "label": "خانه",
+          "href": "/"
+        },
+        {
+          "label": "پاک‌کردن",
+          "href": "/organizations/platform/activity/"
+        }
+      ],
+      "forms": [
+        {
+          "method": "get",
+          "action": "/organizations/platform/activity/"
+        }
+      ],
+      "mains": 1
+    },
+    {
+      "key": "invalid-date-state",
+      "width": 1024,
+      "url": "/organizations/platform/activity/?start=1405%2F13%2F50",
+      "value": ""
+    }
+  ],
+  "errors": []
+}

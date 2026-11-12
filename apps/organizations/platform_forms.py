@@ -6,17 +6,39 @@ from apps.organizations.platform_companies import PLATFORM_READ_ONLY_SETTINGS
 
 
 class CompanySearchForm(forms.Form):
-    q = forms.CharField(label="نام یا کد شرکت", required=False, max_length=100)
+    q = forms.CharField(
+        label="نام یا کد شرکت",
+        required=False,
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={
+                "type": "search",
+                "class": "erp-input w-full",
+                "placeholder": "جست‌وجو با نام یا کد شرکت…",
+            }
+        ),
+    )
     status = forms.ChoiceField(
         label="وضعیت",
         required=False,
         choices=(("", "همه وضعیت‌ها"), *OrganizationStatus.choices),
+        widget=forms.Select(attrs={"class": "erp-input w-full"}),
     )
 
 
 class ActivitySearchForm(forms.Form):
     q = forms.CharField(
-        label="نام کاربری یا نوع رویداد", required=False, max_length=100
+        label="نام کاربری یا نوع رویداد",
+        required=False,
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={
+                "type": "search",
+                "dir": "auto",
+                "class": "erp-input w-full",
+                "placeholder": "جست‌وجو با نام کاربری یا نوع رویداد…",
+            }
+        ),
     )
 
 

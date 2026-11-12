@@ -164,6 +164,8 @@ class WBSNodeForm(JalaliDateMixin, forms.ModelForm):
 
     def __init__(self, *args: object, project: Project, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
+        self.instance.project = project
+        self.instance.organization = project.organization
         self.fields["parent"].queryset = WBSNode.objects.filter(
             project=project, archived_at__isnull=True, is_active=True
         )

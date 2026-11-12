@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from urllib.parse import parse_qsl, urlencode
+from zoneinfo import ZoneInfo
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.organizations.authorization import (
@@ -49,6 +51,11 @@ def _error_message(exc: Exception) -> str:
     from apps.workforce.field_presentation import presentation_error
 
     return presentation_error(exc)
+
+
+def _render(request: HttpRequest, template_name: str, context: dict) -> HttpResponse:
+    with timezone.override(ZoneInfo(request.organization.settings.timezone)):
+        return render(request, template_name, context)
 
 
 def _field_context(request):
@@ -146,7 +153,7 @@ def _form_page(
         if reference_field and not reference_field.queryset.exists()
         else None
     )
-    return render(
+    return _render(
         request,
         "timekeeping/compact_form.html"
         if request.resolver_match.url_name
@@ -268,7 +275,7 @@ def workbench(request: HttpRequest) -> HttpResponse:
     from apps.workforce.field_presentation import cascade_filter_chips
 
     cascade_filter_chips(data["history_filter_bar"])
-    return render(request, "timekeeping/workbench.html", data)
+    return _render(request, "timekeeping/workbench.html", data)
 
 
 @active_organization_required
@@ -475,7 +482,18 @@ def attendance_finalize(request: HttpRequest, record_id) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.ATTENDANCE_CORRECT)
 def attendance_correction_create(request: HttpRequest, record_id) -> HttpResponse:
     record = get_object_or_404(
-        AttendanceRecord, pk=record_id, organization=request.organization
+        _scoped(
+            AttendanceRecord.objects.filter(organization=request.organization), request
+        ),
+        pk=record_id,
+    )
+    require_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.ATTENDANCE_CORRECT,
+        project=record.project,
+        site=record.site,
+        message="مجوز درخواست اصلاح این حضور را ندارید.",
     )
     form = AttendanceCorrectionForm(
         request.POST or None, organization=request.organization
@@ -803,7 +821,7 @@ def timesheet_detail(request: HttpRequest, timesheet_id) -> HttpResponse:
         and can_act("timesheets.prepare")
     )
     allocated_minutes = sum(entry.minutes for entry in entries)
-    return render(
+    return _render(
         request,
         "timekeeping/timesheet_detail.html",
         {
@@ -976,7 +994,37 @@ def record_detail(request: HttpRequest, kind: str, record_id: str) -> HttpRespon
     from .presentation import record_actions
 
     source = record.attendance if kind == "correction" else record
-    return render(
+    replacement_url = ""
+    if kind == "correction" and record.adjustment_id:
+        replacement = (
+            _scoped(
+                AttendanceRecord.objects.filter(organization=request.organization),
+                request,
+            )
+            .filter(pk=record.adjustment.replacement_id)
+            .first()
+        )
+        if replacement is not None and has_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission=BusinessPermissionCode.ATTENDANCE_VIEW,
+            project=replacement.project,
+            site=replacement.site,
+        ):
+            from apps.workforce.field_selectors import FieldContext
+
+            replacement_url = _journey_url(
+                request,
+                "timekeeping:record_detail",
+                "attendance",
+                replacement.pk,
+                context=FieldContext(
+                    project=replacement.project,
+                    site=replacement.site,
+                    employee=replacement.employee,
+                ),
+            )
+    return _render(
         request,
         "timekeeping/record_detail.html",
         {
@@ -986,6 +1034,7 @@ def record_detail(request: HttpRequest, kind: str, record_id: str) -> HttpRespon
             "record": record,
             "record_kind": kind,
             "source": source,
+            "replacement_url": replacement_url,
             "worker_name": f"{source.employee.first_name} {source.employee.last_name}",
             "record_state": record.status if kind == "correction" else record.state,
             "record_state_label": record.get_status_display()

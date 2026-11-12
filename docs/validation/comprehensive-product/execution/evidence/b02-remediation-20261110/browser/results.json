@@ -1,0 +1,1621 @@
+{
+  "browser": "156.0.8078.80",
+  "db": "b02_retest_browser_final",
+  "profile": "MVP",
+  "witness_read_only": true,
+  "cases": [
+    {
+      "id": "PROJECTS-1440",
+      "description": "UIUX-F-018, effective Controls visibility and same-project child creation",
+      "steps": [
+        {
+          "get": "/projects/",
+          "status": 200
+        },
+        {
+          "page": "projects-list",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "page": "project-hub",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "get": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/",
+          "status": 200
+        },
+        {
+          "page": "partial-hub",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "get": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/",
+          "status": 403
+        },
+        {
+          "get": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/",
+          "status": 200
+        },
+        {
+          "post": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/wbs/",
+          "status": 302,
+          "returned": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/",
+          "feedback": [
+            "×\nگره ساختار شکست کار افزوده شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "projects.WBSNode",
+            "id": "9bf18f02-c4c3-4311-a344-2180a60c0e56",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "parent": "68fce54c-4695-4cce-88c7-712f6396b764",
+            "code": "R-CH-1440",
+            "title": "فرزند آزمون 1440",
+            "audit": [
+              {
+                "action": "wbs_node.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "page": "wbs-child-saved",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "negative_post": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/wbs/",
+          "status": 403
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "TIMEZONE-ATTENDANCE-1440",
+      "description": "Jalali entry, invalid order, timezone persistence, reload and independent finalization",
+      "steps": [
+        {
+          "get": "/timekeeping/attendance/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "attendance-form",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/attendance/new/",
+          "status": 200,
+          "returned": "/timekeeping/attendance/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "لطفاً موارد زیر را بررسی کنید:\n\nخروج: زمان خروج باید پس از ورود باشد.",
+            "زمان خروج باید پس از ورود باشد."
+          ]
+        },
+        {
+          "page": "attendance-invalid",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/attendance/new/",
+          "status": 302,
+          "returned": "/timekeeping/records/attendance/aae9fd9e-aa00-48ba-b124-da23ffd1b6c4/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nحضور برای بررسی ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "aae9fd9e-aa00-48ba-b124-da23ffd1b6c4",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-01",
+            "check_in_at": "2026-11-01 04:30:00+00:00",
+            "check_out_at": "2026-11-01 08:30:00+00:00",
+            "state": "draft",
+            "audit": [
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/timekeeping/records/attendance/aae9fd9e-aa00-48ba-b124-da23ffd1b6c4/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "attendance-local-reload",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "get": "/timekeeping/records/attendance/aae9fd9e-aa00-48ba-b124-da23ffd1b6c4/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "post": "/timekeeping/attendance/aae9fd9e-aa00-48ba-b124-da23ffd1b6c4/finalize/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nحضور قطعی شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "aae9fd9e-aa00-48ba-b124-da23ffd1b6c4",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-01",
+            "check_in_at": "2026-11-01 04:30:00+00:00",
+            "check_out_at": "2026-11-01 08:30:00+00:00",
+            "state": "finalized",
+            "audit": [
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "CORRECTION-LINEAGE-1440",
+      "description": "Authorized correction, independent review and scoped replacement navigation",
+      "steps": [
+        {
+          "get": "/timekeeping/records/attendance/aae9fd9e-aa00-48ba-b124-da23ffd1b6c4/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "correction-form",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/attendance/aae9fd9e-aa00-48ba-b124-da23ffd1b6c4/corrections/new/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست اصلاح برای بررسی مستقل ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "361cb62f-6efd-4d8c-afd2-3ea10bb85c74",
+            "replacement_check_in_at": "2026-11-01 04:30:00+00:00",
+            "replacement_check_out_at": "2026-11-01 08:45:00+00:00",
+            "status": "pending",
+            "requested_by": "e14bed65-14d0-45ea-b878-20a41b178ed7",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "get": "/timekeeping/records/correction/361cb62f-6efd-4d8c-afd2-3ea10bb85c74/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "correction-review",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/attendance/corrections/361cb62f-6efd-4d8c-afd2-3ea10bb85c74/review/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست اصلاح تعیین تکلیف شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "361cb62f-6efd-4d8c-afd2-3ea10bb85c74",
+            "replacement_check_in_at": "2026-11-01 04:30:00+00:00",
+            "replacement_check_out_at": "2026-11-01 08:45:00+00:00",
+            "status": "approved",
+            "requested_by": "e14bed65-14d0-45ea-b878-20a41b178ed7",
+            "reviewed_by": "18ff4617-c4dd-4792-97c5-d4701ae85022",
+            "audit": []
+          }
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "a1c10c84-e64e-4e0d-9f5a-ee5693afe5a8",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-01",
+            "check_in_at": "2026-11-01 04:30:00+00:00",
+            "check_out_at": "2026-11-01 08:45:00+00:00",
+            "state": "finalized",
+            "audit": []
+          }
+        },
+        {
+          "get": "/timekeeping/records/correction/361cb62f-6efd-4d8c-afd2-3ea10bb85c74/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "correction-lineage",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "page": "replacement-detail",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "get": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "time-history",
+          "width": 1440,
+          "overflow": false
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "TIMEZONE-REQUESTS-1440",
+      "description": "Leave, Mission and Overtime create/detail/review preserve tenant wall times",
+      "steps": [
+        {
+          "get": "/timekeeping/leave-mission/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "mission-form",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/leave-mission/new/",
+          "status": 302,
+          "returned": "/timekeeping/records/leave/fe371f87-8c71-4766-b7af-82927a7015b8/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nپیش‌نویس درخواست ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "fe371f87-8c71-4766-b7af-82927a7015b8",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-01 09:30:00+00:00",
+            "ends_at": "2026-11-01 10:30:00+00:00",
+            "state": "draft",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "page": "mission-local-reload",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/leave-mission/fe371f87-8c71-4766-b7af-82927a7015b8/submit/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست ارسال شد."
+          ]
+        },
+        {
+          "get": "/timekeeping/records/leave/fe371f87-8c71-4766-b7af-82927a7015b8/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "post": "/timekeeping/leave-mission/fe371f87-8c71-4766-b7af-82927a7015b8/review/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست تعیین تکلیف شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "fe371f87-8c71-4766-b7af-82927a7015b8",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-01 09:30:00+00:00",
+            "ends_at": "2026-11-01 10:30:00+00:00",
+            "state": "approved",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "18ff4617-c4dd-4792-97c5-d4701ae85022",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/timekeeping/records/leave/fe371f87-8c71-4766-b7af-82927a7015b8/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "get": "/timekeeping/leave-mission/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "leave-form",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/leave-mission/new/",
+          "status": 302,
+          "returned": "/timekeeping/records/leave/ad77f52e-ba02-4207-a286-d543e09b76c9/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nپیش‌نویس درخواست ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "ad77f52e-ba02-4207-a286-d543e09b76c9",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-01 10:30:00+00:00",
+            "ends_at": "2026-11-01 11:30:00+00:00",
+            "state": "draft",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "page": "leave-local-reload",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "get": "/timekeeping/overtime/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "overtime-form",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/overtime/new/",
+          "status": 302,
+          "returned": "/timekeeping/records/overtime/f662ca71-5c91-41e2-bb7f-189dad7b11ef/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nپیش‌نویس اضافه‌کاری ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.OvertimeRequest",
+            "id": "f662ca71-5c91-41e2-bb7f-189dad7b11ef",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-01 13:00:00+00:00",
+            "ends_at": "2026-11-01 14:35:00+00:00",
+            "state": "draft",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "page": "overtime-local-reload",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/overtime/f662ca71-5c91-41e2-bb7f-189dad7b11ef/submit/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست ارسال شد."
+          ]
+        },
+        {
+          "get": "/timekeeping/records/overtime/f662ca71-5c91-41e2-bb7f-189dad7b11ef/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "post": "/timekeeping/overtime/f662ca71-5c91-41e2-bb7f-189dad7b11ef/review/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست تعیین تکلیف شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.OvertimeRequest",
+            "id": "f662ca71-5c91-41e2-bb7f-189dad7b11ef",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-01 13:00:00+00:00",
+            "ends_at": "2026-11-01 14:35:00+00:00",
+            "state": "approved",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "18ff4617-c4dd-4792-97c5-d4701ae85022",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/timekeeping/records/overtime/f662ca71-5c91-41e2-bb7f-189dad7b11ef/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "ASSIGNMENT-CONTEXT-1440",
+      "description": "Completion retains authorized filters and shows feedback and stored actual/planned dates",
+      "steps": [
+        {
+          "witness": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "a7efe333-d810-4ef2-8e42-8ad7fad5c543",
+            "employee": "5c1c30a9-e120-4a51-a4e4-a4b380e28331",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "planned_end_date": "2026-11-20",
+            "end_date": "None",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/workforce/assignments/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&q=%D9%85%D8%B3%D8%A6%D9%88%D9%84+%D8%A8%D8%A7%D8%B2%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%DB%8C+1440&sort=status&direction=asc",
+          "status": 200
+        },
+        {
+          "page": "assignment-filtered",
+          "width": 1440,
+          "overflow": false
+        }
+      ],
+      "status": "FAIL",
+      "error": "Locator.click: Timeout 12000ms exceeded.\n"
+    },
+    {
+      "id": "PROJECTS-1024",
+      "description": "UIUX-F-018, effective Controls visibility and same-project child creation",
+      "steps": [
+        {
+          "get": "/projects/",
+          "status": 200
+        },
+        {
+          "page": "projects-list",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "page": "project-hub",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "get": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/",
+          "status": 200
+        },
+        {
+          "page": "partial-hub",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "get": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/",
+          "status": 403
+        },
+        {
+          "get": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/",
+          "status": 200
+        },
+        {
+          "post": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/wbs/",
+          "status": 302,
+          "returned": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/",
+          "feedback": [
+            "×\nگره ساختار شکست کار افزوده شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "projects.WBSNode",
+            "id": "dfd339b0-ad66-473e-b1e2-098464299d93",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "parent": "68fce54c-4695-4cce-88c7-712f6396b764",
+            "code": "R-CH-1024",
+            "title": "فرزند آزمون 1024",
+            "audit": [
+              {
+                "action": "wbs_node.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "page": "wbs-child-saved",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "negative_post": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/wbs/",
+          "status": 403
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "TIMEZONE-ATTENDANCE-1024",
+      "description": "Jalali entry, invalid order, timezone persistence, reload and independent finalization",
+      "steps": [
+        {
+          "get": "/timekeeping/attendance/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "attendance-form",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/attendance/new/",
+          "status": 302,
+          "returned": "/timekeeping/records/attendance/0ae55eec-b06d-4b3a-9ad4-459d3b4261e2/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nحضور برای بررسی ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "0ae55eec-b06d-4b3a-9ad4-459d3b4261e2",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-02",
+            "check_in_at": "2026-11-02 04:30:00+00:00",
+            "check_out_at": "2026-11-02 08:30:00+00:00",
+            "state": "draft",
+            "audit": [
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/timekeeping/records/attendance/0ae55eec-b06d-4b3a-9ad4-459d3b4261e2/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "attendance-local-reload",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "get": "/timekeeping/records/attendance/0ae55eec-b06d-4b3a-9ad4-459d3b4261e2/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "post": "/timekeeping/attendance/0ae55eec-b06d-4b3a-9ad4-459d3b4261e2/finalize/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nحضور قطعی شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "0ae55eec-b06d-4b3a-9ad4-459d3b4261e2",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-02",
+            "check_in_at": "2026-11-02 04:30:00+00:00",
+            "check_out_at": "2026-11-02 08:30:00+00:00",
+            "state": "finalized",
+            "audit": [
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "CORRECTION-LINEAGE-1024",
+      "description": "Authorized correction, independent review and scoped replacement navigation",
+      "steps": [
+        {
+          "get": "/timekeeping/records/attendance/0ae55eec-b06d-4b3a-9ad4-459d3b4261e2/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "correction-form",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/attendance/0ae55eec-b06d-4b3a-9ad4-459d3b4261e2/corrections/new/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست اصلاح برای بررسی مستقل ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "492e97f5-a245-4d58-a101-e132fe0d9f84",
+            "replacement_check_in_at": "2026-11-02 04:30:00+00:00",
+            "replacement_check_out_at": "2026-11-02 08:45:00+00:00",
+            "status": "pending",
+            "requested_by": "e14bed65-14d0-45ea-b878-20a41b178ed7",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "get": "/timekeeping/records/correction/492e97f5-a245-4d58-a101-e132fe0d9f84/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "correction-review",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/attendance/corrections/492e97f5-a245-4d58-a101-e132fe0d9f84/review/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست اصلاح تعیین تکلیف شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "492e97f5-a245-4d58-a101-e132fe0d9f84",
+            "replacement_check_in_at": "2026-11-02 04:30:00+00:00",
+            "replacement_check_out_at": "2026-11-02 08:45:00+00:00",
+            "status": "approved",
+            "requested_by": "e14bed65-14d0-45ea-b878-20a41b178ed7",
+            "reviewed_by": "18ff4617-c4dd-4792-97c5-d4701ae85022",
+            "audit": []
+          }
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "3875fb7a-16a6-4dd9-9976-d974122cd8f9",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-02",
+            "check_in_at": "2026-11-02 04:30:00+00:00",
+            "check_out_at": "2026-11-02 08:45:00+00:00",
+            "state": "finalized",
+            "audit": []
+          }
+        },
+        {
+          "get": "/timekeeping/records/correction/492e97f5-a245-4d58-a101-e132fe0d9f84/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "correction-lineage",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "page": "replacement-detail",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "get": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "time-history",
+          "width": 1024,
+          "overflow": false
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "TIMEZONE-REQUESTS-1024",
+      "description": "Leave, Mission and Overtime create/detail/review preserve tenant wall times",
+      "steps": [
+        {
+          "get": "/timekeeping/leave-mission/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "mission-form",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/leave-mission/new/",
+          "status": 302,
+          "returned": "/timekeeping/records/leave/09408809-cf7e-413a-b3fb-4e31b588aa76/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nپیش‌نویس درخواست ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "09408809-cf7e-413a-b3fb-4e31b588aa76",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-02 09:30:00+00:00",
+            "ends_at": "2026-11-02 10:30:00+00:00",
+            "state": "draft",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "page": "mission-local-reload",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/leave-mission/09408809-cf7e-413a-b3fb-4e31b588aa76/submit/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست ارسال شد."
+          ]
+        },
+        {
+          "get": "/timekeeping/records/leave/09408809-cf7e-413a-b3fb-4e31b588aa76/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "post": "/timekeeping/leave-mission/09408809-cf7e-413a-b3fb-4e31b588aa76/review/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست تعیین تکلیف شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "09408809-cf7e-413a-b3fb-4e31b588aa76",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-02 09:30:00+00:00",
+            "ends_at": "2026-11-02 10:30:00+00:00",
+            "state": "approved",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "18ff4617-c4dd-4792-97c5-d4701ae85022",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/timekeeping/records/leave/09408809-cf7e-413a-b3fb-4e31b588aa76/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "get": "/timekeeping/leave-mission/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "leave-form",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/leave-mission/new/",
+          "status": 302,
+          "returned": "/timekeeping/records/leave/13fe08f6-dc63-407f-8560-ea0bd8691ab3/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nپیش‌نویس درخواست ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "13fe08f6-dc63-407f-8560-ea0bd8691ab3",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-02 10:30:00+00:00",
+            "ends_at": "2026-11-02 11:30:00+00:00",
+            "state": "draft",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "page": "leave-local-reload",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "get": "/timekeeping/overtime/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "overtime-form",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/overtime/new/",
+          "status": 302,
+          "returned": "/timekeeping/records/overtime/a11e8c19-eea3-450f-aec3-011c06adaa5a/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nپیش‌نویس اضافه‌کاری ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.OvertimeRequest",
+            "id": "a11e8c19-eea3-450f-aec3-011c06adaa5a",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-02 13:00:00+00:00",
+            "ends_at": "2026-11-02 14:35:00+00:00",
+            "state": "draft",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "page": "overtime-local-reload",
+          "width": 1024,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/overtime/a11e8c19-eea3-450f-aec3-011c06adaa5a/submit/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست ارسال شد."
+          ]
+        },
+        {
+          "get": "/timekeeping/records/overtime/a11e8c19-eea3-450f-aec3-011c06adaa5a/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "post": "/timekeeping/overtime/a11e8c19-eea3-450f-aec3-011c06adaa5a/review/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست تعیین تکلیف شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.OvertimeRequest",
+            "id": "a11e8c19-eea3-450f-aec3-011c06adaa5a",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-02 13:00:00+00:00",
+            "ends_at": "2026-11-02 14:35:00+00:00",
+            "state": "approved",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "18ff4617-c4dd-4792-97c5-d4701ae85022",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/timekeeping/records/overtime/a11e8c19-eea3-450f-aec3-011c06adaa5a/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "ASSIGNMENT-CONTEXT-1024",
+      "description": "Completion retains authorized filters and shows feedback and stored actual/planned dates",
+      "steps": [
+        {
+          "witness": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "18f46f35-9f7b-44b6-be6d-760366d154f5",
+            "employee": "3c3104f5-471d-4b56-9aa7-cbdca31f8292",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "planned_end_date": "2026-11-20",
+            "end_date": "None",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/workforce/assignments/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&q=%D9%85%D8%B3%D8%A6%D9%88%D9%84+%D8%A8%D8%A7%D8%B2%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%DB%8C+1024&sort=status&direction=asc",
+          "status": 200
+        },
+        {
+          "page": "assignment-filtered",
+          "width": 1024,
+          "overflow": false
+        }
+      ],
+      "status": "FAIL",
+      "error": "Locator.select_option: Timeout 12000ms exceeded.\n"
+    },
+    {
+      "id": "PROJECTS-390",
+      "description": "UIUX-F-018, effective Controls visibility and same-project child creation",
+      "steps": [
+        {
+          "get": "/projects/",
+          "status": 200
+        },
+        {
+          "page": "projects-list",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "page": "project-hub",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "get": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/",
+          "status": 200
+        },
+        {
+          "page": "partial-hub",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "get": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/",
+          "status": 403
+        },
+        {
+          "get": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/",
+          "status": 200
+        },
+        {
+          "post": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/wbs/",
+          "status": 302,
+          "returned": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/",
+          "feedback": [
+            "×\nگره ساختار شکست کار افزوده شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "projects.WBSNode",
+            "id": "003d9bcc-e025-4913-95e8-bc65959a5985",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "parent": "68fce54c-4695-4cce-88c7-712f6396b764",
+            "code": "R-CH-390",
+            "title": "فرزند آزمون 390",
+            "audit": [
+              {
+                "action": "wbs_node.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "page": "wbs-child-saved",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "negative_post": "/projects/b1842b14-f644-48b4-aec3-652718b7ab2d/controls/wbs/",
+          "status": 403
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "TIMEZONE-ATTENDANCE-390",
+      "description": "Jalali entry, invalid order, timezone persistence, reload and independent finalization",
+      "steps": [
+        {
+          "get": "/timekeeping/attendance/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "attendance-form",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/attendance/new/",
+          "status": 302,
+          "returned": "/timekeeping/records/attendance/db2c2fc7-67e6-4b54-9ce7-75da7a8d1c50/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nحضور برای بررسی ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "db2c2fc7-67e6-4b54-9ce7-75da7a8d1c50",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-03",
+            "check_in_at": "2026-11-03 04:30:00+00:00",
+            "check_out_at": "2026-11-03 08:30:00+00:00",
+            "state": "draft",
+            "audit": [
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/timekeeping/records/attendance/db2c2fc7-67e6-4b54-9ce7-75da7a8d1c50/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "attendance-local-reload",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "get": "/timekeeping/records/attendance/db2c2fc7-67e6-4b54-9ce7-75da7a8d1c50/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "post": "/timekeeping/attendance/db2c2fc7-67e6-4b54-9ce7-75da7a8d1c50/finalize/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nحضور قطعی شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "db2c2fc7-67e6-4b54-9ce7-75da7a8d1c50",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-03",
+            "check_in_at": "2026-11-03 04:30:00+00:00",
+            "check_out_at": "2026-11-03 08:30:00+00:00",
+            "state": "finalized",
+            "audit": [
+              {
+                "action": "time.attendance_finalized",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.attendance_captured",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "CORRECTION-LINEAGE-390",
+      "description": "Authorized correction, independent review and scoped replacement navigation",
+      "steps": [
+        {
+          "get": "/timekeeping/records/attendance/db2c2fc7-67e6-4b54-9ce7-75da7a8d1c50/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "correction-form",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/attendance/db2c2fc7-67e6-4b54-9ce7-75da7a8d1c50/corrections/new/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست اصلاح برای بررسی مستقل ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "31b3325e-9d0c-437c-9fc5-57bd11f86376",
+            "replacement_check_in_at": "2026-11-03 04:30:00+00:00",
+            "replacement_check_out_at": "2026-11-03 08:45:00+00:00",
+            "status": "pending",
+            "requested_by": "e14bed65-14d0-45ea-b878-20a41b178ed7",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "get": "/timekeeping/records/correction/31b3325e-9d0c-437c-9fc5-57bd11f86376/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "correction-review",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/attendance/corrections/31b3325e-9d0c-437c-9fc5-57bd11f86376/review/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست اصلاح تعیین تکلیف شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceCorrectionRequest",
+            "id": "31b3325e-9d0c-437c-9fc5-57bd11f86376",
+            "replacement_check_in_at": "2026-11-03 04:30:00+00:00",
+            "replacement_check_out_at": "2026-11-03 08:45:00+00:00",
+            "status": "approved",
+            "requested_by": "e14bed65-14d0-45ea-b878-20a41b178ed7",
+            "reviewed_by": "18ff4617-c4dd-4792-97c5-d4701ae85022",
+            "audit": []
+          }
+        },
+        {
+          "witness": {
+            "model": "timekeeping.AttendanceRecord",
+            "id": "1ce72e23-6135-4b21-8e97-1f6ab26a1d09",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "calendar": "1aa7f092-d07f-4010-9f14-7d9846c06f63",
+            "work_date": "2026-11-03",
+            "check_in_at": "2026-11-03 04:30:00+00:00",
+            "check_out_at": "2026-11-03 08:45:00+00:00",
+            "state": "finalized",
+            "audit": []
+          }
+        },
+        {
+          "get": "/timekeeping/records/correction/31b3325e-9d0c-437c-9fc5-57bd11f86376/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "correction-lineage",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "page": "replacement-detail",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "get": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "time-history",
+          "width": 390,
+          "overflow": false
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "TIMEZONE-REQUESTS-390",
+      "description": "Leave, Mission and Overtime create/detail/review preserve tenant wall times",
+      "steps": [
+        {
+          "get": "/timekeeping/leave-mission/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "mission-form",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/leave-mission/new/",
+          "status": 302,
+          "returned": "/timekeeping/records/leave/47dd8fe6-2b12-47a2-b66f-986d6a4c11b9/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nپیش‌نویس درخواست ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "47dd8fe6-2b12-47a2-b66f-986d6a4c11b9",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-03 09:30:00+00:00",
+            "ends_at": "2026-11-03 10:30:00+00:00",
+            "state": "draft",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "page": "mission-local-reload",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/leave-mission/47dd8fe6-2b12-47a2-b66f-986d6a4c11b9/submit/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست ارسال شد."
+          ]
+        },
+        {
+          "get": "/timekeeping/records/leave/47dd8fe6-2b12-47a2-b66f-986d6a4c11b9/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "post": "/timekeeping/leave-mission/47dd8fe6-2b12-47a2-b66f-986d6a4c11b9/review/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست تعیین تکلیف شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "47dd8fe6-2b12-47a2-b66f-986d6a4c11b9",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-03 09:30:00+00:00",
+            "ends_at": "2026-11-03 10:30:00+00:00",
+            "state": "approved",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "18ff4617-c4dd-4792-97c5-d4701ae85022",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/timekeeping/records/leave/47dd8fe6-2b12-47a2-b66f-986d6a4c11b9/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "get": "/timekeeping/leave-mission/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "leave-form",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/leave-mission/new/",
+          "status": 302,
+          "returned": "/timekeeping/records/leave/0a291480-b7c8-4db9-ad19-394b722b685d/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nپیش‌نویس درخواست ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.LeaveMissionRequest",
+            "id": "0a291480-b7c8-4db9-ad19-394b722b685d",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-03 10:30:00+00:00",
+            "ends_at": "2026-11-03 11:30:00+00:00",
+            "state": "draft",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "page": "leave-local-reload",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "get": "/timekeeping/overtime/new/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "page": "overtime-form",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/overtime/new/",
+          "status": 302,
+          "returned": "/timekeeping/records/overtime/79dd5af2-cac7-4ce1-965e-3f4fb659bc81/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nپیش‌نویس اضافه‌کاری ثبت شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.OvertimeRequest",
+            "id": "79dd5af2-cac7-4ce1-965e-3f4fb659bc81",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-03 13:00:00+00:00",
+            "ends_at": "2026-11-03 14:35:00+00:00",
+            "state": "draft",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "None",
+            "audit": []
+          }
+        },
+        {
+          "page": "overtime-local-reload",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "post": "/timekeeping/overtime/79dd5af2-cac7-4ce1-965e-3f4fb659bc81/submit/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست ارسال شد."
+          ]
+        },
+        {
+          "get": "/timekeeping/records/overtime/79dd5af2-cac7-4ce1-965e-3f4fb659bc81/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        },
+        {
+          "post": "/timekeeping/overtime/79dd5af2-cac7-4ce1-965e-3f4fb659bc81/review/",
+          "status": 302,
+          "returned": "/timekeeping/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "feedback": [
+            "×\nدرخواست تعیین تکلیف شد."
+          ]
+        },
+        {
+          "witness": {
+            "model": "timekeeping.OvertimeRequest",
+            "id": "79dd5af2-cac7-4ce1-965e-3f4fb659bc81",
+            "employee": "24dc3838-9963-4890-a768-0e3eeeccc999",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "starts_at": "2026-11-03 13:00:00+00:00",
+            "ends_at": "2026-11-03 14:35:00+00:00",
+            "state": "approved",
+            "requested_by": "53a37f7a-695e-40f6-b413-2ae2c7c5bad3",
+            "reviewed_by": "18ff4617-c4dd-4792-97c5-d4701ae85022",
+            "audit": [
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-reviewer"
+              },
+              {
+                "action": "time.request_transitioned",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/timekeeping/records/overtime/79dd5af2-cac7-4ce1-965e-3f4fb659bc81/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&employee=24dc3838-9963-4890-a768-0e3eeeccc999",
+          "status": 200
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "ASSIGNMENT-CONTEXT-390",
+      "description": "Completion retains authorized filters and shows feedback and stored actual/planned dates",
+      "steps": [
+        {
+          "witness": {
+            "model": "workforce.EmployeeProjectAssignment",
+            "id": "f8a032a5-8058-4ee1-ac0d-7ea246fc5075",
+            "employee": "de115b44-a99b-48e2-bae3-65e69ef339f6",
+            "project": "b1842b14-f644-48b4-aec3-652718b7ab2d",
+            "site": "77398e34-80ac-43f4-a4a0-2f9b59bab488",
+            "planned_end_date": "2026-11-20",
+            "end_date": "None",
+            "status": "active",
+            "audit": [
+              {
+                "action": "employee_project_assignment.created",
+                "actor__username": "b02-owner"
+              }
+            ]
+          }
+        },
+        {
+          "get": "/workforce/assignments/?project=b1842b14-f644-48b4-aec3-652718b7ab2d&site=77398e34-80ac-43f4-a4a0-2f9b59bab488&q=%D9%85%D8%B3%D8%A6%D9%88%D9%84+%D8%A8%D8%A7%D8%B2%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%DB%8C+390&sort=status&direction=asc",
+          "status": 200
+        },
+        {
+          "page": "assignment-filtered",
+          "width": 390,
+          "overflow": false
+        }
+      ],
+      "status": "FAIL",
+      "error": "Locator.select_option: Timeout 12000ms exceeded.\n"
+    },
+    {
+      "id": "CORRECTION-SCOPE",
+      "description": "Real ungranted record gets safe GET/POST denial across site and tenant boundaries",
+      "steps": [
+        {
+          "get": "/timekeeping/attendance/27c5252e-67cd-40a9-ac10-bd563ff773ff/corrections/new/",
+          "status": 404
+        },
+        {
+          "denial_capture": "sibling-correction-denied-1440.png"
+        },
+        {
+          "negative_post": "/timekeeping/attendance/27c5252e-67cd-40a9-ac10-bd563ff773ff/corrections/new/",
+          "status": 404
+        },
+        {
+          "get": "/timekeeping/attendance/27c5252e-67cd-40a9-ac10-bd563ff773ff/corrections/new/",
+          "status": 404
+        },
+        {
+          "negative_post": "/timekeeping/attendance/27c5252e-67cd-40a9-ac10-bd563ff773ff/corrections/new/",
+          "status": 404
+        },
+        {
+          "get": "/timekeeping/attendance/fcc03958-d621-45ee-8299-92c4e97cb715/corrections/new/",
+          "status": 200
+        },
+        {
+          "page": "own-correction-allowed",
+          "width": 1440,
+          "overflow": false
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "BLOCKED-EXPOSURE",
+      "description": "Active compatibility routes have no field-detail controls; reservation UI entry remains hidden",
+      "steps": [
+        {
+          "get": "/workforce/field/24dc3838-9963-4890-a768-0e3eeeccc999/",
+          "status": 200
+        },
+        {
+          "page": "worker-operation-exposure",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "get": "/workforce/ess/timekeeping/",
+          "status": 403
+        },
+        {
+          "get": "/workforce/employment/",
+          "status": 403
+        },
+        {
+          "get": "/payroll/",
+          "status": 403
+        }
+      ],
+      "status": "PASS"
+    }
+  ]
+}

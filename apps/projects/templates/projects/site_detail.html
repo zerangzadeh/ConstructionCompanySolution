@@ -1,0 +1,22 @@
+{% extends "components/record_detail_page.html" %}
+{% load field_journey %}
+
+{% block title %}{{ site.name }} | بنیرا{% endblock %}
+
+{% block detail_heading %}
+    {% url "projects:site_list" site.project_id as site_list_url %}
+    {% include "components/page_header.html" with page_title=site.name page_description="اطلاعات و وضعیت کارگاه پروژه" page_breadcrumb_label="کارگاه‌ها" page_breadcrumb_url=site_list_url page_icon="hard-hat" only %}
+{% endblock %}
+
+{% block detail_actions %}
+    {% field_journey site.project site header_actions=True %}
+{% endblock %}
+
+{% block detail_summary %}
+    <dl class="erp-record-summary" aria-label="خلاصه کارگاه">
+        {% include "components/record_summary_item.html" with heading="کد کارگاه" value=site.code kind="identifier" only %}
+        {% include "components/record_summary_item.html" with heading="پروژه" value=site.project.name only %}
+        {% include "components/record_summary_item.html" with heading="وضعیت" value=site.is_active|yesno:"active,inactive" kind="status" label=site.is_active|yesno:"فعال,غیرفعال" only %}
+        {% include "components/record_summary_item.html" with heading="نشانی" value=site.address only %}
+    </dl>
+{% endblock %}

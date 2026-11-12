@@ -1,0 +1,54 @@
+{
+  "chrome": "156.0.8078.80",
+  "checks": [
+    {
+      "scenario": "PA-10",
+      "key": "audit-filter-path",
+      "result": "FAIL",
+      "observed": "Applied audit filters did not retain scope and date"
+    },
+    {
+      "scenario": "PA-09",
+      "key": "protected-retire",
+      "result": "PASS",
+      "observed": "{\"retiredSyntheticVersion\":true,\"configuredConfirmation\":false}"
+    }
+  ],
+  "pages": [
+    {
+      "key": "platform-audit-date",
+      "pattern": "DC-11/DC-09",
+      "route": "/organizations/platform/activity/",
+      "viewport": 1440,
+      "client": 1440,
+      "scroll": 1440,
+      "lang": "fa",
+      "dir": "rtl",
+      "bodyFont": "Vazirmatn, Tahoma, \"Segoe UI\", Arial, sans-serif",
+      "mains": 1,
+      "h1": [
+        "فعالیت‌ها و ممیزی"
+      ],
+      "regions": [],
+      "nav": 2,
+      "tableHeaders": [
+        "زمان",
+        "عامل",
+        "عملیات",
+        "هدف",
+        "نتیجه"
+      ],
+      "formCount": 2,
+      "unnamedFields": [],
+      "visibleActions": [
+        "خانه",
+        "▦",
+        "▦",
+        "فیلتر",
+        "پاک‌کردن"
+      ],
+      "screenshot": "platform-audit-date-1440.png"
+    }
+  ],
+  "faults": []
+}

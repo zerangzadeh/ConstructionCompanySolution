@@ -1,0 +1,59 @@
+{% load erp_format l10n %}
+<section id="costs" class="erp-project-panel project-budget" aria-labelledby="project-budget-heading">
+    <div class="erp-project-section-heading">
+        {% include "components/form_icon.html" with icon="layers" only %}
+        <h2 id="project-budget-heading">وضعیت بودجه و هزینه‌های پروژه</h2>
+        <p>مقایسه بودجه تخمینی با هزینه‌های ثبت‌شده پروژه</p>
+    </div>
+
+    {% with comparison=dashboard.budget_comparison currency=dashboard.currency_label %}
+        <div class="project-budget__body{% if comparison %} project-budget__body--compared{% endif %}">
+            <dl class="project-budget__amounts">
+                <div>
+                    <dt>بودجه تخمینی</dt>
+                    <dd><bdi dir="ltr">{{ project.estimated_budget|erp_quantity_fa }}</bdi> <span>{{ currency }}</span></dd>
+                    {% if comparison %}<dd class="project-budget__bar" aria-hidden="true"><meter max="100" value="{{ comparison.budget_bar|unlocalize }}"></meter></dd>{% endif %}
+                </div>
+                <div>
+                    <dt>هزینه ثبت‌شده</dt>
+                    <dd>{% if dashboard.actual_cost != None %}<bdi dir="ltr">{{ dashboard.actual_cost|erp_quantity_fa }}</bdi> <span>{{ currency }}</span>{% else %}داده در دسترس نیست{% endif %}</dd>
+                    {% if comparison %}<dd class="project-budget__bar" aria-hidden="true"><meter max="100" value="{{ comparison.actual_bar|unlocalize }}"></meter></dd>{% endif %}
+                </div>
+            </dl>
+
+            {% if comparison %}
+                <div class="project-budget__result{% if comparison.over_budget %} project-budget__result--over{% endif %}">
+                    <dl>
+                        <div><dt>درصد مصرف</dt><dd><bdi dir="ltr">{{ comparison.percent|erp_quantity_fa }}٪</bdi></dd></div>
+                        <div><dt>مانده نسبت به هزینه ثبت‌شده</dt><dd><bdi dir="ltr">{{ comparison.remaining|erp_quantity_fa }}</bdi> <span>{{ currency }}</span></dd></div>
+                    </dl>
+                    {% if comparison.over_budget %}<p class="project-budget__notice">هزینه ثبت‌شده از بودجه تخمینی بیشتر است.</p>{% endif %}
+                </div>
+            {% endif %}
+        </div>
+        {% if dashboard.cost_message %}<p class="project-budget__message">{{ dashboard.cost_message }}</p>{% endif %}
+        {% if not cost_projection.coverage_complete %}
+            <p class="project-budget__coverage">پوشش ناقص است. این مقایسه فقط هزینه‌های موجود در سوابق هزینه پروژه را در بر می‌گیرد.</p>
+        {% endif %}
+
+        <details class="erp-project-evidence">
+            <summary>ردیابی منبع و پوشش</summary>
+            {% if dashboard.actual_cost != None %}
+                <div class="erp-project-evidence__totals">
+                    <p>تعهد مجاز <bdi dir="ltr">{{ cost_projection.authorized_commitment|erp_quantity_fa }}</bdi> {{ currency }}</p>
+                    <p>تعهد باز <bdi dir="ltr">{{ cost_projection.open_commitment|erp_quantity_fa }}</bdi> {{ currency }}</p>
+                    <p>تعهد رفع‌شده <bdi dir="ltr">{{ cost_projection.relieved_commitment|erp_quantity_fa }}</bdi> {{ currency }}</p>
+                    <p>هزینه تحقق‌یافته <bdi dir="ltr">{{ cost_projection.accrual|erp_quantity_fa }}</bdi> {{ currency }}</p>
+                    <p>هزینه واقعی <bdi dir="ltr">{{ cost_projection.actual_cost|erp_quantity_fa }}</bdi> {{ currency }}</p>
+                </div>
+            {% endif %}
+            <ul>
+                {% for fact in cost_projection.facts %}
+                    <li>{{ fact.get_kind_display }} · نسخه منبع {{ fact.contract.version|erp_quantity_fa }} · <bdi dir="ltr">{{ fact.recognition_date|jalali_date }}</bdi> · <bdi dir="ltr">{{ fact.amount|erp_quantity_fa }}</bdi> {{ fact.currency }}</li>
+                {% empty %}
+                    <li>هنوز شاهد طبقه‌بندی‌شده‌ای ثبت نشده است.</li>
+                {% endfor %}
+            </ul>
+        </details>
+    {% endwith %}
+</section>

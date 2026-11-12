@@ -1,7 +1,7 @@
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_POST
 
@@ -100,6 +100,7 @@ from core.list_filters import (
     paginate_table,
     table_pagination_query,
 )
+from core.organization_time import render_in_organization_time as render
 
 
 def _equipment(request: HttpRequest, equipment_id: str) -> Equipment | None:
@@ -338,7 +339,7 @@ def cost_policy_transition(
         return HttpResponseNotFound("اقدام معتبر نیست.")
     try:
         service(organization=request.organization, actor=request.user, policy=policy)
-    except (PermissionDenied, ValueError) as exc:
+    except (PermissionDenied, ValidationError, ValueError) as exc:
         messages.error(request, str(exc))
     return redirect("equipment:cost_workbench")
 
@@ -372,7 +373,7 @@ def cost_allocation_finalize(request: HttpRequest, allocation_id: str) -> HttpRe
         finalize_cost_allocation(
             organization=request.organization, actor=request.user, allocation=allocation
         )
-    except (PermissionDenied, ValueError) as exc:
+    except (PermissionDenied, ValidationError, ValueError) as exc:
         messages.error(request, str(exc))
     return redirect("equipment:cost_workbench")
 
@@ -396,7 +397,7 @@ def cost_allocation_reverse(request: HttpRequest, allocation_id: str) -> HttpRes
                 allocation=allocation,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             return redirect("equipment:cost_workbench")
@@ -436,7 +437,7 @@ def cost_handoff_review(request: HttpRequest, envelope_id: str) -> HttpResponse:
         review_cost_handoff(
             organization=request.organization, actor=request.user, envelope=envelope
         )
-    except (PermissionDenied, ValueError) as exc:
+    except (PermissionDenied, ValidationError, ValueError) as exc:
         messages.error(request, str(exc))
     return redirect("equipment:cost_workbench")
 
@@ -460,7 +461,7 @@ def cost_handoff_reconcile(request: HttpRequest, envelope_id: str) -> HttpRespon
                 envelope=envelope,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             return redirect("equipment:cost_workbench")
@@ -490,7 +491,7 @@ def operator_qualification_create(request: HttpRequest) -> HttpResponse:
                 actor=request.user,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             return redirect("equipment:operations_workbench")
@@ -516,7 +517,7 @@ def downtime_create(request: HttpRequest) -> HttpResponse:
                 actor=request.user,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             return redirect("equipment:operations_workbench")
@@ -550,7 +551,7 @@ def work_order_evidence_create(
                 work_order=order,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             return redirect("equipment:operations_workbench")
@@ -581,7 +582,7 @@ def _operation_form(
                 actor=request.user,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             return redirect(back_url)
@@ -656,7 +657,7 @@ def work_order_transition(request: HttpRequest, work_order_id: str) -> HttpRespo
                 work_order=order,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             return redirect("equipment:operations_workbench")
@@ -688,7 +689,7 @@ def spare_link_create(request: HttpRequest, work_order_id: str) -> HttpResponse:
                 work_order=order,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             return redirect("equipment:operations_workbench")
@@ -714,7 +715,7 @@ def equipment_create(request: HttpRequest) -> HttpResponse:
                 actor=request.user,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             return redirect("equipment:detail", equipment_id=equipment.pk)
@@ -772,7 +773,7 @@ def equipment_status_change(request: HttpRequest, equipment_id: str) -> HttpResp
                 **form.cleaned_data,
             )
             messages.success(request, "وضعیت تجهیز تغییر کرد.")
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             messages.error(request, str(exc))
     else:
         messages.error(request, "وضعیت جدید را انتخاب کنید.")
@@ -792,7 +793,7 @@ def equipment_archive(request: HttpRequest, equipment_id: str) -> HttpResponse:
         )
         messages.success(request, "تجهیز بایگانی شد.")
         return redirect("equipment:list")
-    except (PermissionDenied, ValueError) as exc:
+    except (PermissionDenied, ValidationError, ValueError) as exc:
         messages.error(request, str(exc))
         return redirect("equipment:detail", equipment_id=equipment_id)
 
@@ -879,7 +880,7 @@ def assignment_create(request: HttpRequest) -> HttpResponse:
                 actor=request.user,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             messages.success(request, "تخصیص تجهیز ثبت شد.")
@@ -926,7 +927,7 @@ def assignment_status_change(request: HttpRequest, assignment_id: str) -> HttpRe
             )
             messages.success(request, "وضعیت تخصیص تغییر کرد.")
             return redirect("equipment:assignment_list")
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
     return render(
         request,
@@ -1014,7 +1015,7 @@ def maintenance_create(request: HttpRequest) -> HttpResponse:
                 actor=request.user,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             messages.success(request, "سابقه سرویس یا تعمیر ثبت شد.")
@@ -1066,7 +1067,7 @@ def maintenance_status_change(request: HttpRequest, record_id: str) -> HttpRespo
             )
             messages.success(request, "وضعیت سابقه سرویس تغییر کرد.")
             return redirect("equipment:maintenance_list")
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
     return render(
         request,
