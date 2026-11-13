@@ -1,0 +1,1178 @@
+{
+  "workflows:definition_list": {
+    "route": "workflows:definition_list",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/workflows/administration/?organization=323f7079-ca40-48ed-9ecd-16f17298508d",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/administration/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "workflow-definitions"
+    ],
+    "execution_id": "INV-WORKFLOWS-DEFINITION-LIST--CV-WF-01",
+    "status": "PASS",
+    "persisted": {
+      "listed_definition": "8d8b88b5-5132-4027-9738-252aa3a8e4c4",
+      "foreign_definition_filtered": true
+    }
+  },
+  "workflows:definition_create": {
+    "route": "workflows:definition_create",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/workflows/administration/new/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/administration/new/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/administration/new/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/administration/new/",
+        "status": 400,
+        "expected": [
+          400
+        ],
+        "case": "duplicate definition"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/administration/new/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "workflow-definition-create"
+    ],
+    "execution_id": "INV-WORKFLOWS-DEFINITION-CREATE--CV-WF-01",
+    "status": "PASS",
+    "persisted": {
+      "definition": "3019158e-07e0-4ff9-8af6-25d41c2490bb",
+      "version": "4ac382d7-7048-49ae-a6e8-2ce58ff81f46",
+      "draft_only": true
+    }
+  },
+  "workflows:version_detail": {
+    "route": "workflows:version_detail",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "explicit read-only workflow permission"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/administration/versions/24dcfa36-285e-4218-a839-8dd0e7ab0065/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign version IDOR"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign admin"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "workflow-version"
+    ],
+    "execution_id": "INV-WORKFLOWS-VERSION-DETAIL--CV-WF-01",
+    "status": "PASS",
+    "persisted": {
+      "version_number": 1,
+      "version_status": "draft",
+      "reader_edit_control": false
+    }
+  },
+  "workflows:version_edit": {
+    "route": "workflows:version_edit",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/edit/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/edit/",
+        "status": 400,
+        "expected": [
+          400
+        ],
+        "case": "unregistered command"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/edit/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/edit/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/administration/versions/24dcfa36-285e-4218-a839-8dd0e7ab0065/edit/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign version IDOR"
+      }
+    ],
+    "design": [
+      "workflow-edit"
+    ],
+    "execution_id": "INV-WORKFLOWS-VERSION-EDIT--CV-WF-01",
+    "status": "PASS",
+    "persisted": {
+      "steps": 4,
+      "transitions": 3,
+      "unregistered_command_persisted": false
+    }
+  },
+  "workflows:version_action": {
+    "route": "workflows:version_action",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/publish/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/validate/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/validate/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/publish/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/publish/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/edit/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "published version immutable"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/administration/versions/e5bf2b3a-c713-4f49-88d8-ddbf8901c21e/retire/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/administration/versions/24dcfa36-285e-4218-a839-8dd0e7ab0065/publish/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign version IDOR"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-WORKFLOWS-VERSION-ACTION--CV-WF-01",
+    "status": "PASS",
+    "persisted": {
+      "published_version": "e5bf2b3a-c713-4f49-88d8-ddbf8901c21e",
+      "validation_errors": 0,
+      "published_edit_denied": true,
+      "publish_audit_count": 1
+    }
+  },
+  "workflows:workbench": {
+    "route": "workflows:workbench",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/workflows/workbench/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/workbench/?organization=059efd96-0ad8-41a6-87d2-cc61a1e8e8f3&query=B07-WF-1",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/workbench/",
+        "status": 200,
+        "expected": [
+          200,
+          403
+        ],
+        "case": "restricted reader"
+      }
+    ],
+    "design": [
+      "workflow-inbox"
+    ],
+    "execution_id": "INV-WORKFLOWS-WORKBENCH--CV-WF-01",
+    "status": "PASS",
+    "persisted": {
+      "candidate": "6fbb8ce8-1721-431d-a787-aab5e0f251e7",
+      "source_link": true,
+      "foreign_item_hidden": true,
+      "reader_item_hidden": true
+    }
+  },
+  "workflows:work_item_claim": {
+    "route": "workflows:work_item_claim",
+    "http": [
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/claim/",
+        "status": 409,
+        "expected": [
+          409
+        ],
+        "case": "foreign item claim"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/claim/",
+        "status": 409,
+        "expected": [
+          409
+        ],
+        "case": "restricted reader claim"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/claim/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "CSRF omitted"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/workbench/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/claim/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-WORKFLOWS-WORK-ITEM-CLAIM--CV-WF-01",
+    "status": "PASS",
+    "persisted": {
+      "item": "62b6219a-cfc8-4b86-b8e3-057f70268b6c",
+      "state": "claimed",
+      "assignee": "579e44df-5963-459f-84a3-dcb322ed7776",
+      "claim_history_count": 1
+    }
+  },
+  "workflows:work_item_release": {
+    "route": "workflows:work_item_release",
+    "http": [
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/release/",
+        "status": 409,
+        "expected": [
+          409
+        ],
+        "case": "non-assignee release"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/release/",
+        "status": 409,
+        "expected": [
+          409
+        ],
+        "case": "foreign item release"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/workbench/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/release/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-WORKFLOWS-WORK-ITEM-RELEASE--CV-WF-01",
+    "status": "PASS",
+    "persisted": {
+      "item": "62b6219a-cfc8-4b86-b8e3-057f70268b6c",
+      "state": "open",
+      "assignee_cleared": true,
+      "release_history_count": 1
+    }
+  },
+  "workflows:work_item_action": {
+    "route": "workflows:work_item_action",
+    "http": [
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/claim/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "claim for independent decision"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/action/",
+        "status": 409,
+        "expected": [
+          409
+        ],
+        "case": "maker tries to decide"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/action/",
+        "status": 409,
+        "expected": [
+          409
+        ],
+        "case": "foreign tenant decision"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/action/",
+        "status": 409,
+        "expected": [
+          409
+        ],
+        "case": "unregistered outcome"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/workbench/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/action/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/action/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "exact decision replay"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/62b6219a-cfc8-4b86-b8e3-057f70268b6c/action/",
+        "status": 409,
+        "expected": [
+          409
+        ],
+        "case": "stale decision on terminal item"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-WORKFLOWS-WORK-ITEM-ACTION--CV-WF-01",
+    "status": "PASS",
+    "persisted": {
+      "item": "62b6219a-cfc8-4b86-b8e3-057f70268b6c",
+      "instance": "6db4c5ee-8860-430b-beb4-d2e809ccb83c",
+      "version": "51427fe1-69f0-471e-a7b9-4e45f46b69a5",
+      "source_state": "approved",
+      "history_action": "complete",
+      "actor": "579e44df-5963-459f-84a3-dcb322ed7776",
+      "approval_audit_count": 1
+    }
+  },
+  "workflows:my_requests": {
+    "route": "workflows:my_requests",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/workflows/my-requests/?requester=c8f4dfff-b7c9-4a5c-a576-d2ad68566bfe",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/my-requests/?requester=43a89555-3aa1-4c03-877b-226653eab60b",
+        "status": 403,
+        "expected": [
+          200,
+          403
+        ],
+        "case": "foreign identity query"
+      }
+    ],
+    "design": [
+      "my-requests"
+    ],
+    "execution_id": "INV-WORKFLOWS-MY-REQUESTS--CV-WF-01",
+    "status": "PASS",
+    "persisted": {
+      "own_source_count": 2,
+      "another_identity_excluded": true
+    }
+  },
+  "workflows:manager_workspace": {
+    "route": "workflows:manager_workspace",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/workflows/manager/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/manager/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "position title without qualifying team assignment"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/manager/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "foreign manager"
+      }
+    ],
+    "design": [
+      "workflow-manager"
+    ],
+    "execution_id": "INV-WORKFLOWS-MANAGER-WORKSPACE--CV-WF-01",
+    "status": "PASS",
+    "persisted": {
+      "team_source_visible": true,
+      "other_team_source_excluded": true,
+      "position_title_only_denied": true
+    }
+  },
+  "parties:list": {
+    "route": "parties:list",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/parties/?name=%D8%B4%D8%B1%DA%A9%D8%AA+%D8%B3%D8%A7%D8%B2%D9%87+%D9%BE%D8%A7%D8%B1%D8%B3&organization=1f6a0998-3dce-45f3-8bd8-eb3a2f1b23bb",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized operational reader"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/?name=%D8%B4%D8%B1%DA%A9%D8%AA+%D8%B3%D8%A7%D8%B2%D9%87+%D9%BE%D8%A7%D8%B1%D8%B3",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "foreign tenant search"
+      }
+    ],
+    "design": [
+      "party-list"
+    ],
+    "execution_id": "INV-PARTIES-LIST--CV-PAR-01",
+    "management_entry_count": 1,
+    "persisted": {
+      "tenant_party": "41042b58-3da7-4b17-81d4-e8c146e877c5",
+      "foreign_search_excluded": true,
+      "reader_has_no_management_controls": true
+    },
+    "status": "PASS"
+  },
+  "parties:create": {
+    "route": "parties:create",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/parties/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/create/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/create/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/create/",
+        "status": 400,
+        "expected": [
+          400
+        ],
+        "case": "duplicate normalized identity"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/create/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "party-compact-form"
+    ],
+    "execution_id": "INV-PARTIES-CREATE--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "person": "3ee34451-86ae-4d5a-a5ec-616d9bcb9ce4",
+      "company": "5beb07a2-d6ce-4290-97f2-1dd4cdae504b",
+      "duplicate_count": 1,
+      "invalid_audit_delta": 0
+    }
+  },
+  "parties:detail": {
+    "route": "parties:detail",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "operational reader"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/d003df6c-96c8-4d1f-b917-ac6e2360ab68/",
+        "status": 404,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "foreign party IDOR"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 404,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "foreign admin"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "party-detail"
+    ],
+    "execution_id": "INV-PARTIES-DETAIL--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "source_party": "41042b58-3da7-4b17-81d4-e8c146e877c5",
+      "operational_read_only": true,
+      "return_to_list": true
+    }
+  },
+  "parties:governance": {
+    "route": "parties:governance",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/parties/governance/?organization=1f6a0998-3dce-45f3-8bd8-eb3a2f1b23bb",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/governance/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/governance/?name=%D8%B4%D8%B1%DA%A9%D8%AA+%D8%B3%D8%A7%D8%B2%D9%87+%D9%BE%D8%A7%D8%B1%D8%B3",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "foreign search"
+      }
+    ],
+    "design": [
+      "party-governance-list"
+    ],
+    "execution_id": "INV-PARTIES-GOVERNANCE--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "authorized_create_entry": true,
+      "foreign_party_filtered": true
+    }
+  },
+  "parties:governance_detail": {
+    "route": "parties:governance_detail",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/parties/governance/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/governance/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/governance/d003df6c-96c8-4d1f-b917-ac6e2360ab68/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "foreign governed record"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/governance/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "foreign admin"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/governance/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "party-governance-detail"
+    ],
+    "execution_id": "INV-PARTIES-GOVERNANCE-DETAIL--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "party": "41042b58-3da7-4b17-81d4-e8c146e877c5",
+      "updated_legal_name": true,
+      "identity_update_audit": 1
+    }
+  },
+  "parties:governance_action": {
+    "route": "parties:governance_action",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/parties/governance/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/governance/41042b58-3da7-4b17-81d4-e8c146e877c5/actions/alias/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/governance/d003df6c-96c8-4d1f-b917-ac6e2360ab68/actions/alias/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "foreign party write"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/governance/41042b58-3da7-4b17-81d4-e8c146e877c5/actions/alias/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-PARTIES-GOVERNANCE-ACTION--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "party": "41042b58-3da7-4b17-81d4-e8c146e877c5",
+      "alias": "d7d27823-6829-4866-b3d3-835791d4213b",
+      "alias_audit": 1,
+      "foreign_alias_count": 0
+    }
+  },
+  "parties:role_create": {
+    "route": "parties:role_create",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/parties/governance/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/roles/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/governance/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/roles/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/governance/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/roles/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/roles/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "duplicate role"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/d003df6c-96c8-4d1f-b917-ac6e2360ab68/roles/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign role IDOR"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/roles/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-PARTIES-ROLE-CREATE--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "role_count": 3,
+      "role_codes": [
+        "supplier",
+        "client",
+        "subcontractor"
+      ]
+    }
+  },
+  "parties:contact_create": {
+    "route": "parties:contact_create",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/parties/governance/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/contacts/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/d003df6c-96c8-4d1f-b917-ac6e2360ab68/contacts/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign contact write"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/contacts/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-PARTIES-CONTACT-CREATE--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "contact": "37301702-e623-4494-ab69-6333fce3fbff",
+      "primary": true,
+      "foreign_contacts": 0
+    }
+  },
+  "parties:archive": {
+    "route": "parties:archive",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/parties/governance/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/archive/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/d003df6c-96c8-4d1f-b917-ac6e2360ab68/archive/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign archive"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/archive/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/archive/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "archive replay"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "archived operational detail"
+      },
+      {
+        "method": "GET",
+        "url": "/parties/governance/41042b58-3da7-4b17-81d4-e8c146e877c5/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "retained governed history"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-PARTIES-ARCHIVE--CV-PAR-01",
+    "status": "FAIL",
+    "error": "Page.goto: Timeout 11000ms exceeded.\nCall log:\n  - navigating to \"http://127.0.0.1:54804/contracts/b040ba8f-9dde-46b3-b0cc-aa0316c195b2/\", waiting until \"domcontentloaded\"\n",
+    "exception": "TimeoutError"
+  }
+}

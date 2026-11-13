@@ -1,6 +1,6 @@
 from django.urls import path
 
-from apps.daily_reports import field_views, views
+from apps.daily_reports import field_views, revision_views, views
 
 app_name = "daily_reports"
 
@@ -35,4 +35,12 @@ urlpatterns = [
     path("<uuid:report_id>/", views.daily_report_detail, name="detail"),
     path("<uuid:report_id>/submit/", views.daily_report_submit, name="submit"),
     path("<uuid:report_id>/approve/", views.daily_report_approve, name="approve"),
+    path("<uuid:report_id>/return/", revision_views.return_report, name="return"),
+    path("<uuid:report_id>/adopt/", revision_views.adopt_report, name="adopt"),
+    path("<uuid:report_id>/correction/start/", revision_views.begin_correction, name="correction_start"),
+    path("<uuid:report_id>/correction/", revision_views.correction, name="correction"),
+    path("<uuid:report_id>/correction/submit/", revision_views.submit_correction, name="correction_submit"),
+    path("<uuid:report_id>/correction/<str:kind>/add/", revision_views.correction_entry, name="correction_entry_add"),
+    path("<uuid:report_id>/correction/<str:kind>/<uuid:entry_id>/", revision_views.correction_entry, name="correction_entry"),
+
 ]

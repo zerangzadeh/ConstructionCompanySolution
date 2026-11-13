@@ -1,0 +1,51 @@
+{
+  "branch": "main",
+  "head": "24ad220f0376cb0b6232b745938b35433843a32d",
+  "upstream": "24ad220f0376cb0b6232b745938b35433843a32d",
+  "original_evidence_sha256": {
+    "B05_ORIGINAL_RESULTS.csv": "0707081d4fb667b7150439094be41ebeaf1ba3a6703104dfcc92c289eeb52da5",
+    "B05_EXECUTION_REPORT.md": "d60567a8e4b03e27f7d69ee4c0ea1b97bebfd833276ec366172767958f9b38ef",
+    "WAVE_05_SUMMARY.md": "d49860830230fa0844aa3d596dccf6bc52ab9ab6429c43ec990532d5a7ff73c5"
+  },
+  "b05_touch_sha256": {
+    "ROADMAP.md": "97cbeae15b63e52f38c9f493045d54c233a9d4cd045b68b342500ef827437c5e",
+    "apps/billing/services.py": "2cc80d568422a7f45015af252d779f616792e5533ca0cf85132e668ea80630fd",
+    "apps/billing/workflow.py": "56199bbc22bf4f7d760c43d329c0b5ca280a94f268ba42ccf2fa2d63d780dc07",
+    "apps/billing/views.py": "ce128f40e88978019aa49165a07f331479a004893841fd53da1136a52d8431d1",
+    "apps/billing/templates/billing/progress_detail.html": "f2bdb892a19aa818bcedebec5ac1d71b0fa06c07282e06898899656fe0c836b6",
+    "apps/workflows/registry.py": "02cae49aada8bfd0f0b74e4883b3493cde3cb13d596c12ccb80750b6032ae8b0",
+    "apps/workflows/runtime.py": "89a33400f04e1b327baf34599719dec058387b1caf3cfd5dc0eef9a7171de32a",
+    "tests/test_b05_validation.py": "77eb1842374e00bb2e9292bef961ff0fa8192a9a357930b9ddb990b428a82c27",
+    "docs/validation/comprehensive-product/DEFECT_REGISTER.csv": "de57044a507c109d6ed43a46d0932262d6d0a5391d565181de40c2b89a4de675",
+    "docs/validation/comprehensive-product/DEFECT_REGISTER.md": "ad2036af86b939b6888b39b8e99b8254ebe6ebc469a4a14c75a94b9b7b2aaf61",
+    "docs/validation/comprehensive-product/TEST_EXECUTION_MATRIX_MVP.csv": "601f6b45b78a20904915e9547d4d404d8cf00f937b0c165e9a8893eb220478ff",
+    "docs/validation/comprehensive-product/USER_JOURNEY_CATALOG.md": "d6385c16954eff44a039f5b722632515a4e08b0adbdf88a46c58523a70a8ceb2",
+    "docs/validation/comprehensive-product/execution/B05_CLOSEOUT_REPORT.md": "a486c6d610a94ec1c30831abdf1f88ecfb8bd0e25a3dcefcb5fdeefc310f6c32",
+    "docs/validation/comprehensive-product/execution/B05_FINAL_RETEST.csv": "61539682c4aeeb903e50b3a9204906008c1e2db524b2c3bf642a3f319b11d4f2"
+  },
+  "concurrent_changes_to_entry_files": {
+    "apps/inventory/p8_forms.py": "ff5eb5960f8444ac8e119dd81bcf562769bf0cff44f15c45385c72e1447048b7",
+    "apps/inventory/p8_services.py": "74ff681b58645564aad966d1d386f6fb4801b2f4054c7473511fcb2b1098f248",
+    "apps/inventory/p8_views.py": "233dcd7bba46d3ac9d60b7be8c499ba80c95f9f9df8cc49073863973c86a8a09",
+    "apps/inventory/templates/inventory/transfer_detail.html": "4a5f8f92bd7474be3bcdd9623e4205a7c4906a34118fc175b8b52c7e86ad5380"
+  },
+  "additional_concurrent_tracked_changes": [
+    "apps/inventory/templates/inventory/custody_workbench.html",
+    "apps/inventory/templates/inventory/warehouse_list.html",
+    "apps/organizations/context_processors.py",
+    "core/home.py",
+    "core/product_surface.py"
+  ],
+  "shared_shell_smoke": "7/7 PASS, Django check and migration drift PASS",
+  "migration_gate": {
+    "applied": 462,
+    "pending": 0
+  },
+  "evidence_validation": {
+    "exactly_once_rows": 73,
+    "chrome_retested": 40,
+    "carried_pass": 20,
+    "statutory_blocked": 13,
+    "non_b05_matrix_rows": "byte-for-byte preserved by the scoped matrix edit"
+  }
+}

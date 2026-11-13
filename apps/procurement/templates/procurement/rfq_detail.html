@@ -1,7 +1,7 @@
 {% extends "base.html" %}{% load static erp_format %}
 {% block title %}{{ rfq.rfq_number }} | استعلام خرید{% endblock %}
 {% block extra_head %}{{ line_form.media.css }}<link rel="stylesheet" href="{% static 'css/erp_reference_list.css' %}"><link rel="stylesheet" href="{% static 'css/bonira_tokens.css' %}"><link rel="stylesheet" href="{% static 'css/erp_rfq_configuration.css' %}">{% endblock %}
-{% block extra_scripts %}{{ line_form.media.js }}{% endblock %}
+{% block extra_scripts %}{{ line_form.media.js }}{% if can_issue %}<script src="{% static 'procurement/rfq_supplier_search.js' %}" defer></script>{% endif %}{% endblock %}
 {% block content %}
 <nav class="text-xs text-slate-500" aria-label="مسیر صفحه"><a href="{% url 'procurement:rfq_list' %}">استعلام‌های خرید</a> / <bdi dir="ltr">{{ rfq.rfq_number }}</bdi></nav>
 <header class="mt-4 flex flex-wrap items-start justify-between gap-3">
@@ -22,7 +22,15 @@
 {% include "procurement/rfq_configuration.html" %}
 {% if can_issue %}<form class="erp-surface mt-4 rounded-xl p-4" method="post" action="{% url 'procurement:rfq_issue' rfq.pk %}" novalidate aria-label="صدور استعلام">{% csrf_token %}<h2 class="text-sm font-bold">تأمین‌کنندگان دعوت‌شونده و صدور</h2><p class="mt-2 text-sm text-slate-500">تأمین‌کنندگان فعال شرکت را برای دعوت انتخاب کنید؛ با صدور، اقلام و تنظیمات انتخاب این نسخه تثبیت می‌شوند.</p>
 {% if rfq.commercial_scope_required and not scope_ready %}<p class="mt-2 text-sm text-amber-800">پیش‌نیاز صدور: مقدار و نحوه انتخاب تأمین‌کننده را تأیید و ذخیره کنید.</p>{% endif %}
-{% include "components/form_errors.html" with form=issue_form only %}{% for field in issue_form.hidden_fields %}{{ field }}{% if field.errors %}<p role="alert" class="mt-2 text-sm text-red-700">اطلاعات فرم معتبر نیست؛ صفحه را دوباره باز کنید.</p>{% endif %}{% endfor %}<div class="mt-3 space-y-3">{% for field in issue_form.visible_fields %}{% include "components/form_field.html" with field=field only %}{% endfor %}</div><button class="erp-btn erp-btn--primary mt-4" type="submit">صدور</button></form>{% endif %}
+{% include "components/form_errors.html" with form=issue_form only %}{% for field in issue_form.hidden_fields %}{{ field }}{% if field.errors %}<p role="alert" class="mt-2 text-sm text-red-700">اطلاعات فرم معتبر نیست؛ صفحه را دوباره باز کنید.</p>{% endif %}{% endfor %}
+<div class="mt-3 space-y-3" data-rfq-supplier-search>
+  <div data-supplier-search-control hidden>
+    <label class="mb-1 block text-sm font-medium" for="rfq-supplier-search">جست‌وجوی تأمین‌کننده</label>
+    <input class="erp-input w-full" id="rfq-supplier-search" type="search" autocomplete="off" aria-controls="id_supplier_ids">
+    <p class="mt-2 text-sm text-slate-500" role="status" data-supplier-search-empty hidden>تأمین‌کننده‌ای با این نام یافت نشد.</p>
+  </div>
+  {% for field in issue_form.visible_fields %}{% include "components/form_field.html" with field=field only %}{% endfor %}
+</div><button class="erp-btn erp-btn--primary mt-4" type="submit">صدور</button></form>{% endif %}
 <section class="erp-surface mt-4 rounded-xl p-4" aria-label="تاریخچه صدور"><h2 class="text-sm font-bold">نسخه‌ها و دعوت‌نامه‌ها</h2>{% for version in rfq.versions.all %}<article class="mt-3 rounded-lg border border-slate-200 p-3 text-sm"><h3 class="font-semibold">نسخه {{ version.version_number|erp_number }} · {{ version.created_at|jalali_datetime }}</h3><p class="mt-2">مهلت دریافت: <bdi dir="ltr">{{ version.closing_at|jalali_datetime }}</bdi> · زمان گشایش: <bdi dir="ltr">{{ version.earliest_opening_at|jalali_datetime }}</bdi></p>{% if version.terms %}<p class="mt-2 break-words">{{ version.terms }}</p>{% endif %}
 <details class="mt-3"><summary class="cursor-pointer text-blue-700">اقلام تثبیت‌شده نسخه</summary><ul class="mt-2 space-y-2">{% for line in version.lines.all %}<li>{{ line.material.name }} · {{ line.quantity|erp_number }} {{ line.unit_of_measure.name }} · {{ line.description }}</li>{% endfor %}</ul></details>
 {% if version.commercial_scope_definition %}<p class="mt-3 font-semibold">تنظیمات انتخاب تأمین‌کننده این نسخه</p><p class="mt-1 text-xs text-slate-500">اقلام و تنظیمات این نسخه هنگام صدور تثبیت شده‌اند.</p>{% endif %}

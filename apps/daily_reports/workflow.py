@@ -27,6 +27,7 @@ from apps.organizations.models import (
     OrganizationMembership,
 )
 from apps.workflows.models import (
+    WorkflowCondition,
     WorkflowDefinition,
     WorkflowInstance,
     WorkflowInstanceStatus,
@@ -50,8 +51,15 @@ from apps.workflows.runtime import (
     start_workflow,
 )
 from apps.workflows.validators import validate_workflow_version
+from core.product_surface import surface_profile
 
 from .models import DailyReport, DailyReportStatus
+from .return_configuration import (
+    RETURN_COMMAND,
+    RETURN_TEMPLATE_CODE,
+    return_configuration,
+)
+from .submission_snapshots import return_enabled
 
 WORKFLOW_TYPE_CODE = "daily_reports.daily_report_approval"
 SUBJECT_TYPE = "daily_reports.daily_report"
@@ -101,6 +109,8 @@ COMPATIBILITY_CONFIGURATION: dict[str, Any] = {
     ],
 }
 
+
+RETURN_CONFIGURATION = return_configuration(COMPATIBILITY_CONFIGURATION)
 
 def _key(*parts: object) -> str:
     return sha256(":".join(str(part) for part in parts).encode()).hexdigest()
@@ -171,10 +181,12 @@ def load_daily_report_subject(
             "site_id": str(report.site_id),
             "status": report.status,
             "created_by_id": str(report.created_by_id),
+            "return_enabled": return_enabled(report),
         },
         creator_membership_id=_active_membership_id(organization, report.created_by_id),
-        submitter_membership_id=_active_membership_id(
-            organization, report.updated_by_id
+        submitter_membership_id=(
+            report.submission_snapshot["submitter_membership_id"] if return_enabled(report)
+            else _active_membership_id(organization, report.updated_by_id)
         ),
         display=f"{report.site} — {report.reporting_date}",
     )
@@ -191,12 +203,12 @@ def _submit_command(
 
 
 def _approve_command(
-    *, subject: DailyReport, actor: User, organization: Organization, **_: object
+    *, subject: DailyReport, actor: User, organization: Organization, work_item=None, **_: object
 ) -> DailyReport:
     from .services import _approve_daily_report_domain
 
     return _approve_daily_report_domain(
-        organization=organization, report_id=str(subject.pk), actor=actor
+        organization=organization, report_id=str(subject.pk), actor=actor, work_item=work_item
     )
 
 
@@ -204,6 +216,9 @@ def register_daily_report_workflow() -> None:
     registry.bind_subject_loader(SUBJECT_TYPE, load_daily_report_subject)
     registry.bind_domain_command("daily_reports.daily_report.submit", _submit_command)
     registry.bind_domain_command("daily_reports.daily_report.approve", _approve_command)
+    from .return_workflow import return_command
+
+    registry.bind_domain_command(RETURN_COMMAND, return_command)
 
 
 def _write_configuration(
@@ -236,7 +251,7 @@ def _write_configuration(
                 is_fallback=route.get("is_fallback", False),
             )
     for item in configuration["transitions"]:
-        WorkflowTransitionDefinition.objects.create(
+        transition = WorkflowTransitionDefinition.objects.create(
             organization=organization,
             version=version,
             source_step=steps[item["source"]],
@@ -246,6 +261,12 @@ def _write_configuration(
             required_permission=item.get("required_permission", ""),
             is_default=item.get("is_default", False),
         )
+        for order, condition in enumerate(item.get("conditions", [])):
+            WorkflowCondition.objects.create(
+                organization=organization, version=version, transition=transition,
+                order=order, condition_type=condition["condition_type"],
+                configuration=condition["configuration"],
+            )
 
 
 def _ensure_daily_report_platform_catalog() -> tuple[WorkflowType, WorkflowTemplate]:
@@ -276,7 +297,8 @@ def ensure_daily_report_compatibility_workflow(
     locked_organization = Organization.objects.select_for_update().get(
         pk=organization.pk
     )
-    workflow_type, template = _ensure_daily_report_platform_catalog()
+    workflow_type, _ = _ensure_daily_report_platform_catalog()
+    template = WorkflowTemplate.objects.get(workflow_type=workflow_type, code=RETURN_TEMPLATE_CODE, is_active=True)
     _, scope_key = canonical_scope({})
     existing = (
         WorkflowVersion.objects.select_related("definition")
@@ -311,7 +333,7 @@ def ensure_daily_report_compatibility_workflow(
         organization=locked_organization,
         definition=definition,
         version_number=1,
-        change_summary="W5.1 legacy compatibility",
+        change_summary="Daily Report compatibility and independent Return",
     )
     _write_configuration(
         organization=locked_organization,
@@ -378,10 +400,19 @@ def resolve_daily_report_workflow_version(
     return selected[0]
 
 
-@transaction.atomic
 def submit_daily_report_with_workflow(
     *, organization: Organization, report_id: str, actor: User
 ) -> DailyReport:
+    if surface_profile() == "MVP":
+        from .return_workflow import submit_returnable
+
+        return submit_returnable(organization=organization, actor=actor, report_id=report_id)
+
+    return _submit_legacy_report(organization=organization, report_id=report_id, actor=actor)
+
+
+@transaction.atomic
+def _submit_legacy_report(*, organization, report_id, actor):
     from .services import _submit_daily_report_domain
 
     if not _has_legacy_approver(organization):
@@ -490,6 +521,10 @@ def approve_daily_report_with_workflow(
         ).exists()
     ):
         _backfill_one(report=report, actor=starter)
+    if return_enabled(report):
+        from .return_workflow import require_independent_reviewer
+
+        require_independent_reviewer(report, actor)
     item = _actor_item(organization=organization, report=report, membership=membership)
     if item.status == WorkItemStatus.OPEN:
         item = claim_work_item(

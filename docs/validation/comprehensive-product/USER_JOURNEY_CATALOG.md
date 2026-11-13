@@ -128,17 +128,17 @@ Reuse the original MVP-08 guide under docs/governance/mvp for each UAT-01–15, 
 
 <a id="uat-07"></a>
 
-### UAT-07 · Create linked contract from approved estimate
+### UAT-07 · Create a contract and verify an existing estimate association
 
 **Batch and status** · B05 · NOT_RUN · 8 worklist rows
 
 **Actors and seed** · estimator, reviewer, contract maintainer. Two estimate revisions, project, eligible parties, configured contract terms
 
-**Browser sequence** · Create estimate with Decimal lines, approve intended revision, open contextual contract creation, select direction and inspect links back to project and estimate.
+**Browser sequence** · Create an estimate with Decimal lines and approve the intended revision. Create a contract from the Contracts list, select the project, party and direction, and open its detail. Use an already associated estimate and contract to verify links to the project, estimate and supported measurement baseline. Open a separate, unlinked estimate and verify that it offers no conversion action.
 
-**Expected UI** · Context defaults and commercial values, breadcrumb and current version agree.
+**Expected UI** · Project, party, commercial values, breadcrumb and current version agree. The independent estimate retains its original identity and history. Automatic estimate-to-contract conversion is deferred to the [post-MVP roadmap](../../../ROADMAP.md#12-deferred-and-post-v1-scope) under BON-DEF-0033.
 
-**Persisted state, cross-module and negative checks** · Calculate line quantities × rates with estimate rounding and check approval and linked contract version. Probe unapproved estimate, wrong project/party and edit of finalized revision.
+**Persisted state, cross-module and negative checks** · Calculate line quantities × rates with estimate rounding. Confirm the approved revision, existing association, and independently created contract. Probe wrong project or party and a write against a finalized estimate revision. Verify that viewing an unlinked estimate creates no contract.
 
 **Evidence** · Estimate, contract and hub screens and saved Decimal values.
 
@@ -450,7 +450,7 @@ Reuse the original MVP-08 guide under docs/governance/mvp for each UAT-01–15, 
 
 ### CV-TEN-01 · Manage tenant accounts, membership and grants
 
-**Batch and status** · B07 · NOT_RUN · 15 worklist rows
+**Batch and status** · B07 · PASS · 15 worklist rows
 
 **Actors and seed** · owner, local admin, limited, foreign admin. Two tenants, active owner, pending member and scoped project grant
 
@@ -470,7 +470,7 @@ Reuse the original MVP-08 guide under docs/governance/mvp for each UAT-01–15, 
 
 ### CV-WF-01 · Configure declarative workflow and act in workbench
 
-**Batch and status** · B07 · NOT_RUN · 11 worklist rows
+**Batch and status** · B07 · PASS · 11 worklist rows
 
 **Actors and seed** · designer, candidate, assignee, requester, reviewer. Starter and draft, routed claim/PR, separate actor identities
 
@@ -490,7 +490,7 @@ Reuse the original MVP-08 guide under docs/governance/mvp for each UAT-01–15, 
 
 ### CV-PAR-01 · Manage parties and materials used downstream
 
-**Batch and status** · B07 · NOT_RUN · 22 worklist rows
+**Batch and status** · B07 · PASS · 22 worklist rows
 
 **Actors and seed** · master maintainers, procurement reader. Eligible parties, unit/category, referenced and unreferenced masters
 

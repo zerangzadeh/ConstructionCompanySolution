@@ -79,6 +79,7 @@ from core.list_filters import (
     paginate_table,
     table_pagination_query,
 )
+from core.organization_time import render_in_organization_time
 
 from .request_forms import RequestCreateForm, RequestFilterForm, RequestLineForm
 from .request_ui import detail_context, error_text, permitted
@@ -127,7 +128,9 @@ def _receipt_record(
 
 def _portal_grant(grant_id: str) -> SupplierPortalGrant:
     try:
-        return SupplierPortalGrant.objects.get(pk=grant_id)
+        return SupplierPortalGrant.objects.select_related("organization__settings").get(
+            pk=grant_id
+        )
     except SupplierPortalGrant.DoesNotExist as exc:
         raise Http404("مجوز درگاه یافت نشد.") from exc
 
@@ -176,7 +179,7 @@ def supplier_portal_context(request: HttpRequest, grant_id: str) -> HttpResponse
         context = get_supplier_portal_rfq_context(actor=request.user, grant=grant)
     except (PermissionDenied, ValueError) as exc:
         raise Http404("زمینه مجاز درگاه یافت نشد.") from exc
-    return render(
+    return render_in_organization_time(
         request,
         "procurement/portal_context.html",
         {
@@ -186,6 +189,7 @@ def supplier_portal_context(request: HttpRequest, grant_id: str) -> HttpResponse
                 initial={"idempotency_key": str(uuid4())}
             ),
         },
+        organization=grant.organization,
     )
 
 
@@ -212,10 +216,11 @@ def supplier_portal_submit(request: HttpRequest, grant_id: str) -> HttpResponse:
         context = get_supplier_portal_rfq_context(actor=request.user, grant=grant)
     except PermissionDenied as exc:
         raise Http404("زمینه مجاز درگاه یافت نشد.") from exc
-    return render(
+    return render_in_organization_time(
         request,
         "procurement/portal_context.html",
         {"portal": context, "grant": grant, "submission_form": form},
+        organization=grant.organization,
         status=400,
     )
 
@@ -226,7 +231,7 @@ def supplier_portal_submit(request: HttpRequest, grant_id: str) -> HttpResponse:
 def supplier_portal_receipt(request: HttpRequest, receipt_id: str) -> HttpResponse:
     try:
         receipt = SupplierPortalSubmissionReceipt.objects.select_related(
-            "grant", "quote_revision"
+            "grant", "quote_revision", "organization__settings"
         ).get(pk=receipt_id)
     except SupplierPortalSubmissionReceipt.DoesNotExist as exc:
         raise Http404("رسید ارسال یافت نشد.") from exc
@@ -234,7 +239,12 @@ def supplier_portal_receipt(request: HttpRequest, receipt_id: str) -> HttpRespon
         get_supplier_portal_rfq_context(actor=request.user, grant=receipt.grant)
     except PermissionDenied as exc:
         raise Http404("رسید ارسال یافت نشد.") from exc
-    return render(request, "procurement/portal_receipt.html", {"receipt": receipt})
+    return render_in_organization_time(
+        request,
+        "procurement/portal_receipt.html",
+        {"receipt": receipt},
+        organization=receipt.organization,
+    )
 
 
 @active_organization_required
@@ -269,7 +279,7 @@ def portal_invitation_manage(request: HttpRequest, invitation_id: str) -> HttpRe
     portal_invitations = invitation.portal_invitations.select_related(
         "accepted_principal__user"
     ).prefetch_related("grants__revocation")
-    return render(
+    return render_in_organization_time(
         request,
         "procurement/portal_invitation_manage.html",
         {

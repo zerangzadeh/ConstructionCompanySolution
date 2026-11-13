@@ -97,7 +97,13 @@ def permission_supports_object_scope(permission: str | BusinessPermissionCode) -
     # Field Workforce read projections intersect employees.view with explicit
     # project/site assignments. Identity writes retain organization authority.
     return (
-        str(permission) == BusinessPermissionCode.EMPLOYEES_VIEW
+        str(permission)
+        in {
+            BusinessPermissionCode.EMPLOYEES_VIEW,
+            BusinessPermissionCode.INVENTORY_TRANSFERS_VIEW,
+            BusinessPermissionCode.INVENTORY_TRANSFERS_DISPATCH,
+            BusinessPermissionCode.INVENTORY_TRANSFERS_ACCEPT,
+        }
         or str(permission).partition(".")[0] in OBJECT_SCOPED_PERMISSION_NAMESPACES
     )
 

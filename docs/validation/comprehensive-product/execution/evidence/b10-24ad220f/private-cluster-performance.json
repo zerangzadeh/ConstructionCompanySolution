@@ -1,0 +1,18 @@
+{
+  "scope": "Disposable synthetic B10 cluster only, never production configuration",
+  "data_directory": "E:/Construction_Company_Solution/.scratch/b10-validation/pg",
+  "commands": [
+    {
+      "sql": "ALTER SYSTEM SET fsync = off",
+      "output": "ALTER SYSTEM"
+    },
+    {
+      "sql": "ALTER SYSTEM SET synchronous_commit = off",
+      "output": "ALTER SYSTEM"
+    },
+    {
+      "sql": "SELECT pg_reload_conf()",
+      "output": "t"
+    }
+  ]
+}

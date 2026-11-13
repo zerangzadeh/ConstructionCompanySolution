@@ -22,6 +22,7 @@ from apps.organizations.models import BusinessPermissionCode
 from apps.projects.models import Project
 from apps.treasury.models import TreasuryMovement
 from core.forms import JalaliDateMixin
+from core.product_surface import route_exposed
 
 TARGET_FIELDS = (
     "project",
@@ -105,6 +106,11 @@ class DocumentTargetForm(forms.Form):
             ).order_by("-created_at"),
         }
         for field_name, queryset in querysets.items():
+            if field_name == "treasury_movement" and not route_exposed(
+                "treasury:movement_detail"
+            ):
+                self.fields.pop(field_name)
+                continue
             if membership is None or not has_business_permission(
                 user=user,
                 organization=organization,
@@ -186,7 +192,7 @@ class DocumentTargetForm(forms.Form):
         raise ValueError("موجودیت مرتبط انتخاب نشده است.")
 
 
-class DocumentCreateForm(DocumentTargetForm):
+class DocumentCreateForm(JalaliDateMixin, DocumentTargetForm):
     document_type = forms.ChoiceField(label="نوع سند", choices=DocumentType.choices)
     title = forms.CharField(label="عنوان سند", max_length=255)
     category = forms.ModelChoiceField(
@@ -201,7 +207,6 @@ class DocumentCreateForm(DocumentTargetForm):
     access_expires_at = forms.DateTimeField(
         label="پایان دسترسی",
         required=False,
-        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
     )
     reference = forms.CharField(label="شماره مرجع", max_length=120, required=False)
     description = forms.CharField(
@@ -303,14 +308,12 @@ class _ContextualIntentForm(forms.Form):
         return cleaned
 
 
-class ContextualDocumentCreateForm(
-    _ContextualIntentForm, JalaliDateMixin, DocumentCreateForm
-):
+class ContextualDocumentCreateForm(_ContextualIntentForm, DocumentCreateForm):
     def __init__(self, *args, context, user, organization, **kwargs):
         super().__init__(*args, user=user, organization=organization, **kwargs)
         for name in TARGET_FIELDS:
             if name != context.source.kind:
-                self.fields.pop(name)
+                self.fields.pop(name, None)
         self.bind_context(context=context, user=user, organization=organization)
 
     def clean_file(self):

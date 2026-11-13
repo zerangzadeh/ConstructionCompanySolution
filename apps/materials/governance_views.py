@@ -6,7 +6,8 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
-from django.shortcuts import redirect, render
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.cache import patch_vary_headers
@@ -17,6 +18,7 @@ from apps.organizations.authorization import (
     require_business_permission,
 )
 from apps.organizations.decorators import active_organization_required
+from apps.organizations.form_scoping import normalized_uuid
 from apps.organizations.models import BusinessPermissionCode as P
 
 from . import governance_forms as forms
@@ -52,6 +54,8 @@ def private_surface(view):
                 response = view(request, *args, **kwargs)
         except PermissionDenied:
             response = render(request, "materials/unavailable.html", status=403)
+        except Http404:
+            response = render(request, "materials/unavailable.html", status=404)
         except (ObjectDoesNotExist, ZoneInfoNotFoundError):
             response = render(request, "materials/unavailable.html", status=503)
         response["Cache-Control"] = "private, no-store"
@@ -72,9 +76,10 @@ def _codes(request):
 
 
 def _material(request, material_id):
-    return m.Material.objects.filter(
-        pk=material_id, organization=request.organization, archived_at__isnull=True
-    ).select_related("category", "unit_of_measure").get()
+    materials = m.Material.objects.filter(
+        organization=request.organization, archived_at__isnull=True
+    ).select_related("category", "unit_of_measure")
+    return get_object_or_404(materials, pk=normalized_uuid(material_id))
 
 
 def _context(request, codes, material=None, *, bound=None, action=None):
@@ -135,6 +140,16 @@ ACTION_PERMISSION = {
     "conversion": P.UOM_CONVERSIONS_MANAGE, "rounding": P.UOM_ROUNDING_MANAGE,
     "definition": P.MATERIAL_ATTRIBUTE_DEFINITIONS_MANAGE, "definition_version": P.MATERIAL_ATTRIBUTE_DEFINITIONS_MANAGE,
 }
+MATERIAL_ACTIONS = frozenset(
+    {
+        "alias",
+        "relationship",
+        "revision",
+        "transition_review",
+        "transition_decide",
+        "attribute_value",
+    }
+)
 
 
 @active_organization_required
@@ -146,7 +161,12 @@ def action(request, action):
     if permission is None:
         return render(request, "materials/unavailable.html", status=404)
     require_business_permission(user=request.user, organization=request.organization, permission=permission, message=DENIED)
-    material = _material(request, request.POST.get("material")) if request.POST.get("material") else None
+    material_id = request.POST.get("material")
+    material = (
+        _material(request, material_id)
+        if material_id or action in MATERIAL_ACTIONS
+        else None
+    )
     catalog = _context(request, codes, material)["forms"]
     form = catalog[action].__class__(request.POST, organization=request.organization, material=material, prefix=action)
     if form.is_valid():

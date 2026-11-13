@@ -1,0 +1,2165 @@
+{
+  "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-SAFETY--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-SAFETY--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/769c0ede-02d1-4210-9140-991161db511d/register/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/safety/769c0ede-02d1-4210-9140-991161db511d/register/",
+        "status": 400,
+        "case": "Forged signed source intent",
+        "expected": [
+          400
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/safety/769c0ede-02d1-4210-9140-991161db511d/register/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/safety/769c0ede-02d1-4210-9140-991161db511d/register/",
+        "status": 403,
+        "case": "Evidence replay",
+        "expected": [
+          302,
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/safety/769c0ede-02d1-4210-9140-991161db511d/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/safety/769c0ede-02d1-4210-9140-991161db511d/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "evidence-register-safety"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "769c0ede-02d1-4210-9140-991161db511d",
+      "kind": "safety",
+      "version": "0b68a723-5d75-4d68-b941-e792a26b2274",
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "source_references": [
+        [
+          "0b68a723-5d75-4d68-b941-e792a26b2274",
+          "بازبینی 1 · ارسال‌شده"
+        ]
+      ]
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-QUALITY--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-QUALITY--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/73354e5c-2562-4b91-825d-619c0cd736af/register/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/quality/73354e5c-2562-4b91-825d-619c0cd736af/register/",
+        "status": 400,
+        "case": "Forged signed source intent",
+        "expected": [
+          400
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/quality/73354e5c-2562-4b91-825d-619c0cd736af/register/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/quality/73354e5c-2562-4b91-825d-619c0cd736af/register/",
+        "status": 403,
+        "case": "Evidence replay",
+        "expected": [
+          302,
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/quality/73354e5c-2562-4b91-825d-619c0cd736af/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/quality/73354e5c-2562-4b91-825d-619c0cd736af/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "evidence-register-quality"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "73354e5c-2562-4b91-825d-619c0cd736af",
+      "kind": "quality",
+      "version": "0b68a723-5d75-4d68-b941-e792a26b2274",
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "source_references": [
+        [
+          "0b68a723-5d75-4d68-b941-e792a26b2274",
+          "بازبینی 1 · ارسال‌شده"
+        ]
+      ]
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-FIELD-OBSERVATION--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-FIELD-OBSERVATION--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/53d784cb-5ee5-4f74-8644-090d8222a302/register/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/field_observation/53d784cb-5ee5-4f74-8644-090d8222a302/register/",
+        "status": 400,
+        "case": "Forged signed source intent",
+        "expected": [
+          400
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/field_observation/53d784cb-5ee5-4f74-8644-090d8222a302/register/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/field_observation/53d784cb-5ee5-4f74-8644-090d8222a302/register/",
+        "status": 302,
+        "case": "Evidence replay",
+        "expected": [
+          302,
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/field_observation/53d784cb-5ee5-4f74-8644-090d8222a302/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/field_observation/53d784cb-5ee5-4f74-8644-090d8222a302/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "evidence-register-field_observation"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "53d784cb-5ee5-4f74-8644-090d8222a302",
+      "kind": "field_observation",
+      "version": "0b68a723-5d75-4d68-b941-e792a26b2274",
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "source_references": [
+        [
+          "0b68a723-5d75-4d68-b941-e792a26b2274",
+          "پیش‌نویس"
+        ]
+      ]
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-MATERIAL--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-MATERIAL--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/material/8b3273aa-0a5e-4aec-bbba-ac74429db369/register/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/material/8b3273aa-0a5e-4aec-bbba-ac74429db369/register/",
+        "status": 400,
+        "case": "Forged signed source intent",
+        "expected": [
+          400
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/material/8b3273aa-0a5e-4aec-bbba-ac74429db369/register/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/material/8b3273aa-0a5e-4aec-bbba-ac74429db369/register/",
+        "status": 400,
+        "case": "Evidence replay",
+        "expected": [
+          302,
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/material/8b3273aa-0a5e-4aec-bbba-ac74429db369/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/material/8b3273aa-0a5e-4aec-bbba-ac74429db369/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "evidence-register-material"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "8b3273aa-0a5e-4aec-bbba-ac74429db369",
+      "kind": "material",
+      "version": "a8af1863-717f-499e-9a41-1fe638afec8f",
+      "sha256": "9072408dd6906259f1b45d33a24a73b001e97ea42c9766fdc123f90128747587",
+      "source_references": [
+        [
+          "a8af1863-717f-499e-9a41-1fe638afec8f",
+          "نسخه ثبت‌شده مصالح"
+        ]
+      ]
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-CONTRACTUAL--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-CONTRACTUAL--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/contractual/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/register/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/contractual/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/register/",
+        "status": 400,
+        "case": "Forged signed source intent",
+        "expected": [
+          400
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/contractual/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/register/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/contractual/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/register/",
+        "status": 302,
+        "case": "Evidence replay",
+        "expected": [
+          302,
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/contractual/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/contractual/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "evidence-register-contractual"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "9fb351fc-cd38-4f6a-8489-f3fdf89b5b35",
+      "kind": "contractual",
+      "version": "0b68a723-5d75-4d68-b941-e792a26b2274",
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "source_references": [
+        [
+          "0b68a723-5d75-4d68-b941-e792a26b2274",
+          "شاهد تاریخی نسخه یک · پیش‌نویس"
+        ]
+      ]
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-REGISTER--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-REGISTER--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/5148b459-a91d-4649-8cd6-db17931dca9b/register/",
+        "status": 403,
+        "case": "No generic commercial registration",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/dce3804a-1bb4-485b-9dd3-a7ea00100e00/register/",
+        "status": 403,
+        "case": "No generic commercial registration",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/ca80fb9e-4a98-4f1c-872d-0c73e8f5036c/register/",
+        "status": 403,
+        "case": "No generic commercial registration",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "No generic commercial registration",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "No generic commercial registration",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "No generic commercial registration",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "supported_registration_evidence": [
+        "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-SAFETY--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-QUALITY--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-FIELD-OBSERVATION--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-MATERIAL--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-CONTRACTUAL--CV-DOC-02"
+      ],
+      "commercial_registration": "Domain-owned create/revision forms only"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-SAFETY--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-SAFETY--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/safety/769c0ede-02d1-4210-9140-991161db511d/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/82fe9fe4-eb95-41d1-9159-de432ad43309/versions/0b68a723-5d75-4d68-b941-e792a26b2274/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/82fe9fe4-eb95-41d1-9159-de432ad43309/versions/0b68a723-5d75-4d68-b941-e792a26b2274/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/769c0ede-02d1-4210-9140-991161db511d/0b68a723-5d75-4d68-b941-e792a26b2274/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/769c0ede-02d1-4210-9140-991161db511d/0b68a723-5d75-4d68-b941-e792a26b2274/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/769c0ede-02d1-4210-9140-991161db511d/0b68a723-5d75-4d68-b941-e792a26b2274/",
+        "status": 403,
+        "case": "Sibling source detail",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/769c0ede-02d1-4210-9140-991161db511d/7cff7b94-b489-4c0f-b869-2ffa263069b0/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/769c0ede-02d1-4210-9140-991161db511d/0d3635c3-0617-478f-b686-6bf69080bc68/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-safety",
+      "evidence-detail-safety"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source detail",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "769c0ede-02d1-4210-9140-991161db511d",
+      "persisted_pins": [
+        [
+          "0b68a723-5d75-4d68-b941-e792a26b2274",
+          "بازبینی 1 · ارسال‌شده"
+        ]
+      ],
+      "witness_version": "0b68a723-5d75-4d68-b941-e792a26b2274",
+      "witness_number": 1,
+      "current_number": 3,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-QUALITY--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-QUALITY--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/quality/73354e5c-2562-4b91-825d-619c0cd736af/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/82fe9fe4-eb95-41d1-9159-de432ad43309/versions/0b68a723-5d75-4d68-b941-e792a26b2274/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/82fe9fe4-eb95-41d1-9159-de432ad43309/versions/0b68a723-5d75-4d68-b941-e792a26b2274/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/73354e5c-2562-4b91-825d-619c0cd736af/0b68a723-5d75-4d68-b941-e792a26b2274/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/73354e5c-2562-4b91-825d-619c0cd736af/0b68a723-5d75-4d68-b941-e792a26b2274/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/73354e5c-2562-4b91-825d-619c0cd736af/0b68a723-5d75-4d68-b941-e792a26b2274/",
+        "status": 403,
+        "case": "Sibling source detail",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/73354e5c-2562-4b91-825d-619c0cd736af/7cff7b94-b489-4c0f-b869-2ffa263069b0/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/73354e5c-2562-4b91-825d-619c0cd736af/0d3635c3-0617-478f-b686-6bf69080bc68/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-quality",
+      "evidence-detail-quality"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source detail",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "73354e5c-2562-4b91-825d-619c0cd736af",
+      "persisted_pins": [
+        [
+          "0b68a723-5d75-4d68-b941-e792a26b2274",
+          "بازبینی 1 · ارسال‌شده"
+        ]
+      ],
+      "witness_version": "0b68a723-5d75-4d68-b941-e792a26b2274",
+      "witness_number": 1,
+      "current_number": 3,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-FIELD-OBSERVATION--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-FIELD-OBSERVATION--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/daily-reports/field/53d784cb-5ee5-4f74-8644-090d8222a302/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/82fe9fe4-eb95-41d1-9159-de432ad43309/versions/0b68a723-5d75-4d68-b941-e792a26b2274/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/82fe9fe4-eb95-41d1-9159-de432ad43309/versions/0b68a723-5d75-4d68-b941-e792a26b2274/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/53d784cb-5ee5-4f74-8644-090d8222a302/0b68a723-5d75-4d68-b941-e792a26b2274/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/53d784cb-5ee5-4f74-8644-090d8222a302/0b68a723-5d75-4d68-b941-e792a26b2274/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/53d784cb-5ee5-4f74-8644-090d8222a302/0b68a723-5d75-4d68-b941-e792a26b2274/",
+        "status": 403,
+        "case": "Sibling source detail",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/53d784cb-5ee5-4f74-8644-090d8222a302/7cff7b94-b489-4c0f-b869-2ffa263069b0/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/53d784cb-5ee5-4f74-8644-090d8222a302/0d3635c3-0617-478f-b686-6bf69080bc68/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-field_observation",
+      "evidence-detail-field_observation"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source detail",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "53d784cb-5ee5-4f74-8644-090d8222a302",
+      "persisted_pins": [
+        [
+          "0b68a723-5d75-4d68-b941-e792a26b2274",
+          "ارسال‌شده"
+        ]
+      ],
+      "witness_version": "0b68a723-5d75-4d68-b941-e792a26b2274",
+      "witness_number": 1,
+      "current_number": 3,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-MATERIAL--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-MATERIAL--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/materials/8b3273aa-0a5e-4aec-bbba-ac74429db369/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/82fe9fe4-eb95-41d1-9159-de432ad43309/versions/a8af1863-717f-499e-9a41-1fe638afec8f/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/82fe9fe4-eb95-41d1-9159-de432ad43309/versions/a8af1863-717f-499e-9a41-1fe638afec8f/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/material/8b3273aa-0a5e-4aec-bbba-ac74429db369/a8af1863-717f-499e-9a41-1fe638afec8f/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/material/8b3273aa-0a5e-4aec-bbba-ac74429db369/a8af1863-717f-499e-9a41-1fe638afec8f/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/material/8b3273aa-0a5e-4aec-bbba-ac74429db369/7cff7b94-b489-4c0f-b869-2ffa263069b0/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/material/8b3273aa-0a5e-4aec-bbba-ac74429db369/0d3635c3-0617-478f-b686-6bf69080bc68/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-material",
+      "evidence-detail-material"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "8b3273aa-0a5e-4aec-bbba-ac74429db369",
+      "persisted_pins": [
+        [
+          "a8af1863-717f-499e-9a41-1fe638afec8f",
+          "نسخه ثبت‌شده مصالح"
+        ]
+      ],
+      "witness_version": "a8af1863-717f-499e-9a41-1fe638afec8f",
+      "witness_number": 2,
+      "current_number": 3,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-GUARANTEE--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-GUARANTEE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/billing/guarantees/5148b459-a91d-4649-8cd6-db17931dca9b/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/e7043a2c-7957-4def-bdf8-97f6dc044006/versions/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/e7043a2c-7957-4def-bdf8-97f6dc044006/versions/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/5148b459-a91d-4649-8cd6-db17931dca9b/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/5148b459-a91d-4649-8cd6-db17931dca9b/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/5148b459-a91d-4649-8cd6-db17931dca9b/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/",
+        "status": 403,
+        "case": "Sibling source detail",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/5148b459-a91d-4649-8cd6-db17931dca9b/7cff7b94-b489-4c0f-b869-2ffa263069b0/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/5148b459-a91d-4649-8cd6-db17931dca9b/0d3635c3-0617-478f-b686-6bf69080bc68/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-guarantee",
+      "evidence-detail-guarantee"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source detail",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "5148b459-a91d-4649-8cd6-db17931dca9b",
+      "persisted_pins": [
+        [
+          "43d085ec-97a5-4806-90ba-d68a2c7d0a3e",
+          "پیش‌نویس"
+        ]
+      ],
+      "witness_version": "43d085ec-97a5-4806-90ba-d68a2c7d0a3e",
+      "witness_number": 1,
+      "current_number": 1,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-COMPLIANCE--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-COMPLIANCE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/billing/compliance-evidence/dce3804a-1bb4-485b-9dd3-a7ea00100e00/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/e7043a2c-7957-4def-bdf8-97f6dc044006/versions/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/e7043a2c-7957-4def-bdf8-97f6dc044006/versions/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/dce3804a-1bb4-485b-9dd3-a7ea00100e00/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/dce3804a-1bb4-485b-9dd3-a7ea00100e00/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/dce3804a-1bb4-485b-9dd3-a7ea00100e00/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/",
+        "status": 403,
+        "case": "Sibling source detail",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/dce3804a-1bb4-485b-9dd3-a7ea00100e00/7cff7b94-b489-4c0f-b869-2ffa263069b0/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/dce3804a-1bb4-485b-9dd3-a7ea00100e00/0d3635c3-0617-478f-b686-6bf69080bc68/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-compliance",
+      "evidence-detail-compliance"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source detail",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "dce3804a-1bb4-485b-9dd3-a7ea00100e00",
+      "persisted_pins": [
+        [
+          "43d085ec-97a5-4806-90ba-d68a2c7d0a3e",
+          "پیش‌نویس"
+        ]
+      ],
+      "witness_version": "43d085ec-97a5-4806-90ba-d68a2c7d0a3e",
+      "witness_number": 1,
+      "current_number": 1,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-RELEASE--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-RELEASE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/billing/retention-releases/ca80fb9e-4a98-4f1c-872d-0c73e8f5036c/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/e7043a2c-7957-4def-bdf8-97f6dc044006/versions/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/e7043a2c-7957-4def-bdf8-97f6dc044006/versions/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/ca80fb9e-4a98-4f1c-872d-0c73e8f5036c/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/ca80fb9e-4a98-4f1c-872d-0c73e8f5036c/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/ca80fb9e-4a98-4f1c-872d-0c73e8f5036c/43d085ec-97a5-4806-90ba-d68a2c7d0a3e/",
+        "status": 403,
+        "case": "Sibling source detail",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/ca80fb9e-4a98-4f1c-872d-0c73e8f5036c/7cff7b94-b489-4c0f-b869-2ffa263069b0/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/ca80fb9e-4a98-4f1c-872d-0c73e8f5036c/0d3635c3-0617-478f-b686-6bf69080bc68/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-release",
+      "evidence-detail-release"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source detail",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "ca80fb9e-4a98-4f1c-872d-0c73e8f5036c",
+      "persisted_pins": [
+        [
+          "43d085ec-97a5-4806-90ba-d68a2c7d0a3e",
+          "پیش‌نویس"
+        ]
+      ],
+      "witness_version": "43d085ec-97a5-4806-90ba-d68a2c7d0a3e",
+      "witness_number": 1,
+      "current_number": 1,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-CONTRACTUAL--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-CONTRACTUAL--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/82fe9fe4-eb95-41d1-9159-de432ad43309/versions/0b68a723-5d75-4d68-b941-e792a26b2274/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/82fe9fe4-eb95-41d1-9159-de432ad43309/versions/0b68a723-5d75-4d68-b941-e792a26b2274/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/contractual/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/0b68a723-5d75-4d68-b941-e792a26b2274/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/contractual/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/0b68a723-5d75-4d68-b941-e792a26b2274/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/contractual/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/0b68a723-5d75-4d68-b941-e792a26b2274/",
+        "status": 403,
+        "case": "Sibling source detail",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/contractual/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/7cff7b94-b489-4c0f-b869-2ffa263069b0/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/contractual/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/0d3635c3-0617-478f-b686-6bf69080bc68/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-contractual",
+      "evidence-detail-contractual"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source detail",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "9fb351fc-cd38-4f6a-8489-f3fdf89b5b35",
+      "persisted_pins": [
+        [
+          "0b68a723-5d75-4d68-b941-e792a26b2274",
+          "شاهد تاریخی نسخه یک · پیش‌نویس"
+        ]
+      ],
+      "witness_version": "0b68a723-5d75-4d68-b941-e792a26b2274",
+      "witness_number": 1,
+      "current_number": 3,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL--CV-DOC-02",
+    "http": [],
+    "state": {
+      "eight_source_evidence": [
+        "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-SAFETY--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-QUALITY--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-FIELD-OBSERVATION--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-MATERIAL--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-GUARANTEE--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-COMPLIANCE--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-RELEASE--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-CONTRACTUAL--CV-DOC-02"
+      ],
+      "pin_comparison": {
+        "safety": [
+          [
+            "0b68a723-5d75-4d68-b941-e792a26b2274",
+            "بازبینی 1 · ارسال‌شده"
+          ]
+        ],
+        "quality": [
+          [
+            "0b68a723-5d75-4d68-b941-e792a26b2274",
+            "بازبینی 1 · ارسال‌شده"
+          ]
+        ],
+        "field_observation": [
+          [
+            "0b68a723-5d75-4d68-b941-e792a26b2274",
+            "ارسال‌شده"
+          ]
+        ],
+        "material": [
+          [
+            "a8af1863-717f-499e-9a41-1fe638afec8f",
+            "نسخه ثبت‌شده مصالح"
+          ]
+        ],
+        "guarantee": [
+          [
+            "43d085ec-97a5-4806-90ba-d68a2c7d0a3e",
+            "پیش‌نویس"
+          ]
+        ],
+        "compliance": [
+          [
+            "43d085ec-97a5-4806-90ba-d68a2c7d0a3e",
+            "پیش‌نویس"
+          ]
+        ],
+        "release": [
+          [
+            "43d085ec-97a5-4806-90ba-d68a2c7d0a3e",
+            "پیش‌نویس"
+          ]
+        ],
+        "contractual": [
+          [
+            "0b68a723-5d75-4d68-b941-e792a26b2274",
+            "شاهد تاریخی نسخه یک · پیش‌نویس"
+          ]
+        ]
+      }
+    },
+    "status": "PASS"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-LIST--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-LIST--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      }
+    ],
+    "design": [
+      "contractual-list"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "record": "9fb351fc-cd38-4f6a-8489-f3fdf89b5b35",
+      "tenant_filtered": true
+    },
+    "status": "PASS"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-CREATE--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-CREATE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/create/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/create/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/create/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/edf8f7eb-3ff1-44bb-bbe4-c5efe4045cfc/",
+        "status": 404,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/create/",
+        "status": 403,
+        "case": "Sibling-project source denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/create/",
+        "status": 403,
+        "case": "Sibling-project source denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "contractual-create"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling-project source denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling-project source denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "record": "edf8f7eb-3ff1-44bb-bbe4-c5efe4045cfc",
+      "contract": "e719b657-a500-4454-a9f2-0a004023358f",
+      "status": "draft"
+    },
+    "status": "PASS"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-DETAIL--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-DETAIL--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/",
+        "status": 404,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "contractual-detail"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "exact_evidence": "0b68a723-5d75-4d68-b941-e792a26b2274",
+      "source": "9fb351fc-cd38-4f6a-8489-f3fdf89b5b35"
+    },
+    "status": "PASS"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-SUBMIT--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-SUBMIT--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/submit/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/submit/",
+        "status": 302,
+        "case": "Submission replay",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/submit/",
+        "status": 404,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/submit/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "status": "submitted",
+      "evidence": [
+        "0b68a723-5d75-4d68-b941-e792a26b2274"
+      ]
+    },
+    "status": "PASS"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-DECIDE--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-DECIDE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/decide/",
+        "status": 403,
+        "case": "Maker checker self-decision",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/decide/",
+        "status": 302,
+        "case": "Mandatory reason",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/decide/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/contractual/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/register/",
+        "status": 403,
+        "case": "Approved contractual evidence registration denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/decide/",
+        "status": 302,
+        "case": "Decision replay",
+        "expected": [
+          302,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/decide/",
+        "status": 404,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/decide/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "Maker checker self-decision",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Approved contractual evidence registration denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "status": "approved",
+      "approved_amount": "100.0000",
+      "exact_evidence": "0b68a723-5d75-4d68-b941-e792a26b2274",
+      "independent_actor": "ec31ff60-c1cb-4069-894d-9f938d90e74a"
+    },
+    "status": "PASS"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-REVISION--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-REVISION--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/revision/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/revision/",
+        "status": 404,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/9fb351fc-cd38-4f6a-8489-f3fdf89b5b35/revision/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "predecessor": "9fb351fc-cd38-4f6a-8489-f3fdf89b5b35",
+      "successor": "45cb0898-bbbf-4fd6-b68b-b42eda87810c",
+      "version": 2,
+      "original_evidence_preserved": true
+    },
+    "status": "PASS"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-WITHDRAW--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-WITHDRAW--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/edf8f7eb-3ff1-44bb-bbe4-c5efe4045cfc/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/edf8f7eb-3ff1-44bb-bbe4-c5efe4045cfc/withdraw/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/edf8f7eb-3ff1-44bb-bbe4-c5efe4045cfc/withdraw/",
+        "status": 302,
+        "case": "Withdrawal replay",
+        "expected": [
+          302,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/edf8f7eb-3ff1-44bb-bbe4-c5efe4045cfc/withdraw/",
+        "status": 404,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/edf8f7eb-3ff1-44bb-bbe4-c5efe4045cfc/withdraw/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "record": "edf8f7eb-3ff1-44bb-bbe4-c5efe4045cfc",
+      "status": "withdrawn",
+      "reason": "استرداد ادعای آزمایشی"
+    },
+    "status": "PASS"
+  }
+}

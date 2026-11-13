@@ -44,13 +44,13 @@
                     </tr></thead>
                     <tbody>{% for report in reports %}
                         <tr>
-                            <td class="erp-list-title" data-label="پروژه / کارگاه"><a href="{% url 'daily_reports:detail' report.pk %}">{{ report.project.name }}</a><span class="erp-list-subtitle">{{ report.site.name }}</span></td>
+                            <td class="erp-list-title" data-label="پروژه / کارگاه"><a href="{% url 'daily_reports:detail' report.pk %}">{{ report.project_label }}</a><span class="erp-list-subtitle">{{ report.site_label }}</span></td>
                             <td class="daily-report-date" data-label="تاریخ گزارش"><a href="{% url 'daily_reports:detail' report.pk %}"><bdi dir="ltr">{{ report.reporting_date|jalali_date }}</bdi></a></td>
-                            <td class="daily-activity" data-label="فاز / فعالیت اصلی">{% if report.phase %}<strong>{{ report.phase.name }}</strong>{% endif %}<span title="{{ report.work_performed }}">{{ report.work_performed|truncatechars:64 }}</span></td>
+                            <td class="daily-activity" data-label="فاز / فعالیت اصلی">{% if report.phase %}<strong>{{ report.phase_label }}</strong>{% endif %}<span title="{{ report.work_performed }}">{{ report.work_performed|truncatechars:64 }}</span></td>
                             <td class="daily-labor" data-label="نیروی کار"><bdi>{{ report.labor_count|erp_number }}</bdi> <span>نفر</span></td>
-                            <td class="erp-list-status" data-label="وضعیت"><span class="daily-status daily-status--{{ report.status }}"><span aria-hidden="true">●</span>{{ report.get_status_display }}</span></td>
+                            <td class="erp-list-status" data-label="وضعیت"><span class="daily-status daily-status--{{ report.status }}"><span aria-hidden="true">●</span>{{ report.get_status_display }}</span>{% if report.submission_hash or report.previous_revision_id %}<span class="erp-list-subtitle">نسخه {{ report.revision_number|erp_number }}</span>{% endif %}</td>
                             <td data-label="نویسنده">{% if report.created_by %}<bdi>{{ report.created_by.get_full_name|default:report.created_by.username }}</bdi>{% else %}—{% endif %}</td>
-                            <td class="erp-list-row-action" data-label="عملیات"><details class="erp-list-row-menu"><summary class="erp-list-action" aria-label="عملیات گزارش {{ report.project.name }}، {{ report.reporting_date|jalali_date }}">⋮</summary><div class="erp-list-row-menu__items"><a href="{% url 'daily_reports:detail' report.pk %}">مشاهده جزئیات</a></div></details></td>
+                            <td class="erp-list-row-action" data-label="عملیات"><details class="erp-list-row-menu"><summary class="erp-list-action" aria-label="عملیات گزارش {{ report.project_label }}، {{ report.reporting_date|jalali_date }}">⋮</summary><div class="erp-list-row-menu__items"><a href="{% url 'daily_reports:detail' report.pk %}">مشاهده جزئیات</a></div></details></td>
                         </tr>
                     {% endfor %}</tbody>
                 </table>

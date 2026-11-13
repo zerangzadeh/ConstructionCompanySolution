@@ -1,9 +1,11 @@
+
 """Report-owned HSE references and orchestration of existing DMS services."""
 
 from __future__ import annotations
 
 from collections.abc import Iterator, Sequence
 from itertools import islice
+from types import SimpleNamespace
 from typing import Any
 from uuid import UUID
 
@@ -309,7 +311,7 @@ def create_report_with_references(
 
 def report_reference_rows(
     *, actor: User, organization: Organization, report: DailyReport
-) -> dict[str, QuerySet]:
+) -> dict[str, QuerySet | list[SimpleNamespace]]:
     """Intersect both originating and additional references with source read scope."""
     rows = {}
     for kind, selector, field in (
@@ -327,7 +329,19 @@ def report_reference_rows(
             .exclude(**{field: None})
             .values(field)
         )
-        rows[kind] = records.filter(Q(daily_report=report) | Q(pk__in=ids)).order_by(
-            "pk"
-        )
+        snapshot = report.submission_snapshot
+        if not snapshot and report.previous_revision_id:
+            snapshot = report.previous_revision.submission_snapshot
+        if snapshot:
+            captured = {item["id"]: item for item in snapshot["references"][kind]}
+            permitted = records.filter(pk__in=captured).values_list("pk", flat=True)
+            rows[kind] = [
+                SimpleNamespace(
+                    pk=pk, incident_number=item["number"], issue_number=item["number"],
+                    description=item["description"], get_status_display=item["status_label"],
+                )
+                for pk in permitted if (item := captured.get(str(pk)))
+            ]
+        else:
+            rows[kind] = records.filter(Q(daily_report=report) | Q(pk__in=ids)).order_by("pk")
     return rows

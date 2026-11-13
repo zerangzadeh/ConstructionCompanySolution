@@ -1,15 +1,19 @@
 from django import forms
+from django.core.exceptions import PermissionDenied
 
 from apps.contracts.models import (
     Contract,
     ContractDirection,
     ContractStatus,
-    ContractualRecord,
     ContractualRecordKind,
     ContractualRevisionAction,
 )
-from apps.organizations.authorization import scope_queryset
-from apps.organizations.models import InsuranceClassification, OrganizationMembership
+from apps.organizations.authorization import require_business_permission, scope_queryset
+from apps.organizations.models import (
+    BusinessPermissionCode,
+    InsuranceClassification,
+    OrganizationMembership,
+)
 from apps.organizations.policy_services import available_insurance_classifications
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project
@@ -132,39 +136,66 @@ class ContractForm(JalaliDateMixin, forms.ModelForm):
         return cleaned_data
 
 
-class ContractualRecordForm(JalaliDateMixin, forms.ModelForm):
-    class Meta:
-        model = ContractualRecord
-        fields = [  # noqa: RUF012
-            "contract",
-            "kind",
-            "record_number",
-            "title",
-            "description",
-            "notice_reference",
-            "notice_date",
-            "requested_amount",
-            "requested_eot_days",
-            "valuation_assumptions",
-            "cost_impact_assumptions",
-            "schedule_impact_assumptions",
-            "contract_value_impact_assumptions",
-        ]
+class ContractualRecordForm(JalaliDateMixin, forms.Form):
+    """Validate browser inputs before the service creates the governed record."""
 
-    def __init__(self, *args, organization=None, **kwargs):
+    contract = forms.ModelChoiceField(label="قرارداد", queryset=Contract.objects.none())
+    kind = forms.ChoiceField(label="نوع رکورد", choices=ContractualRecordKind.choices)
+    record_number = forms.CharField(label="شماره رکورد", max_length=80)
+    title = forms.CharField(label="عنوان", max_length=255)
+    description = forms.CharField(label="شرح", widget=forms.Textarea)
+    notice_reference = forms.CharField(
+        label="مرجع ابلاغ", max_length=160, required=False
+    )
+    notice_date = forms.DateField(label="تاریخ ابلاغ", required=False)
+    requested_amount = forms.DecimalField(
+        label="مبلغ درخواستی",
+        max_digits=18,
+        decimal_places=4,
+        min_value=0,
+        required=False,
+    )
+    requested_eot_days = forms.IntegerField(
+        label="روز تمدید درخواستی", min_value=0, required=False
+    )
+    valuation_assumptions = forms.CharField(
+        label="فرض ارزش‌گذاری", widget=forms.Textarea, required=False
+    )
+    cost_impact_assumptions = forms.CharField(
+        label="فرض اثر هزینه", widget=forms.Textarea, required=False
+    )
+    schedule_impact_assumptions = forms.CharField(
+        label="فرض اثر برنامه", widget=forms.Textarea, required=False
+    )
+    contract_value_impact_assumptions = forms.CharField(
+        label="فرض اثر مبلغ قرارداد", widget=forms.Textarea, required=False
+    )
+
+    def __init__(self, *args, organization=None, user=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["contract"].queryset = Contract.objects.filter(
-            organization=organization,
-            deleted_at__isnull=True,
-            status=ContractStatus.ACTIVE,
-            party__isnull=False,
-        ).select_related("project", "party")
-
-    def clean_kind(self) -> str:
-        kind = self.cleaned_data["kind"]
-        if kind not in ContractualRecordKind.values:
-            raise forms.ValidationError("نوع رکورد قراردادی معتبر نیست.")
-        return kind
+        if user is None or organization is None:
+            return
+        try:
+            membership = require_business_permission(
+                user=user,
+                organization=organization,
+                permission=BusinessPermissionCode.CONTRACTUAL_RECORDS_PREPARE,
+                allow_any_scope=True,
+                message="اجازه تهیه رکورد قراردادی را ندارید.",
+            )
+        except PermissionDenied:
+            return
+        self.fields["contract"].queryset = scope_queryset(
+            Contract.objects.filter(
+                organization=organization,
+                deleted_at__isnull=True,
+                project__deleted_at__isnull=True,
+                status=ContractStatus.ACTIVE,
+                party__isnull=False,
+            ).select_related("project", "party"),
+            membership=membership,
+            project_lookup="project_id",
+        )
 
 
 class ContractualDecisionForm(forms.Form):

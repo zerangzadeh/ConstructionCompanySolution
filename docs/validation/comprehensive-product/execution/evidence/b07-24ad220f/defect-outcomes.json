@@ -1,0 +1,122 @@
+[
+  {
+    "id": "BON-DEF-0040",
+    "severity": "P1",
+    "route": "organizations:member_update",
+    "step": "Member status form",
+    "original": "The disabled role selector is omitted from a normal browser POST. The view required that role field and returned the form without changing status.",
+    "expected": "An authorized status change saves the scoped member, preserves the compatibility role and writes one status audit.",
+    "fix": "Populate the existing scoped compatibility role only when the browser omits the disabled field. Keep explicit forged values subject to the service guard.",
+    "source": "apps/organizations/views.py",
+    "regression": "tests/test_b07_remediation.py::TenantFormRegressionTests::test_status_form_saves_without_the_disabled_role_field",
+    "retest": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json"
+  },
+  {
+    "id": "BON-DEF-0041",
+    "severity": "P2",
+    "route": "organizations:member_authorization",
+    "step": "Authorization observer controls",
+    "original": "A member with view-only authorization permissions sees assignment, revocation and scope mutation forms. The services deny these requests.",
+    "expected": "Show only actions for the existing role and scope permissions while keeping history visible.",
+    "fix": "Use current permission projections for tenant forms and action controls.",
+    "source": "apps/organizations/views.py; apps/organizations/templates/organizations/member_authorization.html",
+    "regression": "tests/test_b07_remediation.py::TenantFormRegressionTests::test_view_only_authorization_keeps_history_and_hides_mutation_controls",
+    "retest": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json"
+  },
+  {
+    "id": "BON-DEF-0042",
+    "severity": "P1",
+    "route": "organizations:account_create",
+    "step": "Invalid temporary password confirmation",
+    "original": "A rejected provisioning form renders the submitted temporary password and confirmation as password input values.",
+    "expected": "Retain valid non-secret inputs and omit credentials from the rejected response.",
+    "fix": "Use PasswordInput without value rendering for both temporary credential fields.",
+    "source": "apps/organizations/forms.py",
+    "regression": "tests/test_b07_remediation.py::TenantFormRegressionTests::test_invalid_provisioning_retains_username_without_echoing_credentials",
+    "retest": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json"
+  },
+  {
+    "id": "BON-DEF-0043",
+    "severity": "P1",
+    "route": "accounts:connection_request_respond",
+    "step": "Unknown connection decision",
+    "original": "Submitting an unrecognized decision rejects the pending connection request and appends a rejection audit.",
+    "expected": "Only explicit accept or reject changes the request. Invalid or missing decisions preserve the pending state, membership count and audit.",
+    "fix": "Validate the existing two decision choices before invoking the response service.",
+    "source": "apps/accounts/views.py",
+    "regression": "tests/test_b07_remediation.py::TenantFormRegressionTests::test_missing_or_unknown_connection_decision_preserves_pending_request",
+    "retest": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json"
+  },
+  {
+    "id": "BON-DEF-0044",
+    "severity": "P2",
+    "route": "materials:governance",
+    "step": "Material governance context",
+    "original": "A foreign material lookup returns 503. The alias action with no material raises a server error.",
+    "expected": "Missing, malformed and foreign material references fail closed with private unavailable-record feedback and no mutation.",
+    "fix": "Normalize the ID through the shared helper, resolve within the current tenant and require material context for existing material actions.",
+    "source": "apps/materials/governance_views.py",
+    "regression": "tests/test_b07_remediation.py::MaterialsGovernanceRegressionTests::test_invalid_material_context_fails_closed_for_reads_and_writes",
+    "retest": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json"
+  },
+  {
+    "id": "BON-DEF-0045",
+    "severity": "P2",
+    "route": "parties:archive",
+    "step": "Protected canonical Party archive",
+    "original": "The detail offers archive for a canonical merge reference. Submission reaches the existing protected-reference guard and returns HTTP 500.",
+    "expected": "Retain the canonical reference and merge history, hide the ineligible archive action and return controlled denial on a forged POST.",
+    "fix": "Honor the existing merged-source archive guard in the page projection and handle the service ValueError.",
+    "source": "apps/parties/views.py; apps/parties/governance_views.py",
+    "regression": "tests/test_b07_remediation.py::PartyRegressionTests::test_canonical_merge_reference_cannot_be_archived",
+    "retest": "execution/evidence/b07-24ad220f/retest-workflow-parties/supplemental.json"
+  },
+  {
+    "id": "BON-DEF-0046",
+    "severity": "P3",
+    "route": "parties:list",
+    "step": "Repeated Party management entry",
+    "original": "The Party operational list presents the same management destination in the primary header and again in a navigation strip.",
+    "expected": "One clear maintenance entry follows the approved list pattern and central Product Surface exposure.",
+    "fix": "Retain the primary action and expose the remaining secondary capability link through the existing surface policy.",
+    "source": "apps/parties/templates/parties/list.html",
+    "regression": "tests/test_b07_remediation.py::PartyRegressionTests::test_operational_party_list_offers_one_management_entry",
+    "retest": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json"
+  },
+  {
+    "id": "BON-DEF-0047",
+    "severity": "P2",
+    "route": "parties:role_create",
+    "step": "Existing supplier selection",
+    "original": "The direct PO selector offers a Party whose supplier role is inactive. The service correctly rejects the supplier on save.",
+    "expected": "Offer only the existing tenant Parties with active supplier roles for new purchase orders.",
+    "fix": "Constrain the existing supplier queryset to active tenant-owned supplier roles. The search endpoint reuses that form queryset.",
+    "source": "apps/procurement/forms.py",
+    "regression": "tests/test_b07_remediation.py::OrderSupplierRegressionTests::test_create_choices_require_active_local_supplier_role",
+    "retest": "execution/evidence/b07-24ad220f/retest-workflow-parties/supplemental.json"
+  },
+  {
+    "id": "BON-DEF-0048",
+    "severity": "P2",
+    "route": "workflows:work_item_action",
+    "step": "Cartable purchase-request rejection",
+    "original": "The Cartable reject button submits no reason. The authoritative rejection service requires a reason and rolls the action back.",
+    "expected": "The rejection journey collects the existing required reason and records it with the source transition.",
+    "fix": "Route eligible rejection from the item menu to the existing source detail and reason form. Preserve the runtime transition and approval action.",
+    "source": "apps/workflows/workbench.py; apps/workflows/templates/workflows/_work_item_row.html",
+    "regression": "tests/test_b07_remediation.py::WorkbenchRejectionRegressionTests::test_purchase_request_rejection_points_to_the_existing_reason_form",
+    "retest": "execution/evidence/b07-24ad220f/retest-workflow-parties/supplemental.json"
+  },
+  {
+    "id": "BON-DEF-0049",
+    "severity": "P2",
+    "route": "organizations:member_authorization",
+    "step": "Membership expiry calendar",
+    "original": "Role and scope expiry fields lack the shared Jalali picker. Submitting a Jalali expiry returns validation errors and creates no assignment.",
+    "expected": "Use the shared Jalali datetime input while preserving optional expiry, independent approval and aware datetime storage.",
+    "fix": "Apply the existing JalaliDateMixin to the two membership authorization forms.",
+    "source": "apps/organizations/forms.py",
+    "regression": "tests/test_b07_remediation.py::TenantFormRegressionTests::test_membership_expiry_forms_share_jalali_input_and_aware_storage",
+    "retest": "execution/evidence/b07-24ad220f/retest-expiry/supplemental.json"
+  }
+]

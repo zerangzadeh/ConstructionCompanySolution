@@ -1,0 +1,72 @@
+{
+  "settings_module": "b07_settings",
+  "product_profile": "MVP",
+  "environment": ".scratch/b07-validation/env.ps1",
+  "browser_commands": [
+    ".venv/Scripts/python.exe .scratch/b07-validation/execute.py",
+    ".venv/Scripts/python.exe .scratch/b07-validation/historical_party.py",
+    ".venv/Scripts/python.exe .scratch/b07-validation/expiry.py"
+  ],
+  "browser_databases": [
+    "b07_original",
+    "b07_qualified",
+    "b07_retest",
+    "b07_retest2"
+  ],
+  "browser_phases": [
+    "original",
+    "qualified",
+    "retest-tenant-materials",
+    "retest-workflow-parties",
+    "retest-party-history",
+    "original-expiry",
+    "retest-expiry"
+  ],
+  "validation_commands": [
+    ".venv/Scripts/python.exe manage.py migrate --check",
+    ".venv/Scripts/python.exe manage.py check",
+    ".venv/Scripts/python.exe manage.py makemigrations --check --dry-run",
+    ".venv/Scripts/python.exe .scratch/b07-validation/readback.py",
+    ".venv/Scripts/python.exe .scratch/b07-validation/verify_deliverables.py"
+  ],
+  "test_commands": [
+    ".scratch/b07-validation/focused.ps1",
+    ".scratch/b07-validation/focused-retest.ps1",
+    "pytest --reuse-db -p b07_qualified_teardown (four concurrency classes)",
+    "pytest --reuse-db tests/test_b07_remediation.py plus platform inspector case",
+    "pytest --reuse-db apps/inventory/test_inbound_transfers.py"
+  ],
+  "private_local_harness_sha256": {
+    ".scratch/b07-validation/bootstrap.py": "16eca959ec567da813602993532b03b73ba0423c241f73797c27265344d12653",
+    ".scratch/b07-validation/harness.py": "0eb92aa1522a03b341320a509dda97800990cfdfa32ad7d023e5b69dcb1bb26b",
+    ".scratch/b07-validation/tenant.py": "a41b27debd0450a573ebbe6c8685e83b7595c6fb7fbbf3ece3de04f931048b05",
+    ".scratch/b07-validation/workflow.py": "5df9c1a2e052c118c74c3b04cbfb745e883614f12969efb8de9365e7835908a5",
+    ".scratch/b07-validation/masters.py": "17a964404ea234fa88245f905fc995603c0689e794081d1ba7ae590c88f86f20",
+    ".scratch/b07-validation/expiry.py": "a8810a702462a1d813b599c57f836c02ea3c88e24b9ac3829ff56c9e43ba236c",
+    ".scratch/b07-validation/historical_party.py": "e23b2d5bedc7f778eb8781f1dce5b5dfbe5524e6c2e033638c9150e352f6d7da",
+    ".scratch/b07-validation/readback.py": "ee4aa362e1ac30ffb168168648b4cb8b14e6b849747d8af0cf769aa75d0beb4b",
+    ".scratch/b07-validation/b07_qualified_teardown.py": "fb1d5976ca3503fd2a3346ce80ca6ee1d0dee18daa85114c0ca7320ca14d0e09",
+    ".scratch/b07-validation/test_b07_qualified_party.py": "9952cc4645abd0e5ed812a8da05eae54ab6f20ef23b7fa6c8ff296369293ff97",
+    ".scratch/b07-validation/focused.ps1": "87f30d977aeb06dea2dc7f13511daf52fca33463f88b04d77d4c1cffecb27680",
+    ".scratch/b07-validation/focused-retest.ps1": "d807a190e9a619a0fe4489bc7d33a2d0dfaa8d5ccffceb2f04cfb391a8776971",
+    ".scratch/b07-validation/closeout.py": "d42918a74e85c491e7890ac2178c00d0affa3195216db9eb54492cf9c8ba0442",
+    ".scratch/b07-validation/publish.py": "bd8e978ad9ee194bc03dfcb49b65162ba909c15321d3b11ce45ff32ea8decc88",
+    ".scratch/b07-validation/register_defects.py": "491f6c5b75d5384536b489b564087476491f19471475f0ee7902d508236ba0fe",
+    ".scratch/b07-validation/record_expiry.py": "c6ae0c0dbab2c86a2ce09d49bd3c69aff07ce9d34a3f4d6e42dbc20bb6fce104",
+    ".scratch/b07-validation/verify_summary.py": "f510e102d85f2e9d381acbb091ebcc6cabe29480cc60fb6f3f1cdd3d7218b070",
+    ".scratch/b07-validation/verify_deliverables.py": "725c4e82245b158d431ace70fe9099a792b91d0d6b7ace1f7aeb645334fe383b"
+  },
+  "durable_qualification_sources": [
+    "qualified_teardown.py",
+    "qualified_party_fixture.py"
+  ],
+  "test_databases": [
+    "test_b07_focused",
+    "test_b07_final",
+    "test_b07_concurrency",
+    "test_b07_inbound_integration",
+    "test_b07_platform_compatibility",
+    "test_b07_expiry"
+  ],
+  "cluster_after_execution": "stopped"
+}

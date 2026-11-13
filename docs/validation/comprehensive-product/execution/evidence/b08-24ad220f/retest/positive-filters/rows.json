@@ -1,0 +1,563 @@
+{
+  "billing:claim_list": {
+    "status": "PASS",
+    "filters": {
+      "status": "approved"
+    },
+    "sql": "SELECT claim_number FROM billing_progressclaim WHERE organization_id=%s AND status=%s",
+    "rows": 1,
+    "output": {
+      "file": "billing-claim_list.xlsx",
+      "sha256": "a5acfd7be9ca7c6110f6c62cc4343a5f14c3640675866f8fe87feb694821599b",
+      "filename": "صورت_وضعیت_ها.xlsx",
+      "response_url": "/billing/claims/?status=approved&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "صورت‌وضعیت‌ها": 1,
+        "ردیف‌های کارکرد": 1,
+        "کسورات و اضافات": 0
+      },
+      "headings": {
+        "صورت‌وضعیت‌ها": [
+          "پروژه",
+          "شماره قرارداد",
+          "عنوان قرارداد",
+          "شماره صورت‌وضعیت",
+          "نسخه",
+          "وضعیت",
+          "شروع دوره",
+          "پایان دوره",
+          "تاریخ قطع اندازه‌گیری",
+          "ارز",
+          "مبلغ ناخالص",
+          "کسورات و اضافات",
+          "مبلغ خالص"
+        ],
+        "ردیف‌های کارکرد": [
+          "شماره قرارداد",
+          "شماره صورت‌وضعیت",
+          "نسخه",
+          "شرح ردیف",
+          "واحد",
+          "مقدار تجمعی قبلی",
+          "مقدار دوره",
+          "مقدار تجمعی جدید",
+          "نرخ واحد ثبت‌شده",
+          "مبلغ دوره"
+        ],
+        "کسورات و اضافات": [
+          "شماره قرارداد",
+          "شماره صورت‌وضعیت",
+          "نسخه",
+          "نوع",
+          "شرح",
+          "نرخ ثبت‌شده",
+          "مبلغ مبنا",
+          "مبلغ"
+        ]
+      }
+    }
+  },
+  "daily_reports:list": {
+    "status": "PASS",
+    "filters": {
+      "q": "=1+1"
+    },
+    "sql": "SELECT reporting_date FROM daily_reports_dailyreport WHERE organization_id=%s AND work_performed=%s",
+    "rows": 30,
+    "output": {
+      "file": "daily_reports-list.xlsx",
+      "sha256": "bc0ff0829eb1fce58baad65179ff18c1497c561a0f487eb7a822dce4c8b60d1a",
+      "filename": "گزارش_های روزانه.xlsx",
+      "response_url": "/daily-reports/?q=%3D1%2B1&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "گزارش‌های روزانه": 30,
+        "فعالیت‌ها": 0,
+        "نیروی انسانی": 0,
+        "تجهیزات": 0,
+        "مصالح": 0,
+        "تأخیرها": 0
+      },
+      "headings": {
+        "گزارش‌های روزانه": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "وضعیت",
+          "آب‌وهوا",
+          "تعداد نیرو",
+          "کارهای انجام‌شده",
+          "خلاصه پیشرفت",
+          "مسائل و تأخیرها",
+          "یادداشت ایمنی",
+          "یادداشت کیفیت"
+        ],
+        "فعالیت‌ها": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "فعالیت",
+          "شرح",
+          "مقدار",
+          "واحد",
+          "درصد پیشرفت ثبت‌شده",
+          "یادداشت"
+        ],
+        "نیروی انسانی": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "گروه کاری",
+          "تعداد نیرو",
+          "ساعات کارکرد",
+          "یادداشت"
+        ],
+        "تجهیزات": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "تجهیز",
+          "ساعات کارکرد",
+          "یادداشت"
+        ],
+        "مصالح": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "مصالح",
+          "مقدار",
+          "واحد",
+          "یادداشت"
+        ],
+        "تأخیرها": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "فعالیت",
+          "تاریخ وقوع",
+          "دسته",
+          "علت",
+          "اثر",
+          "طرف مسئول",
+          "مدت (ساعت)",
+          "وضعیت"
+        ]
+      }
+    }
+  },
+  "equipment:list": {
+    "status": "PASS",
+    "filters": {
+      "equipment": "B08-EQ-25"
+    },
+    "sql": "SELECT code FROM equipment_equipment WHERE organization_id=%s AND code=%s",
+    "rows": 1,
+    "output": {
+      "file": "equipment-list.xlsx",
+      "sha256": "03f4bf26cfc75602896b70ec93f2eebcbd34169ad1a54fc37b2f4980fc5a10ca",
+      "filename": "تجهیزات.xlsx",
+      "response_url": "/equipment/?equipment=B08-EQ-25&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "تجهیزات": 1
+      },
+      "headings": {
+        "تجهیزات": [
+          "کد تجهیز",
+          "تجهیز",
+          "دسته",
+          "مالکیت",
+          "وضعیت",
+          "سازنده",
+          "مدل",
+          "شماره سریال",
+          "شماره پلاک",
+          "تاریخ تملک یا شروع اجاره",
+          "یادداشت"
+        ]
+      }
+    }
+  },
+  "equipment:assignment_list": {
+    "status": "PASS",
+    "filters": {
+      "equipment": "B08-EQ-25"
+    },
+    "sql": "SELECT e.code FROM equipment_equipmentassignment a JOIN equipment_equipment e ON a.equipment_id=e.id WHERE a.organization_id=%s AND e.code=%s",
+    "rows": 1,
+    "output": {
+      "file": "equipment-assignment_list.xlsx",
+      "sha256": "9582b47126bca24c64c3dfe43f45ff1d2a8221b041c7028c3219e19d0c955459",
+      "filename": "تخصیص تجهیزات.xlsx",
+      "response_url": "/equipment/assignments/?equipment=B08-EQ-25&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "تخصیص تجهیزات": 1
+      },
+      "headings": {
+        "تخصیص تجهیزات": [
+          "کد تجهیز",
+          "تجهیز",
+          "پروژه",
+          "کارگاه",
+          "شروع تخصیص",
+          "پایان تخصیص",
+          "وضعیت",
+          "هدف تخصیص",
+          "یادداشت"
+        ]
+      }
+    }
+  },
+  "estimates:list": {
+    "status": "PASS",
+    "filters": {
+      "number": "B08-EST-25"
+    },
+    "sql": "SELECT estimate_number FROM estimates_estimate WHERE organization_id=%s AND estimate_number=%s",
+    "rows": 1,
+    "output": {
+      "file": "estimates-list.xlsx",
+      "sha256": "aeda75bb19c6b0ef0a71dbe968b229873fd1e3a41d1d73e9788c8e79ae417a94",
+      "filename": "برآوردها.xlsx",
+      "response_url": "/estimates/?number=B08-EST-25&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "برآوردها": 1,
+        "ردیف‌های برآورد": 0
+      },
+      "headings": {
+        "برآوردها": [
+          "شماره برآورد",
+          "عنوان",
+          "پروژه",
+          "فاز",
+          "قرارداد",
+          "بازنگری جاری",
+          "وضعیت",
+          "وضعیت بازنگری",
+          "مبلغ کل",
+          "زمان تأیید"
+        ],
+        "ردیف‌های برآورد": [
+          "شماره برآورد",
+          "پروژه",
+          "بازنگری",
+          "شرح ردیف",
+          "واحد",
+          "مقدار",
+          "قیمت واحد",
+          "مبلغ ردیف"
+        ]
+      }
+    }
+  },
+  "expenses:list": {
+    "status": "PASS",
+    "filters": {
+      "description": "B08-REC"
+    },
+    "sql": "SELECT receipt_reference FROM expenses_expense WHERE organization_id=%s AND receipt_reference=%s",
+    "rows": 1,
+    "output": {
+      "file": "expenses-list.xlsx",
+      "sha256": "419009df5922a5e55ec4a71eebecae0b6c9bbe4f50dc8ab186114e6a87c8096c",
+      "filename": "هزینه_ها و تنخواه.xlsx",
+      "response_url": "/expenses/?description=B08-REC&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "هزینه‌ها و تنخواه": 1
+      },
+      "headings": {
+        "هزینه‌ها و تنخواه": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ هزینه",
+          "گروه هزینه",
+          "دسته هزینه",
+          "شرح",
+          "فروشنده",
+          "طرف تجاری",
+          "ارز",
+          "مبلغ",
+          "وضعیت",
+          "مرجع رسید"
+        ]
+      }
+    }
+  },
+  "inventory:transaction_list": {
+    "status": "PASS",
+    "filters": {
+      "q": "B08-IN-25"
+    },
+    "sql": "SELECT transaction_number FROM inventory_stocktransaction WHERE organization_id=%s AND transaction_number=%s",
+    "rows": 1,
+    "output": {
+      "file": "inventory-transaction_list.xlsx",
+      "sha256": "a4893f26294a6aee07e095c0e6bc1c67da2c13d435397731a4da1aa8f29242b2",
+      "filename": "گردش انبار.xlsx",
+      "response_url": "/inventory/transactions/?q=B08-IN-25&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "گردش انبار": 1
+      },
+      "headings": {
+        "گردش انبار": [
+          "شماره گردش",
+          "پروژه",
+          "انبار مبدأ",
+          "انبار مقصد",
+          "مصالح",
+          "واحد",
+          "نوع گردش",
+          "مقدار",
+          "زمان وقوع",
+          "وضعیت ثبت",
+          "مرجع",
+          "رسید کالا",
+          "برگشت گردش",
+          "رسید کالای گردش اصلی"
+        ]
+      }
+    }
+  },
+  "procurement:request_list": {
+    "status": "PASS",
+    "filters": {
+      "q": "B08-PR-25"
+    },
+    "sql": "SELECT request_number FROM procurement_purchaserequest WHERE organization_id=%s AND request_number=%s",
+    "rows": 1,
+    "output": {
+      "file": "procurement-request_list.xlsx",
+      "sha256": "8727e20c0352d7a422827b622b69616b65b73658dfa22b607fe08c9889aad509",
+      "filename": "درخواست_های خرید.xlsx",
+      "response_url": "/procurement/?q=B08-PR-25&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "درخواست‌های خرید": 1,
+        "اقلام": 1
+      },
+      "headings": {
+        "درخواست‌های خرید": [
+          "شماره درخواست خرید",
+          "عنوان",
+          "پروژه",
+          "تاریخ نیاز",
+          "وضعیت"
+        ],
+        "اقلام": [
+          "درخواست خرید",
+          "مصالح",
+          "شرح ردیف",
+          "واحد",
+          "مقدار"
+        ]
+      }
+    }
+  },
+  "procurement:rfq_list": {
+    "status": "PASS",
+    "filters": {
+      "q": "B08-RFQ-25"
+    },
+    "sql": "SELECT rfq_number FROM procurement_requestforquotation WHERE organization_id=%s AND rfq_number=%s",
+    "rows": 1,
+    "output": {
+      "file": "procurement-rfq_list.xlsx",
+      "sha256": "60b80aa6eda68a52e08004412b8f596d77d5552e0dbe227009feed1735150d22",
+      "filename": "استعلام_های خرید.xlsx",
+      "response_url": "/procurement/rfqs/?q=B08-RFQ-25&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "استعلام‌های خرید": 1,
+        "اقلام": 1
+      },
+      "headings": {
+        "استعلام‌های خرید": [
+          "شماره استعلام",
+          "عنوان",
+          "پروژه",
+          "درخواست خرید",
+          "نسخه صادرشده",
+          "مهلت دریافت",
+          "وضعیت"
+        ],
+        "اقلام": [
+          "شماره استعلام",
+          "مصالح",
+          "شرح ردیف",
+          "واحد",
+          "مقدار"
+        ]
+      }
+    }
+  },
+  "procurement:order_list": {
+    "status": "PASS",
+    "filters": {
+      "q": "B08-PO-25"
+    },
+    "sql": "SELECT order_number FROM procurement_purchaseorder WHERE organization_id=%s AND order_number=%s",
+    "rows": 1,
+    "output": {
+      "file": "procurement-order_list.xlsx",
+      "sha256": "1d800946a167040a7a14af5720bb312f2f77736c277461bf35e626c0b521af58",
+      "filename": "سفارش_های خرید.xlsx",
+      "response_url": "/procurement/orders/?q=B08-PO-25&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "سفارش‌های خرید": 1,
+        "اقلام": 1
+      },
+      "headings": {
+        "سفارش‌های خرید": [
+          "شماره سفارش خرید",
+          "پروژه",
+          "تأمین‌کننده",
+          "درخواست خرید",
+          "استعلام منبع",
+          "نسخه استعلام منبع",
+          "نسخه سفارش",
+          "تاریخ سفارش",
+          "تحویل موردانتظار",
+          "وضعیت",
+          "مبلغ کل ثبت‌شده"
+        ],
+        "اقلام": [
+          "سفارش خرید",
+          "مصالح",
+          "شرح ردیف",
+          "واحد",
+          "مقدار",
+          "قیمت واحد ثبت‌شده",
+          "مبلغ ردیف ثبت‌شده",
+          "ردیف درخواست خرید",
+          "شرح قلم انتخاب تأمین‌کننده"
+        ]
+      }
+    }
+  },
+  "procurement:receipt_list": {
+    "status": "PASS",
+    "filters": {
+      "q": "B08-GRN-25"
+    },
+    "sql": "SELECT receipt_number FROM procurement_goodsreceipt WHERE organization_id=%s AND receipt_number=%s",
+    "rows": 1,
+    "output": {
+      "file": "procurement-receipt_list.xlsx",
+      "sha256": "29342433ea3bdb0c29630a74d8c947d08ac19c50b4a97a3f0a75a9cb6df1101b",
+      "filename": "رسیدهای کالا.xlsx",
+      "response_url": "/procurement/receipts/?q=B08-GRN-25&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "رسیدهای کالا": 1,
+        "اقلام": 1
+      },
+      "headings": {
+        "رسیدهای کالا": [
+          "شماره رسید کالا",
+          "پروژه",
+          "شماره سفارش خرید",
+          "نسخه سفارش مبنا",
+          "زمان دریافت",
+          "وضعیت"
+        ],
+        "اقلام": [
+          "رسید کالا",
+          "ردیف سفارش خرید",
+          "مصالح",
+          "واحد",
+          "مقدار دریافت‌شده"
+        ]
+      }
+    }
+  },
+  "timekeeping:workbench": {
+    "status": "PASS",
+    "filters": {
+      "date_from": "2026-11-25",
+      "date_to": "2026-11-25",
+      "project": "453e0c1c-0507-4e1a-9bb7-5f6b82ff4967",
+      "site": "ceb9b5bf-7ed0-4bf7-8319-5fb3c5f985ed"
+    },
+    "sql": "SELECT work_date FROM timekeeping_attendancerecord WHERE organization_id=%s AND work_date=%s",
+    "rows": 1,
+    "output": {
+      "file": "timekeeping-workbench.xlsx",
+      "sha256": "ff6a47a71de83df2a66824213018884fb9cc97bd36712abf090462a08424cd6b",
+      "filename": "حضور و کارکرد.xlsx",
+      "response_url": "/timekeeping/?date_from=2026-11-25&date_to=2026-11-25&project=453e0c1c-0507-4e1a-9bb7-5f6b82ff4967&site=ceb9b5bf-7ed0-4bf7-8319-5fb3c5f985ed&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "حضور": 1,
+        "کارکرد": 0,
+        "توزیع زمان": 0,
+        "اضافه‌کاری": 0
+      },
+      "headings": {
+        "حضور": [
+          "نیروی کار",
+          "پروژه",
+          "کارگاه",
+          "تاریخ",
+          "ورود",
+          "خروج",
+          "وضعیت"
+        ],
+        "کارکرد": [
+          "نیروی کار",
+          "شروع دوره",
+          "پایان دوره",
+          "بازنگری",
+          "زمان اظهارشده (دقیقه)",
+          "وضعیت"
+        ],
+        "توزیع زمان": [
+          "نیروی کار",
+          "شروع دوره",
+          "پایان دوره",
+          "بازنگری",
+          "تاریخ",
+          "پروژه",
+          "کارگاه",
+          "فعالیت",
+          "کارکرد (دقیقه)",
+          "یادداشت"
+        ],
+        "اضافه‌کاری": [
+          "نیروی کار",
+          "پروژه",
+          "کارگاه",
+          "شروع",
+          "پایان",
+          "دلیل",
+          "وضعیت"
+        ]
+      }
+    }
+  },
+  "expenses:list:print": {
+    "status": "PASS",
+    "source_filter": "B08-REC",
+    "rows": 1,
+    "amount": "12345.67",
+    "back": "/expenses/?description=B08-REC"
+  }
+}

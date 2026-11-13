@@ -4,9 +4,10 @@ from datetime import date, timedelta
 from threading import Barrier
 from unittest.mock import patch
 
+from django.apps import apps
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import close_old_connections
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
 
 from apps.accounts.models import User
@@ -26,6 +27,7 @@ from apps.workflows.models import (
 )
 from apps.workflows.registry import registry
 from apps.workflows.runtime import claim_work_item, complete_work_item
+from tests.retirement_fixtures import explicit_fixture_roles
 
 from .models import DailyReport, DailyReportStatus
 from .services import (
@@ -70,6 +72,8 @@ class DailyReportWorkflowFixture:
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
+        explicit_fixture_roles(self.organization)
+        explicit_fixture_roles(self.other_organization)
         self.project = create_project(
             organization=self.organization,
             actor=self.owner,
@@ -95,6 +99,7 @@ class DailyReportWorkflowFixture:
         )
 
 
+@override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
 class DailyReportWorkflowTests(DailyReportWorkflowFixture, TestCase):
     def test_seeded_template_matches_code_owned_compatibility_policy(self) -> None:
         template = WorkflowTemplate.objects.get(code=COMPATIBILITY_TEMPLATE_CODE)
@@ -113,6 +118,7 @@ class DailyReportWorkflowTests(DailyReportWorkflowFixture, TestCase):
         self.organization.memberships.create(
             user=member, role=MembershipRole.MEMBER, status=MembershipStatus.ACTIVE
         )
+        explicit_fixture_roles(self.organization)
         report = create_daily_report(
             organization=self.organization,
             project=self.project,
@@ -343,8 +349,10 @@ class DailyReportWorkflowTests(DailyReportWorkflowFixture, TestCase):
         )
 
 
+@override_settings(PRODUCT_SURFACE_PROFILE="FULL_ERP")
 class DailyReportConcurrencyTests(DailyReportWorkflowFixture, TransactionTestCase):
     serialized_rollback = True
+    available_apps = [config.name for config in apps.get_app_configs()]  # noqa: RUF012
 
     def test_competing_approvals_commit_only_once(self) -> None:
         report = self.report()

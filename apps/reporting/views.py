@@ -46,6 +46,7 @@ from apps.reporting.services import (
     export_dashboard_csv,
     refresh_metric,
 )
+from core.organization_time import render_in_organization_time
 from core.product_surface import metric_exposed, route_exposed
 
 
@@ -84,7 +85,7 @@ def dashboard(request: HttpRequest) -> HttpResponse:
         is_active=True, code__in=[code for code in METRIC_SPECS if metric_exposed(code)]
     ).order_by("code")
     return _private(
-        render(
+        render_in_organization_time(
             request,
             "reporting/dashboard.html",
             {"read_model": model, "definitions": definitions},

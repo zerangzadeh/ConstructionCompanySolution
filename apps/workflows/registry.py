@@ -109,6 +109,7 @@ class DomainCommandSpec:
     to_state: str = ""
     executor: DomainCommandExecutor | None = None
     include_work_item: bool = False
+    authorize_decision: DomainCommandExecutor | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -172,10 +173,18 @@ class WorkflowRegistry:
         specification = self.subject_adapters[key]
         self.subject_adapters[key] = replace(specification, loader=loader)
 
-    def bind_domain_command(self, key: str, executor: DomainCommandExecutor) -> None:
+    def bind_domain_command(
+        self,
+        key: str,
+        executor: DomainCommandExecutor,
+        *,
+        authorize_decision: DomainCommandExecutor | None = None,
+    ) -> None:
         """Bind a domain application-service callback to a registered command."""
         specification = self.domain_commands[key]
-        self.domain_commands[key] = replace(specification, executor=executor)
+        self.domain_commands[key] = replace(
+            specification, executor=executor, authorize_decision=authorize_decision
+        )
 
 
 registry = WorkflowRegistry()
@@ -801,7 +810,7 @@ registry.register_subject_adapter(
         key="daily_reports.daily_report",
         subject_type="daily_reports.daily_report",
         exposed_attributes=frozenset(
-            {"project_id", "site_id", "status", "created_by_id"}
+            {"project_id", "site_id", "status", "created_by_id", "return_enabled"}
         ),
         start_permission="daily_reports.submit",
         view_permission="daily_reports.view",
@@ -919,6 +928,7 @@ registry.register_workflow_type(
             {
                 "daily_reports.daily_report.submit",
                 "daily_reports.daily_report.approve",
+                "daily_reports.daily_report.return_for_correction",
             }
         ),
     )
@@ -933,8 +943,18 @@ for command_key, from_state, to_state in (
             workflow_type="daily_reports.daily_report_approval",
             from_states=frozenset({from_state}),
             to_state=to_state,
+            include_work_item=command_key == "daily_reports.daily_report.approve",
         )
     )
+registry.register_domain_command(
+    DomainCommandSpec(
+        key="daily_reports.daily_report.return_for_correction",
+        workflow_type="daily_reports.daily_report_approval",
+        from_states=frozenset({"submitted"}),
+        to_state="returned",
+        include_work_item=True,
+    )
+)
 registry.register_workflow_type(
     WorkflowTypeSpec(
         code="procurement.purchase_request_approval",

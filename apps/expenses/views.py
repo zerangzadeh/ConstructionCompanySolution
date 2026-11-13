@@ -338,6 +338,16 @@ def platform_expense_group_archive(request: HttpRequest, group_id: str) -> HttpR
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.EXPENSES_CREATE)
 def expense_create(request: HttpRequest) -> HttpResponse:
+    active_project = request.active_project
+    if request.method == "GET" and request.GET.get("project"):
+        from apps.organizations.form_scoping import normalized_uuid
+        from apps.projects.services import get_organization_project
+
+        active_project = get_organization_project(
+            user=request.user,
+            organization=request.organization,
+            project_id=normalized_uuid(request.GET["project"]),
+        )
     membership = get_active_membership(
         user=request.user, organization=request.organization
     )
@@ -345,7 +355,7 @@ def expense_create(request: HttpRequest) -> HttpResponse:
         request.POST or None,
         organization=request.organization,
         membership=membership,
-        active_project=request.active_project,
+        active_project=active_project,
     )
     if request.method == "POST" and form.is_valid():
         data = form.cleaned_data

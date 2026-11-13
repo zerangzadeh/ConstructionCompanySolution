@@ -1,6 +1,7 @@
 """Separate, source-owned review of SafetyIncident records (CEP-027)."""
 
 from collections.abc import Sequence
+from uuid import UUID
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
@@ -19,6 +20,7 @@ from apps.safety.models import (
     SafetyReviewStatus,
 )
 from apps.safety.services import _require_permission
+from core.record_review import check_independent_decision
 
 
 def _locked(organization: Organization, incident_id: str) -> SafetyIncident:
@@ -172,6 +174,7 @@ def decide_safety_record(
     incident_id: str,
     outcome: str,
     reason: str,
+    submission_id: UUID | None = None,
 ) -> SafetyReviewRevision:
     incident = _locked(organization, incident_id)
     _require_permission(
@@ -181,6 +184,12 @@ def decide_safety_record(
         project=incident.project,
         site=incident.site,
     )
+    if submission_id is not None:
+        replay = check_independent_decision(
+            incident, actor, submission_id, outcome, reason
+        )
+        if replay is not None:
+            return replay
     if incident.review_status != SafetyReviewStatus.SUBMITTED or outcome not in {
         SafetyReviewStatus.APPROVED,
         SafetyReviewStatus.REJECTED,
@@ -205,6 +214,7 @@ def correct_returned_safety_record(
     description: str,
     immediate_action: str,
     reason: str,
+    return_id: UUID | None = None,
 ) -> SafetyReviewRevision:
     incident = _locked(organization, incident_id)
     _require_permission(
@@ -214,6 +224,12 @@ def correct_returned_safety_record(
         project=incident.project,
         site=incident.site,
     )
+    if return_id is not None:
+        latest = incident.review_revisions.order_by("-sequence").first()
+        if latest is None or latest.pk != return_id or latest.state != "returned":
+            raise ValueError(
+                "رکورد پس از باز کردن فرم تغییر کرده است. آن را دوباره باز کنید."
+            )
     if (
         incident.review_status != SafetyReviewStatus.RETURNED
         or incident.status == "closed"

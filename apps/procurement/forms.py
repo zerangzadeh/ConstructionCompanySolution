@@ -140,7 +140,9 @@ class PurchaseOrderForm(_StyledForm):
             BusinessParty.objects.filter(
                 organization=organization,
                 archived_at__isnull=True,
+                roles__organization=organization,
                 roles__role=PartyRoleType.SUPPLIER,
+                roles__is_active=True,
             )
             .distinct()
             .order_by("display_name")

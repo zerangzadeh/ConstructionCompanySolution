@@ -1,0 +1,46 @@
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.scratch\b03-b04-integration-20261112\chrome_smoke.py", line 116, in <module>
+    f=owner.locator('main form[method=post]').first;fill(f,**payload);click(f)
+                                                    ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.scratch\b03-b04-integration-20261112\chrome_smoke.py", line 36, in fill
+    if el.is_visible():el.select_option(value)
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Temp\bonira-b02-01a1c63c\pylibs\playwright\sync_api\_generated.py", line 13201, in select_option
+    self._sync(
+  File "C:\Users\azera\AppData\Local\Temp\bonira-b02-01a1c63c\pylibs\playwright\_impl\_sync_base.py", line 124, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Temp\bonira-b02-01a1c63c\pylibs\playwright\_impl\locator.py", line 779, in select_option
+    return await self._frame.select_option(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Temp\bonira-b02-01a1c63c\pylibs\playwright\_impl\frame.py", line 1051, in select_option
+    await self._channel.selectOption(
+  File "C:\Users\azera\AppData\Local\Temp\bonira-b02-01a1c63c\pylibs\playwright\_impl\channel_owner.py", line 398, in _mapped
+    return mapper(await awaitable)
+                  ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Temp\bonira-b02-01a1c63c\pylibs\playwright\_impl\channel_owner.py", line 387, in finish
+    raise e from None
+  File "C:\Users\azera\AppData\Local\Temp\bonira-b02-01a1c63c\pylibs\playwright\_impl\channel_owner.py", line 352, in finish
+    result = await zone.run_async(lambda: awaitable)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Temp\bonira-b02-01a1c63c\pylibs\playwright\_impl\utils\zones.py", line 58, in run_async
+    return await func()
+           ^^^^^^^^^^^^
+playwright._impl._errors.TimeoutError: Locator.select_option: Timeout 45000ms exceeded.
+Call log:
+  - waiting for locator("main form[method=post]").first.locator("[name=\"deployment\"]")
+    - locator resolved to <select disabled name="deployment" id="id_deployment" data-local-parent="id_equipment" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">…</select>
+  - attempting select option action
+    2 × waiting for element to be visible and enabled
+      - element is not enabled
+    - retrying select option action
+    - waiting 20ms
+    2 × waiting for element to be visible and enabled
+      - element is not enabled
+    - retrying select option action
+      - waiting 100ms
+    87 × waiting for element to be visible and enabled
+       - element is not enabled
+     - retrying select option action
+       - waiting 500ms
+

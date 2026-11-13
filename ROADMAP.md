@@ -261,6 +261,11 @@ CRM, tenant-authored executable BPM, parallel ledgers/workflow engines, and
 unrestricted SQL or autonomous consequential AI remain outside the accepted
 product strategy.
 
+- Automatic creation of a contract from an independent estimate is deferred to
+  post-MVP under BON-DEF-0033. The approved MVP uses standalone contract
+  creation and existing supported estimate and measurement associations.
+  Any future conversion requires separately authorized scope and acceptance criteria.
+
 ## 13. Historical P0–P10 reference
 
 The historical implementation/dependency sequence was P0 decisions and

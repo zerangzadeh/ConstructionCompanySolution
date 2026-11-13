@@ -12,10 +12,13 @@
         {% if "warehouses.create" in business_permission_codes %}{% url "inventory:warehouse_create" as create_url %}{% endif %}
         {% include "components/page_header.html" with page_title="انبارها" page_description=request.organization.name page_action_url=create_url page_action_label="انبار جدید" page_icon="document" only %}
     </div>
-    {% if "inventory_reconciliations.view" in business_permission_codes %}
+    {% if inventory_receiving_available or "inventory_reconciliations.view" in business_permission_codes %}
     <nav class="erp-list-navigation" aria-label="فضاهای انبار">
+        {% if inventory_receiving_available %}<a href="{% url 'inventory:custody_workbench' %}?tab=inbound">انتقال‌های ورودی در انتظار دریافت</a>{% endif %}
+        {% if "inventory_reconciliations.view" in business_permission_codes %}
         <a href="{% url 'inventory:custody_workbench' %}">کارتابل مقدار و امانت</a>
         {% if "inventory_valuation.view" in business_permission_codes %}<a href="{% url 'inventory:valuation_workbench' %}">کارتابل ارزش‌گذاری</a>{% endif %}
+        {% endif %}
     </nav>
     {% endif %}
     <div class="erp-list-workspace">

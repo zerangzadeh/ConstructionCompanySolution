@@ -1,3 +1,5 @@
+from functools import partial
+
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
@@ -87,12 +89,21 @@ from apps.equipment.services import (
     transition_maintenance_status,
 )
 from apps.fixed_assets.workspace import equipment_financial_links
-from apps.organizations.authorization import get_active_membership
+from apps.organizations.authorization import (
+    get_active_membership,
+    has_business_permission,
+    permission_supports_object_scope,
+    require_business_permission,
+    scope_queryset,
+)
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
 )
+from apps.organizations.form_scoping import normalized_uuid
 from apps.organizations.models import BusinessPermissionCode
+from apps.projects.services import get_organization_project
+from core.business_choices import contextual_url
 from core.list_filters import (
     apply_table_filters,
     build_table_filters,
@@ -103,20 +114,58 @@ from core.list_filters import (
 from core.organization_time import render_in_organization_time as render
 
 
-def _equipment(request: HttpRequest, equipment_id: str) -> Equipment | None:
+def _equipment(
+    request: HttpRequest, equipment_id: str, *, project=None
+) -> Equipment | None:
     return (
-        get_organization_equipment(user=request.user, organization=request.organization)
+        get_organization_equipment(
+            user=request.user, organization=request.organization, project=project
+        )
         .filter(pk=equipment_id)
         .first()
     )
 
 
+def _equipment_project(request: HttpRequest):
+    """Resolve an optional page filter through existing project/assignment authority."""
+    value = request.GET.get("project")
+    if not value:
+        return None, None
+    project = get_organization_project(
+        user=request.user,
+        organization=request.organization,
+        project_id=normalized_uuid(value),
+    )
+    assignments = get_organization_equipment_assignments(
+        user=request.user, organization=request.organization, project=project
+    )
+    return project, assignments
+
+
+def _equipment_project_links(project, equipment=None):
+    values = {"project": project.pk} if project else {}
+    return {
+        "equipment_project": project,
+        "equipment_context_asset": equipment,
+        "filter_context": {"project": str(project.pk)} if project else {},
+        "equipment_project_url": reverse("projects:detail", args=[project.pk])
+        if project
+        else "",
+        "equipment_list_url": contextual_url("equipment:list", **values),
+        "equipment_operations_url": contextual_url(
+            "equipment:operations_workbench",
+            **values,
+            **({"equipment": equipment.pk} if project and equipment else {}),
+        ),
+    }
+
+
 @active_organization_required
-@organization_permission_required(BusinessPermissionCode.EQUIPMENT_VIEW)
 @require_GET
 def equipment_list(request: HttpRequest) -> HttpResponse:
+    project, _assignments = _equipment_project(request)
     equipment = get_organization_equipment(
-        user=request.user, organization=request.organization
+        user=request.user, organization=request.organization, project=project
     )
     scoped_has_records = equipment.exists()
     category_choices = list(
@@ -163,6 +212,12 @@ def equipment_list(request: HttpRequest) -> HttpResponse:
         request,
         "equipment/list.html",
         {
+            **_equipment_project_links(project),
+            "can_create_equipment": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.EQUIPMENT_CREATE,
+            ),
             "equipment": page.object_list,
             "list_profile": "equipment",
             "scoped_has_records": scoped_has_records,
@@ -200,7 +255,6 @@ def equipment_list(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
-@organization_permission_required(BusinessPermissionCode.EQUIPMENT_OPERATIONS_VIEW)
 @require_GET
 def operations_workbench(request: HttpRequest) -> HttpResponse:
     """Read-only, permission-gated operational evidence workbench.
@@ -209,61 +263,149 @@ def operations_workbench(request: HttpRequest) -> HttpResponse:
     never bypasses the operation-specific permission checks.
     """
     organization = request.organization
+    project, assignments = _equipment_project(request)
+    require_business_permission(
+        user=request.user,
+        organization=organization,
+        permission=BusinessPermissionCode.EQUIPMENT_OPERATIONS_VIEW,
+        project=project,
+        allow_site_parent=True,
+        allow_any_scope=project is None
+        and permission_supports_object_scope(
+            BusinessPermissionCode.EQUIPMENT_OPERATIONS_VIEW
+        ),
+        message="اجازه مشاهده عملیات تجهیزات را ندارید.",
+    )
+    equipment_ids = assignments.values("equipment_id") if project else None
+    selected_equipment = None
+    if project and request.GET.get("equipment"):
+        selected_equipment = get_object_or_404(
+            get_organization_equipment(
+                user=request.user, organization=organization, project=project
+            ).filter(pk__in=equipment_ids),
+            pk=normalized_uuid(request.GET["equipment"]),
+        )
+        assignments = assignments.filter(equipment=selected_equipment)
+        equipment_ids = assignments.values("equipment_id")
+
+    def evidence(queryset, *, deployment=True):
+        if project is None:
+            return queryset
+        if deployment:
+            return queryset.filter(deployment_id__in=assignments.values("pk"))
+        return queryset.filter(equipment_id__in=equipment_ids)
+
+    usage_logs = scope_queryset(
+        evidence(EquipmentUsageLog.objects.all()),
+        membership=get_active_membership(user=request.user, organization=organization),
+        project_lookup="deployment__project_id",
+        site_lookup="deployment__site_id",
+    ).select_related("equipment", "deployment__project", "deployment__site", "operator")
+    action_codes = (
+        "equipment.view",
+        "equipment_cost_allocation.view",
+        "equipment_downtime.manage",
+        "equipment_fuel.record",
+        "equipment_maintenance_plans.manage",
+        "equipment_meters.record",
+        "equipment_qualifications.manage",
+        "equipment_spare_links.manage",
+        "equipment_usage.record",
+        "equipment_work_orders.manage",
+    )
+    action_permissions = {
+        code
+        for code in action_codes
+        if has_business_permission(
+            user=request.user,
+            organization=organization,
+            permission=code,
+            allow_any_scope=permission_supports_object_scope(code),
+        )
+    }
+    if not has_business_permission(
+        user=request.user,
+        organization=organization,
+        permission=BusinessPermissionCode.EQUIPMENT_COST_POLICY_VIEW,
+        allow_any_scope=permission_supports_object_scope(
+            BusinessPermissionCode.EQUIPMENT_COST_POLICY_VIEW
+        ),
+    ):
+        action_permissions.discard("equipment_cost_allocation.view")
     if request.GET.get("format") == "xlsx":
-        from apps.organizations.authorization import scope_queryset
         from core.xlsx import Sheet, download
 
         from .xlsx_exports import USAGE_COLUMNS
 
-        # Operations evidence retains the existing project/site scope boundary.
-        records = (
-            scope_queryset(
-                EquipmentUsageLog.objects.filter(organization=organization),
-                membership=get_active_membership(
-                    user=request.user, organization=organization
-                ),
-                project_lookup="deployment__project_id",
-                site_lookup="deployment__site_id",
-            )
-            .select_related(
-                "equipment", "deployment__project", "deployment__site", "operator"
-            )
-            .order_by("-started_at", "pk")
-        )
         return download(
             "کارکرد تجهیزات",
-            (Sheet("کارکرد تجهیزات", USAGE_COLUMNS, records),),
+            (
+                Sheet(
+                    "کارکرد تجهیزات",
+                    USAGE_COLUMNS,
+                    usage_logs.order_by("-started_at", "pk"),
+                ),
+            ),
             timezone_name=organization.settings.timezone,
         )
     return render(
         request,
         "equipment/operations_workbench.html",
         {
-            "meters": EquipmentMeter.objects.filter(
-                organization=organization
+            **_equipment_project_links(project, selected_equipment),
+            "equipment_operation_permissions": action_permissions,
+            "equipment_list_url": contextual_url("equipment:list", project=project.pk)
+            if project
+            and has_business_permission(
+                user=request.user,
+                organization=organization,
+                permission=BusinessPermissionCode.EQUIPMENT_VIEW,
+                project=project,
+            )
+            else reverse("equipment:list")
+            if "equipment.view" in action_permissions
+            else "",
+            "meters": evidence(
+                EquipmentMeter.objects.filter(organization=organization),
+                deployment=False,
             ).select_related("equipment"),
-            "readings": MeterReading.objects.filter(
-                organization=organization
+            "readings": evidence(
+                MeterReading.objects.filter(organization=organization)
             ).select_related("meter__equipment", "deployment")[:50],
-            "qualifications": OperatorEquipmentQualification.objects.filter(
-                organization=organization
+            "qualifications": evidence(
+                OperatorEquipmentQualification.objects.filter(
+                    organization=organization
+                ),
+                deployment=False,
             ).select_related("equipment", "employee", "workforce_qualification")[:50],
-            "usage_logs": EquipmentUsageLog.objects.filter(
-                organization=organization
-            ).select_related("equipment", "deployment", "operator")[:50],
-            "fuel_logs": FuelLog.objects.filter(
-                organization=organization
+            "usage_logs": usage_logs.order_by("-started_at", "pk")[:50],
+            "fuel_logs": evidence(
+                FuelLog.objects.filter(organization=organization)
             ).select_related("equipment", "inventory_transaction")[:50],
-            "downtime_events": DowntimeEvent.objects.filter(
-                organization=organization
+            "downtime_events": evidence(
+                DowntimeEvent.objects.filter(organization=organization)
             ).select_related("equipment", "deployment")[:50],
-            "plans": MaintenancePlan.objects.filter(
-                organization=organization
+            "plans": evidence(
+                MaintenancePlan.objects.filter(organization=organization),
+                deployment=False,
             ).select_related("equipment")[:50],
-            "work_orders": EquipmentWorkOrder.objects.filter(organization=organization)
+            "work_orders": evidence(
+                EquipmentWorkOrder.objects.filter(organization=organization)
+            )
             .select_related("equipment", "plan", "deployment")
             .prefetch_related("spare_part_references__inventory_transaction")[:50],
         },
+    )
+
+
+def _scoped_cost_sources(request, queryset, *, prefix=""):
+    return scope_queryset(
+        queryset,
+        membership=get_active_membership(
+            user=request.user, organization=request.organization
+        ),
+        project_lookup=f"{prefix}project_id",
+        site_lookup=f"{prefix}site_id",
     )
 
 
@@ -283,11 +425,13 @@ def cost_workbench(request: HttpRequest) -> HttpResponse:
             "rates": EquipmentCostRate.objects.filter(
                 organization=organization
             ).select_related("equipment", "policy")[:50],
-            "allocations": EquipmentCostAllocation.objects.filter(
-                organization=organization
+            "allocations": _scoped_cost_sources(
+                request, EquipmentCostAllocation.objects.all()
             ).select_related("usage__equipment", "project", "rate__policy")[:100],
-            "envelopes": EquipmentCostSourceEnvelope.objects.filter(
-                organization=organization
+            "envelopes": _scoped_cost_sources(
+                request,
+                EquipmentCostSourceEnvelope.objects.all(),
+                prefix="allocation__",
             ).select_related("allocation__usage__equipment")[:100],
         },
     )
@@ -354,6 +498,7 @@ def cost_allocation_create(request: HttpRequest) -> HttpResponse:
         CostAllocationForm,
         "تخصیص پیشنهادی هزینه تجهیز",
         prepare_cost_allocation,
+        scoped_choices=True,
         back_url="equipment:cost_workbench",
     )
 
@@ -364,8 +509,8 @@ def cost_allocation_create(request: HttpRequest) -> HttpResponse:
 )
 @require_POST
 def cost_allocation_finalize(request: HttpRequest, allocation_id: str) -> HttpResponse:
-    allocation = EquipmentCostAllocation.objects.filter(
-        pk=allocation_id, organization=request.organization
+    allocation = _scoped_cost_sources(
+        request, EquipmentCostAllocation.objects.filter(pk=allocation_id)
     ).first()
     if allocation is None:
         return HttpResponseNotFound("تخصیص یافت نشد.")
@@ -383,8 +528,8 @@ def cost_allocation_finalize(request: HttpRequest, allocation_id: str) -> HttpRe
     BusinessPermissionCode.EQUIPMENT_COST_ALLOCATION_REVERSE
 )
 def cost_allocation_reverse(request: HttpRequest, allocation_id: str) -> HttpResponse:
-    allocation = EquipmentCostAllocation.objects.filter(
-        pk=allocation_id, organization=request.organization
+    allocation = _scoped_cost_sources(
+        request, EquipmentCostAllocation.objects.filter(pk=allocation_id)
     ).first()
     if allocation is None:
         return HttpResponseNotFound("تخصیص یافت نشد.")
@@ -420,6 +565,7 @@ def cost_handoff_create(request: HttpRequest) -> HttpResponse:
         CostHandoffForm,
         "پیشنهاد منبع هزینه تجهیز",
         prepare_cost_handoff,
+        scoped_choices=True,
         back_url="equipment:cost_workbench",
     )
 
@@ -428,8 +574,10 @@ def cost_handoff_create(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.EQUIPMENT_COST_HANDOFF_REVIEW)
 @require_POST
 def cost_handoff_review(request: HttpRequest, envelope_id: str) -> HttpResponse:
-    envelope = EquipmentCostSourceEnvelope.objects.filter(
-        pk=envelope_id, organization=request.organization
+    envelope = _scoped_cost_sources(
+        request,
+        EquipmentCostSourceEnvelope.objects.filter(pk=envelope_id),
+        prefix="allocation__",
     ).first()
     if envelope is None:
         return HttpResponseNotFound("پیشنهاد یافت نشد.")
@@ -447,8 +595,10 @@ def cost_handoff_review(request: HttpRequest, envelope_id: str) -> HttpResponse:
     BusinessPermissionCode.EQUIPMENT_COST_HANDOFF_RECONCILE
 )
 def cost_handoff_reconcile(request: HttpRequest, envelope_id: str) -> HttpResponse:
-    envelope = EquipmentCostSourceEnvelope.objects.filter(
-        pk=envelope_id, organization=request.organization
+    envelope = _scoped_cost_sources(
+        request,
+        EquipmentCostSourceEnvelope.objects.filter(pk=envelope_id),
+        prefix="allocation__",
     ).first()
     if envelope is None:
         return HttpResponseNotFound("پیشنهاد یافت نشد.")
@@ -573,8 +723,14 @@ def _operation_form(
     service,
     *,
     back_url="equipment:operations_workbench",
+    scoped_choices=False,
 ):
-    form = form_class(request.POST or None, organization=request.organization)
+    kwargs = {"organization": request.organization}
+    if scoped_choices:
+        kwargs["membership"] = get_active_membership(
+            user=request.user, organization=request.organization
+        )
+    form = form_class(request.POST or None, **kwargs)
     if request.method == "POST" and form.is_valid():
         try:
             service(
@@ -582,7 +738,13 @@ def _operation_form(
                 actor=request.user,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValidationError, ValueError) as exc:
+        except ValidationError as exc:
+            if hasattr(exc, "error_dict"):
+                for field, errors in exc.error_dict.items():
+                    form.add_error(field if field in form.fields else None, errors)
+            else:
+                form.add_error(None, exc)
+        except (PermissionDenied, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             return redirect(back_url)
@@ -611,9 +773,21 @@ def meter_reading_create(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
-@organization_permission_required(BusinessPermissionCode.EQUIPMENT_USAGE_RECORD)
 def usage_create(request: HttpRequest) -> HttpResponse:
-    return _operation_form(request, UsageForm, "ثبت کارکرد تجهیز", record_usage)
+    require_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.EQUIPMENT_USAGE_RECORD,
+        allow_any_scope=True,
+        message="اجازه ثبت کارکرد تجهیز را ندارید.",
+    )
+    return _operation_form(
+        request,
+        UsageForm,
+        "ثبت کارکرد تجهیز",
+        partial(record_usage, require_active_deployment=True),
+        scoped_choices=True,
+    )
 
 
 @active_organization_required
@@ -727,22 +901,40 @@ def equipment_create(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
-@organization_permission_required(BusinessPermissionCode.EQUIPMENT_VIEW)
 @require_GET
 def equipment_detail(request: HttpRequest, equipment_id: str) -> HttpResponse:
-    equipment = _equipment(request, equipment_id)
-    if equipment is None:
+    project, project_assignments = _equipment_project(request)
+    equipment = _equipment(request, equipment_id, project=project)
+    if equipment is None or (
+        project and not project_assignments.filter(equipment=equipment).exists()
+    ):
         return HttpResponseNotFound("تجهیز یافت نشد.")
     assignments = get_organization_equipment_assignments(
-        user=request.user, organization=request.organization, equipment=equipment
+        user=request.user,
+        organization=request.organization,
+        equipment=equipment,
+        project=project,
     )
     maintenance_records = get_organization_maintenance_records(
         user=request.user, organization=request.organization, equipment=equipment
     )
+    if project:
+        maintenance_records = maintenance_records.filter(project=project)
     return render(
         request,
         "equipment/detail.html",
         {
+            **_equipment_project_links(project, equipment),
+            "can_change_equipment": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.EQUIPMENT_CHANGE_STATUS,
+            ),
+            "can_archive_equipment": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.EQUIPMENT_ARCHIVE,
+            ),
             "equipment": equipment,
             "assignments": assignments,
             "maintenance_records": maintenance_records,

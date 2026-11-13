@@ -967,3 +967,5 @@ for _code, _description in SPECIALIST_ROLE_DESCRIPTIONS.items():
 # Platform company authority requires the independently assigned platform duty.
 for _permissions in DEFAULT_ROLE_PERMISSIONS.values():
     _permissions.difference_update(PLATFORM_COMPANY_PERMISSIONS)
+    # Daily Report correction is explicitly assigned even for owner/manager duties.
+    _permissions.discard(str(BusinessPermissionCode.DAILY_REPORTS_CORRECT))

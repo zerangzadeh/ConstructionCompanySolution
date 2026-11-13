@@ -232,12 +232,14 @@ def project_create(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.PROJECTS_VIEW)
 @require_GET
 def project_detail(request: HttpRequest, project_id: str) -> HttpResponse:
+    from core.organization_time import render_in_organization_time
+
     project = get_organization_project(
         user=request.user,
         organization=request.organization,
         project_id=project_id,
     )
-    return render(
+    return render_in_organization_time(
         request,
         "projects/detail.html",
         {

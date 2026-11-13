@@ -1,0 +1,10 @@
+{% if equipment_project %}
+<section class="erp-surface mb-4 rounded-xl border border-blue-100 p-4" aria-label="محدوده تجهیزات پروژه">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <p class="text-sm font-semibold text-slate-900">{{ equipment_project.name }} <bdi dir="ltr">{{ equipment_project.code }}</bdi></p>
+        <a class="erp-btn erp-btn--secondary" href="{{ equipment_project_url }}">بازگشت به داشبورد پروژه</a>
+    </div>
+    <p class="mt-2 text-xs leading-6 text-slate-600">تجهیزات براساس سوابق تخصیص مجاز این پروژه نمایش داده می‌شوند؛ مالکیت تجهیز در سطح شرکت باقی می‌ماند.</p>
+    {% if equipment_context_asset %}<p class="mt-2 text-sm font-semibold text-slate-900">تجهیز: {{ equipment_context_asset.name }} <bdi dir="ltr">{{ equipment_context_asset.code }}</bdi></p>{% endif %}
+</section>
+{% endif %}

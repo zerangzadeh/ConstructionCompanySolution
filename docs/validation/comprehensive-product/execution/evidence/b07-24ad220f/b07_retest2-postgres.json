@@ -1,0 +1,160 @@
+{
+  "database": "b07_retest2",
+  "postgresql": "18.6",
+  "transaction_read_only": "on",
+  "applied_migrations": 462,
+  "connections": [],
+  "provisioned_accounts": [],
+  "provisioned_memberships": [],
+  "targeted_account_audit": [],
+  "purchase_requests": [
+    {
+      "pk": "16752a1a-54de-4d4a-9a8f-fb4da83d36a1",
+      "organization__slug": "procurement-co",
+      "request_number": "B07-WF-REJECT",
+      "status": "rejected",
+      "decision_reason": "دلیل رد آزمایشی"
+    },
+    {
+      "pk": "cd312335-ffc2-4ace-939b-f426e5d9de61",
+      "organization__slug": "procurement-co",
+      "request_number": "B07-WF-1",
+      "status": "approved",
+      "decision_reason": ""
+    }
+  ],
+  "workflow_instances": [
+    {
+      "pk": "6db4c5ee-8860-430b-beb4-d2e809ccb83c",
+      "subject_id": "cd312335-ffc2-4ace-939b-f426e5d9de61",
+      "version_id": "51427fe1-69f0-471e-a7b9-4e45f46b69a5",
+      "version__status": "published",
+      "status": "completed"
+    },
+    {
+      "pk": "caf40174-0949-466a-a4fb-5694f8b06394",
+      "subject_id": "16752a1a-54de-4d4a-9a8f-fb4da83d36a1",
+      "version_id": "51427fe1-69f0-471e-a7b9-4e45f46b69a5",
+      "version__status": "published",
+      "status": "completed"
+    }
+  ],
+  "workflow_assignment_history": [
+    {
+      "work_item__instance__subject_id": "cd312335-ffc2-4ace-939b-f426e5d9de61",
+      "action": "claim",
+      "outcome": "",
+      "previous_state": "open",
+      "new_state": "claimed"
+    },
+    {
+      "work_item__instance__subject_id": "16752a1a-54de-4d4a-9a8f-fb4da83d36a1",
+      "action": "complete",
+      "outcome": "rejected",
+      "previous_state": "claimed",
+      "new_state": "completed"
+    },
+    {
+      "work_item__instance__subject_id": "16752a1a-54de-4d4a-9a8f-fb4da83d36a1",
+      "action": "claim",
+      "outcome": "",
+      "previous_state": "open",
+      "new_state": "claimed"
+    },
+    {
+      "work_item__instance__subject_id": "cd312335-ffc2-4ace-939b-f426e5d9de61",
+      "action": "release",
+      "outcome": "",
+      "previous_state": "claimed",
+      "new_state": "open"
+    },
+    {
+      "work_item__instance__subject_id": "cd312335-ffc2-4ace-939b-f426e5d9de61",
+      "action": "claim",
+      "outcome": "",
+      "previous_state": "open",
+      "new_state": "claimed"
+    },
+    {
+      "work_item__instance__subject_id": "cd312335-ffc2-4ace-939b-f426e5d9de61",
+      "action": "complete",
+      "outcome": "approved",
+      "previous_state": "claimed",
+      "new_state": "completed"
+    }
+  ],
+  "party_master": [
+    {
+      "pk": "3ee34451-86ae-4d5a-a5ec-616d9bcb9ce4",
+      "party_kind": "individual",
+      "tax_identifier": "B07-PERSON",
+      "archived_at": null,
+      "merged_into_id": null
+    },
+    {
+      "pk": "41042b58-3da7-4b17-81d4-e8c146e877c5",
+      "party_kind": "company",
+      "tax_identifier": "SYNTHETIC-030",
+      "archived_at": "2026-11-12 20:15:28.081639+00:00",
+      "merged_into_id": null
+    },
+    {
+      "pk": "590faca4-8bc7-425e-8b17-b80c119afe3b",
+      "party_kind": "company",
+      "tax_identifier": "",
+      "archived_at": null,
+      "merged_into_id": null
+    },
+    {
+      "pk": "5be331a3-23d0-4ba0-ad8b-86e3d80d65b6",
+      "party_kind": "individual",
+      "tax_identifier": "",
+      "archived_at": null,
+      "merged_into_id": null
+    },
+    {
+      "pk": "5beb07a2-d6ce-4290-97f2-1dd4cdae504b",
+      "party_kind": "company",
+      "tax_identifier": "B07-COMPANY",
+      "archived_at": null,
+      "merged_into_id": null
+    },
+    {
+      "pk": "9e0e1587-bd51-499b-a1d1-ed3ad363ceac",
+      "party_kind": "company",
+      "tax_identifier": "",
+      "archived_at": null,
+      "merged_into_id": null
+    },
+    {
+      "pk": "a72cfccb-e3d2-4147-8d4a-67b22eb582e1",
+      "party_kind": "company",
+      "tax_identifier": "",
+      "archived_at": "2026-11-12 20:15:00.644746+00:00",
+      "merged_into_id": null
+    },
+    {
+      "pk": "eaa92ca2-c16f-4743-818c-6a97bc2f09a7",
+      "party_kind": "company",
+      "tax_identifier": "",
+      "archived_at": "2026-11-12 20:15:50.247514+00:00",
+      "merged_into_id": "590faca4-8bc7-425e-8b17-b80c119afe3b"
+    }
+  ],
+  "contract_party": [
+    {
+      "pk": "b040ba8f-9dde-46b3-b0cc-aa0316c195b2",
+      "party_id": "41042b58-3da7-4b17-81d4-e8c146e877c5",
+      "organization__slug": "cep030"
+    }
+  ],
+  "order_supplier": [
+    {
+      "pk": "f3c3ffd4-ad45-4577-8d46-f419c5dcdc39",
+      "supplier_id": "41042b58-3da7-4b17-81d4-e8c146e877c5",
+      "organization__slug": "cep030"
+    }
+  ],
+  "material_foreign_keys": [],
+  "material_aliases": []
+}

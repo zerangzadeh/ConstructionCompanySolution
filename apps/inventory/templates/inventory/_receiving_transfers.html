@@ -1,0 +1,67 @@
+{% load erp_format %}
+{% include "components/page_header.html" with page_eyebrow="انبار و امانت" page_title=receiving_title only %}
+<nav class="mt-4 flex flex-wrap gap-2" aria-label="بخش‌های کنترل موجودی">
+  {% if can_open_summary %}<a class="erp-btn erp-btn--secondary" href="{% url 'inventory:custody_workbench' %}">خلاصه کنترل موجودی</a>{% endif %}
+  <a class="erp-btn {% if receiving_tab == 'inbound' %}erp-btn--primary{% else %}erp-btn--secondary{% endif %}" href="{{ inbound_url }}"{% if receiving_tab == 'inbound' %} aria-current="page"{% endif %}>در انتظار دریافت</a>
+  <a class="erp-btn {% if receiving_tab == 'transfer-history' %}erp-btn--primary{% else %}erp-btn--secondary{% endif %}" href="{{ transfer_history_url }}"{% if receiving_tab == 'transfer-history' %} aria-current="page"{% endif %}>سوابق انتقال</a>
+</nav>
+<div class="erp-reference-list mt-4">
+  {% include "components/filter_bar.html" with bar=filter_bar reference_layout=True fit_quick_filters=True inline_filters=True only %}
+  <div class="mt-3">
+    {% include "components/list_result_summary.html" with bar=filter_bar result_page=page_obj only %}
+  </div>
+</div>
+{% if page_obj %}
+<section class="erp-surface erp-workspace-section mt-3 overflow-hidden rounded-xl" aria-label="{{ receiving_title }}">
+  <div class="erp-table-wrap" role="region" aria-label="فهرست انتقال‌های ورودی" tabindex="0">
+    <table class="erp-workspace-records text-right">
+      <thead>
+        <tr>
+          <th class="px-4 py-3" scope="col">شماره انتقال</th>
+          <th class="px-4 py-3" scope="col">انبار مبدأ</th>
+          <th class="px-4 py-3" scope="col">انبار مقصد</th>
+          <th class="px-4 py-3" scope="col">تاریخ ارسال</th>
+          <th class="px-4 py-3" scope="col">اقلام</th>
+          <th class="px-4 py-3" scope="col">وضعیت</th>
+          <th class="px-4 py-3" scope="col">اقدام</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in page_obj %}
+        <tr class="border-t border-slate-100" data-receiving-transfer>
+          <td class="px-4 py-3 font-semibold" data-label="شماره انتقال"><bdi dir="ltr">{{ item.transfer_number }}</bdi></td>
+          <td class="px-4 py-3" data-label="انبار مبدأ">{{ item.source_warehouse.name }}</td>
+          <td class="px-4 py-3" data-label="انبار مقصد">{{ item.destination_warehouse.name }}</td>
+          <td class="px-4 py-3" data-label="تاریخ ارسال"><bdi dir="ltr">{{ item.dispatched_at|jalali_date }}</bdi></td>
+          <td class="px-4 py-3" data-label="اقلام">
+            {% with lines=item.lines.all %}
+              <ul class="space-y-1">
+                {% for line in lines|slice:":3" %}<li>{{ line.material.name }} · <bdi dir="ltr">{{ line.quantity|erp_quantity_fa }}</bdi> {{ line.unit_of_measure.symbol }}</li>{% endfor %}
+              </ul>
+              {% if lines|length > 3 %}<span class="text-slate-500">{{ lines|length|erp_quantity_fa }} قلم در جزئیات</span>{% endif %}
+            {% endwith %}
+          </td>
+          <td class="px-4 py-3" data-label="وضعیت">{% include "components/status_badge.html" with status=item.status label=item.get_status_display only %}</td>
+          <td class="px-4 py-3">
+            <a class="erp-btn {% if receiving_tab == 'inbound' %}erp-btn--primary{% else %}erp-btn--secondary{% endif %} erp-btn--compact" href="{% url 'inventory:transfer_detail' item.pk %}?tab={{ receiving_tab }}">
+              {% if receiving_tab == 'inbound' %}مشاهده و دریافت{% else %}مشاهده جزئیات{% endif %}
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "components/table_pagination.html" with page_obj=page_obj pagination_query=pagination_query only %}
+</section>
+{% else %}
+<div class="erp-surface mt-3 rounded-xl p-5 text-sm" role="status">
+  {% if filter_bar.form.errors or filter_bar.active_count %}
+    انتقالی با جست‌وجو و فیلترهای فعلی پیدا نشد.
+  {% elif receiving_tab == 'inbound' %}
+    در حال حاضر انتقالی برای دریافت در انبارهای مجاز شما وجود ندارد.
+  {% else %}
+    هنوز انتقال ورودی پذیرفته‌شده‌ای برای انبارهای مجاز شما ثبت نشده است.
+  {% endif %}
+</div>
+{% endif %}

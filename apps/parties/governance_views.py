@@ -147,7 +147,9 @@ def _render_detail(
         "party_governance_surface": True,
         "party_source_active": active,
         "can_edit": active and BusinessPermissionCode.PARTIES_CHANGE in codes,
-        "can_archive": active and BusinessPermissionCode.PARTIES_ARCHIVE in codes,
+        "can_archive": active
+        and BusinessPermissionCode.PARTIES_ARCHIVE in codes
+        and not party.merged_sources.filter(organization=request.organization).exists(),
         "can_assign_role": active
         and BusinessPermissionCode.PARTY_ROLES_ASSIGN in codes,
         "can_add_contact": active

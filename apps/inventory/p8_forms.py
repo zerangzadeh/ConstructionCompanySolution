@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django import forms
 
 from apps.inventory.forms import _StyledForm
@@ -11,6 +13,52 @@ from apps.inventory.models import (
 from apps.materials.models import Material
 from apps.organizations.authorization import get_active_membership, scope_queryset
 from apps.projects.models import Project
+from core.business_choices import SearchChoiceSelect, business_label
+
+
+def _use_searchable_choices(form: forms.Form, *field_names: str) -> None:
+    for name in field_names:
+        field = form.fields[name]
+        field.label_from_instance = business_label
+        field.empty_label = f"انتخاب {field.label}"
+        field.widget = SearchChoiceSelect(
+            attrs={
+                "class": "erp-input w-full",
+                "data-business-choice": name,
+                "data-business-names-primary": "true",
+                "data-local-choices": "true",
+                "data-placeholder": f"جست‌وجو یا انتخاب {field.label}",
+                "dir": "rtl",
+            },
+            choices=field.choices,
+        )
+
+
+class InboundTransferFilterForm(forms.Form):
+    q = forms.CharField(
+        label="جست‌وجوی انتقال",
+        required=False,
+        max_length=200,
+        widget=forms.TextInput(
+            attrs={
+                "class": "erp-input w-full",
+                "placeholder": "شماره انتقال یا نام انبار",
+            }
+        ),
+    )
+    destination = forms.ModelChoiceField(
+        label="انبار مقصد",
+        queryset=Warehouse.objects.none(),
+        required=False,
+        error_messages={
+            "invalid_choice": "انبار مقصد را از گزینه‌های مجاز انتخاب کنید."
+        },
+    )
+
+    def __init__(self, *args, destinations, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["destination"].queryset = destinations
+        _use_searchable_choices(self, "destination")
 
 
 class ReservationCreateForm(_StyledForm):
@@ -18,7 +66,9 @@ class ReservationCreateForm(_StyledForm):
     project = forms.ModelChoiceField(label="پروژه", queryset=Project.objects.none())
     warehouse = forms.ModelChoiceField(label="انبار", queryset=Warehouse.objects.none())
     material = forms.ModelChoiceField(label="مصالح", queryset=Material.objects.none())
-    quantity = forms.DecimalField(label="مقدار", min_value=0.0001, decimal_places=4)
+    quantity = forms.DecimalField(
+        label="مقدار", min_value=Decimal("0.0001"), decimal_places=4
+    )
     need_by = forms.DateField(
         label="تاریخ نیاز",
         required=False,
@@ -67,6 +117,7 @@ class ReservationCreateForm(_StyledForm):
         self.fields["serial"].queryset = InventorySerial.objects.filter(
             organization=organization
         ).order_by("material__name", "serial_number")
+        _use_searchable_choices(self, "project", "warehouse", "material")
 
     def clean(self):
         cleaned = super().clean()
@@ -99,6 +150,7 @@ class InventoryCountCreateForm(_StyledForm):
             membership=membership,
             project_lookup="warehouse__project_id",
         ).order_by("warehouse__name", "code")
+        _use_searchable_choices(self, "warehouse")
 
     def clean(self):
         cleaned = super().clean()
@@ -109,6 +161,42 @@ class InventoryCountCreateForm(_StyledForm):
         ):
             self.add_error("bin", "مکان باید متعلق به انبار انتخاب‌شده باشد.")
         return cleaned
+
+
+class InventoryCountSubmissionForm(_StyledForm):
+    def __init__(self, *args, lines, **kwargs):
+        self.lines = lines
+        super().__init__(*args, **kwargs)
+        for line in lines:
+            self.fields[f"quantity_{line.pk}"] = forms.DecimalField(
+                label="مقدار شمارش",
+                min_value=Decimal(0),
+                max_digits=18,
+                decimal_places=4,
+                initial=line.counted_quantity,
+                widget=forms.NumberInput(attrs={"class": "erp-input w-full"}),
+            )
+            self.fields[f"reason_{line.pk}"] = forms.CharField(
+                label="دلیل مغایرت",
+                required=False,
+                initial=line.variance_reason,
+                widget=forms.TextInput(attrs={"class": "erp-input w-full"}),
+            )
+
+    def rows(self):
+        return [
+            (line, self[f"quantity_{line.pk}"], self[f"reason_{line.pk}"])
+            for line in self.lines
+        ]
+
+    def quantities(self):
+        return {
+            line.pk: (
+                self.cleaned_data[f"quantity_{line.pk}"],
+                self.cleaned_data[f"reason_{line.pk}"],
+            )
+            for line in self.lines
+        }
 
 
 class InventoryTransferCreateForm(_StyledForm):
@@ -164,6 +252,7 @@ class InventoryTransferCreateForm(_StyledForm):
         self.fields["serial"].queryset = InventorySerial.objects.filter(
             organization=organization
         ).order_by("material__name", "serial_number")
+        _use_searchable_choices(self, "source_warehouse", "destination_warehouse", "material")
 
     def clean(self):
         cleaned = super().clean()

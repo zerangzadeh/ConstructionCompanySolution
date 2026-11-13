@@ -30,8 +30,9 @@ def bind_organization_time(form, organization) -> None:
             field.time_zone = zone
 
 
-def render_in_organization_time(request, *args, **kwargs):
-    organization = getattr(request, "organization", None)
+def render_in_organization_time(request, *args, organization=None, **kwargs):
+    if organization is None:
+        organization = getattr(request, "organization", None)
     name = getattr(getattr(organization, "settings", None), "timezone", None)
     with timezone.override(ZoneInfo(name) if name else None):
         return render(request, *args, **kwargs)

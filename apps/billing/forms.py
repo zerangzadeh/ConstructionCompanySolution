@@ -154,7 +154,9 @@ class GuaranteeRevisionForm(_CommercialEvidenceForm):
         widget=forms.DateInput(attrs={"type": "date"}),
     )
     expiry_kind = forms.ChoiceField(
-        label="نوع انقضای جدید", choices=EvidenceExpiryKind.choices, required=False
+        label="نوع انقضای جدید",
+        choices=[("", "حفظ نوع انقضای فعلی"), *EvidenceExpiryKind.choices],
+        required=False,
     )
     expires_on = forms.DateField(
         label="تاریخ انقضای جدید",
@@ -171,6 +173,9 @@ class GuaranteeRevisionForm(_CommercialEvidenceForm):
     def __init__(self, *args, organization, actor=None, source_id=None, **kwargs):
         super().__init__(*args, **kwargs)
         self._configure(organization, actor=actor, source_id=source_id)
+
+    def clean_expiry_kind(self):
+        return self.cleaned_data["expiry_kind"] or None
 
 
 class ComplianceEvidenceForm(_CommercialEvidenceForm):
@@ -336,7 +341,15 @@ class TaxpayerInvoiceForm(forms.Form):
         ).select_related("contract")
         self.fields["corrects"].queryset = TaxpayerInvoice.objects.filter(
             organization=organization, status="approved"
-        ).select_related("contract")
+        ).select_related("contract", "source_claim")
+        self.fields["source_claim"].label_from_instance = lambda claim: (
+            f"{claim.contract.contract_number} · صورت‌وضعیت {claim.claim_number}"
+            f" · بازنگری {claim.revision_number}"
+        )
+        self.fields["corrects"].label_from_instance = lambda invoice: (
+            f"{invoice.contract.contract_number} · صورت‌وضعیت {invoice.source_claim.claim_number}"
+            f" · {invoice.get_record_kind_display()} · نسخه {invoice.version}"
+        )
 
 
 class ContractorComplianceAssessmentForm(forms.Form):
@@ -447,13 +460,16 @@ class PayableMeasurementForm(JalaliDateMixin, forms.Form):
 
     def __init__(self, *args, organization, membership=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["contract_item"].queryset = ContractItem.objects.none()
+        field = self.fields["contract_item"]
+        field.label_from_instance = lambda item: (
+            f"{item.contract.contract_number} · {item.description}"
+        )
         if (
             not isinstance(membership, OrganizationMembership)
             or membership.organization_id != organization.pk
         ):
             return
-        self.fields["contract_item"].queryset = scope_queryset(
+        field.queryset = scope_queryset(
             ContractItem.objects.filter(
                 organization=organization,
                 contract__direction=ContractDirection.PAYABLE,

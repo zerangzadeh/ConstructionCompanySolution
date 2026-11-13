@@ -1,0 +1,84 @@
+[
+  {
+    "route": "billing:claim_detail",
+    "url": "/billing/claims/68f4a14c-df3d-43b4-8228-95e495ff59ca/",
+    "method": "GET",
+    "status": 200,
+    "sha256": "6e4b4bf821f1c0deaa7e920345561631d4f4d7adc256c01c20072fe76f12c558",
+    "bytes": 7374
+  },
+  {
+    "route": "billing:claim_detail",
+    "url": "/billing/claims/68f4a14c-df3d-43b4-8228-95e495ff59ca/",
+    "method": "GET",
+    "status": 200,
+    "sha256": "79f7bc794b619cc0c1058056407461119ace81079cb0f86f0c6713298d4e9035",
+    "bytes": 4446
+  },
+  {
+    "route": "contracts:term_insurance_select",
+    "url": "/contracts/cb9a5639-7acc-4dc2-99ab-91a44bb441e3/terms/8a8fdd74-fcac-47de-a785-b68a2f2d199b/insurance/",
+    "method": "POST",
+    "status": 302,
+    "draft_only": "8a8fdd74-fcac-47de-a785-b68a2f2d199b"
+  },
+  {
+    "route": "billing:statutory_operations_dashboard",
+    "url": "/billing/statutory-operations/",
+    "method": "GET",
+    "status": 200
+  },
+  {
+    "route": "billing:taxpayer_invoice_create",
+    "url": "/billing/taxpayer-invoices/new/",
+    "method": "GET",
+    "status": 200
+  },
+  {
+    "route": "billing:contractor_compliance_create",
+    "url": "/billing/contractor-compliance/new/",
+    "method": "GET",
+    "status": 200
+  },
+  {
+    "route": "billing:taxpayer_invoice_create",
+    "url": "/billing/taxpayer-invoices/new/",
+    "method": "POST",
+    "status": 200,
+    "outcome": "BLOCKED: No applicable independently supported statutory activation policy; safe refusal",
+    "no_record_created": true,
+    "feedback": [
+      "['نسخه مقرراتی پلتفرمِ منتشرشده و مؤثر وجود ندارد.']"
+    ]
+  },
+  {
+    "route": "billing:contractor_compliance_create",
+    "url": "/billing/contractor-compliance/new/",
+    "method": "POST",
+    "status": 200,
+    "outcome": "BLOCKED: No applicable independently supported statutory activation policy; safe refusal",
+    "no_record_created": true,
+    "feedback": [
+      "['نسخه مقرراتی پلتفرمِ منتشرشده و مؤثر وجود ندارد.']"
+    ]
+  },
+  {
+    "check": "real-postgresql-concurrency",
+    "certificate": "56e28d9a-a0d5-406a-8373-427beaa6a72b",
+    "submissions": [
+      "eb3e553e-6f2d-4bf8-a6fe-fe809676233a",
+      "eb3e553e-6f2d-4bf8-a6fe-fe809676233a"
+    ],
+    "submission_audits": 1,
+    "decisions": [
+      "ValidationError",
+      "approved-or-idempotent"
+    ],
+    "approval_audits": 1,
+    "status": "approved"
+  },
+  {
+    "check": "no_implicit_gl_treasury_obligation",
+    "PASS": true
+  }
+]

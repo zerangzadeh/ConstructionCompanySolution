@@ -180,14 +180,27 @@ def create_equipment(
 
 
 def get_organization_equipment(
-    *, user: User, organization: Organization, include_archived: bool = False
+    *,
+    user: User,
+    organization: Organization,
+    include_archived: bool = False,
+    project: Project | None = None,
 ) -> QuerySet[Equipment]:
     _require_permission(
         organization=organization,
         user=user,
         permission=BusinessPermissionCode.EQUIPMENT_VIEW,
+        project=project,
     )
     equipment = Equipment.objects.filter(organization=organization)
+    if project is not None:
+        _require_same_organization(organization, project=project)
+        if project.deleted_at:
+            raise PermissionDenied("پروژه در دسترس نیست.")
+        assignments = get_organization_equipment_assignments(
+            user=user, organization=organization, project=project
+        )
+        equipment = equipment.filter(pk__in=assignments.values("equipment_id"))
     if not include_archived:
         equipment = equipment.filter(archived_at__isnull=True)
     return equipment

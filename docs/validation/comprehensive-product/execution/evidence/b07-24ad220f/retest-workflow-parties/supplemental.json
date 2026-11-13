@@ -1,0 +1,274 @@
+{
+  "workflow source submission": {
+    "route": "workflow source submission",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/procurement/requests/cd312335-ffc2-4ace-939b-f426e5d9de61/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/requests/cd312335-ffc2-4ace-939b-f426e5d9de61/submit/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/requests/cd312335-ffc2-4ace-939b-f426e5d9de61/submit/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "duplicate submit"
+      }
+    ],
+    "design": [],
+    "status": "PASS",
+    "persisted": {
+      "source": "cd312335-ffc2-4ace-939b-f426e5d9de61",
+      "instance": "6db4c5ee-8860-430b-beb4-d2e809ccb83c",
+      "version": "51427fe1-69f0-471e-a7b9-4e45f46b69a5",
+      "submission_events": 1
+    }
+  },
+  "purchase workflow rejection reason": {
+    "route": "purchase workflow rejection reason",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/procurement/requests/16752a1a-54de-4d4a-9a8f-fb4da83d36a1/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/requests/16752a1a-54de-4d4a-9a8f-fb4da83d36a1/submit/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/workbench/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/898e2916-efd1-49ed-ba42-92544e593609/claim/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/workbench/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/898e2916-efd1-49ed-ba42-92544e593609/action/",
+        "status": 409,
+        "expected": [
+          409
+        ],
+        "case": "reasonless forged decision"
+      },
+      {
+        "method": "GET",
+        "url": "/procurement/requests/16752a1a-54de-4d4a-9a8f-fb4da83d36a1/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/requests/16752a1a-54de-4d4a-9a8f-fb4da83d36a1/reject/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      }
+    ],
+    "design": [],
+    "persisted": {
+      "source_state": "rejected",
+      "work_item_state": "completed",
+      "reason_audit": "دلیل رد آزمایشی",
+      "reasonless_unchanged": true
+    },
+    "reasonless_reject_control": false,
+    "status": "PASS"
+  },
+  "contract Party reuse": {
+    "route": "contract Party reuse",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/create/",
+        "status": 200,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "foreign contract Party forgery"
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/create/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      }
+    ],
+    "design": [],
+    "status": "PASS",
+    "persisted": {
+      "contract": "b040ba8f-9dde-46b3-b0cc-aa0316c195b2",
+      "reused_party": "41042b58-3da7-4b17-81d4-e8c146e877c5",
+      "foreign_rejected": true,
+      "archived_excluded": true
+    }
+  },
+  "procurement Party reuse": {
+    "route": "procurement Party reuse",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/procurement/orders/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/orders/create/",
+        "status": 400,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "forged supplier selection"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/orders/create/",
+        "status": 400,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "forged supplier selection"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/orders/create/",
+        "status": 400,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "forged supplier selection"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/orders/create/",
+        "status": 400,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "forged supplier selection"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/orders/create/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      }
+    ],
+    "design": [
+      "purchase-order-party-selector"
+    ],
+    "inactive_role_visible": false,
+    "persisted": {
+      "order": "f3c3ffd4-ad45-4577-8d46-f419c5dcdc39",
+      "reused_party": "41042b58-3da7-4b17-81d4-e8c146e877c5",
+      "forged_writes": 0,
+      "invalid_audit_delta": 0
+    },
+    "status": "PASS"
+  },
+  "protected Party archive": {
+    "route": "protected Party archive",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/parties/governance/590faca4-8bc7-425e-8b17-b80c119afe3b/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/590faca4-8bc7-425e-8b17-b80c119afe3b/archive/",
+        "status": 403,
+        "expected": [
+          403,
+          500
+        ],
+        "case": "protected merge reference archive"
+      }
+    ],
+    "design": [],
+    "persisted": {
+      "merge_reference_preserved": true,
+      "audit_delta": 0,
+      "archive_control_count": 0
+    },
+    "status": "PASS"
+  }
+}

@@ -14,3 +14,9 @@ Real Chrome and isolated PostgreSQL verified scoped daily and field journeys, al
 **Three findings remain for PO review.** Daily Report self-approval and identical labor POST replay still fail the UAT expectation. The Daily Report Return branch needs a policy decision. Proposal review remains blocked in the operator UI, with the existing independent protected POST verified. Formal acceptance is pending.
 
 **Next recommended wave is B04** with `UAT-05`, `UAT-06`, `CV-EQP-01` and `CV-EXP-01`. No B04 validation was started. [Execution plan](../TEST_EXECUTION_PLAN.md)
+
+## Return implementation closeout · 2026-11-12
+
+BON-DEF-0017 is FIXED / RETESTED_PASS after the complete Return → correction → resubmission → independent approval journey. Latest derived B03 results are **22 PASS / 0 FAIL / 0 BLOCKED / 0 NOT_RUN**, with 21 primary rows carried forward and the remaining approval row verified under the approved contract. Formal PO acceptance remains pending. [Implementation report](B03_RETURN_IMPLEMENTATION_REPORT.md) · [Latest overlay](B03_RETURN_IMPLEMENTATION_RETEST.csv)
+
+Earlier counts and PO-decision statements above describe their dated historical checkpoint. This task did not start B04.

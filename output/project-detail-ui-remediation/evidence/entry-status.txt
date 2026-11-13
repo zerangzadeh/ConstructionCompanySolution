@@ -1,0 +1,180 @@
+## main...origin/main
+ M ROADMAP.md
+ M apps/accounts/views.py
+ M apps/audit/models.py
+ M apps/billing/forms.py
+ M apps/billing/services.py
+ M apps/billing/templates/billing/commercial_record_detail.html
+ M apps/billing/templates/billing/payable_measurement_detail.html
+ M apps/billing/templates/billing/progress_detail.html
+ M apps/billing/views.py
+ M apps/billing/workflow.py
+ M apps/contracts/contractual_services.py
+ M apps/contracts/forms.py
+ M apps/contracts/views.py
+ M apps/daily_reports/admin.py
+ M apps/daily_reports/models.py
+ M apps/daily_reports/print_outputs.py
+ M apps/daily_reports/references.py
+ M apps/daily_reports/services.py
+ M apps/daily_reports/templates/daily_reports/detail.html
+ M apps/daily_reports/templates/daily_reports/list.html
+ M apps/daily_reports/test_b03_final_remediation.py
+ M apps/daily_reports/test_list_reference.py
+ M apps/daily_reports/test_workflow.py
+ M apps/daily_reports/urls.py
+ M apps/daily_reports/views.py
+ M apps/daily_reports/workflow.py
+ M apps/daily_reports/xlsx_exports.py
+ M apps/documents/forms.py
+ M apps/documents/templates/documents/detail.html
+ M apps/documents/templates/documents/upload.html
+ M apps/equipment/cost_services.py
+ M apps/equipment/forms.py
+ M apps/equipment/p8_services.py
+ M apps/equipment/services.py
+ M apps/equipment/templates/equipment/detail.html
+ M apps/equipment/templates/equipment/list.html
+ M apps/equipment/templates/equipment/operations_workbench.html
+ M apps/equipment/views.py
+ M apps/estimates/templates/estimates/detail.html
+ M apps/estimates/views.py
+ M apps/expenses/views.py
+ M apps/inventory/p8_forms.py
+ M apps/inventory/p8_services.py
+ M apps/inventory/p8_views.py
+ M apps/inventory/templates/inventory/count_detail.html
+ M apps/inventory/templates/inventory/custody_form.html
+ M apps/inventory/templates/inventory/custody_workbench.html
+ M apps/inventory/templates/inventory/transfer_detail.html
+ M apps/inventory/templates/inventory/warehouse_list.html
+ M apps/inventory/test_p8_s05_s11.py
+ M apps/materials/governance_views.py
+ M apps/organizations/access_services.py
+ M apps/organizations/authorization.py
+ M apps/organizations/context_processors.py
+ M apps/organizations/forms.py
+ M apps/organizations/models.py
+ M apps/organizations/permission_registry.py
+ M apps/organizations/policy_services.py
+ M apps/organizations/role_defaults.py
+ M apps/organizations/templates/organizations/member_authorization.html
+ M apps/organizations/templates/organizations/platform_policy_catalog.html
+ M apps/organizations/templates/organizations/protected_operation_catalog.html
+ M apps/organizations/test_wave01_ux_remediation.py
+ M apps/organizations/views.py
+ M apps/parties/governance_views.py
+ M apps/parties/templates/parties/list.html
+ M apps/parties/views.py
+ M apps/procurement/forms.py
+ M apps/procurement/templates/procurement/portal_context.html
+ M apps/procurement/templates/procurement/portal_invitation_manage.html
+ M apps/procurement/templates/procurement/portal_receipt.html
+ M apps/procurement/templates/procurement/rfq_detail.html
+ M apps/procurement/test_mvp04b1_browser.py
+ M apps/procurement/views.py
+ M apps/projects/dashboard.py
+ M apps/projects/static/projects/detail_dashboard.css
+ M apps/projects/templates/projects/detail.html
+ M apps/projects/views.py
+ M apps/quality/record_review.py
+ M apps/quality/templates/quality/detail.html
+ M apps/quality/urls.py
+ M apps/quality/views.py
+ M apps/reporting/views.py
+ M apps/safety/record_review.py
+ M apps/safety/templates/safety/detail.html
+ M apps/safety/urls.py
+ M apps/safety/views.py
+ M apps/workflows/registry.py
+ M apps/workflows/runtime.py
+ M apps/workflows/templates/workflows/_work_item_row.html
+ M apps/workflows/views.py
+ M apps/workflows/workbench.py
+ M apps/workforce/static/workforce/field_choices.js
+ M core/home.py
+ M core/organization_time.py
+ M core/product_surface.py
+ M docs/validation/comprehensive-product/APPROVED_DESIGN_CONFORMANCE_REGISTRY.md
+ M docs/validation/comprehensive-product/DEFECT_REGISTER.csv
+ M docs/validation/comprehensive-product/DEFECT_REGISTER.md
+ M docs/validation/comprehensive-product/TEST_EXECUTION_MATRIX_MVP.csv
+ M docs/validation/comprehensive-product/USER_JOURNEY_CATALOG.md
+ M docs/validation/comprehensive-product/execution/WAVE_03_SUMMARY.md
+ M output/mvp-03/remediation-20261030/browser/f61-owner-P-project-hub-desktop.png
+ M output/mvp-03/remediation-20261030/browser/f61-owner-Q-project-hub-mobile.png
+ M output/mvp-03/remediation-20261030/browser/f61-owner-R-project-contracts-filter.png
+ M templates/components/record_review_history.html
+ M tests/test_b04_remediation.py
+?? apps/audit/migrations/0060_daily_report_return.py
+?? apps/daily_reports/management/commands/publish_daily_report_return.py
+?? apps/daily_reports/migrations/0008_daily_report_return.py
+?? apps/daily_reports/migrations/0009_revision_guards.py
+?? apps/daily_reports/return_configuration.py
+?? apps/daily_reports/return_workflow.py
+?? apps/daily_reports/revision_services.py
+?? apps/daily_reports/revision_views.py
+?? apps/daily_reports/submission_snapshots.py
+?? apps/daily_reports/templates/daily_reports/_revision_controls.html
+?? apps/daily_reports/templates/daily_reports/correction.html
+?? apps/daily_reports/templates/daily_reports/correction_entry.html
+?? apps/daily_reports/test_return_revisions.py
+?? apps/equipment/templates/equipment/_project_context.html
+?? apps/equipment/usage_context.py
+?? apps/inventory/templates/inventory/_receiving_transfers.html
+?? apps/inventory/test_inbound_transfers.py
+?? apps/organizations/migrations/0130_daily_report_correction_permission.py
+?? apps/procurement/static/
+?? apps/projects/static/projects/project_dashboard.js
+?? apps/projects/test_project_operations_dashboard.py
+?? apps/workflows/migrations/0028_daily_report_return_catalog.py
+?? core/record_review.py
+?? docs/validation/comprehensive-product/execution/B03_B04_INTEGRATION_GATE_REPORT.md
+?? docs/validation/comprehensive-product/execution/B03_RETURN_IMPLEMENTATION_REPORT.md
+?? docs/validation/comprehensive-product/execution/B03_RETURN_IMPLEMENTATION_RETEST.csv
+?? docs/validation/comprehensive-product/execution/B04_FINAL_REMEDIATION_RETEST.csv
+?? docs/validation/comprehensive-product/execution/B04_REMEDIATION_REPORT.md
+?? docs/validation/comprehensive-product/execution/B05_CLOSEOUT_REPORT.md
+?? docs/validation/comprehensive-product/execution/B05_EXECUTION_REPORT.md
+?? docs/validation/comprehensive-product/execution/B05_FINAL_RETEST.csv
+?? docs/validation/comprehensive-product/execution/B05_ORIGINAL_RESULTS.csv
+?? docs/validation/comprehensive-product/execution/B06_EXECUTION_REPORT.md
+?? docs/validation/comprehensive-product/execution/B06_INBOUND_TRANSFERS_ENHANCEMENT.md
+?? docs/validation/comprehensive-product/execution/B06_ORIGINAL_RESULTS.csv
+?? docs/validation/comprehensive-product/execution/B07_EXECUTION_REPORT.md
+?? docs/validation/comprehensive-product/execution/B07_ORIGINAL_RESULTS.csv
+?? docs/validation/comprehensive-product/execution/B08_EXECUTION_REPORT.md
+?? docs/validation/comprehensive-product/execution/B09_EXECUTION_REPORT.md
+?? docs/validation/comprehensive-product/execution/B09_FINAL_RETEST.csv
+?? docs/validation/comprehensive-product/execution/B09_ORIGINAL_RESULTS.csv
+?? docs/validation/comprehensive-product/execution/B10_FINAL_EXECUTION_REPORT.md
+?? docs/validation/comprehensive-product/execution/B10_FINAL_RETEST.csv
+?? docs/validation/comprehensive-product/execution/B11_EXECUTION_REPORT.md
+?? docs/validation/comprehensive-product/execution/B11_FINAL_RETEST.csv
+?? docs/validation/comprehensive-product/execution/WAVE_05_SUMMARY.md
+?? docs/validation/comprehensive-product/execution/WAVE_06_SUMMARY.md
+?? docs/validation/comprehensive-product/execution/WAVE_07_SUMMARY.md
+?? docs/validation/comprehensive-product/execution/WAVE_08_SUMMARY.md
+?? docs/validation/comprehensive-product/execution/WAVE_09_SUMMARY.md
+?? docs/validation/comprehensive-product/execution/WAVE_10_SUMMARY.md
+?? docs/validation/comprehensive-product/execution/WAVE_11_SUMMARY.md
+?? docs/validation/comprehensive-product/execution/evidence/b03-b04-integration-20261112/
+?? docs/validation/comprehensive-product/execution/evidence/b03-return-24ad220f-20261112/
+?? docs/validation/comprehensive-product/execution/evidence/b04-final-remediation-24ad220f/
+?? docs/validation/comprehensive-product/execution/evidence/b05-24ad220f/
+?? docs/validation/comprehensive-product/execution/evidence/b05-closeout-20261112/
+?? docs/validation/comprehensive-product/execution/evidence/b06-24ad220f/
+?? docs/validation/comprehensive-product/execution/evidence/b06-inbound-enhancement/
+?? docs/validation/comprehensive-product/execution/evidence/b07-24ad220f/
+?? docs/validation/comprehensive-product/execution/evidence/b08-24ad220f/
+?? docs/validation/comprehensive-product/execution/evidence/b09-24ad220f/
+?? docs/validation/comprehensive-product/execution/evidence/b10-24ad220f/
+?? docs/validation/comprehensive-product/execution/evidence/b11-24ad220f/
+?? output/project-detail-redesign/
+?? templates/components/record_decision_page.html
+?? tests/test_b04_final_remediation.py
+?? tests/test_b05_validation.py
+?? tests/test_b07_remediation.py
+?? tests/test_b08_reporting.py
+?? tests/test_b09_remediation.py
+?? tests/test_b10_validation.py

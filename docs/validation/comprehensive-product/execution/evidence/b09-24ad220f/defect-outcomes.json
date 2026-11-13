@@ -1,0 +1,106 @@
+[
+  {
+    "id": "BON-DEF-0054",
+    "title": "Standalone document expiry calendar",
+    "severity": "P2",
+    "execution_ids": [
+      "INV-DOCUMENTS-UPLOAD--CV-DOC-01"
+    ],
+    "expected": "Use the shared Jalali datetime input and store the selected aware expiry.",
+    "observed": "The standalone upload used a browser-native Gregorian datetime field.",
+    "fix": "apps/documents/forms.py",
+    "retest": "RETESTED_PASS"
+  },
+  {
+    "id": "BON-DEF-0055",
+    "title": "Employee document routes inherit MVP exposure",
+    "severity": "P1",
+    "execution_ids": [
+      "INV-DOCUMENTS-EMPLOYEE-LIST--CV-DOC-01",
+      "INV-DOCUMENTS-EMPLOYEE-DETAIL--CV-DOC-01",
+      "INV-DOCUMENTS-EMPLOYEE-VERSION-DOWNLOAD--CV-DOC-01"
+    ],
+    "expected": "The MVP exposure gate excludes full ESS document routes.",
+    "observed": "The three routes inherited the shared MVP capability. The original unlinked actors were denied by domain authorization.",
+    "fix": "core/product_surface.py",
+    "retest": "RETESTED_PASS"
+  },
+  {
+    "id": "BON-DEF-0056",
+    "title": "Contractual record creation returns HTTP 500",
+    "severity": "P1",
+    "execution_ids": [
+      "INV-CONTRACTS-CONTRACTUAL-CREATE--CV-DOC-02"
+    ],
+    "expected": "Valid inputs create one draft through the existing contractual service.",
+    "observed": "The ModelForm validated an incomplete record without its required project before the create service ran.",
+    "fix": "apps/contracts/forms.py; apps/contracts/views.py",
+    "retest": "RETESTED_PASS"
+  },
+  {
+    "id": "BON-DEF-0057",
+    "title": "Exact contractual evidence retry duplicates the link and audit",
+    "severity": "P1",
+    "execution_ids": [
+      "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-CONTRACTUAL--CV-DOC-02",
+      "INV-DOCUMENTS-EVIDENCE-REGISTER--CV-DOC-02"
+    ],
+    "expected": "An identical actor, record, label and version retry retains one exact relation and audit.",
+    "observed": "Two PostgreSQL connections submitting identical evidence created two durable links.",
+    "fix": "apps/contracts/contractual_services.py",
+    "retest": "RETESTED_PASS"
+  },
+  {
+    "id": "BON-DEF-0058",
+    "title": "Contractual stale or invalid action lacks controlled feedback",
+    "severity": "P2",
+    "execution_ids": [
+      "INV-CONTRACTS-CONTRACTUAL-SUBMIT--CV-DOC-02",
+      "INV-CONTRACTS-CONTRACTUAL-DECIDE--CV-DOC-02",
+      "INV-CONTRACTS-CONTRACTUAL-REVISION--CV-DOC-02",
+      "INV-CONTRACTS-CONTRACTUAL-WITHDRAW--CV-DOC-02"
+    ],
+    "expected": "Invalid or stale actions preserve state and show understandable Persian feedback.",
+    "observed": "Stale transitions raised unhandled validation errors. Invalid decision input redirected without feedback.",
+    "fix": "apps/contracts/views.py",
+    "retest": "RETESTED_PASS"
+  },
+  {
+    "id": "BON-DEF-0059",
+    "title": "Standalone document forms display a hidden Treasury target",
+    "severity": "P2",
+    "execution_ids": [
+      "INV-DOCUMENTS-UPLOAD--CV-DOC-01",
+      "INV-DOCUMENTS-LINK-ADD--CV-DOC-01"
+    ],
+    "expected": "Only MVP-exposed target fields are presented and selectable.",
+    "observed": "The original Chrome forms rendered a Treasury Movement selector on both upload and detail.",
+    "fix": "apps/documents/forms.py and the upload/detail templates",
+    "retest": "RETESTED_PASS"
+  },
+  {
+    "id": "BON-DEF-0060",
+    "title": "Guarantee correction loses its inherited expiry date",
+    "severity": "P2",
+    "execution_ids": [
+      "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-GUARANTEE--CV-DOC-02",
+      "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-GUARANTEE--CV-DOC-02"
+    ],
+    "expected": "A blank optional expiry type inherits the approved predecessor type and date.",
+    "observed": "The form sent an empty string. The correction lost the inherited date and failed validation.",
+    "fix": "apps/billing/forms.py",
+    "retest": "RETESTED_PASS"
+  },
+  {
+    "id": "BON-DEF-0061",
+    "title": "Document detail omits a configured access deadline",
+    "severity": "P2",
+    "execution_ids": [
+      "INV-DOCUMENTS-DETAIL--CV-DOC-01"
+    ],
+    "expected": "Display the configured deadline as a Jalali datetime to authorized readers.",
+    "observed": "The original detail omitted the access deadline for an active document.",
+    "fix": "apps/documents/templates/documents/detail.html",
+    "retest": "RETESTED_PASS"
+  }
+]

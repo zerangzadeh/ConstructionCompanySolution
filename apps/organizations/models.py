@@ -949,6 +949,7 @@ class BusinessPermissionCode(models.TextChoices):
     )
     DAILY_REPORTS_SUBMIT = "daily_reports.submit", "ارسال گزارش روزانه"
     DAILY_REPORTS_APPROVE = "daily_reports.approve", "تأیید گزارش روزانه"
+    DAILY_REPORTS_CORRECT = "daily_reports.correct", "اصلاح نسخه بازگشتی گزارش روزانه"
 
     FIELD_OBSERVATIONS_VIEW = "field_observations.view", "مشاهده مشاهدات میدانی"
     FIELD_OBSERVATIONS_CAPTURE = (

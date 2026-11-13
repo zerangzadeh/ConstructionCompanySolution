@@ -1,0 +1,64 @@
+{
+  "INV-AUDIT-LOG--CV-REP-01": {
+    "status": "PASS",
+    "real_transition_links": [
+      {
+        "source_model": "procurement.GoodsReceipt",
+        "source_id": "bfda6d97-ae74-4c47-bb41-d15feb92a61d",
+        "event": "63d616c5-992e-46d4-b3a5-ffa4a03ec387",
+        "action": "goods_receipt.posted",
+        "actor": "2f854581-0b12-4887-928f-0ad684e005b0"
+      },
+      {
+        "source_model": "inventory.StockTransaction",
+        "source_id": "431e2cef-f6ac-44bc-a0e4-c5c5068693fb",
+        "event": "2135ab33-ad19-4858-9802-f6418f748af6",
+        "action": "stock_transaction.posted",
+        "actor": "2f854581-0b12-4887-928f-0ad684e005b0"
+      },
+      {
+        "source_model": "billing.ProgressClaim",
+        "source_id": "5f74a2c3-d2d5-4665-950c-22d3bffccbbd",
+        "event": "bf78b2c1-9903-4899-8874-64882e8a53e6",
+        "action": "progress_claim.returned",
+        "actor": "c0b4b28e-a19e-4077-97c9-293f269b8a82"
+      },
+      {
+        "source_model": "daily_reports.DailyReport",
+        "source_id": "9424c0ee-9df7-42f8-a886-97a5f2b1b2d4",
+        "event": "35ac43d2-f0bd-4d7d-8f72-04c4c62a5d99",
+        "action": "daily_report.correction_created",
+        "actor": "c8136278-4978-4af7-8d7b-5952ab997705"
+      }
+    ],
+    "events": 72,
+    "sample": [
+      {
+        "id": "4a90b3ce-9089-4ae6-8011-ff5a666d3404",
+        "actor__username": "procurement-owner",
+        "action": "reporting.metric_refreshed",
+        "created_at": "2026-11-12 21:04:41.084515+00:00",
+        "entity_type": "reporting.MetricResult",
+        "entity_id": "57383e57-b0cb-4037-803c-0a2776359419"
+      },
+      {
+        "id": "3a7b745e-a4bb-4671-96f6-34d2b84975bf",
+        "actor__username": "procurement-owner",
+        "action": "reporting.metric_refreshed",
+        "created_at": "2026-11-12 21:04:40.666131+00:00",
+        "entity_type": "reporting.MetricResult",
+        "entity_id": "b67c3b84-420f-44db-8eee-5fd67ea887aa"
+      },
+      {
+        "id": "896b11f9-1ae0-4ee8-b0d7-101722e91523",
+        "actor__username": "procurement-owner",
+        "action": "expense.recorded",
+        "created_at": "2026-11-12 21:04:31.695450+00:00",
+        "entity_type": "expense",
+        "entity_id": "65827a9b-a36d-4fa7-9029-e99fad1842d0"
+      }
+    ],
+    "security": "Tenant/project/no-permission probes passed",
+    "immutability": "Instance save/delete and queryset update/delete rejected"
+  }
+}

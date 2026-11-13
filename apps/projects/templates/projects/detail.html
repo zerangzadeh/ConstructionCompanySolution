@@ -29,27 +29,36 @@
                     <div><dt>شرکت</dt><dd>{{ request.organization.name }}</dd></div>
                     <div><dt>کد پروژه</dt><dd><bdi dir="ltr">{{ project.code }}</bdi></dd></div>
                     <div><dt>تاریخ شروع</dt><dd><bdi dir="ltr">{{ project.start_date|jalali_date|default:"—" }}</bdi></dd></div>
+                    {% if project.end_date %}<div><dt>تاریخ پایان</dt><dd><bdi dir="ltr">{{ project.end_date|jalali_date }}</bdi></dd></div>{% endif %}
                 </dl>
             </div>
             {% with photo=related_documents.first_photo %}
                 {% if photo %}
-                    <img class="project-hero__image" src="{{ photo.photo_preview_url }}" alt="{{ photo.title }}" width="216" height="116">
-                {% else %}
-                    <div class="project-hero__placeholder" aria-hidden="true">{% include "components/form_icon.html" with icon="layers" only %}</div>
+                    <img class="project-hero__image" data-project-photo hidden src="{{ photo.photo_preview_url }}" alt="{{ photo.title }}" width="160" height="90">
                 {% endif %}
+                <div class="project-hero__placeholder" data-project-photo-fallback aria-hidden="true">{% include "components/form_icon.html" with icon="layers" only %}</div>
             {% endwith %}
         </div>
 
         <nav class="erp-project-tabs" aria-label="بخش‌های پروژه">
             <a class="is-current" href="#overview" aria-current="location">داشبورد</a>
             <a href="#information">اطلاعات اصلی</a>
-            {% if dashboard.controls_url %}<a href="#progress">برنامه و پیشرفت</a>{% endif %}
-            {% for item in commercial_summary %}<a href="{{ item.list_url }}">{{ item.label }}</a>{% endfor %}
-            {% if dashboard.sites_url %}<a href="{{ dashboard.sites_url }}">کارگاه‌ها</a>{% endif %}
-            {% if cost_projection %}<a href="#costs">هزینه‌ها</a>{% endif %}
-            <a href="#recent">آخرین ثبت‌ها</a>
-            {% include "components/related_documents_nav.html" %}
-            {% if dashboard.gallery_url %}<a href="{{ dashboard.gallery_url }}">گالری تصاویر</a>{% endif %}
+            <a href="#workplan">ساختار شکست و فعالیت‌ها</a>
+            <a href="#progress">پیشرفت پروژه</a>
+            <details class="project-nav-more">
+                <summary>بخش‌های دیگر <span aria-hidden="true">⌄</span></summary>
+                <div>
+                    {% for item in commercial_summary %}<a href="{{ item.list_url }}">{{ item.label }}</a>{% endfor %}
+                    {% if dashboard.sites_url %}<a href="{{ dashboard.sites_url }}">کارگاه‌ها</a>{% endif %}
+                    {% if dashboard.equipment_url %}<a href="{{ dashboard.equipment_url }}">تجهیزات پروژه</a>{% endif %}
+                    {% if dashboard.reports_url %}<a href="{{ dashboard.reports_url }}">گزارش‌های روزانه</a>{% endif %}
+                    {% for link in dashboard.quick_links %}<a href="{{ link.url }}">{{ link.label }}</a>{% endfor %}
+                    {% if cost_projection %}<a href="#costs">هزینه‌ها</a>{% endif %}
+                    <a href="#recent">آخرین ثبت‌ها</a>
+                    {% include "components/related_documents_nav.html" %}
+                    {% if dashboard.gallery_url %}<a href="{{ dashboard.gallery_url }}">گالری تصاویر</a>{% endif %}
+                </div>
+            </details>
         </nav>
     </header>
 
@@ -69,9 +78,77 @@
         {% endif %}
     </section>
 
-    {% if cost_projection %}{% include "projects/dashboard_budget.html" %}{% endif %}
+    <section id="workplan" class="project-workplan" aria-labelledby="project-workplan-heading">
+        <div class="project-workplan__intro">
+            <span class="project-workplan__icon" aria-hidden="true">{% include "components/form_icon.html" with icon="layers" only %}</span>
+            <div><p class="project-workplan__eyebrow">مرکز عملیات پروژه</p><h2 id="project-workplan-heading">ساختار شکست کار و فعالیت‌ها</h2></div>
+        </div>
+        {% if dashboard.work != None %}
+            <dl class="project-workplan__stats">
+                <div><dd>{{ dashboard.work.nodes|erp_quantity_fa }}</dd><dt>گره ساختار شکست</dt></div>
+                <div><dd>{{ dashboard.work.activities|erp_quantity_fa }}</dd><dt>فعالیت پروژه</dt></div>
+                <div><dd>{{ dashboard.work.active|erp_quantity_fa }}</dd><dt>فعالیت در حال اجرا</dt></div>
+            </dl>
+            {% if dashboard.work.nodes or dashboard.work.activities %}
+            <div class="project-workplan__preview">
+                <div class="project-workplan__packages">
+                    <h3>بسته‌های کاری <span>{{ dashboard.work.root_count|erp_quantity_fa }} ریشه</span></h3>
+                    <p class="project-workplan__caption">خلاصه دو سطح؛ شمارش فعالیت‌ها شامل تمام زیرمجموعه است.</p>
+                    <ul class="project-workplan__tree">
+                        {% for node in dashboard.work.packages %}
+                            <li>
+                                <div><bdi>{{ node.code }}</bdi><strong>{{ node.title }}</strong><span>{{ node.activity_count|erp_quantity_fa }} فعالیت</span></div>
+                                {% if node.children %}<ul>{% for child in node.children %}<li><div><bdi>{{ child.code }}</bdi><span>{{ child.title }}</span><span>{{ child.activity_count|erp_quantity_fa }} فعالیت</span></div></li>{% endfor %}</ul>{% endif %}
+                                {% if node.more_children %}<p class="project-workplan__caption">{{ node.more_children|erp_quantity_fa }} شاخه دیگر در فضای مدیریت</p>{% endif %}
+                            </li>
+                        {% empty %}<li class="project-dashboard__empty">بسته ریشه قابل نمایش وجود ندارد.</li>{% endfor %}
+                    </ul>
+                    {% if dashboard.work.more_roots %}<p class="project-workplan__caption">{{ dashboard.work.more_roots|erp_quantity_fa }} بسته دیگر در فضای مدیریت</p>{% endif %}
+                </div>
+                <div class="project-workplan__activities">
+                    <h3>فعالیت‌های پروژه <a href="{{ dashboard.controls_url }}#activities-title">همه فعالیت‌ها ←</a></h3>
+                    <ul>
+                        {% for activity in dashboard.work.sample %}
+                            <li>
+                                <div class="project-workplan__activity-title"><bdi>{{ activity.code }}</bdi><span>{{ activity.name }}</span>{% include "components/status_badge.html" with status=activity.status label=activity.get_status_display only %}</div>
+                                {% if activity.planned_start_date or activity.planned_end_date %}<p class="project-workplan__caption">برنامه فعالیت: {% if activity.planned_start_date %}شروع <bdi>{{ activity.planned_start_date|jalali_date }}</bdi>{% endif %}{% if activity.planned_end_date %} · پایان <bdi>{{ activity.planned_end_date|jalali_date }}</bdi>{% endif %}</p>{% endif %}
+                            </li>
+                        {% empty %}<li class="project-dashboard__empty">هنوز فعالیت قابل مشاهده‌ای ثبت نشده است.</li>{% endfor %}
+                    </ul>
+                    {% if dashboard.work.more_activities %}<p class="project-workplan__caption">{{ dashboard.work.more_activities|erp_quantity_fa }} فعالیت دیگر در فضای مدیریت</p>{% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% if not dashboard.work.nodes and not dashboard.work.activities %}<p class="project-workplan__empty">هنوز ساختار اجرایی پروژه تعریف نشده است. از فضای ساختار شکست، گره‌ها و فعالیت‌های مجاز را آغاز کنید.</p>{% endif %}
+            <div class="project-workplan__actions">
+                <a class="erp-btn erp-btn--primary" href="{{ dashboard.controls_url }}">مدیریت ساختار شکست و فعالیت‌ها <span aria-hidden="true">←</span></a>
+            </div>
+        {% else %}
+            <p class="project-workplan__empty">برای مشاهده ساختار اجرایی، دسترسی مشاهده ساختار شکست، فعالیت‌ها و کنترل پروژه لازم است.</p>
+        {% endif %}
+    </section>
 
-    <div class="project-dashboard__pair">
+    <div class="project-dashboard__pair project-performance">
+        <section id="progress" class="erp-project-panel project-progress" aria-labelledby="project-progress-heading">
+            <div class="erp-project-section-heading">{% include "components/form_icon.html" with icon="activity" only %}<h2 id="project-progress-heading">پیشرفت پروژه</h2></div>
+            <p class="project-progress__state">در انتظار مبنای مصوب و اندازه‌گیری معتبر</p>
+            <p class="project-dashboard__empty">پیشرفت برنامه‌ای و واقعی قابل اتکای پروژه ثبت نشده است.</p>
+        </section>
+        {% if cost_projection %}{% include "projects/dashboard_budget.html" %}{% endif %}
+    </div>
+            {% if dashboard.quick_actions %}
+                <section class="erp-project-panel project-quick-create" aria-labelledby="project-quick-heading">
+                    <div class="erp-project-section-heading">
+                        {% include "components/form_icon.html" with icon="bolt" only %}
+                        <h2 id="project-quick-heading">ثبت سریع</h2>
+                    </div>
+                    <div class="erp-project-quick">
+                        {% for link in dashboard.quick_actions %}
+                            <a href="{{ link.url }}" data-action-kind="{{ link.kind }}">{% include "components/form_icon.html" with icon=link.icon only %}<span>{{ link.label }}</span></a>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
         <section id="recent" class="erp-project-panel erp-project-recent" aria-labelledby="project-recent-heading">
             <div class="erp-project-section-heading">
                 {% include "components/form_icon.html" with icon="clock" only %}
@@ -79,13 +156,11 @@
             </div>
             <ul>
                 {% for item in dashboard.recent %}
-                    <li>
-                        <div>
-                            <span class="erp-project-record-kind">{{ item.kind }}</span>
-                            <a href="{{ item.url }}">{{ item.title }}</a>
-                            <time datetime="{{ item.date|date:'c' }}">{{ item.date|jalali_datetime }}</time>
-                        </div>
-                        {% include "components/status_badge.html" with status=item.status label=item.status_label only %}
+                    <li class="project-recent-record">
+                        <div class="project-recent-record__meta"><span class="erp-project-record-kind">{{ item.kind }}</span>{% include "components/status_badge.html" with status=item.status label=item.status_label only %}</div>
+                        <a class="project-recent-record__title" href="{{ item.url }}" title="{{ item.title }}" dir="auto">{{ item.title }}</a>
+                        <time datetime="{{ item.date|date:'c' }}">{{ item.date|jalali_datetime }}</time>
+                        {% if item.title|length > 80 %}<details class="project-recent-record__full"><summary>عنوان کامل</summary><p dir="auto">{{ item.title }}</p></details>{% endif %}
                     </li>
                 {% empty %}
                     <li class="project-dashboard__empty">هنوز مورد قابل مشاهده‌ای ثبت نشده است.</li>
@@ -93,6 +168,7 @@
             </ul>
         </section>
 
+    <div class="project-dashboard__pair project-commercial">
         {% if dashboard.has_contracts_access %}
             <section class="erp-project-panel project-contracts" aria-labelledby="project-contracts-chart-title">
                 {% include "components/dashboard_chart.html" with chart_id="project-contracts-chart" title="وضعیت قراردادهای پروژه" description="توزیع قراردادهای قابل مشاهده بر اساس وضعیت" rows=dashboard.contract_rows ring=True total=dashboard.contract_total unit="قرارداد" icon="document" empty_message="هنوز قراردادی برای نمایش وضعیت وجود ندارد." only %}
@@ -101,41 +177,10 @@
                 {% endfor %}
             </section>
         {% endif %}
+        {% include "projects/commercial_summary.html" %}
     </div>
 
-    {% if commercial_summary or dashboard.quick_links %}
-        <div class="project-dashboard__pair">
-            {% include "projects/commercial_summary.html" %}
-            {% if dashboard.quick_links %}
-                <section class="erp-project-panel" aria-labelledby="project-quick-heading">
-                    <div class="erp-project-section-heading">
-                        {% include "components/form_icon.html" with icon="bolt" only %}
-                        <h2 id="project-quick-heading">دسترسی سریع</h2>
-                        <p>مشاهده اطلاعات این پروژه</p>
-                    </div>
-                    <div class="erp-project-quick">
-                        {% for link in dashboard.quick_links %}
-                            <a href="{{ link.url }}">
-                                {% include "components/form_icon.html" with icon=link.icon only %}
-                                {{ link.label }} <span aria-hidden="true">←</span>
-                            </a>
-                        {% endfor %}
-                    </div>
-                </section>
-            {% endif %}
-        </div>
-    {% endif %}
-
-    {% if dashboard.controls_url %}
-        <section id="progress" class="erp-project-progress" aria-labelledby="project-progress-heading">
-            <div>
-                <h2 id="project-progress-heading">برنامه و پیشرفت</h2>
-                <p>پیشرفت برنامه‌ای و واقعی قابل اتکای پروژه ثبت نشده است.</p>
-            </div>
-            <a class="erp-btn erp-btn--secondary" href="{{ dashboard.controls_url }}">ساختار شکست و فعالیت‌ها ←</a>
-        </section>
-    {% endif %}
-
+    <div class="project-dashboard__pair project-support">
     {% include "components/related_documents.html" with source_label="پروژه" %}
 
     <section id="information" class="erp-project-panel erp-project-information" aria-labelledby="project-information-heading">
@@ -144,7 +189,6 @@
             <h2 id="project-information-heading">اطلاعات اصلی</h2>
         </div>
         <dl>
-            <div><dt>تاریخ پایان</dt><dd><bdi dir="ltr">{{ project.end_date|jalali_date|default:"—" }}</bdi></dd></div>
             <div><dt>بودجه واقعی در مشخصات پروژه</dt><dd><bdi dir="ltr">{{ project.actual_budget|erp_quantity_fa }}</bdi> {{ dashboard.currency_label }}</dd></div>
         </dl>
         <div id="description">
@@ -158,11 +202,13 @@
             </form>
         {% endif %}
     </section>
+    </div>
     {{ dashboard.charts|json_script:"project-dashboard-data" }}
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
+    <script src="{% static 'projects/project_dashboard.js' %}" defer></script>
     <script src="{% static 'projects/vendor/chartjs-4.6.1/chart.umd.min.js' %}" defer></script>
     <script src="{% static 'projects/dashboard_charts.js' %}?v=20261111" defer></script>
 {% endblock %}

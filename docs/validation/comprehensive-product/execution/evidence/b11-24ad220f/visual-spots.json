@@ -1,0 +1,29 @@
+{
+  "equipment": {
+    "path": "/equipment/create/",
+    "viewport": 390,
+    "status": 200,
+    "h1": [
+      "تجهیز جدید"
+    ],
+    "controls": "- main:\n  - navigation \"مسیر صفحه\":\n    - link \"خانه\":\n      - /url: /\n    - link \"تجهیزات\":\n      - /url: /equipment/\n    - text: تجهیز جدید\n  - heading \"تجهیز جدید\" [level=1]\n  - paragraph: شرکت آزمون اصلاحات\n  - form \"تجهیز جدید\":\n    - region \"اطلاعات اصلی\":\n      - heading \"اطلاعات اصلی\" [level=2]\n      - text: کد تجهیز (الزامی)\n      - textbox \"کد تجهیز (الزامی)\"\n      - text: نام تجهیز (الزامی)\n      - textbox \"نام تجهیز (الزامی)\"\n      - text: دسته تجهیز (الزامی)\n      - combobox \"دسته تجهیز (الزامی)\"\n      - text: ⌄\n      - paragraph: از دسته‌های موجود انتخاب کنید یا دسته جدید را وارد کنید.\n      - text: نوع مالکیت (الزامی)\n      - combobox \"نوع مالکیت (الزامی)\":\n        - option \"ملکی\" [selected]\n        - option \"اجاره‌ای\"\n        - option \"لیزینگ\"\n      - text: سازنده\n      - textbox \"سازنده\"\n      - text: مدل\n      - textbox \"مدل\"\n      - text: شماره سریال\n      - textbox \"شماره سریال\"\n      - text: شماره پلاک یا ثبت\n      - textbox \"شماره پلاک یا ثبت\"\n      - text: تاریخ تملک یا شروع اجاره\n      - textbox \"تاریخ تملک یا شروع اجاره\":\n        - /placeholder: ۱۴۰۵/۰۶/۲۳\n      - 'button \"باز کردن تقویم شمسی: تاریخ تملک یا شروع اجاره\"'\n      - text: یادداشت‌ها\n      - textbox \"یادداشت‌ها\"\n    - button \"ثبت\"\n    - link \"انصراف\":\n      - /url: /equipment/"
+  },
+  "payable": {
+    "path": "/billing/payable-measurements/new/",
+    "viewport": 1440,
+    "status": 200,
+    "h1": [
+      "ثبت کارکرد پیمان جزء"
+    ],
+    "controls": "- main:\n  - navigation \"مسیر صفحه\":\n    - link \"خانه\":\n      - /url: /\n    - text: ثبت کارکرد پیمان جزء\n  - paragraph: کنترل تجاری پرداختنی\n  - heading \"ثبت کارکرد پیمان جزء\" [level=1]\n  - paragraph: اطلاعات فقط در دامنه سازمان و پروژه فعال ثبت می‌شود.\n  - text: ردیف پیمان جزء (الزامی)\n  - combobox \"ردیف پیمان جزء (الزامی)\":\n    - option \"---------\" [selected]\n    - option \"SUB-001 · Excavation\"\n  - text: تاریخ اندازه‌گیری (الزامی)\n  - textbox \"تاریخ اندازه‌گیری (الزامی)\":\n    - /placeholder: ۱۴۰۵/۰۶/۲۳\n  - 'button \"باز کردن تقویم شمسی: تاریخ اندازه‌گیری * (الزامی)\"'\n  - text: مقدار دوره (الزامی)\n  - spinbutton \"مقدار دوره (الزامی)\"\n  - text: مقدار تجمعی (الزامی)\n  - spinbutton \"مقدار تجمعی (الزامی)\"\n  - text: مرجع شواهد (الزامی)\n  - textbox \"مرجع شواهد (الزامی)\"\n  - button \"ثبت کارکرد پیمان جزء\""
+  },
+  "taxpayer": {
+    "path": "/billing/taxpayer-invoices/new/",
+    "viewport": 390,
+    "status": 200,
+    "h1": [
+      "تهیه صورتحساب مؤدیان"
+    ],
+    "controls": "- main:\n  - navigation \"مسیر صفحه\":\n    - link \"خانه\":\n      - /url: /\n    - link \"کنترل ضمانت و انطباق\":\n      - /url: /billing/commercial-controls/\n    - text: تهیه صورتحساب مؤدیان\n  - paragraph: کنترل تجاری و شواهد\n  - heading \"تهیه صورتحساب مؤدیان\" [level=1]\n  - paragraph: فقط واقعیت قراردادی یا شاهد بازبینی‌شده ثبت می‌شود؛ نبود اختیار صریح، عملیات را متوقف می‌کند.\n  - text: صورت‌وضعیت تأییدشده (الزامی)\n  - combobox \"صورت‌وضعیت تأییدشده (الزامی)\":\n    - option \"---------\" [selected]\n    - option \"F61-C · صورت‌وضعیت 1 · بازنگری 2\"\n  - text: نوع صورتحساب (الزامی)\n  - combobox \"نوع صورتحساب (الزامی)\":\n    - option \"اصلی\" [selected]\n    - option \"اصلاحی\"\n    - option \"ابطالی\"\n  - text: نسخه پیشین\n  - combobox \"نسخه پیشین\":\n    - option \"---------\" [selected]\n  - text: دلیل ثبت (الزامی)\n  - textbox \"دلیل ثبت (الزامی)\"\n  - button \"تهیه صورتحساب مؤدیان\""
+  }
+}

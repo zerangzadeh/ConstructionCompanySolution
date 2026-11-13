@@ -9,6 +9,16 @@ urlpatterns = [
     path("create/", views.issue_create, name="create"),
     path("<uuid:issue_id>/", views.issue_detail, name="detail"),
     path("<uuid:issue_id>/review/", views.issue_review, name="review"),
+    path(
+        "<uuid:issue_id>/record-decision/",
+        views.issue_record_decision,
+        name="record_decision",
+    ),
+    path(
+        "<uuid:issue_id>/record-correction/",
+        views.issue_record_correction,
+        name="record_correction",
+    ),
     path("<uuid:issue_id>/assign/", views.issue_assign, name="assign"),
     path(
         "<uuid:issue_id>/corrective-action/",

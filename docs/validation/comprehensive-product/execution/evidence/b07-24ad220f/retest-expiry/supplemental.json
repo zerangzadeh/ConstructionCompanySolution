@@ -1,0 +1,62 @@
+{
+  "membership expiry calendar": {
+    "route": "membership expiry calendar",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/authorization/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/authorization/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/authorization/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/authorization/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      }
+    ],
+    "design": [
+      "membership-expiry",
+      "membership-expiry-saved"
+    ],
+    "expiry_widgets": {
+      "role": "datetime",
+      "scope": "datetime"
+    },
+    "status": "PASS",
+    "persisted": {
+      "role_assignment": "9a043253-d266-453d-9468-142f9bd2f9cd",
+      "scope_grant": "c28e38a0-c357-41aa-96dc-bde7c5c889b3",
+      "jalali_input": "1405/12/20 10:30",
+      "role_ends_at": "2027-03-11 10:30:00+00:00",
+      "scope_ends_at": "2027-03-11 10:30:00+00:00",
+      "timezone_aware": true,
+      "independent_approver": "42022749-dc3b-4326-b2dc-1c57192baaa3",
+      "audit_delta": 2
+    }
+  }
+}

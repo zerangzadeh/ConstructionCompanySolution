@@ -1,0 +1,738 @@
+{
+  "rows": [
+    {
+      "execution_id": "INV-ORGANIZATIONS-CREATE--PA-11",
+      "route": "create",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-ADMINISTRATORS--PA-11",
+      "route": "platform_administrators",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-ADMINISTRATORS-GRANT--PA-11",
+      "route": "platform_administrators",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-ADMINISTRATORS-REVOKE--PA-11",
+      "route": "platform_administrators",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-AUDIT--PA-11",
+      "route": "platform_audit",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-DETAIL--PA-11",
+      "route": "platform_company_detail",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-EDIT--PA-11",
+      "route": "platform_company_edit",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-LIST--PA-11",
+      "route": "platform_company_list",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-ONBOARDING--PA-11",
+      "route": "platform_company_onboarding",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-STATUS--PA-11",
+      "route": "platform_company_status",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-STATUS-REACTIVATE--PA-11",
+      "route": "platform_company_status",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-COMPANY-STATUS-SUSPEND--PA-11",
+      "route": "platform_company_status",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-DASHBOARD--PA-11",
+      "route": "platform_dashboard",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-MEMBER-AUTHORIZATION--PA-11",
+      "route": "platform_member_authorization",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-MEMBER-ROLES--PA-11",
+      "route": "platform_member_roles",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-POLICY-CATALOG--PA-11",
+      "route": "platform_policy_catalog",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-ROLE-CATALOG--PA-11",
+      "route": "platform_role_catalog",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-SETTINGS--PA-11",
+      "route": "platform_settings",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-STATUS--PA-11",
+      "route": "platform_status",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-USER-CREATE--PA-11",
+      "route": "platform_user_create",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-USER-DETAIL--PA-11",
+      "route": "platform_user_detail",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-USER-EDIT--PA-11",
+      "route": "platform_user_edit",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET--PA-11",
+      "route": "platform_user_reset",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET-COOLDOWN--PA-11",
+      "route": "platform_user_reset",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET-TRANSPORT-ACCEPTED--PA-11",
+      "route": "platform_user_reset",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET-TRANSPORT-FAILED--PA-11",
+      "route": "platform_user_reset",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-USER-RESET-TRANSPORT-UNAVAILABLE--PA-11",
+      "route": "platform_user_reset",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-USER-STATUS--PA-11",
+      "route": "platform_user_status",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-USER-STATUS-DEACTIVATE--PA-11",
+      "route": "platform_user_status",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-USER-STATUS-REACTIVATE--PA-11",
+      "route": "platform_user_status",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-USER-TEMPORARY-PASSWORD--PA-11",
+      "route": "platform_user_temporary_password",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PLATFORM-USERS--PA-11",
+      "route": "platform_users",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "execution_id": "INV-ORGANIZATIONS-PROTECTED-OPERATION-CATALOG--PA-11",
+      "route": "protected_operation_catalog",
+      "observations": [
+        {
+          "actor": "tenant_admin",
+          "method": "GET",
+          "status": 403
+        },
+        {
+          "actor": "tenant_admin",
+          "method": "POST",
+          "status": 403
+        },
+        {
+          "actor": "anonymous",
+          "method": "GET",
+          "status": 302
+        },
+        {
+          "actor": "anonymous",
+          "method": "POST",
+          "status": 302
+        }
+      ],
+      "status": "PASS"
+    }
+  ],
+  "row_count": 33,
+  "business_and_audit_state_unchanged": true,
+  "counts": {
+    "accounts_loginpagesettings": 0,
+    "accounts_user": 33,
+    "accounts_user_groups": 0,
+    "accounts_user_user_permissions": 0,
+    "audit_auditevent": 47,
+    "organizations_authorizationmigrationissue": 0,
+    "organizations_authorizationpolicyversion": 1,
+    "organizations_businesspermission": 681,
+    "organizations_insuranceclassification": 0,
+    "organizations_membershiproleassignment": 3,
+    "organizations_membershipscopegrant": 3,
+    "organizations_organization": 30,
+    "organizations_organizationaccountconnectionrequest": 0,
+    "organizations_organizationmembership": 3,
+    "organizations_organizationrole": 28,
+    "organizations_organizationrole_permissions": 3945,
+    "organizations_organizationsettings": 2,
+    "organizations_platformpolicy": 0,
+    "organizations_platformpolicyversion": 0,
+    "organizations_platformpolicyversionsource": 0,
+    "organizations_platformroleassignment": 1,
+    "organizations_policyreviewevidence": 0,
+    "organizations_policysource": 0,
+    "organizations_protectedoperation": 15,
+    "organizations_tenantpolicyselection": 0,
+    "projects_activity": 0,
+    "projects_budgetallocation": 0,
+    "projects_budgetmanifestline": 0,
+    "projects_budgetsourcemanifest": 0,
+    "projects_budgetversion": 0,
+    "projects_cbsnode": 0,
+    "projects_costcenter": 0,
+    "projects_coststructureversion": 0,
+    "projects_project": 0,
+    "projects_projectbudgetcontrol": 0,
+    "projects_projectcashflowsnapshot": 0,
+    "projects_projectcashflowsupplement": 0,
+    "projects_projectchangeproposal": 0,
+    "projects_projectcontrolitem": 0,
+    "projects_projectcontrolstatusevent": 0,
+    "projects_projectcostcoverage": 0,
+    "projects_projectcostfact": 0,
+    "projects_projectcostforecast": 0,
+    "projects_projectcostsourcecontract": 0,
+    "projects_projectdocumentlink": 0,
+    "projects_projectforecastreview": 0,
+    "projects_projectforecasttransition": 0,
+    "projects_projectphase": 0,
+    "projects_projectscheduledependency": 0,
+    "projects_projectscheduleitem": 0,
+    "projects_projectschedulerevision": 0,
+    "projects_projectsite": 0,
+    "projects_projectsitedocumentlink": 0,
+    "projects_schedulerebaselineproposal": 0,
+    "projects_wbsnode": 0
+  },
+  "platform_only_tenant_probes": [
+    {
+      "route": "projects:list",
+      "status": 302
+    },
+    {
+      "route": "documents:list",
+      "status": 302
+    },
+    {
+      "route": "organizations:members",
+      "status": 302
+    }
+  ]
+}

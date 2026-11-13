@@ -5,12 +5,14 @@ from django.db.models import QuerySet
 from core.xlsx import Column, Sheet, download
 
 from .models import DailyReport
+from .submission_snapshots import ENTRIES, frozen_entries
 
 REPORT_COLUMNS = (
-    Column("پروژه", "project.name"),
-    Column("کارگاه", "site.name"),
-    Column("فاز", "phase.name"),
+    Column("پروژه", "project_label"),
+    Column("کارگاه", "site_label"),
+    Column("فاز", "phase_label"),
     Column("تاریخ گزارش", "reporting_date"),
+    Column("نسخه", "revision_number"),
     Column("وضعیت", "get_status_display"),
     Column("آب‌وهوا", "weather_conditions"),
     Column("تعداد نیرو", "labor_count"),
@@ -21,10 +23,11 @@ REPORT_COLUMNS = (
     Column("یادداشت کیفیت", "quality_notes", 40),
 )
 CHILD_CONTEXT = (
-    Column("پروژه", "report.project.name"),
-    Column("کارگاه", "report.site.name"),
-    Column("فاز", "report.phase.name"),
+    Column("پروژه", "report.project_label"),
+    Column("کارگاه", "report.site_label"),
+    Column("فاز", "report.phase_label"),
     Column("تاریخ گزارش", "report.reporting_date"),
+    Column("نسخه", "report.revision_number"),
 )
 CHILD_SPECS = (
     (
@@ -106,11 +109,12 @@ def reports_download(records: QuerySet[DailyReport], *, timezone_name: str):
         )
     )
     sheets = [Sheet("گزارش‌های روزانه", REPORT_COLUMNS, records)]
+    kinds = {spec.relation: kind for kind, spec in ENTRIES.items()}
     for title, relation, columns in CHILD_SPECS:
         children = [
             child
             for report in records
-            for child in getattr(report, relation).all()
+            for child in frozen_entries(report, kinds[relation])
             if child.organization_id == report.organization_id
         ]
         sheets.append(Sheet(title, CHILD_CONTEXT + columns, children))

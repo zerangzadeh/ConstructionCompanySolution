@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}اصلاح ردیف گزارش روزانه | بنیرا{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-3xl space-y-5" dir="rtl">
+    {% url 'daily_reports:correction' report.id as back_url %}
+    {% include "components/page_header.html" with page_title=label page_description=report.site.name page_breadcrumb_label="نسخه اصلاحی" page_breadcrumb_url=back_url page_icon="document" only %}
+    <section class="erp-surface rounded-xl p-5">
+        <form method="post" class="space-y-4" data-correction-entry>
+            {% csrf_token %}{{ token.operation_key }}{{ token.expected_version }}
+            {% include "components/form_errors.html" with form=token only %}
+            {% include "components/form_errors.html" with form=form only %}
+            {% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
+            <div class="flex flex-wrap gap-3">
+                <button class="erp-btn erp-btn--primary" type="submit">ذخیره ردیف</button>
+                <a class="erp-btn erp-btn--secondary" href="{{ back_url }}">بازگشت</a>
+                {% if entry_id %}
+                <button class="erp-btn erp-btn--danger" name="action" value="remove" type="submit" formnovalidate>حذف ردیف از نسخه اصلاحی</button>
+                {% endif %}
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

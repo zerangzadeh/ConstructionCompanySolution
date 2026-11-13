@@ -1,0 +1,35 @@
+{
+  "membership expiry calendar": {
+    "route": "membership expiry calendar",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/members/6ec88d07-1d5f-4b6d-af44-a2335281c72e/authorization/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/6ec88d07-1d5f-4b6d-af44-a2335281c72e/authorization/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "Jalali date before remediation"
+      }
+    ],
+    "design": [
+      "membership-expiry"
+    ],
+    "expiry_widgets": {
+      "role": null,
+      "scope": null
+    },
+    "status": "FAIL",
+    "error": "Role and scope expiry fields have no shared Jalali picker",
+    "exception": "AssertionError"
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "policies": [
+    {
+      "policy": "taxpayer-invoice-regulatory",
+      "policy_records": 0,
+      "source_approved_date": "2026-11-12",
+      "resolver_denial": [
+        "نسخه مقرراتی پلتفرمِ منتشرشده و مؤثر وجود ندارد."
+      ],
+      "authorized_create_status": 200,
+      "authorized_feedback": [
+        "['نسخه مقرراتی پلتفرمِ منتشرشده و مؤثر وجود ندارد.']"
+      ]
+    },
+    {
+      "policy": "contractor-compliance-regulatory",
+      "policy_records": 0,
+      "source_approved_date": "2026-11-12",
+      "resolver_denial": [
+        "نسخه مقرراتی پلتفرمِ منتشرشده و مؤثر وجود ندارد."
+      ],
+      "authorized_create_status": 200,
+      "authorized_feedback": [
+        "['نسخه مقرراتی پلتفرمِ منتشرشده و مؤثر وجود ندارد.']"
+      ]
+    }
+  ],
+  "positive_rows_blocked": [
+    "INV-BILLING-CONTRACTOR-COMPLIANCE-APPROVE--CV-BIL-01",
+    "INV-BILLING-CONTRACTOR-COMPLIANCE-CREATE--CV-BIL-01",
+    "INV-BILLING-CONTRACTOR-COMPLIANCE-DETAIL--CV-BIL-01",
+    "INV-BILLING-CONTRACTOR-COMPLIANCE-EXPORT--CV-BIL-01",
+    "INV-BILLING-CONTRACTOR-COMPLIANCE-RETURN--CV-BIL-01",
+    "INV-BILLING-CONTRACTOR-COMPLIANCE-SUBMIT--CV-BIL-01",
+    "INV-BILLING-STATUTORY-SUBMISSION-RESOLVE--CV-BIL-01",
+    "INV-BILLING-TAXPAYER-INVOICE-APPROVE--CV-BIL-01",
+    "INV-BILLING-TAXPAYER-INVOICE-CREATE--CV-BIL-01",
+    "INV-BILLING-TAXPAYER-INVOICE-DETAIL--CV-BIL-01",
+    "INV-BILLING-TAXPAYER-INVOICE-EXPORT--CV-BIL-01",
+    "INV-BILLING-TAXPAYER-INVOICE-RETURN--CV-BIL-01",
+    "INV-BILLING-TAXPAYER-INVOICE-SUBMIT--CV-BIL-01"
+  ],
+  "negative_checks": [
+    {
+      "row": "INV-BILLING-CONTRACTOR-COMPLIANCE-APPROVE--CV-BIL-01",
+      "method": "POST",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 403,
+        "foreign": 404
+      }
+    },
+    {
+      "row": "INV-BILLING-CONTRACTOR-COMPLIANCE-CREATE--CV-BIL-01",
+      "method": "GET",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 403,
+        "foreign": 200
+      }
+    },
+    {
+      "row": "INV-BILLING-CONTRACTOR-COMPLIANCE-CREATE--CV-BIL-01",
+      "method": "POST",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 403,
+        "foreign": 200
+      }
+    },
+    {
+      "row": "INV-BILLING-CONTRACTOR-COMPLIANCE-DETAIL--CV-BIL-01",
+      "method": "GET",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 404,
+        "foreign": 404
+      }
+    },
+    {
+      "row": "INV-BILLING-CONTRACTOR-COMPLIANCE-EXPORT--CV-BIL-01",
+      "method": "POST",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 403,
+        "foreign": 404
+      }
+    },
+    {
+      "row": "INV-BILLING-CONTRACTOR-COMPLIANCE-RETURN--CV-BIL-01",
+      "method": "POST",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 403,
+        "foreign": 404
+      }
+    },
+    {
+      "row": "INV-BILLING-CONTRACTOR-COMPLIANCE-SUBMIT--CV-BIL-01",
+      "method": "POST",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 403,
+        "foreign": 404
+      }
+    },
+    {
+      "row": "INV-BILLING-STATUTORY-SUBMISSION-RESOLVE--CV-BIL-01",
+      "method": "POST",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 403,
+        "foreign": 404
+      }
+    },
+    {
+      "row": "INV-BILLING-TAXPAYER-INVOICE-APPROVE--CV-BIL-01",
+      "method": "POST",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 403,
+        "foreign": 404
+      }
+    },
+    {
+      "row": "INV-BILLING-TAXPAYER-INVOICE-CREATE--CV-BIL-01",
+      "method": "GET",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 403,
+        "foreign": 200
+      }
+    },
+    {
+      "row": "INV-BILLING-TAXPAYER-INVOICE-CREATE--CV-BIL-01",
+      "method": "POST",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 403,
+        "foreign": 200
+      }
+    },
+    {
+      "row": "INV-BILLING-TAXPAYER-INVOICE-DETAIL--CV-BIL-01",
+      "method": "GET",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 404,
+        "foreign": 404
+      }
+    },
+    {
+      "row": "INV-BILLING-TAXPAYER-INVOICE-EXPORT--CV-BIL-01",
+      "method": "POST",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 403,
+        "foreign": 404
+      }
+    },
+    {
+      "row": "INV-BILLING-TAXPAYER-INVOICE-RETURN--CV-BIL-01",
+      "method": "POST",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 403,
+        "foreign": 404
+      }
+    },
+    {
+      "row": "INV-BILLING-TAXPAYER-INVOICE-SUBMIT--CV-BIL-01",
+      "method": "POST",
+      "statuses": {
+        "anonymous": 302,
+        "restricted": 403,
+        "foreign": 404
+      }
+    }
+  ],
+  "statutory_counts": {
+    "TaxpayerInvoice": 0,
+    "ContractorComplianceAssessment": 0,
+    "StatutorySubmissionEvidence": 0
+  }
+}

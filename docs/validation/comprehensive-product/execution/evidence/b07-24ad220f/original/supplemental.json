@@ -1,0 +1,260 @@
+{
+  "protected document": {
+    "route": "protected document",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/4bc74c70-b417-4b20-bd68-ba15fc01b481/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "foreign document IDOR"
+      },
+      {
+        "method": "GET",
+        "url": "/documents/4bc74c70-b417-4b20-bd68-ba15fc01b481/versions/b538a588-e997-43ce-8a95-532b461b72d4/download/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "foreign download IDOR"
+      },
+      {
+        "method": "GET",
+        "url": "/documents/4bc74c70-b417-4b20-bd68-ba15fc01b481/download/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "GET",
+        "url": "/documents/4bc74c70-b417-4b20-bd68-ba15fc01b481/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/documents/4bc74c70-b417-4b20-bd68-ba15fc01b481/versions/b538a588-e997-43ce-8a95-532b461b72d4/download/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized exact version"
+      }
+    ],
+    "design": [],
+    "status": "PASS",
+    "persisted": {
+      "authorized_bytes": 41,
+      "foreign_or_restricted_download_audit": 0,
+      "exact_version": "b538a588-e997-43ce-8a95-532b461b72d4"
+    }
+  },
+  "scoped project export": {
+    "route": "scoped project export",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/projects/b12702f9-4400-49eb-8824-5c8837340372/controls/export/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "sibling project export forgery"
+      },
+      {
+        "method": "GET",
+        "url": "/projects/ed57f4a9-6f07-4ea3-b536-bcf7b801a83a/controls/export/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "foreign project export forgery"
+      },
+      {
+        "method": "GET",
+        "url": "/projects/91eec34e-e8e9-4f16-926f-4526dc8e66f4/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/projects/91eec34e-e8e9-4f16-926f-4526dc8e66f4/controls/export/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized project controls CSV"
+      }
+    ],
+    "design": [],
+    "status": "PASS",
+    "persisted": {
+      "authorized_export_bytes": 58,
+      "sibling_and_foreign_export_denied": true
+    }
+  },
+  "revoked session and hidden surfaces": {
+    "route": "revoked session and hidden surfaces",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/members/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/treasury/",
+        "status": 403,
+        "expected": [
+          404
+        ],
+        "case": "MVP hidden finance URL"
+      }
+    ],
+    "design": [],
+    "status": "FAIL",
+    "error": "MVP hidden finance URL GET: expected (404,), got 403",
+    "exception": "AssertionError"
+  },
+  "contract Party reuse": {
+    "route": "contract Party reuse",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/create/",
+        "status": 200,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "foreign contract Party forgery"
+      }
+    ],
+    "design": [],
+    "status": "FAIL",
+    "error": "Locator.click: Timeout 4500ms exceeded.\nCall log:\n  - waiting for locator(\"[id='id_project-ts-control']\")\n    - locator resolved to <input size=\"1\" type=\"text\" tabindex=\"0\" role=\"combobox\" autocomplete=\"off\" aria-expanded=\"false\" aria-haspopup=\"listbox\" id=\"id_project-ts-control\" aria-labelledby=\"id_project-ts-label\" aria-label=\"جست‌وجو یا انتخاب پروژه…\" aria-controls=\"id_project-ts-dropdown\" placeholder=\"جست‌وجو یا انتخاب پروژه…\"/>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <div class=\"ts-control\">…</div> intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <div class=\"ts-control\">…</div> intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    8 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <div class=\"ts-control\">…</div> intercepts pointer events\n    - retrying click action\n      - waiting 500ms\n",
+    "exception": "TimeoutError"
+  },
+  "procurement Party reuse": {
+    "route": "procurement Party reuse",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/procurement/orders/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/orders/create/",
+        "status": 400,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "forged supplier selection"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/orders/create/",
+        "status": 400,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "forged supplier selection"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/orders/create/",
+        "status": 400,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "forged supplier selection"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/orders/create/",
+        "status": 400,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "forged supplier selection"
+      }
+    ],
+    "design": [
+      "purchase-order-party-selector"
+    ],
+    "inactive_role_visible": true,
+    "status": "FAIL",
+    "error": "Locator.click: Timeout 4500ms exceeded.\nCall log:\n  - waiting for locator(\"[id='id_project-ts-control']\")\n    - locator resolved to <input size=\"1\" type=\"text\" tabindex=\"0\" role=\"combobox\" autocomplete=\"off\" aria-expanded=\"false\" aria-haspopup=\"listbox\" id=\"id_project-ts-control\" aria-labelledby=\"id_project-ts-label\" aria-label=\"جست‌وجو یا انتخاب پروژه…\" aria-controls=\"id_project-ts-dropdown\" placeholder=\"جست‌وجو یا انتخاب پروژه…\"/>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <div class=\"ts-control\">…</div> intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <div class=\"ts-control\">…</div> intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    9 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <div class=\"ts-control\">…</div> intercepts pointer events\n    - retrying click action\n      - waiting 500ms\n",
+    "exception": "TimeoutError"
+  },
+  "protected Party archive": {
+    "route": "protected Party archive",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/parties/governance/d843ae44-be52-4d4e-95ef-f27a6b0d2794/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/d843ae44-be52-4d4e-95ef-f27a6b0d2794/archive/",
+        "status": 500,
+        "expected": [
+          403,
+          500
+        ],
+        "case": "protected merge reference archive"
+      }
+    ],
+    "design": [],
+    "persisted": {
+      "merge_reference_preserved": true,
+      "audit_delta": 0,
+      "archive_control_count": 1
+    },
+    "status": "FAIL",
+    "error": "Protected canonical Party shows archive and returns a server error",
+    "exception": "AssertionError"
+  }
+}

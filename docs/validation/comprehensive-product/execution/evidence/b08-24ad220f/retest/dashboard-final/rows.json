@@ -1,0 +1,51 @@
+{
+  "INV-REPORTING-DASHBOARD--CV-REP-01": {
+    "status": "PASS",
+    "sql_reconciliation": {
+      "cycles": 2,
+      "average_seconds": "172802",
+      "inventory_quantity": "13.0000",
+      "inventory_value": "162.5000",
+      "currency": "IRR",
+      "source_manifest": {
+        "procurement_cycle_time": {
+          "ids": [
+            "b0ddeedd-bde3-4224-bd34-5331f861df4c",
+            "bfda6d97-ae74-4c47-bb41-d15feb92a61d"
+          ],
+          "model": "procurement.GoodsReceipt",
+          "scope_kind": "project_set",
+          "scope_project_ids": [
+            "1ad6bb26-5156-4a49-83af-98b7e7a5d1e7",
+            "453e0c1c-0507-4e1a-9bb7-5f6b82ff4967",
+            "ca2888b6-e624-4837-afbb-2b344e29a533"
+          ]
+        },
+        "inventory_quantity_value": {
+          "ids": [
+            "99ea583a-52eb-4252-9b15-d04b35eb10dc",
+            "e16b6872-abc6-4f2d-9bc3-44a024722f5c"
+          ],
+          "model": "inventory.InventoryValuationPool",
+          "scope_kind": "organization",
+          "scope_project_ids": [
+            "1ad6bb26-5156-4a49-83af-98b7e7a5d1e7",
+            "453e0c1c-0507-4e1a-9bb7-5f6b82ff4967",
+            "ca2888b6-e624-4837-afbb-2b344e29a533"
+          ]
+        }
+      }
+    },
+    "boundaries": "Empty cycles: incomplete with null average; unreviewed foreign inventory amount withheld; missing source permission suppresses cards",
+    "security": "No-permission denied; project-limited snapshots withheld; foreign tenant excluded; MVP refresh/drillthrough denied",
+    "timezone_retest": {
+      "configured": "Asia/Tehran",
+      "retained_source_local_dates": {
+        "procurement_cycle_time": "1405/08/22 00:34",
+        "inventory_quantity_value": "1405/08/22 00:34"
+      },
+      "observation_local_date": "1405/08/22",
+      "stored_utc_unchanged": true
+    }
+  }
+}

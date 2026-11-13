@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from typing import Literal
+from uuid import UUID
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
@@ -60,11 +62,18 @@ from apps.inventory.services import (
 )
 from apps.materials.models import Material, UnitOfMeasure
 from apps.organizations.authorization import (
+    effective_scope_grants,
     get_active_membership,
+    membership_has_permission,
     require_business_permission,
     scope_queryset,
 )
-from apps.organizations.models import BusinessPermissionCode, Organization
+from apps.organizations.models import (
+    AuthorizationScopeType,
+    BusinessPermissionCode,
+    Organization,
+    OrganizationMembership,
+)
 from apps.projects.models import Activity, Project, ProjectSite, WBSNode
 
 INVENTORY_VALUATION_CONSUMER = "inventory.valuation.finalize"
@@ -1597,10 +1606,19 @@ def record_counted_quantity(
     counted_quantity: Decimal,
     variance_reason: str = "",
 ) -> InventoryCountLine:
+    # Use the same lock order as submission and posting, including when this
+    # service is called to record a single line.
+    inventory_count = (
+        InventoryCount.objects.select_for_update(of=("self",))
+        .select_related("warehouse__project")
+        .filter(pk=line.inventory_count_id, organization=organization)
+        .first()
+    )
+    if inventory_count is None:
+        raise PermissionDenied("شمارش متعلق به این سازمان نیست.")
     locked = (
         InventoryCountLine.objects.select_for_update(of=("self",))
-        .select_related("inventory_count__warehouse__project")
-        .filter(pk=line.pk, organization=organization)
+        .filter(pk=line.pk, organization=organization, inventory_count=inventory_count)
         .first()
     )
     if locked is None:
@@ -1609,9 +1627,9 @@ def record_counted_quantity(
         organization=organization,
         actor=actor,
         permission=BusinessPermissionCode.INVENTORY_COUNTS_PREPARE,
-        project=locked.inventory_count.warehouse.project,
+        project=inventory_count.warehouse.project,
     )
-    if locked.inventory_count.status not in {
+    if inventory_count.status not in {
         InventoryCountStatus.FROZEN,
         InventoryCountStatus.COUNTED,
     }:
@@ -1623,8 +1641,9 @@ def record_counted_quantity(
     locked.counted_quantity = counted_quantity
     locked.variance_reason = variance_reason.strip()
     locked.save(update_fields=["counted_quantity", "variance_reason", "updated_at"])
-    inventory_count = locked.inventory_count
-    if not inventory_count.lines.filter(counted_quantity__isnull=True).exists():
+    if inventory_count.status == InventoryCountStatus.FROZEN and not (
+        inventory_count.lines.filter(counted_quantity__isnull=True).exists()
+    ):
         inventory_count.status = InventoryCountStatus.COUNTED
         inventory_count.save(update_fields=["status", "updated_at"])
         _audit(
@@ -1636,6 +1655,34 @@ def record_counted_quantity(
             metadata={"status": inventory_count.status},
         )
     return locked
+
+
+@transaction.atomic
+def record_and_submit_inventory_count(
+    *,
+    organization: Organization,
+    actor: User,
+    inventory_count: InventoryCount,
+    quantities: Mapping[UUID, tuple[Decimal, str]],
+) -> InventoryCount:
+    locked = InventoryCount.objects.select_for_update(of=("self",)).get(
+        pk=inventory_count.pk, organization=organization
+    )
+    lines = list(locked.lines.all())
+    if {line.pk for line in lines} != quantities.keys():
+        raise ValueError("مقدار همه خطوط شمارش الزامی است.")
+    for line in lines:
+        quantity, reason = quantities[line.pk]
+        record_counted_quantity(
+            organization=organization,
+            actor=actor,
+            line=line,
+            counted_quantity=quantity,
+            variance_reason=reason,
+        )
+    return submit_inventory_count(
+        organization=organization, actor=actor, inventory_count=locked
+    )
 
 
 @transaction.atomic
@@ -2308,8 +2355,30 @@ def get_inventory_counts(
     ).select_related("warehouse", "bin")
 
 
+def inventory_transfer_receiving_available(membership: OrganizationMembership) -> bool:
+    return (
+        membership_has_permission(
+            membership, BusinessPermissionCode.INVENTORY_TRANSFERS_VIEW
+        )
+        and membership_has_permission(
+            membership, BusinessPermissionCode.INVENTORY_TRANSFERS_ACCEPT
+        )
+        and effective_scope_grants(membership)
+        .filter(
+            scope_type__in=(
+                AuthorizationScopeType.ORGANIZATION,
+                AuthorizationScopeType.PROJECT,
+            )
+        )
+        .exists()
+    )
+
+
 def get_inventory_transfers(
-    *, organization: Organization, user: User
+    *,
+    organization: Organization,
+    user: User,
+    side: Literal["source", "destination"] | None = None,
 ) -> QuerySet[InventoryTransfer]:
     _require(
         organization=organization,
@@ -2317,8 +2386,25 @@ def get_inventory_transfers(
         permission=BusinessPermissionCode.INVENTORY_TRANSFERS_VIEW,
     )
     membership = get_active_membership(user=user, organization=organization)
-    return scope_queryset(
-        queryset=InventoryTransfer.objects.filter(organization=organization),
+    transfers = InventoryTransfer.objects.filter(organization=organization)
+    outbound = scope_queryset(
+        queryset=transfers,
         membership=membership,
         project_lookup="source_warehouse__project_id",
-    ).select_related("source_warehouse", "destination_warehouse")
+    )
+    inbound = scope_queryset(
+        queryset=transfers.filter(
+            status__in=[
+                InventoryTransferStatus.IN_TRANSIT,
+                InventoryTransferStatus.ACCEPTED,
+            ]
+        ),
+        membership=membership,
+        project_lookup="destination_warehouse__project_id",
+    )
+    visible = {"source": outbound, "destination": inbound}.get(side)
+    if visible is None:
+        visible = outbound | inbound
+    return visible.select_related(
+        "source_warehouse__project", "destination_warehouse__project"
+    )

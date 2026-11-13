@@ -3,13 +3,14 @@
 from dataclasses import dataclass
 
 from apps.accounts.models import User
+from apps.inventory.p8_services import inventory_transfer_receiving_available
 from apps.organizations.authorization import (
     get_active_membership,
     membership_has_scope,
     membership_permission_codes,
     permission_supports_object_scope,
 )
-from apps.organizations.models import Organization
+from apps.organizations.models import BusinessPermissionCode, Organization
 from apps.workflows.personal_workspaces import (
     manager_workspace_available,
     my_requests_available,
@@ -53,6 +54,9 @@ def authorized_home_links(
                 actor=user,
                 organization=organization,
             ),
+            "inventory_receiving_only": BusinessPermissionCode.WAREHOUSES_VIEW
+            not in effective_codes
+            and inventory_transfer_receiving_available(membership),
         },
     )
     workspaces = tuple(

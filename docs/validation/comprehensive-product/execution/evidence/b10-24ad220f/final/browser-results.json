@@ -1,0 +1,48 @@
+{
+  "audit": {
+    "status": "PASS",
+    "detail": {
+      "invalid_retained_at": [
+        1440,
+        1024,
+        390
+      ],
+      "direct_invalid_fails_closed": true,
+      "combined_filter_total": 32,
+      "pagination": [
+        25,
+        7
+      ],
+      "jalali_to_iso": true
+    }
+  },
+  "security-pa11": {
+    "status": "PASS",
+    "detail": {
+      "rows": 33,
+      "denials": 86,
+      "platform_only_probes": [
+        {
+          "route": "projects:list",
+          "status": 302
+        },
+        {
+          "route": "documents:list",
+          "status": 302
+        },
+        {
+          "route": "organizations:members",
+          "status": 302
+        }
+      ]
+    }
+  },
+  "protected-retirement": {
+    "status": "FAIL",
+    "error": "AssertionError"
+  },
+  "policy-lifecycle": {
+    "status": "FAIL",
+    "error": "Page.expect_navigation: Timeout 20000ms exceeded."
+  }
+}

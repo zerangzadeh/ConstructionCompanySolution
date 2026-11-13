@@ -24,14 +24,14 @@ from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import BusinessPermissionCode, Organization
 
 
-def _require(*, organization, actor, permission, project=None):
+def _require(*, organization, actor, permission, project=None, site=None):
     return require_business_permission(
         user=actor,
         organization=organization,
         permission=permission,
         project=project,
+        site=site,
         allow_any_scope=project is None,
-        allow_site_parent=True,
         message="اجازه عملیات هزینه تجهیز را ندارید.",
     )
 
@@ -246,6 +246,7 @@ def prepare_cost_allocation(
         actor=actor,
         permission=BusinessPermissionCode.EQUIPMENT_COST_ALLOCATION_PREPARE,
         project=locked_usage.deployment.project,
+        site=locked_usage.deployment.site,
     )
     existing = EquipmentCostAllocation.objects.filter(
         organization=organization, source_key=source_key
@@ -302,6 +303,7 @@ def finalize_cost_allocation(
         actor=actor,
         permission=BusinessPermissionCode.EQUIPMENT_COST_ALLOCATION_REVIEW,
         project=locked.project,
+        site=locked.site,
     )
     if locked.status != CostAllocationStatus.DRAFT or locked.prepared_by_id == actor.pk:
         raise ValueError("نهایی‌سازی مستقل فقط برای پیش‌نویس مجاز است.")
@@ -332,6 +334,7 @@ def reverse_cost_allocation(
         actor=actor,
         permission=BusinessPermissionCode.EQUIPMENT_COST_ALLOCATION_REVERSE,
         project=locked.project,
+        site=locked.site,
     )
     reversal_key = reversal_source_key or f"reverse:{locked.source_key}"
     existing = EquipmentCostAllocation.objects.filter(
@@ -413,6 +416,7 @@ def prepare_cost_handoff(
         actor=actor,
         permission=BusinessPermissionCode.EQUIPMENT_COST_HANDOFF_PREPARE,
         project=locked.project,
+        site=locked.site,
     )
     if locked.status != CostAllocationStatus.FINALIZED:
         raise ValueError("فقط تخصیص نهایی قابل پیشنهاد است.")
@@ -464,6 +468,7 @@ def review_cost_handoff(
         actor=actor,
         permission=BusinessPermissionCode.EQUIPMENT_COST_HANDOFF_REVIEW,
         project=locked.allocation.project,
+        site=locked.allocation.site,
     )
     if locked.status != ProposalStatus.PREPARED or locked.prepared_by_id == actor.pk:
         raise ValueError("بررسی مستقل فقط برای پیشنهاد تهیه‌شده مجاز است.")
@@ -501,6 +506,7 @@ def reconcile_cost_handoff(
         actor=actor,
         permission=BusinessPermissionCode.EQUIPMENT_COST_HANDOFF_RECONCILE,
         project=locked.allocation.project,
+        site=locked.allocation.site,
     )
     if (
         locked.status

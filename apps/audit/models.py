@@ -865,6 +865,10 @@ class AuditAction(models.TextChoices):
     DAILY_REPORT_RECORD_REFERENCED = "daily_report.record_referenced", "رکورد به گزارش روزانه ارجاع شد"
     DAILY_REPORT_SUBMITTED = "daily_report.submitted", "گزارش روزانه ارسال شد"
     DAILY_REPORT_APPROVED = "daily_report.approved", "گزارش روزانه تأیید شد"
+    DAILY_REPORT_RETURNED = "daily_report.returned", "گزارش روزانه برای اصلاح بازگشت"
+    DAILY_REPORT_CORRECTION_CREATED = "daily_report.correction_created", "نسخه اصلاحی ایجاد شد"
+    DAILY_REPORT_CORRECTION_SAVED = "daily_report.correction_saved", "نسخه اصلاحی ذخیره شد"
+    DAILY_REPORT_BASELINE_FROZEN = "daily_report.baseline_frozen", "مبنای گزارش روزانه ثبت شد"
     DAILY_REPORT_LABOR_ADDED = (
         "daily_report.labor_added",
         "نیروی انسانی به گزارش روزانه افزوده شد",

@@ -1,0 +1,93 @@
+{
+  "dashboard": {
+    "status": "PASS",
+    "detail": {
+      "postgresql_counts": {
+        "companies": 30,
+        "users": 33,
+        "memberships": 3
+      },
+      "rendered_kpis": [
+        30,
+        30,
+        0,
+        33,
+        3
+      ]
+    }
+  },
+  "responsive-pages": {
+    "status": "PASS",
+    "detail": {
+      "observations": 39
+    }
+  },
+  "companies-interactions": {
+    "status": "PASS",
+    "detail": {
+      "search_exact_target": true,
+      "empty_state": true,
+      "active_page_2": true
+    }
+  },
+  "member-selector": {
+    "status": "PASS",
+    "detail": {
+      "responsive": [
+        {
+          "width": 1440,
+          "named_comboboxes": 1
+        },
+        {
+          "width": 1024,
+          "named_comboboxes": 1
+        },
+        {
+          "width": 390,
+          "named_comboboxes": 1
+        }
+      ],
+      "keyboard_authorized_company": true,
+      "native_fallback": true,
+      "platform_only_tenant_grants_denied": true
+    }
+  },
+  "audit": {
+    "status": "FAIL",
+    "error": "Locator.click: Timeout 6000ms exceeded."
+  },
+  "security-pa11": {
+    "status": "PASS",
+    "detail": {
+      "rows": 33,
+      "denials": 86,
+      "platform_only_probes": [
+        {
+          "route": "projects:list",
+          "status": 302
+        },
+        {
+          "route": "documents:list",
+          "status": 302
+        },
+        {
+          "route": "organizations:members",
+          "status": 302
+        }
+      ]
+    }
+  },
+  "protected-retirement": {
+    "status": "PASS",
+    "detail": {
+      "cancel_posts": 0,
+      "confirm_posts": 1,
+      "audit_delta": 1,
+      "prior_versions_intact": true
+    }
+  },
+  "policy-lifecycle": {
+    "status": "FAIL",
+    "error": "Draft editor displayed an incorrect source basis"
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "b06_validation": {
+    "read_only": true,
+    "postgresql_version": "18.6",
+    "migration_count": [
+      [
+        462
+      ]
+    ],
+    "b03_b04_related_migrations": [
+      [
+        "daily_reports",
+        "0008_daily_report_return"
+      ],
+      [
+        "daily_reports",
+        "0009_revision_guards"
+      ],
+      [
+        "equipment",
+        "0006_equipment_handoff_source_uniqueness"
+      ],
+      [
+        "workflows",
+        "0028_daily_report_return_catalog"
+      ]
+    ],
+    "base_tenants": [
+      [
+        0
+      ]
+    ],
+    "base_users": [
+      [
+        0
+      ]
+    ]
+  },
+  "test_b06_independent_count3": {
+    "read_only": true,
+    "postgresql_version": "18.6",
+    "count": [
+      [
+        "posted",
+        true
+      ]
+    ],
+    "counted_lines": [
+      [
+        "5.0000",
+        "6.0000",
+        true
+      ],
+      [
+        "5.0000",
+        "6.0000",
+        true
+      ]
+    ],
+    "audit_transitions": [
+      [
+        6
+      ]
+    ],
+    "journal_entries": [
+      [
+        0
+      ]
+    ]
+  },
+  "test_b06_independent_reservation3": {
+    "read_only": true,
+    "postgresql_version": "18.6",
+    "reservations": [
+      [
+        "cancelled",
+        "2.0000"
+      ]
+    ],
+    "reservation_audits": [
+      [
+        3
+      ]
+    ],
+    "allocations": [
+      [
+        "2.0000",
+        "released"
+      ]
+    ],
+    "movement_count": [
+      [
+        1
+      ]
+    ],
+    "journal_entries": [
+      [
+        0
+      ]
+    ]
+  },
+  "test_b06_independent_transfer3": {
+    "read_only": true,
+    "postgresql_version": "18.6",
+    "transfer": [
+      [
+        "accepted",
+        true
+      ]
+    ],
+    "lineage": [
+      [
+        "3.0000",
+        "3.0000",
+        "3.0000",
+        "3.0000",
+        true
+      ]
+    ],
+    "signed_movement_balance": [
+      [
+        "CENTRAL",
+        "2.0000"
+      ],
+      [
+        "SITE",
+        "3.0000"
+      ]
+    ],
+    "audit_transitions": [
+      [
+        4
+      ]
+    ],
+    "journal_entries": [
+      [
+        0
+      ]
+    ]
+  },
+  "test_b06_independent_cancellation2": {
+    "read_only": true,
+    "postgresql_version": "18.6",
+    "orders": [
+      [
+        "cancelled",
+        1
+      ]
+    ],
+    "rfqs": [
+      [
+        "cancelled",
+        1
+      ]
+    ],
+    "stock_movements": [
+      [
+        0
+      ]
+    ]
+  }
+}

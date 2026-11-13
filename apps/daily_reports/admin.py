@@ -18,6 +18,7 @@ class DailyReportAdmin(admin.ModelAdmin):
         "site",
         "phase",
         "reporting_date",
+        "revision_number",
         "status",
         "organization",
     )
@@ -34,6 +35,9 @@ class DailyReportAdmin(admin.ModelAdmin):
         "updated_at",
         "submitted_at",
         "approved_at",
+        "previous_revision",
+        "revision_number",
+        "submission_hash",
     )
 
     def has_add_permission(self, request: HttpRequest) -> bool:

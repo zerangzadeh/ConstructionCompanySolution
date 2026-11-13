@@ -90,7 +90,16 @@ CAPABILITIES = (
         ),
     ),
     Capability("operational_reports", True, routes=("reporting:dashboard",)),
-    Capability("full_hr", False, ("workforce",)),
+    Capability(
+        "full_hr",
+        False,
+        ("workforce",),
+        (
+            "documents:employee-list",
+            "documents:employee-detail",
+            "documents:employee-version-download",
+        ),
+    ),
     Capability(
         "internal_reporting",
         False,
@@ -379,6 +388,12 @@ NAVIGATION_GROUPS = (
             ),
             NavigationLink("مصالح و کالا", "materials:material_list", "materials.view"),
             NavigationLink("انبار", "inventory:warehouse_list", "warehouses.view"),
+            NavigationLink(
+                "کنترل موجودی",
+                "inventory:custody_workbench",
+                "inventory_transfers.accept",
+                "inventory_receiving_only",
+            ),
         ),
     ),
     NavigationGroup(

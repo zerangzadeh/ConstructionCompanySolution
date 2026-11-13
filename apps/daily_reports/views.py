@@ -45,7 +45,11 @@ from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
 )
+from apps.organizations.form_scoping import normalized_uuid
 from apps.organizations.models import BusinessPermissionCode
+from apps.projects.services import get_organization_project
+from apps.workflows.runtime import WorkflowConflict
+from core.organization_time import render_in_organization_time
 from core.product_surface import surface_profile
 
 
@@ -71,12 +75,21 @@ def daily_report_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_CREATE)
 def daily_report_create(request: HttpRequest) -> HttpResponse:
+    initial = {}
+    if request.method == "GET" and request.GET.get("project"):
+        project = get_organization_project(
+            user=request.user,
+            organization=request.organization,
+            project_id=normalized_uuid(request.GET["project"]),
+        )
+        initial["project"] = project.pk
     form = DailyReportCreateForm(
         request.POST or None,
         organization=request.organization,
         membership=get_active_membership(
             user=request.user, organization=request.organization
         ),
+        initial=initial,
     )
     can_upload = all(
         has_business_permission(
@@ -210,13 +223,17 @@ def daily_report_detail(request: HttpRequest, report_id: str) -> HttpResponse:
 def _render_daily_report_detail(
     request: HttpRequest, report: DailyReport, **bound_forms: BaseForm
 ) -> HttpResponse:
-    return render(
+    from .revision_views import revision_context
+
+    revision = revision_context(report, request.user)
+    return render_in_organization_time(
         request,
         "daily_reports/detail.html",
         {
             "report": report,
             "can_approve_daily_report": (
-                (surface_profile() != "MVP" or report.created_by_id != request.user.pk)
+                (revision["show_return"] if report.submission_hash else
+                 (surface_profile() != "MVP" or report.created_by_id != request.user.pk))
                 and has_business_permission(
                     user=request.user,
                     organization=request.organization,
@@ -252,6 +269,7 @@ def _render_daily_report_detail(
                 report=report, auto_id="daily-activity-%s"
             ),
             "delay_event_form": DelayEventForm(report=report, auto_id="daily-delay-%s"),
+            **revision,
             **bound_forms,
         },
     )
@@ -410,8 +428,10 @@ def daily_report_submit(request: HttpRequest, report_id: str) -> HttpResponse:
             report_id=report_id,
             actor=request.user,
         )
-    except (PermissionDenied, ValueError) as exc:
+    except PermissionDenied as exc:
         return HttpResponse(str(exc), status=403)
+    except (ValueError, ValidationError, WorkflowConflict) as exc:
+        return HttpResponse(str(exc), status=409)
     return redirect("daily_reports:detail", report_id=report_id)
 
 
@@ -425,6 +445,8 @@ def daily_report_approve(request: HttpRequest, report_id: str) -> HttpResponse:
             report_id=report_id,
             actor=request.user,
         )
-    except (PermissionDenied, ValueError) as exc:
+    except PermissionDenied as exc:
         return HttpResponse(str(exc), status=403)
+    except (ValueError, ValidationError, WorkflowConflict) as exc:
+        return HttpResponse(str(exc), status=409)
     return redirect("daily_reports:detail", report_id=report_id)

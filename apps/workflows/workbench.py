@@ -602,6 +602,7 @@ def decorate_work_items(
             and item.current_assignee_id == membership.pk
         )
         item.workbench_outcomes = []
+        item.purchase_request_reject_via_source = False
         is_inventory_reversal = (
             item.instance.definition.workflow_type.code
             == "inventory.stock_transaction_reversal"
@@ -630,8 +631,16 @@ def decorate_work_items(
             and item.current_assignee_id == membership.pk
         ):
             for transition in item.step_instance.step_definition.workbench_transitions:
+                if item.instance.subject_type == "daily_reports.daily_report" and transition.outcome == "returned":
+                    continue
                 required = transition.required_permission or item.required_permission
                 if not required or required in permission_codes:
+                    if (
+                        item.instance.subject_type == "procurement.purchase_request"
+                        and transition.outcome == "rejected"
+                    ):
+                        item.purchase_request_reject_via_source = bool(item.source_url)
+                        continue
                     item.workbench_outcomes.append(
                         {
                             "value": transition.outcome,

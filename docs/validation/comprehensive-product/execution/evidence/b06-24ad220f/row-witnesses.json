@@ -1,0 +1,880 @@
+{
+  "INV-INVENTORY-COUNT-APPROVE--CV-INV-01": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/count-posted.json",
+    "authoritative_checks": "PASS",
+    "actual": "Independent controller approved the submitted count. Maker attempt left the count submitted."
+  },
+  "INV-INVENTORY-COUNT-CREATE--CV-INV-01": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/count-form.json",
+    "authoritative_checks": "PASS",
+    "actual": "Created and froze a count for two materials at quantity 5. Searchable warehouse retained scope."
+  },
+  "INV-INVENTORY-COUNT-DETAIL--CV-INV-01": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/count-invalid.json",
+    "authoritative_checks": "PASS",
+    "actual": "Invalid second line saved neither line or audit, and retained valid values. Corrected quantities submitted atomically."
+  },
+  "INV-INVENTORY-COUNT-POST--CV-INV-01": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/count-posted.json",
+    "authoritative_checks": "PASS",
+    "actual": "Two one-unit adjustments linked to their lines. Concurrent posting retained one adjustment for the contested single-line count."
+  },
+  "INV-INVENTORY-CUSTODY-WORKBENCH--CV-INV-01": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/custody.json",
+    "authoritative_checks": "PASS",
+    "actual": "Company-wide summary and scoped reservation, count and transfer sections, with distinct lifecycle indicators."
+  },
+  "INV-INVENTORY-RESERVATION-CREATE--CV-INV-01": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/reservation-invalid.json",
+    "authoritative_checks": "PASS",
+    "actual": "Excess rejected with no draft or audit. Corrected same-number retry reserved 2 of 5 with searchable scoped controls."
+  },
+  "INV-INVENTORY-RESERVATION-RELEASE--CV-INV-01": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/reservation-release.json",
+    "authoritative_checks": "PASS",
+    "actual": "Release returned the allocation and left on-hand 5. Unfulfilled reservation retained its cancelled history."
+  },
+  "INV-INVENTORY-TRANSFER-ACCEPT--CV-INV-01": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/transfer-accepted.json",
+    "authoritative_checks": "PASS",
+    "actual": "Independent destination actor credited 3 once. Replay retained one credit and exact lineage."
+  },
+  "INV-INVENTORY-TRANSFER-CREATE--CV-INV-01": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/transfer-form.json",
+    "authoritative_checks": "PASS",
+    "actual": "Searchable material and warehouses submitted a source-linked draft. Foreign actor denied."
+  },
+  "INV-INVENTORY-TRANSFER-DETAIL--CV-INV-01": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/transfer-inbound.json",
+    "authoritative_checks": "PASS",
+    "actual": "Inbound record accessible to the destination-project receiver from in-transit, with correct source/destination labels and scoped return."
+  },
+  "INV-INVENTORY-TRANSFER-DISPATCH--CV-INV-01": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/transfer-accepted.json",
+    "authoritative_checks": "PASS",
+    "actual": "One debit of 3 from opening 5. Repeat and concurrent dispatch retained one movement."
+  },
+  "INV-INVENTORY-TRANSFER-IN-TRANSIT--CV-INV-01": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/transfer-inbound.json",
+    "authoritative_checks": "PASS",
+    "actual": "Source became 2 and destination stayed zero in transit. Transition and audit persisted."
+  },
+  "INV-INVENTORY-VALUATION-WORKBENCH--CV-INV-01": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/valuation-valued.json",
+    "authoritative_checks": "PASS",
+    "actual": "Chrome tied 10 units, 100 IRR and 10 IRR/unit to one finalized source. Qualified transfer conserved moving weighted-average value."
+  },
+  "INV-PROCUREMENT-REQUEST-APPROVE--UAT-11": {
+    "status": "PASS",
+    "browser_cases": [
+      "confirmation/test_full_new_pr_to_partial_receipts_stock_and_reversal/04-approve-pr",
+      "confirmation/test_real_chrome_pr_journey_responsive_and_authority_boundaries/add-submit-approve",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/04-approve-pr"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Independent approval, workflow state and explicit RFQ entry. Reviewer denial on unauthorized copies."
+  },
+  "INV-PROCUREMENT-REQUEST-CANCEL--UAT-11": {
+    "status": "PASS",
+    "browser_cases": [
+      "confirmation/test_real_chrome_pr_journey_responsive_and_authority_boundaries/cancelPR-CANCEL",
+      "confirmation/test_real_chrome_pr_journey_responsive_and_authority_boundaries/cancelPR-CANCEL-S"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Draft and submitted copies cancelled with reason. Final controls removed."
+  },
+  "INV-PROCUREMENT-REQUEST-CHOICES--UAT-11": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_list_filter_navigation_pagination_and_searchable_project/list-search-sort-advanced",
+      "confirmation/test_real_chrome_pr_journey_responsive_and_authority_boundaries/add-submit-approve"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Searchable project/material selection and forged tenant/project values denied."
+  },
+  "INV-PROCUREMENT-REQUEST-CREATE--UAT-11": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_full_new_pr_to_partial_receipts_stock_and_reversal/01-create-pr",
+      "original/test_real_chrome_pr_journey_responsive_and_authority_boundaries/create-validation-retention",
+      "qualified/test_full_new_pr_to_partial_receipts_stock_and_reversal/01-create-pr",
+      "confirmation/test_full_new_pr_to_partial_receipts_stock_and_reversal/01-create-pr",
+      "confirmation/test_real_chrome_pr_journey_responsive_and_authority_boundaries/create-validation-retention",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/01-create-pr"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Draft creation retained valid values, with authorized context and Persian feedback."
+  },
+  "INV-PROCUREMENT-REQUEST-DETAIL--UAT-11": {
+    "status": "PASS",
+    "browser_cases": [
+      "confirmation/test_real_chrome_pr_journey_responsive_and_authority_boundaries/detail-approved-1440",
+      "confirmation/test_real_chrome_pr_journey_responsive_and_authority_boundaries/detail-approved-1024",
+      "confirmation/test_real_chrome_pr_journey_responsive_and_authority_boundaries/detail-approved-390"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Draft and approved details at all widths, source and authorized continuation checked."
+  },
+  "INV-PROCUREMENT-REQUEST-ITEM-ADD--UAT-11": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_full_new_pr_to_partial_receipts_stock_and_reversal/02-add-pr-material",
+      "qualified/test_full_new_pr_to_partial_receipts_stock_and_reversal/02-add-pr-material",
+      "confirmation/test_full_new_pr_to_partial_receipts_stock_and_reversal/02-add-pr-material",
+      "confirmation/test_real_chrome_pr_journey_responsive_and_authority_boundaries/item-invalid-retention",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/02-add-pr-material"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Selected material and UOM persisted. Invalid quantity retained the remaining input."
+  },
+  "INV-PROCUREMENT-REQUEST-LIST--UAT-11": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_list_filter_navigation_pagination_and_searchable_project/list-pagination-mobile",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/pr-list-1440",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/pr-list-1024",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/pr-list-390"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Scoped search, sort, pagination and narrow record actions."
+  },
+  "INV-PROCUREMENT-REQUEST-REJECT--UAT-11": {
+    "status": "PASS",
+    "browser_cases": [
+      "confirmation/test_real_chrome_pr_journey_responsive_and_authority_boundaries/rejectPR-REJECT"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Separate request rejected with reason and retained history."
+  },
+  "INV-PROCUREMENT-REQUEST-SUBMIT--UAT-11": {
+    "status": "PASS",
+    "browser_cases": [
+      "confirmation/test_full_new_pr_to_partial_receipts_stock_and_reversal/03-submit-pr",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/03-submit-pr"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Confirmation opened, affirmative action submitted the request. No automatic RFQ."
+  },
+  "INV-PROCUREMENT-PORTAL-ACCEPT--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/portal-accept.json",
+    "authoritative_checks": "PASS",
+    "actual": "Accepted once with the intended authenticated identity. Wrong supplier could not create a grant."
+  },
+  "INV-PROCUREMENT-PORTAL-CONTEXT--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/portal-context.json",
+    "authoritative_checks": "PASS",
+    "actual": "Displayed exact supplier, RFQ version and project. Wrong principal returned 404."
+  },
+  "INV-PROCUREMENT-PORTAL-GRANT-REVOKE--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/portal-persistence.json",
+    "authoritative_checks": "PASS",
+    "actual": "Revoked with reason. Previous context and receipt immediately returned 404."
+  },
+  "INV-PROCUREMENT-PORTAL-INVITATION-MANAGE--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/portal-management.json",
+    "authoritative_checks": "PASS",
+    "actual": "Scoped purchaser created a time-bound invitation through the Jalali form. Token displayed once."
+  },
+  "INV-PROCUREMENT-PORTAL-RECEIPT--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/portal-receipt.json",
+    "authoritative_checks": "PASS",
+    "actual": "Displayed immutable receipt and hid other principals’ submissions."
+  },
+  "INV-PROCUREMENT-PORTAL-SUBMIT--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/portal-persistence.json",
+    "authoritative_checks": "PASS",
+    "actual": "Uploaded real synthetic sealed PDF through Chrome. Repeated identical payload retained one receipt."
+  },
+  "INV-PROCUREMENT-RFQ-ADDENDUM--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "final-focused/test_explicit_scope_issue_addendum_and_responsive_denials/addendum-390",
+      "final-focused/test_explicit_scope_issue_addendum_and_responsive_denials/addendum-pins-new-scope"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Explicit addendum created a successor version. Existing issued scope and evidence were retained."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_receipt_revision_withdraw_close_custody_opening_grants_and_denials/request-protected-opening",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/buyer-workspace-1440",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/buyer-workspace-1024",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/buyer-workspace-390"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-APPOINT-EVALUATOR--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_admissibility_comparison_conflict_award_no_award_isolation/appoint-comparison-evaluator",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/24-appoint_evaluator"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-APPROVE-ADMISSIBILITY--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_admissibility_comparison_conflict_award_no_award_isolation/admissibility-corrective-approval",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/22-approve_admissibility"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-APPROVE-OPENING--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_receipt_revision_withdraw_close_custody_opening_grants_and_denials/opening-independent-actor-denial",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/17-approve_opening"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-ATTACH-EVIDENCE--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_receipt_revision_withdraw_close_custody_opening_grants_and_denials/custody-original-source",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/15-attach_evidence"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-CAPTURE--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_receipt_revision_withdraw_close_custody_opening_grants_and_denials/capture-source-receipt",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/10-capture"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-DECLARE-CONFLICT--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_admissibility_comparison_conflict_award_no_award_isolation/declare-evaluator-conflict"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-DISPOSE-CONFLICT--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_admissibility_comparison_conflict_award_no_award_isolation/independent-conflict-disposition"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-EVALUATE--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_admissibility_comparison_conflict_award_no_award_isolation/unresolved-conflict-blocks-evaluation",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/25-evaluate"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-FINALIZE-AWARD--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_admissibility_comparison_conflict_award_no_award_isolation/award-self-approval-denied",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/28-finalize_award"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-FINALIZE-COMPARISON--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_admissibility_comparison_conflict_award_no_award_isolation/comparison-self-finalization-denial",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/26-finalize_comparison"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-GRANT-ACCESS--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_receipt_revision_withdraw_close_custody_opening_grants_and_denials/grant-exact-revision-access",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/18-grant_access"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-PREPARE-ADMISSIBILITY--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_admissibility_comparison_conflict_award_no_award_isolation/admissibility-corrective-review",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/21-prepare_admissibility"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-PREPARE-AWARD--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_admissibility_comparison_conflict_award_no_award_isolation/partial-award-proposal",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/27-prepare_award"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-PREPARE-COMPARISON--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_admissibility_comparison_conflict_award_no_award_isolation/comparison-explicit-assertions",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/23-prepare_comparison"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-REQUEST-OPENING--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_receipt_revision_withdraw_close_custody_opening_grants_and_denials/early-opening-denied-issued",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/16-request_opening"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-REVOKE-ACCESS--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_receipt_revision_withdraw_close_custody_opening_grants_and_denials/revoke-version-access",
+      "original/test_receipt_revision_withdraw_close_custody_opening_grants_and_denials/revoked-document-access"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-SUBMIT--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_receipt_revision_withdraw_close_custody_opening_grants_and_denials/submit-superseding-revision",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/11-submit"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-ACTION-WITHDRAW--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_receipt_revision_withdraw_close_custody_opening_grants_and_denials/withdraw-current-revision"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized buyer action and resulting revision/decision checked with protected role and denied variants."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-DOCUMENT--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_receipt_revision_withdraw_close_custody_opening_grants_and_denials/authorized-source-document",
+      "original/test_receipt_revision_withdraw_close_custody_opening_grants_and_denials/document-sealed-access-denied"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Original file denied before opening and without grant. Exact-version download allowed after grant and revoked immediately."
+  },
+  "INV-PROCUREMENT-RFQ-BUYER-WORKSPACE--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_admissibility_comparison_conflict_award_no_award_isolation/cross-project-workspace-denial",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/buyer-workspace-1440",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/buyer-workspace-1024",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/buyer-workspace-390"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Rendered business state and transition/source evidence matched the scoped scenario."
+  },
+  "INV-PROCUREMENT-RFQ-CANCEL--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/rfq-cancelled.json",
+    "authoritative_checks": "PASS",
+    "actual": "Chrome cancellation with reason. One cancelled RFQ remained. Foreign detail denied."
+  },
+  "INV-PROCUREMENT-RFQ-CHOICES--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_contextual_partial_second_full_receipt_and_inventory_entry/general-create-390",
+      "original/test_end_to_end_rfq_preparation_issue_and_responsive_history/line-select-add",
+      "original/test_end_to_end_rfq_preparation_issue_and_responsive_history/general-create-390",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/06-select-pr-line",
+      "supplier-regression/test_end_to_end_rfq_preparation_issue_and_responsive_history/line-select-add",
+      "supplier-regression/test_end_to_end_rfq_preparation_issue_and_responsive_history/general-create-390"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized searchable source choices verified, including scoped lookup and forged source denial."
+  },
+  "INV-PROCUREMENT-RFQ-CLOSE--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_receipt_revision_withdraw_close_custody_opening_grants_and_denials/close-issued-rfq",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/14-close-rfq"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Only authorized close froze effective revision evidence. Denied early and repeated attempts."
+  },
+  "INV-PROCUREMENT-RFQ-CREATE--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_browser_denials_and_forged_context/forged-hidden-pr-rejected",
+      "confirmation/test_full_new_pr_to_partial_receipts_stock_and_reversal/05-contextual-pr-to-rfq",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/05-contextual-pr-to-rfq"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Rendered business state and transition/source evidence matched the scoped scenario."
+  },
+  "INV-PROCUREMENT-RFQ-DETAIL--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_end_to_end_rfq_preparation_issue_and_responsive_history/issued-readonly-1440",
+      "original/test_end_to_end_rfq_preparation_issue_and_responsive_history/issued-readonly-1024",
+      "original/test_end_to_end_rfq_preparation_issue_and_responsive_history/issued-readonly-390",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/rfq-detail-1440",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/rfq-detail-1024",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/rfq-detail-390",
+      "supplier-regression/test_end_to_end_rfq_preparation_issue_and_responsive_history/issued-readonly-1440",
+      "supplier-regression/test_end_to_end_rfq_preparation_issue_and_responsive_history/issued-readonly-1024",
+      "supplier-regression/test_end_to_end_rfq_preparation_issue_and_responsive_history/issued-readonly-390"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Rendered business state and transition/source evidence matched the scoped scenario."
+  },
+  "INV-PROCUREMENT-RFQ-ISSUE--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_end_to_end_rfq_preparation_issue_and_responsive_history/issue-freezes-scope-and-invitations",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/09-select-suppliers-and-issue",
+      "supplier-regression/test_end_to_end_rfq_preparation_issue_and_responsive_history/issue-freezes-scope-and-invitations"
+    ],
+    "chrome_state": "chrome/supplier-search-state.json",
+    "authoritative_checks": "PASS",
+    "actual": "Search retained both supplier selections across different filters. Issue froze exactly two invitations and preserved version scope."
+  },
+  "INV-PROCUREMENT-RFQ-LINE-ADD--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_end_to_end_rfq_preparation_issue_and_responsive_history/line-invalid-retains-selection",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/06-select-pr-line",
+      "supplier-regression/test_end_to_end_rfq_preparation_issue_and_responsive_history/line-invalid-retains-selection"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Rendered business state and transition/source evidence matched the scoped scenario."
+  },
+  "INV-PROCUREMENT-RFQ-LIST--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_end_to_end_rfq_preparation_issue_and_responsive_history/list-390",
+      "original/test_end_to_end_rfq_preparation_issue_and_responsive_history/list-filter-sort-chips",
+      "original/test_general_eligible_line_entry_list_filters_sort_and_pagination/inventory-list-390",
+      "original/test_list_filters_pagination_create_retention_and_retry/receipt-list-390",
+      "original/test_real_chrome_pr_journey_responsive_and_authority_boundaries/list-390",
+      "qualified/test_legacy_direct_flow_list_and_responsive_patterns/po-list-390",
+      "qualified/test_legacy_direct_flow_list_and_responsive_patterns/list-filter-sort-chips",
+      "confirmation/test_real_chrome_pr_journey_responsive_and_authority_boundaries/list-390",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/grn-list-390",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/inventory-list-390",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/po-list-390",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/pr-list-390",
+      "supplier-regression/test_end_to_end_rfq_preparation_issue_and_responsive_history/list-390",
+      "supplier-regression/test_end_to_end_rfq_preparation_issue_and_responsive_history/list-filter-sort-chips"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized list, filters, results and responsive navigation verified."
+  },
+  "INV-PROCUREMENT-RFQ-SCOPE-DEFINE--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "final-focused/test_explicit_scope_issue_addendum_and_responsive_denials/scope-save-explicit",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/07-define-explicit-scope"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Explicit source and quantity retained through scope confirmation and issue."
+  },
+  "INV-PROCUREMENT-RFQ-SUBMIT--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_end_to_end_rfq_preparation_issue_and_responsive_history/explicit-scope-and-submit",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/08-submit-rfq",
+      "supplier-regression/test_end_to_end_rfq_preparation_issue_and_responsive_history/explicit-scope-and-submit"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Rendered business state and transition/source evidence matched the scoped scenario."
+  },
+  "INV-PROCUREMENT-SEALED-EVIDENCE-CUSTODY--UAT-12": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/sealed-persistence.json",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized upload retained one sealed original and kept the close manifest immutable. Denied ungranted and foreign actors."
+  },
+  "INV-PROCUREMENT-ORDER-CANCEL--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/order-cancelled.json",
+    "authoritative_checks": "PASS",
+    "actual": "Cancelled a distinct draft with reason. No movement was created and foreign detail was denied."
+  },
+  "INV-PROCUREMENT-ORDER-CHOICES--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_fixed_source_project_and_final_create_visuals/fixed-source-create-1440",
+      "qualified/test_fixed_source_project_and_final_create_visuals/fixed-source-create-1024",
+      "qualified/test_fixed_source_project_and_final_create_visuals/fixed-source-create-390",
+      "qualified/test_legacy_direct_flow_list_and_responsive_patterns/legacy-create-1440",
+      "qualified/test_legacy_direct_flow_list_and_responsive_patterns/legacy-create-1024",
+      "qualified/test_legacy_direct_flow_list_and_responsive_patterns/legacy-create-390",
+      "qualified/test_legacy_direct_flow_list_and_responsive_patterns/legacy-create-retention",
+      "qualified/test_legacy_direct_flow_list_and_responsive_patterns/legacy-create-draft",
+      "qualified/test_source_to_issued_order_context_and_safety/source-create-1440",
+      "qualified/test_source_to_issued_order_context_and_safety/source-create-1024",
+      "qualified/test_source_to_issued_order_context_and_safety/source-create-390",
+      "qualified/test_source_to_issued_order_context_and_safety/forged-supplier-denied"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized searchable source choices verified, including scoped lookup and forged source denial."
+  },
+  "INV-PROCUREMENT-ORDER-CREATE--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_legacy_direct_flow_list_and_responsive_patterns/legacy-create-retention",
+      "qualified/test_legacy_direct_flow_list_and_responsive_patterns/legacy-create-draft"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Rendered business state and transition/source evidence matched the scoped scenario."
+  },
+  "INV-PROCUREMENT-ORDER-DETAIL--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_source_to_issued_order_context_and_safety/issued-detail-1440",
+      "qualified/test_source_to_issued_order_context_and_safety/issued-detail-1024",
+      "qualified/test_source_to_issued_order_context_and_safety/issued-detail-390",
+      "qualified/test_source_to_issued_order_context_and_safety/wrong-tenant-po-detail",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/po-detail-1440",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/po-detail-1024",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/po-detail-390"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Rendered business state and transition/source evidence matched the scoped scenario."
+  },
+  "INV-PROCUREMENT-ORDER-FROM-AWARD--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_source_to_issued_order_context_and_safety/duplicate-allocation-consumption-denied",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/29-award-to-po"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Chrome followed the same approved PR, RFQ, award, PO, receipt and stock source chain, with duplicate and over-quantity checks."
+  },
+  "INV-PROCUREMENT-ORDER-ISSUE--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_source_to_issued_order_context_and_safety/issue-po-explicit-action",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/30-issue-po"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Explicit issue froze source, quantities, units and price evidence. GRN navigation stayed separate."
+  },
+  "INV-PROCUREMENT-ORDER-ITEM-ADD--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_legacy_direct_flow_list_and_responsive_patterns/legacy-line-entry-and-issue"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Rendered business state and transition/source evidence matched the scoped scenario."
+  },
+  "INV-PROCUREMENT-ORDER-LIST--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "qualified/test_legacy_direct_flow_list_and_responsive_patterns/po-list-1440",
+      "qualified/test_legacy_direct_flow_list_and_responsive_patterns/po-list-1024",
+      "qualified/test_legacy_direct_flow_list_and_responsive_patterns/po-list-390",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/po-list-1440",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/po-list-1024",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/po-list-390"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized list, filters, results and responsive navigation verified."
+  },
+  "INV-PROCUREMENT-RECEIPT-CHOICES--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_contextual_partial_second_full_receipt_and_inventory_entry/general-eligible-po-search-and-second-grn",
+      "original/test_void_dependency_denial_valid_void_and_isolation/forged-project-context-denial"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized searchable source choices verified, including scoped lookup and forged source denial."
+  },
+  "INV-PROCUREMENT-RECEIPT-CREATE--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_list_filters_pagination_create_retention_and_retry/header-create-and-exact-retry",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/31-po-to-grn",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/36-po-to-grn"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Contextual and general forms retained the eligible PO and scoped selections. Repeated create kept one source."
+  },
+  "INV-PROCUREMENT-RECEIPT-DETAIL--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_void_dependency_denial_valid_void_and_isolation/cross-project-receipt-denial",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/grn-detail-1440",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/grn-detail-1024",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/grn-detail-390"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Rendered business state and transition/source evidence matched the scoped scenario."
+  },
+  "INV-PROCUREMENT-RECEIPT-ITEM-ADD--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_contextual_partial_second_full_receipt_and_inventory_entry/excess-receipt-denied",
+      "original/test_void_dependency_denial_valid_void_and_isolation/wrong-po-line-denial",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/32-receipt-line"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Partial receipt accepted, excessive quantity, wrong order line and duplicate entry denied."
+  },
+  "INV-PROCUREMENT-RECEIPT-LIST--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_list_filters_pagination_create_retention_and_retry/receipt-list-1440",
+      "original/test_list_filters_pagination_create_retention_and_retry/receipt-list-1024",
+      "original/test_list_filters_pagination_create_retention_and_retry/receipt-list-390",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/grn-list-1440",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/grn-list-1024",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/grn-list-390"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized list, filters, results and responsive navigation verified."
+  },
+  "INV-PROCUREMENT-RECEIPT-POST--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_contextual_partial_second_full_receipt_and_inventory_entry/partial-post-grn",
+      "original/test_contextual_partial_second_full_receipt_and_inventory_entry/second-receipt-exact-remaining-full-post",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/33-post-grn",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/38-post-grn"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "First receipt posted 2 of 5 and left 3. Second completed the source. Concurrent final posting conserved remaining quantity."
+  },
+  "INV-PROCUREMENT-RECEIPT-VOID--UAT-13": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_void_dependency_denial_valid_void_and_isolation/valid-void-with-business-reason",
+      "original/test_void_dependency_denial_valid_void_and_isolation/void-denied-inventory-dependency"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Void retained historical lines. Posted inventory dependency blocked void until resolved."
+  },
+  "INV-INVENTORY-JOURNEY-CHOICES--UAT-14": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_general_eligible_line_entry_list_filters_sort_and_pagination/general-eligible-grn-line-search",
+      "original/test_grn_draft_explicit_post_balance_reversal_and_source_navigation/incompatible-warehouse-denied"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized searchable source choices verified, including scoped lookup and forged source denial."
+  },
+  "INV-INVENTORY-TRANSACTION-CREATE--UAT-14": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_grn_draft_explicit_post_balance_reversal_and_source_navigation/draft-refresh-and-identical-retry",
+      "original/test_grn_draft_explicit_post_balance_reversal_and_source_navigation/inventory-receipt-create-draft",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/34-grn-to-inventory-draft"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Posted GRN produced one draft with source and compatible warehouse. Draft did not increase stock."
+  },
+  "INV-INVENTORY-TRANSACTION-DETAIL--UAT-14": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_grn_draft_explicit_post_balance_reversal_and_source_navigation/inventory-reversed-history-1440",
+      "original/test_grn_draft_explicit_post_balance_reversal_and_source_navigation/inventory-reversed-history-1024",
+      "original/test_grn_draft_explicit_post_balance_reversal_and_source_navigation/inventory-reversed-history-390",
+      "original/test_source_and_warehouse_forgery_unposted_permission_tenant_project_denials/cross-project-inventory-detail-denial",
+      "original/test_source_and_warehouse_forgery_unposted_permission_tenant_project_denials/cross-tenant-inventory-detail-denial",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/inventory-detail-1440",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/inventory-detail-1024",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/inventory-detail-390",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/wrong-tenant-stock"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Rendered business state and transition/source evidence matched the scoped scenario."
+  },
+  "INV-INVENTORY-TRANSACTION-LIST--UAT-14": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_general_eligible_line_entry_list_filters_sort_and_pagination/inventory-list-1440",
+      "original/test_general_eligible_line_entry_list_filters_sort_and_pagination/inventory-list-1024",
+      "original/test_general_eligible_line_entry_list_filters_sort_and_pagination/inventory-list-390",
+      "original/test_general_eligible_line_entry_list_filters_sort_and_pagination/inventory-list-search-chips-sort",
+      "original/test_general_eligible_line_entry_list_filters_sort_and_pagination/inventory-list-pagination",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/inventory-list-1440",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/inventory-list-1024",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/inventory-list-390"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized list, filters, results and responsive navigation verified."
+  },
+  "INV-INVENTORY-TRANSACTION-POST--UAT-14": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_grn_draft_explicit_post_balance_reversal_and_source_navigation/explicit-inventory-post",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/35-post-inventory",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/40-post-inventory"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Explicit posting increased quantity once, including concurrent identical source acceptance."
+  },
+  "INV-INVENTORY-TRANSACTION-REQUEST-POSTING--UAT-14": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/stock-workflow-state.json",
+    "authoritative_checks": "PASS",
+    "actual": "Rendered request created one assignment workflow with restricted controls hidden."
+  },
+  "INV-INVENTORY-TRANSACTION-REQUEST-REVERSAL--UAT-14": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/stock-workflow-state.json",
+    "authoritative_checks": "PASS",
+    "actual": "Separate request created a second workflow. Reversal retained one linked result."
+  },
+  "INV-INVENTORY-TRANSACTION-REVERSE--UAT-14": {
+    "status": "PASS",
+    "browser_cases": [
+      "original/test_grn_draft_explicit_post_balance_reversal_and_source_navigation/reversed-retry-retains-history-and-zero-balance",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/41-explicit-reversal",
+      "connected-replay/test_full_new_pr_to_partial_receipts_stock_and_reversal/42-explicit-reversal"
+    ],
+    "chrome_state": "",
+    "authoritative_checks": "PASS",
+    "actual": "Linked immutable opposite movement restored the balance. Invalid replay kept one reversal."
+  },
+  "INV-INVENTORY-WAREHOUSE-ARCHIVE--UAT-14": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/warehouse-state.json",
+    "authoritative_checks": "PASS",
+    "actual": "Archived a zero-balance warehouse and retained history. Service denied nonzero stock."
+  },
+  "INV-INVENTORY-WAREHOUSE-CREATE--UAT-14": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/warehouse-form.json",
+    "authoritative_checks": "PASS",
+    "actual": "Created a scoped warehouse from the compact form and verified location in PostgreSQL."
+  },
+  "INV-INVENTORY-WAREHOUSE-DETAIL--UAT-14": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/warehouse-detail.json",
+    "authoritative_checks": "PASS",
+    "actual": "Authorized warehouse showed the selected location and balances. Foreign warehouse returned 404."
+  },
+  "INV-INVENTORY-WAREHOUSE-LIST--UAT-14": {
+    "status": "PASS",
+    "browser_cases": [],
+    "chrome_state": "chrome/warehouse-list.json",
+    "authoritative_checks": "PASS",
+    "actual": "Applied location filtering and restored all entitled rows with «همه محل‌ها». Responsive reference list verified."
+  }
+}

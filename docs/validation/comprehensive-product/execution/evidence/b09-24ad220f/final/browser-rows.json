@@ -1,0 +1,4992 @@
+{
+  "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-PROJECT--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-PROJECT--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/projects/9c1cf607-bcb8-42bd-a63c-e399296887f2/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/choices/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/choices/?q=NO-B09-MATCH",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/choices/",
+        "status": 403,
+        "case": "No authority",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/choices/",
+        "status": 403,
+        "case": "Foreign tenant",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/choices/",
+        "status": 403,
+        "case": "Sibling project",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/choices/?return_to=https://invalid.example/",
+        "status": 403,
+        "case": "Unsafe return denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "generic-source-project"
+    ],
+    "denials": [
+      {
+        "case": "No authority",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Foreign tenant",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling project",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe return denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "eligible_ids": [
+        "17778229-abdb-4953-b2d5-2689890f39f2"
+      ],
+      "exact_source": "9c1cf607-bcb8-42bd-a63c-e399296887f2"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-CONTRACT--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-CONTRACT--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/9cf17f0f-e409-458f-a10f-09cb923065bc/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/choices/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/choices/?q=NO-B09-MATCH",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/choices/",
+        "status": 403,
+        "case": "No authority",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/choices/",
+        "status": 403,
+        "case": "Foreign tenant",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/choices/",
+        "status": 403,
+        "case": "Sibling project",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/choices/?return_to=https://invalid.example/",
+        "status": 403,
+        "case": "Unsafe return denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "generic-source-contract"
+    ],
+    "denials": [
+      {
+        "case": "No authority",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Foreign tenant",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling project",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe return denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "eligible_ids": [
+        "5d6a1a36-bfee-48a7-8c6d-c5fbf77bb707",
+        "b1a94318-7604-484a-8183-3965ad32db28",
+        "17778229-abdb-4953-b2d5-2689890f39f2"
+      ],
+      "exact_source": "9cf17f0f-e409-458f-a10f-09cb923065bc"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-ESTIMATE--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-ESTIMATE--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/estimates/373d0a7c-679b-46a9-94e6-49fe797ee427/?project_id=9c1cf607-bcb8-42bd-a63c-e399296887f2",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/choices/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/choices/?q=NO-B09-MATCH",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/choices/",
+        "status": 403,
+        "case": "No authority",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/choices/",
+        "status": 403,
+        "case": "Foreign tenant",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/choices/",
+        "status": 403,
+        "case": "Sibling project",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/choices/?return_to=https://invalid.example/",
+        "status": 403,
+        "case": "Unsafe return denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "generic-source-estimate"
+    ],
+    "denials": [
+      {
+        "case": "No authority",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Foreign tenant",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling project",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe return denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "eligible_ids": [
+        "5d6a1a36-bfee-48a7-8c6d-c5fbf77bb707",
+        "b1a94318-7604-484a-8183-3965ad32db28",
+        "17778229-abdb-4953-b2d5-2689890f39f2"
+      ],
+      "exact_source": "373d0a7c-679b-46a9-94e6-49fe797ee427"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-EXPENSE--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-EXPENSE--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/expenses/41603950-7d20-49c4-a8a3-e1403cb03c1c/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/choices/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/choices/?q=NO-B09-MATCH",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/choices/",
+        "status": 403,
+        "case": "No authority",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/choices/",
+        "status": 403,
+        "case": "Foreign tenant",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/choices/",
+        "status": 403,
+        "case": "Sibling project",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/choices/?return_to=https://invalid.example/",
+        "status": 403,
+        "case": "Unsafe return denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "generic-source-expense"
+    ],
+    "denials": [
+      {
+        "case": "No authority",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Foreign tenant",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling project",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe return denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "eligible_ids": [
+        "5d6a1a36-bfee-48a7-8c6d-c5fbf77bb707",
+        "b1a94318-7604-484a-8183-3965ad32db28",
+        "17778229-abdb-4953-b2d5-2689890f39f2"
+      ],
+      "exact_source": "41603950-7d20-49c4-a8a3-e1403cb03c1c"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-DAILY-REPORT--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-DAILY-REPORT--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/daily-reports/6572afd4-2a49-4138-8e54-c5d3248b34a7/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/choices/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/choices/?q=NO-B09-MATCH",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/choices/",
+        "status": 403,
+        "case": "No authority",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/choices/",
+        "status": 403,
+        "case": "Foreign tenant",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/choices/",
+        "status": 403,
+        "case": "Sibling project",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/choices/?return_to=https://invalid.example/",
+        "status": 403,
+        "case": "Unsafe return denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "generic-source-daily_report"
+    ],
+    "denials": [
+      {
+        "case": "No authority",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Foreign tenant",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling project",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe return denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "eligible_ids": [
+        "5d6a1a36-bfee-48a7-8c6d-c5fbf77bb707",
+        "b1a94318-7604-484a-8183-3965ad32db28",
+        "17778229-abdb-4953-b2d5-2689890f39f2"
+      ],
+      "exact_source": "6572afd4-2a49-4138-8e54-c5d3248b34a7"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-CHOICES--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-CHOICES--CV-DOC-01",
+    "http": [],
+    "state": {
+      "parameterized_evidence": [
+        "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-PROJECT--CV-DOC-01",
+        "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-CONTRACT--CV-DOC-01",
+        "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-ESTIMATE--CV-DOC-01",
+        "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-EXPENSE--CV-DOC-01",
+        "INV-DOCUMENTS-CONTEXTUAL-CHOICES-TARGET-DAILY-REPORT--CV-DOC-01"
+      ],
+      "actual_browser_and_postgresql": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-PROJECT--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-PROJECT--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/projects/9c1cf607-bcb8-42bd-a63c-e399296887f2/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/upload/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/upload/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/00e3e067-14c3-4063-98ae-ae0f08a8a99c/download/",
+        "status": 403,
+        "case": "Pending scan bytes denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/upload/",
+        "status": 403,
+        "case": "No authority",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/upload/",
+        "status": 403,
+        "case": "Foreign tenant",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/upload/",
+        "status": 403,
+        "case": "Sibling project",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/upload/?return_to=https://invalid.example/",
+        "status": 403,
+        "case": "Unsafe return denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/upload/",
+        "status": 400,
+        "case": "Forged intent and foreign document",
+        "expected": [
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/upload/",
+        "status": 403,
+        "case": "Readonly mutation denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "context-upload-project"
+    ],
+    "expiry_widget": {
+      "type": "text",
+      "jalali": "datetime"
+    },
+    "denials": [
+      {
+        "case": "Pending scan bytes denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "No authority",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Foreign tenant",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling project",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe return denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Readonly mutation denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "document": "00e3e067-14c3-4063-98ae-ae0f08a8a99c",
+      "target": "9c1cf607-bcb8-42bd-a63c-e399296887f2",
+      "typed_model": "projects.ProjectDocumentLink",
+      "compatibility_link": "b32d2af9-887a-4221-b9bf-1d1735a18cda",
+      "version": "405987c1-f022-4bfd-9683-8739daa0c111",
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "return": "/projects/9c1cf607-bcb8-42bd-a63c-e399296887f2/#related-documents"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-CONTRACT--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-CONTRACT--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/9cf17f0f-e409-458f-a10f-09cb923065bc/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/upload/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/upload/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/3de3f82d-8e00-46b5-9ba6-a1909b7f609c/download/",
+        "status": 403,
+        "case": "Pending scan bytes denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/upload/",
+        "status": 403,
+        "case": "No authority",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/upload/",
+        "status": 403,
+        "case": "Foreign tenant",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/upload/",
+        "status": 403,
+        "case": "Sibling project",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/upload/?return_to=https://invalid.example/",
+        "status": 403,
+        "case": "Unsafe return denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/upload/",
+        "status": 400,
+        "case": "Forged intent and foreign document",
+        "expected": [
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/upload/",
+        "status": 403,
+        "case": "Readonly mutation denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "context-upload-contract"
+    ],
+    "expiry_widget": {
+      "type": "text",
+      "jalali": "datetime"
+    },
+    "denials": [
+      {
+        "case": "Pending scan bytes denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "No authority",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Foreign tenant",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling project",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe return denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Readonly mutation denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "document": "3de3f82d-8e00-46b5-9ba6-a1909b7f609c",
+      "target": "9cf17f0f-e409-458f-a10f-09cb923065bc",
+      "typed_model": "contracts.ContractDocumentLink",
+      "compatibility_link": "ccdbf41e-694a-4a3b-a40e-e14666c480ab",
+      "version": "13aa8c6f-cefe-4c50-bc5b-062827e009fc",
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "return": "/contracts/9cf17f0f-e409-458f-a10f-09cb923065bc/#related-documents"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-ESTIMATE--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-ESTIMATE--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/estimates/373d0a7c-679b-46a9-94e6-49fe797ee427/?project_id=9c1cf607-bcb8-42bd-a63c-e399296887f2",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/upload/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/upload/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/3d16644e-ca65-47cb-ac3a-2662d0e1b83f/download/",
+        "status": 403,
+        "case": "Pending scan bytes denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/upload/",
+        "status": 403,
+        "case": "No authority",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/upload/",
+        "status": 403,
+        "case": "Foreign tenant",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/upload/",
+        "status": 403,
+        "case": "Sibling project",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/upload/?return_to=https://invalid.example/",
+        "status": 403,
+        "case": "Unsafe return denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/upload/",
+        "status": 400,
+        "case": "Forged intent and foreign document",
+        "expected": [
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/upload/",
+        "status": 403,
+        "case": "Readonly mutation denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "context-upload-estimate"
+    ],
+    "expiry_widget": {
+      "type": "text",
+      "jalali": "datetime"
+    },
+    "denials": [
+      {
+        "case": "Pending scan bytes denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "No authority",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Foreign tenant",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling project",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe return denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Readonly mutation denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "document": "3d16644e-ca65-47cb-ac3a-2662d0e1b83f",
+      "target": "373d0a7c-679b-46a9-94e6-49fe797ee427",
+      "typed_model": "estimates.EstimateDocumentLink",
+      "compatibility_link": "91b2daf3-3dc3-4b0d-bc98-b9ab6d0be94f",
+      "version": "021817d2-9823-4c64-a713-9a73c309ea01",
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "return": "/estimates/373d0a7c-679b-46a9-94e6-49fe797ee427/?project_id=9c1cf607-bcb8-42bd-a63c-e399296887f2#related-documents"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-EXPENSE--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-EXPENSE--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/expenses/41603950-7d20-49c4-a8a3-e1403cb03c1c/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/upload/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/upload/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/227fc8b5-6309-4807-9f63-91e766f087e0/download/",
+        "status": 403,
+        "case": "Pending scan bytes denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/upload/",
+        "status": 403,
+        "case": "No authority",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/upload/",
+        "status": 403,
+        "case": "Foreign tenant",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/upload/",
+        "status": 403,
+        "case": "Sibling project",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/upload/?return_to=https://invalid.example/",
+        "status": 403,
+        "case": "Unsafe return denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/upload/",
+        "status": 400,
+        "case": "Forged intent and foreign document",
+        "expected": [
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/upload/",
+        "status": 403,
+        "case": "Readonly mutation denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "context-upload-expense"
+    ],
+    "expiry_widget": {
+      "type": "text",
+      "jalali": "datetime"
+    },
+    "denials": [
+      {
+        "case": "Pending scan bytes denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "No authority",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Foreign tenant",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling project",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe return denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Readonly mutation denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "document": "227fc8b5-6309-4807-9f63-91e766f087e0",
+      "target": "41603950-7d20-49c4-a8a3-e1403cb03c1c",
+      "typed_model": "expenses.ExpenseDocumentLink",
+      "compatibility_link": "54d98c40-cff0-4f86-8f48-2d8221ebedf6",
+      "version": "06cc3dfd-94e8-4763-b854-97c4daed2cf8",
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "return": "/expenses/41603950-7d20-49c4-a8a3-e1403cb03c1c/#related-documents"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-DAILY-REPORT--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-DAILY-REPORT--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/daily-reports/6572afd4-2a49-4138-8e54-c5d3248b34a7/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/upload/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/upload/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/fa414ac7-abbc-41aa-95a6-faa2dd0486e5/download/",
+        "status": 403,
+        "case": "Pending scan bytes denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/upload/",
+        "status": 403,
+        "case": "No authority",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/upload/",
+        "status": 403,
+        "case": "Foreign tenant",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/upload/",
+        "status": 403,
+        "case": "Sibling project",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/upload/?return_to=https://invalid.example/",
+        "status": 403,
+        "case": "Unsafe return denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/upload/",
+        "status": 400,
+        "case": "Forged intent and foreign document",
+        "expected": [
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/upload/",
+        "status": 403,
+        "case": "Readonly mutation denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "context-upload-daily_report"
+    ],
+    "expiry_widget": {
+      "type": "text",
+      "jalali": "datetime"
+    },
+    "denials": [
+      {
+        "case": "Pending scan bytes denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "No authority",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Foreign tenant",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling project",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe return denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Readonly mutation denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "document": "fa414ac7-abbc-41aa-95a6-faa2dd0486e5",
+      "target": "6572afd4-2a49-4138-8e54-c5d3248b34a7",
+      "typed_model": "daily_reports.DailyReportDocumentLink",
+      "compatibility_link": "5b3484aa-34e8-4894-82dd-b645a42bc218",
+      "version": "431eb45a-58fd-43ed-9161-fd4acc0f8716",
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "return": "/daily-reports/6572afd4-2a49-4138-8e54-c5d3248b34a7/#related-documents"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-UPLOAD--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-UPLOAD--CV-DOC-01",
+    "http": [],
+    "state": {
+      "parameterized_evidence": [
+        "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-PROJECT--CV-DOC-01",
+        "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-CONTRACT--CV-DOC-01",
+        "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-ESTIMATE--CV-DOC-01",
+        "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-EXPENSE--CV-DOC-01",
+        "INV-DOCUMENTS-CONTEXTUAL-UPLOAD-TARGET-DAILY-REPORT--CV-DOC-01"
+      ],
+      "actual_browser_and_postgresql": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-LINK-TARGET-PROJECT--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-LINK-TARGET-PROJECT--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/projects/9c1cf607-bcb8-42bd-a63c-e399296887f2/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/link/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/link/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/link/",
+        "status": 400,
+        "case": "Association replay",
+        "expected": [
+          302,
+          400
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/link/",
+        "status": 403,
+        "case": "No authority",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/link/",
+        "status": 403,
+        "case": "Foreign tenant",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/link/",
+        "status": 403,
+        "case": "Sibling project",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/link/?return_to=https://invalid.example/",
+        "status": 403,
+        "case": "Unsafe return denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/link/",
+        "status": 400,
+        "case": "Forged intent and foreign document",
+        "expected": [
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/link/",
+        "status": 403,
+        "case": "Readonly mutation denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "context-link-project"
+    ],
+    "denials": [
+      {
+        "case": "No authority",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Foreign tenant",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling project",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe return denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Readonly mutation denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "document": "17778229-abdb-4953-b2d5-2689890f39f2",
+      "target": "9c1cf607-bcb8-42bd-a63c-e399296887f2",
+      "typed_model": "projects.ProjectDocumentLink",
+      "compatibility_link": "5188f259-6fbf-4aca-9f2a-adf92519676f",
+      "version": "30511366-cec8-431c-b2cc-4fc624734dcb",
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "return": "/projects/9c1cf607-bcb8-42bd-a63c-e399296887f2/#related-documents"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-LINK-TARGET-CONTRACT--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-LINK-TARGET-CONTRACT--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/9cf17f0f-e409-458f-a10f-09cb923065bc/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/contract/9cf17f0f-e409-458f-a10f-09cb923065bc/link/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      }
+    ],
+    "design": [
+      "context-link-contract"
+    ],
+    "status": "FAIL",
+    "error": "Locator.click: Timeout 45000ms exceeded.\nCall log:\n  - waiting for locator(\"main form\").first.locator(\"button[type=submit],input[type=submit]\").first\n    - locator resolved to <button type=\"submit\" class=\"erp-btn erp-btn--primary\">ثبت پیوند سند</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    81 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n",
+    "exception": "TimeoutError"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-LINK-TARGET-ESTIMATE--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-LINK-TARGET-ESTIMATE--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/estimates/373d0a7c-679b-46a9-94e6-49fe797ee427/?project_id=9c1cf607-bcb8-42bd-a63c-e399296887f2",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/estimate/373d0a7c-679b-46a9-94e6-49fe797ee427/link/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      }
+    ],
+    "design": [
+      "context-link-estimate"
+    ],
+    "status": "FAIL",
+    "error": "Locator.click: Timeout 45000ms exceeded.\nCall log:\n  - waiting for locator(\"main form\").first.locator(\"button[type=submit],input[type=submit]\").first\n    - locator resolved to <button type=\"submit\" class=\"erp-btn erp-btn--primary\">ثبت پیوند سند</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    83 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n",
+    "exception": "TimeoutError"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-LINK-TARGET-EXPENSE--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-LINK-TARGET-EXPENSE--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/expenses/41603950-7d20-49c4-a8a3-e1403cb03c1c/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/expense/41603950-7d20-49c4-a8a3-e1403cb03c1c/link/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      }
+    ],
+    "design": [
+      "context-link-expense"
+    ],
+    "status": "FAIL",
+    "error": "Locator.click: Timeout 45000ms exceeded.\nCall log:\n  - waiting for locator(\"main form\").first.locator(\"button[type=submit],input[type=submit]\").first\n    - locator resolved to <button type=\"submit\" class=\"erp-btn erp-btn--primary\">ثبت پیوند سند</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    76 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n",
+    "exception": "TimeoutError"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-LINK-TARGET-DAILY-REPORT--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-LINK-TARGET-DAILY-REPORT--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/daily-reports/6572afd4-2a49-4138-8e54-c5d3248b34a7/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/daily_report/6572afd4-2a49-4138-8e54-c5d3248b34a7/link/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      }
+    ],
+    "design": [
+      "context-link-daily_report"
+    ],
+    "status": "FAIL",
+    "error": "Locator.click: Timeout 45000ms exceeded.\nCall log:\n  - waiting for locator(\"main form\").first.locator(\"button[type=submit],input[type=submit]\").first\n    - locator resolved to <button type=\"submit\" class=\"erp-btn erp-btn--primary\">ثبت پیوند سند</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    78 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n",
+    "exception": "TimeoutError"
+  },
+  "INV-DOCUMENTS-CONTEXTUAL-LINK--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-CONTEXTUAL-LINK--CV-DOC-01",
+    "http": [],
+    "status": "FAIL",
+    "error": "",
+    "exception": "AssertionError"
+  },
+  "INV-DOCUMENTS-LIST--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-LIST--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      }
+    ],
+    "design": [
+      "documents-list"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "own_document_visible": true,
+      "foreign_title_absent": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-DETAIL--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-DETAIL--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "documents-detail"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "current": "8701c9b1-51c2-416a-a220-49c8c9496a25",
+      "source": "9c1cf607-bcb8-42bd-a63c-e399296887f2"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-UPLOAD--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-UPLOAD--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/upload/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/upload/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/upload/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/upload/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "documents-upload"
+    ],
+    "expiry_widget": {
+      "type": "text",
+      "jalali": "datetime"
+    },
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "document": "674cb6aa-29d4-4151-b9e4-e764c29f0ebc",
+      "hash": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "pending_scan": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-VERSION-ADD--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-VERSION-ADD--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/add/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/add/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/add/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/add/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "v1": "8701c9b1-51c2-416a-a220-49c8c9496a25",
+      "v2": "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218",
+      "hashes": [
+        "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+        "9072408dd6906259f1b45d33a24a73b001e97ea42c9766fdc123f90128747587"
+      ],
+      "v1_unchanged": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-VERSION-DOWNLOAD--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-VERSION-DOWNLOAD--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/7016e729-32fe-4bd0-92db-9f93b1888ccb/download/",
+        "status": 403,
+        "case": "Mixed version/document",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Mixed version/document",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "size": 613,
+      "version": 1,
+      "download_audit_delta": 1
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-DOWNLOAD--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-DOWNLOAD--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/download/",
+        "status": 403,
+        "case": "Unassessed current version",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/download/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/download/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/download/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/download/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "Unassessed current version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "current": "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218",
+      "sha256": "9072408dd6906259f1b45d33a24a73b001e97ea42c9766fdc123f90128747587",
+      "actual_scanner_evidence": "../assets-and-scan.json"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-LINK-ADD--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-LINK-ADD--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/links/add/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/links/add/",
+        "status": 400,
+        "case": "Legacy add replay",
+        "expected": [
+          302,
+          400
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/links/add/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/links/add/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/links/add/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "exact_estimate": "373d0a7c-679b-46a9-94e6-49fe797ee427",
+      "replay_single_link": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-PHOTO-PREVIEW--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-PHOTO-PREVIEW--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/1b4e420e-d484-478e-a792-7c8de6a31cff/photo-preview/",
+        "status": 403,
+        "case": "Pending photo denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/1b4e420e-d484-478e-a792-7c8de6a31cff/photo-preview/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/1b4e420e-d484-478e-a792-7c8de6a31cff/photo-preview/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/1b4e420e-d484-478e-a792-7c8de6a31cff/photo-preview/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/1b4e420e-d484-478e-a792-7c8de6a31cff/photo-preview/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "Pending photo denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "photo": "1b4e420e-d484-478e-a792-7c8de6a31cff",
+      "sha256": "ff2cf5176ccb7338e589c9ce18c97c06e38bdb70774ee246e0511ee3bc995126",
+      "size": 399
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EMPLOYEE-LIST--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-EMPLOYEE-LIST--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/mine/",
+        "status": 403,
+        "case": "MVP ESS exclusion",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/mine/",
+        "status": 403,
+        "case": "MVP ESS exclusion POST",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/mine/",
+        "status": 403,
+        "case": "MVP ESS exclusion",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/mine/",
+        "status": 403,
+        "case": "MVP ESS exclusion POST",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/mine/",
+        "status": 403,
+        "case": "MVP ESS exclusion",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/mine/",
+        "status": 403,
+        "case": "MVP ESS exclusion POST",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "MVP ESS exclusion",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion POST",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion POST",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion POST",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "runtime_exposed": false,
+    "state": {
+      "scope": "Conditional security control only; approved ESS exclusion retained",
+      "exposed": false
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EMPLOYEE-DETAIL--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-EMPLOYEE-DETAIL--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/mine/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 403,
+        "case": "MVP ESS exclusion",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/mine/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 403,
+        "case": "MVP ESS exclusion POST",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/mine/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 403,
+        "case": "MVP ESS exclusion",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/mine/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 403,
+        "case": "MVP ESS exclusion POST",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/mine/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 403,
+        "case": "MVP ESS exclusion",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/mine/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 403,
+        "case": "MVP ESS exclusion POST",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "MVP ESS exclusion",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion POST",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion POST",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion POST",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "runtime_exposed": false,
+    "state": {
+      "scope": "Conditional security control only; approved ESS exclusion retained",
+      "exposed": false
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EMPLOYEE-VERSION-DOWNLOAD--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-EMPLOYEE-VERSION-DOWNLOAD--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/mine/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "MVP ESS exclusion",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/mine/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "MVP ESS exclusion POST",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/mine/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "MVP ESS exclusion",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/mine/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "MVP ESS exclusion POST",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/mine/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "MVP ESS exclusion",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/mine/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "MVP ESS exclusion POST",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "MVP ESS exclusion",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion POST",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion POST",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "MVP ESS exclusion POST",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "runtime_exposed": false,
+    "state": {
+      "scope": "Conditional security control only; approved ESS exclusion retained",
+      "exposed": false
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-ARCHIVE--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-ARCHIVE--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/53e2dc30-1a32-4ff7-8aed-c3078e82a446/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/53e2dc30-1a32-4ff7-8aed-c3078e82a446/archive/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/53e2dc30-1a32-4ff7-8aed-c3078e82a446/download/",
+        "status": 403,
+        "case": "Archived bytes denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/53e2dc30-1a32-4ff7-8aed-c3078e82a446/archive/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/53e2dc30-1a32-4ff7-8aed-c3078e82a446/archive/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "Archived bytes denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "document": "53e2dc30-1a32-4ff7-8aed-c3078e82a446",
+      "history_preserved": true,
+      "archive_actor": "d5396baa-c5a3-4f81-a057-27e29cbeafdf"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-SAFETY--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-SAFETY--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/choices/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/choices/",
+        "status": 403,
+        "case": "Sibling source",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/choices/?next=//invalid.example/",
+        "status": 403,
+        "case": "Unsafe source return",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe source return",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "1d02627d-72a0-467d-9b4e-65a3b3409d2f",
+      "kind": "safety",
+      "eligible_versions": [
+        "021817d2-9823-4c64-a713-9a73c309ea01",
+        "06cc3dfd-94e8-4763-b854-97c4daed2cf8",
+        "13aa8c6f-cefe-4c50-bc5b-062827e009fc",
+        "30511366-cec8-431c-b2cc-4fc624734dcb",
+        "405987c1-f022-4bfd-9683-8739daa0c111",
+        "431eb45a-58fd-43ed-9161-fd4acc0f8716",
+        "5016f2b4-4395-473c-aacd-a05e0901ddf8",
+        "52513e95-c76b-48fe-a47a-7b628164dd54",
+        "8701c9b1-51c2-416a-a220-49c8c9496a25",
+        "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218",
+        "a5c925da-ed7e-435e-9f37-6fda9492f3c9"
+      ],
+      "selected_expected": "8701c9b1-51c2-416a-a220-49c8c9496a25"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-QUALITY--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-QUALITY--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/choices/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/choices/",
+        "status": 403,
+        "case": "Sibling source",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/choices/?next=//invalid.example/",
+        "status": 403,
+        "case": "Unsafe source return",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe source return",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "e3a86cae-e1f8-45e3-8b8e-86f7407f49a1",
+      "kind": "quality",
+      "eligible_versions": [
+        "021817d2-9823-4c64-a713-9a73c309ea01",
+        "06cc3dfd-94e8-4763-b854-97c4daed2cf8",
+        "13aa8c6f-cefe-4c50-bc5b-062827e009fc",
+        "30511366-cec8-431c-b2cc-4fc624734dcb",
+        "405987c1-f022-4bfd-9683-8739daa0c111",
+        "431eb45a-58fd-43ed-9161-fd4acc0f8716",
+        "5016f2b4-4395-473c-aacd-a05e0901ddf8",
+        "52513e95-c76b-48fe-a47a-7b628164dd54",
+        "8701c9b1-51c2-416a-a220-49c8c9496a25",
+        "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218",
+        "a5c925da-ed7e-435e-9f37-6fda9492f3c9"
+      ],
+      "selected_expected": "8701c9b1-51c2-416a-a220-49c8c9496a25"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-FIELD-OBSERVATION--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-FIELD-OBSERVATION--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/choices/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/choices/",
+        "status": 403,
+        "case": "Sibling source",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/choices/?next=//invalid.example/",
+        "status": 403,
+        "case": "Unsafe source return",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe source return",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "6c387d65-a6d6-449c-bc73-69e685932026",
+      "kind": "field_observation",
+      "eligible_versions": [
+        "30511366-cec8-431c-b2cc-4fc624734dcb",
+        "52513e95-c76b-48fe-a47a-7b628164dd54",
+        "8701c9b1-51c2-416a-a220-49c8c9496a25",
+        "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218",
+        "a5c925da-ed7e-435e-9f37-6fda9492f3c9"
+      ],
+      "selected_expected": "8701c9b1-51c2-416a-a220-49c8c9496a25"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-MATERIAL--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-MATERIAL--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/material/34a12ffc-b998-4f8d-a7d9-24804d45c7b9/choices/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/material/34a12ffc-b998-4f8d-a7d9-24804d45c7b9/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/material/34a12ffc-b998-4f8d-a7d9-24804d45c7b9/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/material/34a12ffc-b998-4f8d-a7d9-24804d45c7b9/choices/?next=//invalid.example/",
+        "status": 403,
+        "case": "Unsafe source return",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe source return",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "34a12ffc-b998-4f8d-a7d9-24804d45c7b9",
+      "kind": "material",
+      "eligible_versions": [
+        "021817d2-9823-4c64-a713-9a73c309ea01",
+        "06cc3dfd-94e8-4763-b854-97c4daed2cf8",
+        "13aa8c6f-cefe-4c50-bc5b-062827e009fc",
+        "30511366-cec8-431c-b2cc-4fc624734dcb",
+        "405987c1-f022-4bfd-9683-8739daa0c111",
+        "431eb45a-58fd-43ed-9161-fd4acc0f8716",
+        "5016f2b4-4395-473c-aacd-a05e0901ddf8",
+        "52513e95-c76b-48fe-a47a-7b628164dd54",
+        "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218",
+        "a5c925da-ed7e-435e-9f37-6fda9492f3c9"
+      ],
+      "selected_expected": "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-GUARANTEE--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-GUARANTEE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/cf277d1c-15e0-4530-950b-49e619f6392e/choices/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/cf277d1c-15e0-4530-950b-49e619f6392e/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/cf277d1c-15e0-4530-950b-49e619f6392e/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/cf277d1c-15e0-4530-950b-49e619f6392e/choices/",
+        "status": 403,
+        "case": "Sibling source",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/cf277d1c-15e0-4530-950b-49e619f6392e/choices/?next=//invalid.example/",
+        "status": 403,
+        "case": "Unsafe source return",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe source return",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "cf277d1c-15e0-4530-950b-49e619f6392e",
+      "kind": "guarantee",
+      "eligible_versions": [
+        "30511366-cec8-431c-b2cc-4fc624734dcb",
+        "52513e95-c76b-48fe-a47a-7b628164dd54",
+        "8701c9b1-51c2-416a-a220-49c8c9496a25",
+        "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218",
+        "a5c925da-ed7e-435e-9f37-6fda9492f3c9"
+      ],
+      "selected_expected": "8701c9b1-51c2-416a-a220-49c8c9496a25"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-COMMERCIAL-EVIDENCE-CHOICES-EVIDENCE-GUARANTEE--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-COMMERCIAL-EVIDENCE-CHOICES-EVIDENCE-GUARANTEE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/choices/guarantee/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/choices/guarantee/",
+        "status": 200,
+        "case": "Commercial selector tenant/permission",
+        "expected": [
+          200,
+          403
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/choices/guarantee/",
+        "status": 403,
+        "case": "Commercial selector tenant/permission",
+        "expected": [
+          200,
+          403
+        ]
+      }
+    ],
+    "state": {
+      "kind": "guarantee",
+      "authorized_versions": [
+        "30511366-cec8-431c-b2cc-4fc624734dcb",
+        "52513e95-c76b-48fe-a47a-7b628164dd54",
+        "8701c9b1-51c2-416a-a220-49c8c9496a25",
+        "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218",
+        "a5c925da-ed7e-435e-9f37-6fda9492f3c9"
+      ],
+      "foreign_absent": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-COMPLIANCE--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-COMPLIANCE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/308aeddb-f675-46ed-9f43-f3e4219f4845/choices/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/308aeddb-f675-46ed-9f43-f3e4219f4845/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/308aeddb-f675-46ed-9f43-f3e4219f4845/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/308aeddb-f675-46ed-9f43-f3e4219f4845/choices/",
+        "status": 403,
+        "case": "Sibling source",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/308aeddb-f675-46ed-9f43-f3e4219f4845/choices/?next=//invalid.example/",
+        "status": 403,
+        "case": "Unsafe source return",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe source return",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "308aeddb-f675-46ed-9f43-f3e4219f4845",
+      "kind": "compliance",
+      "eligible_versions": [
+        "30511366-cec8-431c-b2cc-4fc624734dcb",
+        "52513e95-c76b-48fe-a47a-7b628164dd54",
+        "8701c9b1-51c2-416a-a220-49c8c9496a25",
+        "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218",
+        "a5c925da-ed7e-435e-9f37-6fda9492f3c9"
+      ],
+      "selected_expected": "8701c9b1-51c2-416a-a220-49c8c9496a25"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-COMMERCIAL-EVIDENCE-CHOICES-EVIDENCE-COMPLIANCE--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-COMMERCIAL-EVIDENCE-CHOICES-EVIDENCE-COMPLIANCE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/choices/compliance/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/choices/compliance/",
+        "status": 200,
+        "case": "Commercial selector tenant/permission",
+        "expected": [
+          200,
+          403
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/choices/compliance/",
+        "status": 403,
+        "case": "Commercial selector tenant/permission",
+        "expected": [
+          200,
+          403
+        ]
+      }
+    ],
+    "state": {
+      "kind": "compliance",
+      "authorized_versions": [
+        "30511366-cec8-431c-b2cc-4fc624734dcb",
+        "52513e95-c76b-48fe-a47a-7b628164dd54",
+        "8701c9b1-51c2-416a-a220-49c8c9496a25",
+        "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218",
+        "a5c925da-ed7e-435e-9f37-6fda9492f3c9"
+      ],
+      "foreign_absent": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-RELEASE--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-RELEASE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/dc945c52-45e3-4d54-b81b-ea7853a211fc/choices/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/dc945c52-45e3-4d54-b81b-ea7853a211fc/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/dc945c52-45e3-4d54-b81b-ea7853a211fc/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/dc945c52-45e3-4d54-b81b-ea7853a211fc/choices/",
+        "status": 403,
+        "case": "Sibling source",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/dc945c52-45e3-4d54-b81b-ea7853a211fc/choices/?next=//invalid.example/",
+        "status": 403,
+        "case": "Unsafe source return",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe source return",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "dc945c52-45e3-4d54-b81b-ea7853a211fc",
+      "kind": "release",
+      "eligible_versions": [
+        "30511366-cec8-431c-b2cc-4fc624734dcb",
+        "52513e95-c76b-48fe-a47a-7b628164dd54",
+        "8701c9b1-51c2-416a-a220-49c8c9496a25",
+        "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218",
+        "a5c925da-ed7e-435e-9f37-6fda9492f3c9"
+      ],
+      "selected_expected": "8701c9b1-51c2-416a-a220-49c8c9496a25"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-COMMERCIAL-EVIDENCE-CHOICES-EVIDENCE-RELEASE--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-COMMERCIAL-EVIDENCE-CHOICES-EVIDENCE-RELEASE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/choices/release/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/choices/release/",
+        "status": 200,
+        "case": "Commercial selector tenant/permission",
+        "expected": [
+          200,
+          403
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/choices/release/",
+        "status": 403,
+        "case": "Commercial selector tenant/permission",
+        "expected": [
+          200,
+          403
+        ]
+      }
+    ],
+    "state": {
+      "kind": "release",
+      "authorized_versions": [
+        "30511366-cec8-431c-b2cc-4fc624734dcb",
+        "52513e95-c76b-48fe-a47a-7b628164dd54",
+        "8701c9b1-51c2-416a-a220-49c8c9496a25",
+        "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218",
+        "a5c925da-ed7e-435e-9f37-6fda9492f3c9"
+      ],
+      "foreign_absent": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-CONTRACTUAL--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-CONTRACTUAL--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/contractual/33628948-f43e-4b12-b7f4-9c1d4b7b852b/choices/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/contractual/33628948-f43e-4b12-b7f4-9c1d4b7b852b/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/contractual/33628948-f43e-4b12-b7f4-9c1d4b7b852b/choices/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/contractual/33628948-f43e-4b12-b7f4-9c1d4b7b852b/choices/",
+        "status": 403,
+        "case": "Sibling source",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/contractual/33628948-f43e-4b12-b7f4-9c1d4b7b852b/choices/?next=//invalid.example/",
+        "status": 403,
+        "case": "Unsafe source return",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unsafe source return",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "33628948-f43e-4b12-b7f4-9c1d4b7b852b",
+      "kind": "contractual",
+      "eligible_versions": [
+        "021817d2-9823-4c64-a713-9a73c309ea01",
+        "06cc3dfd-94e8-4763-b854-97c4daed2cf8",
+        "13aa8c6f-cefe-4c50-bc5b-062827e009fc",
+        "30511366-cec8-431c-b2cc-4fc624734dcb",
+        "405987c1-f022-4bfd-9683-8739daa0c111",
+        "431eb45a-58fd-43ed-9161-fd4acc0f8716",
+        "5016f2b4-4395-473c-aacd-a05e0901ddf8",
+        "52513e95-c76b-48fe-a47a-7b628164dd54",
+        "8701c9b1-51c2-416a-a220-49c8c9496a25",
+        "9ccd3ef1-bc77-4390-a03b-d0c72c5e2218",
+        "a5c925da-ed7e-435e-9f37-6fda9492f3c9"
+      ],
+      "selected_expected": "8701c9b1-51c2-416a-a220-49c8c9496a25"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-CHOICES--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-CHOICES--CV-DOC-02",
+    "http": [],
+    "state": {
+      "parameterized_evidence": [
+        "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-SAFETY--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-QUALITY--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-FIELD-OBSERVATION--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-MATERIAL--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-GUARANTEE--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-COMPLIANCE--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-RELEASE--CV-DOC-02",
+        "INV-DOCUMENTS-EVIDENCE-CHOICES-EVIDENCE-CONTRACTUAL--CV-DOC-02"
+      ]
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-COMMERCIAL-EVIDENCE-CHOICES--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-COMMERCIAL-EVIDENCE-CHOICES--CV-DOC-02",
+    "http": [],
+    "state": {
+      "parameterized_evidence": [
+        "INV-DOCUMENTS-COMMERCIAL-EVIDENCE-CHOICES-EVIDENCE-GUARANTEE--CV-DOC-02",
+        "INV-DOCUMENTS-COMMERCIAL-EVIDENCE-CHOICES-EVIDENCE-COMPLIANCE--CV-DOC-02",
+        "INV-DOCUMENTS-COMMERCIAL-EVIDENCE-CHOICES-EVIDENCE-RELEASE--CV-DOC-02"
+      ]
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-SAFETY--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-SAFETY--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/register/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/register/",
+        "status": 400,
+        "case": "Forged signed source intent",
+        "expected": [
+          400
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/register/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/register/",
+        "status": 403,
+        "case": "Evidence replay",
+        "expected": [
+          302,
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "evidence-register-safety"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "1d02627d-72a0-467d-9b4e-65a3b3409d2f",
+      "kind": "safety",
+      "version": "8701c9b1-51c2-416a-a220-49c8c9496a25",
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "source_references": [
+        [
+          "8701c9b1-51c2-416a-a220-49c8c9496a25",
+          "بازبینی 1 · ارسال‌شده"
+        ]
+      ]
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-QUALITY--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-QUALITY--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/register/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/register/",
+        "status": 400,
+        "case": "Forged signed source intent",
+        "expected": [
+          400
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/register/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/register/",
+        "status": 403,
+        "case": "Evidence replay",
+        "expected": [
+          302,
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "evidence-register-quality"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "e3a86cae-e1f8-45e3-8b8e-86f7407f49a1",
+      "kind": "quality",
+      "version": "8701c9b1-51c2-416a-a220-49c8c9496a25",
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "source_references": [
+        [
+          "8701c9b1-51c2-416a-a220-49c8c9496a25",
+          "بازبینی 1 · ارسال‌شده"
+        ]
+      ]
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-FIELD-OBSERVATION--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-FIELD-OBSERVATION--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/register/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/register/",
+        "status": 400,
+        "case": "Forged signed source intent",
+        "expected": [
+          400
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/register/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/register/",
+        "status": 302,
+        "case": "Evidence replay",
+        "expected": [
+          302,
+          400,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/register/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "evidence-register-field_observation"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "6c387d65-a6d6-449c-bc73-69e685932026",
+      "kind": "field_observation",
+      "version": "8701c9b1-51c2-416a-a220-49c8c9496a25",
+      "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "source_references": [
+        [
+          "8701c9b1-51c2-416a-a220-49c8c9496a25",
+          "پیش‌نویس"
+        ]
+      ]
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-MATERIAL--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-MATERIAL--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/material/34a12ffc-b998-4f8d-a7d9-24804d45c7b9/register/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/material/34a12ffc-b998-4f8d-a7d9-24804d45c7b9/register/",
+        "status": 400,
+        "case": "Forged signed source intent",
+        "expected": [
+          400
+        ]
+      }
+    ],
+    "design": [
+      "evidence-register-material"
+    ],
+    "status": "FAIL",
+    "error": "Locator.click: Timeout 45000ms exceeded.\nCall log:\n  - waiting for locator(\"main form\").first.locator(\"button[type=submit],input[type=submit]\").first\n    - locator resolved to <button type=\"submit\" class=\"erp-btn erp-btn--primary\">ثبت نسخه شاهد</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <div role=\"option\" class=\"option\" data-selectable=\"\" id=\"id_version-opt-7\" data-value=\"06cc3dfd-94e8-4763-b854-97c4daed2cf8\">…</div> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <div role=\"option\" class=\"option\" data-selectable=\"\" id=\"id_version-opt-7\" data-value=\"06cc3dfd-94e8-4763-b854-97c4daed2cf8\">…</div> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    16 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <div role=\"option\" class=\"option\" data-selectable=\"\" id=\"id_version-opt-7\" data-value=\"06cc3dfd-94e8-4763-b854-97c4daed2cf8\">…</div> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n    67 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <div role=\"option\" class=\"option\" data-selectable=\"\" data-value=\"405987c1-f022-4bfd-9683-8739daa0c111\">…</div> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n",
+    "exception": "TimeoutError"
+  },
+  "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-CONTRACTUAL--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-REGISTER-EVIDENCE-CONTRACTUAL--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/contractual/33628948-f43e-4b12-b7f4-9c1d4b7b852b/register/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/contractual/33628948-f43e-4b12-b7f4-9c1d4b7b852b/register/",
+        "status": 400,
+        "case": "Forged signed source intent",
+        "expected": [
+          400
+        ]
+      }
+    ],
+    "design": [
+      "evidence-register-contractual"
+    ],
+    "status": "FAIL",
+    "error": "Locator.click: Timeout 45000ms exceeded.\nCall log:\n  - waiting for locator(\"main form\").first.locator(\"button[type=submit],input[type=submit]\").first\n    - locator resolved to <button type=\"submit\" class=\"erp-btn erp-btn--primary\">ثبت نسخه شاهد</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    10 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <span class=\"business-choice-name\">سند شاهد آزمون بنیرا</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n    74 × waiting for element to be visible, enabled and stable\n       - element is visible, enabled and stable\n       - scrolling into view if needed\n       - done scrolling\n       - <span dir=\"auto\" class=\"business-choice-code\">DOC-000002 · مرجع B09-EVIDENCE · عمومی · نسخه شاه…</span> from <div class=\"erp-form-field\">…</div> subtree intercepts pointer events\n     - retrying click action\n       - waiting 500ms\n",
+    "exception": "TimeoutError"
+  },
+  "INV-DOCUMENTS-EVIDENCE-REGISTER--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-REGISTER--CV-DOC-02",
+    "http": [],
+    "status": "FAIL",
+    "error": "",
+    "exception": "AssertionError"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-SAFETY--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-SAFETY--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/8701c9b1-51c2-416a-a220-49c8c9496a25/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/8701c9b1-51c2-416a-a220-49c8c9496a25/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/8701c9b1-51c2-416a-a220-49c8c9496a25/",
+        "status": 403,
+        "case": "Sibling source detail",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/7016e729-32fe-4bd0-92db-9f93b1888ccb/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/2f0dd696-6a55-4f6c-a9b3-05f7d9f6e81b/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-safety",
+      "evidence-detail-safety"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source detail",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "1d02627d-72a0-467d-9b4e-65a3b3409d2f",
+      "persisted_pins": [
+        [
+          "8701c9b1-51c2-416a-a220-49c8c9496a25",
+          "بازبینی 1 · ارسال‌شده"
+        ]
+      ],
+      "witness_version": "8701c9b1-51c2-416a-a220-49c8c9496a25",
+      "witness_number": 1,
+      "current_number": 3,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-QUALITY--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-QUALITY--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/8701c9b1-51c2-416a-a220-49c8c9496a25/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/8701c9b1-51c2-416a-a220-49c8c9496a25/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/8701c9b1-51c2-416a-a220-49c8c9496a25/",
+        "status": 403,
+        "case": "Sibling source detail",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/7016e729-32fe-4bd0-92db-9f93b1888ccb/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/2f0dd696-6a55-4f6c-a9b3-05f7d9f6e81b/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-quality",
+      "evidence-detail-quality"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source detail",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "e3a86cae-e1f8-45e3-8b8e-86f7407f49a1",
+      "persisted_pins": [
+        [
+          "8701c9b1-51c2-416a-a220-49c8c9496a25",
+          "بازبینی 1 · ارسال‌شده"
+        ]
+      ],
+      "witness_version": "8701c9b1-51c2-416a-a220-49c8c9496a25",
+      "witness_number": 1,
+      "current_number": 3,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-FIELD-OBSERVATION--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-FIELD-OBSERVATION--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/daily-reports/field/6c387d65-a6d6-449c-bc73-69e685932026/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/8701c9b1-51c2-416a-a220-49c8c9496a25/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/8701c9b1-51c2-416a-a220-49c8c9496a25/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/8701c9b1-51c2-416a-a220-49c8c9496a25/",
+        "status": 403,
+        "case": "Sibling source detail",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/7016e729-32fe-4bd0-92db-9f93b1888ccb/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/2f0dd696-6a55-4f6c-a9b3-05f7d9f6e81b/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-field_observation",
+      "evidence-detail-field_observation"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source detail",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "6c387d65-a6d6-449c-bc73-69e685932026",
+      "persisted_pins": [
+        [
+          "8701c9b1-51c2-416a-a220-49c8c9496a25",
+          "ارسال‌شده"
+        ]
+      ],
+      "witness_version": "8701c9b1-51c2-416a-a220-49c8c9496a25",
+      "witness_number": 1,
+      "current_number": 3,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-MATERIAL--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-MATERIAL--CV-DOC-02",
+    "http": [],
+    "status": "FAIL",
+    "error": "No persisted exact evidence",
+    "exception": "AssertionError"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-GUARANTEE--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-GUARANTEE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/billing/guarantees/cf277d1c-15e0-4530-950b-49e619f6392e/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/5d6a1a36-bfee-48a7-8c6d-c5fbf77bb707/versions/a5c925da-ed7e-435e-9f37-6fda9492f3c9/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/5d6a1a36-bfee-48a7-8c6d-c5fbf77bb707/versions/a5c925da-ed7e-435e-9f37-6fda9492f3c9/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/cf277d1c-15e0-4530-950b-49e619f6392e/a5c925da-ed7e-435e-9f37-6fda9492f3c9/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/cf277d1c-15e0-4530-950b-49e619f6392e/a5c925da-ed7e-435e-9f37-6fda9492f3c9/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/cf277d1c-15e0-4530-950b-49e619f6392e/a5c925da-ed7e-435e-9f37-6fda9492f3c9/",
+        "status": 403,
+        "case": "Sibling source detail",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/cf277d1c-15e0-4530-950b-49e619f6392e/7016e729-32fe-4bd0-92db-9f93b1888ccb/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/guarantee/cf277d1c-15e0-4530-950b-49e619f6392e/2f0dd696-6a55-4f6c-a9b3-05f7d9f6e81b/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-guarantee",
+      "evidence-detail-guarantee"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source detail",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "cf277d1c-15e0-4530-950b-49e619f6392e",
+      "persisted_pins": [
+        [
+          "a5c925da-ed7e-435e-9f37-6fda9492f3c9",
+          "پیش‌نویس"
+        ]
+      ],
+      "witness_version": "a5c925da-ed7e-435e-9f37-6fda9492f3c9",
+      "witness_number": 1,
+      "current_number": 1,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-COMPLIANCE--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-COMPLIANCE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/billing/compliance-evidence/308aeddb-f675-46ed-9f43-f3e4219f4845/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/5d6a1a36-bfee-48a7-8c6d-c5fbf77bb707/versions/a5c925da-ed7e-435e-9f37-6fda9492f3c9/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/5d6a1a36-bfee-48a7-8c6d-c5fbf77bb707/versions/a5c925da-ed7e-435e-9f37-6fda9492f3c9/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/308aeddb-f675-46ed-9f43-f3e4219f4845/a5c925da-ed7e-435e-9f37-6fda9492f3c9/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/308aeddb-f675-46ed-9f43-f3e4219f4845/a5c925da-ed7e-435e-9f37-6fda9492f3c9/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/308aeddb-f675-46ed-9f43-f3e4219f4845/a5c925da-ed7e-435e-9f37-6fda9492f3c9/",
+        "status": 403,
+        "case": "Sibling source detail",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/308aeddb-f675-46ed-9f43-f3e4219f4845/7016e729-32fe-4bd0-92db-9f93b1888ccb/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/compliance/308aeddb-f675-46ed-9f43-f3e4219f4845/2f0dd696-6a55-4f6c-a9b3-05f7d9f6e81b/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-compliance",
+      "evidence-detail-compliance"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source detail",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "308aeddb-f675-46ed-9f43-f3e4219f4845",
+      "persisted_pins": [
+        [
+          "a5c925da-ed7e-435e-9f37-6fda9492f3c9",
+          "پیش‌نویس"
+        ]
+      ],
+      "witness_version": "a5c925da-ed7e-435e-9f37-6fda9492f3c9",
+      "witness_number": 1,
+      "current_number": 1,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-RELEASE--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-RELEASE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/billing/retention-releases/dc945c52-45e3-4d54-b81b-ea7853a211fc/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/5d6a1a36-bfee-48a7-8c6d-c5fbf77bb707/versions/a5c925da-ed7e-435e-9f37-6fda9492f3c9/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/5d6a1a36-bfee-48a7-8c6d-c5fbf77bb707/versions/a5c925da-ed7e-435e-9f37-6fda9492f3c9/download/",
+        "status": 403,
+        "case": "Evidence independent download permission",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/dc945c52-45e3-4d54-b81b-ea7853a211fc/a5c925da-ed7e-435e-9f37-6fda9492f3c9/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/dc945c52-45e3-4d54-b81b-ea7853a211fc/a5c925da-ed7e-435e-9f37-6fda9492f3c9/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/dc945c52-45e3-4d54-b81b-ea7853a211fc/a5c925da-ed7e-435e-9f37-6fda9492f3c9/",
+        "status": 403,
+        "case": "Sibling source detail",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/dc945c52-45e3-4d54-b81b-ea7853a211fc/7016e729-32fe-4bd0-92db-9f93b1888ccb/",
+        "status": 403,
+        "case": "Unlinked foreign witness",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/release/dc945c52-45e3-4d54-b81b-ea7853a211fc/2f0dd696-6a55-4f6c-a9b3-05f7d9f6e81b/",
+        "status": 403,
+        "case": "Unregistered current quarantined version",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "specialized-source-release",
+      "evidence-detail-release"
+    ],
+    "denials": [
+      {
+        "case": "Evidence independent download permission",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Sibling source detail",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unlinked foreign witness",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Unregistered current quarantined version",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "source": "dc945c52-45e3-4d54-b81b-ea7853a211fc",
+      "persisted_pins": [
+        [
+          "a5c925da-ed7e-435e-9f37-6fda9492f3c9",
+          "پیش‌نویس"
+        ]
+      ],
+      "witness_version": "a5c925da-ed7e-435e-9f37-6fda9492f3c9",
+      "witness_number": 1,
+      "current_number": 1,
+      "immutable_after_new_version": true
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-CONTRACTUAL--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL-EVIDENCE-CONTRACTUAL--CV-DOC-02",
+    "http": [],
+    "status": "FAIL",
+    "error": "No persisted exact evidence",
+    "exception": "AssertionError"
+  },
+  "INV-DOCUMENTS-EVIDENCE-DETAIL--CV-DOC-02": {
+    "execution_id": "INV-DOCUMENTS-EVIDENCE-DETAIL--CV-DOC-02",
+    "http": [],
+    "status": "FAIL",
+    "error": "",
+    "exception": "AssertionError"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-LIST--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-LIST--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      }
+    ],
+    "design": [
+      "contractual-list"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "record": "33628948-f43e-4b12-b7f4-9c1d4b7b852b",
+      "tenant_filtered": true
+    },
+    "status": "PASS"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-CREATE--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-CREATE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/create/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/create/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/create/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/d7a971c9-972a-470f-9ea4-46006a83c892/",
+        "status": 404,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/create/",
+        "status": 403,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      }
+    ],
+    "design": [
+      "contractual-create"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "status": "FAIL",
+    "error": "authorized page: {'method': 'GET', 'url': '/contracts/contractual-records/create/', 'status': 403, 'case': 'authorized page', 'expected': (200,)}",
+    "exception": "AssertionError"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-DETAIL--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-DETAIL--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/33628948-f43e-4b12-b7f4-9c1d4b7b852b/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      }
+    ],
+    "design": [
+      "contractual-detail"
+    ],
+    "status": "FAIL",
+    "error": "",
+    "exception": "AssertionError"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-SUBMIT--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-SUBMIT--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/33628948-f43e-4b12-b7f4-9c1d4b7b852b/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/33628948-f43e-4b12-b7f4-9c1d4b7b852b/submit/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/33628948-f43e-4b12-b7f4-9c1d4b7b852b/submit/",
+        "status": 302,
+        "case": "Submission replay",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/33628948-f43e-4b12-b7f4-9c1d4b7b852b/submit/",
+        "status": 404,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/33628948-f43e-4b12-b7f4-9c1d4b7b852b/submit/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "status": "submitted",
+      "evidence": []
+    },
+    "status": "PASS"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-DECIDE--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-DECIDE--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/33628948-f43e-4b12-b7f4-9c1d4b7b852b/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/33628948-f43e-4b12-b7f4-9c1d4b7b852b/decide/",
+        "status": 403,
+        "case": "Maker checker self-decision",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/33628948-f43e-4b12-b7f4-9c1d4b7b852b/decide/",
+        "status": 302,
+        "case": "Mandatory reason",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/33628948-f43e-4b12-b7f4-9c1d4b7b852b/decide/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "Maker checker self-decision",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "status": "FAIL",
+    "error": "ContractualRecordEvidence matching query does not exist.",
+    "exception": "DoesNotExist"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-REVISION--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-REVISION--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/33628948-f43e-4b12-b7f4-9c1d4b7b852b/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/33628948-f43e-4b12-b7f4-9c1d4b7b852b/revision/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      }
+    ],
+    "status": "FAIL",
+    "error": "ContractualRecordEvidence matching query does not exist.",
+    "exception": "DoesNotExist"
+  },
+  "INV-CONTRACTS-CONTRACTUAL-WITHDRAW--CV-DOC-02": {
+    "execution_id": "INV-CONTRACTS-CONTRACTUAL-WITHDRAW--CV-DOC-02",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/contractual-records/d7a971c9-972a-470f-9ea4-46006a83c892/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/d7a971c9-972a-470f-9ea4-46006a83c892/withdraw/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/d7a971c9-972a-470f-9ea4-46006a83c892/withdraw/",
+        "status": 302,
+        "case": "Withdrawal replay",
+        "expected": [
+          302,
+          403
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/d7a971c9-972a-470f-9ea4-46006a83c892/withdraw/",
+        "status": 404,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/contractual-records/d7a971c9-972a-470f-9ea4-46006a83c892/withdraw/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "record": "d7a971c9-972a-470f-9ea4-46006a83c892",
+      "status": "withdrawn",
+      "reason": "استرداد ادعای آزمایشی"
+    },
+    "status": "PASS"
+  }
+}

@@ -157,6 +157,8 @@ def _get_draft_report_for_update(
         permission=permission,
     ):
         raise PermissionDenied("اجازه به‌روزرسانی این گزارش روزانه را ندارید.")
+    if report.previous_revision_id:
+        raise PermissionDenied("تغییر نسخه اصلاحی فقط از فرم اصلاح گزارش مجاز است.")
     if require_draft and report.status != DailyReportStatus.DRAFT:
         raise ValueError("فقط گزارش روزانه پیش‌نویس قابل به‌روزرسانی است.")
     return report
@@ -230,7 +232,7 @@ def create_daily_report(
     return report
 
 
-def get_organization_daily_reports(
+def _visible_daily_report_revisions(
     *,
     user: User,
     organization: Organization,
@@ -261,6 +263,15 @@ def get_organization_daily_reports(
     )
 
 
+def get_organization_daily_reports(
+    *, user: User, organization: Organization,
+) -> QuerySet[DailyReport]:
+    """List only the current revision in each authorized report chain."""
+    return _visible_daily_report_revisions(user=user, organization=organization).filter(
+        next_revision__isnull=True
+    )
+
+
 def get_organization_daily_report(
     *,
     user: User,
@@ -269,7 +280,7 @@ def get_organization_daily_report(
 ) -> DailyReport:
     """Return one report after applying active-organization scope."""
 
-    reports = get_organization_daily_reports(
+    reports = _visible_daily_report_revisions(
         user=user,
         organization=organization,
     ).prefetch_related(
@@ -296,6 +307,8 @@ def _submit_daily_report_domain(
 ) -> DailyReport:
     """Submit a draft report; its author or a manager may submit it."""
 
+    if surface_profile() == "MVP":
+        raise PermissionDenied("ارسال گزارش در این سطح باید نسخه ثبت‌شده داشته باشد.")
     _validate_active_access(actor, organization)
     try:
         report = (
@@ -318,6 +331,8 @@ def _submit_daily_report_domain(
         permission=BusinessPermissionCode.DAILY_REPORTS_SUBMIT,
     ):
         raise PermissionDenied("اجازه ارسال این گزارش روزانه را ندارید.")
+    if report.previous_revision_id:
+        raise PermissionDenied("ارسال نسخه اصلاحی فقط از فرم اصلاح گزارش مجاز است.")
     if report.status != DailyReportStatus.DRAFT:
         raise ValueError("فقط گزارش روزانه پیش‌نویس قابل ارسال است.")
 
@@ -661,6 +676,7 @@ def _approve_daily_report_domain(
     organization: Organization,
     report_id: str,
     actor: User,
+    work_item=None,
 ) -> DailyReport:
     """Approve a submitted report and make its operational history final."""
 
@@ -685,6 +701,11 @@ def _approve_daily_report_domain(
         site=report.site,
     ):
         raise PermissionDenied("اجازه تأیید گزارش‌های روزانه این سازمان را ندارید.")
+    if report.submission_hash:
+        from .return_workflow import require_independent_reviewer, require_review_item
+
+        membership = require_independent_reviewer(report, actor)
+        work_item = require_review_item(report, membership, work_item)
     if surface_profile() == "MVP" and report.created_by_id == actor.pk:
         raise PermissionDenied("ایجادکننده نمی‌تواند گزارش روزانه خود را تأیید کند.")
     if report.status != DailyReportStatus.SUBMITTED:
@@ -710,7 +731,12 @@ def _approve_daily_report_domain(
         entity_id=report.pk,
         organization=organization,
         actor=actor,
-        metadata={"project_id": str(report.project_id), "site_id": str(report.site_id)},
+        metadata={
+            "project_id": str(report.project_id), "site_id": str(report.site_id),
+            "revision_number": report.revision_number, "submission_hash": report.submission_hash,
+            "work_item_id": str(work_item.pk) if work_item else None,
+            "workflow_version_id": str(work_item.instance.version_id) if work_item else None,
+        },
     )
     return report
 

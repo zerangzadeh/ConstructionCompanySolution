@@ -1,7 +1,13 @@
+from decimal import Decimal
+from zoneinfo import ZoneInfo
+
 from django import forms
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from apps.equipment.models import (
     Equipment,
+    EquipmentAssignment,
     EquipmentOwnershipType,
     EquipmentStatus,
     MaintenanceType,
@@ -15,6 +21,11 @@ from apps.equipment.p8_models import (
     EquipmentUsageLog,
     MaintenancePlan,
     MeterReading,
+)
+from apps.equipment.usage_context import (
+    active_usage_deployments,
+    operator_qualifications,
+    usage_dates,
 )
 from apps.inventory.models import (
     StockTransaction,
@@ -110,6 +121,7 @@ class EquipmentForm(_StyledForm):
                 "placeholder": "انتخاب یا ورود دسته تجهیز…",
                 "data-placeholder": "انتخاب یا ورود دسته تجهیز…",
                 "data-editable-text-choice": "true",
+                "data-hide-enhanced-source": "true",
                 "data-local-choices": "true",
                 "dir": "rtl",
             },
@@ -401,6 +413,18 @@ class MeterReadingForm(_StyledForm):
 
 class UsageForm(_StyledForm):
     equipment = forms.ModelChoiceField(label="تجهیز", queryset=Equipment.objects.none())
+    deployment = forms.ModelChoiceField(
+        label="تخصیص فعال",
+        queryset=EquipmentAssignment.objects.none(),
+        required=False,
+        empty_label="انتخاب خودکار در صورت وجود یک تخصیص معتبر",
+    )
+    operator = forms.ModelChoiceField(
+        label="اپراتور",
+        queryset=Employee.objects.none(),
+        required=False,
+        empty_label="بدون اپراتور",
+    )
     started_at = OrganizationDateTimeField(
         label="شروع", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
     )
@@ -408,19 +432,46 @@ class UsageForm(_StyledForm):
         label="پایان", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
     )
     runtime_hours = forms.DecimalField(
-        label="ساعت کار", min_value=0.001, decimal_places=3
+        label="ساعت کار", min_value=Decimal("0.001"), max_digits=12, decimal_places=3
     )
     source_key = forms.CharField(label="کلید منبع", max_length=100)
     evidence_reference = forms.CharField(
         label="مرجع مدرک", required=False, max_length=255
     )
 
-    def __init__(self, *args, organization, **kwargs):
+    def __init__(self, *args, organization, membership=None, **kwargs):
         super().__init__(*args, organization=organization, **kwargs)
         initialize_occurrence_key(self, "source_key")
-        self.fields["equipment"].queryset = Equipment.objects.filter(
-            organization=organization, archived_at__isnull=True
+        if membership is None:
+            return
+        deployments = active_usage_deployments(membership)
+        self.fields["deployment"].queryset = deployments
+        self.fields["deployment"].label_from_instance = lambda item: (
+            f"{item.equipment.name} · {item.project.name}"
+            + (f" · {item.site.name}" if item.site else "")
+            + f" · {format_jalali(item.start_date)}"
         )
+        self.fields["equipment"].queryset = Equipment.objects.filter(
+            organization=organization, pk__in=deployments.values("equipment_id")
+        ).order_by("name")
+        first_day = last_day = timezone.localdate(
+            timezone=ZoneInfo(organization.settings.timezone)
+        )
+        if self.is_bound:
+            try:
+                start = self.fields["started_at"].clean(self.data.get("started_at"))
+                end = self.fields["ended_at"].clean(self.data.get("ended_at"))
+                if end > start:
+                    first_day, last_day = usage_dates(organization, start, end)
+            except ValidationError:
+                pass
+        qualifications = operator_qualifications(
+            organization, first_day, last_day
+        ).filter(equipment_id__in=deployments.values("equipment_id"))
+        self.fields["operator"].queryset = Employee.objects.filter(
+            organization=organization, pk__in=qualifications.values("employee_id")
+        ).order_by("last_name", "first_name")
+        attach_parent_choice_ui(self, "deployment", "equipment", "equipment_id")
 
 
 class FuelForm(_StyledForm):
@@ -579,12 +630,25 @@ class CostAllocationForm(_StyledForm):
     )
     source_key = forms.CharField(label="کلید رخداد", max_length=120)
 
-    def __init__(self, *args, organization, **kwargs):
+    def __init__(self, *args, organization, membership=None, **kwargs):
         super().__init__(*args, organization=organization, **kwargs)
         initialize_occurrence_key(self, "source_key")
         self.fields["usage"].queryset = EquipmentUsageLog.objects.filter(
             organization=organization, deployment__isnull=False
-        ).select_related("equipment", "deployment")
+        ).select_related("equipment", "deployment__project", "deployment__site")
+        self.fields["usage"].label_from_instance = lambda item: (
+            f"{item.equipment.name} · {item.deployment.project.name}"
+            + (f" · {item.deployment.site.name}" if item.deployment.site else "")
+            + f" · {format_jalali(item.started_at, include_time=True)} · {item.runtime_hours} ساعت"
+        )
+
+        if membership is not None:
+            self.fields["usage"].queryset = scope_queryset(
+                self.fields["usage"].queryset,
+                membership=membership,
+                project_lookup="deployment__project_id",
+                site_lookup="deployment__site_id",
+            )
 
 
 class CostHandoffForm(_StyledForm):
@@ -595,7 +659,7 @@ class CostHandoffForm(_StyledForm):
         label="مرجع پیشنهاد", max_length=140, required=False
     )
 
-    def __init__(self, *args, organization, **kwargs):
+    def __init__(self, *args, organization, membership=None, **kwargs):
         super().__init__(*args, organization=organization, **kwargs)
         self.organization = organization
         initialize_occurrence_key(
@@ -606,7 +670,20 @@ class CostHandoffForm(_StyledForm):
         )
         self.fields["allocation"].queryset = EquipmentCostAllocation.objects.filter(
             organization=organization, status="finalized"
+        ).select_related("usage__equipment", "project", "site")
+        self.fields["allocation"].label_from_instance = lambda item: (
+            f"{item.usage.equipment.name} · {item.project.name}"
+            + (f" · {item.site.name}" if item.site else "")
+            + f" · {format_jalali(item.usage.started_at, include_time=True)} · {item.amount} ریال"
         )
+
+        if membership is not None:
+            self.fields["allocation"].queryset = scope_queryset(
+                self.fields["allocation"].queryset,
+                membership=membership,
+                project_lookup="project_id",
+                site_lookup="site_id",
+            )
 
     def clean(self):
         data = super().clean()

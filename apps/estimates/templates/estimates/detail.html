@@ -69,8 +69,8 @@
                     {% for item in current_items %}
                     <tr>
                         <td class="ed-row-number">{{ forloop.counter|erp_number }}</td><th scope="row" class="ed-description">{{ item.description }}</th><td>{{ item.unit_of_measure.name|default:item.unit }}</td><td class="ed-number"><bdi dir="ltr">{{ item.quantity|erp_number }}</bdi></td>
-                        <td class="ed-number"><span class="ed-money"><bdi dir="ltr">{{ item.unit_price|erp_number }}</bdi><small>{% include "estimates/detail_currency.html" %}</small></span></td>
-                        <td class="ed-number ed-line-total"><span class="ed-money"><bdi dir="ltr">{{ item.line_total|erp_number }}</bdi><small>{% include "estimates/detail_currency.html" %}</small></span></td>
+                        <td class="ed-number" data-money-display-enhanced="true"><span class="ed-money"><bdi dir="ltr">{{ item.unit_price|erp_number }}</bdi><small>{% include "estimates/detail_currency.html" %}</small></span></td>
+                        <td class="ed-number ed-line-total" data-money-display-enhanced="true"><span class="ed-money"><bdi dir="ltr">{{ item.line_total|erp_number }}</bdi><small>{% include "estimates/detail_currency.html" %}</small></span></td>
                         <td class="ed-no-actions"><span aria-hidden="true">—</span><span class="sr-only">عملیاتی برای این ردیف در دسترس نیست.</span></td>
                     </tr>
                     {% empty %}<tr><td colspan="7" class="ed-empty"><strong>هنوز ردیفی ثبت نشده است.</strong>{% if estimate.status == "draft" and "estimate_items.add" in business_permission_codes %}<p>برای شروع، یک ردیف به برآورد اضافه کنید.</p>{% endif %}</td></tr>{% endfor %}

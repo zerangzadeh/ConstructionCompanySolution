@@ -1,0 +1,6 @@
+{% extends "components/compact_form_page.html" %}
+{% block title %}{{ action_title|default:"تصمیم بررسی رکورد" }} | بنیرا{% endblock %}
+{% block compact_content %}
+    {% include "components/page_header.html" with page_title=action_title|default:"تصمیم بررسی رکورد" page_breadcrumb_label=record_label page_breadcrumb_url=source_url only %}
+    {% include "components/compact_form_card.html" with form=form csrf_token=csrf_token cancel_url=source_url submit_label=submit_label|default:"ثبت تصمیم" only %}
+{% endblock %}

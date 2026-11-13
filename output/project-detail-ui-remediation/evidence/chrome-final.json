@@ -1,0 +1,207 @@
+{
+  "browser": "156.0.8078.80",
+  "database": "project_ui_retest",
+  "source_values": {
+    "budget": "9875000000.00",
+    "active_contracts": 2,
+    "reports": 1,
+    "wbs": 5,
+    "activities": 5
+  },
+  "cases": {
+    "responsive-keyboard-1440": {
+      "status": "PASS",
+      "detail": {
+        "width": 1440,
+        "document": 1440,
+        "dir": "rtl"
+      }
+    },
+    "responsive-keyboard-1024": {
+      "status": "PASS",
+      "detail": {
+        "width": 1024,
+        "document": 1024,
+        "dir": "rtl"
+      }
+    },
+    "responsive-keyboard-390": {
+      "status": "PASS",
+      "detail": {
+        "width": 390,
+        "document": 390,
+        "dir": "rtl"
+      }
+    },
+    "operational-hierarchy-action-dedup-and-full-titles": {
+      "status": "PASS",
+      "detail": {
+        "root_subtree_activities": 3,
+        "child_subtree_activities": 2,
+        "sample_activities": 5,
+        "quick_create_only": true,
+        "long_titles": [
+          {
+            "width": 1440,
+            "height": 900,
+            "full_title_keyboard": true,
+            "visual_title": {
+              "height": 46.78125,
+              "line": 23.4,
+              "clamp": "2"
+            }
+          },
+          {
+            "width": 1024,
+            "height": 768,
+            "full_title_keyboard": true,
+            "visual_title": {
+              "height": 46.78125,
+              "line": 23.4,
+              "clamp": "2"
+            }
+          },
+          {
+            "width": 390,
+            "height": 844,
+            "full_title_keyboard": true,
+            "visual_title": {
+              "height": 46.78125,
+              "line": 23.4,
+              "clamp": "2"
+            }
+          }
+        ]
+      }
+    },
+    "photo-dimension-fallback": {
+      "status": "PASS",
+      "detail": [
+        {
+          "natural_width": 1,
+          "natural_height": 1,
+          "photo_visible": false,
+          "scope": "presentation dimension guard; DMS authorization covered by Django"
+        },
+        {
+          "natural_width": 320,
+          "natural_height": 180,
+          "photo_visible": true,
+          "scope": "presentation dimension guard; DMS authorization covered by Django"
+        }
+      ]
+    },
+    "wbs-activities-and-return": {
+      "status": "PASS",
+      "detail": {
+        "path": "/projects/eddeb58e-22dd-493b-8403-9983061576e6/controls/",
+        "project_retained": true,
+        "return": "/projects/eddeb58e-22dd-493b-8403-9983061576e6/"
+      }
+    },
+    "all-dashboard-get-destinations": {
+      "status": "PASS",
+      "detail": {
+        "/": 200,
+        "/projects/": 200,
+        "/estimates/?project_id=eddeb58e-22dd-493b-8403-9983061576e6": 200,
+        "/contracts/?project_id=eddeb58e-22dd-493b-8403-9983061576e6": 200,
+        "/billing/claims/?project_id=eddeb58e-22dd-493b-8403-9983061576e6": 200,
+        "/projects/eddeb58e-22dd-493b-8403-9983061576e6/sites/": 200,
+        "/equipment/?project=eddeb58e-22dd-493b-8403-9983061576e6": 200,
+        "/daily-reports/?project_filter=eddeb58e-22dd-493b-8403-9983061576e6": 200,
+        "/workforce/field/?project=eddeb58e-22dd-493b-8403-9983061576e6": 200,
+        "/timekeeping/?project=eddeb58e-22dd-493b-8403-9983061576e6": 200,
+        "/projects/eddeb58e-22dd-493b-8403-9983061576e6/gallery/": 200,
+        "/projects/eddeb58e-22dd-493b-8403-9983061576e6/controls/#activities-title": 200,
+        "/projects/eddeb58e-22dd-493b-8403-9983061576e6/controls/": 200,
+        "/daily-reports/create/?project=eddeb58e-22dd-493b-8403-9983061576e6": 200,
+        "/expenses/create/?project=eddeb58e-22dd-493b-8403-9983061576e6": 200,
+        "/expenses/4ffdfaa8-4067-4584-b925-3578211bbb7d/": 200,
+        "/contracts/4ce59c3e-c124-4ba5-967b-7fe3aaf0f525/": 200,
+        "/daily-reports/b8ae8385-eb92-49cd-8f52-8f0403f50ab3/": 200,
+        "/estimates/create/?project_id=eddeb58e-22dd-493b-8403-9983061576e6": 200,
+        "/contracts/create/?project=eddeb58e-22dd-493b-8403-9983061576e6": 200,
+        "/documents/context/project/eddeb58e-22dd-493b-8403-9983061576e6/upload/": 200,
+        "/documents/context/project/eddeb58e-22dd-493b-8403-9983061576e6/link/": 200
+      }
+    },
+    "quick-create-project-initialization": {
+      "status": "PASS",
+      "detail": {
+        "/daily-reports/create/": "authorized project preselected",
+        "/expenses/create/": "authorized project preselected"
+      }
+    },
+    "equipment-list-detail-operations-return": {
+      "status": "PASS",
+      "detail": {
+        "project": "eddeb58e-22dd-493b-8403-9983061576e6",
+        "assignment_association": true,
+        "ownership_changed": false,
+        "return": "/projects/eddeb58e-22dd-493b-8403-9983061576e6/"
+      }
+    },
+    "project-role-positive-and-foreign-denial": {
+      "status": "PASS",
+      "detail": {
+        "/equipment/own": 200,
+        "/equipment/sibling": 403,
+        "/equipment/foreign": 403,
+        "/equipment/operations/own": 200,
+        "/equipment/operations/sibling": 403,
+        "/equipment/operations/foreign": 403
+      }
+    },
+    "empty-workplan-and-unavailable-measurements": {
+      "status": "PASS",
+      "detail": {
+        "start_action": true,
+        "fabricated_progress": false,
+        "fabricated_actual": false
+      }
+    },
+    "protected-company-pages-and-projects-list": {
+      "status": "PASS",
+      "detail": [
+        {
+          "route": "/organizations/platform/companies/",
+          "width": 1440,
+          "document": 1440,
+          "status": 200
+        },
+        {
+          "route": "/organizations/platform/companies/",
+          "width": 1024,
+          "document": 1024,
+          "status": 200
+        },
+        {
+          "route": "/organizations/platform/companies/",
+          "width": 390,
+          "document": 390,
+          "status": 200
+        },
+        {
+          "route": "/organizations/platform/companies/c0f35d3d-3452-4be0-8d45-6cac0ff6b60c/",
+          "width": 1440,
+          "document": 1440,
+          "status": 200
+        },
+        {
+          "route": "/organizations/platform/companies/c0f35d3d-3452-4be0-8d45-6cac0ff6b60c/",
+          "width": 1024,
+          "document": 1024,
+          "status": 200
+        },
+        {
+          "route": "/organizations/platform/companies/c0f35d3d-3452-4be0-8d45-6cac0ff6b60c/",
+          "width": 390,
+          "document": 390,
+          "status": 200
+        }
+      ]
+    }
+  },
+  "browser_issues": []
+}

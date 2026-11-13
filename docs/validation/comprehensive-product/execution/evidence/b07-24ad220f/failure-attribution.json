@@ -1,0 +1,74 @@
+[
+  {
+    "case": "OrganizationTenantIsolationTests.test_invalid_session_organization_is_cleared_by_middleware",
+    "classification": "BASELINE TEST DEBT",
+    "evidence": "The invalid company selection is cleared. This historical test expects automatic reselection. Chrome verified revoked and stale context clearance and explicit authorized switching.",
+    "source": "apps/organizations/tests.py:409"
+  },
+  {
+    "case": "AdministrationTests.test_read_only_lifecycle_forms_and_navigation_do_not_mutate",
+    "classification": "BASELINE TEST DEBT",
+    "evidence": "The lifecycle GET succeeded without mutation. The historical assertion expects NAV-039 in the pre-MVP navigation. B07 checked the currently exposed definition links.",
+    "source": "apps/workflows/test_cep046_administration.py:209"
+  },
+  {
+    "case": "Cep018WorkspaceTests.test_my_requests_is_own_identity_scoped_and_source_owned",
+    "classification": "BASELINE TEST DEBT",
+    "evidence": "Own and foreign source assertions completed before the historical NAV-004 assertion failed. The B07 Chrome fixture checked the current own-source links.",
+    "source": "apps/workflows/test_cep018_workspaces.py:174"
+  },
+  {
+    "case": "Cep018WorkspaceTests.test_notification_is_deduplicated_linked_and_presentation_only",
+    "classification": "BASELINE TEST DEBT",
+    "evidence": "The support notification endpoint belongs to a UI-hidden capability under MVP and returned 403. B07 did not activate support.",
+    "source": "apps/workflows/test_cep018_workspaces.py:254"
+  },
+  {
+    "case": "BusinessPartyServiceTests (5 tests)",
+    "classification": "BASELINE TEST DEBT",
+    "evidence": "The legacy fixture creates role strings without explicit effective role assignments or scope. The separate qualified fixture reuses the existing explicit_fixture_authority helper and reruns all five unchanged assertions.",
+    "source": "apps/parties/tests.py:17"
+  },
+  {
+    "case": "PartySurfaceTests.test_governance_layout_dates_cache_and_navigation",
+    "classification": "BASELINE TEST DEBT",
+    "evidence": "The old NAV-043 selector is absent under the current navigation. The protected page retained Persian RTL, history and private no-store headers.",
+    "source": "apps/parties/test_cep030.py:387"
+  },
+  {
+    "case": "PartySurfaceTests.test_invalid_and_empty_states_are_explicit",
+    "classification": "BASELINE TEST DEBT",
+    "evidence": "The non-matching filter uses the shared filtered empty state. The historical assertion expects the unfiltered empty state text.",
+    "source": "apps/parties/test_cep030.py:376"
+  },
+  {
+    "case": "MaterialsGovernanceSurfaceTests.test_steward_can_view_tenant_local_history_and_create_alias_relationship",
+    "classification": "BASELINE TEST DEBT",
+    "evidence": "The GET succeeds under the business label مدیریت مشخصات مصالح و واحدهای اندازه‌گیری. The old literal حاکمیت مصالح fails before the action checks. B07 Chrome separately persisted the alias.",
+    "source": "apps/materials/test_cep031.py:66"
+  },
+  {
+    "case": "WorkflowRuntimeConcurrencyTests, SafetyWorkflowConcurrencyTests, QualityWorkflowConcurrencyTests",
+    "classification": "TEST INFRASTRUCTURE DEBT",
+    "evidence": "Assertions ran before the default teardown failed to truncate managed tables referenced by retained unmanaged payments FKs. Qualification reuses the repository cascade teardown on the isolated database.",
+    "source": "apps/billing/test_mvp03_browser.py:183"
+  },
+  {
+    "case": "ReturnConcurrencyTests and later classes in first focused retest",
+    "classification": "TEST INFRASTRUCTURE DEBT",
+    "evidence": "The available_apps pre-setup signal recreated ContentType rows before serialized migration catalogue restoration. The final isolated concurrency run sets available_apps=None, retains full INSTALLED_APPS and uses the same migration snapshot and cascade teardown.",
+    "source": "django/test/testcases.py:1137"
+  },
+  {
+    "case": "Browser fixture qualification",
+    "classification": "TEST INFRASTRUCTURE DEBT",
+    "evidence": "The first workflow setup collided with the real compatibility workflow seeded on commit. Qualification reused the existing empty synthetic-tenant browser fixture. Other harness corrections used membership IDs for started_by, canonical history actions claim/release/complete, scoped row identifiers instead of echoed search values, and focus plus explicit Jalali picker dismissal.",
+    "source": "apps/workflows/test_cep046_browser.py:53"
+  },
+  {
+    "case": "Archived Party historical contract read timeout",
+    "classification": "TEST INFRASTRUCTURE DEBT",
+    "evidence": "The contract returned 200 after 10.928 seconds while competing local tests were running, at the 11-second browser boundary. A separate Chrome process with a 45-second navigation budget read the same archived Party references and verified both FKs without mutation.",
+    "source": "retest-party-history/supplemental.json"
+  }
+]

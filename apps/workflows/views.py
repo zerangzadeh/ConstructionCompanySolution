@@ -250,6 +250,11 @@ def work_item_action(request: HttpRequest, work_item_id: object) -> HttpResponse
         outcome = request.POST.get("outcome", "").strip()
         if not outcome or len(outcome) > 100:
             raise ValidationError("نتیجه اقدام معتبر نیست.")
+        if outcome == "returned" and WorkItem.objects.filter(
+            pk=work_item_id, organization=request.organization,
+            instance__subject_type="daily_reports.daily_report",
+        ).exists():
+            raise PermissionDenied("بازگشت را از فرم دارای دلیل در جزئیات گزارش ثبت کنید.")
         return complete_work_item(
             actor=request.user,
             organization=request.organization,

@@ -129,10 +129,11 @@ class B03FinalRemediationTests(FinalFixture, TestCase):
             organization=self.organization, actor=self.owner, report_id=self.report.pk
         )
         item = WorkItem.objects.get(instance__subject_id=self.report.pk)
-        claim_work_item(
-            actor=self.owner, organization=self.organization,
-            work_item_id=item.pk, idempotency_key="final-author-claim",
-        )
+        with self.assertRaises(PermissionDenied):
+            claim_work_item(
+                actor=self.owner, organization=self.organization,
+                work_item_id=item.pk, idempotency_key="final-author-claim",
+            )
         before = AuditEvent.objects.count()
         with self.assertRaises(PermissionDenied):
             complete_work_item(
@@ -142,7 +143,7 @@ class B03FinalRemediationTests(FinalFixture, TestCase):
             )
         item.refresh_from_db()
         self.report.refresh_from_db()
-        self.assertEqual(item.status, "claimed")
+        self.assertEqual(item.status, "open")
         self.assertEqual(self.report.status, "submitted")
         self.assertEqual(AuditEvent.objects.count(), before)
 

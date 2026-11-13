@@ -1,0 +1,236 @@
+{
+  "workflow source submission": {
+    "route": "workflow source submission",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/procurement/requests/a65acd03-018e-4a2b-89c7-a63ed15d05d2/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/requests/a65acd03-018e-4a2b-89c7-a63ed15d05d2/submit/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      }
+    ],
+    "design": [],
+    "status": "FAIL",
+    "error": "",
+    "exception": "AssertionError"
+  },
+  "purchase workflow rejection reason": {
+    "route": "purchase workflow rejection reason",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/procurement/requests/6ca38292-85f9-443f-8791-0bc8c0a08265/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/requests/6ca38292-85f9-443f-8791-0bc8c0a08265/submit/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/workbench/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/01cbc44a-82ab-467c-aee1-9a44272c2da0/claim/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/workflows/workbench/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/workflows/workbench/01cbc44a-82ab-467c-aee1-9a44272c2da0/action/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "Cartable reject button submits no reason"
+      },
+      {
+        "method": "GET",
+        "url": "/procurement/requests/6ca38292-85f9-443f-8791-0bc8c0a08265/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      }
+    ],
+    "design": [],
+    "status": "FAIL",
+    "error": "Locator.evaluate: Timeout 4500ms exceeded.\nCall log:\n  - waiting for locator(\"main form[action='/procurement/requests/6ca38292-85f9-443f-8791-0bc8c0a08265/reject/']\").first.locator(\"[name='reason']\").first\n",
+    "exception": "TimeoutError"
+  },
+  "contract Party reuse": {
+    "route": "contract Party reuse",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/contracts/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/create/",
+        "status": 200,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "foreign contract Party forgery"
+      },
+      {
+        "method": "POST",
+        "url": "/contracts/create/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      }
+    ],
+    "design": [],
+    "status": "PASS",
+    "persisted": {
+      "contract": "9ca8e0fc-240f-43c9-925d-52df64f4c18d",
+      "reused_party": "b162c997-e4a5-4705-902b-46cdf4a47e98",
+      "foreign_rejected": true,
+      "archived_excluded": true
+    }
+  },
+  "procurement Party reuse": {
+    "route": "procurement Party reuse",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/procurement/orders/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/orders/create/",
+        "status": 400,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "forged supplier selection"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/orders/create/",
+        "status": 400,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "forged supplier selection"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/orders/create/",
+        "status": 400,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "forged supplier selection"
+      },
+      {
+        "method": "POST",
+        "url": "/procurement/orders/create/",
+        "status": 400,
+        "expected": [
+          200,
+          400
+        ],
+        "case": "forged supplier selection"
+      }
+    ],
+    "design": [
+      "purchase-order-party-selector"
+    ],
+    "inactive_role_visible": true,
+    "status": "FAIL",
+    "error": "Locator.click: Timeout 4500ms exceeded.\nCall log:\n  - waiting for locator(\"main form:has([name='project'])\").first.locator(\"button[type=submit], button:not([type]), input[type=submit]\").first\n    - locator resolved to <button type=\"submit\" class=\"erp-btn erp-btn--primary\">…</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <div class=\"erp-jalali-days\">…</div> from <section class=\"erp-form-section\" aria-labelledby=\"po-dates\">…</section> subtree intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <div class=\"erp-jalali-days\">…</div> from <section class=\"erp-form-section\" aria-labelledby=\"po-dates\">…</section> subtree intercepts pointer events\n    - retrying click action\n      - waiting 100ms\n    8 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <div class=\"erp-jalali-days\">…</div> from <section class=\"erp-form-section\" aria-labelledby=\"po-dates\">…</section> subtree intercepts pointer events\n    - retrying click action\n      - waiting 500ms\n",
+    "exception": "TimeoutError"
+  },
+  "protected Party archive": {
+    "route": "protected Party archive",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/parties/governance/d778feb1-b639-4434-b6a4-1c708b2e3e96/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/parties/d778feb1-b639-4434-b6a4-1c708b2e3e96/archive/",
+        "status": 500,
+        "expected": [
+          403,
+          500
+        ],
+        "case": "protected merge reference archive"
+      }
+    ],
+    "design": [],
+    "persisted": {
+      "merge_reference_preserved": true,
+      "audit_delta": 0,
+      "archive_control_count": 1
+    },
+    "status": "FAIL",
+    "error": "Protected canonical Party shows archive and returns a server error",
+    "exception": "AssertionError"
+  }
+}

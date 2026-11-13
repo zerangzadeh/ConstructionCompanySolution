@@ -3,11 +3,11 @@
 {% block list_root_attributes %}data-field-list{% endblock %}
 {% block title %}تجهیزات | بنیرا{% endblock %}
 {% block list_heading %}<div data-workspace-id="WS-15A">
-{% if "equipment.create" in business_permission_codes %}{% url "equipment:create" as create_url %}{% endif %}
+{% if can_create_equipment %}{% url "equipment:create" as create_url %}{% endif %}
 {% include "components/page_header.html" with page_title="تجهیزات" page_description="مدیریت فهرست ماشین‌آلات و تجهیزات شرکت" page_action_url=create_url page_action_label="ثبت تجهیز جدید" page_icon="document" only %}
 </div>{% endblock %}
-{% block list_navigation %}<nav class="erp-list-navigation" aria-label="صفحات مرتبط تجهیزات">
-{% if "equipment_operations.view" in business_permission_codes %}<a href="{% url 'equipment:operations_workbench' %}">عملیات تجهیزات</a>{% endif %}
+{% block list_navigation %}{% include "equipment/_project_context.html" %}<nav class="erp-list-navigation" aria-label="صفحات مرتبط تجهیزات">
+{% if "equipment_operations.view" in business_permission_codes %}<a href="{{ equipment_operations_url }}">{% if equipment_project %}عملیات تجهیزات این پروژه{% else %}عملیات تجهیزات{% endif %}</a>{% endif %}
 {% if "equipment_assignments.view" in business_permission_codes %}<a href="{% url 'equipment:assignment_list' %}">تخصیص‌ها</a>{% endif %}
 {% if "maintenance_records.view" in business_permission_codes %}<a href="{% url 'equipment:maintenance_list' %}">سرویس و تعمیرات</a>{% endif %}
 </nav>{% endblock %}
@@ -16,10 +16,10 @@
 {% if equipment %}<table class="erp-responsive-list" aria-label="تجهیزات"><thead><tr>
 {% for option in list_ui.sorts %}<th scope="col"{% if list_ui.sort.key == option.key %} aria-sort="{{ list_ui.sort.descending|yesno:'descending,ascending' }}"{% endif %}>{% table_sort_header option.key option.label %}</th>{% endfor %}<th scope="col">عملیات</th>
 </tr></thead><tbody>{% for item in equipment %}{% url 'equipment:detail' item.pk as detail_url %}<tr>
-<td class="erp-list-title" data-label="کد و نام"><a href="{{ detail_url }}">{{ item.name }}</a><span class="erp-list-subtitle"><bdi dir="ltr">{{ item.code }}</bdi></span></td>
+<td class="erp-list-title" data-label="کد و نام"><a href="{{ detail_url }}{% if equipment_project %}?project={{ equipment_project.pk }}{% endif %}">{{ item.name }}</a><span class="erp-list-subtitle"><bdi dir="ltr">{{ item.code }}</bdi></span></td>
 <td data-label="دسته">{{ item.category }}</td><td data-label="مالکیت">{{ item.get_ownership_type_display }}</td><td class="erp-list-status" data-label="وضعیت">{% include "components/status_badge.html" with status=item.status label=item.get_status_display only %}</td>
-<td class="erp-list-row-action">{% include "components/list_detail_action.html" with detail_url=detail_url label=item.name floating_menu=True only %}</td>
+<td class="erp-list-row-action">{% if equipment_project %}<a class="erp-btn erp-btn--secondary" href="{{ detail_url }}?project={{ equipment_project.pk }}">مشاهده</a>{% else %}{% include "components/list_detail_action.html" with detail_url=detail_url label=item.name floating_menu=True only %}{% endif %}</td>
 </tr>{% endfor %}</tbody></table>
 {% elif scoped_has_records %}{% include "components/filtered_empty_state.html" with clear_filters_url=list_ui.bar.clear_url %}
-{% else %}{% if "equipment.create" in business_permission_codes %}{% url 'equipment:create' as empty_create_url %}{% endif %}{% include "components/empty_state.html" with empty_title="هنوز تجهیزی ثبت نشده است" empty_description="ماشین‌آلات و ابزارهای شرکت را ثبت کنید." empty_action_url=empty_create_url empty_action_label="ثبت تجهیز جدید" only %}{% endif %}
+{% elif equipment_project %}{% include "components/empty_state.html" with empty_title="هنوز تخصیص تجهیزی برای این پروژه وجود ندارد" empty_description="این فهرست فقط تجهیزات دارای سابقه تخصیص مجاز به پروژه را نمایش می‌دهد؛ فهرست تجهیزات شرکت مستقل است." only %}{% else %}{% if can_create_equipment %}{% url 'equipment:create' as empty_create_url %}{% endif %}{% include "components/empty_state.html" with empty_title="هنوز تجهیزی ثبت نشده است" empty_description="ماشین‌آلات و ابزارهای شرکت را ثبت کنید." empty_action_url=empty_create_url empty_action_label="ثبت تجهیز جدید" only %}{% endif %}
 {% endblock %}

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from typing import Any
 
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -253,6 +253,7 @@ def update_platform_policy_version(
     effective_to: date | None = None,
     supersedes: PlatformPolicyVersion | None = None,
     insurance_classification: InsuranceClassification | None = None,
+    expected_updated_at: datetime | None = None,
 ) -> PlatformPolicyVersion:
     """Edit only a Platform-managed draft; published history is never rewritten."""
     _require_platform_admin(actor)
@@ -263,6 +264,8 @@ def update_platform_policy_version(
     )
     if locked.status != PolicyVersionStatus.DRAFT:
         raise ValidationError("فقط نسخه پیش‌نویس قابل ویرایش است.")
+    if expected_updated_at is not None and locked.updated_at != expected_updated_at:
+        raise ValidationError("نسخه سیاست تغییر کرده است. صفحه را تازه‌سازی کنید.")
     if effective_from < timezone.localdate():
         raise ValidationError("تغییر با تاریخ گذشته برای سیاست مجاز نیست.")
     if source_basis not in PolicySourceBasis.values:
@@ -335,7 +338,11 @@ def link_policy_version_source(
 
 @transaction.atomic
 def publish_platform_policy_version(
-    *, actor: User, policy_version: PlatformPolicyVersion, reason: str
+    *,
+    actor: User,
+    policy_version: PlatformPolicyVersion,
+    reason: str,
+    expected_updated_at: datetime | None = None,
 ) -> PlatformPolicyVersion:
     _require_platform_admin(actor)
     if not reason.strip():
@@ -347,6 +354,8 @@ def publish_platform_policy_version(
     )
     if locked.status != PolicyVersionStatus.DRAFT:
         raise ValidationError("فقط نسخه پیش‌نویس قابل انتشار است.")
+    if expected_updated_at is not None and locked.updated_at != expected_updated_at:
+        raise ValidationError("نسخه سیاست تغییر کرده است. صفحه را تازه‌سازی کنید.")
     PlatformPolicy.objects.select_for_update().get(pk=locked.policy_id)
     spec = get_platform_policy_spec(locked.policy.code)
     validate_policy_parameters(spec=spec, parameters=locked.parameters)

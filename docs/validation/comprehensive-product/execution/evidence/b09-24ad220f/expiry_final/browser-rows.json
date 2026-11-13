@@ -1,0 +1,141 @@
+{
+  "INV-DOCUMENTS-DETAIL--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-DETAIL--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/ad07b0aa-a365-4ab6-90bf-f2c2907d3adb/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/ad07b0aa-a365-4ab6-90bf-f2c2907d3adb/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/ad07b0aa-a365-4ab6-90bf-f2c2907d3adb/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/ad07b0aa-a365-4ab6-90bf-f2c2907d3adb/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "documents-detail"
+    ],
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "current": "174a26d8-43c8-4003-b652-db03e4a8ceba",
+      "source": "b2880576-e094-4fdd-be8d-49f6d00eae88"
+    },
+    "status": "PASS"
+  },
+  "INV-DOCUMENTS-UPLOAD--CV-DOC-01": {
+    "execution_id": "INV-DOCUMENTS-UPLOAD--CV-DOC-01",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/upload/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/upload/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/upload/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/upload/",
+        "status": 403,
+        "case": "denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "design": [
+      "documents-upload"
+    ],
+    "expiry_widget": {
+      "type": "text",
+      "jalali": "datetime"
+    },
+    "denials": [
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "document": "df10c882-d74a-4596-a5cc-c89684117e3b",
+      "hash": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "pending_scan": true,
+      "aware_expiry": "2027-04-04 12:30:00+00:00",
+      "treasury_choice_absent": true
+    },
+    "status": "PASS"
+  }
+}

@@ -1,0 +1,2408 @@
+{
+  "INV-BILLING-CLAIM-LIST-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "01-billing-claim_list.xlsx",
+      "sha256": "193dba48269ec1a3873728b05a8aa627758a37f7369375e51664f93e6df8f6ee",
+      "filename": "صورت_وضعیت_ها.xlsx",
+      "response_url": "/billing/claims/?format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "صورت‌وضعیت‌ها": 32,
+        "ردیف‌های کارکرد": 2,
+        "کسورات و اضافات": 0
+      },
+      "headings": {
+        "صورت‌وضعیت‌ها": [
+          "پروژه",
+          "شماره قرارداد",
+          "عنوان قرارداد",
+          "شماره صورت‌وضعیت",
+          "نسخه",
+          "وضعیت",
+          "شروع دوره",
+          "پایان دوره",
+          "تاریخ قطع اندازه‌گیری",
+          "ارز",
+          "مبلغ ناخالص",
+          "کسورات و اضافات",
+          "مبلغ خالص"
+        ],
+        "ردیف‌های کارکرد": [
+          "شماره قرارداد",
+          "شماره صورت‌وضعیت",
+          "نسخه",
+          "شرح ردیف",
+          "واحد",
+          "مقدار تجمعی قبلی",
+          "مقدار دوره",
+          "مقدار تجمعی جدید",
+          "نرخ واحد ثبت‌شده",
+          "مبلغ دوره"
+        ],
+        "کسورات و اضافات": [
+          "شماره قرارداد",
+          "شماره صورت‌وضعیت",
+          "نسخه",
+          "نوع",
+          "شرح",
+          "نرخ ثبت‌شده",
+          "مبلغ مبنا",
+          "مبلغ"
+        ]
+      }
+    },
+    "child_reconciliation": [
+      {
+        "sheet": "ردیف‌های کارکرد",
+        "rows": 2,
+        "export_column_indexes": [
+          1,
+          2,
+          6,
+          9
+        ],
+        "sql": "SELECT c.claim_number,c.revision_number,i.current_quantity,i.current_amount\n            FROM billing_progressclaimitem i JOIN billing_progressclaim c ON i.claim_id=c.id\n            WHERE c.organization_id=%s"
+      },
+      {
+        "sheet": "کسورات و اضافات",
+        "rows": 0,
+        "export_column_indexes": [
+          1,
+          2,
+          5,
+          6,
+          7
+        ],
+        "sql": "SELECT c.claim_number,c.revision_number,a.rate_snapshot,a.base_amount_snapshot,a.amount\n            FROM billing_claimadjustment a JOIN billing_progressclaim c ON a.claim_id=c.id\n            WHERE c.organization_id=%s"
+      }
+    ],
+    "full_primary_reconciliation": {
+      "sql": "SELECT p.name,c.contract_number,c.title,b.claim_number::text,b.revision_number,b.status,b.period_start,b.period_end,b.measurement_cutoff,b.currency_code,b.gross_amount,b.adjustment_amount,b.net_amount\n          FROM billing_progressclaim b JOIN projects_project p ON b.project_id=p.id JOIN contracts_contract c ON b.contract_id=c.id WHERE b.organization_id=%s",
+      "rows": 32,
+      "columns": 13,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "billing.ProgressClaim",
+      "source_columns": {
+        "3": "claim_number",
+        "4": "revision_number",
+        "10": "gross_amount",
+        "11": "adjustment_amount",
+        "12": "net_amount"
+      },
+      "rows": 32,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 32,
+    "empty": {
+      "file": "01-billing-claim_list-empty.xlsx",
+      "sha256": "f962c47f9119ab812d059ccbf072854247ffd759b3488e816d115e0058c1d205",
+      "filename": "صورت_وضعیت_ها.xlsx",
+      "response_url": "/billing/claims/?status=cancelled&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "صورت‌وضعیت‌ها": 0,
+        "ردیف‌های کارکرد": 0,
+        "کسورات و اضافات": 0
+      },
+      "headings": {
+        "صورت‌وضعیت‌ها": [
+          "پروژه",
+          "شماره قرارداد",
+          "عنوان قرارداد",
+          "شماره صورت‌وضعیت",
+          "نسخه",
+          "وضعیت",
+          "شروع دوره",
+          "پایان دوره",
+          "تاریخ قطع اندازه‌گیری",
+          "ارز",
+          "مبلغ ناخالص",
+          "کسورات و اضافات",
+          "مبلغ خالص"
+        ],
+        "ردیف‌های کارکرد": [
+          "شماره قرارداد",
+          "شماره صورت‌وضعیت",
+          "نسخه",
+          "شرح ردیف",
+          "واحد",
+          "مقدار تجمعی قبلی",
+          "مقدار دوره",
+          "مقدار تجمعی جدید",
+          "نرخ واحد ثبت‌شده",
+          "مبلغ دوره"
+        ],
+        "کسورات و اضافات": [
+          "شماره قرارداد",
+          "شماره صورت‌وضعیت",
+          "نسخه",
+          "نوع",
+          "شرح",
+          "نرخ ثبت‌شده",
+          "مبلغ مبنا",
+          "مبلغ"
+        ]
+      }
+    },
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 200,
+      "anonymous": 302
+    }
+  },
+  "INV-BILLING-CLAIM-DETAIL-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "02-billing-claim_detail.xlsx",
+      "sha256": "0c562fc974fcacb60493efc698b85c5ea53aeb92588b67c0093c19f512869fa5",
+      "filename": "صورت_وضعیت_ها.xlsx",
+      "response_url": "/billing/claims/5f74a2c3-d2d5-4665-950c-22d3bffccbbd/?format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "صورت‌وضعیت‌ها": 1,
+        "ردیف‌های کارکرد": 1,
+        "کسورات و اضافات": 0
+      },
+      "headings": {
+        "صورت‌وضعیت‌ها": [
+          "پروژه",
+          "شماره قرارداد",
+          "عنوان قرارداد",
+          "شماره صورت‌وضعیت",
+          "نسخه",
+          "وضعیت",
+          "شروع دوره",
+          "پایان دوره",
+          "تاریخ قطع اندازه‌گیری",
+          "ارز",
+          "مبلغ ناخالص",
+          "کسورات و اضافات",
+          "مبلغ خالص"
+        ],
+        "ردیف‌های کارکرد": [
+          "شماره قرارداد",
+          "شماره صورت‌وضعیت",
+          "نسخه",
+          "شرح ردیف",
+          "واحد",
+          "مقدار تجمعی قبلی",
+          "مقدار دوره",
+          "مقدار تجمعی جدید",
+          "نرخ واحد ثبت‌شده",
+          "مبلغ دوره"
+        ],
+        "کسورات و اضافات": [
+          "شماره قرارداد",
+          "شماره صورت‌وضعیت",
+          "نسخه",
+          "نوع",
+          "شرح",
+          "نرخ ثبت‌شده",
+          "مبلغ مبنا",
+          "مبلغ"
+        ]
+      }
+    },
+    "child_reconciliation": [
+      {
+        "sheet": "ردیف‌های کارکرد",
+        "rows": 1,
+        "export_column_indexes": [
+          1,
+          2,
+          6,
+          9
+        ],
+        "sql": "SELECT c.claim_number,c.revision_number,i.current_quantity,i.current_amount\n            FROM billing_progressclaimitem i JOIN billing_progressclaim c ON i.claim_id=c.id\n            WHERE c.organization_id=%s AND c.id=%s"
+      },
+      {
+        "sheet": "کسورات و اضافات",
+        "rows": 0,
+        "export_column_indexes": [
+          1,
+          2,
+          5,
+          6,
+          7
+        ],
+        "sql": "SELECT c.claim_number,c.revision_number,a.rate_snapshot,a.base_amount_snapshot,a.amount\n            FROM billing_claimadjustment a JOIN billing_progressclaim c ON a.claim_id=c.id\n            WHERE c.organization_id=%s AND c.id=%s"
+      }
+    ],
+    "full_primary_reconciliation": {
+      "sql": "SELECT p.name,c.contract_number,c.title,b.claim_number::text,b.revision_number,b.status,b.period_start,b.period_end,b.measurement_cutoff,b.currency_code,b.gross_amount,b.adjustment_amount,b.net_amount\n          FROM billing_progressclaim b JOIN projects_project p ON b.project_id=p.id JOIN contracts_contract c ON b.contract_id=c.id WHERE b.organization_id=%s AND b.id=%s",
+      "rows": 1,
+      "columns": 13,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "billing.ProgressClaim",
+      "source_columns": {
+        "3": "claim_number",
+        "4": "revision_number",
+        "10": "gross_amount",
+        "11": "adjustment_amount",
+        "12": "net_amount"
+      },
+      "rows": 1,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 1,
+    "empty": "Detail: not applicable",
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 404,
+      "cross-project": 404,
+      "anonymous": 302
+    }
+  },
+  "INV-DAILY-REPORTS-LIST-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "03-daily_reports-list.xlsx",
+      "sha256": "d0b73f21016d258e7f3612be3326690e490bc28d05304c231bbdf5812cd75b6e",
+      "filename": "گزارش_های روزانه.xlsx",
+      "response_url": "/daily-reports/?site_filter=ceb9b5bf-7ed0-4bf7-8319-5fb3c5f985ed&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "گزارش‌های روزانه": 31,
+        "فعالیت‌ها": 1,
+        "نیروی انسانی": 1,
+        "تجهیزات": 1,
+        "مصالح": 1,
+        "تأخیرها": 1
+      },
+      "headings": {
+        "گزارش‌های روزانه": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "وضعیت",
+          "آب‌وهوا",
+          "تعداد نیرو",
+          "کارهای انجام‌شده",
+          "خلاصه پیشرفت",
+          "مسائل و تأخیرها",
+          "یادداشت ایمنی",
+          "یادداشت کیفیت"
+        ],
+        "فعالیت‌ها": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "فعالیت",
+          "شرح",
+          "مقدار",
+          "واحد",
+          "درصد پیشرفت ثبت‌شده",
+          "یادداشت"
+        ],
+        "نیروی انسانی": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "گروه کاری",
+          "تعداد نیرو",
+          "ساعات کارکرد",
+          "یادداشت"
+        ],
+        "تجهیزات": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "تجهیز",
+          "ساعات کارکرد",
+          "یادداشت"
+        ],
+        "مصالح": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "مصالح",
+          "مقدار",
+          "واحد",
+          "یادداشت"
+        ],
+        "تأخیرها": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "فعالیت",
+          "تاریخ وقوع",
+          "دسته",
+          "علت",
+          "اثر",
+          "طرف مسئول",
+          "مدت (ساعت)",
+          "وضعیت"
+        ]
+      }
+    },
+    "child_reconciliation": [
+      {
+        "sheet": "فعالیت‌ها",
+        "rows": 1,
+        "export_column_indexes": [
+          6,
+          7,
+          9
+        ],
+        "sql": "SELECT i.description,i.quantity,i.progress_percent FROM daily_reports_dailyactivity i JOIN daily_reports_dailyreport p ON i.report_id=p.id WHERE p.organization_id=%s"
+      },
+      {
+        "sheet": "نیروی انسانی",
+        "rows": 1,
+        "export_column_indexes": [
+          5,
+          6,
+          7
+        ],
+        "sql": "SELECT i.team_name,i.worker_count,i.hours_worked FROM daily_reports_dailyreportlaborentry i JOIN daily_reports_dailyreport p ON i.report_id=p.id WHERE p.organization_id=%s"
+      },
+      {
+        "sheet": "تجهیزات",
+        "rows": 1,
+        "export_column_indexes": [
+          5,
+          6
+        ],
+        "sql": "SELECT i.equipment_name,i.hours_used FROM daily_reports_dailyreportequipmententry i JOIN daily_reports_dailyreport p ON i.report_id=p.id WHERE p.organization_id=%s"
+      },
+      {
+        "sheet": "مصالح",
+        "rows": 1,
+        "export_column_indexes": [
+          6
+        ],
+        "sql": "SELECT i.quantity FROM daily_reports_dailyreportmaterialentry i JOIN daily_reports_dailyreport p ON i.report_id=p.id WHERE p.organization_id=%s"
+      },
+      {
+        "sheet": "تأخیرها",
+        "rows": 1,
+        "export_column_indexes": [
+          6,
+          8,
+          11
+        ],
+        "sql": "SELECT i.occurred_on,i.cause,i.duration_hours FROM daily_reports_delayevent i JOIN daily_reports_dailyreport p ON i.report_id=p.id WHERE p.organization_id=%s"
+      }
+    ],
+    "full_primary_reconciliation": {
+      "sql": "SELECT p.name,s.name,ph.name,d.reporting_date,d.revision_number,d.status,d.weather_conditions,d.labor_count,d.work_performed,d.progress_summary,d.issues_and_delays,d.safety_notes,d.quality_notes\n          FROM daily_reports_dailyreport d JOIN projects_project p ON d.project_id=p.id LEFT JOIN projects_projectsite s ON d.site_id=s.id LEFT JOIN projects_projectphase ph ON d.phase_id=ph.id WHERE d.organization_id=%s",
+      "rows": 31,
+      "columns": 13,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "daily_reports.DailyReport",
+      "source_columns": {
+        "3": "reporting_date",
+        "4": "revision_number",
+        "7": "labor_count",
+        "8": "work_performed"
+      },
+      "rows": 31,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 30,
+    "empty": {
+      "file": "03-daily_reports-list-empty.xlsx",
+      "sha256": "2db1ff95e087d4203ccc10d5ff024deef7979a7220378e98299ded3690da034d",
+      "filename": "گزارش_های روزانه.xlsx",
+      "response_url": "/daily-reports/?q=B08-MISSING&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "گزارش‌های روزانه": 0,
+        "فعالیت‌ها": 0,
+        "نیروی انسانی": 0,
+        "تجهیزات": 0,
+        "مصالح": 0,
+        "تأخیرها": 0
+      },
+      "headings": {
+        "گزارش‌های روزانه": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "وضعیت",
+          "آب‌وهوا",
+          "تعداد نیرو",
+          "کارهای انجام‌شده",
+          "خلاصه پیشرفت",
+          "مسائل و تأخیرها",
+          "یادداشت ایمنی",
+          "یادداشت کیفیت"
+        ],
+        "فعالیت‌ها": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "فعالیت",
+          "شرح",
+          "مقدار",
+          "واحد",
+          "درصد پیشرفت ثبت‌شده",
+          "یادداشت"
+        ],
+        "نیروی انسانی": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "گروه کاری",
+          "تعداد نیرو",
+          "ساعات کارکرد",
+          "یادداشت"
+        ],
+        "تجهیزات": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "تجهیز",
+          "ساعات کارکرد",
+          "یادداشت"
+        ],
+        "مصالح": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "مصالح",
+          "مقدار",
+          "واحد",
+          "یادداشت"
+        ],
+        "تأخیرها": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ گزارش",
+          "نسخه",
+          "فعالیت",
+          "تاریخ وقوع",
+          "دسته",
+          "علت",
+          "اثر",
+          "طرف مسئول",
+          "مدت (ساعت)",
+          "وضعیت"
+        ]
+      }
+    },
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 200,
+      "anonymous": 302
+    }
+  },
+  "INV-EQUIPMENT-LIST-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "04-equipment-list.xlsx",
+      "sha256": "99a076b685b710b010da55217e4dcb561f27a29a9628168075804054cdeac290",
+      "filename": "تجهیزات.xlsx",
+      "response_url": "/equipment/?format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "تجهیزات": 31
+      },
+      "headings": {
+        "تجهیزات": [
+          "کد تجهیز",
+          "تجهیز",
+          "دسته",
+          "مالکیت",
+          "وضعیت",
+          "سازنده",
+          "مدل",
+          "شماره سریال",
+          "شماره پلاک",
+          "تاریخ تملک یا شروع اجاره",
+          "یادداشت"
+        ]
+      }
+    },
+    "child_reconciliation": [],
+    "full_primary_reconciliation": {
+      "sql": "SELECT code,name,category,ownership_type,status,manufacturer,model,serial_number,registration_number,acquired_on,notes FROM equipment_equipment WHERE organization_id=%s",
+      "rows": 31,
+      "columns": 11,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "equipment.Equipment",
+      "source_columns": {
+        "0": "code",
+        "1": "name",
+        "9": "acquired_on",
+        "10": "notes"
+      },
+      "rows": 31,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 30,
+    "empty": {
+      "file": "04-equipment-list-empty.xlsx",
+      "sha256": "f6bf17ac323d95ee2ac4734d7f42425ecaf3d3f2a6ffdc46378f87bd31d184bd",
+      "filename": "تجهیزات.xlsx",
+      "response_url": "/equipment/?equipment=B08-MISSING&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "تجهیزات": 0
+      },
+      "headings": {
+        "تجهیزات": [
+          "کد تجهیز",
+          "تجهیز",
+          "دسته",
+          "مالکیت",
+          "وضعیت",
+          "سازنده",
+          "مدل",
+          "شماره سریال",
+          "شماره پلاک",
+          "تاریخ تملک یا شروع اجاره",
+          "یادداشت"
+        ]
+      }
+    },
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 403,
+      "anonymous": 302
+    }
+  },
+  "INV-EQUIPMENT-ASSIGNMENT-LIST-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "05-equipment-assignment_list.xlsx",
+      "sha256": "03d61e4f79ee55c4d18d6f023e69111ca29da4eb43787f15d478aa6b5a716665",
+      "filename": "تخصیص تجهیزات.xlsx",
+      "response_url": "/equipment/assignments/?project=%D9%BE%D8%B1%D9%88%DA%98%D9%87+%D9%BE%D9%84+%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%D8%B4%DB%8C&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "تخصیص تجهیزات": 31
+      },
+      "headings": {
+        "تخصیص تجهیزات": [
+          "کد تجهیز",
+          "تجهیز",
+          "پروژه",
+          "کارگاه",
+          "شروع تخصیص",
+          "پایان تخصیص",
+          "وضعیت",
+          "هدف تخصیص",
+          "یادداشت"
+        ]
+      }
+    },
+    "child_reconciliation": [],
+    "full_primary_reconciliation": {
+      "sql": "SELECT e.code,e.name,p.name,s.name,a.start_date,a.end_date,a.status,a.purpose,a.notes\n          FROM equipment_equipmentassignment a JOIN equipment_equipment e ON a.equipment_id=e.id JOIN projects_project p ON a.project_id=p.id LEFT JOIN projects_projectsite s ON a.site_id=s.id WHERE a.organization_id=%s",
+      "rows": 31,
+      "columns": 9,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "equipment.EquipmentAssignment",
+      "source_columns": {
+        "4": "start_date",
+        "5": "end_date",
+        "7": "purpose",
+        "8": "notes"
+      },
+      "rows": 31,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 30,
+    "empty": {
+      "file": "05-equipment-assignment_list-empty.xlsx",
+      "sha256": "090191f778c68b336ac7a13269e8779cb7fc9dfd351d0fe0244350fed93ee3e5",
+      "filename": "تخصیص تجهیزات.xlsx",
+      "response_url": "/equipment/assignments/?project=B08-MISSING&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "تخصیص تجهیزات": 0
+      },
+      "headings": {
+        "تخصیص تجهیزات": [
+          "کد تجهیز",
+          "تجهیز",
+          "پروژه",
+          "کارگاه",
+          "شروع تخصیص",
+          "پایان تخصیص",
+          "وضعیت",
+          "هدف تخصیص",
+          "یادداشت"
+        ]
+      }
+    },
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 200,
+      "anonymous": 302
+    }
+  },
+  "INV-EQUIPMENT-OPERATIONS-WORKBENCH-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "06-equipment-operations_workbench.xlsx",
+      "sha256": "cc84927a7c65588279d7b0dee065f0e1c628ad1a85989af1a8e5fae9ee9fccc0",
+      "filename": "کارکرد تجهیزات.xlsx",
+      "response_url": "/equipment/operations/?format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "کارکرد تجهیزات": 56
+      },
+      "headings": {
+        "کارکرد تجهیزات": [
+          "کد تجهیز",
+          "تجهیز",
+          "پروژه",
+          "کارگاه",
+          "شروع",
+          "پایان",
+          "کارکرد ثبت‌شده (ساعت)",
+          "اپراتور",
+          "دلیل اصلاح"
+        ]
+      }
+    },
+    "child_reconciliation": [],
+    "full_primary_reconciliation": {
+      "sql": "SELECT e.code,e.name,p.name,s.name,u.started_at,u.ended_at,u.runtime_hours,\n          CASE WHEN w.id IS NULL THEN NULL ELSE w.first_name || ' ' || w.last_name END,u.correction_reason\n          FROM equipment_equipmentusagelog u JOIN equipment_equipment e ON u.equipment_id=e.id JOIN equipment_equipmentassignment a ON u.deployment_id=a.id JOIN projects_project p ON a.project_id=p.id LEFT JOIN projects_projectsite s ON a.site_id=s.id LEFT JOIN workforce_employee w ON u.operator_id=w.id WHERE u.organization_id=%s",
+      "rows": 56,
+      "columns": 9,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "equipment.EquipmentUsageLog",
+      "source_columns": {
+        "4": "started_at",
+        "5": "ended_at",
+        "6": "runtime_hours",
+        "8": "correction_reason"
+      },
+      "rows": 56,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 55,
+    "empty": "Verified through foreign tenant / scoped actor",
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 403,
+      "anonymous": 302
+    }
+  },
+  "INV-ESTIMATES-LIST-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "07-estimates-list.xlsx",
+      "sha256": "696de27224b69c37892f5e6dfe8c372ca45b4a2dacb11ebcf2736e721c595eac",
+      "filename": "برآوردها.xlsx",
+      "response_url": "/estimates/?format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "برآوردها": 31,
+        "ردیف‌های برآورد": 1
+      },
+      "headings": {
+        "برآوردها": [
+          "شماره برآورد",
+          "عنوان",
+          "پروژه",
+          "فاز",
+          "قرارداد",
+          "بازنگری جاری",
+          "وضعیت",
+          "وضعیت بازنگری",
+          "مبلغ کل",
+          "زمان تأیید"
+        ],
+        "ردیف‌های برآورد": [
+          "شماره برآورد",
+          "پروژه",
+          "بازنگری",
+          "شرح ردیف",
+          "واحد",
+          "مقدار",
+          "قیمت واحد",
+          "مبلغ ردیف"
+        ]
+      }
+    },
+    "child_reconciliation": [
+      {
+        "sheet": "ردیف‌های برآورد",
+        "rows": 1,
+        "export_column_indexes": [
+          0,
+          2,
+          3,
+          5,
+          6,
+          7
+        ],
+        "sql": "SELECT e.estimate_number,r.revision_number,i.description,i.quantity,i.unit_price,round(i.quantity*i.unit_price,2)\n            FROM estimates_estimateitem i JOIN estimates_estimate e ON i.estimate_id=e.id\n            LEFT JOIN estimates_estimaterevision r ON i.revision_id=r.id\n            WHERE e.organization_id=%s AND (e.current_revision_id IS NULL OR e.current_revision_id=i.revision_id)"
+      },
+      {
+        "sheet": "برآوردها",
+        "rows": 31,
+        "export_column_indexes": [
+          0,
+          8
+        ],
+        "sql": "SELECT e.estimate_number,coalesce(sum(round(i.quantity*i.unit_price,2)),0)\n            FROM estimates_estimate e LEFT JOIN estimates_estimateitem i ON i.estimate_id=e.id\n            AND (e.current_revision_id IS NULL OR i.revision_id=e.current_revision_id)\n            WHERE e.organization_id=%s GROUP BY e.id"
+      }
+    ],
+    "full_primary_reconciliation": {
+      "sql": "SELECT e.estimate_number,e.title,p.name,ph.name,c.contract_number,r.revision_number,e.status,r.status,\n          coalesce((SELECT sum(round(i.quantity*i.unit_price,2)) FROM estimates_estimateitem i WHERE i.estimate_id=e.id AND (e.current_revision_id IS NULL OR i.revision_id=e.current_revision_id)),0),e.approved_at\n          FROM estimates_estimate e JOIN projects_project p ON e.project_id=p.id LEFT JOIN projects_projectphase ph ON e.phase_id=ph.id LEFT JOIN contracts_contract c ON e.contract_id=c.id LEFT JOIN estimates_estimaterevision r ON e.current_revision_id=r.id WHERE e.organization_id=%s",
+      "rows": 31,
+      "columns": 10,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "estimates.Estimate",
+      "source_columns": {
+        "0": "estimate_number",
+        "1": "title"
+      },
+      "rows": 31,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 31,
+    "empty": {
+      "file": "07-estimates-list-empty.xlsx",
+      "sha256": "931e8ecde11ba4b72f5e568f39cdb0c442c5ff531d6b3784f137214255b714cc",
+      "filename": "برآوردها.xlsx",
+      "response_url": "/estimates/?number=B08-MISSING&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "برآوردها": 0,
+        "ردیف‌های برآورد": 0
+      },
+      "headings": {
+        "برآوردها": [
+          "شماره برآورد",
+          "عنوان",
+          "پروژه",
+          "فاز",
+          "قرارداد",
+          "بازنگری جاری",
+          "وضعیت",
+          "وضعیت بازنگری",
+          "مبلغ کل",
+          "زمان تأیید"
+        ],
+        "ردیف‌های برآورد": [
+          "شماره برآورد",
+          "پروژه",
+          "بازنگری",
+          "شرح ردیف",
+          "واحد",
+          "مقدار",
+          "قیمت واحد",
+          "مبلغ ردیف"
+        ]
+      }
+    },
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 200,
+      "anonymous": 302
+    }
+  },
+  "INV-EXPENSES-LIST-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "08-expenses-list.xlsx",
+      "sha256": "0e744671425c7be4da4df37b702e08cbdd86b16e1c767ea376b681e1fa902b4d",
+      "filename": "هزینه_ها و تنخواه.xlsx",
+      "response_url": "/expenses/?format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "هزینه‌ها و تنخواه": 31
+      },
+      "headings": {
+        "هزینه‌ها و تنخواه": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ هزینه",
+          "گروه هزینه",
+          "دسته هزینه",
+          "شرح",
+          "فروشنده",
+          "طرف تجاری",
+          "ارز",
+          "مبلغ",
+          "وضعیت",
+          "مرجع رسید"
+        ]
+      }
+    },
+    "child_reconciliation": [],
+    "full_primary_reconciliation": {
+      "sql": "SELECT p.name,s.name,ph.name,e.incurred_on,g.name,cat.name,e.description,e.vendor_name,b.display_name,os.currency,e.amount,e.status,e.receipt_reference\n          FROM expenses_expense e JOIN projects_project p ON e.project_id=p.id LEFT JOIN projects_projectphase ph ON e.phase_id=ph.id LEFT JOIN projects_projectsite s ON ph.site_id=s.id LEFT JOIN expenses_platformexpensegroup g ON e.primary_group_id=g.id LEFT JOIN expenses_expensecategory cat ON e.expense_category_id=cat.id LEFT JOIN parties_businessparty b ON e.party_id=b.id JOIN organizations_organizationsettings os ON e.organization_id=os.organization_id WHERE e.organization_id=%s",
+      "rows": 31,
+      "columns": 13,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "expenses.Expense",
+      "source_columns": {
+        "3": "incurred_on",
+        "6": "description",
+        "10": "amount",
+        "12": "receipt_reference"
+      },
+      "rows": 31,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 1,
+    "empty": {
+      "file": "08-expenses-list-empty.xlsx",
+      "sha256": "9ce726b5de7f06d42cf2606fe9a7fb658b541edf59b2aca63062b918fd343631",
+      "filename": "هزینه_ها و تنخواه.xlsx",
+      "response_url": "/expenses/?description=B08-MISSING&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "هزینه‌ها و تنخواه": 0
+      },
+      "headings": {
+        "هزینه‌ها و تنخواه": [
+          "پروژه",
+          "کارگاه",
+          "فاز",
+          "تاریخ هزینه",
+          "گروه هزینه",
+          "دسته هزینه",
+          "شرح",
+          "فروشنده",
+          "طرف تجاری",
+          "ارز",
+          "مبلغ",
+          "وضعیت",
+          "مرجع رسید"
+        ]
+      }
+    },
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 200,
+      "anonymous": 302
+    }
+  },
+  "INV-INVENTORY-TRANSACTION-LIST-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "09-inventory-transaction_list.xlsx",
+      "sha256": "ef3ea44a2da60929b83a9a223888628f2b5ee8cc61557b18da301cc7c162906d",
+      "filename": "گردش انبار.xlsx",
+      "response_url": "/inventory/transactions/?format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "گردش انبار": 31
+      },
+      "headings": {
+        "گردش انبار": [
+          "شماره گردش",
+          "پروژه",
+          "انبار مبدأ",
+          "انبار مقصد",
+          "مصالح",
+          "واحد",
+          "نوع گردش",
+          "مقدار",
+          "زمان وقوع",
+          "وضعیت ثبت",
+          "مرجع",
+          "رسید کالا",
+          "برگشت گردش",
+          "رسید کالای گردش اصلی"
+        ]
+      }
+    },
+    "child_reconciliation": [],
+    "full_primary_reconciliation": {
+      "sql": "SELECT t.transaction_number,p.name,sw.name,dw.name,m.name,u.name,t.transaction_type,t.quantity,t.occurred_at,t.status,t.reference,g.receipt_number,r.transaction_number,rg.receipt_number\n          FROM inventory_stocktransaction t LEFT JOIN projects_project p ON t.project_id=p.id LEFT JOIN inventory_warehouse sw ON t.source_warehouse_id=sw.id LEFT JOIN inventory_warehouse dw ON t.destination_warehouse_id=dw.id JOIN materials_material m ON t.material_id=m.id JOIN materials_unitofmeasure u ON t.unit_of_measure_id=u.id LEFT JOIN procurement_goodsreceiptitem gi ON t.goods_receipt_item_id=gi.id LEFT JOIN procurement_goodsreceipt g ON gi.goods_receipt_id=g.id LEFT JOIN inventory_stocktransaction r ON t.reversal_of_id=r.id LEFT JOIN procurement_goodsreceiptitem ri ON r.goods_receipt_item_id=ri.id LEFT JOIN procurement_goodsreceipt rg ON ri.goods_receipt_id=rg.id WHERE t.organization_id=%s",
+      "rows": 31,
+      "columns": 14,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "inventory.StockTransaction",
+      "source_columns": {
+        "0": "transaction_number",
+        "7": "quantity",
+        "8": "occurred_at",
+        "10": "reference"
+      },
+      "rows": 31,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 61,
+    "empty": {
+      "file": "09-inventory-transaction_list-empty.xlsx",
+      "sha256": "9ffc68dba72db4d0cbce6ec376599e38a4cb079dc9fdc7eb0b6f97f26472f7f7",
+      "filename": "گردش انبار.xlsx",
+      "response_url": "/inventory/transactions/?q=B08-MISSING&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "گردش انبار": 0
+      },
+      "headings": {
+        "گردش انبار": [
+          "شماره گردش",
+          "پروژه",
+          "انبار مبدأ",
+          "انبار مقصد",
+          "مصالح",
+          "واحد",
+          "نوع گردش",
+          "مقدار",
+          "زمان وقوع",
+          "وضعیت ثبت",
+          "مرجع",
+          "رسید کالا",
+          "برگشت گردش",
+          "رسید کالای گردش اصلی"
+        ]
+      }
+    },
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 200,
+      "anonymous": 302
+    }
+  },
+  "INV-PROCUREMENT-REQUEST-LIST-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "10-procurement-request_list.xlsx",
+      "sha256": "163c043be8a0194c48e1ac6caf6721f82b01a131c61c8d1390318abb4c6ece06",
+      "filename": "درخواست_های خرید.xlsx",
+      "response_url": "/procurement/?format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "درخواست‌های خرید": 32,
+        "اقلام": 32
+      },
+      "headings": {
+        "درخواست‌های خرید": [
+          "شماره درخواست خرید",
+          "عنوان",
+          "پروژه",
+          "تاریخ نیاز",
+          "وضعیت"
+        ],
+        "اقلام": [
+          "درخواست خرید",
+          "مصالح",
+          "شرح ردیف",
+          "واحد",
+          "مقدار"
+        ]
+      }
+    },
+    "child_reconciliation": [
+      {
+        "sheet": "اقلام",
+        "rows": 32,
+        "export_column_indexes": [
+          0,
+          2,
+          4
+        ],
+        "sql": "SELECT p.request_number,i.description,i.quantity FROM procurement_purchaserequestitem i JOIN procurement_purchaserequest p ON i.purchase_request_id=p.id WHERE p.organization_id=%s"
+      }
+    ],
+    "full_primary_reconciliation": {
+      "sql": "SELECT r.request_number,r.title,p.name,r.required_by,r.status FROM procurement_purchaserequest r JOIN projects_project p ON r.project_id=p.id WHERE r.organization_id=%s",
+      "rows": 32,
+      "columns": 5,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "procurement.PurchaseRequest",
+      "source_columns": {
+        "0": "request_number",
+        "1": "title",
+        "3": "required_by"
+      },
+      "rows": 32,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 62,
+    "empty": {
+      "file": "10-procurement-request_list-empty.xlsx",
+      "sha256": "f3edc6feb64e72248b21f4c181bc6262e4981486b872f51981556dda86802b88",
+      "filename": "درخواست_های خرید.xlsx",
+      "response_url": "/procurement/?q=B08-MISSING&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "درخواست‌های خرید": 0,
+        "اقلام": 0
+      },
+      "headings": {
+        "درخواست‌های خرید": [
+          "شماره درخواست خرید",
+          "عنوان",
+          "پروژه",
+          "تاریخ نیاز",
+          "وضعیت"
+        ],
+        "اقلام": [
+          "درخواست خرید",
+          "مصالح",
+          "شرح ردیف",
+          "واحد",
+          "مقدار"
+        ]
+      }
+    },
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 200,
+      "anonymous": 302
+    }
+  },
+  "INV-PROCUREMENT-RFQ-LIST-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "11-procurement-rfq_list.xlsx",
+      "sha256": "464646a3413f0ff0d2fc5deb4cf5738f3b57b7c105820c7e6ba0a32b88f9a9f0",
+      "filename": "استعلام_های خرید.xlsx",
+      "response_url": "/procurement/rfqs/?format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "استعلام‌های خرید": 31,
+        "اقلام": 31
+      },
+      "headings": {
+        "استعلام‌های خرید": [
+          "شماره استعلام",
+          "عنوان",
+          "پروژه",
+          "درخواست خرید",
+          "نسخه صادرشده",
+          "مهلت دریافت",
+          "وضعیت"
+        ],
+        "اقلام": [
+          "شماره استعلام",
+          "مصالح",
+          "شرح ردیف",
+          "واحد",
+          "مقدار"
+        ]
+      }
+    },
+    "child_reconciliation": [
+      {
+        "sheet": "اقلام",
+        "rows": 31,
+        "export_column_indexes": [
+          0,
+          2,
+          4
+        ],
+        "sql": "SELECT p.rfq_number,i.description,i.quantity FROM procurement_requestforquotationline i JOIN procurement_requestforquotation p ON i.rfq_id=p.id WHERE p.organization_id=%s"
+      }
+    ],
+    "full_primary_reconciliation": {
+      "sql": "SELECT q.rfq_number,q.title,p.name,r.request_number,q.current_version_number,q.closing_at,q.status FROM procurement_requestforquotation q JOIN projects_project p ON q.project_id=p.id LEFT JOIN procurement_purchaserequest r ON q.purchase_request_id=r.id WHERE q.organization_id=%s",
+      "rows": 31,
+      "columns": 7,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "procurement.RequestForQuotation",
+      "source_columns": {
+        "0": "rfq_number",
+        "1": "title",
+        "5": "closing_at"
+      },
+      "rows": 31,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 61,
+    "empty": {
+      "file": "11-procurement-rfq_list-empty.xlsx",
+      "sha256": "3dde33eb213c2a78e67447d63b44d36efcb1e29fb7862c3f11ce0cdb849f744e",
+      "filename": "استعلام_های خرید.xlsx",
+      "response_url": "/procurement/rfqs/?q=B08-MISSING&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "استعلام‌های خرید": 0,
+        "اقلام": 0
+      },
+      "headings": {
+        "استعلام‌های خرید": [
+          "شماره استعلام",
+          "عنوان",
+          "پروژه",
+          "درخواست خرید",
+          "نسخه صادرشده",
+          "مهلت دریافت",
+          "وضعیت"
+        ],
+        "اقلام": [
+          "شماره استعلام",
+          "مصالح",
+          "شرح ردیف",
+          "واحد",
+          "مقدار"
+        ]
+      }
+    },
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 200,
+      "anonymous": 302
+    }
+  },
+  "INV-PROCUREMENT-ORDER-LIST-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "12-procurement-order_list.xlsx",
+      "sha256": "6e43553b2532f7cbed743a0917fd41afa6b831e002d20b74a0fb99b18f6dd151",
+      "filename": "سفارش_های خرید.xlsx",
+      "response_url": "/procurement/orders/?format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "سفارش‌های خرید": 31,
+        "اقلام": 31
+      },
+      "headings": {
+        "سفارش‌های خرید": [
+          "شماره سفارش خرید",
+          "پروژه",
+          "تأمین‌کننده",
+          "درخواست خرید",
+          "استعلام منبع",
+          "نسخه استعلام منبع",
+          "نسخه سفارش",
+          "تاریخ سفارش",
+          "تحویل موردانتظار",
+          "وضعیت",
+          "مبلغ کل ثبت‌شده"
+        ],
+        "اقلام": [
+          "سفارش خرید",
+          "مصالح",
+          "شرح ردیف",
+          "واحد",
+          "مقدار",
+          "قیمت واحد ثبت‌شده",
+          "مبلغ ردیف ثبت‌شده",
+          "ردیف درخواست خرید",
+          "شرح قلم انتخاب تأمین‌کننده"
+        ]
+      }
+    },
+    "child_reconciliation": [
+      {
+        "sheet": "اقلام",
+        "rows": 31,
+        "export_column_indexes": [
+          0,
+          2,
+          4,
+          5,
+          6
+        ],
+        "sql": "SELECT p.order_number,i.description,i.quantity,i.unit_price,round(i.quantity*i.unit_price,2) FROM procurement_purchaseorderitem i JOIN procurement_purchaseorder p ON i.purchase_order_id=p.id WHERE p.organization_id=%s"
+      }
+    ],
+    "full_primary_reconciliation": {
+      "sql": "SELECT o.order_number,p.name,b.display_name,r.request_number,NULL,NULL,v.version_number,o.order_date,o.expected_delivery_date,o.status,coalesce((SELECT sum(round(i.quantity*i.unit_price,2)) FROM procurement_purchaseorderitem i WHERE i.purchase_order_id=o.id),0)\n          FROM procurement_purchaseorder o JOIN projects_project p ON o.project_id=p.id JOIN parties_businessparty b ON o.supplier_id=b.id LEFT JOIN procurement_purchaserequest r ON o.purchase_request_id=r.id LEFT JOIN procurement_purchaseorderversion v ON o.current_version_id=v.id WHERE o.organization_id=%s",
+      "rows": 31,
+      "columns": 11,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "procurement.PurchaseOrder",
+      "source_columns": {
+        "0": "order_number",
+        "7": "order_date",
+        "8": "expected_delivery_date"
+      },
+      "rows": 31,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 62,
+    "empty": {
+      "file": "12-procurement-order_list-empty.xlsx",
+      "sha256": "ad3f3ad8f25d565328ef6589f46c83208bc51f16ce6fad8c00742f2772eb1abf",
+      "filename": "سفارش_های خرید.xlsx",
+      "response_url": "/procurement/orders/?q=B08-MISSING&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "سفارش‌های خرید": 0,
+        "اقلام": 0
+      },
+      "headings": {
+        "سفارش‌های خرید": [
+          "شماره سفارش خرید",
+          "پروژه",
+          "تأمین‌کننده",
+          "درخواست خرید",
+          "استعلام منبع",
+          "نسخه استعلام منبع",
+          "نسخه سفارش",
+          "تاریخ سفارش",
+          "تحویل موردانتظار",
+          "وضعیت",
+          "مبلغ کل ثبت‌شده"
+        ],
+        "اقلام": [
+          "سفارش خرید",
+          "مصالح",
+          "شرح ردیف",
+          "واحد",
+          "مقدار",
+          "قیمت واحد ثبت‌شده",
+          "مبلغ ردیف ثبت‌شده",
+          "ردیف درخواست خرید",
+          "شرح قلم انتخاب تأمین‌کننده"
+        ]
+      }
+    },
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 200,
+      "anonymous": 302
+    }
+  },
+  "INV-PROCUREMENT-RECEIPT-LIST-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "13-procurement-receipt_list.xlsx",
+      "sha256": "7c4698a8c1a85787fc18ff0622e2b580c2eb5c9c1c07bf9070e17d116f7f1c93",
+      "filename": "رسیدهای کالا.xlsx",
+      "response_url": "/procurement/receipts/?format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "رسیدهای کالا": 32,
+        "اقلام": 32
+      },
+      "headings": {
+        "رسیدهای کالا": [
+          "شماره رسید کالا",
+          "پروژه",
+          "شماره سفارش خرید",
+          "نسخه سفارش مبنا",
+          "زمان دریافت",
+          "وضعیت"
+        ],
+        "اقلام": [
+          "رسید کالا",
+          "ردیف سفارش خرید",
+          "مصالح",
+          "واحد",
+          "مقدار دریافت‌شده"
+        ]
+      }
+    },
+    "child_reconciliation": [
+      {
+        "sheet": "اقلام",
+        "rows": 32,
+        "export_column_indexes": [
+          0,
+          4
+        ],
+        "sql": "SELECT p.receipt_number,i.quantity FROM procurement_goodsreceiptitem i JOIN procurement_goodsreceipt p ON i.goods_receipt_id=p.id WHERE p.organization_id=%s"
+      }
+    ],
+    "full_primary_reconciliation": {
+      "sql": "SELECT g.receipt_number,p.name,o.order_number,v.version_number,g.received_at,g.status FROM procurement_goodsreceipt g JOIN projects_project p ON g.project_id=p.id JOIN procurement_purchaseorder o ON g.purchase_order_id=o.id LEFT JOIN procurement_purchaseorderversion v ON g.purchase_order_version_id=v.id WHERE g.organization_id=%s",
+      "rows": 32,
+      "columns": 6,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "procurement.GoodsReceipt",
+      "source_columns": {
+        "0": "receipt_number",
+        "4": "received_at"
+      },
+      "rows": 32,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 32,
+    "empty": {
+      "file": "13-procurement-receipt_list-empty.xlsx",
+      "sha256": "8e8e08045974bb9a5760bbaa3a635f752724d2f0e58ecc7cbdc50dfa9b4ff909",
+      "filename": "رسیدهای کالا.xlsx",
+      "response_url": "/procurement/receipts/?q=B08-MISSING&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "رسیدهای کالا": 0,
+        "اقلام": 0
+      },
+      "headings": {
+        "رسیدهای کالا": [
+          "شماره رسید کالا",
+          "پروژه",
+          "شماره سفارش خرید",
+          "نسخه سفارش مبنا",
+          "زمان دریافت",
+          "وضعیت"
+        ],
+        "اقلام": [
+          "رسید کالا",
+          "ردیف سفارش خرید",
+          "مصالح",
+          "واحد",
+          "مقدار دریافت‌شده"
+        ]
+      }
+    },
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 200,
+      "anonymous": 302
+    }
+  },
+  "INV-TIMEKEEPING-WORKBENCH-XLSX--UAT-10": {
+    "status": "PASS",
+    "output": {
+      "file": "14-timekeeping-workbench.xlsx",
+      "sha256": "39649cccea4d48a33ec41dc7153a87671d1ee9d5d8e1ec45d7328cb703658bd5",
+      "filename": "حضور و کارکرد.xlsx",
+      "response_url": "/timekeeping/?project=453e0c1c-0507-4e1a-9bb7-5f6b82ff4967&site=ceb9b5bf-7ed0-4bf7-8319-5fb3c5f985ed&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "حضور": 31,
+        "کارکرد": 1,
+        "توزیع زمان": 1,
+        "اضافه‌کاری": 1
+      },
+      "headings": {
+        "حضور": [
+          "نیروی کار",
+          "پروژه",
+          "کارگاه",
+          "تاریخ",
+          "ورود",
+          "خروج",
+          "وضعیت"
+        ],
+        "کارکرد": [
+          "نیروی کار",
+          "شروع دوره",
+          "پایان دوره",
+          "بازنگری",
+          "زمان اظهارشده (دقیقه)",
+          "وضعیت"
+        ],
+        "توزیع زمان": [
+          "نیروی کار",
+          "شروع دوره",
+          "پایان دوره",
+          "بازنگری",
+          "تاریخ",
+          "پروژه",
+          "کارگاه",
+          "فعالیت",
+          "کارکرد (دقیقه)",
+          "یادداشت"
+        ],
+        "اضافه‌کاری": [
+          "نیروی کار",
+          "پروژه",
+          "کارگاه",
+          "شروع",
+          "پایان",
+          "دلیل",
+          "وضعیت"
+        ]
+      }
+    },
+    "child_reconciliation": [
+      {
+        "sheet": "کارکرد",
+        "rows": 1,
+        "export_column_indexes": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "sql": "SELECT period_start,period_end,revision,declared_minutes FROM timekeeping_timesheet WHERE organization_id=%s"
+      },
+      {
+        "sheet": "توزیع زمان",
+        "rows": 1,
+        "export_column_indexes": [
+          4,
+          8,
+          9
+        ],
+        "sql": "SELECT work_date,minutes,note FROM timekeeping_timesheetentry WHERE organization_id=%s"
+      },
+      {
+        "sheet": "اضافه‌کاری",
+        "rows": 1,
+        "export_column_indexes": [
+          3,
+          4,
+          5
+        ],
+        "sql": "SELECT starts_at,ends_at,reason FROM timekeeping_overtimerequest WHERE organization_id=%s"
+      }
+    ],
+    "full_primary_reconciliation": {
+      "sql": "SELECT w.first_name || ' ' || w.last_name,p.name,s.name,a.work_date,a.check_in_at,a.check_out_at,a.state\n          FROM timekeeping_attendancerecord a JOIN workforce_employee w ON a.employee_id=w.id JOIN projects_project p ON a.project_id=p.id LEFT JOIN projects_projectsite s ON a.site_id=s.id WHERE a.organization_id=%s",
+      "rows": 31,
+      "columns": 7,
+      "all_primary_cells_equal": true
+    },
+    "reconciliation": {
+      "source_model": "timekeeping.AttendanceRecord",
+      "source_columns": {
+        "3": "work_date",
+        "4": "check_in_at",
+        "5": "check_out_at"
+      },
+      "rows": 31,
+      "exact_value_comparison": true
+    },
+    "literal_formula_like_cells": 1,
+    "empty": {
+      "file": "14-timekeeping-workbench-empty.xlsx",
+      "sha256": "ccd60d3929aa0763b96d932e92ed213a7c34a8665fe4e872241d05594fbb7959",
+      "filename": "حضور و کارکرد.xlsx",
+      "response_url": "/timekeeping/?date_from=2099-01-01&format=xlsx",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "sheets": {
+        "حضور": 0,
+        "کارکرد": 0,
+        "توزیع زمان": 0,
+        "اضافه‌کاری": 0
+      },
+      "headings": {
+        "حضور": [
+          "نیروی کار",
+          "پروژه",
+          "کارگاه",
+          "تاریخ",
+          "ورود",
+          "خروج",
+          "وضعیت"
+        ],
+        "کارکرد": [
+          "نیروی کار",
+          "شروع دوره",
+          "پایان دوره",
+          "بازنگری",
+          "زمان اظهارشده (دقیقه)",
+          "وضعیت"
+        ],
+        "توزیع زمان": [
+          "نیروی کار",
+          "شروع دوره",
+          "پایان دوره",
+          "بازنگری",
+          "تاریخ",
+          "پروژه",
+          "کارگاه",
+          "فعالیت",
+          "کارکرد (دقیقه)",
+          "یادداشت"
+        ],
+        "اضافه‌کاری": [
+          "نیروی کار",
+          "پروژه",
+          "کارگاه",
+          "شروع",
+          "پایان",
+          "دلیل",
+          "وضعیت"
+        ]
+      }
+    },
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 200,
+      "anonymous": 302
+    }
+  },
+  "INV-BILLING-CLAIM-DETAIL-PRINT--UAT-10": {
+    "status": "PASS",
+    "source_revision": {
+      "requested": 1,
+      "successor": 2,
+      "successor_status": "approved"
+    },
+    "postgres_numeric_reconciliation": {
+      "expected": [
+        [
+          "0.0000",
+          "0.5000",
+          "0.5000",
+          "120.0000",
+          "60.0000"
+        ]
+      ],
+      "printed": [
+        [
+          "0",
+          "0.5",
+          "0.5",
+          "120",
+          "60"
+        ]
+      ],
+      "equal": true
+    },
+    "printed_tables": [
+      {
+        "caption": "کارکرد و مقادیر تجمعی",
+        "rows": [
+          [
+            "Concrete work",
+            "m3",
+            "0",
+            "0.5",
+            "0.5",
+            "120",
+            "60"
+          ]
+        ]
+      },
+      {
+        "caption": "کسور و تعدیلات",
+        "rows": [
+          [
+            "موردی ثبت نشده است."
+          ]
+        ]
+      }
+    ],
+    "print_geometry": {
+      "tables": [
+        {
+          "client": 390,
+          "scroll": 390
+        },
+        {
+          "client": 390,
+          "scroll": 390
+        }
+      ],
+      "font": "Vazirmatn, sans-serif",
+      "loadedFonts": [
+        {
+          "family": "Vazirmatn",
+          "status": "loaded"
+        }
+      ]
+    },
+    "file": "billing-claim_detail.pdf",
+    "sha256": "ec36b0b4a5c5ae0671f5dfcef574c35b0676e9789fd5e7d40a5cb77a6225548f",
+    "source_values": [
+      "60",
+      "F61-C"
+    ],
+    "back": "/billing/claims/5f74a2c3-d2d5-4665-950c-22d3bffccbbd/",
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 404,
+      "cross-project": 404
+    }
+  },
+  "INV-DAILY-REPORTS-DETAIL-PRINT--UAT-10": {
+    "status": "PASS",
+    "source_revision": {
+      "requested": 1,
+      "latest_marker_absent": "B08-LATEST-ONLY"
+    },
+    "postgres_numeric_reconciliation": {
+      "expected": [
+        [
+          2,
+          "7.00"
+        ],
+        [
+          "3.00"
+        ],
+        [
+          "3.0000"
+        ],
+        [
+          null,
+          "20.00"
+        ],
+        [
+          null
+        ]
+      ],
+      "printed": [
+        [
+          "2",
+          "7"
+        ],
+        [
+          "3"
+        ],
+        [
+          "3"
+        ],
+        [
+          "—",
+          "20"
+        ],
+        [
+          "—"
+        ]
+      ],
+      "equal": true
+    },
+    "printed_tables": [
+      {
+        "caption": "فعالیت‌های روزانه",
+        "rows": [
+          [
+            "تسطیح",
+            "—",
+            "—",
+            "20",
+            "—"
+          ]
+        ]
+      },
+      {
+        "caption": "نیروی انسانی",
+        "rows": [
+          [
+            "تیم الف",
+            "2",
+            "7",
+            "—"
+          ]
+        ]
+      },
+      {
+        "caption": "تجهیزات",
+        "rows": [
+          [
+            "بیل",
+            "3",
+            "—"
+          ]
+        ]
+      },
+      {
+        "caption": "مصالح مصرفی",
+        "rows": [
+          [
+            "سنگ",
+            "3",
+            "تن",
+            "—"
+          ]
+        ]
+      },
+      {
+        "caption": "رویدادهای تأخیر",
+        "rows": [
+          [
+            "1405/08/16",
+            "باران",
+            "—",
+            "—",
+            "باز"
+          ]
+        ]
+      }
+    ],
+    "print_geometry": {
+      "tables": [
+        {
+          "client": 390,
+          "scroll": 390
+        },
+        {
+          "client": 390,
+          "scroll": 390
+        },
+        {
+          "client": 390,
+          "scroll": 390
+        },
+        {
+          "client": 390,
+          "scroll": 390
+        },
+        {
+          "client": 390,
+          "scroll": 390
+        }
+      ],
+      "font": "Vazirmatn, sans-serif",
+      "loadedFonts": [
+        {
+          "family": "Vazirmatn",
+          "status": "loaded"
+        }
+      ]
+    },
+    "file": "daily_reports-detail.pdf",
+    "sha256": "786225abf0909addc3985d576466f8f0e40c229532f2a2f0a12181d39c35fccf",
+    "source_values": [
+      "شرح اولیه آزمایشی",
+      "پروژه پل آزمایشی"
+    ],
+    "back": "/daily-reports/9424c0ee-9df7-42f8-a886-97a5f2b1b2d4/",
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 403,
+      "cross-project": 403
+    }
+  },
+  "INV-EXPENSES-LIST-PRINT--UAT-10": {
+    "status": "PASS",
+    "postgres_numeric_reconciliation": {
+      "expected": [
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ],
+        [
+          "12345.67"
+        ]
+      ],
+      "printed": [
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ],
+        [
+          "12,345.67"
+        ]
+      ],
+      "equal": true
+    },
+    "printed_tables": [
+      {
+        "caption": "هزینه‌های ثبت‌شده",
+        "rows": [
+          [
+            "B08 هزینه 31 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-31"
+          ],
+          [
+            "B08 هزینه 30 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-30"
+          ],
+          [
+            "B08 هزینه 29 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-29"
+          ],
+          [
+            "B08 هزینه 28 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-28"
+          ],
+          [
+            "B08 هزینه 27 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-27"
+          ],
+          [
+            "B08 هزینه 26 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-26"
+          ],
+          [
+            "B08 هزینه 25 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-25"
+          ],
+          [
+            "B08 هزینه 24 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-24"
+          ],
+          [
+            "B08 هزینه 23 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-23"
+          ],
+          [
+            "B08 هزینه 22 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-22"
+          ],
+          [
+            "B08 هزینه 21 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-21"
+          ],
+          [
+            "B08 هزینه 20 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-20"
+          ],
+          [
+            "B08 هزینه 19 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-19"
+          ],
+          [
+            "B08 هزینه 18 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-18"
+          ],
+          [
+            "B08 هزینه 17 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-17"
+          ],
+          [
+            "B08 هزینه 16 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-16"
+          ],
+          [
+            "B08 هزینه 15 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-15"
+          ],
+          [
+            "B08 هزینه 14 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-14"
+          ],
+          [
+            "B08 هزینه 13 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-13"
+          ],
+          [
+            "B08 هزینه 12 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-12"
+          ],
+          [
+            "B08 هزینه 11 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-11"
+          ],
+          [
+            "B08 هزینه 10 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-10"
+          ],
+          [
+            "B08 هزینه 9 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-9"
+          ],
+          [
+            "B08 هزینه 8 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-8"
+          ],
+          [
+            "B08 هزینه 7 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-7"
+          ],
+          [
+            "B08 هزینه 6 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-6"
+          ],
+          [
+            "B08 هزینه 5 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-5"
+          ],
+          [
+            "B08 هزینه 4 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-4"
+          ],
+          [
+            "B08 هزینه 3 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-3"
+          ],
+          [
+            "B08 هزینه 2 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-2"
+          ],
+          [
+            "=1+1 — پروژه پل آزمایشی",
+            "1405/08/12 — سایر",
+            "—",
+            "12,345.67",
+            "ثبت‌شده — B08-REC"
+          ]
+        ]
+      }
+    ],
+    "print_geometry": {
+      "tables": [
+        {
+          "client": 390,
+          "scroll": 390
+        }
+      ],
+      "font": "Vazirmatn, sans-serif",
+      "loadedFonts": [
+        {
+          "family": "Vazirmatn",
+          "status": "loaded"
+        }
+      ]
+    },
+    "file": "expenses-list.pdf",
+    "sha256": "88dcb9a630c66d9fe3d62ce1f9c7f36f7a178e40ab0fdb2084033334a1d67e8c",
+    "source_values": [
+      "12,345.67"
+    ],
+    "back": "/expenses/",
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 200,
+      "cross-project": 200
+    }
+  },
+  "INV-PROCUREMENT-ORDER-DETAIL-PRINT--UAT-10": {
+    "status": "PASS",
+    "postgres_numeric_reconciliation": {
+      "expected": [
+        [
+          "10.0000",
+          "12.50",
+          "125.00"
+        ]
+      ],
+      "printed": [
+        [
+          "10",
+          "12.5",
+          "125"
+        ]
+      ],
+      "equal": true
+    },
+    "printed_tables": [
+      {
+        "caption": "اقلام سفارش خرید",
+        "rows": [
+          [
+            "=1+1 — سیمان پرتلند",
+            "عدد",
+            "10",
+            "12.5",
+            "125"
+          ]
+        ]
+      }
+    ],
+    "print_geometry": {
+      "tables": [
+        {
+          "client": 390,
+          "scroll": 390
+        }
+      ],
+      "font": "Vazirmatn, sans-serif",
+      "loadedFonts": [
+        {
+          "family": "Vazirmatn",
+          "status": "loaded"
+        }
+      ]
+    },
+    "file": "procurement-order_detail.pdf",
+    "sha256": "e2dfd79a16cd55a862a90a7078b193d0bfa5950bf55b3849e41dc1b61f569a5b",
+    "source_values": [
+      "PO-GRN"
+    ],
+    "back": "/procurement/orders/e216b327-767b-4dd4-b1b7-cb2812ea7add/",
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 404,
+      "cross-project": 404
+    }
+  },
+  "INV-PROCUREMENT-RECEIPT-DETAIL-PRINT--UAT-10": {
+    "status": "PASS",
+    "postgres_numeric_reconciliation": {
+      "expected": [
+        [
+          "4.0000"
+        ]
+      ],
+      "printed": [
+        [
+          "4"
+        ]
+      ],
+      "equal": true
+    },
+    "printed_tables": [
+      {
+        "caption": "اقلام دریافت‌شده",
+        "rows": [
+          [
+            "=1+1 — سیمان پرتلند",
+            "عدد",
+            "4",
+            "تحویل سالم"
+          ]
+        ]
+      }
+    ],
+    "print_geometry": {
+      "tables": [
+        {
+          "client": 390,
+          "scroll": 390
+        }
+      ],
+      "font": "Vazirmatn, sans-serif",
+      "loadedFonts": [
+        {
+          "family": "Vazirmatn",
+          "status": "loaded"
+        }
+      ]
+    },
+    "file": "procurement-receipt_detail.pdf",
+    "sha256": "661e82ed481d77dfe3a45fe7a55ef092d724fe4261821b239c4a50776ae99f4d",
+    "source_values": [
+      "GRN-1"
+    ],
+    "back": "/procurement/receipts/bfda6d97-ae74-4c47-bb41-d15feb92a61d/",
+    "security": {
+      "no-permission": 403,
+      "foreign-tenant": 404,
+      "cross-project": 404
+    }
+  },
+  "INV-REPORTING-DASHBOARD--CV-REP-01": {
+    "status": "PASS",
+    "sql_reconciliation": {
+      "cycles": 2,
+      "average_seconds": "172802",
+      "inventory_quantity": "13.0000",
+      "inventory_value": "162.5000",
+      "currency": "IRR",
+      "source_manifest": {
+        "procurement_cycle_time": {
+          "ids": [
+            "b0ddeedd-bde3-4224-bd34-5331f861df4c",
+            "bfda6d97-ae74-4c47-bb41-d15feb92a61d"
+          ],
+          "model": "procurement.GoodsReceipt",
+          "scope_kind": "project_set",
+          "scope_project_ids": [
+            "1ad6bb26-5156-4a49-83af-98b7e7a5d1e7",
+            "453e0c1c-0507-4e1a-9bb7-5f6b82ff4967",
+            "ca2888b6-e624-4837-afbb-2b344e29a533"
+          ]
+        },
+        "inventory_quantity_value": {
+          "ids": [
+            "99ea583a-52eb-4252-9b15-d04b35eb10dc",
+            "e16b6872-abc6-4f2d-9bc3-44a024722f5c"
+          ],
+          "model": "inventory.InventoryValuationPool",
+          "scope_kind": "organization",
+          "scope_project_ids": [
+            "1ad6bb26-5156-4a49-83af-98b7e7a5d1e7",
+            "453e0c1c-0507-4e1a-9bb7-5f6b82ff4967",
+            "ca2888b6-e624-4837-afbb-2b344e29a533"
+          ]
+        }
+      }
+    },
+    "boundaries": "Empty cycles: incomplete with null average; unreviewed foreign inventory amount withheld; missing source permission suppresses cards",
+    "security": "No-permission denied; project-limited snapshots withheld; foreign tenant excluded; MVP refresh/drillthrough denied"
+  },
+  "INV-AUDIT-LOG--CV-REP-01": {
+    "status": "FAIL",
+    "error": ""
+  }
+}

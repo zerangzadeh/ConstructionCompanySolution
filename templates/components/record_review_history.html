@@ -1,6 +1,10 @@
 {% load erp_format %}<section class="erp-record-section" id="record-history" aria-labelledby="record-history-title">
 {% include "components/form_section_header.html" with heading_id="record-history-title" heading="سوابق ثبت و بررسی" icon="calendar" only %}
-<div class="erp-record-section__body"><ol class="erp-record-history">
+<div class="erp-record-section__body">
+<p>وضعیت بررسی رکورد: <strong>{{ record.get_review_status_display }}</strong></p>
+{% if decision_url %}<a class="erp-btn erp-btn--primary" href="{{ decision_url }}">تصمیم بررسی رکورد</a>{% endif %}
+{% if correction_url %}<a class="erp-btn erp-btn--primary" href="{{ correction_url }}">اصلاح رکورد برگشت‌خورده</a>{% endif %}
+<ol class="erp-record-history">
 <li>ثبت: {% include "components/record_detail_value.html" with value=record.created_at kind="datetime" only %} · {% if record.created_by %}{{ record.created_by.get_full_name|default:record.created_by.username }}{% else %}—{% endif %}</li>
 {% for revision in record_history %}<li><span>بررسی {{ revision.sequence|erp_number }}</span> · {{ revision.get_state_display }} · {% include "components/record_detail_value.html" with value=revision.occurred_at kind="datetime" only %} · {% if revision.actor %}{{ revision.actor.get_full_name|default:revision.actor.username }}{% else %}—{% endif %}<p class="whitespace-pre-line text-slate-600">{{ revision.reason }}</p></li>{% endfor %}
 </ol></div></section>

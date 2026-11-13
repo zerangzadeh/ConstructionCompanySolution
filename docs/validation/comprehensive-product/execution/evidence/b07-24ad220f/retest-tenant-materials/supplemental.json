@@ -1,0 +1,159 @@
+{
+  "protected document": {
+    "route": "protected document",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/3739ac35-2c6c-4ce4-9c04-600be3b17101/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "foreign document IDOR"
+      },
+      {
+        "method": "GET",
+        "url": "/documents/3739ac35-2c6c-4ce4-9c04-600be3b17101/versions/f72ae79d-49ac-426f-bd8e-16d8e044ff04/download/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "foreign download IDOR"
+      },
+      {
+        "method": "GET",
+        "url": "/documents/3739ac35-2c6c-4ce4-9c04-600be3b17101/download/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "GET",
+        "url": "/documents/3739ac35-2c6c-4ce4-9c04-600be3b17101/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/documents/3739ac35-2c6c-4ce4-9c04-600be3b17101/versions/f72ae79d-49ac-426f-bd8e-16d8e044ff04/download/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized exact version"
+      }
+    ],
+    "design": [],
+    "status": "PASS",
+    "persisted": {
+      "authorized_bytes": 41,
+      "foreign_or_restricted_download_audit": 0,
+      "exact_version": "f72ae79d-49ac-426f-bd8e-16d8e044ff04"
+    }
+  },
+  "scoped project export": {
+    "route": "scoped project export",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/projects/bc7b067c-c056-49fd-b1fc-d6af49a3042b/controls/export/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "sibling project export forgery"
+      },
+      {
+        "method": "GET",
+        "url": "/projects/1957ecf4-3936-4451-b106-b8e5a76ab28d/controls/export/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "foreign project export forgery"
+      },
+      {
+        "method": "GET",
+        "url": "/projects/4a6ab13d-af03-41af-9f25-99f9cab79431/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/projects/4a6ab13d-af03-41af-9f25-99f9cab79431/controls/export/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized project controls CSV"
+      }
+    ],
+    "design": [],
+    "status": "PASS",
+    "persisted": {
+      "authorized_export_bytes": 58,
+      "sibling_and_foreign_export_denied": true
+    }
+  },
+  "revoked session and hidden surfaces": {
+    "route": "revoked session and hidden surfaces",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/members/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/treasury/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "MVP hidden finance URL"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/configuration-profiles/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "MVP hidden configuration URL"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/members/",
+        "status": 403,
+        "expected": [
+          302,
+          403
+        ],
+        "case": "session still holds revoked company"
+      }
+    ],
+    "design": [],
+    "status": "PASS",
+    "persisted": {
+      "previously_authorized_session_denied_after_revoke": true,
+      "hidden_routes_denied": 2
+    }
+  }
+}

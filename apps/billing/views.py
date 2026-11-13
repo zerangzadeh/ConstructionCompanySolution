@@ -105,6 +105,7 @@ from .services import (
     get_progress_claims,
     get_progress_records,
     get_project_baselines,
+    progress_verification_separation_error,
     reject_progress_record,
     request_progress_verification,
     verify_progress_record,
@@ -353,6 +354,11 @@ def progress_detail(request: HttpRequest, record_id: str) -> HttpResponse:
         "billing/progress_detail.html",
         {
             "progress_record": record,
+            "verification_separation_error": (
+                progress_verification_separation_error(
+                    record=record, actor=request.user
+                )
+            ),
             "history_url": history_url,
             "page_breadcrumbs": breadcrumbs,
         },

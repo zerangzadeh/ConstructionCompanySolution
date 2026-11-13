@@ -769,8 +769,12 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             P.DAILY_REPORTS_ADD_DELAY,
             P.DAILY_REPORTS_SUBMIT,
             P.DAILY_REPORTS_APPROVE,
+            P.DAILY_REPORTS_CORRECT,
         ),
-        ("apps.daily_reports.services", "apps.daily_reports.references"),
+        (
+            "apps.daily_reports.services", "apps.daily_reports.references",
+            "apps.daily_reports.revision_services", "apps.daily_reports.return_workflow",
+        ),
     ),
     PermissionResource(
         "field_observations",

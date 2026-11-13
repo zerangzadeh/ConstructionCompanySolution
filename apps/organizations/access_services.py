@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from datetime import datetime
 from typing import Any
+from uuid import UUID
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import connection, transaction
@@ -1148,7 +1149,7 @@ def create_protected_operation_version(
 
 @transaction.atomic
 def retire_protected_operation(
-    *, actor: User, code: str, reason: str
+    *, actor: User, code: str, reason: str, expected_operation_id: UUID | None = None
 ) -> ProtectedOperation:
     """Retire the current version without deleting its immutable audit history."""
 
@@ -1170,6 +1171,8 @@ def retire_protected_operation(
         raise ValidationError("کد عملیات حفاظت‌شده نامعتبر است.") from exc
     if item is None:
         raise ValidationError("نسخه فعالی برای بازنشستگی یافت نشد.")
+    if expected_operation_id is not None and item.pk != expected_operation_id:
+        raise ValidationError("نسخه فعال تغییر کرده است. صفحه را تازه‌سازی کنید.")
     retired_at = timezone.now()
     ProtectedOperation.objects.filter(pk=item.pk).update(
         retired_at=retired_at,

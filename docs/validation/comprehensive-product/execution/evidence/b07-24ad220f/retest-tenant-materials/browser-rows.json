@@ -1,0 +1,1706 @@
+{
+  "organizations:select": {
+    "route": "organizations:select",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/accounts/login/?next=%2Forganizations%2F",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/accounts/login/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "Chrome credential login"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "anonymous login redirect"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/switch/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      }
+    ],
+    "design": [
+      "company-select"
+    ],
+    "execution_id": "INV-ORGANIZATIONS-SELECT--CV-TEN-01",
+    "status": "PASS",
+    "persisted": {
+      "eligible": 2,
+      "foreign_visible": false,
+      "active_company": "abfdc98a-6a0a-4cc5-82a6-b399783cbb0a"
+    }
+  },
+  "organizations:switch": {
+    "route": "organizations:switch",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/switch/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/switch/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "forged foreign company"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/switch/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-ORGANIZATIONS-SWITCH--CV-TEN-01",
+    "status": "PASS",
+    "persisted": {
+      "authorized_round_trip": true,
+      "forged_switch_preserved_session": true
+    }
+  },
+  "organizations:members": {
+    "route": "organizations:members",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/members/?organization=916bfc92-0e20-4ff7-9961-2c8956a65d8b",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/members/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "company-members"
+    ],
+    "execution_id": "INV-ORGANIZATIONS-MEMBERS--CV-TEN-01",
+    "status": "PASS",
+    "persisted": {
+      "visible_member": "637cc2eb-366b-4977-a0d6-3cb89240707c",
+      "foreign_filtered": true,
+      "tenant_membership_count": 3
+    }
+  },
+  "organizations:member_detail": {
+    "route": "organizations:member_detail",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/members/7c06a22e-a04a-4f80-899f-d3416e923132/",
+        "status": 404,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/",
+        "status": 404,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "foreign admin"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "member-detail"
+    ],
+    "execution_id": "INV-ORGANIZATIONS-MEMBER-DETAIL--CV-TEN-01",
+    "status": "PASS",
+    "persisted": {
+      "membership": "637cc2eb-366b-4977-a0d6-3cb89240707c",
+      "tenant": "abfdc98a-6a0a-4cc5-82a6-b399783cbb0a",
+      "back_to_members": true
+    }
+  },
+  "organizations:member_profile_image": {
+    "route": "organizations:member_profile_image",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/profile-image/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/members/7c06a22e-a04a-4f80-899f-d3416e923132/profile-image/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign image IDOR"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/profile-image/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign admin"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/profile-image/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-ORGANIZATIONS-MEMBER-PROFILE-IMAGE--CV-TEN-01",
+    "status": "PASS",
+    "persisted": {
+      "byte_count": 68,
+      "mimetype": "image/png",
+      "nosniff": true
+    }
+  },
+  "organizations:settings": {
+    "route": "organizations:settings",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/settings/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/settings/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/settings/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "company-settings"
+    ],
+    "execution_id": "INV-ORGANIZATIONS-SETTINGS--CV-TEN-01",
+    "status": "PASS",
+    "persisted": {
+      "tenant": "abfdc98a-6a0a-4cc5-82a6-b399783cbb0a",
+      "settings_site_prefix": "B07",
+      "foreign_untouched": true
+    }
+  },
+  "organizations:role_catalog": {
+    "route": "organizations:role_catalog",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/roles/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/roles/?edit=dc1f5ac4-f581-458f-9df0-cb2921b8bc7f",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "foreign custom role IDOR"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/roles/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "owner without Tenant Admin role"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/roles/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "role-catalog"
+    ],
+    "execution_id": "INV-ORGANIZATIONS-ROLE-CATALOG--CV-TEN-01",
+    "status": "PASS",
+    "persisted": {
+      "own_custom_role": true,
+      "foreign_role": false,
+      "catalog_role_count": 2
+    }
+  },
+  "organizations:member_update": {
+    "route": "organizations:member_update",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/edit/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/edit/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "forged role elevation"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/634de26f-5d86-4c65-b148-6e3c8be96e32/edit/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "last owner revocation"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/edit/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/edit/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/edit/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/edit/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/7c06a22e-a04a-4f80-899f-d3416e923132/edit/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/edit/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "member-status"
+    ],
+    "execution_id": "INV-ORGANIZATIONS-MEMBER-UPDATE--CV-TEN-01",
+    "status": "PASS",
+    "persisted": {
+      "status_round_trip": [
+        "active",
+        "suspended",
+        "active"
+      ],
+      "role_retained": "member"
+    }
+  },
+  "organizations:member_authorization": {
+    "route": "organizations:member_authorization",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/authorization/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/authorization/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "self approval rejected"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/authorization/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/authorization/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/authorization/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/7c06a22e-a04a-4f80-899f-d3416e923132/authorization/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/authorization/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/authorization/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorization observer"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/authorization/",
+        "status": 200,
+        "expected": [
+          200,
+          403
+        ],
+        "case": "observer direct POST"
+      }
+    ],
+    "design": [
+      "member-grants"
+    ],
+    "execution_id": "INV-ORGANIZATIONS-MEMBER-AUTHORIZATION--CV-TEN-01",
+    "observer_mutation_controls": 0,
+    "persisted": {
+      "assignment": "01d56a8b-ad4e-4665-9935-b074837b99bf",
+      "reason": "دامنه آزمایشی مستقل",
+      "project_grant": "5f6cd16d-f13a-4097-ae3c-6f900b53cfc9",
+      "independent_approver": "42022749-dc3b-4326-b2dc-1c57192baaa3"
+    },
+    "status": "PASS"
+  },
+  "organizations:account_create": {
+    "route": "organizations:account_create",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/members/accounts/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/accounts/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "invalid confirmation retains non-secret input"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/accounts/create/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/accounts/create/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "account-create"
+    ],
+    "execution_id": "INV-ORGANIZATIONS-ACCOUNT-CREATE--CV-TEN-01",
+    "credential_echoed": false,
+    "persisted": {
+      "tenant": "abfdc98a-6a0a-4cc5-82a6-b399783cbb0a",
+      "created_accounts": 1,
+      "must_rotate": true,
+      "authorized_audit": 1
+    },
+    "status": "PASS"
+  },
+  "organizations:member_password_reset": {
+    "route": "organizations:member_password_reset",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/reset-password/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/reset-password/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/7c06a22e-a04a-4f80-899f-d3416e923132/reset-password/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/members/637cc2eb-366b-4977-a0d6-3cb89240707c/reset-password/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "member-password-reset"
+    ],
+    "execution_id": "INV-ORGANIZATIONS-MEMBER-PASSWORD-RESET--CV-TEN-01",
+    "status": "PASS",
+    "persisted": {
+      "target_membership": "637cc2eb-366b-4977-a0d6-3cb89240707c",
+      "rotates_on_login": true,
+      "reset_events": 1
+    }
+  },
+  "accounts:connection_requests": {
+    "route": "accounts:connection_requests",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/accounts/connection-requests/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/accounts/connection-requests/?target=8c1a0c91-fabf-4df1-8d72-7899c9b24ac4&organization=abfdc98a-6a0a-4cc5-82a6-b399783cbb0a",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/accounts/connection-requests/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "anonymous"
+      }
+    ],
+    "design": [
+      "connection-request"
+    ],
+    "execution_id": "INV-ACCOUNTS-CONNECTION-REQUESTS--CV-TEN-01",
+    "status": "PASS",
+    "persisted": {
+      "visible_only_to_target": true,
+      "status": "pending",
+      "membership_before_consent": 0
+    }
+  },
+  "accounts:connection_request_respond": {
+    "route": "accounts:connection_request_respond",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/accounts/connection-requests/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/accounts/connection-requests/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/accounts/connection-requests/9dbd9fa4-3cc1-4866-9d25-049542fbbcf5/respond/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign accept forgery"
+      },
+      {
+        "method": "POST",
+        "url": "/accounts/connection-requests/1ebcd47b-2a15-4f1b-aee4-624d008b3010/respond/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "other target accept forgery"
+      },
+      {
+        "method": "POST",
+        "url": "/accounts/connection-requests/9dbd9fa4-3cc1-4866-9d25-049542fbbcf5/respond/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/accounts/connection-requests/9dbd9fa4-3cc1-4866-9d25-049542fbbcf5/respond/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "exact replay"
+      },
+      {
+        "method": "POST",
+        "url": "/accounts/connection-requests/1ebcd47b-2a15-4f1b-aee4-624d008b3010/respond/",
+        "status": 302,
+        "expected": [
+          302,
+          400
+        ],
+        "case": "invalid decision"
+      },
+      {
+        "method": "POST",
+        "url": "/accounts/connection-requests/1ebcd47b-2a15-4f1b-aee4-624d008b3010/respond/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-ACCOUNTS-CONNECTION-REQUEST-RESPOND--CV-TEN-01",
+    "malformed_outcome": {
+      "status": "pending",
+      "audit_delta": 0
+    },
+    "persisted": {
+      "explicit_accept": "accepted",
+      "explicit_reject": "rejected",
+      "replay_membership_count": 1
+    },
+    "status": "PASS"
+  },
+  "organizations:update_context": {
+    "route": "organizations:update_context",
+    "http": [
+      {
+        "method": "POST",
+        "url": "/organizations/context/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "forged mismatched or unauthorized scope"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/context/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "forged mismatched or unauthorized scope"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/context/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "forged mismatched or unauthorized scope"
+      },
+      {
+        "method": "POST",
+        "url": "/organizations/context/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "allowed site and unsafe return"
+      },
+      {
+        "method": "GET",
+        "url": "/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "stale session cleanup"
+      }
+    ],
+    "design": [
+      "site-context"
+    ],
+    "execution_id": "INV-ORGANIZATIONS-UPDATE-CONTEXT--CV-TEN-01",
+    "status": "PASS",
+    "persisted": {
+      "allowed_site": "6f0e9963-2957-4610-8e48-f9fed5c5bcea",
+      "stale_context_cleared": true
+    }
+  },
+  "organizations:form_context_options": {
+    "route": "organizations:form_context_options",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/organizations/context/form-options/?source=expenses&field=phase&project=4a6ab13d-af03-41af-9f25-99f9cab79431&organization=1bdff438-451f-41a2-a93a-3a6229d8297d",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/context/form-options/?source=expenses&field=phase&project=bc7b067c-c056-49fd-b1fc-d6af49a3042b",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "forged project filter"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/context/form-options/?source=expenses&field=phase&project=1957ecf4-3936-4451-b106-b8e5a76ab28d",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "forged project filter"
+      },
+      {
+        "method": "GET",
+        "url": "/organizations/context/form-options/?source=expenses&field=phase&project=4a6ab13d-af03-41af-9f25-99f9cab79431",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-ORGANIZATIONS-FORM-CONTEXT-OPTIONS--CV-TEN-01",
+    "status": "PASS",
+    "persisted": {
+      "allowed_phase": "56515b83-0147-4a46-9d18-9afd83f1af33",
+      "sibling_phase_excluded": "d84c6173-ee97-4c60-abd1-562178c1add0"
+    }
+  },
+  "materials:unit_list": {
+    "route": "materials:unit_list",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/materials/units/?organization=853b955d-54b7-4641-8dd5-e5a43cea557b&name=Kilogram",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/units/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "foreign admin listing"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/units/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized read-only master list"
+      }
+    ],
+    "design": [
+      "unit-list"
+    ],
+    "execution_id": "INV-MATERIALS-UNIT-LIST--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "tenant_source": "7fbafdc0-5ead-4321-a025-7437b818a209",
+      "foreign_filtered": true,
+      "reader_archive_actions": 0
+    }
+  },
+  "materials:category_list": {
+    "route": "materials:category_list",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/materials/categories/?organization=853b955d-54b7-4641-8dd5-e5a43cea557b&name=Steel",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/categories/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "foreign admin listing"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/categories/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized read-only master list"
+      }
+    ],
+    "design": [
+      "category-list"
+    ],
+    "execution_id": "INV-MATERIALS-CATEGORY-LIST--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "tenant_source": "2d76a0e2-c152-4a9b-993e-3f74e3fde0d4",
+      "foreign_filtered": true,
+      "reader_archive_actions": 0
+    }
+  },
+  "materials:material_list": {
+    "route": "materials:material_list",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/materials/?organization=853b955d-54b7-4641-8dd5-e5a43cea557b&name=Steel+A",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "foreign admin listing"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized read-only master list"
+      }
+    ],
+    "design": [
+      "material-list"
+    ],
+    "execution_id": "INV-MATERIALS-MATERIAL-LIST--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "tenant_source": "37044bb3-fbc2-4900-a08a-3ecf683b4f58",
+      "foreign_filtered": true,
+      "reader_archive_actions": 0
+    }
+  },
+  "materials:unit_create": {
+    "route": "materials:unit_create",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/materials/units/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/units/create/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/units/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/units/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "case-normalized duplicate"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/units/create/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "unit-create"
+    ],
+    "execution_id": "INV-MATERIALS-UNIT-CREATE--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "created": "aba7132a-6f75-43d6-86e1-bef50bfd06d7",
+      "code": "B07-U",
+      "creation_audit": 1,
+      "duplicate_count": 1
+    }
+  },
+  "materials:category_create": {
+    "route": "materials:category_create",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/materials/categories/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/categories/create/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/categories/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/categories/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "case-normalized duplicate"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/categories/create/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "category-create"
+    ],
+    "execution_id": "INV-MATERIALS-CATEGORY-CREATE--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "created": "36d5bceb-7754-482c-97aa-adda5e1f3a5a",
+      "code": "B07-C",
+      "creation_audit": 1,
+      "duplicate_count": 1
+    }
+  },
+  "materials:material_create": {
+    "route": "materials:material_create",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/materials/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "foreign category and unit payload"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/create/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/create/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "case-normalized duplicate"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/create/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [
+      "material-create",
+      "material-create"
+    ],
+    "execution_id": "INV-MATERIALS-MATERIAL-CREATE--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "created": "4a425dd7-9de1-4ae2-a0e1-c2398354f250",
+      "code": "B07-M",
+      "creation_audit": 1,
+      "duplicate_count": 1,
+      "category": "2d76a0e2-c152-4a9b-993e-3f74e3fde0d4",
+      "unit": "7fbafdc0-5ead-4321-a025-7437b818a209",
+      "foreign_refs_persisted": false
+    }
+  },
+  "materials:category_detail": {
+    "route": "materials:category_detail",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/materials/categories/2d76a0e2-c152-4a9b-993e-3f74e3fde0d4/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/categories/2d76a0e2-c152-4a9b-993e-3f74e3fde0d4/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/categories/2d76a0e2-c152-4a9b-993e-3f74e3fde0d4/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "read-only master detail"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/categories/2d76a0e2-c152-4a9b-993e-3f74e3fde0d4/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/categories/e27ef694-46b1-410a-a49d-50fbc1e5e302/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign object update"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/categories/2d76a0e2-c152-4a9b-993e-3f74e3fde0d4/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign tenant"
+      }
+    ],
+    "design": [
+      "category-detail"
+    ],
+    "execution_id": "INV-MATERIALS-CATEGORY-DETAIL--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "updated": "2d76a0e2-c152-4a9b-993e-3f74e3fde0d4",
+      "foreign_untouched": true,
+      "reader_edit_disabled": true
+    }
+  },
+  "materials:material_detail": {
+    "route": "materials:material_detail",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/materials/37044bb3-fbc2-4900-a08a-3ecf683b4f58/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/37044bb3-fbc2-4900-a08a-3ecf683b4f58/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/37044bb3-fbc2-4900-a08a-3ecf683b4f58/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "read-only master detail"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/37044bb3-fbc2-4900-a08a-3ecf683b4f58/",
+        "status": 403,
+        "expected": [
+          403,
+          404
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/64ae88d7-8690-4820-a7dd-235bc094810c/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign object update"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/37044bb3-fbc2-4900-a08a-3ecf683b4f58/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign tenant"
+      }
+    ],
+    "design": [
+      "material-detail"
+    ],
+    "execution_id": "INV-MATERIALS-MATERIAL-DETAIL--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "updated": "37044bb3-fbc2-4900-a08a-3ecf683b4f58",
+      "foreign_untouched": true,
+      "reader_edit_disabled": true
+    }
+  },
+  "materials:governance": {
+    "route": "materials:governance",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/materials/governance/?material=37044bb3-fbc2-4900-a08a-3ecf683b4f58",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/governance/?material=37044bb3-fbc2-4900-a08a-3ecf683b4f58",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/governance/?material=64ae88d7-8690-4820-a7dd-235bc094810c",
+        "status": 404,
+        "expected": [
+          404,
+          503
+        ],
+        "case": "foreign material IDOR"
+      }
+    ],
+    "design": [
+      "material-governance"
+    ],
+    "execution_id": "INV-MATERIALS-GOVERNANCE--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "governed_material": "37044bb3-fbc2-4900-a08a-3ecf683b4f58",
+      "foreign_id_denied": true,
+      "reader_governance_denied": true
+    }
+  },
+  "materials:governance_action": {
+    "route": "materials:governance_action",
+    "http": [
+      {
+        "method": "GET",
+        "url": "/materials/governance/?material=37044bb3-fbc2-4900-a08a-3ecf683b4f58",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/governance/actions/alias/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/governance/actions/alias/",
+        "status": 404,
+        "expected": [
+          404,
+          503
+        ],
+        "case": "foreign alias write"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/governance/actions/alias/",
+        "status": 404,
+        "expected": [
+          400,
+          404,
+          500
+        ],
+        "case": "missing material"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/governance/actions/alias/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-MATERIALS-GOVERNANCE-ACTION--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "alias": "a5f6951d-95a1-4121-91a0-ef7e8a0e7512",
+      "material": "37044bb3-fbc2-4900-a08a-3ecf683b4f58",
+      "audit": 1
+    }
+  },
+  "materials:material_archive": {
+    "route": "materials:material_archive",
+    "http": [
+      {
+        "method": "POST",
+        "url": "/materials/5f17b1f1-7121-444c-8bb2-570a15dc979a/archive/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/64ae88d7-8690-4820-a7dd-235bc094810c/archive/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign archive"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/5f17b1f1-7121-444c-8bb2-570a15dc979a/archive/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/5f17b1f1-7121-444c-8bb2-570a15dc979a/archive/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "archive replay"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/?name=Steel+B",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-MATERIALS-MATERIAL-ARCHIVE--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "archived": "5f17b1f1-7121-444c-8bb2-570a15dc979a",
+      "archive_events": 1,
+      "referenced_master_preserved": false
+    }
+  },
+  "materials:category_archive": {
+    "route": "materials:category_archive",
+    "http": [
+      {
+        "method": "POST",
+        "url": "/materials/categories/2d76a0e2-c152-4a9b-993e-3f74e3fde0d4/archive/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "referenced active master cannot archive"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/categories/d96fd086-b149-4d65-93ff-f446d18e1394/archive/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/categories/e27ef694-46b1-410a-a49d-50fbc1e5e302/archive/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign archive"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/categories/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/categories/d96fd086-b149-4d65-93ff-f446d18e1394/archive/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/categories/d96fd086-b149-4d65-93ff-f446d18e1394/archive/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "archive replay"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/categories/?name=%D8%AF%D8%B3%D8%AA%D9%87+%D9%85%D8%B3%D8%AA%D9%82%D9%84+%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%D8%B4%DB%8C",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-MATERIALS-CATEGORY-ARCHIVE--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "archived": "d96fd086-b149-4d65-93ff-f446d18e1394",
+      "archive_events": 1,
+      "referenced_master_preserved": true
+    }
+  },
+  "materials:unit_archive": {
+    "route": "materials:unit_archive",
+    "http": [
+      {
+        "method": "POST",
+        "url": "/materials/units/7fbafdc0-5ead-4321-a025-7437b818a209/archive/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "referenced active master cannot archive"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/units/1ad9a3d0-27ce-4698-b8a0-8c56c69c1236/archive/",
+        "status": 403,
+        "expected": [
+          403
+        ],
+        "case": "insufficient actor"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/units/aaf2d706-72b0-44ee-b3f8-ca6a0aa5b229/archive/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "foreign archive"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/units/",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/units/1ad9a3d0-27ce-4698-b8a0-8c56c69c1236/archive/",
+        "status": 302,
+        "expected": [
+          302
+        ],
+        "case": "form submit"
+      },
+      {
+        "method": "POST",
+        "url": "/materials/units/1ad9a3d0-27ce-4698-b8a0-8c56c69c1236/archive/",
+        "status": 404,
+        "expected": [
+          404
+        ],
+        "case": "archive replay"
+      },
+      {
+        "method": "GET",
+        "url": "/materials/units/?name=%D9%88%D8%A7%D8%AD%D8%AF+%D9%85%D8%B3%D8%AA%D9%82%D9%84+%D8%A2%D8%B2%D9%85%D8%A7%DB%8C%D8%B4%DB%8C",
+        "status": 200,
+        "expected": [
+          200
+        ],
+        "case": "authorized"
+      }
+    ],
+    "design": [],
+    "execution_id": "INV-MATERIALS-UNIT-ARCHIVE--CV-PAR-01",
+    "status": "PASS",
+    "persisted": {
+      "archived": "1ad9a3d0-27ce-4698-b8a0-8c56c69c1236",
+      "archive_events": 1,
+      "referenced_master_preserved": true
+    }
+  }
+}

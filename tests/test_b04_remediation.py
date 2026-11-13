@@ -6,7 +6,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.equipment.forms import DowntimeForm, FuelForm, MeterReadingForm, UsageForm
-from apps.equipment.models import Equipment
+from apps.equipment.models import Equipment, EquipmentAssignment
 from apps.equipment.p8_models import EquipmentUsageLog
 from apps.quality.forms import QualityIssueForm
 from apps.safety.forms import SafetyIncidentForm
@@ -42,6 +42,14 @@ class B04RemediationTests(B02Fixture, TestCase):
         self.assertRedirects(response, reverse("equipment:cost_workbench"))
 
     def test_invalid_usage_displays_domain_error_and_retains_safe_fields(self):
+        EquipmentAssignment.objects.create(
+            organization=self.organization,
+            equipment=self.equipment,
+            project=self.project,
+            site=self.site,
+            status="active",
+            start_date=self.day,
+        )
         response = self.client.post(
             reverse("equipment:usage_create"),
             {
@@ -54,7 +62,7 @@ class B04RemediationTests(B02Fixture, TestCase):
             },
         )
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context["form"].non_field_errors())
+        self.assertIn("ended_at", response.context["form"].errors)
         self.assertContains(response, "preserve-this-reference")
         self.assertFalse(
             EquipmentUsageLog.objects.filter(source_key="B04-invalid").exists()

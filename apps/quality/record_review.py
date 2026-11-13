@@ -1,6 +1,7 @@
 """Separate, source-owned review of QualityIssue records (CEP-027)."""
 
 from collections.abc import Sequence
+from uuid import UUID
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
@@ -19,6 +20,7 @@ from apps.quality.models import (
     QualityReviewStatus,
 )
 from apps.quality.services import _require_permission
+from core.record_review import check_independent_decision
 
 
 def _locked(organization: Organization, issue_id: str) -> QualityIssue:
@@ -170,6 +172,7 @@ def decide_quality_record(
     issue_id: str,
     outcome: str,
     reason: str,
+    submission_id: UUID | None = None,
 ) -> QualityReviewRevision:
     issue = _locked(organization, issue_id)
     _require_permission(
@@ -179,6 +182,12 @@ def decide_quality_record(
         project=issue.project,
         site=issue.site,
     )
+    if submission_id is not None:
+        replay = check_independent_decision(
+            issue, actor, submission_id, outcome, reason
+        )
+        if replay is not None:
+            return replay
     if issue.review_status != QualityReviewStatus.SUBMITTED or outcome not in {
         QualityReviewStatus.APPROVED,
         QualityReviewStatus.REJECTED,
@@ -203,6 +212,7 @@ def correct_returned_quality_record(
     description: str,
     specification_reference: str,
     reason: str,
+    return_id: UUID | None = None,
 ) -> QualityReviewRevision:
     issue = _locked(organization, issue_id)
     _require_permission(
@@ -212,6 +222,12 @@ def correct_returned_quality_record(
         project=issue.project,
         site=issue.site,
     )
+    if return_id is not None:
+        latest = issue.review_revisions.order_by("-sequence").first()
+        if latest is None or latest.pk != return_id or latest.state != "returned":
+            raise ValueError(
+                "رکورد پس از باز کردن فرم تغییر کرده است. آن را دوباره باز کنید."
+            )
     if issue.review_status != QualityReviewStatus.RETURNED or issue.status == "closed":
         raise ValueError("فقط رکورد برگشت‌خورده قابل اصلاح است.")
     prior = issue.review_status

@@ -1,0 +1,46 @@
+{
+  "focused": {
+    "command": "pytest core/test_product_surface.py core/test_home.py tests/test_b10_validation.py tests/test_b09_remediation.py apps/inventory/test_inbound_transfers.py --reuse-db --ds=b11_settings",
+    "passed": 96,
+    "failed": 1,
+    "subtests_passed": 59,
+    "failure": "ProductSurfaceHttpTests.test_reporting_filters_retained_cash_projection_after_authorization",
+    "attribution": "Existing test mocks reporting.views.render, while the B08 view calls render_in_organization_time. Response is 200. Reporting view/test dependency bytes are unchanged by B11.",
+    "raw_log": "focused-regression.log"
+  },
+  "portal_localization": {
+    "passed": 32,
+    "failed": 4,
+    "subtests_passed": 52,
+    "failures": [
+      "SupplierPortalConcurrencyTests.test_concurrent_identical_submission_creates_one_receipt teardown flush cannot truncate billing_progressclaim referenced by billing_claimsettlementallocation",
+      "DeferredUiPatternTests.test_ess_grouping_preserves_permission_gates",
+      "DeferredUiPatternTests.test_navigation_denies_ungranted_destinations_and_has_no_dead_placeholders",
+      "DeferredUiReferenceTests.test_navigation_uses_existing_availability_flags_and_omits_empty_groups"
+    ],
+    "attribution": "No B11 schema or navigation change. The teardown uses flush without cascade. Three legacy tests expect pre-MVP availability/navigation contracts. Current centralized MVP menu and direct-denial browser observations are separate.",
+    "raw_log": "portal-localization-regression.log"
+  },
+  "changed_surface_python": {
+    "passed": 24,
+    "failed": 1,
+    "subtests_passed": 37,
+    "classes": [
+      "SupplierPortalFoundationTests",
+      "Cep003LocalizationAccessibilityTests",
+      "EquipmentPanelTests",
+      "CommercialRevisionDetailTests"
+    ],
+    "failure": "EquipmentPanelTests.test_owner_can_open_scoped_equipment_pages",
+    "attribution": "Legacy EquipmentTestBase creates an owner with legacy role only. No effective governed assignment. Request fails closed with 403 before rendering or reaching changed EquipmentForm. Current explicit-grant Chrome actor passes.",
+    "raw_log": "changed-surface-regression.log"
+  },
+  "exact_final": {
+    "explicit-authorized-organization-and-ambient-time-restoration": "PASS",
+    "payable-labels-scope-deny-default-and-invalid-retention": "PASS",
+    "taxpayer-business-labels-and-organization-isolation": "PASS",
+    "equipment-enhancement-destroy-restores-native-labeled-fallback": "PASS",
+    "platform-tenant-selector-enhancement-cleanup": "PASS"
+  },
+  "policy": "Do not total overlapping runs as unique tests. These are partial suite results, not a green full suite. Existing assertions and infrastructure failures remain visible. Concurrency is not repeated without an attributable change."
+}

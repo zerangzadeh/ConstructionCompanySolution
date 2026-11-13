@@ -197,9 +197,12 @@ class DailyListTests(DailyListFixture, TestCase):
         self.assertNotEqual(self.client.get(self.url).status_code, 200)
 
 
-@override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
+@override_settings(
+    PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"],
+    PRODUCT_SURFACE_PROFILE="FULL_ERP",
+)
 class DailyReportCurrentAuthorityRegressionTests(daily_fixture.DailyReportServiceTests):
-    """Run existing domain tests unchanged after modernizing only their fixture."""
+    """Exercise the original report contract with current grants in FULL_ERP."""
 
     def setUp(self):
         authorized_daily_fixture(self)

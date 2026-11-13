@@ -1,0 +1,125 @@
+{
+  "deployment-active": [
+    {
+      "ok": true,
+      "site": "6feb5c9c-54fe-4534-bce7-2af789f3038a",
+      "project": "953bc7db-5655-46b5-9473-fedc670e0c91"
+    }
+  ],
+  "runtime-limit": [
+    {
+      "ok": true
+    }
+  ],
+  "overlap-limit": [
+    {
+      "ok": true
+    }
+  ],
+  "usage-sibling-choice": [
+    {
+      "ok": true
+    }
+  ],
+  "usage-sibling-forgery": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "chrome-usage-created": [
+    {
+      "ok": true,
+      "usage": "60416722-3aa0-443c-89d9-3bdd538cc0ed",
+      "deployment": "e6fb1101-220c-43d5-b700-05158fc38a4b",
+      "operator": "c8cab9b7-6807-4cc1-91c2-fc6f2a989282",
+      "utc_start": "2026-11-12 13:30:00+00:00",
+      "utc_end": "2026-11-12 15:30:00+00:00"
+    }
+  ],
+  "usage-replay": [
+    {
+      "ok": true
+    }
+  ],
+  "equipment:cost_allocation_create": [
+    {
+      "ok": true,
+      "path": "/equipment/cost/",
+      "errors": "",
+      "pk": "b523e8a3-1e10-41a6-b72b-0d3092c50855"
+    }
+  ],
+  "cost-allocation": [
+    {
+      "ok": true,
+      "amount": "250000.000000",
+      "rate": "125000.000000",
+      "source": "60416722-3aa0-443c-89d9-3bdd538cc0ed"
+    }
+  ],
+  "cost-sibling-scope": [
+    {
+      "ok": true,
+      "status": 403
+    }
+  ],
+  "equipment:cost_allocation_finalize": [
+    {
+      "ok": true,
+      "state": "finalized",
+      "expected": "finalized"
+    }
+  ],
+  "equipment:cost_handoff_create": [
+    {
+      "ok": true,
+      "path": "/equipment/cost/",
+      "errors": "",
+      "pk": "30d2f641-fcc9-4f28-9a40-3c6da59ae9a5"
+    }
+  ],
+  "cost-handoff": [
+    {
+      "ok": true,
+      "usage": "60416722-3aa0-443c-89d9-3bdd538cc0ed",
+      "allocation": "b523e8a3-1e10-41a6-b72b-0d3092c50855",
+      "envelope": "30d2f641-fcc9-4f28-9a40-3c6da59ae9a5",
+      "source_amount": "250000.000000"
+    }
+  ],
+  "equipment:cost_handoff_review": [
+    {
+      "ok": true,
+      "state": "reviewed",
+      "expected": "reviewed"
+    }
+  ],
+  "cost-handoff-replay": [
+    {
+      "ok": true
+    }
+  ],
+  "no-financial-effects": [
+    {
+      "ok": true,
+      "before": {
+        "JournalEntry": 0,
+        "TreasuryMovement": 0,
+        "PaymentRequest": 0,
+        "ProjectCostFact": 0
+      },
+      "after": {
+        "JournalEntry": 0,
+        "TreasuryMovement": 0,
+        "PaymentRequest": 0,
+        "ProjectCostFact": 0
+      }
+    }
+  ],
+  "historical-usage-unchanged": [
+    {
+      "ok": true
+    }
+  ]
+}

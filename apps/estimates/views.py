@@ -281,8 +281,7 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
                 unit_price=data["unit_price"],
             )
         except (PermissionDenied, ValueError) as exc:
-            messages.error(request, str(exc))
-            return redirect(detail_url)
+            item_form.add_error(None, str(exc))
         else:
             return redirect(detail_url)
     return render(

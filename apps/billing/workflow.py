@@ -46,6 +46,7 @@ from apps.workflows.runtime import (
     start_workflow,
 )
 from apps.workflows.validators import validate_workflow_version
+from core.product_surface import surface_profile
 
 from .models import (
     BaselineItem,
@@ -171,6 +172,7 @@ def load_progress_record_subject(
         organization=organization,
         permission=BusinessPermissionCode.PROGRESS_VIEW,
         message="اجازه مشاهده پیشرفت را ندارید.",
+        allow_any_scope=surface_profile() == "MVP",
     )
     queryset = ProgressRecord.objects.select_related(
         "baseline__project", "baseline__contract", "baseline_item"
@@ -189,6 +191,14 @@ def load_progress_record_subject(
         or record.baseline.contract.deleted_at is not None
     ):
         raise PermissionDenied("دامنه رکورد پیشرفت معتبر نیست.")
+    if surface_profile() == "MVP":
+        require_business_permission(
+            user=actor,
+            organization=organization,
+            permission=BusinessPermissionCode.PROGRESS_VIEW,
+            project=record.baseline.project,
+            message="اجازه مشاهده پیشرفت این پروژه را ندارید.",
+        )
     return SubjectSnapshot(
         subject=record,
         subject_id=str(record.pk),
@@ -248,8 +258,14 @@ def _reject_progress_command(
 
 
 def register_progress_verification_workflow() -> None:
+    from .services import require_independent_progress_verifier
+
     registry.bind_subject_loader(PROGRESS_SUBJECT_TYPE, load_progress_record_subject)
-    registry.bind_domain_command("billing.progress.verify", _verify_progress_command)
+    registry.bind_domain_command(
+        "billing.progress.verify",
+        _verify_progress_command,
+        authorize_decision=require_independent_progress_verifier,
+    )
     registry.bind_domain_command("billing.progress.reject", _reject_progress_command)
 
 
@@ -843,6 +859,8 @@ def _complete_progress_work_item(
     reason: str,
     outcome: str,
 ) -> ProgressRecord:
+    from .services import require_independent_progress_verifier
+
     if not reason.strip():
         raise ValidationError("دلیل تصمیم راستی‌آزمایی الزامی است.")
     membership = require_business_permission(
@@ -850,6 +868,7 @@ def _complete_progress_work_item(
         organization=organization,
         permission=VERIFY_PERMISSION,
         message="اجازه راستی‌آزمایی پیشرفت این سازمان را ندارید.",
+        allow_any_scope=outcome == "verified" and surface_profile() == "MVP",
     ) or get_active_membership(user=actor, organization=organization)
     try:
         locked = ProgressRecord.objects.select_for_update().get(
@@ -859,6 +878,8 @@ def _complete_progress_work_item(
         raise PermissionDenied("رکورد پیشرفت متعلق به این سازمان نیست.") from exc
     if locked.status != ProgressRecordStatus.SUBMITTED:
         raise ValidationError("فقط رکورد ارسال‌شده قابل تصمیم‌گیری است.")
+    if outcome == "verified":
+        require_independent_progress_verifier(subject=locked, actor=actor)
     item = _actor_progress_item(
         organization=organization, record=locked, membership=membership
     )

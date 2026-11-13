@@ -112,6 +112,7 @@ class Wave01UXRemediationTests(TestCase):
         payload = {
             "action": "retire",
             "code": operation.code,
+            "operation_id": operation.pk,
             "reason": "Test retirement",
         }
         self.assertEqual(strict.post(url, payload).status_code, 403)

@@ -558,8 +558,11 @@ def contractual_record_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.CONTRACTUAL_RECORDS_PREPARE)
 def contractual_record_create(request: HttpRequest) -> HttpResponse:
+    operation_key = request.POST.get("idempotency_key") or str(uuid.uuid4())
     form = ContractualRecordForm(
-        request.POST or None, organization=request.organization
+        request.POST if request.method == "POST" else None,
+        organization=request.organization,
+        user=request.user,
     )
     if request.method == "POST" and form.is_valid():
         data = form.cleaned_data
@@ -582,8 +585,7 @@ def contractual_record_create(request: HttpRequest) -> HttpResponse:
                 contract_value_impact_assumptions=data[
                     "contract_value_impact_assumptions"
                 ],
-                idempotency_key=request.POST.get("idempotency_key")
-                or str(uuid.uuid4()),
+                idempotency_key=operation_key,
             )
         except (PermissionDenied, ValidationError, ValueError) as exc:
             form.add_error(None, str(exc))
@@ -592,7 +594,7 @@ def contractual_record_create(request: HttpRequest) -> HttpResponse:
     return render(
         request,
         "contracts/contractual_record_form.html",
-        {"form": form, "idempotency_key": str(uuid.uuid4())},
+        {"form": form, "idempotency_key": operation_key},
     )
 
 
@@ -645,9 +647,12 @@ def contractual_record_submit(request: HttpRequest, record_id: str) -> HttpRespo
     if request.method != "POST":
         raise PermissionDenied("این عملیات فقط با درخواست POST مجاز است.")
     record = _contractual_record(request, record_id)
-    submit_contractual_record(
-        organization=request.organization, actor=request.user, record=record
-    )
+    try:
+        submit_contractual_record(
+            organization=request.organization, actor=request.user, record=record
+        )
+    except ValidationError:
+        messages.error(request, "ارسال انجام نشد. وضعیت رکورد را دوباره بررسی کنید.")
     return redirect("contracts:contractual_detail", record_id=record.pk)
 
 
@@ -660,17 +665,22 @@ def contractual_record_decide(request: HttpRequest, record_id: str) -> HttpRespo
     form = ContractualDecisionForm(request.POST)
     if form.is_valid():
         data = form.cleaned_data
-        decide_contractual_record(
-            organization=request.organization,
-            actor=request.user,
-            record=record,
-            approved=data["outcome"] == "approved",
-            reason=data["reason"],
-            entitlement_approved=data.get("entitlement_approved"),
-            approved_amount=data.get("approved_amount"),
-            approved_eot_days=data.get("approved_eot_days"),
-            delay_responsibility=data.get("delay_responsibility", ""),
-        )
+        try:
+            decide_contractual_record(
+                organization=request.organization,
+                actor=request.user,
+                record=record,
+                approved=data["outcome"] == "approved",
+                reason=data["reason"],
+                entitlement_approved=data.get("entitlement_approved"),
+                approved_amount=data.get("approved_amount"),
+                approved_eot_days=data.get("approved_eot_days"),
+                delay_responsibility=data.get("delay_responsibility", ""),
+            )
+        except ValidationError:
+            messages.error(request, "تصمیم ثبت نشد. وضعیت رکورد را دوباره بررسی کنید.")
+    else:
+        messages.error(request, "نوع تصمیم، دلیل و اطلاعات استحقاق را بررسی کنید.")
     return redirect("contracts:contractual_detail", record_id=record.pk)
 
 
@@ -682,17 +692,26 @@ def contractual_record_revision(request: HttpRequest, record_id: str) -> HttpRes
     record = _contractual_record(request, record_id)
     form = ContractualRevisionForm(request.POST)
     if form.is_valid():
-        revised = create_contractual_revision(
-            organization=request.organization,
-            actor=request.user,
-            predecessor=record,
-            revision_action=form.cleaned_data["revision_action"],
-            reason=form.cleaned_data["reason"],
-            title=form.cleaned_data.get("title"),
-            description=form.cleaned_data.get("description"),
-            idempotency_key=request.POST.get("idempotency_key") or str(uuid.uuid4()),
-        )
-        return redirect("contracts:contractual_detail", record_id=revised.pk)
+        try:
+            revised = create_contractual_revision(
+                organization=request.organization,
+                actor=request.user,
+                predecessor=record,
+                revision_action=form.cleaned_data["revision_action"],
+                reason=form.cleaned_data["reason"],
+                title=form.cleaned_data.get("title"),
+                description=form.cleaned_data.get("description"),
+                idempotency_key=request.POST.get("idempotency_key")
+                or str(uuid.uuid4()),
+            )
+        except ValidationError:
+            messages.error(
+                request, "بازنگری ثبت نشد. وضعیت رکورد را دوباره بررسی کنید."
+            )
+        else:
+            return redirect("contracts:contractual_detail", record_id=revised.pk)
+    else:
+        messages.error(request, "نوع و دلیل بازنگری را بررسی کنید.")
     return redirect("contracts:contractual_detail", record_id=record.pk)
 
 
@@ -704,12 +723,19 @@ def contractual_record_withdraw(request: HttpRequest, record_id: str) -> HttpRes
     record = _contractual_record(request, record_id)
     form = ContractualWithdrawalForm(request.POST)
     if form.is_valid():
-        withdraw_contractual_record(
-            organization=request.organization,
-            actor=request.user,
-            record=record,
-            reason=form.cleaned_data["reason"],
-        )
+        try:
+            withdraw_contractual_record(
+                organization=request.organization,
+                actor=request.user,
+                record=record,
+                reason=form.cleaned_data["reason"],
+            )
+        except ValidationError:
+            messages.error(
+                request, "استرداد ثبت نشد. وضعیت رکورد را دوباره بررسی کنید."
+            )
+    else:
+        messages.error(request, "دلیل استرداد را وارد کنید.")
     return redirect("contracts:contractual_detail", record_id=record.pk)
 
 

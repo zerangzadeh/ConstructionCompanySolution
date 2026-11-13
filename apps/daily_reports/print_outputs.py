@@ -3,15 +3,17 @@
 from core.printing import Document, Table, day, moment, value
 
 from .models import DailyReport
+from .submission_snapshots import frozen_entries
 
 
 def daily_document(report: DailyReport) -> Document:
     document = Document(
         "گزارش روزانه",
         metadata=[
-            ("پروژه", value(report.project.name)),
-            ("کارگاه", value(report.site.name)),
-            ("فاز", value(report.phase.name if report.phase else None)),
+            ("پروژه", value(report.project_label)),
+            ("کارگاه", value(report.site_label)),
+            ("فاز", value(report.phase_label)),
+            ("نسخه", value(report.revision_number)),
             ("تاریخ گزارش", day(report.reporting_date)),
             ("وضعیت", value(report.get_status_display())),
             ("آب‌وهوا", value(report.weather_conditions)),
@@ -40,7 +42,7 @@ def daily_document(report: DailyReport) -> Document:
                     value(row.progress_percent),
                     value(row.notes),
                 )
-                for row in report.daily_activities.all()
+                for row in frozen_entries(report, "activities")
             ],
             wide_first=True,
         ),
@@ -54,7 +56,7 @@ def daily_document(report: DailyReport) -> Document:
                     value(row.hours_worked),
                     value(row.notes),
                 )
-                for row in report.labor_entries.all()
+                for row in frozen_entries(report, "labor")
             ],
         ),
         Table(
@@ -62,7 +64,7 @@ def daily_document(report: DailyReport) -> Document:
             ("نام تجهیز", "ساعات کارکرد", "یادداشت"),
             [
                 (value(row.equipment_name), value(row.hours_used), value(row.notes))
-                for row in report.equipment_entries.all()
+                for row in frozen_entries(report, "equipment")
             ],
         ),
         Table(
@@ -75,7 +77,7 @@ def daily_document(report: DailyReport) -> Document:
                     value(row.unit),
                     value(row.notes),
                 )
-                for row in report.material_entries.all()
+                for row in frozen_entries(report, "materials")
             ],
         ),
         Table(
@@ -91,7 +93,7 @@ def daily_document(report: DailyReport) -> Document:
                     value(row.duration_hours),
                     value(row.get_status_display()),
                 )
-                for row in report.delay_events.all()
+                for row in frozen_entries(report, "delays")
             ],
             wide_first=False,
         ),

@@ -21,7 +21,7 @@
         <details class="erp-list-row-menu">
             <summary class="erp-list-action" aria-labelledby="work-item-actions-label-{{ item.pk }} work-item-title-{{ item.pk }}"><span id="work-item-actions-label-{{ item.pk }}" class="sr-only">عملیات</span><span aria-hidden="true">⋯</span></summary>
             <div class="erp-list-row-menu__items">
-                {% if item.source_url and item.source_url|surface_url_exposed %}<a href="{{ item.source_url }}">مشاهده جزئیات</a>{% endif %}
+                {% if item.source_url and item.source_url|surface_url_exposed %}<a href="{{ item.source_url }}">{% if item.purchase_request_reject_via_source %}مشاهده جزئیات و رد درخواست{% else %}مشاهده جزئیات{% endif %}</a>{% endif %}
         <div class="erp-inbox-actions">
             {% if item.can_claim_from_workbench %}<form method="post" action="{% url 'workflows:work_item_claim' item.pk %}">{% csrf_token %}<input type="hidden" name="idempotency_key" value="{{ item.operation_tokens.claim }}"><button class="erp-btn erp-btn--compact erp-btn--primary" type="submit">قبول کار</button></form>{% endif %}
             {% if item.can_release_from_workbench %}<form method="post" action="{% url 'workflows:work_item_release' item.pk %}">{% csrf_token %}<input type="hidden" name="idempotency_key" value="{{ item.operation_tokens.release }}"><button class="erp-btn erp-btn--compact erp-btn--secondary" type="submit">واگذاری کار</button></form>{% endif %}

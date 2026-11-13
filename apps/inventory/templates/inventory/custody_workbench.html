@@ -1,7 +1,10 @@
 {% extends "components/operational_workspace.html" %}{% load erp_format %}
-{% block title %}کنترل موجودی | سامانه مدیریت ساخت{% endblock %}
+{% block title %}{{ receiving_title|default:"کنترل موجودی" }} | سامانه مدیریت ساخت{% endblock %}
 {% block workspace_class %}erp-workspace--inventory{% endblock %}
 {% block workspace_content %}
+{% if receiving_tab %}
+  {% include "inventory/_receiving_transfers.html" %}
+{% else %}
 {% include "components/page_header.html" with page_eyebrow="انبار و امانت" page_title="کنترل مقدار و امانت موجودی" page_description="رزروها، شمارش انبار، انتقال کالا و موعد انقضای اقلام را پیگیری کنید." only %}
 <section class="mt-4" aria-labelledby="inventory-summary-title">
 <h2 id="inventory-summary-title" class="mb-2">خلاصه کنترل موجودی</h2>
@@ -16,6 +19,7 @@
 </section>
 <p class="mt-3 text-xs text-slate-500">خلاصه موجودی شرکت؛ فهرست‌های رزرو، شمارش و انتقال مطابق دسترسی شما و هرکدام حداکثر ۲۰ سابقه دارند.</p>
 <nav class="mt-4 flex flex-wrap gap-2" aria-label="عملیات موجودی">
+  {% if inbound_url %}<a class="erp-btn erp-btn--secondary" href="{{ inbound_url }}">انتقال‌های ورودی در انتظار دریافت</a>{% endif %}
   {% if "inventory_reservations.manage" in business_permission_codes %}<a class="erp-btn erp-btn--primary" href="{% url 'inventory:reservation_create' %}">رزرو جدید</a>{% endif %}
   {% if "inventory_counts.prepare" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'inventory:count_create' %}">شمارش جدید</a>{% endif %}
   {% if "inventory_transfers.prepare" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'inventory:transfer_create' %}">انتقال جدید</a>{% endif %}
@@ -27,4 +31,5 @@
 </div>
 <section class="erp-surface erp-workspace-section mt-6 rounded-xl p-4"><h2 class="font-bold">صف انقضا تا ۳۰ روز آینده</h2><p class="mt-1 text-xs text-slate-500">حداکثر ۲۰ بچ و ۲۰ سریال از صف موجود</p><div class="mt-3 grid gap-2 sm:grid-cols-2">{% for item in expiry_items %}<div class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2"><b>{{ item.material.name }}</b><span class="mr-2" dir="ltr">{{ item.expires_on|jalali_date }}</span><small class="block text-amber-800">{{ item }}</small></div>{% empty %}<p class="text-sm text-slate-500">موردی در صف انقضا نیست.</p>{% endfor %}</div></section>
 <details class="mt-4 text-xs text-slate-500"><summary class="cursor-pointer">درباره کنترل مقدار و امانت</summary><p class="mt-2">این کارتابل فقط مقدار و امانت را کنترل می‌کند و هیچ ارزش‌گذاری، سند حسابداری، هزینه واقعی پروژه یا اثر دارایی ثابت ایجاد نمی‌کند.</p></details>
+{% endif %}
 {% endblock %}

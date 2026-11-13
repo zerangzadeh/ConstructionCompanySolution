@@ -52,6 +52,7 @@ from apps.projects.models import Activity, Project, WBSNode
 from apps.subledgers.models import Obligation, ObligationDirection, SettlementAllocation
 from apps.subledgers.services import allocate_settlement, reverse_settlement
 from apps.treasury.models import TreasuryMovement
+from core.product_surface import surface_profile
 
 from .models import (
     MONEY_QUANTUM,
@@ -931,18 +932,54 @@ def _latest_verified_progress_locked(
     )
 
 
+def progress_verification_separation_error(
+    *, record: ProgressRecord, actor: User
+) -> str:
+    if surface_profile() == "MVP":
+        if actor.pk in (record.created_by_id, record.submitted_by_id):
+            return "ایجادکننده یا ارسال‌کننده نمی‌تواند این کارکرد را تأیید کند."
+        if record.created_by_id is None or record.submitted_by_id is None:
+            return "تأیید کارکرد به ثبت هویت ایجادکننده و ارسال‌کننده نیاز دارد."
+    return ""
+
+
+def require_independent_progress_verifier(
+    *, subject: ProgressRecord, actor: User
+) -> None:
+    if error := progress_verification_separation_error(record=subject, actor=actor):
+        raise PermissionDenied(error)
+
+
 @transaction.atomic
 def _verify_progress_record_domain(
     *, organization: Organization, actor: User, record: ProgressRecord, reason: str
 ) -> ProgressRecord:
-    _require_progress_permission(
-        actor=actor,
-        organization=organization,
-        permission=BusinessPermissionCode.PROGRESS_VERIFY,
-    )
     if not reason.strip():
         raise ValidationError("دلیل راستی‌آزمایی الزامی است.")
     locked = _locked_progress_record(organization=organization, record=record)
+    if surface_profile() == "MVP":
+        project, contract = locked.baseline.project, locked.baseline.contract
+        _validate_project_contract(
+            organization=organization, project=project, contract=contract
+        )
+        if (
+            contract.organization_id != organization.pk
+            or contract.deleted_at is not None
+        ):
+            raise PermissionDenied("قرارداد کارکرد در سازمان فعال در دسترس نیست.")
+        _require_permission(
+            actor=actor,
+            organization=organization,
+            permission=BusinessPermissionCode.PROGRESS_VERIFY,
+            project=project,
+        )
+        require_independent_progress_verifier(subject=locked, actor=actor)
+    else:
+        _require_progress_permission(
+            actor=actor,
+            organization=organization,
+            permission=BusinessPermissionCode.PROGRESS_VERIFY,
+        )
     if locked.status != ProgressRecordStatus.SUBMITTED:
         raise ValidationError("فقط رکورد ارسال‌شده قابل راستی‌آزمایی است.")
     _, item = _locked_progress_baseline_item(

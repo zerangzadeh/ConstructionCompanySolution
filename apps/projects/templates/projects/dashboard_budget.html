@@ -16,7 +16,7 @@
                 </div>
                 <div>
                     <dt>هزینه ثبت‌شده</dt>
-                    <dd>{% if dashboard.actual_cost != None %}<bdi dir="ltr">{{ dashboard.actual_cost|erp_quantity_fa }}</bdi> <span>{{ currency }}</span>{% else %}داده در دسترس نیست{% endif %}</dd>
+                    <dd>{% if dashboard.actual_cost != None %}<bdi dir="ltr">{{ dashboard.actual_cost|erp_quantity_fa }}</bdi> <span>{{ currency }}</span>{% else %}<span aria-label="داده در دسترس نیست">—</span>{% endif %}</dd>
                     {% if comparison %}<dd class="project-budget__bar" aria-hidden="true"><meter max="100" value="{{ comparison.actual_bar|unlocalize }}"></meter></dd>{% endif %}
                 </div>
             </dl>
@@ -32,12 +32,9 @@
             {% endif %}
         </div>
         {% if dashboard.cost_message %}<p class="project-budget__message">{{ dashboard.cost_message }}</p>{% endif %}
-        {% if not cost_projection.coverage_complete %}
-            <p class="project-budget__coverage">پوشش ناقص است. این مقایسه فقط هزینه‌های موجود در سوابق هزینه پروژه را در بر می‌گیرد.</p>
-        {% endif %}
-
         <details class="erp-project-evidence">
             <summary>ردیابی منبع و پوشش</summary>
+            {% if not cost_projection.coverage_complete %}<p>پوشش ناقص است. این مقایسه فقط هزینه‌های موجود در سوابق هزینه پروژه را در بر می‌گیرد.</p>{% endif %}
             {% if dashboard.actual_cost != None %}
                 <div class="erp-project-evidence__totals">
                     <p>تعهد مجاز <bdi dir="ltr">{{ cost_projection.authorized_commitment|erp_quantity_fa }}</bdi> {{ currency }}</p>

@@ -1481,8 +1481,10 @@ def complete_work_item(
         raise PermissionDenied("مجوز دامنه لازم برای این تصمیم را ندارید.")
     threshold_reached = _decision_threshold_reached(step=step)
     command_key = transition.domain_command or step.step_definition.domain_command
+    command = registry.domain_commands.get(command_key) if command_key else None
+    if command and command.authorize_decision:
+        command.authorize_decision(subject=snapshot.subject, actor=actor)
     if threshold_reached and command_key:
-        command = registry.domain_commands.get(command_key)
         if command is None or command.executor is None:
             raise ValidationError("فرمان runtime این دامنه هنوز ثبت نشده است.")
         command.executor(

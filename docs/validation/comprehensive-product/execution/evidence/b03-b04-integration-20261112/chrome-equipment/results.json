@@ -1,0 +1,98 @@
+{
+  "checks": [
+    {
+      "check": "equipment-invalid-runtime-rejected",
+      "pass": true
+    },
+    {
+      "check": "equipment-usage-layout-1440",
+      "pass": true
+    },
+    {
+      "check": "equipment-usage-layout-390",
+      "pass": true
+    },
+    {
+      "check": "equipment-qualified-usage-created",
+      "pass": true,
+      "usage": "de461166-4b96-4e5a-8f37-7a74a90e369c",
+      "deployment": "ff8011db-01e4-414e-9ccf-f6b34af8c54d",
+      "utc_start": "2026-11-01 04:30:00+00:00",
+      "utc_end": "2026-11-01 06:30:00+00:00"
+    },
+    {
+      "check": "no-http-500",
+      "pass": true
+    }
+  ],
+  "pages": [
+    {
+      "label": "equipment-usage",
+      "path": "/equipment/operations/usage/create/",
+      "width": 1440,
+      "scroll": 1440,
+      "dir": "rtl",
+      "main": 1,
+      "headings": [
+        "ثبت کارکرد تجهیز",
+        "اطلاعات اصلی"
+      ]
+    },
+    {
+      "label": "equipment-usage",
+      "path": "/equipment/operations/usage/create/",
+      "width": 390,
+      "scroll": 390,
+      "dir": "rtl",
+      "main": 1,
+      "headings": [
+        "ثبت کارکرد تجهیز",
+        "اطلاعات اصلی"
+      ]
+    }
+  ],
+  "traffic": [
+    [
+      "owner",
+      "GET",
+      "/accounts/login/",
+      200
+    ],
+    [
+      "owner",
+      "POST",
+      "/accounts/login/",
+      302
+    ],
+    [
+      "owner",
+      "GET",
+      "/daily-reports/",
+      200
+    ],
+    [
+      "owner",
+      "GET",
+      "/equipment/operations/usage/create/",
+      200
+    ],
+    [
+      "owner",
+      "POST",
+      "/equipment/operations/usage/create/",
+      200
+    ],
+    [
+      "owner",
+      "POST",
+      "/equipment/operations/usage/create/",
+      302
+    ],
+    [
+      "owner",
+      "GET",
+      "/equipment/operations/",
+      200
+    ]
+  ]
+}

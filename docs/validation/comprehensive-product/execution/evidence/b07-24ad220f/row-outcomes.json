@@ -1,0 +1,482 @@
+{
+  "organizations:select": {
+    "execution_id": "INV-ORGANIZATIONS-SELECT--CV-TEN-01",
+    "status": "PASS",
+    "actual": "A real Chrome login listed the two authorized companies. Foreign company was absent and the unauthenticated attempt redirected to login.",
+    "page": "A real Chrome login listed the two authorized companies. Foreign company was absent and the unauthenticated attempt redirected to login.",
+    "patterns": "DC-03/DC-04/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "organizations:switch": {
+    "execution_id": "INV-ORGANIZATIONS-SWITCH--CV-TEN-01",
+    "status": "PASS",
+    "actual": "Both permitted switches persisted the chosen company. Forging a foreign company ID returned 403 and preserved the prior session.",
+    "page": "Both permitted switches persisted the chosen company. Forging a foreign company ID returned 403 and preserved the prior session.",
+    "patterns": "DC-03/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "organizations:members": {
+    "execution_id": "INV-ORGANIZATIONS-MEMBERS--CV-TEN-01",
+    "status": "PASS",
+    "actual": "The list retained active-company context and contained only that company’s members. A forged company filter and insufficient actor could not disclose foreign rows.",
+    "page": "The list retained active-company context and contained only that company’s members. A forged company filter and insufficient actor could not disclose foreign rows.",
+    "patterns": "DC-03/DC-04/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "organizations:member_detail": {
+    "execution_id": "INV-ORGANIZATIONS-MEMBER-DETAIL--CV-TEN-01",
+    "status": "PASS",
+    "actual": "Scoped member identity and return link rendered. Same-session foreign UUID, foreign admin and insufficient actor were denied.",
+    "page": "Scoped member identity and return link rendered. Same-session foreign UUID, foreign admin and insufficient actor were denied.",
+    "patterns": "DC-03/DC-05",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "organizations:member_profile_image": {
+    "execution_id": "INV-ORGANIZATIONS-MEMBER-PROFILE-IMAGE--CV-TEN-01",
+    "status": "PASS",
+    "actual": "The authorized avatar returned exact PNG bytes with nosniff. Foreign and restricted requests disclosed no image.",
+    "page": "The authorized avatar returned exact PNG bytes with nosniff. Foreign and restricted requests disclosed no image.",
+    "patterns": "DC-05/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "organizations:settings": {
+    "execution_id": "INV-ORGANIZATIONS-SETTINGS--CV-TEN-01",
+    "status": "PASS",
+    "actual": "Company profile and numbering settings saved under the resolved tenant. Restricted submission and the independent tenant stayed unchanged.",
+    "page": "Company profile and numbering settings saved under the resolved tenant. Restricted submission and the independent tenant stayed unchanged.",
+    "patterns": "DC-03/DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "organizations:role_catalog": {
+    "execution_id": "INV-ORGANIZATIONS-ROLE-CATALOG--CV-TEN-01",
+    "status": "PASS",
+    "actual": "The tenant admin saw only local role definitions. The owner without that role and a restricted reader were denied. The foreign role ID returned no role data.",
+    "page": "The tenant admin saw only local role definitions. The owner without that role and a restricted reader were denied. The foreign role ID returned no role data.",
+    "patterns": "DC-03/DC-04/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": "Role and authorization wording"
+  },
+  "organizations:member_update": {
+    "execution_id": "INV-ORGANIZATIONS-MEMBER-UPDATE--CV-TEN-01",
+    "status": "PASS",
+    "actual": "The browser suspended and reactivated the member through the status form. A forged role, last-owner removal and foreign update left state unchanged.",
+    "page": "The browser suspended and reactivated the member through the status form. A forged role, last-owner removal and foreign update left state unchanged.",
+    "patterns": "DC-03/DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "BON-DEF-0040",
+    "po_review": ""
+  },
+  "organizations:member_authorization": {
+    "execution_id": "INV-ORGANIZATIONS-MEMBER-AUTHORIZATION--CV-TEN-01",
+    "status": "PASS",
+    "actual": "An independent approver supported one role and one project-scope grant. The view-only actor saw history and zero mutation controls. Both expiry forms accepted the shared Jalali datetime and stored equal aware expiries.",
+    "page": "An independent approver supported one role and one project-scope grant. The view-only actor saw history and zero mutation controls. Both expiry forms accepted the shared Jalali datetime and stored equal aware expiries.",
+    "patterns": "DC-03/DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json | execution/evidence/b07-24ad220f/retest-expiry/supplemental.json",
+    "defects": "BON-DEF-0041 | BON-DEF-0049",
+    "po_review": ""
+  },
+  "organizations:account_create": {
+    "execution_id": "INV-ORGANIZATIONS-ACCOUNT-CREATE--CV-TEN-01",
+    "status": "PASS",
+    "actual": "Provisioning retained valid input and cleared both credential fields on error. Successful creation issued one scoped membership, a rotation requirement and one audit event.",
+    "page": "Provisioning retained valid input and cleared both credential fields on error. Successful creation issued one scoped membership, a rotation requirement and one audit event.",
+    "patterns": "DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "BON-DEF-0042",
+    "po_review": ""
+  },
+  "organizations:member_password_reset": {
+    "execution_id": "INV-ORGANIZATIONS-MEMBER-PASSWORD-RESET--CV-TEN-01",
+    "status": "PASS",
+    "actual": "The owner reset the selected member with forced rotation and one audit event. Foreign member and restricted actor submissions had no effect.",
+    "page": "The owner reset the selected member with forced rotation and one audit event. Foreign member and restricted actor submissions had no effect.",
+    "patterns": "DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "accounts:connection_requests": {
+    "execution_id": "INV-ACCOUNTS-CONNECTION-REQUESTS--CV-TEN-01",
+    "status": "PASS",
+    "actual": "The pending request appeared only for its target. A foreign actor could neither list it nor use a forged target filter.",
+    "page": "The pending request appeared only for its target. A foreign actor could neither list it nor use a forged target filter.",
+    "patterns": "DC-03/DC-04/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "accounts:connection_request_respond": {
+    "execution_id": "INV-ACCOUNTS-CONNECTION-REQUEST-RESPOND--CV-TEN-01",
+    "status": "PASS",
+    "actual": "Explicit accept and reject applied once. Invalid input preserved the pending request and audit count. Foreign requests were denied.",
+    "page": "Explicit accept and reject applied once. Invalid input preserved the pending request and audit count. Foreign requests were denied.",
+    "patterns": "DC-03/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "BON-DEF-0043",
+    "po_review": ""
+  },
+  "organizations:update_context": {
+    "execution_id": "INV-ORGANIZATIONS-UPDATE-CONTEXT--CV-TEN-01",
+    "status": "PASS",
+    "actual": "The permitted site and parent persisted and rendered. Sibling, foreign and inconsistent selections failed. An unsafe return URL and stale context were cleared.",
+    "page": "The permitted site and parent persisted and rendered. Sibling, foreign and inconsistent selections failed. An unsafe return URL and stale context were cleared.",
+    "patterns": "DC-03/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "organizations:form_context_options": {
+    "execution_id": "INV-ORGANIZATIONS-FORM-CONTEXT-OPTIONS--CV-TEN-01",
+    "status": "PASS",
+    "actual": "The site grant returned exactly the authorized phase. Sibling, foreign and unauthorized probes returned empty choices or denial.",
+    "page": "The site grant returned exactly the authorized phase. Sibling, foreign and unauthorized probes returned empty choices or denial.",
+    "patterns": "DC-03/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "materials:unit_list": {
+    "execution_id": "INV-MATERIALS-UNIT-LIST--CV-PAR-01",
+    "status": "PASS",
+    "actual": "The authorized unit list filtered to the tenant. The restricted reader had no archive controls.",
+    "page": "The authorized unit list filtered to the tenant. The restricted reader had no archive controls.",
+    "patterns": "DC-03/DC-04",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "materials:category_list": {
+    "execution_id": "INV-MATERIALS-CATEGORY-LIST--CV-PAR-01",
+    "status": "PASS",
+    "actual": "The scoped list displayed the local category with search and no reader archive action. The independent tenant saw only its source.",
+    "page": "The scoped list displayed the local category with search and no reader archive action. The independent tenant saw only its source.",
+    "patterns": "DC-03/DC-04",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "materials:material_list": {
+    "execution_id": "INV-MATERIALS-MATERIAL-LIST--CV-PAR-01",
+    "status": "PASS",
+    "actual": "Scoped search and detail navigation resolved the correct local material. The independent tenant and reader retained their own boundaries.",
+    "page": "Scoped search and detail navigation resolved the correct local material. The independent tenant and reader retained their own boundaries.",
+    "patterns": "DC-03/DC-04",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "materials:unit_create": {
+    "execution_id": "INV-MATERIALS-UNIT-CREATE--CV-PAR-01",
+    "status": "PASS",
+    "actual": "Unit code and precision persisted with one audit. Case-normalized duplicate and restricted submissions left the source intact.",
+    "page": "Unit code and precision persisted with one audit. Case-normalized duplicate and restricted submissions left the source intact.",
+    "patterns": "DC-03/DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "materials:category_create": {
+    "execution_id": "INV-MATERIALS-CATEGORY-CREATE--CV-PAR-01",
+    "status": "PASS",
+    "actual": "Category creation recorded one scoped row and audit. Case-normalized duplicate and restricted submission made no change.",
+    "page": "Category creation recorded one scoped row and audit. Case-normalized duplicate and restricted submission made no change.",
+    "patterns": "DC-03/DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "materials:material_create": {
+    "execution_id": "INV-MATERIALS-MATERIAL-CREATE--CV-PAR-01",
+    "status": "PASS",
+    "actual": "The material kept the authorized category and unit. Invalid foreign references and duplicate code retained valid input and created no records.",
+    "page": "The material kept the authorized category and unit. Invalid foreign references and duplicate code retained valid input and created no records.",
+    "patterns": "DC-03/DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "materials:category_detail": {
+    "execution_id": "INV-MATERIALS-CATEGORY-DETAIL--CV-PAR-01",
+    "status": "PASS",
+    "actual": "The maintainer saved the category name. Reader fields were disabled and foreign read and write probes were denied.",
+    "page": "The maintainer saved the category name. Reader fields were disabled and foreign read and write probes were denied.",
+    "patterns": "DC-03/DC-05/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "materials:material_detail": {
+    "execution_id": "INV-MATERIALS-MATERIAL-DETAIL--CV-PAR-01",
+    "status": "PASS",
+    "actual": "The local name update persisted against the original record. A reader could not edit, and foreign records remained inaccessible.",
+    "page": "The local name update persisted against the original record. A reader could not edit, and foreign records remained inaccessible.",
+    "patterns": "DC-03/DC-05/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "materials:governance": {
+    "execution_id": "INV-MATERIALS-GOVERNANCE--CV-PAR-01",
+    "status": "PASS",
+    "actual": "The material steward saw authorized source history. A foreign material lookup returned a private 404 with no disclosure or audit.",
+    "page": "The material steward saw authorized source history. A foreign material lookup returned a private 404 with no disclosure or audit.",
+    "patterns": "DC-03/DC-05/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "BON-DEF-0044",
+    "po_review": ""
+  },
+  "materials:governance_action": {
+    "execution_id": "INV-MATERIALS-GOVERNANCE-ACTION--CV-PAR-01",
+    "status": "PASS",
+    "actual": "One authorized alias persisted with one audit. Missing or foreign material and insufficient actor requests caused no write or server error.",
+    "page": "One authorized alias persisted with one audit. Missing or foreign material and insufficient actor requests caused no write or server error.",
+    "patterns": "DC-05/DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "BON-DEF-0044",
+    "po_review": ""
+  },
+  "materials:material_archive": {
+    "execution_id": "INV-MATERIALS-MATERIAL-ARCHIVE--CV-PAR-01",
+    "status": "PASS",
+    "actual": "Archive set the local material inactive once and removed it from the list. Foreign, restricted and replay attempts caused no change.",
+    "page": "Archive set the local material inactive once and removed it from the list. Foreign, restricted and replay attempts caused no change.",
+    "patterns": "DC-04/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "materials:category_archive": {
+    "execution_id": "INV-MATERIALS-CATEGORY-ARCHIVE--CV-PAR-01",
+    "status": "PASS",
+    "actual": "Unused category archived once. A category with active material, foreign category and unauthorized requests were rejected.",
+    "page": "Unused category archived once. A category with active material, foreign category and unauthorized requests were rejected.",
+    "patterns": "DC-04/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "materials:unit_archive": {
+    "execution_id": "INV-MATERIALS-UNIT-ARCHIVE--CV-PAR-01",
+    "status": "PASS",
+    "actual": "An unused unit archived once. The unit used by active material and denied requests stayed unchanged.",
+    "page": "An unused unit archived once. The unit used by active material and denied requests stayed unchanged.",
+    "patterns": "DC-04/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-tenant-materials/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "workflows:definition_list": {
+    "execution_id": "INV-WORKFLOWS-DEFINITION-LIST--CV-WF-01",
+    "status": "PASS",
+    "actual": "Local draft and version link rendered. Foreign definition remained absent and an ungranted actor received 403.",
+    "page": "Local draft and version link rendered. Foreign definition remained absent and an ungranted actor received 403.",
+    "patterns": "DC-03/DC-04",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "workflows:definition_create": {
+    "execution_id": "INV-WORKFLOWS-DEFINITION-CREATE--CV-WF-01",
+    "status": "PASS",
+    "actual": "Chrome created a scoped draft with no runtime instance. Duplicate input retained the label, and a view-only actor could not create it.",
+    "page": "Chrome created a scoped draft with no runtime instance. Duplicate input retained the label, and a view-only actor could not create it.",
+    "patterns": "DC-03/DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "workflows:version_detail": {
+    "execution_id": "INV-WORKFLOWS-VERSION-DETAIL--CV-WF-01",
+    "status": "PASS",
+    "actual": "The draft detail identified its version and list return. A view-only actor saw no edit link, and foreign versions did not resolve.",
+    "page": "The draft detail identified its version and list return. A view-only actor saw no edit link, and foreign versions did not resolve.",
+    "patterns": "DC-03/DC-05",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "workflows:version_edit": {
+    "execution_id": "INV-WORKFLOWS-VERSION-EDIT--CV-WF-01",
+    "status": "PASS",
+    "actual": "A valid graph persisted four steps. An unregistered command, insufficient actor and foreign version failed without persisting changes.",
+    "page": "A valid graph persisted four steps. An unregistered command, insufficient actor and foreign version failed without persisting changes.",
+    "patterns": "DC-03/DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "workflows:version_action": {
+    "execution_id": "INV-WORKFLOWS-VERSION-ACTION--CV-WF-01",
+    "status": "PASS",
+    "actual": "Validation followed by publication recorded the exact immutable version and one publish audit. Published edit, reader retirement and foreign publication were denied.",
+    "page": "Validation followed by publication recorded the exact immutable version and one publish audit. Published edit, reader retirement and foreign publication were denied.",
+    "patterns": "DC-03/DC-05/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "workflows:workbench": {
+    "execution_id": "INV-WORKFLOWS-WORKBENCH--CV-WF-01",
+    "status": "PASS",
+    "actual": "The candidate saw the assigned item, status and authorized source link. The restricted reader and foreign tenant received no item data.",
+    "page": "The candidate saw the assigned item, status and authorized source link. The restricted reader and foreign tenant received no item data.",
+    "patterns": "DC-03/DC-08/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "workflows:work_item_claim": {
+    "execution_id": "INV-WORKFLOWS-WORK-ITEM-CLAIM--CV-WF-01",
+    "status": "PASS",
+    "actual": "The eligible approver claimed one scoped item with one assignment history event. Restricted, foreign and missing-CSRF attempts were denied.",
+    "page": "The eligible approver claimed one scoped item with one assignment history event. Restricted, foreign and missing-CSRF attempts were denied.",
+    "patterns": "DC-03/DC-08/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "workflows:work_item_release": {
+    "execution_id": "INV-WORKFLOWS-WORK-ITEM-RELEASE--CV-WF-01",
+    "status": "PASS",
+    "actual": "Release removed the current assignee and wrote one release history event. Non-assignee and foreign attempts left state intact.",
+    "page": "Release removed the current assignee and wrote one release history event. Non-assignee and foreign attempts left state intact.",
+    "patterns": "DC-03/DC-08/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "workflows:work_item_action": {
+    "execution_id": "INV-WORKFLOWS-WORK-ITEM-ACTION--CV-WF-01",
+    "status": "PASS",
+    "actual": "The independent approver completed one PR and one history action on the exact version. Maker, foreign actor, unknown outcome and stale replay left no mutation. Rejection used the source reason form.",
+    "page": "The independent approver completed one PR and one history action on the exact version. Maker, foreign actor, unknown outcome and stale replay left no mutation. Rejection used the source reason form.",
+    "patterns": "DC-03/DC-08/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json | execution/evidence/b07-24ad220f/retest-workflow-parties/supplemental.json",
+    "defects": "BON-DEF-0048",
+    "po_review": ""
+  },
+  "workflows:my_requests": {
+    "execution_id": "INV-WORKFLOWS-MY-REQUESTS--CV-WF-01",
+    "status": "PASS",
+    "actual": "The requester saw two own sources. Foreign and forged requester filters could not expose another identity’s requests.",
+    "page": "The requester saw two own sources. Foreign and forged requester filters could not expose another identity’s requests.",
+    "patterns": "DC-03/DC-08/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "workflows:manager_workspace": {
+    "execution_id": "INV-WORKFLOWS-MANAGER-WORKSPACE--CV-WF-01",
+    "status": "PASS",
+    "actual": "The manager saw qualifying team requests and a source link. A title-only actor, foreign actor and other team sources stayed out.",
+    "page": "The manager saw qualifying team requests and a source link. A title-only actor, foreign actor and other team sources stayed out.",
+    "patterns": "DC-03/DC-08/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "parties:list": {
+    "execution_id": "INV-PARTIES-LIST--CV-PAR-01",
+    "status": "PASS",
+    "actual": "Scoped search, read-only browsing, record navigation and a single steward management entry worked at the review sizes.",
+    "page": "Scoped search, read-only browsing, record navigation and a single steward management entry worked at the review sizes.",
+    "patterns": "DC-03/DC-04/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "BON-DEF-0046",
+    "po_review": "Discovery of business Party maintenance from the operational list"
+  },
+  "parties:create": {
+    "execution_id": "INV-PARTIES-CREATE--CV-PAR-01",
+    "status": "PASS",
+    "actual": "Person and company records persisted separately. Duplicate tax identifier retained valid input and created no duplicate or audit.",
+    "page": "Person and company records persisted separately. Duplicate tax identifier retained valid input and created no duplicate or audit.",
+    "patterns": "DC-03/DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "parties:detail": {
+    "execution_id": "INV-PARTIES-DETAIL--CV-PAR-01",
+    "status": "PASS",
+    "actual": "Operational detail remained read-only with a list return and permitted governance link. Foreign and forged reader writes were denied.",
+    "page": "Operational detail remained read-only with a list return and permitted governance link. Foreign and forged reader writes were denied.",
+    "patterns": "DC-03/DC-05/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "parties:governance": {
+    "execution_id": "INV-PARTIES-GOVERNANCE--CV-PAR-01",
+    "status": "PASS",
+    "actual": "The steward saw local master history and create entry. Operational reader and foreign search could not reach protected records.",
+    "page": "The steward saw local master history and create entry. Operational reader and foreign search could not reach protected records.",
+    "patterns": "DC-03/DC-04/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "parties:governance_detail": {
+    "execution_id": "INV-PARTIES-GOVERNANCE-DETAIL--CV-PAR-01",
+    "status": "PASS",
+    "actual": "The identity edit retained the source record and one audited revision. Operational navigation and tenant boundaries held.",
+    "page": "The identity edit retained the source record and one audited revision. Operational navigation and tenant boundaries held.",
+    "patterns": "DC-03/DC-05/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "parties:governance_action": {
+    "execution_id": "INV-PARTIES-GOVERNANCE-ACTION--CV-PAR-01",
+    "status": "PASS",
+    "actual": "Alias persisted on the existing local Party with one audit event. Restricted and foreign action attempts had no effect.",
+    "page": "Alias persisted on the existing local Party with one audit event. Restricted and foreign action attempts had no effect.",
+    "patterns": "DC-05/DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "parties:role_create": {
+    "execution_id": "INV-PARTIES-ROLE-CREATE--CV-PAR-01",
+    "status": "PASS",
+    "actual": "Supplier, client and subcontractor roles reused one identity. Duplicate, unauthorized and foreign role attempts had no effect. Contract and PO selectors reused the existing Party.",
+    "page": "Supplier, client and subcontractor roles reused one identity. Duplicate, unauthorized and foreign role attempts had no effect. Contract and PO selectors reused the existing Party.",
+    "patterns": "DC-05/DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json | execution/evidence/b07-24ad220f/retest-workflow-parties/supplemental.json",
+    "defects": "BON-DEF-0047",
+    "po_review": ""
+  },
+  "parties:contact_create": {
+    "execution_id": "INV-PARTIES-CONTACT-CREATE--CV-PAR-01",
+    "status": "PASS",
+    "actual": "The primary contact stayed on the tenant’s Party. Restricted and foreign writes created no contact.",
+    "page": "The primary contact stayed on the tenant’s Party. Restricted and foreign writes created no contact.",
+    "patterns": "DC-05/DC-06/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json",
+    "defects": "",
+    "po_review": ""
+  },
+  "parties:archive": {
+    "execution_id": "INV-PARTIES-ARCHIVE--CV-PAR-01",
+    "status": "PASS",
+    "actual": "The archive persisted once and retained contract and order references. The protected merge reference returned 403 with its link and audit history intact.",
+    "page": "The archive persisted once and retained contract and order references. The protected merge reference returned 403 with its link and audit history intact.",
+    "patterns": "DC-03/DC-05/DC-09",
+    "evidence": "execution/evidence/b07-24ad220f/retest-workflow-parties/browser-rows.json | execution/evidence/b07-24ad220f/retest-party-history/supplemental.json | execution/evidence/b07-24ad220f/retest-workflow-parties/supplemental.json",
+    "defects": "BON-DEF-0045",
+    "po_review": ""
+  }
+}

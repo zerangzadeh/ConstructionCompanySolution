@@ -3,6 +3,7 @@ from django.http import HttpRequest
 
 from apps.accounts.header_identity import membership_header_identity
 from apps.accounts.platform_user_services import user_management_permissions
+from apps.inventory.p8_services import inventory_transfer_receiving_available
 from apps.organizations.authorization import (
     get_active_membership,
     membership_has_scope,
@@ -109,6 +110,7 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
     my_requests_workspace_available = False
     manager_workspace_entry_available = False
     compliance_workspace_available = False
+    inventory_receiving_available = False
     header_identity = None
     if organization is not None and request.user.is_authenticated:
         try:
@@ -128,6 +130,9 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
                     allow_any_scope=permission_supports_object_scope(code),
                 )
             }
+            inventory_receiving_available = inventory_transfer_receiving_available(
+                membership
+            )
             compliance_workspace_available = (
                 BusinessPermissionCode.COMPLIANCE_VIEW
                 in membership_permission_codes(membership)
@@ -163,6 +168,8 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
             {
                 "my_requests_workspace_available": my_requests_workspace_available,
                 "manager_workspace_available": manager_workspace_entry_available,
+                "inventory_receiving_only": inventory_receiving_available
+                and BusinessPermissionCode.WAREHOUSES_VIEW not in permission_codes,
             },
         )
         if organization is not None and permission_codes
@@ -180,6 +187,7 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
         "header_identity": header_identity,
         "product_navigation_groups": groups,
         "business_permission_codes": permission_codes,
+        "inventory_receiving_available": inventory_receiving_available,
         "compliance_workspace_available": compliance_workspace_available,
         "party_governance_available": BusinessPermissionCode.PARTIES_VIEW
         in permission_codes

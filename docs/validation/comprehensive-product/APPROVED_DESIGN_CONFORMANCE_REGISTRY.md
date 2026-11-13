@@ -27,6 +27,8 @@ Both are recorded as PO_EDITED_CURRENT_BASELINE / FUNCTIONAL_VERIFICATION_PASS /
 
 A final incoming Companies List CSS change arrived after the captured browser pass. Its contents were preserved; responsive verification of that last delta remains BLOCKED by the moving baseline. The captured revision and the current file hashes are listed separately in the preservation evidence.
 
+The later Wave 01 final closeout resolved the historical CSS block. B10 reconfirmed the current Company List and Company Detail at 1440, 1024 and 390 CSS px. Both remain `PO_EDITED_CURRENT_BASELINE / FUNCTIONAL_VERIFICATION_PASS / VISUAL_ACCEPTANCE_PENDING`. [Wave 01 final closeout](execution/WAVE_01_FINAL_UX_CLOSEOUT.md) · [B10 review evidence](execution/B10_FINAL_EXECUTION_REPORT.md#product-owner-decisions)
+
 DC-01 remains a page-specific reference gap for the login and four public recovery rows. A local candidate login design exists at E:/ERP_Construction_Documents/Main Page/BONIRA_Login_10of10_v7_palette_aligned.html. Its filename and contents do not establish Product Owner approval. No separate accepted public-recovery design was located in the reviewed repository evidence. Apply the existing shared authentication, RTL, form, feedback and accessibility standards while those visual decisions remain pending.
 
 ## Projects design decisions recorded 2026-11-12
@@ -39,3 +41,15 @@ Authority is the explicit Product Owner request **BONIRA — Project Dashboard U
 | Project Detail dashboard | `DESIGN_DIRECTION_APPROVED`; final `PO_ACCEPTANCE_PENDING` | The supplied project-dashboard PNG, explicit redesign requirements and current shared UI/color guidance direct this implementation. The [redesign report](execution/B02_PROJECT_DASHBOARD_REDESIGN_REPORT.md) provides before/after images at 1440, 1024 and 390 CSS px. The reference's fictional values, unsupported actions and financial claims confer no implementation authority. |
 
 `IMPLEMENTED`, `TESTED` and `READY_FOR_PO_VISUAL_REVIEW` do not establish Product Owner acceptance of Project Detail. Other page-specific reference gaps and historical observations retain their original meaning.
+
+## B11 conformance closeout · 2026-11-13
+
+[B11 execution](execution/B11_EXECUTION_REPORT.md) reconciles all 302 UI overlay rows. Current Chrome and qualified prior evidence preserve the existing DC-01–DC-11 authorities. Company List PA-03, Company Detail PA-02 and Projects List source fingerprints remain unchanged. Their existing acceptance boundaries remain in force.
+
+Objective corrections are BON-DEF-0062–0064. Equipment and Platform selector cleanup were independently tested, including the native fallback. The Sectioned Form board remains pending separate visual PO acceptance for Expense Create, Expense Draft, Daily Report Create, Safety Create and Quality Create. Authentication/recovery reference gaps, both Company formal visual acceptances and final Project Detail acceptance remain open. B11 technical results do not issue PO acceptance.
+
+## Project Operations Dashboard follow-up · 2026-11-13
+
+The current Product Owner request **BONIRA — Project Detail Dashboard Redesign** supplies approved design direction for the existing Project Detail. The implementation makes WBS and activities the primary operational section, retains source-qualified financial/unavailable states and adds an authorized project-assignment handoff to Equipment and Operations. [Implementation and before/after review](../../../output/project-detail-redesign/REPORT.md).
+
+The new dated verification addresses the Equipment context gap identified in B11. Historical B11 outcomes and original evidence remain unchanged. Projects List and the PO-edited Company pages remain protected. This implementation is `READY_FOR_PO_VISUAL_REVIEW`; final Project Detail visual acceptance remains pending. The supplied image's sample financial values, progress percentages and construction artwork confer no additional business or data authority.

@@ -1,0 +1,42 @@
+{
+  "navigation-boundaries": {
+    "status": "PASS",
+    "detail": {
+      "credential_login_landed_on_dashboard": true,
+      "desktop_and_mobile_destinations": [
+        "/organizations/platform/",
+        "/organizations/platform/companies/",
+        "/organizations/platform/users/",
+        "/organizations/platform/administrators/",
+        "/organizations/platform/roles/",
+        "/organizations/platform/settings/",
+        "/organizations/platform/activity/",
+        "/organizations/platform/status/"
+      ],
+      "keyboard_company_sort": true,
+      "platform_only_tenant_probes": [
+        {
+          "route": "projects:detail",
+          "method": "GET",
+          "status": 302
+        },
+        {
+          "route": "projects:controls_export",
+          "method": "GET",
+          "status": 302
+        },
+        {
+          "route": "projects:create",
+          "method": "POST",
+          "status": 302
+        },
+        {
+          "route": "admin:index",
+          "method": "GET",
+          "status": 403
+        }
+      ],
+      "business_and_audit_state_unchanged": true
+    }
+  }
+}

@@ -38,6 +38,7 @@ class DailyReportStatus(models.TextChoices):
     DRAFT = "draft", "پیش‌نویس"
     SUBMITTED = "submitted", "ارسال‌شده"
     APPROVED = "approved", "تأییدشده"
+    RETURNED = "returned", "بازگشت برای اصلاح"
 
 
 class DailyReport(UUIDModel, TimeStampedModel):
@@ -70,6 +71,14 @@ class DailyReport(UUIDModel, TimeStampedModel):
         related_name="daily_reports",
     )
     reporting_date = models.DateField("تاریخ گزارش")
+    previous_revision = models.OneToOneField(
+        "self", null=True, blank=True, on_delete=models.PROTECT,
+        related_name="next_revision", editable=False,
+    )
+    revision_number = models.PositiveIntegerField(default=1, editable=False)
+    edit_version = models.PositiveBigIntegerField(default=0, editable=False)
+    submission_snapshot = models.JSONField(default=dict, blank=True, editable=False)
+    submission_hash = models.CharField(max_length=64, blank=True, default="", editable=False)
     status = models.CharField(
         "وضعیت",
         max_length=20,
@@ -117,7 +126,23 @@ class DailyReport(UUIDModel, TimeStampedModel):
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["organization", "site", "reporting_date"],
+                condition=models.Q(previous_revision__isnull=True),
                 name="daily_report_org_site_date_uq",
+            ),
+            models.CheckConstraint(
+                condition=(models.Q(previous_revision__isnull=True, revision_number=1)
+                           | models.Q(previous_revision__isnull=False, revision_number__gt=1)),
+                name="daily_report_revision_number_ck",
+            ),
+            models.CheckConstraint(
+                condition=(models.Q(submission_hash="", submission_snapshot={})
+                           | (~models.Q(submission_snapshot={}) & models.Q(submission_hash__regex=r"^[0-9a-f]{64}$"))),
+                name="daily_report_submission_seal_ck",
+            ),
+            models.CheckConstraint(
+                condition=(~models.Q(status="returned") & (models.Q(previous_revision__isnull=True) | models.Q(status="draft")))
+                | ~models.Q(submission_hash=""),
+                name="daily_report_revision_seal_required_ck",
             ),
         ]
         indexes = [  # noqa: RUF012
@@ -135,6 +160,18 @@ class DailyReport(UUIDModel, TimeStampedModel):
             ),
         ]
         ordering = ["-reporting_date", "-created_at"]  # noqa: RUF012
+
+    @property
+    def project_label(self):
+        return self.submission_snapshot.get("labels", {}).get("project") if self.submission_hash else self.project.name
+
+    @property
+    def site_label(self):
+        return self.submission_snapshot.get("labels", {}).get("site") if self.submission_hash else self.site.name
+
+    @property
+    def phase_label(self):
+        return self.submission_snapshot.get("labels", {}).get("phase") if self.submission_hash else (self.phase.name if self.phase_id else None)
 
     def __str__(self) -> str:
         return f"{self.site} - {self.reporting_date}"

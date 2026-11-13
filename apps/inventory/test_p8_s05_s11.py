@@ -12,6 +12,7 @@ from django.utils import timezone
 
 from apps.accounting.models import JournalEntry
 from apps.accounts.models import User
+from apps.audit.models import AuditAction, AuditEvent
 from apps.inventory.models import (
     InventoryCountStatus,
     InventoryReservation,
@@ -469,6 +470,178 @@ class InventoryCustodyServiceTests(InventoryFixtureMixin, TestCase):
         self.assertContains(response, "کنترل مقدار و امانت موجودی")
         self.assertNotContains(response, self.other_warehouse.name)
 
+    def test_failed_reservation_create_rolls_back_draft_and_audit(self) -> None:
+        self.create_and_post(
+            number="RESERVATION-OPENING",
+            transaction_type=StockTransactionType.ADJUSTMENT_IN,
+            quantity=Decimal(5),
+            destination=self.central,
+            actor=self.owner,
+        )
+        self.client.force_login(self.owner)
+        session = self.client.session
+        set_active_organization(session, self.organization)
+        session.save()
+        url = reverse("inventory:reservation_create")
+        payload = {
+            "reservation_number": "RESERVATION-RETRY",
+            "project": self.project.pk,
+            "warehouse": self.central.pk,
+            "material": self.material.pk,
+            "quantity": "6",
+        }
+        events = AuditEvent.objects.filter(
+            organization=self.organization,
+            action=AuditAction.INVENTORY_RESERVATION_TRANSITIONED,
+        )
+        self.assertContains(
+            self.client.post(url, payload), "موجودی قابل رزرو کافی نیست"
+        )
+        self.assertFalse(
+            InventoryReservation.objects.filter(organization=self.organization).exists()
+        )
+        self.assertFalse(events.exists())
+
+        payload["quantity"] = "2"
+        self.assertEqual(self.client.post(url, payload).status_code, 302)
+        self.assertEqual(
+            InventoryReservation.objects.get(organization=self.organization).status,
+            ReservationStatus.ACTIVE,
+        )
+        self.assertEqual(events.count(), 2)
+
+    def test_invalid_count_submission_rolls_back_all_lines_and_retains_input(
+        self,
+    ) -> None:
+        from apps.materials.models import Material
+
+        second_material = Material.objects.create(
+            organization=self.organization,
+            code="BRICK",
+            name="Brick",
+            unit_of_measure=self.unit,
+        )
+        original_material = self.material
+        for material in (original_material, second_material):
+            self.material = material
+            self.create_and_post(
+                number=f"COUNT-OPEN-{material.code}",
+                transaction_type=StockTransactionType.ADJUSTMENT_IN,
+                quantity=Decimal(5),
+                destination=self.central,
+                actor=self.owner,
+            )
+        self.material = original_material
+        count = freeze_inventory_count(
+            organization=self.organization,
+            actor=self.owner,
+            inventory_count=create_inventory_count(
+                organization=self.organization,
+                actor=self.owner,
+                count_number="COUNT-ATOMIC",
+                warehouse=self.central,
+            ),
+        )
+        first, second = count.lines.all()
+        self.client.force_login(self.owner)
+        session = self.client.session
+        set_active_organization(session, self.organization)
+        session.save()
+        url = reverse("inventory:count_detail", args=[count.pk])
+        payload = {
+            f"quantity_{first.pk}": "6",
+            f"reason_{first.pk}": "بازشماری",
+            f"quantity_{second.pk}": "6",
+        }
+        response = self.client.post(url, payload)
+        self.assertContains(response, "برای مغایرت شمارش دلیل الزامی است")
+        self.assertEqual(
+            response.context["submission_form"][f"quantity_{first.pk}"].value(), "6"
+        )
+        self.assertFalse(count.lines.filter(counted_quantity__isnull=False).exists())
+        count.refresh_from_db()
+        self.assertEqual(count.status, InventoryCountStatus.FROZEN)
+        self.assertEqual(
+            AuditEvent.objects.filter(
+                organization=self.organization,
+                entity_id=str(count.pk),
+                action=AuditAction.INVENTORY_COUNT_TRANSITIONED,
+            ).count(),
+            2,
+        )
+
+        payload[f"reason_{second.pk}"] = "بازشماری دوم"
+        self.assertEqual(self.client.post(url, payload).status_code, 302)
+        count.refresh_from_db()
+        self.assertEqual(count.status, InventoryCountStatus.SUBMITTED)
+        self.assertEqual(
+            list(count.lines.values_list("counted_quantity", flat=True)),
+            [Decimal(6), Decimal(6)],
+        )
+
+    def test_inbound_transfer_available_to_destination_project_only_when_in_transit(
+        self,
+    ) -> None:
+        self.create_and_post(
+            number="TRANSFER-OPENING",
+            transaction_type=StockTransactionType.ADJUSTMENT_IN,
+            quantity=Decimal(5),
+            destination=self.central,
+            actor=self.owner,
+        )
+        transfer = create_inventory_transfer(
+            organization=self.organization,
+            actor=self.owner,
+            transfer_number="INBOUND-SCOPE",
+            source_warehouse=self.central,
+            destination_warehouse=self.site,
+            lines=[TransferLineSpec(self.material, Decimal(3))],
+        )
+        member = self.organization.memberships.get(user=self.controller)
+        member.scope_grants.update(
+            scope_type=AuthorizationScopeType.PROJECT, project=self.project
+        )
+        self.client.force_login(self.controller)
+        session = self.client.session
+        set_active_organization(session, self.organization)
+        session.save()
+        detail = reverse("inventory:transfer_detail", args=[transfer.pk])
+        accept = reverse("inventory:transfer_accept", args=[transfer.pk])
+        self.assertEqual(self.client.get(detail).status_code, 404)
+        self.assertEqual(self.client.post(accept).status_code, 404)
+        dispatch_inventory_transfer(
+            organization=self.organization,
+            actor=self.owner,
+            inventory_transfer=transfer,
+        )
+        mark_transfer_in_transit(
+            organization=self.organization,
+            actor=self.owner,
+            inventory_transfer=transfer,
+        )
+
+        response = self.client.get(detail)
+        self.assertContains(response, "ثبت پذیرش مستقل")
+        self.assertEqual(response.context["breadcrumb_url"], reverse("inventory:warehouse_list"))
+        line = transfer.lines.get()
+        payload = {f"accepted_{line.pk}": "3"}
+        self.assertEqual(self.client.post(accept, payload).status_code, 302)
+        self.assertEqual(self.client.post(accept, payload).status_code, 302)
+        transfer.refresh_from_db()
+        line.refresh_from_db()
+        self.assertEqual(transfer.status, InventoryTransferStatus.ACCEPTED)
+        self.assertEqual(transfer.accepted_by, self.controller)
+        self.assertIsNotNone(line.receipt_transaction_id)
+        self.assertEqual(
+            get_stock_balance(
+                user=self.owner,
+                organization=self.organization,
+                warehouse=self.site,
+                material=self.material,
+            ),
+            Decimal(3),
+        )
+
 
 class InventoryCustodyConcurrencyTests(InventoryFixtureMixin, TransactionTestCase):
     serialized_rollback = True
@@ -478,10 +651,16 @@ class InventoryCustodyConcurrencyTests(InventoryFixtureMixin, TransactionTestCas
         self.controller = User.objects.create_user(username="p8-controller")
         self.reviewer = User.objects.create_user(username="p8-reviewer")
         for user in (self.controller, self.reviewer):
-            self.organization.memberships.create(
+            membership = self.organization.memberships.create(
                 user=user,
                 role=MembershipRole.COMPANY_MANAGER,
                 status=MembershipStatus.ACTIVE,
+            )
+            MembershipScopeGrant.objects.create(
+                organization=self.organization,
+                membership=membership,
+                scope_type=AuthorizationScopeType.ORGANIZATION,
+                reason="Independent custody race test authority",
             )
 
     def test_competing_transfer_dispatch_posts_once(self) -> None:

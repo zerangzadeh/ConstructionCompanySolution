@@ -1,5 +1,5 @@
 import json
-from datetime import date
+from datetime import date, datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -16,6 +16,7 @@ from django.http import (
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
@@ -120,6 +121,7 @@ from apps.organizations.services import (
     update_organization_settings,
 )
 from apps.projects.models import ProjectPhase
+from core.forms import parse_jalali_date
 from core.list_filters import apply_table_sorting
 
 
@@ -611,8 +613,12 @@ def update_member(request: HttpRequest, membership_id: str) -> HttpResponse:
         return HttpResponseForbidden("فقط مالک شرکت می‌تواند عضویت مالک را مدیریت کند.")
 
     if request.method == "POST":
+        data = request.POST.copy()
+        # The browser omits the disabled compatibility role field.
+        if "role_definition" not in data and membership.role_definition_id:
+            data["role_definition"] = membership.role_definition.code
         form = OrganizationMembershipForm(
-            request.POST,
+            data,
             instance=membership,
             allow_owner_role=allow_owner_role,
         )
@@ -819,16 +825,24 @@ def member_authorization_response(
                 user=request.user,
                 organization=organization,
                 permission=BusinessPermissionCode.AUTHORIZATION_ROLES_ASSIGN,
-            )
-            if platform_mode
-            else False,
+            ),
             "can_revoke_roles": has_business_permission(
                 user=request.user,
                 organization=organization,
                 permission=BusinessPermissionCode.AUTHORIZATION_ROLES_REVOKE,
-            )
-            if platform_mode
-            else False,
+            ),
+            "can_grant_scope": not platform_mode
+            and has_business_permission(
+                user=request.user,
+                organization=organization,
+                permission=BusinessPermissionCode.AUTHORIZATION_GRANTS_CREATE,
+            ),
+            "can_revoke_scope": not platform_mode
+            and has_business_permission(
+                user=request.user,
+                organization=organization,
+                permission=BusinessPermissionCode.AUTHORIZATION_GRANTS_REVOKE,
+            ),
             "role_assignments": MembershipRoleAssignment.objects.filter(
                 organization=organization,
                 membership=membership,
@@ -1082,15 +1096,35 @@ def protected_operation_catalog(request: HttpRequest) -> HttpResponse:
 
     if not is_platform_admin(request.user):
         return HttpResponseForbidden("فقط Platform Admin به این بخش دسترسی دارد.")
-    form = ProtectedOperationCatalogForm(request.POST or None)
+    action = request.POST.get("action", "create")
+    form = ProtectedOperationCatalogForm(
+        request.POST if request.method == "POST" and action != "retire" else None
+    )
+    operations = list(
+        ProtectedOperation.objects.select_related("created_by", "retired_by")
+    )
+    active_codes = set()
+    for operation in operations:
+        operation.can_retire = (
+            operation.retired_at is None and operation.code not in active_codes
+        )
+        if operation.can_retire:
+            active_codes.add(operation.code)
     if request.method == "POST":
-        action = request.POST.get("action", "create")
         try:
             if action == "retire":
+                expected_operation_id = normalized_uuid(
+                    request.POST.get("operation_id")
+                )
+                if expected_operation_id is None:
+                    raise ValidationError(
+                        "نسخه عملیات را از صفحه تازه‌سازی‌شده انتخاب کنید."
+                    )
                 retire_protected_operation(
                     actor=request.user,
                     code=request.POST.get("code", ""),
                     reason=request.POST.get("reason", ""),
+                    expected_operation_id=expected_operation_id,
                 )
                 messages.success(request, "نسخه فعال عملیات حفاظت‌شده بازنشسته شد.")
             elif form.is_valid():
@@ -1108,13 +1142,19 @@ def protected_operation_catalog(request: HttpRequest) -> HttpResponse:
                     "organizations/protected_operation_catalog.html",
                     {
                         "form": form,
-                        "operations": ProtectedOperation.objects.select_related(
-                            "created_by", "retired_by"
-                        ),
+                        "operations": operations,
                     },
                 )
         except (PermissionDenied, ValidationError, ValueError) as exc:
-            form.add_error(None, str(exc))
+            if action == "retire":
+                messages.error(
+                    request,
+                    " ".join(exc.messages)
+                    if isinstance(exc, ValidationError)
+                    else str(exc),
+                )
+                return redirect("organizations:protected_operation_catalog")
+            form.add_error(None, exc if isinstance(exc, ValidationError) else str(exc))
         else:
             return redirect("organizations:protected_operation_catalog")
     return render(
@@ -1122,11 +1162,23 @@ def protected_operation_catalog(request: HttpRequest) -> HttpResponse:
         "organizations/protected_operation_catalog.html",
         {
             "form": form,
-            "operations": ProtectedOperation.objects.select_related(
-                "created_by", "retired_by"
-            ),
+            "operations": operations,
         },
     )
+
+
+def _expected_policy_update(request: HttpRequest) -> datetime:
+    updated_at = parse_datetime(request.POST.get("expected_updated_at", ""))
+    if updated_at is None or timezone.is_naive(updated_at):
+        raise ValidationError("نسخه سیاست را از صفحه تازه‌سازی‌شده انتخاب کنید.")
+    return updated_at
+
+
+def _platform_policy_date(value: str) -> date:
+    try:
+        return parse_jalali_date(value) if "/" in value else date.fromisoformat(value)
+    except ValueError as exc:
+        raise ValidationError("یک تاریخ معتبر وارد کنید.") from exc
 
 
 @login_required
@@ -1190,11 +1242,11 @@ def platform_policy_catalog(request: HttpRequest) -> HttpResponse:
                     if request.POST.get("insurance_classification_id")
                     else None,
                     "parameters": json.loads(request.POST["parameters"]),
-                    "effective_from": date.fromisoformat(
+                    "effective_from": _platform_policy_date(
                         request.POST["effective_from"]
                     ),
                     "effective_to": (
-                        date.fromisoformat(request.POST["effective_to"])
+                        _platform_policy_date(request.POST["effective_to"])
                         if request.POST.get("effective_to")
                         else None
                     ),
@@ -1209,7 +1261,11 @@ def platform_policy_catalog(request: HttpRequest) -> HttpResponse:
                         **kwargs,
                     )
                 else:
-                    update_platform_policy_version(policy_version=version, **kwargs)
+                    update_platform_policy_version(
+                        policy_version=version,
+                        expected_updated_at=_expected_policy_update(request),
+                        **kwargs,
+                    )
             elif action == "record_source":
                 record_policy_source(
                     actor=request.user,
@@ -1240,7 +1296,7 @@ def platform_policy_catalog(request: HttpRequest) -> HttpResponse:
                     qualification_summary=request.POST["qualification_summary"],
                     independence_statement=request.POST["independence_statement"],
                     evidence_reference=request.POST["evidence_reference"],
-                    reviewed_on=date.fromisoformat(request.POST["reviewed_on"]),
+                    reviewed_on=_platform_policy_date(request.POST["reviewed_on"]),
                     review_scope=request.POST["review_scope"],
                     disposition=request.POST["disposition"],
                     conditions=request.POST.get("conditions", ""),
@@ -1252,6 +1308,7 @@ def platform_policy_catalog(request: HttpRequest) -> HttpResponse:
                         pk=request.POST["policy_version_id"]
                     ),
                     reason=request.POST["reason"],
+                    expected_updated_at=_expected_policy_update(request),
                 )
             elif action == "retire":
                 retire_platform_policy_version(
@@ -1291,6 +1348,7 @@ def platform_policy_catalog(request: HttpRequest) -> HttpResponse:
     }
     for version in versions:
         version.parameters_json = json.dumps(version.parameters, ensure_ascii=False)
+        version.update_token = version.updated_at.isoformat()
         versions_by_code[version.policy.code].append(version)
     return render(
         request,

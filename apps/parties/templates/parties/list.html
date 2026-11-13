@@ -1,4 +1,4 @@
-{% extends "components/operational_list.html" %}{% load table_filters static %}
+{% extends "components/operational_list.html" %}{% load table_filters static product_surface %}
 {% block extra_head %}{{ block.super }}<script src="{% static 'workforce/field_list.js' %}" defer></script>{% endblock %}
 {% block list_root_attributes %}data-field-list{% endblock %}
 {% block title %}طرف‌های تجاری | بنیرا{% endblock %}
@@ -6,10 +6,13 @@
 {% if party_governance_available %}{% url "parties:governance" as governance_url %}{% endif %}
 {% include "components/page_header.html" with page_title="طرف‌های تجاری" page_description="مدیریت فهرست اشخاص و شرکت‌های همکار" page_action_url=governance_url page_action_label="مدیریت و سوابق" page_icon="document" only %}
 {% endblock %}
-{% block list_navigation %}<nav class="erp-list-navigation" aria-label="سطوح طرف تجاری">
-{% if party_governance_available %}<a href="{% url 'parties:governance' %}">مدیریت و سوابق طرف‌های تجاری</a>{% endif %}
-{% if "partner.view" in business_permission_codes %}<a href="{% url 'partner_qualification:workbench' %}">صلاحیت و عملکرد همکاران</a>{% endif %}
-</nav>{% endblock %}
+{% block list_navigation %}
+{% if "partner.view" in business_permission_codes and "partner_qualification:workbench"|surface_exposed %}
+<nav class="erp-list-navigation" aria-label="سطوح طرف تجاری">
+  <a href="{% url 'partner_qualification:workbench' %}">صلاحیت و عملکرد همکاران</a>
+</nav>
+{% endif %}
+{% endblock %}
 {% block list_table %}
 {% if parties %}<table class="erp-responsive-list" aria-label="طرف‌های تجاری"><thead><tr>
 <th scope="col"{% if list_ui.sort.key == 'name' %} aria-sort="{{ list_ui.sort.descending|yesno:'descending,ascending' }}"{% endif %}>{% table_sort_header 'name' 'نام نمایشی' %}</th>

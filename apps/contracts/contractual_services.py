@@ -318,6 +318,8 @@ def add_contractual_evidence(
         code=BusinessPermissionCode.CONTRACTUAL_RECORDS_PREPARE,
         project=locked.project,
     )
+    if locked.status != ContractualRecordStatus.DRAFT:
+        raise ValidationError("شواهد فقط به نسخه پیش‌نویس افزوده می‌شود.")
     allowed = {
         "document_version",
         "project_control_item",
@@ -326,12 +328,23 @@ def add_contractual_evidence(
         "progress_record",
         "payable_measurement",
     }
+    source_fields = {key: value for key, value in source.items() if key in allowed}
+    document_version = source_fields.get("document_version")
+    if document_version is not None and set(source_fields) == {"document_version"}:
+        existing = locked.evidence_links.filter(
+            organization=organization,
+            document_version=document_version,
+            label=label,
+            linked_by=actor,
+        ).first()
+        if existing is not None:
+            return existing
     link = ContractualRecordEvidence(
         organization=organization,
         record=locked,
         label=label,
         linked_by=actor,
-        **{key: value for key, value in source.items() if key in allowed},
+        **source_fields,
     )
     link.save()
     record_audit_event(

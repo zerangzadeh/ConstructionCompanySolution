@@ -296,6 +296,23 @@ class RFQPreparationBrowserTests(CommercialScopeFixture, StaticLiveServerTestCas
                     mustText=["تأمین مصالح پارس"],
                     steps=[
                         self.inspect(
+                            """(() => {
+                                const search = document.querySelector('#rfq-supplier-search');
+                                const supplier = document.querySelector('input[name=supplier_ids]');
+                                const label = supplier.closest('label');
+                                const empty = document.querySelector('[data-supplier-search-empty]');
+                                const filter = value => {
+                                    search.value = value;
+                                    search.dispatchEvent(new Event('input'));
+                                };
+                                filter('بدون نتیجه');
+                                const noMatch = label.hidden && !empty.hidden;
+                                filter('پارس');
+                                return noMatch && !label.hidden && empty.hidden;
+                            })()""",
+                            "supplier search filters the existing authorized checkbox choices",
+                        ),
+                        self.inspect(
                             "document.querySelector('[name=idempotency_key]').type==='hidden' && [...document.querySelectorAll('main input:not([type=hidden]),main textarea')].every(e=>!['idempotency_key','supplier_ids'].includes(e.name)||e.type==='checkbox')",
                             "supplier choices business labelled; retry key internal",
                         )

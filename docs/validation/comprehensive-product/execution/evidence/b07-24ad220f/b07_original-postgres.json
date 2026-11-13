@@ -1,0 +1,153 @@
+{
+  "database": "b07_original",
+  "postgresql": "18.6",
+  "transaction_read_only": "on",
+  "applied_migrations": 462,
+  "connections": [
+    {
+      "target_user__username": "b07-reject-target",
+      "organization__slug": "owner-account-company",
+      "status": "rejected"
+    },
+    {
+      "target_user__username": "b07-reject-target-clean",
+      "organization__slug": "owner-account-company",
+      "status": "rejected"
+    },
+    {
+      "target_user__username": "b07-connection-target",
+      "organization__slug": "owner-account-company",
+      "status": "accepted"
+    }
+  ],
+  "provisioned_accounts": [
+    {
+      "username": "b07-provisioned",
+      "must_change_password": true
+    }
+  ],
+  "provisioned_memberships": [
+    {
+      "organization__slug": "owner-account-company",
+      "status": "active"
+    }
+  ],
+  "targeted_account_audit": [
+    {
+      "organization__slug": "owner-account-company",
+      "action": "account_connection.accepted"
+    },
+    {
+      "organization__slug": "owner-account-company",
+      "action": "account_connection.rejected"
+    },
+    {
+      "organization__slug": "owner-account-company",
+      "action": "account_connection.rejected"
+    },
+    {
+      "organization__slug": "owner-account-company",
+      "action": "organization_account.created"
+    },
+    {
+      "organization__slug": "owner-account-company",
+      "action": "organization_member.password_reset"
+    }
+  ],
+  "purchase_requests": [],
+  "workflow_instances": [],
+  "workflow_assignment_history": [],
+  "party_master": [
+    {
+      "pk": "5df138f7-b8eb-4316-ab8f-6aad6f315ece",
+      "party_kind": "company",
+      "tax_identifier": "",
+      "archived_at": null,
+      "merged_into_id": null
+    },
+    {
+      "pk": "78735ed9-279a-4a83-8f56-b92eeb338484",
+      "party_kind": "company",
+      "tax_identifier": "",
+      "archived_at": "2026-11-12 20:07:05.057572+00:00",
+      "merged_into_id": null
+    },
+    {
+      "pk": "cc25bd77-b713-4bc9-8eee-aea15afee506",
+      "party_kind": "individual",
+      "tax_identifier": "",
+      "archived_at": null,
+      "merged_into_id": null
+    },
+    {
+      "pk": "d39eb33f-bafa-45a7-b29a-9b3749372fe4",
+      "party_kind": "company",
+      "tax_identifier": "",
+      "archived_at": "2026-11-12 20:07:19.748842+00:00",
+      "merged_into_id": "d843ae44-be52-4d4e-95ef-f27a6b0d2794"
+    },
+    {
+      "pk": "d70257e1-a8a3-4c72-988f-3537895bcc86",
+      "party_kind": "company",
+      "tax_identifier": "B07-COMPANY",
+      "archived_at": null,
+      "merged_into_id": null
+    },
+    {
+      "pk": "d843ae44-be52-4d4e-95ef-f27a6b0d2794",
+      "party_kind": "company",
+      "tax_identifier": "",
+      "archived_at": null,
+      "merged_into_id": null
+    },
+    {
+      "pk": "de8a9a9d-619e-4507-9746-6bb2207b36ac",
+      "party_kind": "company",
+      "tax_identifier": "SYNTHETIC-030",
+      "archived_at": "2026-11-12 20:07:18.613986+00:00",
+      "merged_into_id": null
+    },
+    {
+      "pk": "e230ffe3-37a1-4c45-a028-23cf8701b0f8",
+      "party_kind": "individual",
+      "tax_identifier": "B07-PERSON",
+      "archived_at": null,
+      "merged_into_id": null
+    }
+  ],
+  "contract_party": [],
+  "order_supplier": [],
+  "material_foreign_keys": [
+    {
+      "pk": "570e066e-b520-4378-8fd1-ea4ecd8bee21",
+      "code": "B07-M",
+      "category_id": "9e631725-b9b3-41da-8ea9-266f0786c172",
+      "unit_of_measure_id": "2fb4cf1b-4c99-4074-a751-9f13a73e7d65",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "pk": "849d8d90-8c46-4cf1-a002-1b50cb3001b1",
+      "code": "B",
+      "category_id": "9e631725-b9b3-41da-8ea9-266f0786c172",
+      "unit_of_measure_id": "2fb4cf1b-4c99-4074-a751-9f13a73e7d65",
+      "is_active": true,
+      "archived_at": null
+    },
+    {
+      "pk": "a595e1f6-8cc9-40be-9388-5fde9099da95",
+      "code": "A",
+      "category_id": "9e631725-b9b3-41da-8ea9-266f0786c172",
+      "unit_of_measure_id": "2fb4cf1b-4c99-4074-a751-9f13a73e7d65",
+      "is_active": true,
+      "archived_at": null
+    }
+  ],
+  "material_aliases": [
+    {
+      "pk": "343b79a8-dfc1-4c94-b34a-c395c83e18d0",
+      "code": "B07-ALT",
+      "material_id": "a595e1f6-8cc9-40be-9388-5fde9099da95"
+    }
+  ]
+}

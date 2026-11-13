@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from apps.audit.models import AuditAction
@@ -20,6 +21,12 @@ from apps.equipment.p8_models import (
     MaintenanceWorkOrderEvidence,
     MeterReading,
     OperatorEquipmentQualification,
+)
+from apps.equipment.usage_context import (
+    active_usage_deployments,
+    operator_qualifications,
+    usage_dates,
+    usage_interval,
 )
 from apps.inventory.models import (
     StockTransaction,
@@ -139,38 +146,153 @@ def record_usage(
     deployment: EquipmentAssignment | None = None,
     operator=None,
     evidence_reference: str = "",
+    require_active_deployment: bool = False,
 ) -> EquipmentUsageLog:
-    _require(
-        organization, actor, BusinessPermissionCode.EQUIPMENT_USAGE_RECORD, equipment
+    equipment = (
+        Equipment.objects.select_for_update()
+        .filter(pk=equipment.pk, organization=organization, archived_at__isnull=True)
+        .first()
     )
-    existing = EquipmentUsageLog.objects.filter(
-        organization=organization, source_key=source_key
-    ).first()
-    if existing:
+    if equipment is None:
+        raise PermissionDenied("تجهیز در شرکت فعال در دسترس نیست.")
+    permission = BusinessPermissionCode.EQUIPMENT_USAGE_RECORD
+    membership = require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=permission,
+        allow_any_scope=True,
+        message="اجازه ثبت کارکرد تجهیز را ندارید.",
+    )
+    start, end = usage_interval(started_at, ended_at, runtime_hours)
+    existing = (
+        EquipmentUsageLog.objects.filter(
+            organization=organization, source_key=source_key
+        )
+        .select_related("deployment__project", "deployment__site")
+        .first()
+    )
+    if existing is not None:
+        if (
+            existing.created_by_id != actor.pk
+            or existing.equipment_id != equipment.pk
+            or existing.started_at != start
+            or existing.ended_at != end
+            or existing.runtime_hours != runtime_hours
+            or existing.operator_id != getattr(operator, "pk", None)
+            or existing.evidence_reference != evidence_reference
+            or (deployment is not None and existing.deployment_id != deployment.pk)
+            or (require_active_deployment and existing.deployment_id is None)
+        ):
+            raise ValidationError(
+                {"source_key": "کلید منبع قبلاً برای کارکرد دیگری استفاده شده است."}
+            )
+        _require_usage_scope(organization, actor, existing.deployment)
         return existing
+
+    first_day, last_day = usage_dates(organization, start, end)
+    if require_active_deployment:
+        eligible = (
+            active_usage_deployments(membership)
+            .filter(equipment=equipment, start_date__lte=first_day)
+            .filter(Q(end_date__isnull=True) | Q(end_date__gte=last_day))
+        )
+        if deployment is None:
+            choices = list(eligible[:2])
+            if len(choices) != 1:
+                raise ValidationError(
+                    {
+                        "deployment": (
+                            "یکی از تخصیص‌های معتبر را انتخاب کنید."
+                            if choices
+                            else "برای این بازه، تخصیص فعال و مجازی برای تجهیز وجود ندارد."
+                        )
+                    }
+                )
+            deployment = choices[0]
+        else:
+            deployment = eligible.filter(pk=deployment.pk).first()
+            if deployment is None:
+                raise ValidationError(
+                    {"deployment": "تخصیص انتخاب‌شده برای این تجهیز و بازه معتبر نیست."}
+                )
+    elif deployment is not None and (
+        deployment.organization_id != organization.pk
+        or deployment.equipment_id != equipment.pk
+    ):
+        raise ValidationError(
+            {"deployment": "تخصیص انتخاب‌شده با تجهیز یا شرکت سازگار نیست."}
+        )
+    _require_usage_scope(organization, actor, deployment)
+    if (
+        operator is not None
+        and not operator_qualifications(organization, first_day, last_day)
+        .filter(employee=operator, equipment=equipment)
+        .exists()
+    ):
+        raise ValidationError(
+            {
+                "operator": "اپراتور برای این تجهیز در تمام بازه کارکرد صلاحیت معتبر ندارد."
+            }
+        )
+    if EquipmentUsageLog.objects.filter(
+        organization=organization,
+        equipment=equipment,
+        started_at__lt=end,
+        ended_at__gt=start,
+    ).exists():
+        raise ValidationError(
+            {"started_at": "این بازه با کارکرد ثبت‌شده برای همین تجهیز هم‌پوشانی دارد."}
+        )
     log = EquipmentUsageLog(
         organization=organization,
         equipment=equipment,
         deployment=deployment,
         operator=operator,
-        started_at=started_at,
-        ended_at=ended_at,
+        started_at=start,
+        ended_at=end,
         runtime_hours=runtime_hours,
         source_key=source_key,
         evidence_reference=evidence_reference,
         created_by=actor,
     )
-    log.full_clean()
-    log.save()
+    log.full_clean(validate_constraints=False)
+    try:
+        with transaction.atomic():
+            log.save()
+    except IntegrityError as exc:
+        if (
+            getattr(getattr(exc.__cause__, "diag", None), "constraint_name", None)
+            != "equip_usage_org_source_uq"
+        ):
+            raise
+        raise ValidationError(
+            {"source_key": "کلید منبع قبلاً برای کارکرد دیگری استفاده شده است."}
+        ) from exc
     record_audit_event(
         action=AuditAction.EQUIPMENT_OPERATION_RECORDED,
         entity_type="equipment_usage",
         entity_id=log.pk,
         organization=organization,
         actor=actor,
-        metadata={"equipment_id": str(equipment.pk), "source_key": source_key},
+        metadata={
+            "equipment_id": str(equipment.pk),
+            "source_key": source_key,
+            "deployment_id": str(deployment.pk) if deployment else None,
+            "operator_id": str(operator.pk) if operator else None,
+        },
     )
     return log
+
+
+def _require_usage_scope(organization, actor, deployment):
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.EQUIPMENT_USAGE_RECORD,
+        project=deployment.project if deployment else None,
+        site=deployment.site if deployment else None,
+        message="اجازه ثبت کارکرد در محدوده این تخصیص را ندارید.",
+    )
 
 
 @transaction.atomic

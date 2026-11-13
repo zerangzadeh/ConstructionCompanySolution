@@ -1,0 +1,485 @@
+{
+  "observation-submission-pinned-history": {
+    "http": [
+      {
+        "method": "GET",
+        "url": "/daily-reports/field/6c387d65-a6d6-449c-bc73-69e685932026/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/daily-reports/field/6c387d65-a6d6-449c-bc73-69e685932026/submit/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/register/",
+        "status": 403,
+        "case": "Submitted observation immutable evidence",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "Submitted observation immutable evidence",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "status": "submitted",
+      "canonical_hash": "68126763982b3af34aac2528615bcbdbd6bdcf21ecd881e3c9424980a448be95",
+      "evidence": [
+        {
+          "id": "1b099fee-bb10-4b14-97ad-2635ac9392b4",
+          "created_at": "2026-11-13 08:38:38.629317+00:00",
+          "organization_id": "71c660de-0427-4fc5-815f-881f866998c5",
+          "document_id": "b1a94318-7604-484a-8183-3965ad32db28",
+          "created_by_id": "d5396baa-c5a3-4f81-a057-27e29cbeafdf",
+          "legacy_link_id": null,
+          "field_observation_id": "6c387d65-a6d6-449c-bc73-69e685932026",
+          "document_version_id": "8701c9b1-51c2-416a-a220-49c8c9496a25",
+          "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+          "operation_key": "bfb94898-7f43-4309-a4fc-c1dccafc349b",
+          "payload_hash": "054bb1273eb931cbc7049e537597cfad0139d17d24b35b97c3c5a4eb55bd77b0"
+        }
+      ]
+    },
+    "status": "PASS"
+  },
+  "quarantine-immutability": {
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/download/",
+        "status": 403,
+        "case": "Latest quarantined version denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 200,
+        "case": "probe",
+        "expected": [
+          200
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "Latest quarantined version denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "design": [
+      "quarantined-document"
+    ],
+    "state": {
+      "v1_still_deliverable": true,
+      "v3_quarantined_denied": true,
+      "metadata_replacement_denied": true
+    },
+    "status": "PASS"
+  },
+  "material-stale-selection": {
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/material/34a12ffc-b998-4f8d-a7d9-24804d45c7b9/register/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/evidence/material/34a12ffc-b998-4f8d-a7d9-24804d45c7b9/register/",
+        "status": 400,
+        "case": "Stale non-current Material witness",
+        "expected": [
+          400
+        ]
+      }
+    ],
+    "state": {
+      "stale_v1_rejected": true,
+      "historical_v2_preserved": false
+    },
+    "status": "PASS"
+  },
+  "expiry-delivery": {
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/3c5a5066-6bf3-400a-b95a-414f3f3a37d8/download/",
+        "status": 403,
+        "case": "Expired bytes denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "Expired bytes denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "expired_document": "3c5a5066-6bf3-400a-b95a-414f3f3a37d8",
+      "bytes_denied": true
+    },
+    "status": "PASS"
+  },
+  "invalid-files-csrf-private-storage": {
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/upload/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/upload/",
+        "status": 400,
+        "case": "Disallowed signature",
+        "expected": [
+          400
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/upload/",
+        "status": 403,
+        "case": "Missing CSRF",
+        "expected": [
+          403
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/private/",
+        "status": 404,
+        "case": "Path traversal",
+        "expected": [
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/065d9e10-48d0-47af-9f39-bac62de531d3/",
+        "status": 403,
+        "case": "Forged document UUID",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/not-a-uuid/download/",
+        "status": 404,
+        "case": "Malformed exact version identifier",
+        "expected": [
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/media/organizations/71c660de-0427-4fc5-815f-881f866998c5/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/001c4404-e4cc-401f-8874-b2671a2562bb.pdf",
+        "status": 404,
+        "case": "Anonymous direct media path",
+        "expected": [
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/upload/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/upload/",
+        "status": 400,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          400
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "Path traversal",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Forged document UUID",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Malformed exact version identifier",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Anonymous direct media path",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "design": [
+      "invalid-upload-retained-values"
+    ],
+    "expiry_widget": {
+      "type": "text",
+      "jalali": "datetime"
+    },
+    "state": {
+      "invalid_upload_no_storage_write": true,
+      "csrf_required": true,
+      "path_traversal_denied": true,
+      "raw_storage_url_disabled": true
+    },
+    "status": "PASS"
+  },
+  "expired-signed-intent": {
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/link/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/documents/context/project/9c1cf607-bcb8-42bd-a63c-e399296887f2/link/",
+        "status": 400,
+        "case": "Correctly signed but expired intent",
+        "expected": [
+          400
+        ]
+      }
+    ],
+    "state": {
+      "expired_signed_token_rejected": true,
+      "no_delta": true
+    },
+    "status": "PASS"
+  },
+  "concurrent-version-allocation": {
+    "http": [],
+    "state": {
+      "separate_database_connections": true,
+      "workers": [
+        {
+          "id": "48186a06-5553-4319-a20a-1b4e4778f271",
+          "number": 3,
+          "sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a"
+        },
+        {
+          "id": "25a77fac-b28f-4892-99ca-672f17f393ab",
+          "number": 2,
+          "sha256": "9072408dd6906259f1b45d33a24a73b001e97ea42c9766fdc123f90128747587"
+        }
+      ],
+      "current_version": "48186a06-5553-4319-a20a-1b4e4778f271",
+      "v1_preserved": true
+    },
+    "status": "PASS"
+  },
+  "independent-download-ui": {
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 302,
+        "case": "Anonymous exact download requires login",
+        "expected": [
+          302
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "Anonymous exact download requires login",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "authorized_metadata_visible": true,
+      "download_controls_absent": true,
+      "anonymous_bytes_denied": true
+    },
+    "status": "PASS"
+  },
+  "contractual-evidence-and-decision-concurrency": {
+    "http": [],
+    "state": {
+      "record": "614f87d9-3f60-4511-920a-48ad6ad28e85",
+      "concurrent_evidence_ids": [
+        "be788af9-d46d-48ee-aa00-57d0f1f082d8",
+        "be788af9-d46d-48ee-aa00-57d0f1f082d8"
+      ],
+      "decisions": [
+        {
+          "rejected": "ValidationError",
+          "actor": "e61102f5-7525-46d1-bae1-64416ce38db0"
+        },
+        {
+          "status": "approved",
+          "actor": "b34702db-6664-480d-8910-38afa2be52bf"
+        }
+      ],
+      "exact_version": "8701c9b1-51c2-416a-a220-49c8c9496a25",
+      "source_audit": [
+        {
+          "action": "contractual_record.approved",
+          "actor_id": "b34702db-6664-480d-8910-38afa2be52bf"
+        },
+        {
+          "action": "contractual_record.submitted",
+          "actor_id": "d5396baa-c5a3-4f81-a057-27e29cbeafdf"
+        },
+        {
+          "action": "contractual_record.created",
+          "actor_id": "d5396baa-c5a3-4f81-a057-27e29cbeafdf"
+        }
+      ],
+      "separate_connections": true
+    },
+    "status": "PASS"
+  },
+  "all-eight-quarantine-policies": {
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/evidence/safety/1d02627d-72a0-467d-9b4e-65a3b3409d2f/8701c9b1-51c2-416a-a220-49c8c9496a25/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "safety unsafe exact witness denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/quality/e3a86cae-e1f8-45e3-8b8e-86f7407f49a1/8701c9b1-51c2-416a-a220-49c8c9496a25/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "quality unsafe exact witness denied",
+        "expected": [
+          403,
+          404
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/evidence/field_observation/6c387d65-a6d6-449c-bc73-69e685932026/8701c9b1-51c2-416a-a220-49c8c9496a25/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/b1a94318-7604-484a-8183-3965ad32db28/versions/8701c9b1-51c2-416a-a220-49c8c9496a25/download/",
+        "status": 403,
+        "case": "field_observation unsafe exact witness denied",
+        "expected": [
+          403,
+          404
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "safety unsafe exact witness denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "quality unsafe exact witness denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "field_observation unsafe exact witness denied",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "status": "FAIL",
+    "error": "",
+    "exception": "AssertionError"
+  }
+}

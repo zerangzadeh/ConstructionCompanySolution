@@ -1,0 +1,27 @@
+{
+  "authority": "Explicit user B09 validation/remediation request in attachment; no CEP scope expansion",
+  "planned_rows": 65,
+  "scenarios": {
+    "CV-DOC-01": 30,
+    "CV-DOC-02": 35
+  },
+  "product_mutation": "Only confirmed B09 defects with established expected behavior; exact files recorded on confirmation",
+  "evidence_touch_set": [
+    "B09_EXECUTION_REPORT.md",
+    "WAVE_09_SUMMARY.md",
+    "B09_ORIGINAL_RESULTS.csv",
+    "B09_FINAL_RETEST.csv",
+    "execution/evidence/b09-24ad220f/*"
+  ],
+  "shared_files": "Only B09 matrix rows; append B09 confirmed findings to current defect register with concurrent-write checks",
+  "schema": "Apply current repository migrations to newly initialized private B09 cluster only; no schema design change planned",
+  "excluded": [
+    "B10",
+    "commits",
+    "push",
+    "development/demo/production database writes",
+    "new targets",
+    "FULL_ERP exposure",
+    "PO acceptance"
+  ]
+}

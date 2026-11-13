@@ -6,7 +6,7 @@ here describes the visible evidence and does not write financial state.
 
 from decimal import Decimal
 
-from django.db.models import Count
+from django.db.models import Case, Count, F, Q, QuerySet, When
 from django.http import HttpRequest
 from django.urls import reverse
 
@@ -17,9 +17,11 @@ from apps.expenses.services import get_organization_expenses
 from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import BusinessPermissionCode as P
 from apps.projects.business_hub import project_commercial_summary
-from apps.projects.models import Project, ProjectCostFactKind
+from apps.projects.models import Activity, Project, ProjectCostFactKind, WBSNode
 from apps.projects.services import (
+    get_organization_activities,
     get_organization_project_sites,
+    get_organization_wbs_nodes,
     get_project_cost_projection,
 )
 from core.business_choices import contextual_url
@@ -36,6 +38,71 @@ def _budget_comparison(budget: Decimal, actual: Decimal | None) -> dict | None:
         "budget_bar": (budget * 100 / scale).quantize(Decimal("0.01")),
         "actual_bar": (actual * 100 / scale).quantize(Decimal("0.01")),
         "over_budget": actual > budget,
+    }
+
+
+def _work_preview(nodes: QuerySet[WBSNode], activities: QuerySet[Activity]) -> dict:
+    """Bounded presentation of authorized sources; no schedule/progress inference."""
+    visible = list(
+        nodes.order_by("sort_order", "code", "pk").values(
+            "pk", "parent_id", "code", "title"
+        )
+    )
+    children = {}
+    for node in visible:
+        children.setdefault(node["parent_id"], []).append(node)
+    counts = {
+        row["wbs_node_id"]: row
+        for row in activities.order_by()
+        .values("wbs_node_id")
+        .annotate(total=Count("pk"), active=Count("pk", filter=Q(status="active")))
+    }
+
+    def preview(node):
+        # Only traverse authorized nodes. A malformed cycle cannot hang the read.
+        pending, seen, total = [node["pk"]], set(), 0
+        while pending:
+            key = pending.pop()
+            if key in seen:
+                continue
+            seen.add(key)
+            total += counts.get(key, {}).get("total", 0)
+            pending.extend(child["pk"] for child in children.get(key, []))
+        return {**node, "activity_count": total}
+
+    roots = children.get(None, [])
+    packages = []
+    for root in roots[:3]:
+        branch = children.get(root["pk"], [])
+        packages.append(
+            {
+                **preview(root),
+                "children": [preview(child) for child in branch[:2]],
+                "more_children": max(len(branch) - 2, 0),
+            }
+        )
+    sample = list(
+        activities.order_by(
+            Case(
+                When(status="active", then=0),
+                When(status="planning", then=1),
+                default=2,
+            ),
+            F("planned_start_date").asc(nulls_last=True),
+            "code",
+            "pk",
+        )[:5]
+    )
+    total = sum(row["total"] for row in counts.values())
+    return {
+        "nodes": len(visible),
+        "activities": total,
+        "active": sum(row["active"] for row in counts.values()),
+        "packages": packages,
+        "root_count": len(roots),
+        "sample": sample,
+        "more_activities": max(total - len(sample), 0),
+        "more_roots": max(len(roots) - len(packages), 0),
     }
 
 
@@ -236,6 +303,39 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
         access(permission, "projects:controls")
         for permission in (P.PROJECT_CONTROLS_VIEW, P.WBS_NODES_VIEW, P.ACTIVITIES_VIEW)
     )
+    work = None
+    if can_controls:
+        nodes = get_organization_wbs_nodes(
+            user=request.user, organization=request.organization, project_id=project.pk
+        )
+        activities = get_organization_activities(
+            user=request.user, organization=request.organization, project_id=project.pk
+        )
+        work = _work_preview(nodes, activities)
+    equipment_url = ""
+    if all(
+        access(permission, "equipment:list")
+        for permission in (P.EQUIPMENT_VIEW, P.EQUIPMENT_ASSIGNMENTS_VIEW)
+    ):
+        equipment_url = contextual_url("equipment:list", project=project.pk)
+    actions = []
+    for permission, route, label, icon, kind in (
+        (
+            P.DAILY_REPORTS_CREATE,
+            "daily_reports:create",
+            "ثبت گزارش روزانه",
+            "calendar",
+            "create",
+        ),
+        (P.EXPENSES_CREATE, "expenses:create", "ثبت هزینه", "coins", "create"),
+    ):
+        if access(permission, route, site_parent=True):
+            url = (
+                reverse(route, args=[project.pk])
+                if route == "projects:site_list"
+                else contextual_url(route, project=project.pk)
+            )
+            actions.append({"label": label, "url": url, "icon": icon, "kind": kind})
     return {
         "commercial_summary": commercial,
         "cost_projection": projection,
@@ -251,6 +351,14 @@ def project_dashboard(request: HttpRequest, project: Project) -> dict:
             "has_contracts_access": contracts is not None,
             "recent": sorted(recent, key=lambda item: item["date"], reverse=True)[:6],
             "quick_links": links,
+            "quick_actions": actions,
+            "work": work,
+            "equipment_url": equipment_url,
+            "reports_url": contextual_url(
+                "daily_reports:list", project_filter=project.pk
+            )
+            if access(P.DAILY_REPORTS_VIEW, "daily_reports:list", site_parent=True)
+            else "",
             "sites_url": sites_url,
             "controls_url": reverse("projects:controls", args=[project.pk])
             if can_controls

@@ -22,6 +22,7 @@ from apps.organizations.models import (
     ProtectedOperationCode,
 )
 from apps.projects.models import Project, ProjectSite
+from core.forms import JalaliDateMixin
 from core.identifiers import canonicalize_lower_identifier
 
 TEXT_INPUT_CLASS = (
@@ -329,7 +330,7 @@ class OrganizationMemberPasswordResetForm(SetPasswordForm):
         ].help_text = "عضو در ورود بعدی باید گذرواژه شخصی خود را تعیین کند."
 
 
-class MembershipRoleAssignmentForm(forms.Form):
+class MembershipRoleAssignmentForm(JalaliDateMixin, forms.Form):
     role = forms.ModelChoiceField(
         label="نقش عضو",
         queryset=OrganizationRole.objects.none(),
@@ -369,7 +370,7 @@ class MembershipRoleAssignmentForm(forms.Form):
             field.widget.attrs.setdefault("class", TEXT_INPUT_CLASS)
 
 
-class MembershipScopeGrantForm(forms.Form):
+class MembershipScopeGrantForm(JalaliDateMixin, forms.Form):
     scope_type = forms.ChoiceField(
         label="سطح دسترسی به شرکت، پروژه یا کارگاه",
         choices=AuthorizationScopeType.choices,
@@ -452,12 +453,12 @@ class OrganizationAccountCreateForm(forms.Form):
     )
     temporary_password = forms.CharField(
         label="گذرواژه موقت",
-        widget=forms.PasswordInput(render_value=True),
+        widget=forms.PasswordInput,
         help_text="کاربر در نخستین ورود ملزم به تعیین گذرواژه شخصی خواهد بود.",
     )
     temporary_password_confirm = forms.CharField(
         label="تکرار گذرواژه موقت",
-        widget=forms.PasswordInput(render_value=True),
+        widget=forms.PasswordInput,
     )
 
     def __init__(

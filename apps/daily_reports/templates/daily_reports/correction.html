@@ -1,0 +1,52 @@
+{% extends "base.html" %}{% load erp_format %}
+{% block title %}اصلاح گزارش روزانه | بنیرا{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-5xl space-y-5" dir="rtl">
+    {% url 'daily_reports:detail' report.id as back_url %}
+    {% include "components/page_header.html" with page_title="اصلاح گزارش روزانه" page_description=report.site.name page_breadcrumb_label="جزئیات گزارش" page_breadcrumb_url=back_url page_icon="document" only %}
+    <p class="text-sm text-slate-600">نسخه {{ report.revision_number|erp_number }} · {{ report.reporting_date|jalali_date }}
+        · <a class="text-blue-700 underline" href="{% url 'daily_reports:detail' report.previous_revision_id %}">مشاهده نسخه بازگشتی</a>
+    </p>
+    {% if return_reason %}<p class="rounded-lg border border-slate-200 p-3 text-sm whitespace-pre-line break-words">دلیل بازگشت: {{ return_reason }}</p>{% endif %}
+    {% if submit_error %}<p role="alert" class="rounded-lg bg-red-50 p-3 text-sm text-red-800">{{ submit_error }}</p>{% endif %}
+    <section class="erp-surface space-y-4 rounded-xl p-5">
+        <h2 class="font-semibold text-slate-900">شرح گزارش</h2>
+        <form method="post" class="space-y-4" data-correction-header>
+            {% csrf_token %}{{ token.operation_key }}{{ token.expected_version }}
+            {% include "components/form_errors.html" with form=token only %}
+            {% include "components/form_errors.html" with form=header only %}
+            <div class="grid gap-4 sm:grid-cols-2">
+                {% for field in header %}{% include "components/form_field.html" with field=field only %}{% endfor %}
+            </div>
+            <button class="erp-btn erp-btn--primary" type="submit">ذخیره اصلاحات شرح گزارش</button>
+        </form>
+    </section>
+    <div class="grid gap-5 md:grid-cols-2">
+        {% for section in sections %}
+        <section class="erp-surface min-w-0 space-y-3 rounded-xl p-5">
+            <h2 class="font-semibold text-slate-900">{{ section.label }}</h2>
+            <ul class="space-y-2 text-sm">
+                {% for row, label in section.rows %}
+                <li class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                    <span class="min-w-0 break-words">{{ label }}</span>
+                    <a class="shrink-0 text-blue-700 underline" href="{% url 'daily_reports:correction_entry' report.id section.kind row.id %}">ویرایش ردیف</a>
+                </li>
+                {% empty %}<li class="text-slate-500">ردیفی ثبت نشده است.</li>{% endfor %}
+            </ul>
+            {% if section.can_add %}
+            <a class="erp-btn erp-btn--secondary erp-btn--compact" href="{% url 'daily_reports:correction_entry_add' report.id section.kind %}">افزودن ردیف</a>
+            {% endif %}
+        </section>
+        {% endfor %}
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+        {% if can_submit %}
+        <form method="post" action="{% url 'daily_reports:correction_submit' report.id %}">
+            {% csrf_token %}{{ submit_token.operation_key }}{{ submit_token.expected_version }}
+            <button class="erp-btn erp-btn--primary" type="submit">ارسال دوباره برای بررسی</button>
+        </form>
+        {% endif %}
+        <a class="erp-btn erp-btn--secondary" href="{{ back_url }}">بازگشت به جزئیات گزارش</a>
+    </div>
+</div>
+{% endblock %}

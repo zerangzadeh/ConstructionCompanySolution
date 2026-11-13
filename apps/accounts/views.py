@@ -243,11 +243,15 @@ def connection_request_respond(request: HttpRequest, request_id: str) -> HttpRes
     ).first()
     if request_record is None:
         raise Http404
+    decision = request.POST.get("decision")
+    if decision not in {"accept", "reject"}:
+        messages.error(request, "پذیرش یا رد درخواست را انتخاب کنید.")
+        return redirect("accounts:connection_requests")
     try:
         respond_to_account_connection_request(
             target_user=request.user,
             request_record=request_record,
-            accept=request.POST.get("decision") == "accept",
+            accept=decision == "accept",
         )
     except (PermissionDenied, ValueError) as exc:
         messages.error(request, str(exc))

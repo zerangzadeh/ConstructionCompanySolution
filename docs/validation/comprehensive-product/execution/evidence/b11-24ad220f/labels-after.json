@@ -1,0 +1,32 @@
+{
+  "equipment": {
+    "status": 200,
+    "path": "/equipment/create/",
+    "role": "field",
+    "controls": "- main:\n  - navigation \"مسیر صفحه\":\n    - link \"خانه\":\n      - /url: /\n    - link \"تجهیزات\":\n      - /url: /equipment/\n    - text: تجهیز جدید\n  - heading \"تجهیز جدید\" [level=1]\n  - paragraph: شرکت آزمون اصلاحات\n  - form \"تجهیز جدید\":\n    - region \"اطلاعات اصلی\":\n      - heading \"اطلاعات اصلی\" [level=2]\n      - text: کد تجهیز (الزامی)\n      - textbox \"کد تجهیز (الزامی)\"\n      - text: نام تجهیز (الزامی)\n      - textbox \"نام تجهیز (الزامی)\"\n      - text: دسته تجهیز (الزامی)\n      - combobox \"دسته تجهیز (الزامی)\"\n      - text: ⌄\n      - paragraph: از دسته‌های موجود انتخاب کنید یا دسته جدید را وارد کنید.\n      - text: نوع مالکیت (الزامی)\n      - combobox \"نوع مالکیت (الزامی)\":\n        - option \"ملکی\" [selected]\n        - option \"اجاره‌ای\"\n        - option \"لیزینگ\"\n      - text: سازنده\n      - textbox \"سازنده\"\n      - text: مدل\n      - textbox \"مدل\"\n      - text: شماره سریال\n      - textbox \"شماره سریال\"\n      - text: شماره پلاک یا ثبت\n      - textbox \"شماره پلاک یا ثبت\"\n      - text: تاریخ تملک یا شروع اجاره\n      - textbox \"تاریخ تملک یا شروع اجاره\":\n        - /placeholder: ۱۴۰۵/۰۶/۲۳\n      - 'button \"باز کردن تقویم شمسی: تاریخ تملک یا شروع اجاره\"'\n      - text: یادداشت‌ها\n      - textbox \"یادداشت‌ها\"\n    - button \"ثبت\"\n    - link \"انصراف\":\n      - /url: /equipment/",
+    "category": {
+      "labels": [],
+      "outer": "<input type=\"text\" name=\"category\" maxlength=\"120\" class=\"block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 tomselected ts-hidden-accessible\" placeholder=\"انتخاب یا ورود دسته تجهیز…\" data-placeholder=\"انتخاب یا ورود دسته تجهیز…\" data-editable-text-choice=\"true\" data-hide-enhanced-source=\"true\" data-local-choices=\"true\" dir=\"rtl\" aria-describedby=\"id_category-help\" required=\"\" id=\"id_category\" list=\"id_category-choices\" tabindex=\"-1\" aria-hidden=\"true\">"
+    }
+  },
+  "payable": {
+    "status": 200,
+    "path": "/billing/payable-measurements/new/",
+    "role": "payable",
+    "controls": "- main:\n  - navigation \"مسیر صفحه\":\n    - link \"خانه\":\n      - /url: /\n    - text: ثبت کارکرد پیمان جزء\n  - paragraph: کنترل تجاری پرداختنی\n  - heading \"ثبت کارکرد پیمان جزء\" [level=1]\n  - paragraph: اطلاعات فقط در دامنه سازمان و پروژه فعال ثبت می‌شود.\n  - text: ردیف پیمان جزء (الزامی)\n  - combobox \"ردیف پیمان جزء (الزامی)\":\n    - option \"---------\" [selected]\n    - option \"SUB-001 · Excavation\"\n  - text: تاریخ اندازه‌گیری (الزامی)\n  - textbox \"تاریخ اندازه‌گیری (الزامی)\":\n    - /placeholder: ۱۴۰۵/۰۶/۲۳\n  - 'button \"باز کردن تقویم شمسی: تاریخ اندازه‌گیری * (الزامی)\"'\n  - text: مقدار دوره (الزامی)\n  - spinbutton \"مقدار دوره (الزامی)\"\n  - text: مقدار تجمعی (الزامی)\n  - spinbutton \"مقدار تجمعی (الزامی)\"\n  - text: مرجع شواهد (الزامی)\n  - textbox \"مرجع شواهد (الزامی)\"\n  - button \"ثبت کارکرد پیمان جزء\"",
+    "options": [
+      "---------",
+      "SUB-001 · Excavation"
+    ]
+  },
+  "statutory": {
+    "status": 200,
+    "path": "/billing/taxpayer-invoices/new/",
+    "role": "billing",
+    "controls": "- main:\n  - navigation \"مسیر صفحه\":\n    - link \"خانه\":\n      - /url: /\n    - link \"کنترل ضمانت و انطباق\":\n      - /url: /billing/commercial-controls/\n    - text: تهیه صورتحساب مؤدیان\n  - paragraph: کنترل تجاری و شواهد\n  - heading \"تهیه صورتحساب مؤدیان\" [level=1]\n  - paragraph: فقط واقعیت قراردادی یا شاهد بازبینی‌شده ثبت می‌شود؛ نبود اختیار صریح، عملیات را متوقف می‌کند.\n  - text: صورت‌وضعیت تأییدشده (الزامی)\n  - combobox \"صورت‌وضعیت تأییدشده (الزامی)\":\n    - option \"---------\" [selected]\n    - option \"F61-C · صورت‌وضعیت 1 · بازنگری 2\"\n  - text: نوع صورتحساب (الزامی)\n  - combobox \"نوع صورتحساب (الزامی)\":\n    - option \"اصلی\" [selected]\n    - option \"اصلاحی\"\n    - option \"ابطالی\"\n  - text: نسخه پیشین\n  - combobox \"نسخه پیشین\":\n    - option \"---------\" [selected]\n  - text: دلیل ثبت (الزامی)\n  - textbox \"دلیل ثبت (الزامی)\"\n  - button \"تهیه صورتحساب مؤدیان\"",
+    "options": [
+      "---------",
+      "F61-C · صورت‌وضعیت 1 · بازنگری 2"
+    ]
+  }
+}

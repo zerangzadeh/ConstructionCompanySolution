@@ -1,0 +1,251 @@
+{
+  "commercial-create-revision-guarantee": {
+    "http": [
+      {
+        "method": "GET",
+        "url": "/billing/guarantees/new/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/billing/guarantees/new/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/billing/guarantees/e508e8ca-5dc5-4762-bd2e-a63743c4e50a/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      }
+    ],
+    "design": [
+      "commercial-create-guarantee",
+      "commercial-revision-guarantee"
+    ],
+    "status": "FAIL",
+    "error": "Page.expect_response: Timeout 60000ms exceeded while waiting for event \"response\"",
+    "exception": "TimeoutError"
+  },
+  "commercial-create-revision-compliance": {
+    "http": [
+      {
+        "method": "GET",
+        "url": "/billing/compliance-evidence/new/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/billing/compliance-evidence/new/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/billing/compliance-evidence/a34d293b-c3d6-4dbd-95ff-2f3de5b86449/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/billing/compliance-evidence/a34d293b-c3d6-4dbd-95ff-2f3de5b86449/revise/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      }
+    ],
+    "design": [
+      "commercial-create-compliance",
+      "commercial-revision-compliance"
+    ],
+    "state": {
+      "original_source": "a34d293b-c3d6-4dbd-95ff-2f3de5b86449",
+      "original_pin": "9ac48ac2-0432-4069-b429-1062707f4519",
+      "original_sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "successor": "593437c8-be75-4694-b4f5-f22e7d49c119",
+      "successor_pin": "6a15a2f1-9509-43cc-80e3-af388a77d306",
+      "successor_sha256": "9072408dd6906259f1b45d33a24a73b001e97ea42c9766fdc123f90128747587"
+    },
+    "status": "PASS"
+  },
+  "commercial-create-revision-release": {
+    "http": [
+      {
+        "method": "GET",
+        "url": "/billing/retention-releases/new/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/billing/retention-releases/new/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/billing/retention-releases/66be74b3-4d15-4fb4-8469-428fb29631ea/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "/billing/retention-releases/66be74b3-4d15-4fb4-8469-428fb29631ea/correct/",
+        "status": 302,
+        "case": "Actual Chrome form submit",
+        "expected": [
+          302
+        ]
+      }
+    ],
+    "design": [
+      "commercial-create-release",
+      "commercial-revision-release"
+    ],
+    "state": {
+      "original_source": "66be74b3-4d15-4fb4-8469-428fb29631ea",
+      "original_pin": "9ac48ac2-0432-4069-b429-1062707f4519",
+      "original_sha256": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a",
+      "successor": "989e2fd4-23ca-4f99-8a72-a42f3a68bde5",
+      "successor_pin": "6a15a2f1-9509-43cc-80e3-af388a77d306",
+      "successor_sha256": "9072408dd6906259f1b45d33a24a73b001e97ea42c9766fdc123f90128747587"
+    },
+    "status": "PASS"
+  },
+  "mvp-ess-eligible-actor": {
+    "http": [
+      {
+        "method": "GET",
+        "url": "/documents/",
+        "status": 200,
+        "case": "authorized page",
+        "expected": [
+          200
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/mine/",
+        "status": 403,
+        "case": "Eligible ESS actor denied by MVP surface",
+        "expected": [
+          403
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/mine/?profile=FULL_ERP",
+        "status": 403,
+        "case": "Forged profile does not activate ESS",
+        "expected": [
+          403
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/mine/c9a7deb1-9e94-435f-8baa-ecf5918d8ee8/",
+        "status": 403,
+        "case": "Eligible ESS actor denied by MVP surface",
+        "expected": [
+          403
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/mine/c9a7deb1-9e94-435f-8baa-ecf5918d8ee8/?profile=FULL_ERP",
+        "status": 403,
+        "case": "Forged profile does not activate ESS",
+        "expected": [
+          403
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/mine/c9a7deb1-9e94-435f-8baa-ecf5918d8ee8/versions/905d5d92-0ce9-40f6-bea9-c2297ad58e76/download/",
+        "status": 403,
+        "case": "Eligible ESS actor denied by MVP surface",
+        "expected": [
+          403
+        ]
+      },
+      {
+        "method": "GET",
+        "url": "/documents/mine/c9a7deb1-9e94-435f-8baa-ecf5918d8ee8/versions/905d5d92-0ce9-40f6-bea9-c2297ad58e76/download/?profile=FULL_ERP",
+        "status": 403,
+        "case": "Forged profile does not activate ESS",
+        "expected": [
+          403
+        ]
+      }
+    ],
+    "denials": [
+      {
+        "case": "Eligible ESS actor denied by MVP surface",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Forged profile does not activate ESS",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Eligible ESS actor denied by MVP surface",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Forged profile does not activate ESS",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Eligible ESS actor denied by MVP surface",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      },
+      {
+        "case": "Forged profile does not activate ESS",
+        "no_business_audit_storage_delta": true,
+        "no_protected_payload": true
+      }
+    ],
+    "state": {
+      "eligible_under_preserved_domain_policy": true,
+      "mvp_http_routes_denied": 3,
+      "document_hash": "51c7068b7a660de246292a66d15e6f6ae68300633b2a749c37e883a1e0804d9a"
+    },
+    "status": "PASS"
+  }
+}

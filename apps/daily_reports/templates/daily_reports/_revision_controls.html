@@ -1,0 +1,65 @@
+{% load erp_format %}
+{% if revision_history %}
+<section class="erp-surface mt-5 rounded-xl p-5" aria-labelledby="daily-revision-history">
+    <h2 id="daily-revision-history" class="font-semibold text-slate-900">سابقه نسخه‌ها</h2>
+    <ol class="mt-3 space-y-2 text-sm">
+        {% for version, reason in revision_history %}
+        <li class="rounded-lg border border-slate-200 p-3">
+            {% if version.id == report.id %}
+            <span class="font-semibold" aria-current="page">نسخه {{ version.revision_number|erp_number }}</span>
+            {% else %}
+            <a class="font-semibold text-blue-700 underline" href="{% url 'daily_reports:detail' version.id %}">نسخه {{ version.revision_number|erp_number }}</a>
+            {% endif %}
+            <span> · {{ version.get_status_display }}</span>
+            {% if version.submitted_at %}<span> · {{ version.submitted_at|jalali_datetime }}</span>{% endif %}
+            {% if reason %}<p class="mt-1 whitespace-pre-line break-words">دلیل بازگشت: {{ reason }}</p>{% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+</section>
+{% endif %}
+{% if revision_documents %}
+<section class="erp-surface mt-5 rounded-xl p-5" aria-labelledby="daily-pinned-evidence">
+    <h2 id="daily-pinned-evidence" class="font-semibold text-slate-900">مستندات نسخه ثبت‌شده</h2>
+    <ul class="mt-3 space-y-2 text-sm">
+        {% for item in revision_documents %}
+        <li class="flex flex-wrap items-center gap-2">
+            <span class="break-words">{{ item.title }}</span>
+            {% if item.version_id %}
+                <a class="text-blue-700 underline" href="{% url 'documents:version-download' item.document_id item.version_id %}">دریافت نسخه ثبت‌شده</a>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+{% if show_return or return_form.is_bound %}
+<section class="erp-surface mt-5 rounded-xl p-5" aria-labelledby="daily-return-heading">
+    <h2 id="daily-return-heading" class="font-semibold text-slate-900">بازگشت برای اصلاح</h2>
+    <form class="mt-3 space-y-3" method="post" action="{% url 'daily_reports:return' report.id %}">
+        {% csrf_token %}{{ return_form.operation_key }}
+        {% include "components/form_errors.html" with form=return_form only %}
+        {% include "components/form_field.html" with field=return_form.reason only %}
+        <button class="erp-btn erp-btn--secondary" type="submit">بازگرداندن گزارش</button>
+    </form>
+</section>
+{% endif %}
+{% if show_adopt or adoption_form.is_bound %}
+<section class="erp-surface mt-5 rounded-xl p-5">
+    <h2 class="font-semibold text-slate-900">انتقال گزارش به بررسی مستقل</h2>
+    <form class="mt-3 space-y-3" method="post" action="{% url 'daily_reports:adopt' report.id %}">
+        {% csrf_token %}{{ adoption_form.operation_key }}
+        {% include "components/form_errors.html" with form=adoption_form only %}
+        {% include "components/form_field.html" with field=adoption_form.reason only %}
+        <button class="erp-btn erp-btn--secondary" type="submit">انتقال به بررسی مستقل</button>
+    </form>
+</section>
+{% endif %}
+{% if show_start_correction %}
+<form method="post" action="{% url 'daily_reports:correction_start' report.id %}" class="mt-5">
+    {% csrf_token %}{{ start_correction_form.operation_key }}
+    <button class="erp-btn erp-btn--primary" type="submit">ایجاد نسخه اصلاحی</button>
+</form>
+{% elif show_edit_correction %}
+<a class="erp-btn erp-btn--primary mt-5" href="{% url 'daily_reports:correction' report.id %}">ویرایش نسخه اصلاحی</a>
+{% endif %}

@@ -140,7 +140,7 @@ def party_archive(request: HttpRequest, party_id: str) -> HttpResponse:
         archive_business_party(
             organization=request.organization, actor=request.user, party=party
         )
-    except PermissionDenied as exc:
+    except (PermissionDenied, ValueError) as exc:
         return HttpResponseForbidden(str(exc))
     return redirect("parties:governance")
 

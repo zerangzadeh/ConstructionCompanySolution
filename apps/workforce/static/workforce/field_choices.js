@@ -33,6 +33,7 @@
       const editableText = local && select.matches('input[data-editable-text-choice="true"]');
       const initiallyDisabled = select.disabled;
       const originalAriaHidden = select.getAttribute('aria-hidden');
+      const originalLabels = [...(select.labels || [])].map(label => [label, label.htmlFor]);
       let generation = 0, pending;
       const message = (text, visible = false, action = null) => {
         status.textContent = text;
@@ -155,6 +156,7 @@
         if (select.dataset.hideEnhancedSource === 'true') {
           if (originalAriaHidden === null) select.removeAttribute('aria-hidden');
           else select.setAttribute('aria-hidden', originalAriaHidden);
+          for (const [label, target] of originalLabels) label.htmlFor = target;
         }
         container.removeEventListener('click', retry);
         for (const name of dependencies) parent(select, name)?.removeEventListener('change', reset);
